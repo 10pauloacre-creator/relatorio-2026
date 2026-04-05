@@ -1,3 +1,13 @@
+// Configuração do Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyDO-BTsc6pYMBd89WIKEUcz4_iaaD46tR4",
+  authDomain: "relatorio-c693d.firebaseapp.com",
+  projectId: "relatorio-c693d",
+  storageBucket: "relatorio-c693d.firebasestorage.app",
+  messagingSenderId: "457657450375",
+  appId: "1:457657450375:web:15b1335aed2ba9939bdd22",
+  measurementId: "G-3P3SK63P71"
+};
 // ═══════════════════════════════════════════════════════════
 // FIREBASE.JS — Todas as operações com Firebase
 // Autenticação Google + Firestore CRUD
