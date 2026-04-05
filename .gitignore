@@ -1,0 +1,13 @@
+# IMPORTANTE: Este arquivo contém suas credenciais do Firebase!
+# NUNCA commite firebase-config.js com suas chaves reais.
+firebase-config.js
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+*.swp
+*.swo

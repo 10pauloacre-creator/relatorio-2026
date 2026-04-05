@@ -1,0 +1,46 @@
+{
+  "name": "Relatório Diário 2026 — Pe. Carlos Casavequia",
+  "short_name": "Relatório 2026",
+  "description": "Diário de aulas do Prof. Paulo Roberto — E.E. Rural Pe. Carlos Casavequia",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a3a2a",
+  "theme_color": "#1a3a2a",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/icons/screenshot.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "shortcuts": [
+    {
+      "name": "1ª Série",
+      "url": "./index.html#t1",
+      "description": "Abrir turma 1ª Série"
+    },
+    {
+      "name": "Plano Anual",
+      "url": "./index.html#plano",
+      "description": "Abrir Plano Anual"
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+.plano-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  align-items: flex-end;
+}
+
+.filtro-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filtro-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cinza-medio);
+  font-weight: 600;
+}
+
+.filtro-select {
+  border: 1px solid var(--cinza-claro);
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  color: var(--cinza-escuro);
+  background: white;
+  cursor: pointer;
+  min-width: 160px;
+  transition: border-color 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a5a5a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+.filtro-select:focus {
+  outline: none;
+  border-color: var(--verde-claro);
+}
+
+.bimestre-section {
+  margin-bottom: 32px;
+}
+
+.bimestre-header {
+  background: linear-gradient(135deg, var(--verde-escuro), var(--verde-medio));
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 16px 20px;
+}
+
+.bimestre-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bimestre-stats {
+  font-size: 0.78rem;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+.bimestre-progresso {
+  margin-top: 10px;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bimestre-progresso-fill {
+  height: 100%;
+  background: var(--ouro);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.lista-aulas {
+  border: 1px solid var(--cinza-claro);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+}
+
+.aula-item {
+  border-bottom: 1px solid var(--cinza-claro);
+  transition: background 0.15s;
+}
+
+.aula-item:last-child {
+  border-bottom: none;
+}
+
+.aula-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.aula-header-row:hover {
+  background: var(--creme);
+}
+
+.aula-numero {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--cinza-medio);
+  width: 24px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.aula-titulo-text {
+  flex: 1;
+  font-size: 0.88rem;
+  color: var(--cinza-escuro);
+  line-height: 1.4;
+}
+
+.aula-titulo-text.aplicada {
+  text-decoration: line-through;
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+.aula-titulo-text.pulada {
+  font-style: italic;
+}
+
+.aula-indicadores {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.status-panel {
+  background: var(--creme);
+  padding: 10px 16px 10px 52px;
+  display: none;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  border-top: 1px solid var(--cinza-claro);
+}
+
+.aula-item.expandido .status-panel {
+  display: flex;
+}
+
+.status-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--cinza-claro);
+  background: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-btn:hover {
+  border-color: var(--verde-claro);
+}
+
+.status-btn.ativo-aplicada {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: white;
+}
+
+.status-btn.ativo-pulada {
+  background: #ca8a04;
+  border-color: #ca8a04;
+  color: white;
+}
+
+.status-btn.ativo-simaed {
+  background: var(--azul-info);
+  border-color: var(--azul-info);
+  color: white;
+}
+
+.indicador-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.ind-aplicada {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.ind-pulada {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.ind-simaed {
+  background: #dbeeff;
+  color: var(--azul-info);
+}

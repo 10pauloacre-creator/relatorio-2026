@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a3a2a">
+<meta name="description" content="Relatório Diário de Aulas 2026 — Prof. Paulo Roberto — E.E. Rural Pe. Carlos Casavequia">
+<title>Relatório Diário 2026 — Pe. Carlos Casavequia</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/editor.css">
+<link rel="stylesheet" href="assets/css/plano.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+
+<!-- Firebase SDK v9 (modular via CDN compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  // Adapta a API compat para as funções do firebase.js
+  document.addEventListener('DOMContentLoaded', function() {
+    window.firebase_app       = { initializeApp: function(cfg) { return firebase.initializeApp(cfg); } };
+    window.firebase_auth      = {
+      getAuth: function(app) { return app.auth(); },
+      GoogleAuthProvider: firebase.auth.GoogleAuthProvider,
+      signInWithPopup: function(auth, provider) { return auth.signInWithPopup(provider); },
+      onAuthStateChanged: function(auth, cb) { return auth.onAuthStateChanged(cb); },
+      signOut: function(auth) { return auth.signOut(); },
+      browserLocalPersistence: firebase.auth.Auth.Persistence.LOCAL,
+      setPersistence: function(auth, p) { return auth.setPersistence(p); }
+    };
+    window.firebase_firestore = {
+      getFirestore: function(app) { return app.firestore(); },
+      doc: function(db, path) {
+        var parts = path.split('/');
+        var ref = db.collection(parts[0]).doc(parts[1]);
+        for (var i = 2; i < parts.length - 1; i += 2) {
+          ref = ref.collection(parts[i]).doc(parts[i+1]);
+        }
+        return ref;
+      },
+      collection: function(db, path) {
+        var parts = path.split('/');
+        var ref = db.collection(parts[0]);
+        for (var i = 1; i < parts.length - 1; i += 2) {
+          ref = ref.doc(parts[i]).collection(parts[i+1]);
+        }
+        return ref;
+      },
+      setDoc: function(ref, data, opts) { return opts && opts.merge ? ref.set(data, {merge:true}) : ref.set(data); },
+      getDoc: function(ref) { return ref.get(); },
+      getDocs: function(q) { return q.get ? q.get() : q; },
+      orderBy: function(field, dir) { return { _field: field, _dir: dir || 'asc' }; },
+      query: function(col) {
+        var q = col;
+        for (var i = 1; i < arguments.length; i++) {
+          var arg = arguments[i];
+          if (arg && arg._field) q = q.orderBy(arg._field, arg._dir);
+          if (arg && arg._limit) q = q.limit(arg._limit);
+        }
+        return q;
+      },
+      limit: function(n) { return { _limit: n }; },
+      deleteDoc: function(ref) { return ref.delete(); },
+      serverTimestamp: function() { return firebase.firestore.FieldValue.serverTimestamp(); }
+    };
+  });
+</script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     TELA DE LOGIN
+══════════════════════════════════════════════════════ -->
+<div id="tela-login" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1a3a2a 0%,#2d6147 60%,#4a9467 100%);">
+  <div class="login-card" style="background:white;border-radius:20px;padding:48px 40px;max-width:400px;width:90%;box-shadow:0 24px 80px rgba(0,0,0,0.25);text-align:center;">
+    <div style="font-size:3.5rem;margin-bottom:16px;">📚</div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#1a3a2a;margin-bottom:6px;">Relatório Diário 2026</h1>
+    <p style="font-size:0.82rem;color:#5a5a5a;margin-bottom:4px;">E.E. Rural Pe. Carlos Casavequia</p>
+    <p style="font-size:0.78rem;color:#5a5a5a;margin-bottom:32px;">Senador Guiomard – AC</p>
+    <button id="btn-google-login" style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:13px 20px;border:1.5px solid #e8e5de;border-radius:10px;background:white;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:500;color:#2b2b2b;transition:box-shadow 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Entrar com Google
+    </button>
+    <p id="login-erro" style="display:none;margin-top:16px;font-size:0.8rem;color:#c0392b;background:#fdecea;padding:8px 12px;border-radius:6px;"></p>
+    <p style="margin-top:24px;font-size:0.72rem;color:#999;">Acesso restrito ao professor autorizado</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     APLICATIVO PRINCIPAL
+══════════════════════════════════════════════════════ -->
+<div id="app" style="display:none;flex-direction:column;height:100vh;">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button id="btn-menu-mobile" style="display:none;background:none;border:none;color:white;font-size:1.3rem;cursor:pointer;padding:8px;margin-right:4px;" title="Menu">☰</button>
+    <div class="topbar-logo">
+      <span>📚</span>
+      <span style="font-family:'Playfair Display',serif;color:#c9a84c;font-size:0.92rem;margin-left:8px;">Relatório 2026</span>
+    </div>
+    <div id="sync-indicator" class="sync-indicator sync-salvo" style="margin-left:16px;">
+      <span>🟢</span><span>Salvo</span>
+    </div>
+    <div class="topbar-actions">
+      <button id="btn-historico" style="display:none;background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:0.78rem;">⏱ Histórico</button>
+      <button id="btn-editar">✏️ Editar</button>
+      <img id="user-avatar" class="user-avatar" src="" alt="Usuário" style="display:none;">
+      <button id="btn-logout" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:0.78rem;padding:6px;">Sair</button>
+    </div>
+  </div>
+
+  <!-- LAYOUT PRINCIPAL -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar" class="sidebar">
+      <nav>
+        <button class="nav-item ativo" data-pagina="geral">
+          <span>📋</span><span>Geral</span>
+        </button>
+        <div class="nav-sep"></div>
+        <button class="nav-item" data-pagina="t1">
+          <span>1ª</span><span>1ª Série</span>
+        </button>
+        <button class="nav-item" data-pagina="t2">
+          <span>2ª</span><span>2ª Série</span>
+        </button>
+        <button class="nav-item" data-pagina="t3">
+          <span>3ª</span><span>3ª Série</span>
+        </button>
+        <button class="nav-item" data-pagina="t6">
+          <span>6º</span><span>6º Ano</span>
+        </button>
+        <div class="nav-sep"></div>
+        <button class="nav-item" data-pagina="plano">
+          <span>📚</span><span>Plano Anual</span>
+        </button>
+        <button class="nav-item" data-pagina="cronograma">
+          <span>📅</span><span>Cronograma</span>
+        </button>
+        <button class="nav-item" data-pagina="contador">
+          <span>📊</span><span>Contador</span>
+        </button>
+      </nav>
+    </div>
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <!-- ÁREA DE CONTEÚDO -->
+    <div class="content">
+
+      <!-- ══ GERAL ══ -->
+      <div class="page visivel" id="page-geral">
+        <div class="page-header">
+          <div class="turma-badge">2026</div>
+          <div class="page-title">
+            <h2>Visão Geral — Todas as Turmas</h2>
+            <p>Língua Portuguesa · Artes · Trilhas de Ciências Humanas e Linguagens</p>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="num">1</div><div class="label">Dias de Aula</div></div>
+          <div class="stat-card"><div class="num">4</div><div class="label">Aulas Registradas</div></div>
+          <div class="stat-card"><div class="num">4</div><div class="label">Turmas Monitoradas</div></div>
+          <div class="stat-card alerta"><div class="num">3</div><div class="label">Obs. Comportamentais</div></div>
+        </div>
+
+        <div id="page-content-geral">
+          <!-- Entrada 30/03 -->
+          <div class="entrada-aula">
+            <div class="entrada-header">
+              <div class="entrada-data-bloco"><div class="dia">30</div><div class="mes-ano">Mar 2026</div></div>
+              <div class="entrada-meta">
+                <div class="entrada-disciplina">Língua Portuguesa — 1ª, 2ª e 3ª Série</div>
+                <div class="entrada-chips">
+                  <span class="chip chip-horario">⏰ 07h–11h15</span>
+                  <span class="chip chip-presenca">👥 1ª: 5 alunos · 2ª e 3ª: juntas</span>
+                  <span class="chip chip-info">📌 Primeiro dia letivo 2026</span>
+                </div>
+              </div>
+              <div class="entrada-toggle">▾</div>
+            </div>
+            <div class="entrada-corpo">
+              <div class="secao-titulo">Resumo do Dia</div>
+              <div class="conteudo-texto">Primeiro dia de aula do ano letivo 2026. Foram realizadas 2h/aula de Língua Portuguesa em cada uma das três séries do Ensino Médio. A 1ª Série foi atendida às 7h com presença reduzida (5 alunos). A 2ª e 3ª Série foram reunidas na biblioteca das 9h15 às 11h15 para aplicação da avaliação diagnóstica.</div>
+              <p style="margin-top:12px;font-size:0.83rem;color:#5a5a5a;">↳ Acesse as abas das turmas para detalhes completos e análise comportamental.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ 1ª SÉRIE ══ -->
+      <div class="page" id="page-t1">
+        <div class="page-header">
+          <div class="turma-badge">1ª</div>
+          <div class="page-title">
+            <h2>1ª Série — Ensino Médio</h2>
+            <p>Língua Portuguesa · Trilhas de Linguagens</p>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="num">1</div><div class="label">Dias de Aula</div></div>
+          <div class="stat-card"><div class="num">2</div><div class="label">Aulas Registradas</div></div>
+          <div class="stat-card"><div class="num">5</div><div class="label">Presentes (30/03)</div></div>
+          <div class="stat-card alerta"><div class="num">3</div><div class="label">Obs. Comportamentais</div></div>
+        </div>
+        <div id="page-content-t1">
+          <div class="entrada-aula">
+            <div class="entrada-header">
+              <div class="entrada-data-bloco"><div class="dia">30</div><div class="mes-ano">Mar 2026</div></div>
+              <div class="entrada-meta">
+                <div class="entrada-disciplina">Língua Portuguesa — 2 h/aula</div>
+                <div class="entrada-chips">
+                  <span class="chip chip-horario">⏰ 07h00 – 08h40</span>
+                  <span class="chip chip-presenca">👥 5 alunos presentes</span>
+                  <span class="chip chip-alerta">⚠️ Atividade não impressa a tempo</span>
+                </div>
+              </div>
+              <div class="entrada-toggle">▾</div>
+            </div>
+            <div class="entrada-corpo">
+              <div class="secao-titulo">📖 Conteúdo Trabalhado</div>
+              <div class="conteudo-texto"><strong>Iniciação do ano letivo e firmando acordos.</strong><br>Conversa inicial sobre expectativas do ano letivo. Elaboração e envio da avaliação diagnóstica à secretaria — não impressa antes do recreio. Aula conduzida de forma dialogada por ausência de plano de curso elaborado nesta data.</div>
+              <div class="secao-titulo">⚠️ Ocorrências</div>
+              <div class="nota-geral"><span>📝</span><span>Presença reduzida: 5 alunos no primeiro dia. Atividade diagnóstica encaminhada à secretaria, porém não impressa a tempo — aplicação aguardada para a próxima aula.</span></div>
+              <div class="secao-titulo">🔎 Observações Comportamentais</div>
+              <div class="obs-lista">
+                <div class="obs-item">
+                  <span class="obs-icone">💬</span>
+                  <div>
+                    <div class="obs-alunos">Paulo Henrique, Maria Eduarda e Jade</div>
+                    <div class="obs-descricao">Os três demonstram preferência por sentar próximos, gerando conversas paralelas. Padrão observado no primeiro dia — será monitorado nas próximas aulas.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="analise-ia">
+                <div class="analise-ia-header"><div class="tag">✦ Análise IA</div><span>Estimativa de impacto comportamental — Base: 1 ocorrência</span></div>
+                <div class="analise-item">
+                  <div class="analise-aluno">Paulo Henrique</div>
+                  <div class="analise-impacto">⚠ Atenção — 1ª ocorrência</div>
+                  <div class="analise-texto">Primeira observação de conversa paralela. Início de ano, sem perda de pontos estimada.</div>
+                </div>
+                <div class="analise-item">
+                  <div class="analise-aluno">Maria Eduarda</div>
+                  <div class="analise-impacto">⚠ Atenção — 1ª ocorrência</div>
+                  <div class="analise-texto">Mesma situação. Caráter exploratório de início de ano. Sem impacto pontual estimado.</div>
+                </div>
+                <div class="analise-item">
+                  <div class="analise-aluno">Jade</div>
+                  <div class="analise-impacto">⚠ Atenção — 1ª ocorrência</div>
+                  <div class="analise-texto">Tendência de socialização em trio pode indicar dispersão futura. Aguardar reincidência.</div>
+                </div>
+                <div class="analise-sugestao">💡 Sugestão: Reorganizar assentos já na próxima aula, separando este trio.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ 2ª SÉRIE ══ -->
+      <div class="page" id="page-t2">
+        <div class="page-header">
+          <div class="turma-badge badge-azul">2ª</div>
+          <div class="page-title">
+            <h2>2ª Série — Ensino Médio</h2>
+            <p>Língua Portuguesa · Trilhas de Ciências Humanas · Artes</p>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="num">1</div><div class="label">Dias de Aula</div></div>
+          <div class="stat-card"><div class="num">2</div><div class="label">Aulas Registradas</div></div>
+          <div class="stat-card"><div class="num">—</div><div class="label">Presença (a registrar)</div></div>
+          <div class="stat-card alerta"><div class="num">0</div><div class="label">Obs. Comportamentais</div></div>
+        </div>
+        <div id="page-content-t2">
+          <div class="entrada-aula">
+            <div class="entrada-header">
+              <div class="entrada-data-bloco"><div class="dia">30</div><div class="mes-ano">Mar 2026</div></div>
+              <div class="entrada-meta">
+                <div class="entrada-disciplina">Língua Portuguesa — 2 h/aula</div>
+                <div class="entrada-chips">
+                  <span class="chip chip-horario">⏰ 09h15 – 11h15</span>
+                  <span class="chip chip-info">📍 Sala da Biblioteca</span>
+                  <span class="chip chip-info">🔗 Aula junto com 3ª Série</span>
+                </div>
+              </div>
+              <div class="entrada-toggle">▾</div>
+            </div>
+            <div class="entrada-corpo">
+              <div class="secao-titulo">📖 Conteúdo Trabalhado</div>
+              <div class="conteudo-texto"><strong>Avaliação diagnóstica de Língua Portuguesa.</strong><br>2ª e 3ª Série reunidas na biblioteca. Aplicação da avaliação diagnóstica. 2 h/aula contabilizadas individualmente para cada turma.</div>
+              <div class="secao-titulo">📋 Observações</div>
+              <div class="nota-geral"><span>ℹ️</span><span>Turmas agrupadas para a atividade diagnóstica. Nenhuma ocorrência comportamental registrada. Lista de presença a complementar.</span></div>
+              <div class="obs-lista">
+                <div class="obs-item neutro"><span class="obs-icone">✅</span><div><div class="obs-alunos" style="color:#2980b9">Nenhuma ocorrência</div><div class="obs-descricao">Turma colaborativa na realização da avaliação diagnóstica.</div></div></div>
+              </div>
+              <div class="analise-ia">
+                <div class="analise-ia-header"><div class="tag">✦ Análise IA</div><span>Sem ocorrências — sem impacto estimado</span></div>
+                <div class="analise-item"><div class="analise-texto">Nenhum aluno da 2ª Série citado negativamente. Perfil comportamental em construção.</div></div>
+                <div class="analise-sugestao">💡 Após correção da avaliação diagnóstica, registre aqui as defasagens identificadas.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ 3ª SÉRIE ══ -->
+      <div class="page" id="page-t3">
+        <div class="page-header">
+          <div class="turma-badge badge-ouro">3ª</div>
+          <div class="page-title">
+            <h2>3ª Série — Ensino Médio</h2>
+            <p>Língua Portuguesa · Trilhas de Ciências Humanas · Artes</p>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="num">1</div><div class="label">Dias de Aula</div></div>
+          <div class="stat-card"><div class="num">2</div><div class="label">Aulas Registradas</div></div>
+          <div class="stat-card"><div class="num">—</div><div class="label">Presença (a registrar)</div></div>
+          <div class="stat-card alerta"><div class="num">0</div><div class="label">Obs. Comportamentais</div></div>
+        </div>
+        <div id="page-content-t3">
+          <div class="entrada-aula">
+            <div class="entrada-header">
+              <div class="entrada-data-bloco"><div class="dia">30</div><div class="mes-ano">Mar 2026</div></div>
+              <div class="entrada-meta">
+                <div class="entrada-disciplina">Língua Portuguesa — 2 h/aula</div>
+                <div class="entrada-chips">
+                  <span class="chip chip-horario">⏰ 09h15 – 11h15</span>
+                  <span class="chip chip-info">📍 Sala da Biblioteca</span>
+                  <span class="chip chip-info">🔗 Aula junto com 2ª Série</span>
+                </div>
+              </div>
+              <div class="entrada-toggle">▾</div>
+            </div>
+            <div class="entrada-corpo">
+              <div class="secao-titulo">📖 Conteúdo Trabalhado</div>
+              <div class="conteudo-texto"><strong>Avaliação diagnóstica de Língua Portuguesa.</strong><br>2ª e 3ª Série reunidas na biblioteca. 2 h/aula contabilizadas individualmente para cada turma.</div>
+              <div class="secao-titulo">📋 Observações</div>
+              <div class="nota-geral"><span>ℹ️</span><span>Turma concluinte. Nenhuma ocorrência comportamental registrada. Lista de presença a complementar.</span></div>
+              <div class="obs-lista">
+                <div class="obs-item neutro"><span class="obs-icone">✅</span><div><div class="obs-alunos" style="color:#2980b9">Nenhuma ocorrência</div><div class="obs-descricao">Sem registros de comportamento inadequado nesta aula.</div></div></div>
+              </div>
+              <div class="analise-ia">
+                <div class="analise-ia-header"><div class="tag">✦ Análise IA</div><span>Sem ocorrências — sem impacto estimado</span></div>
+                <div class="analise-item"><div class="analise-texto">Nenhum aluno da 3ª Série citado negativamente. Como turma concluinte, pode apresentar maior maturidade.</div></div>
+                <div class="analise-sugestao">💡 Registre percepções sobre engajamento e motivação em relação ao ENEM.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ 6º ANO ══ -->
+      <div class="page" id="page-t6">
+        <div class="page-header">
+          <div class="turma-badge badge-laranja">6º</div>
+          <div class="page-title">
+            <h2>6º Ano — Ensino Fundamental II</h2>
+            <p>Artes · Sextas-feiras das 7h às 8h (1 h/aula por semana)</p>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="num">0</div><div class="label">Dias de Aula</div></div>
+          <div class="stat-card"><div class="num">0</div><div class="label">Aulas Registradas</div></div>
+          <div class="stat-card"><div class="num">—</div><div class="label">Presença</div></div>
+          <div class="stat-card alerta"><div class="num">0</div><div class="label">Obs. Comportamentais</div></div>
+        </div>
+        <div class="nota-geral" style="margin-bottom:20px;">
+          <span>📅</span>
+          <div><strong>Primeira aula prevista: Sexta-feira, 03/04/2026</strong><br>Disciplina: Artes · Horário: 07h–08h (1 h/aula)<br>Os registros aparecerão aqui após o primeiro relato de Artes do 6º Ano.</div>
+        </div>
+        <div id="page-content-t6">
+          <div class="sem-dados"><span class="icone">🎨</span><p>Nenhuma aula de Artes registrada para o 6º Ano até o momento.</p></div>
+        </div>
+      </div>
+
+      <!-- ══ PLANO ANUAL ══ -->
+      <div class="page" id="page-plano">
+        <div class="page-header">
+          <div class="turma-badge badge-cinza">📚</div>
+          <div class="page-title">
+            <h2>Plano Anual de Conteúdos</h2>
+            <p>Status interativo por aula — marque como Aplicada, Pulada ou no SIMAED</p>
+          </div>
+        </div>
+        <div id="plano-filtros"></div>
+        <div id="plano-content"></div>
+      </div>
+
+      <!-- ══ CRONOGRAMA ══ -->
+      <div class="page" id="page-cronograma">
+        <div class="page-header">
+          <div class="turma-badge badge-cinza">📅</div>
+          <div class="page-title">
+            <h2>Cronograma Semanal de Aulas</h2>
+            <p>Grade em vigor · Atualizado pelo professor quando houver mudanças</p>
+          </div>
+        </div>
+        <div class="cron-intro" style="background:white;border-radius:14px;padding:18px 22px;box-shadow:0 2px 12px rgba(26,58,42,0.08);margin-bottom:20px;font-size:0.87rem;line-height:1.6;color:#5a5a5a;">
+          <strong>Grade em vigor desde 30/03/2026.</strong> O dia da semana atual é destacado automaticamente.
+        </div>
+        <div class="cron-legenda" style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.77rem;font-weight:500;"><div style="width:10px;height:10px;border-radius:3px;background:#2d6147;"></div><span>Língua Portuguesa</span></div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.77rem;font-weight:500;"><div style="width:10px;height:10px;border-radius:3px;background:#6c3483;"></div><span>Trilhas</span></div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.77rem;font-weight:500;"><div style="width:10px;height:10px;border-radius:3px;background:#c0570a;"></div><span>Artes</span></div>
+        </div>
+        <div id="cron-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:16px;"></div>
+        <div id="resumo-cron" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin-top:20px;background:white;border-radius:14px;padding:18px 22px;box-shadow:0 2px 12px rgba(26,58,42,0.08);"></div>
+      </div>
+
+      <!-- ══ CONTADOR ══ -->
+      <div class="page" id="page-contador">
+        <div class="page-header">
+          <div class="turma-badge badge-cinza">📊</div>
+          <div class="page-title">
+            <h2>Contador de Aulas por Disciplina e Turma</h2>
+            <p>Progresso bimestral, anual e datas previstas de conclusão</p>
+          </div>
+        </div>
+        <div class="cont-intro" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:14px;padding:20px 24px;margin-bottom:28px;color:white;">
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.05rem;margin-bottom:8px;color:#c9a84c;">📈 Como funciona o contador</h3>
+          <p style="font-size:0.83rem;opacity:0.75;line-height:1.6;">As aulas feitas são calculadas com base nos relatos diários registrados. As datas de conclusão são <strong>estimativas matemáticas</strong> baseadas no número de h/aula semanais — sem descontar feriados ou recessos.</p>
+          <div style="display:inline-block;margin-top:10px;background:rgba(201,168,76,0.2);border:1px solid rgba(201,168,76,0.35);border-radius:10px;padding:3px 12px;font-size:0.72rem;color:#c9a84c;">📅 Base: 30/03/2026 — 1º relato registrado</div>
+        </div>
+
+        <div class="cont-grupo-tit" style="display:flex;align-items:center;gap:10px;margin:28px 0 14px;padding-bottom:8px;border-bottom:2px solid #e8e5de;">
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:#1a3a2a;">Língua Portuguesa</h3>
+          <span style="background:#c8e6d4;color:#2d6147;padding:3px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;">LP</span>
+        </div>
+        <div class="cont-cards" id="cont-lp" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:16px;"></div>
+
+        <div class="cont-grupo-tit" style="display:flex;align-items:center;gap:10px;margin:28px 0 14px;padding-bottom:8px;border-bottom:2px solid #e8e5de;">
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:#1a3a2a;">Trilhas</h3>
+          <span style="background:#e8daef;color:#6c3483;padding:3px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;">TRILHAS</span>
+        </div>
+        <div class="cont-cards" id="cont-tri" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:16px;"></div>
+
+        <div class="cont-grupo-tit" style="display:flex;align-items:center;gap:10px;margin:28px 0 14px;padding-bottom:8px;border-bottom:2px solid #e8e5de;">
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:#1a3a2a;">Artes</h3>
+          <span style="background:#fdebd0;color:#c0570a;padding:3px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;">ARTE</span>
+        </div>
+        <div class="cont-cards" id="cont-art" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:16px;"></div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /layout -->
+
+  <!-- FOOTER -->
+  <footer style="background:#1a3a2a;color:rgba(255,255,255,0.5);text-align:center;padding:16px 40px;font-size:0.78rem;letter-spacing:0.04em;flex-shrink:0;">
+    E.E. Rural Pe. Carlos Casavequia · Senador Guiomard – AC &nbsp;|&nbsp; Prof. Paulo Roberto Ramalho Magalhães &nbsp;|&nbsp; Ano Letivo 2026
+  </footer>
+
+</div><!-- /app -->
+
+<!-- ══ TOOLBAR DE TEXTO (modo edição) ══ -->
+<div id="toolbar-texto" style="position:fixed;z-index:1000;background:#1a1a2e;border-radius:8px;padding:6px 8px;display:none;align-items:center;gap:4px;box-shadow:0 4px 20px rgba(0,0,0,0.4);flex-wrap:wrap;max-width:420px;">
+  <button class="tb-btn" data-cmd="bold" title="Negrito (Ctrl+B)"><strong>B</strong></button>
+  <button class="tb-btn" data-cmd="italic" title="Itálico (Ctrl+I)"><em>I</em></button>
+  <button class="tb-btn" data-cmd="underline" title="Sublinhado (Ctrl+U)"><u>U</u></button>
+  <button class="tb-btn" data-cmd="strikeThrough" title="Tachado"><s>S</s></button>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" data-cmd="justifyLeft" title="Alinhar esquerda">≡</button>
+  <button class="tb-btn" data-cmd="justifyCenter" title="Centralizar">≡</button>
+  <button class="tb-btn" data-cmd="justifyRight" title="Alinhar direita">≡</button>
+  <div class="tb-sep"></div>
+  <select id="tb-tamanho" class="tb-select" title="Tamanho da fonte">
+    <option value="2">10px</option>
+    <option value="3" selected>12px</option>
+    <option value="4">14px</option>
+    <option value="5">18px</option>
+    <option value="6">24px</option>
+    <option value="7">32px</option>
+  </select>
+  <div class="tb-sep"></div>
+  <input type="color" id="tb-cor-texto" title="Cor do texto" value="#2b2b2b" style="width:26px;height:26px;border:none;background:none;cursor:pointer;border-radius:4px;">
+  <input type="color" id="tb-cor-fundo" title="Cor de destaque" value="#fef9c3" style="width:26px;height:26px;border:none;background:none;cursor:pointer;border-radius:4px;">
+</div>
+
+<!-- ══ MODAL DE ADICIONAR BLOCO ══ -->
+<div id="modal-bloco" class="modal-overlay">
+  <div class="modal-bloco">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:#1a3a2a;">＋ Adicionar bloco</h3>
+      <button class="modal-fechar" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#5a5a5a;">×</button>
+    </div>
+    <div id="modal-bloco-lista"></div>
+  </div>
+</div>
+
+<!-- ══ PAINEL DE HISTÓRICO ══ -->
+<div id="painel-historico" style="position:fixed;right:0;top:56px;width:320px;height:calc(100vh - 56px);background:white;border-left:1px solid #e8e5de;z-index:300;display:none;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,0.1);transform:translateX(100%);transition:transform 0.3s;">
+  <div class="hist-header" style="padding:20px;border-bottom:1px solid #e8e5de;font-family:'Playfair Display',serif;font-size:1rem;color:#1a3a2a;display:flex;justify-content:space-between;align-items:center;">
+    ⏱ Histórico de versões
+    <button id="btn-fechar-historico" style="background:none;border:none;cursor:pointer;color:#5a5a5a;font-size:1.2rem;">×</button>
+  </div>
+  <div id="hist-lista" class="hist-lista" style="flex:1;overflow-y:auto;padding:12px;"></div>
+</div>
+
+<!-- ══ BOTÃO FLUTUANTE ADICIONAR ══ -->
+<button id="btn-add-entrada" style="display:none;position:fixed;bottom:24px;right:24px;background:#c9a84c;color:#1a3a2a;border:none;border-radius:50px;padding:12px 24px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.2);z-index:100;align-items:center;gap:8px;">
+  ＋ Adicionar bloco
+</button>
+
+<!-- ══ SCRIPTS ══ -->
+<script src="firebase-config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/firebase.js"></script>
+<script src="assets/js/blocks.js"></script>
+<script src="assets/js/editor.js"></script>
+<script src="assets/js/presenca.js"></script>
+<script src="assets/js/atividades.js"></script>
+<script src="assets/js/contador.js"></script>
+<script src="assets/js/cronograma.js"></script>
+<script src="assets/js/plano.js"></script>
+<script src="assets/js/app.js"></script>
+
+</body>
+</html>

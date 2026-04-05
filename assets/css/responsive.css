@@ -1,0 +1,190 @@
+#btn-menu-mobile {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+#btn-menu-mobile:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 399;
+  display: none;
+}
+
+.sidebar-overlay.visivel {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  #btn-menu-mobile {
+    display: flex;
+  }
+
+  .topbar-logo span {
+    display: none;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    width: 260px;
+    height: 100vh;
+    top: 0;
+    z-index: 400;
+    transition: left 0.3s ease;
+    padding-top: 56px;
+  }
+
+  .sidebar.aberta {
+    left: 0;
+  }
+
+  .page {
+    padding: 20px 16px;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #toolbar-texto {
+    max-width: calc(100vw - 32px);
+    font-size: 0.8rem;
+  }
+
+  .entrada-data-bloco {
+    min-width: 70px;
+    padding: 14px 10px;
+  }
+
+  .entrada-data-bloco .dia {
+    font-size: 1.5rem;
+  }
+
+  .lista-alunos {
+    grid-template-columns: 1fr;
+  }
+
+  .plano-filtros {
+    flex-direction: column;
+  }
+
+  .filtro-select {
+    min-width: 100%;
+    width: 100%;
+  }
+
+  #painel-historico {
+    width: 100%;
+    top: 56px;
+    height: calc(100vh - 56px);
+  }
+
+  .login-card {
+    padding: 32px 24px;
+  }
+
+  .page-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .turma-badge {
+    font-size: 1.1rem;
+    padding: 8px 14px;
+  }
+
+  .page-title h2 {
+    font-size: 1.1rem;
+  }
+
+  .status-panel {
+    padding-left: 16px;
+  }
+
+  button,
+  .nav-item,
+  .aluno-item,
+  .ativ-aluno,
+  .status-btn,
+  .opcao-bloco,
+  #btn-google-login {
+    min-height: 44px;
+  }
+
+  .tb-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .bc-btn {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1023px) {
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    width: 240px;
+    height: 100vh;
+    top: 0;
+    z-index: 400;
+    transition: left 0.3s ease;
+    padding-top: 56px;
+  }
+
+  .sidebar.aberta {
+    left: 0;
+  }
+
+  #btn-menu-mobile {
+    display: flex;
+  }
+
+  .layout {
+    margin-left: 0;
+  }
+
+  .page {
+    padding: 24px 28px;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  #btn-menu-mobile {
+    display: none;
+  }
+
+  .sidebar {
+    position: relative;
+    left: 0;
+    display: flex;
+    height: auto;
+    padding-top: 16px;
+  }
+
+  .sidebar-overlay {
+    display: none !important;
+  }
+}
