@@ -29,6 +29,7 @@ function configurarBtnEditar() {
 function entrarModoEdicao() {
   modoEdicaoAtivo = true;
   document.body.classList.add('modo-edicao');
+
   var btn = document.getElementById('btn-editar');
   if (btn) {
     btn.textContent = '✅ Salvar';
@@ -37,15 +38,22 @@ function entrarModoEdicao() {
   }
   var btnHist = document.getElementById('btn-historico');
   if (btnHist) btnHist.style.display = 'inline-flex';
-
   var btnAdd = document.getElementById('btn-add-entrada');
   if (btnAdd) btnAdd.style.display = 'flex';
 
-  // Torna editáveis os campos de conteúdo da página ativa
-  document.querySelectorAll('.entrada-disciplina, .conteudo-texto, .nota-geral').forEach(function(el) {
+  // Torna editável o cabeçalho e todo o conteúdo principal
+  var zonas = ['.cab-i', '.main'];
+  zonas.forEach(function(sel) {
+    var el = document.querySelector(sel);
+    if (!el) return;
     el.contentEditable = 'true';
-    el.style.outline = 'none';
     el.addEventListener('input', agendarSalvamentoGeral);
+  });
+
+  // Bloqueia elementos interativos dentro das zonas editáveis
+  var bloqueados = 'button, input, select, textarea, [onclick], .toolbar-texto, #painel-historico, #btn-historico, #btn-add-entrada';
+  document.querySelectorAll('.cab-i ' + bloqueados + ', .main ' + bloqueados).forEach(function(el) {
+    el.contentEditable = 'false';
   });
 }
 
@@ -64,8 +72,8 @@ async function salvarESairEdicao() {
   var btnAdd = document.getElementById('btn-add-entrada');
   if (btnAdd) btnAdd.style.display = 'none';
 
-  // Remove contentEditable
-  document.querySelectorAll('[contenteditable="true"]').forEach(function(el) {
+  // Remove contentEditable das zonas e dos bloqueios
+  document.querySelectorAll('[contenteditable]').forEach(function(el) {
     el.removeAttribute('contenteditable');
   });
 

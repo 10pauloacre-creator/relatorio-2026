@@ -9,6 +9,48 @@ body.modo-edicao .page-content > *:hover {
   background: rgba(201,168,76,0.03);
 }
 
+/* Cabeçalho editável */
+body.modo-edicao .cab-i {
+  outline: 2px dashed rgba(201,168,76,0.5);
+  border-radius: 8px;
+}
+
+body.modo-edicao .cab-i:focus-within {
+  outline-color: var(--ou, #c9a84c);
+  background: rgba(201,168,76,0.06);
+}
+
+/* Todo texto editável — destaque sutil ao focar */
+body.modo-edicao [contenteditable="true"]:focus {
+  outline: 2px solid rgba(201,168,76,0.7);
+  border-radius: 4px;
+  background: rgba(255,255,255,0.05);
+}
+
+/* Garante que botões bloqueados continuem clicáveis */
+body.modo-edicao [contenteditable="false"] {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Faixa de aviso no topo durante edição */
+body.modo-edicao::before {
+  content: '✏️ MODO DE EDIÇÃO — Clique em qualquer texto para editar. Clique em ✅ Salvar para concluir.';
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #16a34a;
+  color: white;
+  text-align: center;
+  padding: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  z-index: 9999;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.02em;
+}
+
 #toolbar-texto {
   position: fixed;
   z-index: 1000;
