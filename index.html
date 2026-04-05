@@ -6097,6 +6097,7 @@ function salvarConfigGH() {
   localStorage.setItem('gh_user', document.getElementById('gh-user').value.trim());
   localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim());
   localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim());
+  localStorage.setItem('anthropic_key', document.getElementById('anthropic-key').value.trim());
   const ok = document.getElementById('cfg-ok');
   ok.style.display = 'inline'; setTimeout(() => ok.style.display = 'none', 2500);
 }
@@ -6104,8 +6105,8 @@ function carregarConfigGH() {
   document.getElementById('gh-user').value = localStorage.getItem('gh_user') || '10pauloacre-creator';
   document.getElementById('gh-repo').value = localStorage.getItem('gh_repo') || 'relatorio-2026';
   document.getElementById('gh-token').value = localStorage.getItem('gh_token') || '';
-  // Se já configurado, manter colapsado
-  if (localStorage.getItem('gh_token')) {
+  document.getElementById('anthropic-key').value = localStorage.getItem('anthropic_key') || '';
+  if (localStorage.getItem('gh_token') && localStorage.getItem('anthropic_key')) {
     document.getElementById('cfg-gh-fields').style.display = 'none';
     document.getElementById('cfg-arrow').textContent = '▾ expandir';
   } else {
@@ -6160,19 +6161,26 @@ REGRAS OBRIGATÓRIAS:
 Rascunho do professor:
 ${rascunho}`;
 
+  const geminiKey = localStorage.getItem('anthropic_key') || '';
+  if (!geminiKey) {
+    alert('Configure a Chave API do Google Gemini primeiro!\n\nClique em ⚙️ Configuração GitHub e adicione sua chave gratuita de:\naistudio.google.com/apikey');
+    btn.textContent = '🤖 Gerar Relato com IA'; btn.disabled = false;
+    return;
+  }
+
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 1000, temperature: 0.3 }
       })
     });
     const data2 = await resp.json();
-    let html = data2.content?.[0]?.text || '';
-    html = html.trim();
+    if (!resp.ok) throw new Error(data2.error?.message || 'Erro na API Gemini: ' + resp.status);
+    let html = data2.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    html = html.trim().replace(/```html?/gi,'').replace(/```/g,'').trim();
     // Garantir que começa com a div correta
     if (!html.startsWith('<div class="ea">')) {
       const idx = html.indexOf('<div class="ea">');
@@ -6283,6 +6291,9 @@ async function publicarNoGitHub() {
         <input id="gh-repo" placeholder="relatorio-2026" style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
         <label style="font-size:.78rem;font-weight:600;color:var(--ce);display:block;margin-bottom:4px">Token GitHub (com permissão repo + workflow)</label>
         <input id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxx" style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
+        <label style="font-size:.78rem;font-weight:600;color:var(--ce);display:block;margin-bottom:4px">🤖 Chave API Google Gemini (gratuita)</label>
+        <input id="anthropic-key" type="password" placeholder="AIzaSy..." style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:4px">
+        <div style="font-size:.72rem;color:var(--cm);margin-bottom:10px">🆓 Gratuito, sem cartão. Obtenha em: <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ai)">aistudio.google.com/apikey</a></div>
         <button onclick="salvarConfigGH()" style="background:var(--vm);color:#fff;border:none;padding:7px 16px;border-radius:6px;font-weight:700;font-size:.8rem;cursor:pointer">💾 Salvar</button>
         <span id="cfg-ok" style="display:none;margin-left:10px;color:var(--vm);font-size:.8rem;font-weight:700">✓ Salvo!</span>
       </div>
