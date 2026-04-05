@@ -195,6 +195,8 @@ footer{background:var(--vd);color:rgba(255,255,255,.5);text-align:center;padding
 <button class="nb" onclick="aba('plano',this)">📚 Plano Anual</button><div class="sp"></div>
     <button class="nb" onclick="aba('cron',this)">📅 Cronograma</button><div class="sp"></div>
 <button class="nb" onclick="aba('cont',this)">📊 Contador</button>
+<div class="sp"></div>
+<button class="nb" onclick="abrirModalRelato()" style="background:rgba(201,168,76,.2);color:var(--ou);border:1px solid rgba(201,168,76,.4);border-radius:6px;margin:6px 4px">✏️ Novo Relato</button>
 </div></nav>
 <main class="main">
 
@@ -202,6 +204,7 @@ footer{background:var(--vd);color:rgba(255,255,255,.5);text-align:center;padding
 <div class="th"><div class="tb">2026</div><div class="ti"><h2>Visão Geral — Todas as Turmas</h2><p>LP · Artes · Trilhas de Linguagens · Trilhas de C. Humanas</p></div></div>
 <div class="sr"><div class="sc2"><div class="n">3</div><div class="l">Dias de Aula</div></div><div class="sc2"><div class="n">14</div><div class="l">H/aulas</div></div><div class="sc2"><div class="n">4</div><div class="l">Turmas</div></div><div class="sc2 al"><div class="n">14+</div><div class="l">Obs. Comportamentais</div></div></div>
 <p style="color:var(--cm);font-size:.84rem;margin-bottom:20px">Selecione a aba da turma para o diário completo com presença e atividades.</p>
+<!-- RELATOS_INICIO -->
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">30</div><div class="my">Mar 2026</div></div><div class="em"><div class="ed">LP — 1ª, 2ª e 3ª Série</div><div class="ec"><span class="ch ch-h">⏰ 07h–11h15</span><span class="ch ch-i">📌 1º dia letivo</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="ct">Primeiro dia. 2h/aula de LP por série. 1ª às 7h com 5 presentes. 2ª e 3ª na biblioteca às 9h15 — avaliação diagnóstica.</div></div></div></div>
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">31</div><div class="my">Mar 2026</div></div><div class="em"><div class="ed">LP + T. Linguagens — 2ª e 3ª (Terça)</div><div class="ec"><span class="ch ch-h">⏰ 13h–17h15</span><span class="ch ch-i">🤖 Colando com Sabedoria</span><span class="ch ch-a">⚠️ 5 obs.</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="ct">Projeto Colando com Sabedoria (LP + T. Linguagens interdisciplinar). Mundo Mistério — Superinteligência Artificial + uso correto de IAs. 3ª: 13h–15h · 2ª: 15h–17h15.</div></div></div></div>
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">02</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">LP — 1ª e 2ª (Contra-turno) · ⛪ Semana Santa</div><div class="ec"><span class="ch ch-h">⏰ 07h–10h20</span><span class="ch ch-i">📖 Democracia / Direitos Humanos</span><span class="ch ch-a">⚠️ 9 obs.</span><span class="ch ch-a">🚫 Sem Artes à tarde</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="ct">Contra-turno matutino. 1ª e 2ª unificadas. 4h/aula cada. SIMAED: LP. Conteúdo real: Trilhas C.H. — Democracia, Justiça Social e D.H. Aula encerrada às 10h20 para palestra do Dia do Autismo + bingo. <strong>Tarde:</strong> escola entrou em feriado de Semana Santa — sem aula de Artes (2ª/3ª Série). <strong>03/04 (sexta): feriado, sem aulas.</strong></div></div></div></div>
@@ -6064,6 +6067,268 @@ function initStatusButtons() {
 }
 document.addEventListener('DOMContentLoaded', initStatusButtons);
 
+/* ═══════════════════════════════════════════
+   NOVO RELATO — IA + GITHUB AUTO-PUBLISH
+═══════════════════════════════════════════ */
+let _relatoGerado = '';
+
+// Setar data de hoje ao abrir
+function abrirModalRelato() {
+  const m = document.getElementById('modal-relato');
+  m.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  const hoje = new Date().toISOString().split('T')[0];
+  document.getElementById('relato-data').value = hoje;
+  carregarConfigGH();
+  voltarEtapa1();
+}
+function fecharModalRelato() {
+  document.getElementById('modal-relato').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function toggleConfigGH() {
+  const f = document.getElementById('cfg-gh-fields');
+  const a = document.getElementById('cfg-arrow');
+  if (f.style.display === 'none') { f.style.display = 'block'; a.textContent = '▴ recolher'; }
+  else { f.style.display = 'none'; a.textContent = '▾ expandir'; }
+}
+function salvarConfigGH() {
+  localStorage.setItem('gh_user', document.getElementById('gh-user').value.trim());
+  localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim());
+  localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim());
+  const ok = document.getElementById('cfg-ok');
+  ok.style.display = 'inline'; setTimeout(() => ok.style.display = 'none', 2500);
+}
+function carregarConfigGH() {
+  document.getElementById('gh-user').value = localStorage.getItem('gh_user') || '10pauloacre-creator';
+  document.getElementById('gh-repo').value = localStorage.getItem('gh_repo') || 'relatorio-2026';
+  document.getElementById('gh-token').value = localStorage.getItem('gh_token') || '';
+  // Se já configurado, manter colapsado
+  if (localStorage.getItem('gh_token')) {
+    document.getElementById('cfg-gh-fields').style.display = 'none';
+    document.getElementById('cfg-arrow').textContent = '▾ expandir';
+  } else {
+    document.getElementById('cfg-gh-fields').style.display = 'block';
+    document.getElementById('cfg-arrow').textContent = '▴ recolher';
+  }
+}
+
+function voltarEtapa1() {
+  document.getElementById('relato-etapa1').style.display = 'block';
+  document.getElementById('relato-etapa2').style.display = 'none';
+}
+
+// Exemplos dos relatos existentes para o prompt
+const EXEMPLOS_HTML = `
+Exemplo 1 — dia 30 março:
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">30</div><div class="my">Mar 2026</div></div><div class="em"><div class="ed">LP — 1ª, 2ª e 3ª Série</div><div class="ec"><span class="ch ch-h">⏰ 07h–11h15</span><span class="ch ch-i">📌 1º dia letivo</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="ct">Primeiro dia. 2h/aula de LP por série. 1ª às 7h com 5 presentes. 2ª e 3ª na biblioteca às 9h15 — avaliação diagnóstica.</div></div></div></div>
+
+Exemplo 2 — dia 31 março (com observações comportamentais):
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">31</div><div class="my">Mar 2026</div></div><div class="em"><div class="ed">LP + T. Linguagens — 2ª e 3ª (Terça)</div><div class="ec"><span class="ch ch-h">⏰ 13h–17h15</span><span class="ch ch-i">🤖 Colando com Sabedoria</span><span class="ch ch-a">⚠️ 5 obs.</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="ct">Projeto Colando com Sabedoria (LP + T. Linguagens interdisciplinar). Mundo Mistério — Superinteligência Artificial + uso correto de IAs. 3ª: 13h–15h · 2ª: 15h–17h15.</div></div></div></div>
+`;
+
+async function gerarComIA() {
+  const rascunho = document.getElementById('relato-rascunho').value.trim();
+  const data = document.getElementById('relato-data').value;
+  const hora = document.getElementById('relato-hora').value.trim();
+  if (!rascunho) { alert('Escreva o rascunho antes de gerar!'); return; }
+  if (!data) { alert('Selecione a data da aula!'); return; }
+
+  const btn = document.getElementById('btn-gerar');
+  btn.textContent = '⏳ Gerando com IA...';
+  btn.disabled = true;
+
+  const dataObj = new Date(data + 'T12:00:00');
+  const dia = String(dataObj.getDate()).padStart(2,'0');
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const mes = meses[dataObj.getMonth()] + ' 2026';
+
+  const prompt = `Você é assistente de um professor chamado Paulo Roberto que ensina Língua Portuguesa, Artes, Trilhas de Linguagens e Trilhas de C. Humanas no Ensino Médio (1ª, 2ª e 3ª Série) e 6º Ano, na E.E. Rural Pe. Carlos Casavequia, Senador Guiomard - AC.
+
+Aqui estão exemplos do HTML exato que você deve gerar:
+${EXEMPLOS_HTML}
+
+REGRAS OBRIGATÓRIAS:
+- Gere APENAS o HTML do bloco .ea, exatamente no mesmo formato dos exemplos
+- Dia: "${dia}" | Mês: "${mes}" | Horário: "${hora || 'ver rascunho'}"
+- Use ch-h para horário (⏰), ch-i para temas/projetos (📌 ou emoji relevante), ch-p para presença (👥), ch-a para alertas/obs (⚠️)
+- O texto do .ct deve ser fluido, profissional e conciso como nos exemplos
+- NÃO inclua markdown, explicações ou qualquer texto fora do HTML
+- Comece exatamente com: <div class="ea">
+
+Rascunho do professor:
+${rascunho}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data2 = await resp.json();
+    let html = data2.content?.[0]?.text || '';
+    html = html.trim();
+    // Garantir que começa com a div correta
+    if (!html.startsWith('<div class="ea">')) {
+      const idx = html.indexOf('<div class="ea">');
+      if (idx > -1) html = html.substring(idx);
+    }
+    _relatoGerado = html;
+
+    // Preview visual
+    document.getElementById('relato-preview').innerHTML = html;
+    document.getElementById('relato-etapa1').style.display = 'none';
+    document.getElementById('relato-etapa2').style.display = 'block';
+  } catch(e) {
+    alert('Erro ao gerar: ' + e.message);
+  }
+  btn.textContent = '🤖 Gerar Relato com IA';
+  btn.disabled = false;
+}
+
+async function publicarNoGitHub() {
+  const user  = localStorage.getItem('gh_user') || '10pauloacre-creator';
+  const repo  = localStorage.getItem('gh_repo') || 'relatorio-2026';
+  const token = localStorage.getItem('gh_token') || '';
+  if (!token) { alert('Configure o Token GitHub primeiro (⚙️ Configuração GitHub acima)!'); return; }
+  if (!_relatoGerado) { alert('Gere o relato com IA primeiro!'); return; }
+
+  const btn = document.getElementById('btn-publicar');
+  const status = document.getElementById('pub-status');
+  btn.textContent = '⏳ Publicando...'; btn.disabled = true;
+  status.style.display = 'none';
+
+  try {
+    // 1. Buscar arquivo atual + SHA
+    const getResp = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/index.html`, {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+    if (!getResp.ok) throw new Error('Erro ao buscar arquivo: ' + getResp.status);
+    const fileData = await getResp.json();
+    const sha = fileData.sha;
+    const conteudoAtual = decodeURIComponent(escape(atob(fileData.content.replace(/\n/g,''))));
+
+    // 2. Injetar novo relato após o marcador
+    const marcador = '<!-- RELATOS_INICIO -->';
+    if (!conteudoAtual.includes(marcador)) throw new Error('Marcador não encontrado. Publique a versão 10 do arquivo primeiro.');
+    const novoConteudo = conteudoAtual.replace(marcador, marcador + '\n' + _relatoGerado + '\n');
+
+    // 3. Enviar de volta
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    const putResp = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/index.html`, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: `📚 Novo relato — ${hoje}`,
+        content: btoa(unescape(encodeURIComponent(novoConteudo))),
+        sha: sha
+      })
+    });
+    if (!putResp.ok) {
+      const err = await putResp.json();
+      throw new Error(err.message || 'Erro ao publicar: ' + putResp.status);
+    }
+
+    status.style.display = 'block';
+    status.style.background = '#f0faf4';
+    status.style.color = 'var(--vm)';
+    status.style.border = '1px solid var(--vc)';
+    status.innerHTML = '✅ <strong>Publicado com sucesso!</strong><br><span style="font-size:.76rem">O site atualiza em ~2 minutos. Feche e recarregue a página.</span>';
+    btn.textContent = '✅ Publicado!';
+    setTimeout(() => fecharModalRelato(), 4000);
+  } catch(e) {
+    status.style.display = 'block';
+    status.style.background = '#fdecea';
+    status.style.color = 'var(--ra)';
+    status.style.border = '1px solid #f5c6c0';
+    status.innerHTML = '❌ <strong>Erro:</strong> ' + e.message;
+    btn.textContent = '🚀 Publicar no GitHub'; btn.disabled = false;
+  }
+}
+
+
 </script>
+<!-- MODAL NOVO RELATO -->
+<div id="modal-relato" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;overflow-y:auto;padding:20px">
+<div style="max-width:640px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+
+  <!-- Cabeçalho -->
+  <div style="background:linear-gradient(135deg,var(--vd),var(--vm));color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700">✏️ Novo Relato Diário</div>
+      <div style="font-size:.78rem;opacity:.8;margin-top:3px">IA organiza — GitHub publica automaticamente</div>
+    </div>
+    <button onclick="fecharModalRelato()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:1.3rem;width:34px;height:34px;border-radius:50%;cursor:pointer">✕</button>
+  </div>
+
+  <!-- Etapa 1: Configuração -->
+  <div id="relato-etapa1" style="padding:24px">
+
+    <!-- Config GitHub (colapsável) -->
+    <div id="config-gh-box" style="background:#f8f5ee;border:1px solid var(--cl);border-radius:10px;padding:14px;margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleConfigGH()">
+        <span style="font-size:.82rem;font-weight:700;color:var(--vd)">⚙️ Configuração GitHub</span>
+        <span id="cfg-arrow" style="color:var(--cm);font-size:.8rem">▾ expandir</span>
+      </div>
+      <div id="cfg-gh-fields" style="display:none;margin-top:12px">
+        <div style="font-size:.76rem;color:var(--cm);margin-bottom:10px">Preencha uma vez — fica salvo no navegador</div>
+        <label style="font-size:.78rem;font-weight:600;color:var(--ce);display:block;margin-bottom:4px">Usuário GitHub</label>
+        <input id="gh-user" placeholder="10pauloacre-creator" style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
+        <label style="font-size:.78rem;font-weight:600;color:var(--ce);display:block;margin-bottom:4px">Repositório</label>
+        <input id="gh-repo" placeholder="relatorio-2026" style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
+        <label style="font-size:.78rem;font-weight:600;color:var(--ce);display:block;margin-bottom:4px">Token GitHub (com permissão repo + workflow)</label>
+        <input id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxx" style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
+        <button onclick="salvarConfigGH()" style="background:var(--vm);color:#fff;border:none;padding:7px 16px;border-radius:6px;font-weight:700;font-size:.8rem;cursor:pointer">💾 Salvar</button>
+        <span id="cfg-ok" style="display:none;margin-left:10px;color:var(--vm);font-size:.8rem;font-weight:700">✓ Salvo!</span>
+      </div>
+    </div>
+
+    <!-- Data e horário -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div>
+        <label style="font-size:.78rem;font-weight:700;color:var(--vd);display:block;margin-bottom:5px">📅 Data da aula</label>
+        <input type="date" id="relato-data" style="width:100%;padding:9px 10px;border:2px solid var(--cl);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem">
+      </div>
+      <div>
+        <label style="font-size:.78rem;font-weight:700;color:var(--vd);display:block;margin-bottom:5px">⏰ Horário</label>
+        <input type="text" id="relato-hora" placeholder="ex: 07h–11h15" style="width:100%;padding:9px 10px;border:2px solid var(--cl);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem">
+      </div>
+    </div>
+
+    <!-- Rascunho -->
+    <label style="font-size:.78rem;font-weight:700;color:var(--vd);display:block;margin-bottom:6px">📝 Rascunho — escreva como quiser</label>
+    <div style="background:#f0faf4;border-radius:8px;padding:10px 12px;font-size:.76rem;color:var(--vm);margin-bottom:8px">
+      💡 <strong>Exemplos:</strong> "segunda, LP 1ª série, 5 alunos, trabalhei intertextualidade, João faltou sem justificativa" · "terça tarde, 2ª e 3ª, projeto IA, 13h às 17h, muita participação, 3 obs comportamentais"
+    </div>
+    <textarea id="relato-rascunho" rows="7" placeholder="Descreva o que aconteceu na aula hoje..." style="width:100%;padding:12px;border:2px solid var(--cl);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;resize:vertical;line-height:1.6"></textarea>
+
+    <button onclick="gerarComIA()" id="btn-gerar" style="margin-top:14px;width:100%;background:linear-gradient(135deg,var(--vd),var(--vm));color:#fff;border:none;padding:13px;border-radius:10px;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .2s">
+      🤖 Gerar Relato com IA
+    </button>
+  </div>
+
+  <!-- Etapa 2: Preview -->
+  <div id="relato-etapa2" style="display:none;padding:24px">
+    <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--vd);margin-bottom:14px">👁️ Preview do Relato Gerado</div>
+    <div id="relato-preview" style="border:2px solid var(--cl);border-radius:10px;padding:16px;background:#fafaf8;font-size:.85rem;line-height:1.6;max-height:300px;overflow-y:auto;margin-bottom:16px"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button onclick="voltarEtapa1()" style="background:#f5f3ee;color:var(--ce);border:2px solid var(--cl);padding:11px;border-radius:10px;font-weight:700;font-size:.88rem;cursor:pointer">← Editar rascunho</button>
+      <button onclick="publicarNoGitHub()" id="btn-publicar" style="background:linear-gradient(135deg,#1a3a2a,var(--vm));color:#fff;border:none;padding:11px;border-radius:10px;font-weight:700;font-size:.88rem;cursor:pointer">
+        🚀 Publicar no GitHub
+      </button>
+    </div>
+
+    <div id="pub-status" style="display:none;margin-top:12px;text-align:center;font-size:.82rem;padding:10px;border-radius:8px"></div>
+  </div>
+
+</div>
+</div>
+
 </body>
 </html>
