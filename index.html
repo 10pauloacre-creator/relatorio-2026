@@ -183,6 +183,7 @@ footer{background:var(--vd);color:rgba(255,255,255,.5);text-align:center;padding
 .lesson-item.st-sm .lesson-title{color:#374151;text-decoration:line-through}
 .lesson-item.st-sm .lesson-num{background:#e5e7eb!important;color:#6b7280!important}
 </style>
+<link rel="stylesheet" href="assets/css/editor.css">
 </head>
 <body>
 <header class="cab"><div class="cab-i"><div class="escu">📚</div><div class="cab-t"><h1>Relatório Diário de Aulas 2026</h1><div class="sub">E.E. Rural Pe. Carlos Casavequia · Senador Guiomard – AC</div><div class="prof">✦ Prof. Paulo Roberto Ramalho Magalhães · Ensino Fundamental e Médio ✦</div></div></div></header>
@@ -196,7 +197,9 @@ footer{background:var(--vd);color:rgba(255,255,255,.5);text-align:center;padding
     <button class="nb" onclick="aba('cron',this)">📅 Cronograma</button><div class="sp"></div>
 <button class="nb" onclick="aba('cont',this)">📊 Contador</button>
 <div class="sp"></div>
-<button class="nb" onclick="abrirModalRelato()" style="background:rgba(201,168,76,.2);color:var(--ou);border:1px solid rgba(201,168,76,.4);border-radius:6px;margin:6px 4px">✏️ Novo Relato</button>
+<button class="nb" onclick="window.open('https://claude.ai/share/8d701803-b6b5-471f-8ca2-15a8d9d2349c','_blank')" style="background:rgba(201,168,76,.2);color:var(--ou);border:1px solid rgba(201,168,76,.4);border-radius:6px;margin:6px 4px">✏️ Novo Relato</button>
+<div class="sp"></div>
+<button id="btn-editar" class="nb" style="background:rgba(74,148,103,.2);color:#7fddaa;border:1px solid rgba(74,148,103,.4);border-radius:6px;margin:6px 4px">✏️ Editar</button>
 </div></nav>
 <main class="main">
 
@@ -6097,7 +6100,6 @@ function salvarConfigGH() {
   localStorage.setItem('gh_user', document.getElementById('gh-user').value.trim());
   localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim());
   localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim());
-  localStorage.setItem('anthropic_key', document.getElementById('anthropic-key').value.trim());
   const ok = document.getElementById('cfg-ok');
   ok.style.display = 'inline'; setTimeout(() => ok.style.display = 'none', 2500);
 }
@@ -6105,8 +6107,7 @@ function carregarConfigGH() {
   document.getElementById('gh-user').value = localStorage.getItem('gh_user') || '10pauloacre-creator';
   document.getElementById('gh-repo').value = localStorage.getItem('gh_repo') || 'relatorio-2026';
   document.getElementById('gh-token').value = localStorage.getItem('gh_token') || '';
-  document.getElementById('anthropic-key').value = localStorage.getItem('anthropic_key') || '';
-  if (localStorage.getItem('gh_token') && localStorage.getItem('anthropic_key')) {
+  if (localStorage.getItem('gh_token')) {
     document.getElementById('cfg-gh-fields').style.display = 'none';
     document.getElementById('cfg-arrow').textContent = '▾ expandir';
   } else {
@@ -6120,83 +6121,57 @@ function voltarEtapa1() {
   document.getElementById('relato-etapa2').style.display = 'none';
 }
 
-// Exemplos dos relatos existentes para o prompt
-const EXEMPLOS_HTML = `
-Exemplo 1 — dia 30 março:
-<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">30</div><div class="my">Mar 2026</div></div><div class="em"><div class="ed">LP — 1ª, 2ª e 3ª Série</div><div class="ec"><span class="ch ch-h">⏰ 07h–11h15</span><span class="ch ch-i">📌 1º dia letivo</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="ct">Primeiro dia. 2h/aula de LP por série. 1ª às 7h com 5 presentes. 2ª e 3ª na biblioteca às 9h15 — avaliação diagnóstica.</div></div></div></div>
-
-Exemplo 2 — dia 31 março (com observações comportamentais):
-<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">31</div><div class="my">Mar 2026</div></div><div class="em"><div class="ed">LP + T. Linguagens — 2ª e 3ª (Terça)</div><div class="ec"><span class="ch ch-h">⏰ 13h–17h15</span><span class="ch ch-i">🤖 Colando com Sabedoria</span><span class="ch ch-a">⚠️ 5 obs.</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="ct">Projeto Colando com Sabedoria (LP + T. Linguagens interdisciplinar). Mundo Mistério — Superinteligência Artificial + uso correto de IAs. 3ª: 13h–15h · 2ª: 15h–17h15.</div></div></div></div>
-`;
-
-async function gerarComIA() {
+function gerarComIA() {
   const rascunho = document.getElementById('relato-rascunho').value.trim();
   const data = document.getElementById('relato-data').value;
   const hora = document.getElementById('relato-hora').value.trim();
-  if (!rascunho) { alert('Escreva o rascunho antes de gerar!'); return; }
+  if (!rascunho) { alert('Escreva o rascunho antes de continuar!'); return; }
   if (!data) { alert('Selecione a data da aula!'); return; }
-
-  const btn = document.getElementById('btn-gerar');
-  btn.textContent = '⏳ Gerando com IA...';
-  btn.disabled = true;
 
   const dataObj = new Date(data + 'T12:00:00');
   const dia = String(dataObj.getDate()).padStart(2,'0');
   const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const mes = meses[dataObj.getMonth()] + ' 2026';
 
-  const prompt = `Você é assistente de um professor chamado Paulo Roberto que ensina Língua Portuguesa, Artes, Trilhas de Linguagens e Trilhas de C. Humanas no Ensino Médio (1ª, 2ª e 3ª Série) e 6º Ano, na E.E. Rural Pe. Carlos Casavequia, Senador Guiomard - AC.
+  const prompt = `Você é assistente do Prof. Paulo Roberto Ramalho Magalhães, que leciona Língua Portuguesa, Artes, Trilhas de Linguagens e Trilhas de C. Humanas no Ensino Médio (1ª, 2ª e 3ª Série) e 6º Ano na E.E. Rural Pe. Carlos Casavequia, Senador Guiomard – AC.
 
-Aqui estão exemplos do HTML exato que você deve gerar:
-${EXEMPLOS_HTML}
+Gere o HTML do relato diário no formato EXATO abaixo (sem markdown, sem explicações, apenas o HTML):
 
-REGRAS OBRIGATÓRIAS:
-- Gere APENAS o HTML do bloco .ea, exatamente no mesmo formato dos exemplos
+FORMATO:
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">DD</div><div class="my">Mmm 2026</div></div><div class="em"><div class="ed">DISCIPLINA — TURMAS</div><div class="ec"><span class="ch ch-h">⏰ HORÁRIO</span><span class="ch ch-i">📌 TEMA</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="ct">TEXTO DO RELATO</div></div></div></div>
+
+REGRAS:
 - Dia: "${dia}" | Mês: "${mes}" | Horário: "${hora || 'ver rascunho'}"
-- Use ch-h para horário (⏰), ch-i para temas/projetos (📌 ou emoji relevante), ch-p para presença (👥), ch-a para alertas/obs (⚠️)
-- O texto do .ct deve ser fluido, profissional e conciso como nos exemplos
-- NÃO inclua markdown, explicações ou qualquer texto fora do HTML
-- Comece exatamente com: <div class="ea">
+- ch-h = horário (⏰), ch-i = tema/projeto, ch-p = presença (👥), ch-a = alerta/obs (⚠️)
+- .ct deve ser profissional, fluido e conciso
+- Comece EXATAMENTE com: <div class="ea">
+- NÃO inclua nada além do HTML
 
-Rascunho do professor:
+RASCUNHO DO PROFESSOR:
 ${rascunho}`;
 
-  const geminiKey = localStorage.getItem('anthropic_key') || '';
-  if (!geminiKey) {
-    alert('Configure a Chave API do Google Gemini primeiro!\n\nClique em ⚙️ Configuração GitHub e adicione sua chave gratuita de:\naistudio.google.com/apikey');
-    btn.textContent = '🤖 Gerar Relato com IA'; btn.disabled = false;
-    return;
-  }
-
   try {
-    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 1000, temperature: 0.3 }
-      })
-    });
-    const data2 = await resp.json();
-    if (!resp.ok) throw new Error(data2.error?.message || 'Erro na API Gemini: ' + resp.status);
-    let html = data2.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    html = html.trim().replace(/```html?/gi,'').replace(/```/g,'').trim();
-    // Garantir que começa com a div correta
-    if (!html.startsWith('<div class="ea">')) {
-      const idx = html.indexOf('<div class="ea">');
-      if (idx > -1) html = html.substring(idx);
-    }
-    _relatoGerado = html;
-
-    // Preview visual
-    document.getElementById('relato-preview').innerHTML = html;
-    document.getElementById('relato-etapa1').style.display = 'none';
-    document.getElementById('relato-etapa2').style.display = 'block';
+    navigator.clipboard.writeText(prompt);
   } catch(e) {
-    alert('Erro ao gerar: ' + e.message);
+    // clipboard não disponível — o usuário copiará manualmente
   }
-  btn.textContent = '🤖 Gerar Relato com IA';
-  btn.disabled = false;
+
+  window.open('https://claude.ai/new', '_blank');
+
+  document.getElementById('relato-etapa1').style.display = 'none';
+  document.getElementById('relato-etapa2').style.display = 'block';
+  document.getElementById('relato-html-colado').value = '';
+  document.getElementById('relato-preview').style.display = 'none';
+  document.getElementById('pub-status').style.display = 'none';
+}
+
+function mostrarPreviewColado() {
+  const html = document.getElementById('relato-html-colado').value.trim();
+  const preview = document.getElementById('relato-preview');
+  if (html) {
+    preview.innerHTML = html;
+    preview.style.display = 'block';
+  }
 }
 
 async function publicarNoGitHub() {
@@ -6204,7 +6179,9 @@ async function publicarNoGitHub() {
   const repo  = localStorage.getItem('gh_repo') || 'relatorio-2026';
   const token = localStorage.getItem('gh_token') || '';
   if (!token) { alert('Configure o Token GitHub primeiro (⚙️ Configuração GitHub acima)!'); return; }
-  if (!_relatoGerado) { alert('Gere o relato com IA primeiro!'); return; }
+  const _relatoGerado = (document.getElementById('relato-html-colado').value || '').trim();
+  if (!_relatoGerado) { alert('Cole o HTML gerado pelo Claude antes de publicar!'); return; }
+  if (!_relatoGerado.includes('<div class="ea">')) { alert('O HTML colado não parece correto. Deve começar com <div class="ea">.'); return; }
 
   const btn = document.getElementById('btn-publicar');
   const status = document.getElementById('pub-status');
@@ -6291,9 +6268,6 @@ async function publicarNoGitHub() {
         <input id="gh-repo" placeholder="relatorio-2026" style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
         <label style="font-size:.78rem;font-weight:600;color:var(--ce);display:block;margin-bottom:4px">Token GitHub (com permissão repo + workflow)</label>
         <input id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxx" style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
-        <label style="font-size:.78rem;font-weight:600;color:var(--ce);display:block;margin-bottom:4px">🤖 Chave API Google Gemini (gratuita)</label>
-        <input id="anthropic-key" type="password" placeholder="AIzaSy..." style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:4px">
-        <div style="font-size:.72rem;color:var(--cm);margin-bottom:10px">🆓 Gratuito, sem cartão. Obtenha em: <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ai)">aistudio.google.com/apikey</a></div>
         <button onclick="salvarConfigGH()" style="background:var(--vm);color:#fff;border:none;padding:7px 16px;border-radius:6px;font-weight:700;font-size:.8rem;cursor:pointer">💾 Salvar</button>
         <span id="cfg-ok" style="display:none;margin-left:10px;color:var(--vm);font-size:.8rem;font-weight:700">✓ Salvo!</span>
       </div>
@@ -6318,18 +6292,25 @@ async function publicarNoGitHub() {
     </div>
     <textarea id="relato-rascunho" rows="7" placeholder="Descreva o que aconteceu na aula hoje..." style="width:100%;padding:12px;border:2px solid var(--cl);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;resize:vertical;line-height:1.6"></textarea>
 
-    <button onclick="gerarComIA()" id="btn-gerar" style="margin-top:14px;width:100%;background:linear-gradient(135deg,var(--vd),var(--vm));color:#fff;border:none;padding:13px;border-radius:10px;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .2s">
-      🤖 Gerar Relato com IA
+    <button onclick="gerarComIA()" id="btn-gerar" style="margin-top:14px;width:100%;background:linear-gradient(135deg,#1a1a2e,#2980b9);color:#fff;border:none;padding:13px;border-radius:10px;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .2s">
+      🤖 Abrir no Claude.ai
     </button>
   </div>
 
-  <!-- Etapa 2: Preview -->
+  <!-- Etapa 2: Colar HTML do Claude -->
   <div id="relato-etapa2" style="display:none;padding:24px">
-    <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--vd);margin-bottom:14px">👁️ Preview do Relato Gerado</div>
-    <div id="relato-preview" style="border:2px solid var(--cl);border-radius:10px;padding:16px;background:#fafaf8;font-size:.85rem;line-height:1.6;max-height:300px;overflow-y:auto;margin-bottom:16px"></div>
+    <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--vd);margin-bottom:6px">📋 Cole o HTML gerado pelo Claude</div>
+    <div style="background:#f0f7ff;border-radius:8px;padding:10px 12px;font-size:.76rem;color:var(--ai);margin-bottom:12px;line-height:1.5">
+      1. O Claude.ai foi aberto em nova aba com o prompt já copiado<br>
+      2. Cole o prompt, descreva a aula e peça o HTML<br>
+      3. Copie o HTML gerado e cole abaixo
+    </div>
+    <textarea id="relato-html-colado" rows="8" placeholder='Cole aqui o HTML gerado pelo Claude (começa com &lt;div class="ea"&gt;...)' oninput="mostrarPreviewColado()" style="width:100%;padding:12px;border:2px solid var(--cl);border-radius:8px;font-family:'DM Mono',monospace;font-size:.78rem;resize:vertical;line-height:1.5"></textarea>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <button onclick="voltarEtapa1()" style="background:#f5f3ee;color:var(--ce);border:2px solid var(--cl);padding:11px;border-radius:10px;font-weight:700;font-size:.88rem;cursor:pointer">← Editar rascunho</button>
+    <div id="relato-preview" style="border:2px solid var(--cl);border-radius:10px;padding:16px;background:#fafaf8;font-size:.85rem;line-height:1.6;max-height:200px;overflow-y:auto;margin-top:10px;display:none"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+      <button onclick="voltarEtapa1()" style="background:#f5f3ee;color:var(--ce);border:2px solid var(--cl);padding:11px;border-radius:10px;font-weight:700;font-size:.88rem;cursor:pointer">← Voltar</button>
       <button onclick="publicarNoGitHub()" id="btn-publicar" style="background:linear-gradient(135deg,#1a3a2a,var(--vm));color:#fff;border:none;padding:11px;border-radius:10px;font-weight:700;font-size:.88rem;cursor:pointer">
         🚀 Publicar no GitHub
       </button>
@@ -6341,5 +6322,44 @@ async function publicarNoGitHub() {
 </div>
 </div>
 
+<!-- TOOLBAR EDITOR -->
+<div id="toolbar-texto">
+  <button class="tb-btn" data-cmd="bold" title="Negrito (Ctrl+B)"><strong>B</strong></button>
+  <button class="tb-btn" data-cmd="italic" title="Itálico (Ctrl+I)"><em>I</em></button>
+  <button class="tb-btn" data-cmd="underline" title="Sublinhado (Ctrl+U)"><u>U</u></button>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" data-cmd="insertUnorderedList" title="Lista">≡</button>
+  <button class="tb-btn" data-cmd="insertOrderedList" title="Lista numerada">№</button>
+  <div class="tb-sep"></div>
+  <select class="tb-select" id="tb-tamanho" title="Tamanho">
+    <option value="3">Normal</option>
+    <option value="1">Pequeno</option>
+    <option value="4">Grande</option>
+    <option value="5">Maior</option>
+  </select>
+  <div class="tb-sep"></div>
+  <input type="color" id="tb-cor-texto" value="#2b2b2b" title="Cor do texto" style="width:24px;height:24px;border:none;border-radius:4px;cursor:pointer;padding:0;background:transparent">
+  <input type="color" id="tb-cor-fundo" value="#faf8f2" title="Destaque" style="width:24px;height:24px;border:none;border-radius:4px;cursor:pointer;padding:0;background:transparent">
+</div>
+
+<!-- BOTÕES FLUTUANTES DO EDITOR -->
+<button id="btn-historico" style="display:none;position:fixed;bottom:80px;right:20px;z-index:400;background:#1a3a2a;color:#fff;border:none;border-radius:24px;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3)">📜 Histórico</button>
+<button id="btn-add-entrada" style="display:none;position:fixed;bottom:20px;right:20px;z-index:400;background:var(--ou);color:#1a3a2a;border:none;border-radius:24px;padding:12px 20px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3)">+ Entrada</button>
+
+<!-- PAINEL HISTÓRICO -->
+<div id="painel-historico">
+  <div class="hist-header">
+    <span>📜 Histórico de Versões</span>
+    <button id="btn-fechar-historico" style="background:transparent;border:none;cursor:pointer;font-size:1.1rem;color:#999">✕</button>
+  </div>
+  <div id="hist-lista" class="hist-lista"></div>
+</div>
+
+<script src="assets/js/editor.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof initEditor === 'function') initEditor();
+});
+</script>
 </body>
 </html>
