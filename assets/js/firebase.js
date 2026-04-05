@@ -8,6 +8,7 @@ const firebaseConfig = {
   appId: "1:457657450375:web:15b1335aed2ba9939bdd22",
   measurementId: "G-3P3SK63P71"
 };
+window.FIREBASE_CONFIG = firebaseConfig;
 // ═══════════════════════════════════════════════════════════
 // FIREBASE.JS — Todas as operações com Firebase
 // Autenticação Google + Firestore CRUD
