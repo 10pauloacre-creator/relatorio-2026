@@ -238,8 +238,8 @@ footer{background:var(--vd);color:rgba(255,255,255,.5);text-align:center;padding
 
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">07</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Língua Portuguesa — 2 h/aula</div><div class="ec"><span class="ch ch-h">⏰ 07h–09h</span><span class="ch ch-p">👥 12 presentes</span><span class="ch ch-i">📖 Intertextualidade</span><span class="ch ch-a">⚠️ 1 obs.</span></div></div><div class="et">▾</div></div>
 <div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t1-0407')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t1-0407')">👥 Presença</button><button class="itab" onclick="itab(this,'a-t1-0407')">📝 Atividades</button></div>
-<div class="ipane on" id="r-t1-0407"><div class="st">📖 Conteúdo</div><div class="ct"><strong>Intertextualidade — Texto X.</strong><br>Aula expositiva e dialogada sobre intertextualidade. Análise de referências entre textos, identificação de citações e relações temáticas.</div><div class="st">⚠️ Ocorrências</div><div class="ol"><div class="oi nt"><span class="oi-ic">🚪</span><div><div class="oa">Daiane Oliveira Santos (nº5)</div><div class="od">Saiu mais cedo sem justificativa. 1ª ocorrência — monitorar.</div></div></div></div><div class="st">📋 Faltas</div><div class="ng"><span>📝</span><span><strong>Carlos Eduardo Souza (nº4)</strong> e <strong>Gabriel Henrique Lima (nº8)</strong> faltaram.</span></div></div>
-<div class="ipane" id="p-t1-0407"><div class="pres-av"><span>ℹ️</span><span>12 presentes · Faltas: Carlos Eduardo (nº4) e Gabriel Henrique (nº8) · Daiane Oliveira (nº5) saiu antes do término.</span></div><div id="pl-t1-0407" class="pres-grid"></div></div>
+<div class="ipane on" id="r-t1-0407"><div class="st">📖 Conteúdo</div><div class="ct"><strong>Intertextualidade — Texto X.</strong><br>Aula expositiva e dialogada sobre intertextualidade. Análise de referências entre textos, identificação de citações e relações temáticas.</div><div class="st">⚠️ Ocorrências</div><div class="ol"><div class="oi nt"><span class="oi-ic">🚪</span><div><div class="oa">Felipe Costa Bezerra (nº5)</div><div class="od">Saiu mais cedo sem justificativa. 1ª ocorrência — monitorar.</div></div></div></div><div class="st">📋 Faltas</div><div class="ng"><span>📝</span><span><strong>Eduarda Pereira Santiago (nº4)</strong> e <strong>Jady Kamilly de Oliveira Amorim (nº8)</strong> faltaram.</span></div></div>
+<div class="ipane" id="p-t1-0407"><div class="pres-av"><span>ℹ️</span><span>12 presentes · Faltas: Eduarda Pereira Santiago (nº4) e Jady Kamilly de Oliveira Amorim (nº8) · Felipe Costa Bezerra (nº5) saiu antes do término.</span></div><div id="pl-t1-0407" class="pres-grid"></div></div>
 <div class="ipane" id="a-t1-0407"><div class="st">📋 Atividade</div><div class="atv-tema"><strong>Intertextualidade — Texto X</strong><br><span style="font-size:.82rem;color:var(--cm)">Atividade em sala · 07/04/2026</span></div></div>
 </div></div>
 </section>
@@ -6364,9 +6364,11 @@ async function publicarNoGitHub() {
 </div>
 
 <script src="assets/js/editor.js"></script>
+<script src="assets/js/alunos.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   if (typeof initEditor === 'function') initEditor();
+  if (typeof initAlunos === 'function') initAlunos();
 });
 </script>
 </body>
