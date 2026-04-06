@@ -26,122 +26,106 @@ const TURMAS = [
   { id: 't6', nome: '6º Ano', nivel: 'Ensino Fundamental II', badge: '6º', cor: 'laranja' }
 ];
 
-// Listas de alunos por turma
-// NOTA: Listas fictícias baseadas no contexto - substituir pelos alunos reais
+// Listas de alunos por turma — dados reais (Turmas 2026)
 const ALUNOS = {
   t1: [
-    { num: 1, nome: 'Aleff Rodrigues Silva' },
-    { num: 2, nome: 'Amanda Ferreira Lima' },
-    { num: 3, nome: 'Ana Beatriz Costa' },
-    { num: 4, nome: 'Carlos Eduardo Souza' },
-    { num: 5, nome: 'Daiane Oliveira Santos' },
-    { num: 6, nome: 'Eduardo Pereira Melo' },
-    { num: 7, nome: 'Fernanda Castro Alves' },
-    { num: 8, nome: 'Gabriel Henrique Lima' },
-    { num: 9, nome: 'Jade Cristina Mendes' },
-    { num: 10, nome: 'João Paulo Ramos' },
-    { num: 11, nome: 'Juliana Moreira Pinto' },
-    { num: 12, nome: 'Kaique Santos Barbosa' },
-    { num: 13, nome: 'Larissa Figueiredo' },
-    { num: 14, nome: 'Lucas Ferreira Nunes' },
-    { num: 15, nome: 'Maria Eduarda Andrade' },
-    { num: 16, nome: 'Marcos Antônio Cunha' },
-    { num: 17, nome: 'Natalia Oliveira Cruz' },
-    { num: 18, nome: 'Paulo Henrique Vieira' },
-    { num: 19, nome: 'Rafael Augusto Torres' },
-    { num: 20, nome: 'Sabrina Lima Cardoso' },
-    { num: 21, nome: 'Thiago Rodrigues Assis' },
-    { num: 22, nome: 'Vanessa Sousa Freitas' }
+    { num: 2,  nome: 'Cleiton Silva Santana' },
+    { num: 3,  nome: 'Daniel Henrique Rodrigues Galvão' },
+    { num: 4,  nome: 'Eduarda Pereira Santiago' },
+    { num: 5,  nome: 'Felipe Costa Bezerra' },
+    { num: 6,  nome: 'Gabriel Souza Silva' },
+    { num: 7,  nome: 'Gustavo Gomes da Silva' },
+    { num: 8,  nome: 'Jady Kamilly de Oliveira Amorim' },
+    { num: 9,  nome: 'João Pedro Gomes da Silva' },
+    { num: 10, nome: 'Juliana da Silva Euripe' },
+    { num: 11, nome: 'Lauane da Silva Santos' },
+    { num: 12, nome: 'Maria Eduarda da Silva de Paula' },
+    { num: 13, nome: 'Maria Valéria Aparecida Nunes de Lima' },
+    { num: 14, nome: 'Paulo Henrique Chaves Teixeira' },
+    { num: 15, nome: 'Yudi Oliveira de Araujo' },
+    { num: 16, nome: 'Isabelle Moura dos Santos' }
   ],
   t2: [
-    { num: 1, nome: 'Adriele Santos Macedo' },
-    { num: 2, nome: 'Alan Rodrigues Silva' },
-    { num: 3, nome: 'Beatriz Carvalho Lima' },
-    { num: 4, nome: 'Bruno Ferreira Costa' },
-    { num: 5, nome: 'Camila Oliveira Gomes' },
-    { num: 6, nome: 'Daniel Pereira Alves' },
-    { num: 7, nome: 'Dayane Santos Cruz' },
-    { num: 8, nome: 'Diego Martins Souza' },
-    { num: 9, nome: 'Emilly Rodrigues Melo' },
-    { num: 10, nome: 'Felipe Andrade Lima' },
-    { num: 11, nome: 'Gabriela Mendes Pinto' },
-    { num: 12, nome: 'Gustavo Farias Torres' },
-    { num: 13, nome: 'Isabela Costa Santos' },
-    { num: 14, nome: 'José Lucas Moreira' },
-    { num: 15, nome: 'Jéssica Alves Barbosa' },
-    { num: 16, nome: 'Kevin Ribeiro Nunes' },
-    { num: 17, nome: 'Laís Fernanda Silva' },
-    { num: 18, nome: 'Leonardo Cruz Araújo' },
-    { num: 19, nome: 'Luana Souza Ferreira' },
-    { num: 20, nome: 'Marcos Paulo Rocha' },
-    { num: 21, nome: 'Mariana Lima Cardoso' },
-    { num: 22, nome: 'Mateus Oliveira Gomes' },
-    { num: 23, nome: 'Nathalia Santos Ramos' },
-    { num: 24, nome: 'Pedro Henrique Vieira' },
-    { num: 25, nome: 'Raquel Figueiredo Melo' },
-    { num: 26, nome: 'Rodrigo Pereira Assis' },
-    { num: 27, nome: 'Sara Cristina Lima' },
-    { num: 28, nome: 'Tiago Rodrigues Cunha' }
+    { num: 1,  nome: 'Alice Ferreira de Souza' },
+    { num: 2,  nome: 'Ana Beatriz Nascimento Maia' },
+    { num: 3,  nome: 'Anthonny Gabriel Almeida Paiva' },
+    { num: 4,  nome: 'Antonio Samuel de Oliveira Barreto' },
+    { num: 5,  nome: 'Elanne Melo de Souza' },
+    { num: 6,  nome: 'Eslane Moraes Ribeiro' },
+    { num: 7,  nome: 'Everton Oliveira da Silva' },
+    { num: 8,  nome: 'Fabio Henrique Barbosa Rosas' },
+    { num: 9,  nome: 'Francielly da Silveira Braga Santiago' },
+    { num: 10, nome: 'Francisco Gabriel de Queiroz Brasil' },
+    { num: 11, nome: 'Jorge Arnaldo Félix Pereira' },
+    { num: 12, nome: 'Kauesley dos Anjos Dantas' },
+    { num: 13, nome: 'Kayo dos Anjos Coutinho' },
+    { num: 14, nome: 'Lilia da Silva Ramos' },
+    { num: 15, nome: 'Luiz Guilherme da Silva Santiago' },
+    { num: 16, nome: 'Maria Clara Lima da Silva' },
+    { num: 17, nome: 'Maria Eduarda Silva de Jesus' },
+    { num: 18, nome: 'Nathaly Yasmim Castro Jardim' },
+    { num: 19, nome: 'Pietro Fidelis Miranda' },
+    { num: 20, nome: 'Sabrina Damazio Alves Araújo' },
+    { num: 21, nome: 'Tamires Lima Fernandes' },
+    { num: 24, nome: 'Wesley Emanuel Lima da Silva' },
+    { num: 25, nome: 'Émilly Nathasha Martins Sá' }
   ],
   t3: [
-    { num: 1, nome: 'Aline Moreira Santos' },
-    { num: 2, nome: 'André Luiz Costa' },
-    { num: 3, nome: 'Bianca Ferreira Lima' },
-    { num: 4, nome: 'Carlos Alberto Nunes' },
-    { num: 5, nome: 'Cintia Rodrigues Silva' },
-    { num: 6, nome: 'Danilo Santos Alves' },
-    { num: 7, nome: 'Débora Lima Carvalho' },
-    { num: 8, nome: 'Eduardo Farias Gomes' },
-    { num: 9, nome: 'Elizangela Cruz Melo' },
-    { num: 10, nome: 'Fabiano Pereira Torres' },
-    { num: 11, nome: 'Geovana Santos Pinto' },
-    { num: 12, nome: 'Heloísa Oliveira Lima' },
-    { num: 13, nome: 'Igor Martins Barbosa' },
-    { num: 14, nome: 'Jacqueline Souza Ramos' },
-    { num: 15, nome: 'Jonathan Costa Assis' },
-    { num: 16, nome: 'Karoline Lima Freitas' },
-    { num: 17, nome: 'Leonardo Andrade Cunha' },
-    { num: 18, nome: 'Lídia Fernanda Rocha' },
-    { num: 19, nome: 'Marcelo Rodrigues Cruz' },
-    { num: 20, nome: 'Michelle Santos Lima' },
-    { num: 21, nome: 'Nataniel Pereira Melo' },
-    { num: 22, nome: 'Pamela Oliveira Gomes' },
-    { num: 23, nome: 'Quézia Alves Santos' },
-    { num: 24, nome: 'Ricardo Ferreira Torres' }
+    { num: 1,  nome: 'Alonso Queiroz Santiago' },
+    { num: 2,  nome: 'Antoniel Araujo de Lima' },
+    { num: 3,  nome: 'Francisco Kevison de Lima Paixao' },
+    { num: 4,  nome: 'Gabriel Oliveira Evangelista' },
+    { num: 5,  nome: 'Gabriella Farias Moreira' },
+    { num: 6,  nome: 'Hana Beatryz Araujo Sales' },
+    { num: 7,  nome: 'Joaiz Muniz de Souza Júnior' },
+    { num: 8,  nome: 'Joao Paulo Barreto Chaves' },
+    { num: 9,  nome: 'Karina Paiva Lima' },
+    { num: 10, nome: 'Kiara Kasiele Silva Paixão' },
+    { num: 11, nome: 'Lourival Wagner Aparecido Nunes de Lima' },
+    { num: 12, nome: 'Maria Beatriz Oliveira da Gama' },
+    { num: 13, nome: 'Maria Eduarda Souza Teixeira' },
+    { num: 14, nome: 'Matheus Henrique Silveira Santiago' },
+    { num: 15, nome: 'Mayco Gabriel da Silva Dias' },
+    { num: 16, nome: 'Natanael Ovides de Sousa' },
+    { num: 17, nome: 'Sara Machado do Amor Divino' },
+    { num: 18, nome: 'Sibelly Victória Santiago de Sousa' }
   ],
   t6: [
-    { num: 1, nome: 'Agatha Rodrigues Lima' },
-    { num: 2, nome: 'Alexandre Santos Costa' },
-    { num: 3, nome: 'Ana Clara Ferreira' },
-    { num: 4, nome: 'Arthur Oliveira Melo' },
-    { num: 5, nome: 'Beatriz Carvalho Pinto' },
-    { num: 6, nome: 'Benjamin Silva Souza' },
-    { num: 7, nome: 'Brenda Santos Cruz' },
-    { num: 8, nome: 'Carlos Henrique Lima' },
-    { num: 9, nome: 'Clara Martins Gomes' },
-    { num: 10, nome: 'Daniel Rodrigues Alves' },
-    { num: 11, nome: 'Emanuelly Costa Torres' },
-    { num: 12, nome: 'Erick Pereira Barbosa' },
-    { num: 13, nome: 'Fernanda Lima Santos' },
-    { num: 14, nome: 'Filipe Andrade Rocha' },
-    { num: 15, nome: 'Giovanna Cruz Freitas' },
-    { num: 16, nome: 'Guilherme Santos Melo' },
-    { num: 17, nome: 'Helena Oliveira Lima' },
-    { num: 18, nome: 'Igor Ferreira Costa' },
-    { num: 19, nome: 'Isabela Rodrigues Cunha' },
-    { num: 20, nome: 'João Victor Santos' },
-    { num: 21, nome: 'Julia Lima Carvalho' },
-    { num: 22, nome: 'Kaique Pereira Gomes' },
-    { num: 23, nome: 'Laura Santos Alves' },
-    { num: 24, nome: 'Leonardo Cruz Torres' },
-    { num: 25, nome: 'Leticia Ferreira Lima' },
-    { num: 26, nome: 'Lucas Rodrigues Barbosa' },
-    { num: 27, nome: 'Maria Eduarda Costa' },
-    { num: 28, nome: 'Matheus Oliveira Pinto' },
-    { num: 29, nome: 'Nicolas Santos Rocha' },
-    { num: 30, nome: 'Nicolly Lima Freitas' },
-    { num: 31, nome: 'Pedro Henrique Melo' },
-    { num: 32, nome: 'Rafaela Andrade Cruz' }
+    { num: 1,  nome: 'Ághata Luiza Sousa da Silva' },
+    { num: 2,  nome: 'Angelo de Freitas Soares' },
+    { num: 3,  nome: 'Anthony Mayksson Willames Silva de Lima' },
+    { num: 4,  nome: 'Antônio Yuri da Silva Santos' },
+    { num: 5,  nome: 'Asheley Prince Miranda Lima' },
+    { num: 6,  nome: 'Bianca Alves Bulin' },
+    { num: 7,  nome: 'Cayki Silva de Farias' },
+    { num: 8,  nome: 'Daniel Magalhães de Lima' },
+    { num: 9,  nome: 'Davi Oliveira de Amorim' },
+    { num: 10, nome: 'Douglas Oliveira Queiroz da Silva' },
+    { num: 11, nome: 'Fabrício Nunes Ataíde' },
+    { num: 12, nome: 'Guilherme Castro Pereira' },
+    { num: 13, nome: 'Hadassa Walthier da Silva' },
+    { num: 14, nome: 'Hagata Gabriely da Silva Santos' },
+    { num: 15, nome: 'Isaac Souza Fernandes' },
+    { num: 17, nome: 'João Pedro Maia de Oliveira' },
+    { num: 18, nome: 'Joel do Nascimento Cruz' },
+    { num: 19, nome: 'José Otávio da Silva Paixão' },
+    { num: 20, nome: 'Lazaro da Silva Martins' },
+    { num: 21, nome: 'Maria Isabele de Lima Paixão' },
+    { num: 22, nome: 'Mirella Barroso Lima' },
+    { num: 23, nome: 'Murilo Santana de Souza' },
+    { num: 24, nome: 'Nayla Vitória de Sousa Santana' },
+    { num: 25, nome: 'Neemias de Sousa Amim' },
+    { num: 26, nome: 'Nicolas da Silva Nogueira' },
+    { num: 27, nome: 'Pamella Letycia Souza Lino' },
+    { num: 28, nome: 'Pedro Lucas Fidelis dos Reis' },
+    { num: 29, nome: 'Sabrina Silva Ribeiro' },
+    { num: 30, nome: 'Thaemmy Silva de Farias' },
+    { num: 31, nome: 'Victor Emanoel da Silva do Nascimento' },
+    { num: 32, nome: 'Vidal Wanderley de Lima' },
+    { num: 33, nome: 'Wandson Santiago de Sousa' },
+    { num: 34, nome: 'Yan Lima Rodrigues' },
+    { num: 35, nome: 'Yasmin Vitória Vasconcelos Silva' },
+    { num: 36, nome: 'Breno Barroso da Silva' }
   ]
 };
 
@@ -1142,4 +1126,91 @@ const DIARIOS_INICIAIS = {
     }
   },
   t6: {}
+};
+
+// ═══════════════════════════════════════════════════════
+// ATIVIDADES_BIMESTRE — Atividades aplicadas por turma
+// Atualizar a cada nova atividade lançada nos relatos
+// ═══════════════════════════════════════════════════════
+const ATIVIDADES_BIMESTRE = {
+  t1: [
+    { id: 'atv-t1-0402', data: '02/04', desc: 'Trilhas C.H. — Democracia, Justiça Social e D.H.', disc: 'Trilhas C.H.' },
+    { id: 'atv-t1-0407', data: '07/04', desc: 'LP — Intertextualidade (Texto X)', disc: 'LP' }
+  ],
+  t2: [],
+  t3: [],
+  t6: []
+};
+
+// ═══════════════════════════════════════════════════════
+// REGISTROS — Faltas, ocorrências e atividades por aluno
+// Chave: número do aluno conforme lista de chamada
+// atividades: 'realizada' | 'pendente' | 'nao_realizada'
+// obs.desconto: pontos descontados (0 = só monitorar)
+// ═══════════════════════════════════════════════════════
+const REGISTROS = {
+  t1: {
+    2:  { // Cleiton Silva Santana
+      faltas: [],
+      obs: [{ data:'02/04', desc:'Jogando no celular durante atividade — 1ª ocorrência', desconto:0 }],
+      atividades: { 'atv-t1-0402':'pendente', 'atv-t1-0407':'realizada' },
+      notaProva: null
+    },
+    4:  { // Eduarda Pereira Santiago
+      faltas: ['07/04'],
+      obs: [{ data:'02/04', desc:'Conversa alta + celular não pedagógico — 1ª ocorrência', desconto:0 }],
+      atividades: { 'atv-t1-0402':'pendente', 'atv-t1-0407':'nao_realizada' },
+      notaProva: null
+    },
+    5:  { // Felipe Costa Bezerra
+      faltas: [],
+      obs: [{ data:'07/04', desc:'Saiu mais cedo sem justificativa — 1ª ocorrência', desconto:0 }],
+      atividades: { 'atv-t1-0402':'pendente', 'atv-t1-0407':'realizada' },
+      notaProva: null
+    },
+    7:  { // Gustavo Gomes da Silva
+      faltas: [],
+      obs: [{ data:'02/04', desc:'Jogando no celular durante atividade — 1ª ocorrência', desconto:0 }],
+      atividades: { 'atv-t1-0402':'pendente', 'atv-t1-0407':'realizada' },
+      notaProva: null
+    },
+    8:  { // Jady Kamilly de Oliveira Amorim
+      faltas: ['07/04'],
+      obs: [
+        { data:'30/03', desc:'Conversa com colegas próximos — 1ª ocorrência', desconto:0 },
+        { data:'02/04', desc:'Conversa alta + celular não pedagógico — 2ª ocorrência', desconto:0 }
+      ],
+      atividades: { 'atv-t1-0402':'pendente', 'atv-t1-0407':'nao_realizada' },
+      notaProva: null
+    },
+    12: { // Maria Eduarda da Silva de Paula
+      faltas: [],
+      obs: [
+        { data:'30/03', desc:'Conversa com colegas próximos — 1ª ocorrência', desconto:0 },
+        { data:'02/04', desc:'Conversa alta + celular não pedagógico — 2ª ocorrência', desconto:0 }
+      ],
+      atividades: { 'atv-t1-0402':'pendente', 'atv-t1-0407':'realizada' },
+      notaProva: null
+    },
+    14: { // Paulo Henrique Chaves Teixeira
+      faltas: [],
+      obs: [
+        { data:'30/03', desc:'Conversa com colegas próximos — 1ª ocorrência', desconto:0 },
+        { data:'02/04', desc:'Saiu no início da aula sem protocolo — 2ª ocorrência', desconto:0 }
+      ],
+      atividades: { 'atv-t1-0402':'pendente', 'atv-t1-0407':'realizada' },
+      notaProva: null
+    }
+  },
+  t2: {},
+  t3: {},
+  t6: {}
+};
+
+// ═══════════════════════════════════════════════════════
+// NOTAS_PROVA — Notas de prova por aluno (inserir manualmente após prova)
+// Escala 0–5. null = prova ainda não realizada
+// ═══════════════════════════════════════════════════════
+const NOTAS_PROVA = {
+  t1: {}, t2: {}, t3: {}, t6: {}
 };
