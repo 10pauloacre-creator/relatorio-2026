@@ -94,23 +94,23 @@ function abrirModalAlunos(turmaId) {
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px">';
 
   alunos.forEach(function(aluno) {
-    var reg = obterRegistro(turmaId, aluno.num);
+    var reg = obterRegistro(turmaId, aluno.n);
     var nObs = reg.obs.length;
     var nFaltas = reg.faltas.length;
-    var nota = calcularNotaTrabalho(turmaId, aluno.num);
+    var nota = calcularNotaTrabalho(turmaId, aluno.n);
     var notaStr = nota !== null ? nota.toFixed(1) : '—';
     var cor = nObs === 0 ? '#f0faf4' : (nObs <= 2 ? '#fffbeb' : '#fef2f2');
     var borda = nObs === 0 ? '#86efac' : (nObs <= 2 ? '#fcd34d' : '#fca5a5');
     var icone = nObs === 0 ? '🟢' : (nObs <= 2 ? '🟡' : '🔴');
 
-    html += '<div onclick="abrirPainelAluno(\'' + turmaId + '\',' + aluno.num + ')" '
+    html += '<div onclick="abrirPainelAluno(\'' + turmaId + '\',' + aluno.n + ')" '
       + 'style="background:' + cor + ';border:1.5px solid ' + borda + ';border-radius:10px;padding:11px 14px;cursor:pointer;transition:box-shadow .15s" '
       + 'onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,.12)\'" onmouseout="this.style.boxShadow=\'\'">'
       + '<div style="display:flex;justify-content:space-between;align-items:center">'
-      + '<span style="font-size:.72rem;font-weight:700;color:var(--cm)">Nº ' + aluno.num + '</span>'
+      + '<span style="font-size:.72rem;font-weight:700;color:var(--cm)">Nº ' + aluno.n + '</span>'
       + '<span style="font-size:.8rem">' + icone + '</span>'
       + '</div>'
-      + '<div style="font-weight:600;font-size:.88rem;color:var(--vd);margin:4px 0;line-height:1.3">' + aluno.nome + '</div>'
+      + '<div style="font-weight:600;font-size:.88rem;color:var(--vd);margin:4px 0;line-height:1.3">' + aluno.nm + '</div>'
       + '<div style="display:flex;gap:8px;font-size:.72rem;color:var(--cm)">'
       + '<span>⚠️ ' + nObs + ' obs</span>'
       + '<span>❌ ' + nFaltas + ' falta(s)</span>'
@@ -134,7 +134,7 @@ function fecharModalAlunos() {
 
 function abrirPainelAluno(turmaId, num) {
   var alunos = (typeof ALUNOS !== 'undefined' && ALUNOS[turmaId]) || [];
-  var aluno = alunos.find(function(a) { return a.num === num; });
+  var aluno = alunos.find(function(a) { return a.n === num; });
   if (!aluno) return;
 
   var turmas = (typeof TURMAS !== 'undefined') ? TURMAS : [];
@@ -144,7 +144,7 @@ function abrirPainelAluno(turmaId, num) {
   var notaTrab = calcularNotaTrabalho(turmaId, num);
   var notaProva = reg.notaProva;
 
-  document.getElementById('painel-aluno-nome').textContent = 'Nº ' + num + ' · ' + aluno.nome;
+  document.getElementById('painel-aluno-nome').textContent = 'Nº ' + num + ' · ' + aluno.nm;
   document.getElementById('painel-aluno-info').textContent = turmaInfo.nome + ' · ' + turmaInfo.nivel;
 
   var html = '';
