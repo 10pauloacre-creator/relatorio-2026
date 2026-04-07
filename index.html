@@ -6152,7 +6152,7 @@ async function gerarComIA() {
   if (!rascunho) { alert('Escreva o rascunho antes de continuar!'); return; }
   if (!dataVal) { alert('Selecione a data da aula!'); return; }
   if (!geminiKey) {
-    alert('Configure a Chave API Gemini primeiro!\n\nClique em ⚙️ Configuração GitHub acima, preencha o campo "Chave API Gemini" e clique em 💾 Salvar.');
+    alert('Configure a Chave API Groq primeiro!\n\nClique em ⚙️ Configuração GitHub acima, preencha o campo "Chave API Groq" e clique em 💾 Salvar.');
     document.getElementById('cfg-gh-fields').style.display = 'block';
     document.getElementById('cfg-arrow').textContent = '▴ recolher';
     return;
@@ -6187,22 +6187,24 @@ ${rascunho}`;
 
   try {
     const resp = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=' + geminiKey,
+      'https://api.groq.com/openai/v1/chat/completions',
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + geminiKey },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.3, maxOutputTokens: 1200 }
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.3,
+          max_tokens: 1200
         })
       }
     );
     if (!resp.ok) {
       const err = await resp.json();
-      throw new Error(err.error?.message || 'Erro na API Gemini (' + resp.status + ')');
+      throw new Error(err.error?.message || 'Erro na API Groq (' + resp.status + ')');
     }
     const json = await resp.json();
-    let html = (json.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
+    let html = (json.choices?.[0]?.message?.content || '').trim();
 
     // Remove markdown code blocks caso o modelo os inclua
     html = html.replace(/^```html?\s*/i, '').replace(/\s*```$/, '').trim();
@@ -6308,7 +6310,7 @@ async function publicarNoGitHub() {
   <div style="background:linear-gradient(135deg,var(--vd),var(--vm));color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700">✏️ Novo Relato Diário</div>
-      <div style="font-size:.78rem;opacity:.8;margin-top:3px">IA organiza — GitHub publica automaticamente</div>
+      <div style="font-size:.78rem;opacity:.8;margin-top:3px">Groq IA organiza — GitHub publica automaticamente</div>
     </div>
     <button onclick="fecharModalRelato()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:1.3rem;width:34px;height:34px;border-radius:50%;cursor:pointer">✕</button>
   </div>
@@ -6330,8 +6332,8 @@ async function publicarNoGitHub() {
         <input id="gh-repo" placeholder="relatorio-2026" style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
         <label style="font-size:.78rem;font-weight:600;color:var(--ce);display:block;margin-bottom:4px">Token GitHub (com permissão repo + workflow)</label>
         <input id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxx" style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
-        <label style="font-size:.78rem;font-weight:600;color:var(--ce);display:block;margin-bottom:4px">Chave API Gemini (gratuita — <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--ai)">obter aqui</a>)</label>
-        <input id="gemini-key" type="password" placeholder="AIzaSy..." style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
+        <label style="font-size:.78rem;font-weight:600;color:var(--ce);display:block;margin-bottom:4px">Chave API Groq (gratuita — <a href="https://console.groq.com/keys" target="_blank" style="color:var(--ai)">obter aqui</a>)</label>
+        <input id="gemini-key" type="password" placeholder="gsk_..." style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
         <button onclick="salvarConfigGH()" style="background:var(--vm);color:#fff;border:none;padding:7px 16px;border-radius:6px;font-weight:700;font-size:.8rem;cursor:pointer">💾 Salvar</button>
         <span id="cfg-ok" style="display:none;margin-left:10px;color:var(--vm);font-size:.8rem;font-weight:700">✓ Salvo!</span>
       </div>
@@ -6357,13 +6359,13 @@ async function publicarNoGitHub() {
     <textarea id="relato-rascunho" rows="7" placeholder="Descreva o que aconteceu na aula hoje..." style="width:100%;padding:12px;border:2px solid var(--cl);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;resize:vertical;line-height:1.6"></textarea>
 
     <button onclick="gerarComIA()" id="btn-gerar" style="margin-top:14px;width:100%;background:linear-gradient(135deg,#1a1a2e,#1a73e8);color:#fff;border:none;padding:13px;border-radius:10px;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .2s">
-      🤖 Gerar com Gemini
+      🤖 Gerar com Groq IA
     </button>
   </div>
 
   <!-- Etapa 2: Colar HTML do Claude -->
   <div id="relato-etapa2" style="display:none;padding:24px">
-    <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--vd);margin-bottom:6px">✅ HTML Gerado pelo Gemini</div>
+    <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--vd);margin-bottom:6px">✅ HTML Gerado pela IA</div>
     <div style="background:#f0faf4;border-radius:8px;padding:10px 12px;font-size:.76rem;color:var(--vm);margin-bottom:12px;line-height:1.5">
       Confira o preview abaixo. Se quiser ajustar, edite o HTML no campo de texto e o preview atualiza automaticamente.
     </div>
