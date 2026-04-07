@@ -205,7 +205,7 @@ footer{background:var(--vd);color:rgba(255,255,255,.5);text-align:center;padding
     <button class="nb" onclick="aba('cron',this)">📅 Cronograma</button><div class="sp"></div>
 <button class="nb" onclick="aba('cont',this)">📊 Contador</button>
 <div class="sp"></div>
-<button class="nb" onclick="window.open('https://claude.ai/share/8d701803-b6b5-471f-8ca2-15a8d9d2349c','_blank')" style="background:rgba(201,168,76,.2);color:var(--ou);border:1px solid rgba(201,168,76,.4);border-radius:6px;margin:6px 4px">✏️ Novo Relato</button>
+<button class="nb" onclick="abrirModalRelato()" style="background:rgba(201,168,76,.2);color:var(--ou);border:1px solid rgba(201,168,76,.4);border-radius:6px;margin:6px 4px">✏️ Novo Relato</button>
 <div class="sp"></div>
 <button id="btn-editar" class="nb" style="background:rgba(74,148,103,.2);color:#7fddaa;border:1px solid rgba(74,148,103,.4);border-radius:6px;margin:6px 4px">✏️ Editar</button>
 </div></nav>
@@ -6118,6 +6118,7 @@ function salvarConfigGH() {
   localStorage.setItem('gh_user', document.getElementById('gh-user').value.trim());
   localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim());
   localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim());
+  localStorage.setItem('gemini_key', document.getElementById('gemini-key').value.trim());
   const ok = document.getElementById('cfg-ok');
   ok.style.display = 'inline'; setTimeout(() => ok.style.display = 'none', 2500);
 }
@@ -6125,6 +6126,7 @@ function carregarConfigGH() {
   document.getElementById('gh-user').value = localStorage.getItem('gh_user') || '10pauloacre-creator';
   document.getElementById('gh-repo').value = localStorage.getItem('gh_repo') || 'relatorio-2026';
   document.getElementById('gh-token').value = localStorage.getItem('gh_token') || '';
+  document.getElementById('gemini-key').value = localStorage.getItem('gemini_key') || '';
   if (localStorage.getItem('gh_token')) {
     document.getElementById('cfg-gh-fields').style.display = 'none';
     document.getElementById('cfg-arrow').textContent = '▾ expandir';
@@ -6137,23 +6139,33 @@ function carregarConfigGH() {
 function voltarEtapa1() {
   document.getElementById('relato-etapa1').style.display = 'block';
   document.getElementById('relato-etapa2').style.display = 'none';
+  const btn = document.getElementById('btn-gerar');
+  if (btn) { btn.textContent = '🤖 Gerar com Gemini'; btn.disabled = false; }
 }
 
-function gerarComIA() {
+async function gerarComIA() {
   const rascunho = document.getElementById('relato-rascunho').value.trim();
-  const data = document.getElementById('relato-data').value;
+  const dataVal = document.getElementById('relato-data').value;
   const hora = document.getElementById('relato-hora').value.trim();
-  if (!rascunho) { alert('Escreva o rascunho antes de continuar!'); return; }
-  if (!data) { alert('Selecione a data da aula!'); return; }
+  const geminiKey = localStorage.getItem('gemini_key') || '';
 
-  const dataObj = new Date(data + 'T12:00:00');
+  if (!rascunho) { alert('Escreva o rascunho antes de continuar!'); return; }
+  if (!dataVal) { alert('Selecione a data da aula!'); return; }
+  if (!geminiKey) {
+    alert('Configure a Chave API Gemini primeiro!\n\nClique em ⚙️ Configuração GitHub acima, preencha o campo "Chave API Gemini" e clique em 💾 Salvar.');
+    document.getElementById('cfg-gh-fields').style.display = 'block';
+    document.getElementById('cfg-arrow').textContent = '▴ recolher';
+    return;
+  }
+
+  const dataObj = new Date(dataVal + 'T12:00:00');
   const dia = String(dataObj.getDate()).padStart(2,'0');
   const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const mes = meses[dataObj.getMonth()] + ' 2026';
 
   const prompt = `Você é assistente do Prof. Paulo Roberto Ramalho Magalhães, que leciona Língua Portuguesa, Artes, Trilhas de Linguagens e Trilhas de C. Humanas no Ensino Médio (1ª, 2ª e 3ª Série) e 6º Ano na E.E. Rural Pe. Carlos Casavequia, Senador Guiomard – AC.
 
-Gere o HTML do relato diário no formato EXATO abaixo (sem markdown, sem explicações, apenas o HTML):
+Gere o HTML do relato diário no formato EXATO abaixo (sem markdown, sem explicações, apenas o HTML puro):
 
 FORMATO:
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">DD</div><div class="my">Mmm 2026</div></div><div class="em"><div class="ed">DISCIPLINA — TURMAS</div><div class="ec"><span class="ch ch-h">⏰ HORÁRIO</span><span class="ch ch-i">📌 TEMA</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="ct">TEXTO DO RELATO</div></div></div></div>
@@ -6161,26 +6173,58 @@ FORMATO:
 REGRAS:
 - Dia: "${dia}" | Mês: "${mes}" | Horário: "${hora || 'ver rascunho'}"
 - ch-h = horário (⏰), ch-i = tema/projeto, ch-p = presença (👥), ch-a = alerta/obs (⚠️)
-- .ct deve ser profissional, fluido e conciso
+- .ct deve ser profissional, fluido e conciso, com negrito nos destaques importantes
 - Comece EXATAMENTE com: <div class="ea">
-- NÃO inclua nada além do HTML
+- Termine EXATAMENTE com: </div>
+- NÃO inclua markdown, blocos de código, comentários ou qualquer texto fora do HTML
 
 RASCUNHO DO PROFESSOR:
 ${rascunho}`;
 
+  const btn = document.getElementById('btn-gerar');
+  btn.textContent = '⏳ Gerando...';
+  btn.disabled = true;
+
   try {
-    navigator.clipboard.writeText(prompt);
+    const resp = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + geminiKey,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.3, maxOutputTokens: 1200 }
+        })
+      }
+    );
+    if (!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.error?.message || 'Erro na API Gemini (' + resp.status + ')');
+    }
+    const json = await resp.json();
+    let html = (json.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
+
+    // Remove markdown code blocks caso o modelo os inclua
+    html = html.replace(/^```html?\s*/i, '').replace(/\s*```$/, '').trim();
+
+    if (!html.startsWith('<div class="ea">')) {
+      // Tenta extrair só o bloco ea
+      const m = html.match(/<div class="ea">[\s\S]+<\/div>/);
+      if (m) html = m[0]; else throw new Error('O Gemini não gerou o HTML esperado. Tente novamente.');
+    }
+
+    _relatoGerado = html;
+    document.getElementById('relato-html-colado').value = html;
+    document.getElementById('relato-etapa1').style.display = 'none';
+    document.getElementById('relato-etapa2').style.display = 'block';
+    document.getElementById('relato-preview').innerHTML = html;
+    document.getElementById('relato-preview').style.display = 'block';
+    document.getElementById('pub-status').style.display = 'none';
   } catch(e) {
-    // clipboard não disponível — o usuário copiará manualmente
+    alert('Erro ao chamar o Gemini:\n' + e.message);
+    btn.textContent = '🤖 Gerar com Gemini';
+    btn.disabled = false;
   }
-
-  window.open('https://claude.ai/new', '_blank');
-
-  document.getElementById('relato-etapa1').style.display = 'none';
-  document.getElementById('relato-etapa2').style.display = 'block';
-  document.getElementById('relato-html-colado').value = '';
-  document.getElementById('relato-preview').style.display = 'none';
-  document.getElementById('pub-status').style.display = 'none';
 }
 
 function mostrarPreviewColado() {
@@ -6198,8 +6242,8 @@ async function publicarNoGitHub() {
   const token = localStorage.getItem('gh_token') || '';
   if (!token) { alert('Configure o Token GitHub primeiro (⚙️ Configuração GitHub acima)!'); return; }
   const _relatoGerado = (document.getElementById('relato-html-colado').value || '').trim();
-  if (!_relatoGerado) { alert('Cole o HTML gerado pelo Claude antes de publicar!'); return; }
-  if (!_relatoGerado.includes('<div class="ea">')) { alert('O HTML colado não parece correto. Deve começar com <div class="ea">.'); return; }
+  if (!_relatoGerado) { alert('Gere o relato com o Gemini antes de publicar!'); return; }
+  if (!_relatoGerado.includes('<div class="ea">')) { alert('O HTML gerado não parece correto. Deve conter <div class="ea">.'); return; }
 
   const btn = document.getElementById('btn-publicar');
   const status = document.getElementById('pub-status');
@@ -6286,6 +6330,8 @@ async function publicarNoGitHub() {
         <input id="gh-repo" placeholder="relatorio-2026" style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
         <label style="font-size:.78rem;font-weight:600;color:var(--ce);display:block;margin-bottom:4px">Token GitHub (com permissão repo + workflow)</label>
         <input id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxx" style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
+        <label style="font-size:.78rem;font-weight:600;color:var(--ce);display:block;margin-bottom:4px">Chave API Gemini (gratuita — <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--ai)">obter aqui</a>)</label>
+        <input id="gemini-key" type="password" placeholder="AIzaSy..." style="width:100%;padding:8px 10px;border:1px solid var(--cl);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;margin-bottom:10px">
         <button onclick="salvarConfigGH()" style="background:var(--vm);color:#fff;border:none;padding:7px 16px;border-radius:6px;font-weight:700;font-size:.8rem;cursor:pointer">💾 Salvar</button>
         <span id="cfg-ok" style="display:none;margin-left:10px;color:var(--vm);font-size:.8rem;font-weight:700">✓ Salvo!</span>
       </div>
@@ -6310,20 +6356,18 @@ async function publicarNoGitHub() {
     </div>
     <textarea id="relato-rascunho" rows="7" placeholder="Descreva o que aconteceu na aula hoje..." style="width:100%;padding:12px;border:2px solid var(--cl);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;resize:vertical;line-height:1.6"></textarea>
 
-    <button onclick="gerarComIA()" id="btn-gerar" style="margin-top:14px;width:100%;background:linear-gradient(135deg,#1a1a2e,#2980b9);color:#fff;border:none;padding:13px;border-radius:10px;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .2s">
-      🤖 Abrir no Claude.ai
+    <button onclick="gerarComIA()" id="btn-gerar" style="margin-top:14px;width:100%;background:linear-gradient(135deg,#1a1a2e,#1a73e8);color:#fff;border:none;padding:13px;border-radius:10px;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .2s">
+      🤖 Gerar com Gemini
     </button>
   </div>
 
   <!-- Etapa 2: Colar HTML do Claude -->
   <div id="relato-etapa2" style="display:none;padding:24px">
-    <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--vd);margin-bottom:6px">📋 Cole o HTML gerado pelo Claude</div>
-    <div style="background:#f0f7ff;border-radius:8px;padding:10px 12px;font-size:.76rem;color:var(--ai);margin-bottom:12px;line-height:1.5">
-      1. O Claude.ai foi aberto em nova aba com o prompt já copiado<br>
-      2. Cole o prompt, descreva a aula e peça o HTML<br>
-      3. Copie o HTML gerado e cole abaixo
+    <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--vd);margin-bottom:6px">✅ HTML Gerado pelo Gemini</div>
+    <div style="background:#f0faf4;border-radius:8px;padding:10px 12px;font-size:.76rem;color:var(--vm);margin-bottom:12px;line-height:1.5">
+      Confira o preview abaixo. Se quiser ajustar, edite o HTML no campo de texto e o preview atualiza automaticamente.
     </div>
-    <textarea id="relato-html-colado" rows="8" placeholder='Cole aqui o HTML gerado pelo Claude (começa com &lt;div class="ea"&gt;...)' oninput="mostrarPreviewColado()" style="width:100%;padding:12px;border:2px solid var(--cl);border-radius:8px;font-family:'DM Mono',monospace;font-size:.78rem;resize:vertical;line-height:1.5"></textarea>
+    <textarea id="relato-html-colado" rows="5" placeholder='HTML gerado pelo Gemini aparecerá aqui...' oninput="mostrarPreviewColado()" style="width:100%;padding:12px;border:2px solid var(--cl);border-radius:8px;font-family:'DM Mono',monospace;font-size:.78rem;resize:vertical;line-height:1.5"></textarea>
 
     <div id="relato-preview" style="border:2px solid var(--cl);border-radius:10px;padding:16px;background:#fafaf8;font-size:.85rem;line-height:1.6;max-height:200px;overflow-y:auto;margin-top:10px;display:none"></div>
 
