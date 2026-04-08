@@ -6292,8 +6292,16 @@ async function publicarNoGitHub() {
     if (!getResp.ok) throw new Error('Erro ao buscar arquivo: ' + getResp.status);
     const fileData = await getResp.json();
     const sha = fileData.sha;
-    const bytes = Uint8Array.from(atob(fileData.content.replace(/\n/g,'')), c => c.charCodeAt(0));
-    const conteudoAtual = new TextDecoder('utf-8').decode(bytes);
+    let conteudoAtual;
+    if (fileData.content) {
+      const bytes = Uint8Array.from(atob(fileData.content.replace(/\n/g,'')), c => c.charCodeAt(0));
+      conteudoAtual = new TextDecoder('utf-8').decode(bytes);
+    } else {
+      // Arquivo > 1MB: usar download_url para buscar conteúdo bruto
+      const rawResp = await fetch(fileData.download_url);
+      if (!rawResp.ok) throw new Error('Erro ao baixar arquivo via download_url: ' + rawResp.status);
+      conteudoAtual = await rawResp.text();
+    }
 
     // 2. Injetar relatos nos marcadores de cada seção
     const m_geral = '<!-- RELATOS_INICIO -->';
