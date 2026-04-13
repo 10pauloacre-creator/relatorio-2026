@@ -106,8 +106,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .atv-r .aic{font-size:.85rem;flex-shrink:0}
 .atv-ic-p{margin-left:auto;font-size:.8rem;opacity:.45;flex-shrink:0;transition:opacity .15s;font-weight:700}
 .atv-r:hover .atv-ic-p{opacity:1}
-.atv-menu{position:absolute;right:0;top:calc(100% + 3px);background:#fff;border-radius:9px;box-shadow:0 6px 22px rgba(0,0,0,.18);z-index:300;min-width:158px;overflow:hidden;display:none}
-.atv-menu.on{display:block}
+#atv-float-menu{position:fixed;background:#fff;border-radius:9px;box-shadow:0 6px 22px rgba(0,0,0,.18);z-index:5000;min-width:160px;overflow:hidden;display:none}
+#atv-float-menu.on{display:block}
 .atv-mo{padding:9px 14px;font-size:.8rem;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .1s}
 .atv-mo:hover{background:#f0f0f0}
 .atv-mo.verde{color:var(--vm)}.atv-mo.verm{color:var(--ra)}.atv-mo.ag-o{color:#b8963e}.atv-mo.pfil{color:var(--vd);border-top:1px solid #eee}
@@ -288,7 +288,7 @@ body.modo-escuro .atv-r.fz{background:#152510!important;color:#80d080!important}
 body.modo-escuro .atv-r.nf{background:#2a1515!important;color:#ff9090!important}
 body.modo-escuro .atv-r.pd{background:#252533!important;color:#a0a0b0!important}
 body.modo-escuro .atv-r.ag{background:#2a2015!important;color:#d4a840!important}
-body.modo-escuro .atv-menu{background:#2a2a3a!important;box-shadow:0 6px 22px rgba(0,0,0,.5)!important}
+body.modo-escuro #atv-float-menu{background:#2a2a3a!important;box-shadow:0 6px 22px rgba(0,0,0,.5)!important}
 body.modo-escuro .atv-mo:hover{background:#383848!important}
 body.modo-escuro .atv-mo.pfil{border-top-color:#444!important}
 body.modo-escuro .pfm-inner{background:#1a2030}
@@ -6064,6 +6064,9 @@ document.getElementById('p6ano').classList.add('active');
 
 </main>
 
+<!-- ── MENU FLUTUANTE ATIVIDADES ── -->
+<div id="atv-float-menu"></div>
+
 <!-- ── MODAL PERFIL DO ALUNO ── -->
 <div id="pfm" class="pfm" onclick="if(event.target===this)fecharPerfil()">
   <div class="pfm-inner" id="pfm-inner"></div>
@@ -6151,13 +6154,36 @@ function _atvAtualizarStat(atvId){
   st.innerHTML='<span>✓ Entregaram: <strong>'+fz+'</strong></span><span>✗ Não entregaram: <strong>'+nf+'</strong></span><span>⏳ Pendente: <strong>'+ag+'</strong></span>';
 }
 
-function atvRegistrar(atvId,n,s,evt){
-  if(evt){evt.stopPropagation();}
+function _atvFecharMenu(){
+  var m=document.getElementById('atv-float-menu');
+  if(m){m.classList.remove('on');m.innerHTML='';}
+}
+
+function _atvAbrirMenu(cell,atvId,n,turma){
+  var m=document.getElementById('atv-float-menu');if(!m)return;
+  _atvFecharMenu();
+  var rect=cell.getBoundingClientRect();
+  var mH=170,mW=164;
+  var top=rect.bottom+4;
+  if(top+mH>window.innerHeight)top=Math.max(4,rect.top-mH-4);
+  var left=rect.right-mW;
+  if(left<6)left=6;
+  if(left+mW>window.innerWidth-6)left=window.innerWidth-mW-6;
+  m.style.top=top+'px';m.style.left=left+'px';
+  m.innerHTML=
+    '<div class="atv-mo verde" onclick="atvRegistrar(\''+atvId+'\','+n+',\'fz\')">✓ Entregue</div>'
+    +'<div class="atv-mo verm" onclick="atvRegistrar(\''+atvId+'\','+n+',\'nf\')">✗ Não entregue</div>'
+    +'<div class="atv-mo ag-o" onclick="atvRegistrar(\''+atvId+'\','+n+',\'ag\')">⏳ Aguardando</div>'
+    +'<div class="atv-mo pfil" onclick="abrirPerfil(\''+turma+'\','+n+');_atvFecharMenu()">👤 Ver perfil</div>';
+  m.classList.add('on');
+}
+
+function atvRegistrar(atvId,n,s){
   _atvManual[atvId+'_'+n]=s;
   _atvSalvar();
   var cell=document.querySelector('[data-atv="'+atvId+'"][data-n="'+n+'"]');
   if(cell)_atvAtualizarCelula(cell,s);
-  document.querySelectorAll('.atv-menu.on').forEach(function(m){m.classList.remove('on');});
+  _atvFecharMenu();
   _atvAtualizarStat(atvId);
 }
 
@@ -6175,23 +6201,14 @@ function _atvCriarCelulas(el,atvId,turma,cfg){
     cell.setAttribute('data-n',a.n);
     cell.innerHTML='<span class="aic">'+(_atvIcons[s]||'–')+'</span>'
       +'<span class="atv-nm">'+a.nm+'</span>'
-      +'<span class="atv-ic-p">⋯</span>'
-      +'<div class="atv-menu">'
-        +'<div class="atv-mo verde" data-reg="fz">✓ Entregue</div>'
-        +'<div class="atv-mo verm" data-reg="nf">✗ Não entregue</div>'
-        +'<div class="atv-mo ag-o" data-reg="ag">⏳ Aguardando</div>'
-        +'<div class="atv-mo pfil" data-perfil="1">👤 Ver perfil</div>'
-      +'</div>';
+      +'<span class="atv-ic-p">⋯</span>';
     cell.addEventListener('click',function(e){
       e.stopPropagation();
-      var menu=this.querySelector('.atv-menu');
-      var reg=e.target.getAttribute('data-reg');
-      var perfil=e.target.getAttribute('data-perfil');
-      if(reg){atvRegistrar(atvId,a.n,reg,e);return;}
-      if(perfil){abrirPerfil(turma,a.n);return;}
-      var isOpen=menu.classList.contains('on');
-      document.querySelectorAll('.atv-menu.on').forEach(function(m){m.classList.remove('on');});
-      if(!isOpen)menu.classList.add('on');
+      var fm=document.getElementById('atv-float-menu');
+      var jaAberto=fm&&fm.classList.contains('on')&&fm.getAttribute('data-for')===(atvId+'_'+a.n);
+      if(jaAberto){_atvFecharMenu();return;}
+      if(fm)fm.setAttribute('data-for',atvId+'_'+a.n);
+      _atvAbrirMenu(this,atvId,a.n,turma);
     });
     el.appendChild(cell);
   });
@@ -6199,9 +6216,7 @@ function _atvCriarCelulas(el,atvId,turma,cfg){
 }
 
 function renderAtividades(){
-  document.addEventListener('click',function(){
-    document.querySelectorAll('.atv-menu.on').forEach(function(m){m.classList.remove('on');});
-  });
+  document.addEventListener('click',function(){_atvFecharMenu();});
   // Percorre TODOS os painéis de atividade de todos os diários
   document.querySelectorAll('.ipane[id^="a-t"]').forEach(function(pane){
     var m=pane.id.match(/^a-(t[^-]+)-(.+)$/);
@@ -6332,7 +6347,7 @@ function abrirPerfil(turma,numAluno){
       +'<div>'+atvRows+'</div>'
     +'</div>';
   document.getElementById('pfm').classList.add('on');
-  document.querySelectorAll('.atv-menu.on').forEach(function(m){m.classList.remove('on');});
+  _atvFecharMenu();
 }
 
 function fecharPerfil(){document.getElementById('pfm').classList.remove('on');}
