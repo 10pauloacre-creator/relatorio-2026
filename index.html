@@ -6142,8 +6142,9 @@ function _atvAtualizarCelula(cell,s){
 }
 
 function _atvAtualizarStat(atvId){
-  var cfg=ATIVIDADES[atvId];if(!cfg)return;
-  var al=ALUNOS[cfg.turma]||[];
+  var m2=atvId.match(/^atv-(t[^-]+)/);var turma=m2?m2[1]:null;if(!turma)return;
+  var al=ALUNOS[turma]||[];
+  var cfg=ATIVIDADES[atvId]||{fez:[],naoFez:[],parcial:false};
   var st=document.querySelector('[data-stat="'+atvId+'"]');if(!st)return;
   var fz=0,nf=0,ag=0;
   al.forEach(function(a){var s=_atvStatus(atvId,a.n,cfg);if(s==='fz')fz++;else if(s==='nf')nf++;else ag++;});
@@ -6160,44 +6161,64 @@ function atvRegistrar(atvId,n,s,evt){
   _atvAtualizarStat(atvId);
 }
 
+function _atvCriarCelulas(el,atvId,turma,cfg){
+  var al=ALUNOS[turma]||[];if(!al.length)return;
+  if(!document.querySelector('[data-stat="'+atvId+'"]')){
+    var st=document.createElement('div');st.className='atv-stat';st.setAttribute('data-stat',atvId);
+    el.before(st);
+  }
+  al.forEach(function(a){
+    var s=_atvStatus(atvId,a.n,cfg);
+    var cell=document.createElement('div');
+    cell.className='atv-r '+s;
+    cell.setAttribute('data-atv',atvId);
+    cell.setAttribute('data-n',a.n);
+    cell.innerHTML='<span class="aic">'+(_atvIcons[s]||'–')+'</span>'
+      +'<span class="atv-nm">'+a.nm+'</span>'
+      +'<span class="atv-ic-p">⋯</span>'
+      +'<div class="atv-menu">'
+        +'<div class="atv-mo verde" data-reg="fz">✓ Entregue</div>'
+        +'<div class="atv-mo verm" data-reg="nf">✗ Não entregue</div>'
+        +'<div class="atv-mo ag-o" data-reg="ag">⏳ Aguardando</div>'
+        +'<div class="atv-mo pfil" data-perfil="1">👤 Ver perfil</div>'
+      +'</div>';
+    cell.addEventListener('click',function(e){
+      e.stopPropagation();
+      var menu=this.querySelector('.atv-menu');
+      var reg=e.target.getAttribute('data-reg');
+      var perfil=e.target.getAttribute('data-perfil');
+      if(reg){atvRegistrar(atvId,a.n,reg,e);return;}
+      if(perfil){abrirPerfil(turma,a.n);return;}
+      var isOpen=menu.classList.contains('on');
+      document.querySelectorAll('.atv-menu.on').forEach(function(m){m.classList.remove('on');});
+      if(!isOpen)menu.classList.add('on');
+    });
+    el.appendChild(cell);
+  });
+  _atvAtualizarStat(atvId);
+}
+
 function renderAtividades(){
   document.addEventListener('click',function(){
     document.querySelectorAll('.atv-menu.on').forEach(function(m){m.classList.remove('on');});
   });
-  Object.entries(ATIVIDADES).forEach(function([atvId,cfg]){
-    var el=document.getElementById(atvId);if(!el)return;
-    var al=ALUNOS[cfg.turma]||[];
-    var st=document.createElement('div');st.className='atv-stat';st.setAttribute('data-stat',atvId);
-    el.before(st);
-    al.forEach(function(a){
-      var s=_atvStatus(atvId,a.n,cfg);
-      var cell=document.createElement('div');
-      cell.className='atv-r '+s;
-      cell.setAttribute('data-atv',atvId);
-      cell.setAttribute('data-n',a.n);
-      cell.innerHTML='<span class="aic">'+(_atvIcons[s]||'–')+'</span>'
-        +'<span class="atv-nm">'+a.nm+'</span>'
-        +'<span class="atv-ic-p">⋯</span>'
-        +'<div class="atv-menu">'
-          +'<div class="atv-mo verde" data-reg="fz">✓ Entregue</div>'
-          +'<div class="atv-mo verm" data-reg="nf">✗ Não entregue</div>'
-          +'<div class="atv-mo ag-o" data-reg="ag">⏳ Aguardando</div>'
-          +'<div class="atv-mo pfil" data-perfil="1">👤 Ver perfil</div>'
-        +'</div>';
-      cell.addEventListener('click',function(e){
-        e.stopPropagation();
-        var menu=this.querySelector('.atv-menu');
-        var reg=e.target.getAttribute('data-reg');
-        var perfil=e.target.getAttribute('data-perfil');
-        if(reg){atvRegistrar(atvId,a.n,reg,e);return;}
-        if(perfil){abrirPerfil(cfg.turma,a.n);return;}
-        var isOpen=menu.classList.contains('on');
-        document.querySelectorAll('.atv-menu.on').forEach(function(m){m.classList.remove('on');});
-        if(!isOpen)menu.classList.add('on');
-      });
-      el.appendChild(cell);
-    });
-    _atvAtualizarStat(atvId);
+  // Percorre TODOS os painéis de atividade de todos os diários
+  document.querySelectorAll('.ipane[id^="a-t"]').forEach(function(pane){
+    var m=pane.id.match(/^a-(t[^-]+)-(.+)$/);
+    if(!m)return;
+    var turma=m[1],mmdd=m[2];
+    var atvId='atv-'+turma+'-'+mmdd;
+    var al=ALUNOS[turma]||[];if(!al.length)return;
+    // Pega ou cria o container da grade
+    var el=document.getElementById(atvId);
+    if(!el){
+      el=document.createElement('div');
+      el.id=atvId;el.className='atv-grid';
+      pane.appendChild(el);
+    }
+    if(el.children.length>0)return; // já populado
+    var cfg=ATIVIDADES[atvId]||{turma:turma,fez:[],naoFez:[],parcial:false};
+    _atvCriarCelulas(el,atvId,turma,cfg);
   });
 }
 
