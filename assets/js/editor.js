@@ -34,14 +34,17 @@ function entrarModoEdicao() {
   if (btn) { btn.textContent = '✅ Salvar'; btn.style.cssText = 'background:#16a34a;color:white;border:none'; }
 
   // Mostra botões de undo/redo e adicionar
-  document.getElementById('ed-undo').style.display = 'flex';
-  document.getElementById('ed-redo').style.display = 'flex';
-  document.getElementById('ed-add-card').style.display = 'flex';
+  var _eu = document.getElementById('ed-undo');   if (_eu) _eu.style.display = 'flex';
+  var _er = document.getElementById('ed-redo');   if (_er) _er.style.display = 'flex';
+  var _ea = document.getElementById('ed-add-card'); if (_ea) _ea.style.display = 'flex';
 
   // Adiciona listeners de seleção em todos os elementos editáveis
-  document.querySelector('.main').addEventListener('click', _editorClick, true);
-  document.querySelector('.main').addEventListener('mouseover', _editorHover, true);
-  document.querySelector('.main').addEventListener('mouseout', _editorHoverOut, true);
+  var mainEl = document.querySelector('.main');
+  if (mainEl) {
+    mainEl.addEventListener('click', _editorClick, true);
+    mainEl.addEventListener('mouseover', _editorHover, true);
+    mainEl.addEventListener('mouseout', _editorHoverOut, true);
+  }
   document.addEventListener('keydown', _editorKeydown);
 }
 
@@ -52,20 +55,23 @@ function sairModoEdicao() {
   if (btn) { btn.textContent = '✏️ Editar'; btn.style.cssText = ''; }
 
   // Esconde botões
-  document.getElementById('ed-undo').style.display = 'none';
-  document.getElementById('ed-redo').style.display = 'none';
-  document.getElementById('ed-add-card').style.display = 'none';
+  var _eu2 = document.getElementById('ed-undo');    if (_eu2) _eu2.style.display = 'none';
+  var _er2 = document.getElementById('ed-redo');    if (_er2) _er2.style.display = 'none';
+  var _ea2 = document.getElementById('ed-add-card'); if (_ea2) _ea2.style.display = 'none';
 
   // Remove listeners
-  document.querySelector('.main').removeEventListener('click', _editorClick, true);
-  document.querySelector('.main').removeEventListener('mouseover', _editorHover, true);
-  document.querySelector('.main').removeEventListener('mouseout', _editorHoverOut, true);
+  var mainEl2 = document.querySelector('.main');
+  if (mainEl2) {
+    mainEl2.removeEventListener('click', _editorClick, true);
+    mainEl2.removeEventListener('mouseover', _editorHover, true);
+    mainEl2.removeEventListener('mouseout', _editorHoverOut, true);
+  }
   document.removeEventListener('keydown', _editorKeydown);
 
   // Salva para localStorage
   _salvarAlteracoes();
   _deselecionarElemento();
-  _painel.style.display = 'none';
+  if (_painel) _painel.style.display = 'none';
   document.querySelectorAll('[contenteditable="true"]').forEach(function(el) {
     el.removeAttribute('contenteditable');
   });
