@@ -1,4 +1,4 @@
-const CACHE = 'relatorio-2026-v1';
+const CACHE = 'relatorio-2026-v3';
 const ASSETS = [
   '/relatorio-2026/',
   '/relatorio-2026/index.html',
