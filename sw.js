@@ -1,4 +1,4 @@
-const CACHE = 'relatorio-2026-v3';
+const CACHE = 'relatorio-2026-v4';
 const ASSETS = [
   '/relatorio-2026/',
   '/relatorio-2026/index.html',
@@ -58,6 +58,74 @@ self.addEventListener('push', e => {
     })
   );
 });
+
+// ── Periodic Background Sync (verifica timers com app fechado) ──
+self.addEventListener('periodicsync', e => {
+  if (e.tag === 'claude-timer-check') {
+    e.waitUntil(verificarTimersClaude());
+  }
+});
+
+async function verificarTimersClaude() {
+  // Lê timers do IndexedDB (escritos pela página principal)
+  try {
+    var db = await abrirIDB();
+    var timers = await lerTodosTimers(db);
+    var agora = Date.now();
+    for (var i = 0; i < timers.length; i++) {
+      var t = timers[i];
+      if (t.fim > 0 && t.fim <= agora && !t.notificado) {
+        await self.registration.showNotification('Claude Liberado! ✅', {
+          body: 'Conta [' + t.nome + '] liberada! O limite do Claude expirou.',
+          icon: '/relatorio-2026/icon-192.png',
+          badge: '/relatorio-2026/icon-192.png',
+          tag: 'cl-' + t.id,
+          renotify: true,
+          requireInteraction: true,
+          vibrate: [300, 100, 300, 100, 300],
+          data: { id: t.id }
+        });
+        await marcarNotificado(db, t.id);
+      }
+    }
+  } catch(e) {
+    console.warn('[SW] Erro ao verificar timers:', e);
+  }
+}
+
+function abrirIDB() {
+  return new Promise(function(resolve, reject) {
+    var req = self.indexedDB.open('claude-timers', 1);
+    req.onupgradeneeded = function(e) {
+      e.target.result.createObjectStore('timers', { keyPath: 'id' });
+    };
+    req.onsuccess = function(e) { resolve(e.target.result); };
+    req.onerror = reject;
+  });
+}
+
+function lerTodosTimers(db) {
+  return new Promise(function(resolve, reject) {
+    var tx = db.transaction('timers', 'readonly');
+    var req = tx.objectStore('timers').getAll();
+    req.onsuccess = function() { resolve(req.result || []); };
+    req.onerror = reject;
+  });
+}
+
+function marcarNotificado(db, id) {
+  return new Promise(function(resolve, reject) {
+    var tx = db.transaction('timers', 'readwrite');
+    var store = tx.objectStore('timers');
+    var getReq = store.get(id);
+    getReq.onsuccess = function() {
+      var item = getReq.result;
+      if (item) { item.notificado = true; store.put(item); }
+      tx.oncomplete = resolve;
+    };
+    getReq.onerror = reject;
+  });
+}
 
 // Clicar na notificação abre o app na aba Claude
 self.addEventListener('notificationclick', e => {

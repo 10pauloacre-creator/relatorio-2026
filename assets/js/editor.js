@@ -1,7 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// EDITOR.JS v2 — Editor Visual Completo
-// Funcionalidades: seleção de elementos, cores, texto,
-//   tamanhos, adicionar/remover blocos, undo/redo
+// EDITOR.JS v3 — Editor Visual Completo
+// Melhorias: opacidade, tab-aware, painel arrastável, undo/redo
 // ═══════════════════════════════════════════════════════════
 
 var modoEdicaoAtivo = false;
@@ -33,12 +32,10 @@ function entrarModoEdicao() {
   var btn = document.getElementById('btn-editar');
   if (btn) { btn.textContent = '✅ Salvar'; btn.style.cssText = 'background:#16a34a;color:white;border:none'; }
 
-  // Mostra botões de undo/redo e adicionar
-  var _eu = document.getElementById('ed-undo');   if (_eu) _eu.style.display = 'flex';
-  var _er = document.getElementById('ed-redo');   if (_er) _er.style.display = 'flex';
-  var _ea = document.getElementById('ed-add-card'); if (_ea) _ea.style.display = 'flex';
+  var _eu = document.getElementById('ed-undo');    if (_eu) _eu.style.display = 'flex';
+  var _er = document.getElementById('ed-redo');    if (_er) _er.style.display = 'flex';
+  _atualizarBtnTabAtivo();
 
-  // Adiciona listeners de seleção em todos os elementos editáveis
   var mainEl = document.querySelector('.main');
   if (mainEl) {
     mainEl.addEventListener('click', _editorClick, true);
@@ -46,6 +43,7 @@ function entrarModoEdicao() {
     mainEl.addEventListener('mouseout', _editorHoverOut, true);
   }
   document.addEventListener('keydown', _editorKeydown);
+  _adicionarBotoesExcluirClaude();
 }
 
 function sairModoEdicao() {
@@ -54,12 +52,11 @@ function sairModoEdicao() {
   var btn = document.getElementById('btn-editar');
   if (btn) { btn.textContent = '✏️ Editar'; btn.style.cssText = ''; }
 
-  // Esconde botões
   var _eu2 = document.getElementById('ed-undo');    if (_eu2) _eu2.style.display = 'none';
   var _er2 = document.getElementById('ed-redo');    if (_er2) _er2.style.display = 'none';
-  var _ea2 = document.getElementById('ed-add-card'); if (_ea2) _ea2.style.display = 'none';
+  var _ea2 = document.getElementById('ed-add-bloco'); if (_ea2) _ea2.style.display = 'none';
+  var _ec2 = document.getElementById('ed-add-card');  if (_ec2) _ec2.style.display = 'none';
 
-  // Remove listeners
   var mainEl2 = document.querySelector('.main');
   if (mainEl2) {
     mainEl2.removeEventListener('click', _editorClick, true);
@@ -68,7 +65,9 @@ function sairModoEdicao() {
   }
   document.removeEventListener('keydown', _editorKeydown);
 
-  // Salva para localStorage
+  // Remove botões de excluir claude
+  document.querySelectorAll('.ed-remove-card').forEach(function(b) { b.remove(); });
+
   _salvarAlteracoes();
   _deselecionarElemento();
   if (_painel) _painel.style.display = 'none';
@@ -77,29 +76,56 @@ function sairModoEdicao() {
   });
 }
 
+// ─── TAB-AWARE: botões contextuais por aba ───────────────
+
+function _abaAtiva() {
+  var sec = document.querySelector('.sec.on');
+  return sec ? sec.id.replace('sec-', '') : 'all';
+}
+
+function _atualizarBtnTabAtivo() {
+  if (!modoEdicaoAtivo) return;
+  var aba = _abaAtiva();
+  var btnAdd  = document.getElementById('ed-add-bloco');
+  var btnCard = document.getElementById('ed-add-card');
+  if (!btnAdd || !btnCard) return;
+
+  if (aba === 'claude') {
+    btnAdd.style.display  = 'none';
+    btnCard.style.display = 'flex';
+  } else {
+    btnAdd.style.display  = 'flex';
+    btnCard.style.display = 'none';
+  }
+}
+
+// Monitora mudança de aba para atualizar botões
+(function() {
+  var _orig = window.aba;
+  if (typeof _orig === 'function') {
+    window.aba = function(id, btn) {
+      _orig(id, btn);
+      _atualizarBtnTabAtivo();
+      if (modoEdicaoAtivo && id === 'claude') {
+        setTimeout(_adicionarBotoesExcluirClaude, 200);
+      }
+    };
+  }
+})();
+
 // ─── SELEÇÃO DE ELEMENTOS ────────────────────────────────
 
 function _editorClick(e) {
   var alvo = e.target;
-
-  // Ignora cliques nos painéis do editor, toolbars e botões do editor
-  if (alvo.closest('#painel-editor, #toolbar-texto, #ed-undo, #ed-redo, #ed-add-card, .ed-remove-card')) return;
-
-  // Ignora elementos interativos nativos (mas não links para edição)
+  if (alvo.closest('#painel-editor, #toolbar-texto, #ed-undo, #ed-redo, #ed-add-bloco, #ed-add-card, .ed-remove-card')) return;
   if (['INPUT','SELECT','TEXTAREA'].includes(alvo.tagName)) return;
-
-  // Clique em botão existente — bloquear ação original em modo edição
   if (alvo.tagName === 'BUTTON' && !alvo.classList.contains('ed-remove-card')) {
     e.preventDefault(); e.stopPropagation();
   }
-
-  // Duplo clique em texto → contenteditable
   if (e.detail === 2 && _isTextElement(alvo)) {
     _tornarEditavel(alvo);
     return;
   }
-
-  // Seleciona o bloco pai mais significativo
   var bloco = _encontrarBlocoEditavel(alvo);
   if (bloco) {
     e.stopPropagation();
@@ -117,27 +143,23 @@ function _editorHover(e) {
 
 function _editorHoverOut(e) {
   if (!modoEdicaoAtivo) return;
-  var alvo = e.target;
-  var bloco = _encontrarBlocoEditavel(alvo);
+  var bloco = _encontrarBlocoEditavel(e.target);
   if (bloco) bloco.classList.remove('ed-hover');
 }
 
 function _editorKeydown(e) {
   if (!modoEdicaoAtivo) return;
-  // Ctrl+Z = undo, Ctrl+Y = redo, Escape = deselecionar
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); edUndo(); }
   if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); edRedo(); }
-  if (e.key === 'Escape') { _deselecionarElemento(); _painel.style.display = 'none'; }
+  if (e.key === 'Escape') { _deselecionarElemento(); if (_painel) _painel.style.display = 'none'; }
 }
 
 function _encontrarBlocoEditavel(el) {
-  // Sobe na árvore para encontrar um bloco editável significativo
   var candidatos = ['.ea', '.cl-card', '.sc2', '.ci', '.th', '.ct', '.brow', '.ccard', '.lembrete', 'p', 'h2', 'h3', 'li', 'img'];
   for (var i = 0; i < candidatos.length; i++) {
     var ancestor = el.closest(candidatos[i]);
     if (ancestor && ancestor.closest('.main')) return ancestor;
   }
-  // Qualquer elemento dentro de .main
   if (el.closest('.main')) return el;
   return null;
 }
@@ -147,7 +169,7 @@ function _isTextElement(el) {
 }
 
 function _tornarEditavel(el) {
-  _pushUndo(el);
+  _pushUndo();
   el.contentEditable = 'true';
   el.focus();
   el.addEventListener('blur', function handler() {
@@ -171,14 +193,18 @@ function _deselecionarElemento() {
   }
 }
 
-// ─── PAINEL DE PROPRIEDADES ──────────────────────────────
+// ─── PAINEL ARRASTÁVEL ──────────────────────────────────
 
 function criarPainelEditor() {
   _painel = document.createElement('div');
   _painel.id = 'painel-editor';
   _painel.style.display = 'none';
+
   _painel.innerHTML = [
-    '<div class="pe-titulo">✏️ Propriedades</div>',
+    '<div class="pe-header" id="pe-drag-handle">',
+    '  <span class="pe-titulo">✏️ Propriedades</span>',
+    '  <span style="font-size:.7rem;color:#999;cursor:move">⠿ arrastar</span>',
+    '</div>',
     '<div class="pe-grupo">',
     '  <label>Fundo</label>',
     '  <input type="color" id="pe-bg" oninput="edAplicarProp(\'backgroundColor\',this.value)">',
@@ -194,96 +220,187 @@ function criarPainelEditor() {
     '  <input type="color" id="pe-bd" oninput="edAplicarBorda(this.value)">',
     '  <button class="pe-clear" onclick="edAplicarBorda(\'\')">✕</button>',
     '</div>',
-    '<div class="pe-grupo">',
+    '<div class="pe-grupo" style="flex-direction:column;align-items:flex-start;gap:3px">',
+    '  <label>Opacidade</label>',
+    '  <div style="display:flex;align-items:center;gap:6px;width:100%">',
+    '    <input type="range" id="pe-op" min="0" max="100" step="5" value="100" style="flex:1;accent-color:#2d6147" oninput="edAplicarOpacidade(this.value)">',
+    '    <span id="pe-op-val" style="font-size:.72rem;min-width:32px">100%</span>',
+    '  </div>',
+    '</div>',
+    '<div class="pe-grupo" style="flex-direction:column;align-items:flex-start;gap:3px">',
     '  <label>Tamanho fonte</label>',
-    '  <input type="range" id="pe-fs" min="10" max="60" step="1" oninput="edAplicarFonte(this.value)">',
-    '  <span id="pe-fs-val">–</span>',
+    '  <div style="display:flex;align-items:center;gap:6px;width:100%">',
+    '    <input type="range" id="pe-fs" min="10" max="60" step="1" style="flex:1;accent-color:#2d6147" oninput="edAplicarFonte(this.value)">',
+    '    <span id="pe-fs-val" style="font-size:.72rem;min-width:32px">–</span>',
+    '  </div>',
     '</div>',
     '<div class="pe-grupo">',
     '  <label>Texto</label>',
-    '  <button class="pe-btn" onclick="edEditarTexto()">✏️ Editar texto</button>',
+    '  <button class="pe-btn" onclick="edEditarTexto()">✏️ Editar</button>',
     '</div>',
     '<div class="pe-grupo" id="pe-grupo-img" style="display:none">',
     '  <label>Imagem</label>',
-    '  <button class="pe-btn" onclick="edAlterarImagem()">🖼 Alterar URL</button>',
+    '  <button class="pe-btn" onclick="edAlterarImagem()">🖼 URL</button>',
     '</div>',
     '<div class="pe-grupo">',
-    '  <label>Negrito</label>',
-    '  <button class="pe-btn" onclick="edToggleProp(\'fontWeight\',\'bold\',\'normal\')">B</button>',
+    '  <button class="pe-btn" onclick="edToggleProp(\'fontWeight\',\'bold\',\'normal\')"><strong>N</strong></button>',
     '  <button class="pe-btn" onclick="edToggleProp(\'fontStyle\',\'italic\',\'normal\')"><em>I</em></button>',
+    '  <button class="pe-btn" onclick="edAdicionarTextBox()">+ Texto</button>',
     '</div>',
     '<hr style="border:none;border-top:1px solid rgba(0,0,0,.1);margin:8px 0">',
     '<button class="pe-btn pe-del" onclick="edRemoverElemento()">🗑 Excluir bloco</button>',
-    '<button class="pe-btn pe-close" onclick="_painel.style.display=\'none\';_deselecionarElemento()">✕ Fechar</button>'
+    '<button class="pe-btn pe-close" onclick="edFecharPainel()">✕ Fechar</button>'
   ].join('');
   document.body.appendChild(_painel);
 
-  // Botões flutuantes do editor (undo/redo/add)
+  // Drag behavior
+  _ativarDragPainel();
+
+  // Botões flutuantes
   var undoBtn = document.createElement('button');
-  undoBtn.id = 'ed-undo';
-  undoBtn.className = 'ed-float-btn';
-  undoBtn.title = 'Desfazer (Ctrl+Z)';
-  undoBtn.textContent = '↩ Desfazer';
-  undoBtn.style.cssText = 'display:none;bottom:130px;right:20px';
+  undoBtn.id = 'ed-undo'; undoBtn.className = 'ed-float-btn';
+  undoBtn.title = 'Desfazer (Ctrl+Z)'; undoBtn.textContent = '↩ Desfazer';
+  undoBtn.style.cssText = 'display:none;bottom:70px;right:20px';
   undoBtn.addEventListener('click', edUndo);
   document.body.appendChild(undoBtn);
 
   var redoBtn = document.createElement('button');
-  redoBtn.id = 'ed-redo';
-  redoBtn.className = 'ed-float-btn';
-  redoBtn.title = 'Refazer (Ctrl+Y)';
-  redoBtn.textContent = '↪ Refazer';
-  redoBtn.style.cssText = 'display:none;bottom:80px;right:20px';
+  redoBtn.id = 'ed-redo'; redoBtn.className = 'ed-float-btn';
+  redoBtn.title = 'Refazer (Ctrl+Y)'; redoBtn.textContent = '↪ Refazer';
+  redoBtn.style.cssText = 'display:none;bottom:20px;right:20px';
   redoBtn.addEventListener('click', edRedo);
   document.body.appendChild(redoBtn);
 
+  // Botão genérico por aba (texto/bloco)
   var addBtn = document.createElement('button');
-  addBtn.id = 'ed-add-card';
-  addBtn.className = 'ed-float-btn';
-  addBtn.title = 'Adicionar conta Claude';
-  addBtn.textContent = '+ Conta Claude';
-  addBtn.style.cssText = 'display:none;bottom:20px;right:20px;background:#c9a84c;color:#1a3a2a';
-  addBtn.addEventListener('click', edAdicionarCartaClaude);
+  addBtn.id = 'ed-add-bloco'; addBtn.className = 'ed-float-btn';
+  addBtn.title = 'Adicionar caixa de texto';
+  addBtn.textContent = '+ Caixa de texto';
+  addBtn.style.cssText = 'display:none;bottom:120px;right:20px;background:#2d6147;color:#fff';
+  addBtn.addEventListener('click', edAdicionarTextBox);
   document.body.appendChild(addBtn);
+
+  // Botão específico da aba Claude
+  var cardBtn = document.createElement('button');
+  cardBtn.id = 'ed-add-card'; cardBtn.className = 'ed-float-btn';
+  cardBtn.title = 'Adicionar conta Claude';
+  cardBtn.textContent = '+ Conta Claude';
+  cardBtn.style.cssText = 'display:none;bottom:120px;right:20px;background:#c9a84c;color:#1a3a2a';
+  cardBtn.addEventListener('click', edAdicionarCartaClaude);
+  document.body.appendChild(cardBtn);
 }
+
+function edFecharPainel() {
+  if (_painel) _painel.style.display = 'none';
+  _deselecionarElemento();
+}
+
+// ─── DRAG DO PAINEL ──────────────────────────────────────
+
+function _ativarDragPainel() {
+  var handle = document.getElementById('pe-drag-handle');
+  if (!handle || !_painel) return;
+  var drag = { active: false, sx: 0, sy: 0, ox: 0, oy: 0 };
+
+  handle.style.cursor = 'move';
+  handle.addEventListener('mousedown', function(e) {
+    drag.active = true;
+    drag.sx = e.clientX; drag.sy = e.clientY;
+    var rect = _painel.getBoundingClientRect();
+    drag.ox = rect.left; drag.oy = rect.top;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (!drag.active) return;
+    var nx = drag.ox + (e.clientX - drag.sx);
+    var ny = drag.oy + (e.clientY - drag.sy);
+    nx = Math.max(0, Math.min(nx, window.innerWidth - _painel.offsetWidth));
+    ny = Math.max(0, Math.min(ny, window.innerHeight - _painel.offsetHeight));
+    _painel.style.left = nx + 'px';
+    _painel.style.top  = ny + 'px';
+    _painel.style.right = 'auto';
+  });
+  document.addEventListener('mouseup', function() { drag.active = false; });
+
+  // Touch support (mobile)
+  handle.addEventListener('touchstart', function(e) {
+    var t = e.touches[0];
+    drag.active = true;
+    drag.sx = t.clientX; drag.sy = t.clientY;
+    var rect = _painel.getBoundingClientRect();
+    drag.ox = rect.left; drag.oy = rect.top;
+  }, { passive: true });
+  document.addEventListener('touchmove', function(e) {
+    if (!drag.active) return;
+    var t = e.touches[0];
+    var nx = drag.ox + (t.clientX - drag.sx);
+    var ny = drag.oy + (t.clientY - drag.sy);
+    nx = Math.max(0, Math.min(nx, window.innerWidth - _painel.offsetWidth));
+    ny = Math.max(0, Math.min(ny, window.innerHeight - _painel.offsetHeight));
+    _painel.style.left = nx + 'px';
+    _painel.style.top  = ny + 'px';
+    _painel.style.right = 'auto';
+  }, { passive: true });
+  document.addEventListener('touchend', function() { drag.active = false; });
+}
+
+// ─── MOSTRAR PAINEL ──────────────────────────────────────
 
 function _mostrarPainel(el) {
   if (!_painel) return;
-  var rect = el.getBoundingClientRect();
-  var top = Math.min(Math.max(rect.top + window.scrollY, window.scrollY + 8), window.scrollY + window.innerHeight - 350);
-  var left = Math.min(rect.right + 12, window.innerWidth - 230);
-  if (left < 4) left = 4;
-  _painel.style.cssText = 'display:block;top:' + top + 'px;left:' + left + 'px';
+  // Só posiciona se ainda não foi arrastado (usa posição padrão lateral)
+  if (!_painel._arrastado) {
+    var rect = el.getBoundingClientRect();
+    var top = Math.min(Math.max(rect.top + window.scrollY, window.scrollY + 8), window.scrollY + window.innerHeight - 420);
+    var left = Math.min(rect.right + 12, window.innerWidth - 230);
+    if (left < 4) left = 4;
+    _painel.style.top  = top + 'px';
+    _painel.style.left = left + 'px';
+    _painel.style.right = 'auto';
+  }
+  _painel.style.display = 'block';
 
-  // Preenche valores atuais
+  // Preenche valores
   var style = window.getComputedStyle(el);
   var bgInput = document.getElementById('pe-bg');
-  if (bgInput) bgInput.value = _rgbToHex(style.backgroundColor) || '#ffffff';
+  if (bgInput) { var bg = _rgbToHex(style.backgroundColor); bgInput.value = bg || '#ffffff'; }
   var fgInput = document.getElementById('pe-fg');
-  if (fgInput) fgInput.value = _rgbToHex(style.color) || '#000000';
+  if (fgInput) { var fg = _rgbToHex(style.color); fgInput.value = fg || '#000000'; }
   var fsSlider = document.getElementById('pe-fs');
-  var fsVal = document.getElementById('pe-fs-val');
-  var fs = parseInt(style.fontSize);
-  if (fsSlider) fsSlider.value = fs || 16;
-  if (fsVal) fsVal.textContent = (fs || 16) + 'px';
+  var fsVal    = document.getElementById('pe-fs-val');
+  var fs = parseInt(style.fontSize) || 16;
+  if (fsSlider) fsSlider.value = fs;
+  if (fsVal)    fsVal.textContent = fs + 'px';
 
-  // Mostra campo de imagem se for img
+  // Opacidade
+  var opSlider = document.getElementById('pe-op');
+  var opVal    = document.getElementById('pe-op-val');
+  var op = el.style.opacity !== '' ? Math.round(parseFloat(el.style.opacity) * 100) : 100;
+  if (opSlider) opSlider.value = op;
+  if (opVal)    opVal.textContent = op + '%';
+
+  // Campo de imagem
   var grupoImg = document.getElementById('pe-grupo-img');
   if (grupoImg) grupoImg.style.display = (el.tagName === 'IMG' || el.querySelector('img')) ? 'flex' : 'none';
 }
+
+// Marca que o painel foi arrastado
+document.addEventListener('mouseup', function() {
+  if (_painel && _painel._dragAtivo) _painel._arrastado = true;
+});
 
 // ─── APLICAR PROPRIEDADES ────────────────────────────────
 
 function edAplicarProp(prop, valor) {
   if (!_elSelecionado) return;
-  _pushUndo(_elSelecionado);
+  _pushUndo();
   _elSelecionado.style[prop] = valor;
   _salvarAlteracoes();
 }
 
 function edAplicarBorda(cor) {
   if (!_elSelecionado) return;
-  _pushUndo(_elSelecionado);
+  _pushUndo();
   _elSelecionado.style.borderColor = cor;
   if (cor) _elSelecionado.style.borderStyle = 'solid';
   _salvarAlteracoes();
@@ -291,16 +408,25 @@ function edAplicarBorda(cor) {
 
 function edAplicarFonte(px) {
   if (!_elSelecionado) return;
-  _pushUndo(_elSelecionado);
+  _pushUndo();
   _elSelecionado.style.fontSize = px + 'px';
   var fsVal = document.getElementById('pe-fs-val');
   if (fsVal) fsVal.textContent = px + 'px';
   _salvarAlteracoes();
 }
 
+function edAplicarOpacidade(val) {
+  if (!_elSelecionado) return;
+  _pushUndo();
+  _elSelecionado.style.opacity = (val / 100).toFixed(2);
+  var opVal = document.getElementById('pe-op-val');
+  if (opVal) opVal.textContent = val + '%';
+  _salvarAlteracoes();
+}
+
 function edToggleProp(prop, valA, valB) {
   if (!_elSelecionado) return;
-  _pushUndo(_elSelecionado);
+  _pushUndo();
   var atual = _elSelecionado.style[prop];
   _elSelecionado.style[prop] = (atual === valA) ? valB : valA;
   _salvarAlteracoes();
@@ -317,7 +443,7 @@ function edAlterarImagem() {
   if (!img) return;
   var novaUrl = prompt('URL da nova imagem:', img.src);
   if (novaUrl !== null && novaUrl.trim()) {
-    _pushUndo(_elSelecionado);
+    _pushUndo();
     img.src = novaUrl.trim();
     _salvarAlteracoes();
   }
@@ -326,11 +452,25 @@ function edAlterarImagem() {
 function edRemoverElemento() {
   if (!_elSelecionado) return;
   if (!confirm('Excluir este bloco?')) return;
-  _pushUndo(document.querySelector('.main'));
+  _pushUndo();
   _elSelecionado.remove();
-  _painel.style.display = 'none';
+  if (_painel) _painel.style.display = 'none';
   _elSelecionado = null;
   _salvarAlteracoes();
+}
+
+function edAdicionarTextBox() {
+  var sec = document.querySelector('.sec.on');
+  if (!sec) return;
+  _pushUndo();
+  var div = document.createElement('div');
+  div.className = 'ct';
+  div.style.cssText = 'margin:12px 0;min-height:40px';
+  div.contentEditable = 'true';
+  div.textContent = 'Clique aqui para editar o texto...';
+  sec.querySelector('.main') ? sec.querySelector('.main').appendChild(div) : sec.appendChild(div);
+  _salvarAlteracoes();
+  _selecionarElemento(div);
 }
 
 // ─── CARDS CLAUDE ────────────────────────────────────────
@@ -341,51 +481,39 @@ function edAdicionarCartaClaude() {
   var nome = prompt('Nome/e-mail da nova conta:');
   if (!nome || !nome.trim()) return;
   var tipo = prompt('Tipo (PRO ou Free):', 'Free') || 'Free';
-
-  // Gera ID único
   var id = 'c' + Date.now();
-
-  // Adiciona ao array global de contas
   if (typeof CLAUDE_CONTAS !== 'undefined') {
-    CLAUDE_CONTAS.push({id: id, nome: nome.trim(), tipo: tipo.trim()});
+    CLAUDE_CONTAS.push({ id: id, nome: nome.trim(), tipo: tipo.trim() });
   }
-
-  // Salva contas customizadas no localStorage
   _salvarContasClaude();
-
-  // Re-renderiza
   if (typeof claudeRenderizar === 'function') claudeRenderizar();
-
-  // Adiciona botão de excluir em modo edição
-  _adicionarBotoesExcluirClaude();
+  setTimeout(_adicionarBotoesExcluirClaude, 150);
 }
 
 function _adicionarBotoesExcluirClaude() {
   if (!modoEdicaoAtivo) return;
   document.querySelectorAll('.cl-card').forEach(function(card) {
-    if (!card.querySelector('.ed-remove-card')) {
-      var btn = document.createElement('button');
-      btn.className = 'ed-remove-card';
-      btn.textContent = '🗑';
-      btn.title = 'Excluir esta conta';
-      btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        var cardId = card.id.replace('card-', '');
-        if (!confirm('Excluir conta "' + cardId + '"?')) return;
-        // Remove do array
-        if (typeof CLAUDE_CONTAS !== 'undefined') {
-          var idx = CLAUDE_CONTAS.findIndex(function(c) { return c.id === cardId; });
-          if (idx > -1) CLAUDE_CONTAS.splice(idx, 1);
+    if (card.querySelector('.ed-remove-card')) return;
+    var btn = document.createElement('button');
+    btn.className = 'ed-remove-card';
+    btn.textContent = '🗑';
+    btn.title = 'Excluir esta conta';
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var cardId = card.id.replace('card-', '');
+      if (!confirm('Excluir conta "' + cardId + '"?')) return;
+      if (typeof CLAUDE_CONTAS !== 'undefined') {
+        for (var i = 0; i < CLAUDE_CONTAS.length; i++) {
+          if (CLAUDE_CONTAS[i].id === cardId) { CLAUDE_CONTAS.splice(i, 1); break; }
         }
-        // Remove localStorage
-        localStorage.removeItem('cl_fim_' + cardId);
-        localStorage.removeItem('cl_notif_' + cardId);
-        _salvarContasClaude();
-        if (typeof claudeRenderizar === 'function') claudeRenderizar();
-        setTimeout(_adicionarBotoesExcluirClaude, 100);
-      });
-      card.appendChild(btn);
-    }
+      }
+      localStorage.removeItem('cl_fim_' + cardId);
+      localStorage.removeItem('cl_notif_' + cardId);
+      _salvarContasClaude();
+      if (typeof claudeRenderizar === 'function') claudeRenderizar();
+      setTimeout(_adicionarBotoesExcluirClaude, 150);
+    });
+    card.appendChild(btn);
   });
 }
 
@@ -395,43 +523,53 @@ function _salvarContasClaude() {
   }
 }
 
-// ─── UNDO / REDO ────────────────────────────────────────
+// ─── UNDO / REDO (baseado em snapshots do .main) ─────────
+// Usa innerHTML completo do .main — simples e confiável
 
-function _pushUndo(el) {
-  _undoStack.push({ el: el, html: el.outerHTML, style: el.getAttribute('style') || '' });
+function _pushUndo() {
+  var main = document.querySelector('.main');
+  if (!main) return;
+  _undoStack.push(main.innerHTML);
   _redoStack = [];
-  if (_undoStack.length > 50) _undoStack.shift();
+  if (_undoStack.length > 20) _undoStack.shift();
+  // Atualiza indicador visual
+  var undoBtn = document.getElementById('ed-undo');
+  var redoBtn = document.getElementById('ed-redo');
+  if (undoBtn) undoBtn.style.opacity = '1';
+  if (redoBtn) redoBtn.style.opacity = '0.4';
 }
 
 function edUndo() {
   if (!_undoStack.length) return;
-  var item = _undoStack.pop();
-  _redoStack.push({ el: item.el, html: item.el.outerHTML, style: item.el.getAttribute('style') || '' });
-  var temp = document.createElement('div');
-  temp.innerHTML = item.html;
-  var restored = temp.firstElementChild;
-  if (restored && item.el.parentNode) {
-    item.el.parentNode.replaceChild(restored, item.el);
-  } else if (item.el) {
-    item.el.setAttribute('style', item.style);
-  }
+  var main = document.querySelector('.main');
+  if (!main) return;
+  _redoStack.push(main.innerHTML);
+  main.innerHTML = _undoStack.pop();
   _salvarAlteracoes();
+  _deselecionarElemento();
+  if (_painel) _painel.style.display = 'none';
+  var undoBtn = document.getElementById('ed-undo');
+  var redoBtn = document.getElementById('ed-redo');
+  if (undoBtn) undoBtn.style.opacity = _undoStack.length ? '1' : '0.4';
+  if (redoBtn) redoBtn.style.opacity = _redoStack.length ? '1' : '0.4';
 }
 
 function edRedo() {
   if (!_redoStack.length) return;
-  var item = _redoStack.pop();
-  _undoStack.push({ el: item.el, html: item.el.outerHTML, style: item.el.getAttribute('style') || '' });
-  var temp = document.createElement('div');
-  temp.innerHTML = item.html;
-  var restored = temp.firstElementChild;
-  if (restored && item.el.parentNode) {
-    item.el.parentNode.replaceChild(restored, item.el);
-  }
+  var main = document.querySelector('.main');
+  if (!main) return;
+  _undoStack.push(main.innerHTML);
+  main.innerHTML = _redoStack.pop();
   _salvarAlteracoes();
+  _deselecionarElemento();
+  if (_painel) _painel.style.display = 'none';
+  var undoBtn = document.getElementById('ed-undo');
+  var redoBtn = document.getElementById('ed-redo');
+  if (undoBtn) undoBtn.style.opacity = _undoStack.length ? '1' : '0.4';
+  if (redoBtn) redoBtn.style.opacity = _redoStack.length ? '1' : '0.4';
 }
 
-// ─── PERSISTÊNCIA (localStorage) ────────────────────────
+// ─── PERSISTÊNCIA ────────────────────────────────────────
 
 function _salvarAlteracoes() {
   try {
@@ -440,18 +578,8 @@ function _salvarAlteracoes() {
   } catch(e) { console.warn('[Editor] Erro ao salvar:', e); }
 }
 
-function restaurarAlteracoes() {
-  try {
-    var saved = localStorage.getItem('ed_main_html');
-    if (saved) {
-      var main = document.querySelector('.main');
-      if (main) main.innerHTML = saved;
-    }
-  } catch(e) {}
-}
-
 function limparAlteracoes() {
-  if (!confirm('Restaurar o site ao estado original? Todas as edições serão perdidas.')) return;
+  if (!confirm('Restaurar o site ao estado original? Todas as edições visuais serão perdidas.')) return;
   localStorage.removeItem('ed_main_html');
   window.location.reload();
 }
@@ -515,12 +643,8 @@ function _rgbToHex(rgb) {
   return '#' + [m[1],m[2],m[3]].map(function(n) { return ('0'+parseInt(n).toString(16)).slice(-2); }).join('');
 }
 
+// Carrega contas Claude salvas no localStorage
 document.addEventListener('DOMContentLoaded', function() {
-  // Restaura alterações salvas
-  // DESABILITADO POR PADRÃO — descomentar quando quiser persistência:
-  // restaurarAlteracoes();
-
-  // Carrega contas Claude salvas
   try {
     var contasSalvas = localStorage.getItem('cl_contas');
     if (contasSalvas && typeof CLAUDE_CONTAS !== 'undefined') {
