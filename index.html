@@ -100,11 +100,41 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .atv-stat{font-size:.72rem;color:var(--cm);margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap}
 .atv-stat strong{color:var(--ce)}
 .atv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:5px}
-.atv-r{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.8rem}
-.atv-r.fz{background:#f0faf4;color:var(--vm)}.atv-r.nf{background:var(--rs);color:var(--ra)}.atv-r.pd{background:#f5f5f5;color:var(--cm)}
+.atv-r{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.8rem;cursor:pointer;position:relative;transition:filter .15s,transform .1s;user-select:none}
+.atv-r:active{transform:scale(.97)}
+.atv-r.fz{background:#f0faf4;color:var(--vm)}.atv-r.nf{background:var(--rs);color:var(--ra)}.atv-r.pd{background:#f5f5f5;color:var(--cm)}.atv-r.ag{background:#fdf8ed;color:#b8963e}
 .atv-r .aic{font-size:.85rem;flex-shrink:0}
+.atv-ic-p{margin-left:auto;font-size:.8rem;opacity:.45;flex-shrink:0;transition:opacity .15s;font-weight:700}
+.atv-r:hover .atv-ic-p{opacity:1}
+.atv-menu{position:absolute;right:0;top:calc(100% + 3px);background:#fff;border-radius:9px;box-shadow:0 6px 22px rgba(0,0,0,.18);z-index:300;min-width:158px;overflow:hidden;display:none}
+.atv-menu.on{display:block}
+.atv-mo{padding:9px 14px;font-size:.8rem;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .1s}
+.atv-mo:hover{background:#f0f0f0}
+.atv-mo.verde{color:var(--vm)}.atv-mo.verm{color:var(--ra)}.atv-mo.ag-o{color:#b8963e}.atv-mo.pfil{color:var(--vd);border-top:1px solid #eee}
 .atv-av{background:#f5f3ee;border:1px solid var(--cl);border-radius:var(--rs2);padding:10px 14px;font-size:.82rem;color:var(--cm);font-style:italic;display:flex;gap:8px;margin-bottom:10px}
 .atv-av.warn{background:var(--rs);border-color:#f5c6c0;color:var(--ra);font-style:normal}
+/* ── PERFIL DO ALUNO ── */
+.pfm{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.pfm.on{display:flex}
+.pfm-inner{background:var(--cr);border-radius:16px;width:100%;max-width:460px;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
+.pfm-top{background:var(--vd);padding:20px 18px 15px;display:flex;align-items:center;gap:14px;position:relative}
+.pfm-foto{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;overflow:visible;cursor:pointer;position:relative}
+.pfm-foto-img{width:60px;height:60px;border-radius:50%;object-fit:cover;position:absolute;inset:0}
+.pfm-foto-cam{position:absolute;bottom:-2px;right:-2px;background:var(--ou);border-radius:50%;width:18px;height:18px;font-size:.55rem;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.pfm-nome{font-family:'Playfair Display',serif;font-size:1rem;color:#fff;font-weight:700;margin-bottom:3px}
+.pfm-sub{font-size:.73rem;color:rgba(255,255,255,.65)}
+.pfm-close{position:absolute;right:14px;top:14px;background:rgba(255,255,255,.15);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.pfm-body{padding:15px 18px 20px}
+.pfm-wpp{display:flex;align-items:center;gap:8px;background:#f5f9f5;border-radius:8px;padding:8px 10px;margin-bottom:13px;border:1px solid #d0e8d0}
+.pfm-wpp input{flex:1;border:none;background:transparent;font-family:'DM Mono',monospace;font-size:.8rem;color:var(--ce);outline:none}
+.pfm-wpp button{background:var(--vm);color:#fff;border:none;border-radius:6px;padding:4px 9px;font-size:.72rem;cursor:pointer;white-space:nowrap}
+.pfm-sect{font-size:.69rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--cm);margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--cl)}
+.pfm-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--cl);font-size:.79rem}
+.pfm-row:last-child{border:none}
+.pfm-ic{font-size:.82rem;flex-shrink:0}
+.pfm-badge{padding:2px 7px;border-radius:4px;font-size:.68rem;font-weight:700;margin-left:auto;flex-shrink:0}
+.pfm-badge.fz{background:#e8f9ef;color:var(--vm)}.pfm-badge.nf{background:#fde8e8;color:var(--ra)}.pfm-badge.f{background:#fde8e8;color:var(--ra)}.pfm-badge.pd{background:#f5f3ee;color:var(--cm)}.pfm-badge.ag{background:#fdf8ed;color:#b8963e}.pfm-badge.fj{background:#fff8e8;color:#b8963e}
+.pfm-empty{text-align:center;padding:16px;font-size:.79rem;color:var(--cm);opacity:.65}
 .cron-intro{background:#fff;border-radius:var(--r);padding:17px 21px;box-shadow:var(--sc);margin-bottom:18px;font-size:.86rem;line-height:1.6;color:var(--cm)}
 .cleg{display:flex;flex-wrap:wrap;gap:11px;margin-bottom:18px}
 .cl2{display:flex;align-items:center;gap:6px;font-size:.76rem;font-weight:500}
@@ -257,6 +287,21 @@ body.modo-escuro .atv-av{background:#1e1e2a!important;border-color:rgba(255,255,
 body.modo-escuro .atv-r.fz{background:#152510!important;color:#80d080!important}
 body.modo-escuro .atv-r.nf{background:#2a1515!important;color:#ff9090!important}
 body.modo-escuro .atv-r.pd{background:#252533!important;color:#a0a0b0!important}
+body.modo-escuro .atv-r.ag{background:#2a2015!important;color:#d4a840!important}
+body.modo-escuro .atv-menu{background:#2a2a3a!important;box-shadow:0 6px 22px rgba(0,0,0,.5)!important}
+body.modo-escuro .atv-mo:hover{background:#383848!important}
+body.modo-escuro .atv-mo.pfil{border-top-color:#444!important}
+body.modo-escuro .pfm-inner{background:#1a2030}
+body.modo-escuro .pfm-wpp{background:#1e2a1e!important;border-color:#2a4a2a!important}
+body.modo-escuro .pfm-wpp input{color:#d0d8c0!important}
+body.modo-escuro .pfm-sect{color:#8080a0!important;border-color:#333344!important}
+body.modo-escuro .pfm-row{border-color:#333344!important;color:#c0c0d8}
+body.modo-escuro .pfm-badge.fz{background:#152510!important;color:#80d080!important}
+body.modo-escuro .pfm-badge.nf{background:#2a1515!important;color:#ff9090!important}
+body.modo-escuro .pfm-badge.f{background:#2a1515!important;color:#ff9090!important}
+body.modo-escuro .pfm-badge.ag{background:#2a2015!important;color:#d4a840!important}
+body.modo-escuro .pfm-badge.fj{background:#252015!important;color:#d0a060!important}
+body.modo-escuro .pfm-badge.pd{background:#252533!important;color:#a0a0b0!important}
 body.modo-escuro .ar2.pr{background:#152510!important;color:#80d080!important}
 body.modo-escuro .ar2.fa{background:#2a1515!important;color:#ff9090!important}
 body.modo-escuro .ar2.fj{background:#252015!important;color:#d0a060!important}
@@ -6018,6 +6063,11 @@ document.getElementById('p6ano').classList.add('active');
 </section>
 
 </main>
+
+<!-- ── MODAL PERFIL DO ALUNO ── -->
+<div id="pfm" class="pfm" onclick="if(event.target===this)fecharPerfil()">
+  <div class="pfm-inner" id="pfm-inner"></div>
+</div>
 <footer>E.E. Rural Pe. Carlos Casavequia · Senador Guiomard – AC &nbsp;|&nbsp; Prof. Paulo Roberto Ramalho Magalhães &nbsp;|&nbsp; Ano Letivo 2026 &nbsp;|&nbsp; Assistência de IA</footer>
 
 <script>
@@ -6074,21 +6124,80 @@ const ATIVIDADES={
   'atv-t2-0402':{turma:'t2',fez:[8,13],naoFez:[],parcial:true}
 };
 
+/* ── ATIVIDADES INTERATIVAS ── */
+var _atvManual=JSON.parse(localStorage.getItem('atv_manual')||'{}');
+function _atvSalvar(){localStorage.setItem('atv_manual',JSON.stringify(_atvManual));}
+var _atvMenuAberto=null;
+
+function _atvStatus(atvId,n,cfg){
+  var key=atvId+'_'+n,m=_atvManual[key];
+  if(m)return m;
+  return cfg.fez.includes(n)?'fz':cfg.naoFez.includes(n)?'nf':cfg.parcial?'ag':'pd';
+}
+var _atvIcons={fz:'✓',nf:'✗',pd:'–',ag:'⏳'};
+
+function _atvAtualizarCelula(cell,s){
+  cell.className='atv-r '+s;
+  cell.querySelector('.aic').textContent=_atvIcons[s]||'–';
+}
+
+function _atvAtualizarStat(atvId){
+  var cfg=ATIVIDADES[atvId];if(!cfg)return;
+  var al=ALUNOS[cfg.turma]||[];
+  var st=document.querySelector('[data-stat="'+atvId+'"]');if(!st)return;
+  var fz=0,nf=0,ag=0;
+  al.forEach(function(a){var s=_atvStatus(atvId,a.n,cfg);if(s==='fz')fz++;else if(s==='nf')nf++;else ag++;});
+  st.innerHTML='<span>✓ Entregaram: <strong>'+fz+'</strong></span><span>✗ Não entregaram: <strong>'+nf+'</strong></span><span>⏳ Pendente: <strong>'+ag+'</strong></span>';
+}
+
+function atvRegistrar(atvId,n,s,evt){
+  if(evt){evt.stopPropagation();}
+  _atvManual[atvId+'_'+n]=s;
+  _atvSalvar();
+  var cell=document.querySelector('[data-atv="'+atvId+'"][data-n="'+n+'"]');
+  if(cell)_atvAtualizarCelula(cell,s);
+  document.querySelectorAll('.atv-menu.on').forEach(function(m){m.classList.remove('on');});
+  _atvAtualizarStat(atvId);
+}
+
 function renderAtividades(){
-  Object.entries(ATIVIDADES).forEach(([id,cfg])=>{
-    const el=document.getElementById(id);if(!el)return;
-    const al=ALUNOS[cfg.turma]||[];
-    const fz=cfg.fez.length,nf=cfg.naoFez.length,pd=al.length-fz-nf;
-    const st=document.createElement('div');st.className='atv-stat';
-    st.innerHTML=`<span>✓ Realizaram: <strong>${fz}</strong></span><span>✗ Não realizaram: <strong>${nf}</strong></span><span>⏳ Pendente: <strong>${pd}</strong></span>`;
+  document.addEventListener('click',function(){
+    document.querySelectorAll('.atv-menu.on').forEach(function(m){m.classList.remove('on');});
+  });
+  Object.entries(ATIVIDADES).forEach(function([atvId,cfg]){
+    var el=document.getElementById(atvId);if(!el)return;
+    var al=ALUNOS[cfg.turma]||[];
+    var st=document.createElement('div');st.className='atv-stat';st.setAttribute('data-stat',atvId);
     el.before(st);
-    al.forEach(a=>{
-      const fez=cfg.fez.includes(a.n),nfez=cfg.naoFez.includes(a.n);
-      const cls=fez?'fz':nfez?'nf':'pd',ic=fez?'✓':nfez?'✗':'–';
-      const row=document.createElement('div');row.className='atv-r '+cls;
-      row.innerHTML=`<span class="aic">${ic}</span><span>${a.nm}</span>`;
-      el.appendChild(row);
+    al.forEach(function(a){
+      var s=_atvStatus(atvId,a.n,cfg);
+      var cell=document.createElement('div');
+      cell.className='atv-r '+s;
+      cell.setAttribute('data-atv',atvId);
+      cell.setAttribute('data-n',a.n);
+      cell.innerHTML='<span class="aic">'+(_atvIcons[s]||'–')+'</span>'
+        +'<span class="atv-nm">'+a.nm+'</span>'
+        +'<span class="atv-ic-p">⋯</span>'
+        +'<div class="atv-menu">'
+          +'<div class="atv-mo verde" data-reg="fz">✓ Entregue</div>'
+          +'<div class="atv-mo verm" data-reg="nf">✗ Não entregue</div>'
+          +'<div class="atv-mo ag-o" data-reg="ag">⏳ Aguardando</div>'
+          +'<div class="atv-mo pfil" data-perfil="1">👤 Ver perfil</div>'
+        +'</div>';
+      cell.addEventListener('click',function(e){
+        e.stopPropagation();
+        var menu=this.querySelector('.atv-menu');
+        var reg=e.target.getAttribute('data-reg');
+        var perfil=e.target.getAttribute('data-perfil');
+        if(reg){atvRegistrar(atvId,a.n,reg,e);return;}
+        if(perfil){abrirPerfil(cfg.turma,a.n);return;}
+        var isOpen=menu.classList.contains('on');
+        document.querySelectorAll('.atv-menu.on').forEach(function(m){m.classList.remove('on');});
+        if(!isOpen)menu.classList.add('on');
+      });
+      el.appendChild(cell);
     });
+    _atvAtualizarStat(atvId);
   });
 }
 
@@ -6128,6 +6237,112 @@ function renderCont(){
   });
 }
 document.addEventListener('DOMContentLoaded',()=>{renderPresenca();renderAtividades();renderCont();});
+
+/* ── PERFIL DO ALUNO ── */
+function abrirPerfil(turma,numAluno){
+  var aluno=(ALUNOS[turma]||[]).find(function(a){return a.n===numAluno;});
+  if(!aluno)return;
+  var nomeTurma={t1:'1ª Série',t2:'2ª Série',t3:'3ª Série',t6:'6º Ano'}[turma]||turma;
+  var pfKey='pfm_'+turma+'_'+numAluno;
+  var saved=JSON.parse(localStorage.getItem(pfKey)||'{}');
+
+  // Faltas
+  var faltas=[],faltasJ=[];
+  Object.entries(PRESENCA).forEach(function([id,cfg]){
+    if(cfg.turma!==turma)return;
+    var mmdd=id.replace('pl-'+turma+'-','');
+    var data=mmdd.slice(2)+'/'+mmdd.slice(0,2);
+    if(cfg.faltaram.includes(numAluno))faltas.push(data);
+    if(cfg.faltJ.includes(numAluno))faltasJ.push(data);
+  });
+
+  // Atividades
+  var atvH=[];
+  Object.entries(ATIVIDADES).forEach(function([id,cfg]){
+    if(cfg.turma!==turma)return;
+    var mmdd=id.replace('atv-'+turma+'-','');
+    var data=mmdd.slice(2)+'/'+mmdd.slice(0,2);
+    var s=_atvStatus(id,numAluno,cfg);
+    var pane=document.getElementById(id);
+    var tema='Atividade';
+    if(pane){
+      var prev=pane.previousElementSibling;
+      if(prev&&prev.classList.contains('atv-stat'))prev=prev.previousElementSibling;
+      if(prev&&prev.classList.contains('atv-tema')){
+        var strong=prev.querySelector('strong');
+        if(strong)tema=strong.textContent;
+      }
+    }
+    atvH.push({data:data,s:s,tema:tema});
+  });
+
+  var fotoHTML=saved.foto?'<img class="pfm-foto-img" src="'+saved.foto+'" alt="">':'<span>👤</span>';
+  var labsAtv={fz:'Entregue',nf:'Não entregue',ag:'Aguardando',pd:'Pendente'};
+  var totalFaltas=faltas.length+faltasJ.length;
+  var totalEntregas=atvH.filter(function(a){return a.s==='fz';}).length;
+
+  var faltaRows=faltas.map(function(d){return '<div class="pfm-row"><span class="pfm-ic">📅</span><span>'+d+'</span><span class="pfm-badge f">Falta</span></div>';}).join('')
+    +faltasJ.map(function(d){return '<div class="pfm-row"><span class="pfm-ic">📅</span><span>'+d+'</span><span class="pfm-badge fj">Justificada</span></div>';}).join('');
+  if(!faltaRows)faltaRows='<div class="pfm-empty">Nenhuma falta registrada ✓</div>';
+
+  var atvRows=atvH.map(function(a){
+    var t=a.tema.length>42?a.tema.slice(0,42)+'…':a.tema;
+    return '<div class="pfm-row"><span class="pfm-ic">📝</span><span style="flex:1;font-size:.77rem">'+t+'<br><span style="opacity:.6;font-size:.7rem">'+a.data+'</span></span><span class="pfm-badge '+a.s+'">'+labsAtv[a.s]+'</span></div>';
+  }).join('');
+  if(!atvRows)atvRows='<div class="pfm-empty">Nenhuma atividade registrada</div>';
+
+  document.getElementById('pfm-inner').innerHTML=
+    '<div class="pfm-top">'
+    +'<div class="pfm-foto" id="pfm-foto-el" onclick="_pfmFoto(\''+turma+'\','+numAluno+')">'
+      +fotoHTML
+      +'<div class="pfm-foto-cam">📷</div>'
+    +'</div>'
+    +'<div>'
+      +'<div class="pfm-nome">'+numAluno+'. '+aluno.nm+'</div>'
+      +'<div class="pfm-sub">'+nomeTurma+' · '+totalFaltas+' falta(s) · '+totalEntregas+' entrega(s)</div>'
+    +'</div>'
+    +'<button class="pfm-close" onclick="fecharPerfil()">✕</button>'
+    +'</div>'
+    +'<div class="pfm-body">'
+      +'<div class="pfm-wpp"><span>📱</span><input type="tel" id="pfm-wpp-inp" placeholder="WhatsApp (ex: 68 9 9999-9999)" value="'+(saved.wpp||'')+'" onblur="_pfmSalvarWpp(\''+turma+'\','+numAluno+')"></input><button onclick="_pfmSalvarWpp(\''+turma+'\','+numAluno+')">💾 Salvar</button></div>'
+      +'<div class="pfm-sect">📅 Faltas ('+totalFaltas+')</div>'
+      +'<div>'+faltaRows+'</div>'
+      +'<div class="pfm-sect">📝 Atividades ('+atvH.length+')</div>'
+      +'<div>'+atvRows+'</div>'
+    +'</div>';
+  document.getElementById('pfm').classList.add('on');
+  document.querySelectorAll('.atv-menu.on').forEach(function(m){m.classList.remove('on');});
+}
+
+function fecharPerfil(){document.getElementById('pfm').classList.remove('on');}
+
+function _pfmSalvarWpp(turma,numAluno){
+  var inp=document.getElementById('pfm-wpp-inp');if(!inp)return;
+  var pfKey='pfm_'+turma+'_'+numAluno;
+  var saved=JSON.parse(localStorage.getItem(pfKey)||'{}');
+  saved.wpp=inp.value.trim();
+  localStorage.setItem(pfKey,JSON.stringify(saved));
+}
+
+function _pfmFoto(turma,numAluno){
+  var inp=document.createElement('input');
+  inp.type='file';inp.accept='image/*';
+  inp.onchange=function(){
+    var file=this.files[0];if(!file)return;
+    if(file.size>2*1024*1024){alert('Foto muito grande. Use uma imagem menor que 2MB.');return;}
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var pfKey='pfm_'+turma+'_'+numAluno;
+      var saved=JSON.parse(localStorage.getItem(pfKey)||'{}');
+      saved.foto=e.target.result;
+      localStorage.setItem(pfKey,JSON.stringify(saved));
+      var fd=document.getElementById('pfm-foto-el');
+      if(fd){fd.innerHTML='<img class="pfm-foto-img" src="'+e.target.result+'" alt=""><div class="pfm-foto-cam">📷</div>';}
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
 
 /* ── PLANO ANUAL JS ── */
 function planShowPage(pid, el) {
