@@ -174,7 +174,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .sem{text-align:center;padding:55px 40px;color:var(--cm)}
 .sem .ic{font-size:2.8rem;margin-bottom:11px;opacity:.4;display:block}
 footer{background:var(--vd);color:rgba(255,255,255,.5);text-align:center;padding:18px 40px;font-size:.76rem;letter-spacing:.04em}
-@media(max-width:680px){.cab-i{padding:20px 15px;flex-direction:column;text-align:center}.main{padding:18px 13px 40px}.nav-i{padding:0 6px}.nb{padding:10px 10px;font-size:.76rem}.sr{grid-template-columns:repeat(2,1fr)}.cg,.rcg{grid-template-columns:1fr}.brow{grid-template-columns:repeat(2,1fr)}.edb{min-width:68px;padding:13px 9px}.pres-grid,.atv-grid{grid-template-columns:1fr}}
+@media(max-width:680px){.cab-i{padding:20px 15px;flex-direction:column;text-align:center}.main{padding:18px 13px 40px}.nav-i{padding:0 6px}.nb{padding:10px 10px;font-size:.76rem}.sr{grid-template-columns:repeat(2,1fr)}.cg,.rcg{grid-template-columns:1fr}.brow{grid-template-columns:repeat(2,1fr)}.edb{min-width:68px;padding:13px 9px}.pres-grid,.atv-grid{grid-template-columns:1fr}.cl-grid{grid-template-columns:1fr!important}.cl-timer{font-size:2rem!important}}
+/* ── CLAUDE TIMER ── */
+.cl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.cl-card{background:var(--bg3);border-radius:14px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;border:2px solid transparent;transition:background .4s,border-color .4s}
+.cl-card.ocupado{background:rgba(225,6,0,.13);border-color:var(--red)}
+.cl-card.livre{background:rgba(0,212,106,.13);border-color:var(--green)}
+.cl-nome{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;color:var(--white);text-align:center;word-break:break-all}
+.cl-tipo{font-size:.7rem;color:var(--gray2);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em}
+.cl-timer{font-family:'DM Mono',monospace;font-size:2.8rem;font-weight:500;letter-spacing:.04em;color:var(--white);line-height:1;margin:4px 0}
+.cl-card.ocupado .cl-timer{color:#ff4444}
+.cl-card.livre .cl-timer{color:var(--green)}
+.cl-status{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em}
+.cl-card.ocupado .cl-status{color:#ff4444}
+.cl-card.livre .cl-status{color:var(--green)}
+.cl-btn{margin-top:4px;background:var(--bg4);color:var(--white);border:1px solid var(--border);border-radius:8px;padding:7px 18px;font-size:.82rem;font-family:'Barlow',sans-serif;font-weight:600;cursor:pointer;transition:background .2s,color .2s}
+.cl-btn:hover{background:rgba(201,168,76,.8);color:#000}
+.cl-notif-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:18px;padding:10px 16px;background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.25);border-radius:10px;font-size:.83rem;color:var(--yellow)}
+.cl-notif-bar button{background:rgba(255,214,0,.2);color:var(--yellow);border:1px solid rgba(255,214,0,.4);border-radius:6px;padding:5px 14px;font-size:.78rem;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600}
+@media(min-width:681px) and (max-width:900px){.cl-grid{grid-template-columns:repeat(2,1fr)!important}}
 /* ── STATUS BUTTONS ── */
 .lesson-item{cursor:pointer}
 .lesson-actions{display:none;gap:5px;margin-top:9px;flex-wrap:wrap;padding-top:7px;border-top:1px solid var(--cl)}
@@ -204,6 +222,8 @@ footer{background:var(--vd);color:rgba(255,255,255,.5);text-align:center;padding
 <button class="nb" onclick="aba('plano',this)">📚 Plano Anual</button><div class="sp"></div>
     <button class="nb" onclick="aba('cron',this)">📅 Cronograma</button><div class="sp"></div>
 <button class="nb" onclick="aba('cont',this)">📊 Contador</button>
+<div class="sp"></div>
+<button class="nb" onclick="aba('claude',this)">⏱ Claude</button>
 <div class="sp"></div>
 <button class="nb" onclick="abrirModalRelato()" style="background:rgba(201,168,76,.2);color:var(--ou);border:1px solid rgba(201,168,76,.4);border-radius:6px;margin:6px 4px">✏️ Novo Relato</button>
 <div class="sp"></div>
@@ -5844,6 +5864,15 @@ document.getElementById('p6ano').classList.add('active');
 <div class="cgt"><h3>Artes</h3><span class="bd bd-ar">ARTE</span></div><div class="ccards" id="cnt-ar"></div>
 </section>
 
+<section class="sec" id="sec-claude">
+<div class="th"><div class="tb gz">⏱</div><div class="ti"><h2>Controle de Tempo — Claude</h2><p>Gerenciamento das 6 contas · Espera de 5 horas · Notificações automáticas</p></div></div>
+<div id="cl-notif-bar" class="cl-notif-bar" style="display:none">
+  <span>🔔 Ative as notificações para ser avisado quando a conta liberar</span>
+  <button onclick="claudePedirPermissao()">Ativar Notificações</button>
+</div>
+<div class="cl-grid" id="claude-cards"></div>
+</section>
+
 </main>
 <footer>E.E. Rural Pe. Carlos Casavequia · Senador Guiomard – AC &nbsp;|&nbsp; Prof. Paulo Roberto Ramalho Magalhães &nbsp;|&nbsp; Ano Letivo 2026 &nbsp;|&nbsp; Assistência de IA</footer>
 
@@ -6501,6 +6530,111 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
+// ═══════════════════════════════════════════════
+// CLAUDE TIMER — Controle de 5h por conta
+// ═══════════════════════════════════════════════
+const CLAUDE_CONTAS = [
+  {id:'c1', nome:'quinari.ouvidoria', tipo:'PRO'},
+  {id:'c2', nome:'10pauloacre',       tipo:'Free'},
+  {id:'c3', nome:'paulorobertoramalho',tipo:'Free'},
+  {id:'c4', nome:'paulof1tv',         tipo:'Free'},
+  {id:'c5', nome:'31pauloacre',       tipo:'Free'},
+  {id:'c6', nome:'paumaga',           tipo:'Free'}
+];
+const CLAUDE_ESPERA_MS = 5 * 60 * 60 * 1000; // 5 horas
+
+function claudeIniciar(id) {
+  localStorage.removeItem('cl_notif_' + id);
+  localStorage.setItem('cl_fim_' + id, (Date.now() + CLAUDE_ESPERA_MS).toString());
+  claudeRenderizar();
+}
+
+function claudeFormatarTempo(ms) {
+  if (ms <= 0) return '00:00:00';
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  return [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
+}
+
+function claudeRenderizar() {
+  const grid = document.getElementById('claude-cards');
+  if (!grid) return;
+  const agora = Date.now();
+  grid.innerHTML = CLAUDE_CONTAS.map(conta => {
+    const fim = parseInt(localStorage.getItem('cl_fim_' + conta.id) || '0');
+    const restante = fim - agora;
+    const livre = restante <= 0;
+    const cls = livre ? 'livre' : 'ocupado';
+    return '<div class="cl-card ' + cls + '" id="card-' + conta.id + '">' +
+      '<div class="cl-nome">' + conta.nome + '</div>' +
+      '<div class="cl-tipo">Claude ' + conta.tipo + '</div>' +
+      '<div class="cl-timer" id="timer-' + conta.id + '">' + claudeFormatarTempo(restante) + '</div>' +
+      '<div class="cl-status" id="status-' + conta.id + '">' + (livre ? 'Livre ✓' : 'Aguardando...') + '</div>' +
+      '<button class="cl-btn" onclick="claudeIniciar(\'' + conta.id + '\')">⏱ Iniciar Timer</button>' +
+      '</div>';
+  }).join('');
+  claudeAtualizarNotifBar();
+}
+
+function claudeTick() {
+  const agora = Date.now();
+  CLAUDE_CONTAS.forEach(function(conta) {
+    var timerEl = document.getElementById('timer-' + conta.id);
+    var cardEl  = document.getElementById('card-' + conta.id);
+    var statEl  = document.getElementById('status-' + conta.id);
+    if (!timerEl || !cardEl || !statEl) return;
+    var fim = parseInt(localStorage.getItem('cl_fim_' + conta.id) || '0');
+    var restante = fim - agora;
+    if (restante > 0) {
+      timerEl.textContent = claudeFormatarTempo(restante);
+      cardEl.className = 'cl-card ocupado';
+      statEl.textContent = 'Aguardando...';
+    } else {
+      timerEl.textContent = '00:00:00';
+      cardEl.className = 'cl-card livre';
+      statEl.textContent = 'Livre ✓';
+      if (fim > 0 && !localStorage.getItem('cl_notif_' + conta.id)) {
+        localStorage.setItem('cl_notif_' + conta.id, '1');
+        claudeNotificar(conta.nome);
+      }
+    }
+  });
+}
+
+function claudeNotificar(nome) {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    new Notification('Claude Liberado! ✅', {
+      body: 'Conta [' + nome + '] liberada! O limite do Claude expirou.',
+      icon: 'icon-192.png',
+      badge: 'icon-192.png',
+      tag: 'cl-' + nome,
+      renotify: true,
+      vibrate: [200, 100, 200]
+    });
+  }
+}
+
+function claudePedirPermissao() {
+  if (!('Notification' in window)) { alert('Seu navegador não suporta notificações.'); return; }
+  Notification.requestPermission().then(function(perm) {
+    claudeAtualizarNotifBar();
+    if (perm === 'granted') alert('Notificações ativadas! ✅');
+  });
+}
+
+function claudeAtualizarNotifBar() {
+  var bar = document.getElementById('cl-notif-bar');
+  if (!bar) return;
+  bar.style.display = ('Notification' in window && Notification.permission !== 'granted') ? 'flex' : 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  claudeRenderizar();
+  setInterval(claudeTick, 1000);
+});
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')

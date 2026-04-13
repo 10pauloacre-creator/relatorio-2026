@@ -40,3 +40,34 @@ self.addEventListener('fetch', e => {
       .catch(() => caches.match(e.request))
   );
 });
+
+// Receber notificações push (background)
+self.addEventListener('push', e => {
+  let data = { title: 'Claude Liberado! ✅', body: 'Uma conta do Claude está disponível.' };
+  if (e.data) {
+    try { data = e.data.json(); } catch(_) { data.body = e.data.text(); }
+  }
+  e.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: '/relatorio-2026/icon-192.png',
+      badge: '/relatorio-2026/icon-192.png',
+      tag: data.tag || 'claude-timer',
+      renotify: true,
+      vibrate: [200, 100, 200]
+    })
+  );
+});
+
+// Clicar na notificação abre o app na aba Claude
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      for (const client of list) {
+        if (client.url.includes('relatorio-2026') && 'focus' in client) return client.focus();
+      }
+      return clients.openWindow('/relatorio-2026/#claude');
+    })
+  );
+});
