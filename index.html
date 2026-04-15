@@ -312,9 +312,35 @@ body.modo-escuro .dc .dc-body{background:#1e1e2a!important}
 body.modo-escuro .cc{background:#1e1e2a!important}
 body.modo-escuro .bi{background:#1e1e2a!important;color:#d0d0e8!important;border-color:rgba(255,255,255,.1)!important}
 body.modo-escuro .lesson-item{background:#1e1e2a!important;color:#d0d0e8!important;border-color:rgba(255,255,255,.08)!important}
+body.modo-escuro .lesson-title{color:#e2e2f4!important}
+body.modo-escuro .lesson-sub{color:#9898b8!important}
+body.modo-escuro .lesson-num{color:#d0d8f0!important}
+body.modo-escuro .lesson-list{background:#1a1a28!important;box-shadow:none!important}
+body.modo-escuro .bim-header{background:#151524!important;border-color:rgba(255,255,255,.12)!important}
+body.modo-escuro .bim-header h3{color:#d0d8f0!important}
+body.modo-escuro .bim-header .badge{background:#252538!important;color:#9898b8!important}
+body.modo-escuro .main-tab{background:#1a1a28!important;color:#9898b8!important;border-color:rgba(255,255,255,.1)!important}
+body.modo-escuro .main-tab.active{color:#7fddaa!important;border-color:#4a9467!important}
+body.modo-escuro .disc-tab{background:#1a1a28!important;color:#9898b8!important;border-color:rgba(255,255,255,.1)!important}
+body.modo-escuro .disc-tab.active{color:#7fddaa!important;border-color:#4a9467!important}
+body.modo-escuro .bim-tab{background:#252538!important;color:#9898b8!important;border-color:rgba(255,255,255,.1)!important}
+body.modo-escuro .bim-tab.active{color:#7fddaa!important;background:#1a3a2a!important;border-color:#4a9467!important}
+body.modo-escuro .plano-wrapper .header{background:#0d1520!important}
 body.modo-escuro .lesson-item.st-ap{background:#152510!important}
 body.modo-escuro .lesson-item.st-pu{background:#252015!important}
 body.modo-escuro .lesson-actions button{background:#252533!important;color:#c0c0d0!important;border-color:rgba(255,255,255,.1)!important}
+body.modo-escuro .liv-card{background:#1e1e2a!important;border-color:rgba(255,255,255,.1)!important}
+body.modo-escuro .liv-card.criando{background:#2a1515!important;border-color:#874040!important}
+body.modo-escuro .liv-card.concluido{background:#152510!important;border-color:#3a7a50!important}
+body.modo-escuro .liv-card-nm{color:#d0d0e8!important}
+body.modo-escuro .liv-card.criando .liv-card-nm{color:#ff9090!important}
+body.modo-escuro .liv-card.concluido .liv-card-nm{color:#80d0a0!important}
+body.modo-escuro .liv-disc-h{color:#8080a0!important;border-color:rgba(255,255,255,.1)!important}
+body.modo-escuro .liv-tabs{border-color:rgba(255,255,255,.1)!important}
+body.modo-escuro .liv-tab{color:#8080a0!important}
+body.modo-escuro .liv-tab.on{color:#7fddaa!important;border-bottom-color:#4a9467!important}
+body.modo-escuro .liv-btn.b-cri{color:#ff9090!important;border-color:#874040!important}
+body.modo-escuro .liv-btn.b-con{color:#80d0a0!important;border-color:#3a7a50!important}
 body.modo-escuro .ai2{background:#1a1a28!important;border-color:rgba(255,255,255,.1)!important}
 body.modo-escuro .ai2h{background:#1e2a20!important;color:#a8d8b8!important}
 body.modo-escuro .ai2h .tg{background:#1a3a2a!important;color:#7fddaa!important}
@@ -383,6 +409,40 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .lesson-item.st-sm{background:#f3f4f6!important;filter:grayscale(1);opacity:.55}
 .lesson-item.st-sm .lesson-title{color:#374151;text-decoration:line-through}
 .lesson-item.st-sm .lesson-num{background:#e5e7eb!important;color:#6b7280!important}
+/* ── LIVROS DIGITAIS ── */
+.liv-tabs{display:flex;gap:4px;margin-bottom:22px;border-bottom:2px solid var(--cl);padding-bottom:0}
+.liv-tab{padding:9px 20px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:600;color:var(--cm);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap}
+.liv-tab.on{color:var(--vm);border-bottom-color:var(--vm)}
+.liv-page{display:none}.liv-page.on{display:block}
+.liv-disc{margin-bottom:26px}
+.liv-disc-h{display:flex;align-items:center;gap:9px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--cm);margin-bottom:11px;padding-bottom:7px;border-bottom:2px solid var(--cl)}
+.liv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+.liv-card{border-radius:12px;padding:16px 12px;text-align:center;transition:all .22s;cursor:pointer;border:2px solid var(--cl);background:var(--cr);position:relative;overflow:hidden}
+.liv-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.1);transform:translateY(-1px)}
+.liv-card.criando{background:#fef0f0;border-color:#e87878}
+.liv-card.concluido{background:#edf9f3;border-color:#4a9467}
+.liv-card-bim{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--cm);margin-bottom:7px}
+.liv-card-ic{font-size:1.9rem;margin-bottom:6px;display:block}
+.liv-card-nm{font-size:.79rem;font-weight:700;color:var(--ce);margin-bottom:11px;line-height:1.3}
+.liv-card.criando .liv-card-nm{color:#c0392b}
+.liv-card.concluido .liv-card-nm{color:#1a6b3c}
+.liv-btns{display:none;flex-direction:column;gap:5px}
+.liv-card.open .liv-btns{display:flex}
+.liv-btn{padding:6px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;border:2px solid;font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center}
+.liv-btn.b-cri{background:transparent;color:#c0392b;border-color:#e87878}
+.liv-btn.b-cri:hover{background:#e87878;color:#fff}
+.liv-btn.b-con{background:transparent;color:#1a6b3c;border-color:#4a9467}
+.liv-btn.b-con:hover{background:#4a9467;color:#fff}
+.liv-btn.b-ace{background:var(--vd);color:#fff;border-color:var(--vd)}
+.liv-btn.b-ace[disabled]{background:var(--cl);color:var(--cm);border-color:var(--cl);cursor:not-allowed;opacity:.55}
+.liv-card.criando .liv-btn.b-cri{background:#e87878;color:#fff}
+.liv-card.concluido .liv-btn.b-con{background:#4a9467;color:#fff}
+.liv-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;font-size:.76rem}
+.liv-leg-item{display:flex;align-items:center;gap:6px;color:var(--cm)}
+.liv-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.liv-dot.nd{background:var(--cl);border:1px solid #ccc}
+.liv-dot.cr{background:#e87878}.liv-dot.co{background:#4a9467}
+@media(max-width:680px){.liv-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 <link rel="stylesheet" href="assets/css/editor.css">
 </head>
@@ -403,6 +463,8 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 <button class="nb" onclick="aba('cont',this)">📊 Contador</button>
 <div class="sp"></div>
 <button class="nb" onclick="aba('claude',this)">⏱ Claude</button>
+<div class="sp"></div>
+<button class="nb" onclick="aba('livros',this)">📖 Livros</button>
 <div class="sp"></div>
 <button id="btn-editar" class="nb" style="background:rgba(74,148,103,.2);color:#7fddaa;border:1px solid rgba(74,148,103,.4);border-radius:6px;margin:6px 4px">✏️ Editar</button>
 </div></nav>
@@ -6062,6 +6124,27 @@ document.getElementById('p6ano').classList.add('active');
 </div>
 </section>
 
+<section class="sec" id="sec-livros">
+<div class="th"><div class="tb" style="background:linear-gradient(135deg,#c9a84c,#e8c86a)">📖</div><div class="ti"><h2>Livros Digitais</h2><p>Produção e acompanhamento dos livros digitais por disciplina e bimestre</p></div></div>
+
+<div class="liv-legend">
+  <div class="liv-leg-item"><div class="liv-dot nd"></div>Não iniciado</div>
+  <div class="liv-leg-item"><div class="liv-dot cr"></div>Em criação</div>
+  <div class="liv-leg-item"><div class="liv-dot co"></div>Concluído</div>
+  <div class="liv-leg-item" style="margin-left:auto;font-size:.72rem;opacity:.7">Clique no livro para registrar o status</div>
+</div>
+
+<div class="liv-tabs">
+  <button class="liv-tab on" onclick="livTab('t1',this)">📚 1ª Série</button>
+  <button class="liv-tab" onclick="livTab('t2',this)">📚 2ª Série</button>
+  <button class="liv-tab" onclick="livTab('t3',this)">📚 3ª Série</button>
+</div>
+
+<div id="liv-page-t1" class="liv-page on"></div>
+<div id="liv-page-t2" class="liv-page"></div>
+<div id="liv-page-t3" class="liv-page"></div>
+</section>
+
 </main>
 
 <!-- ── MENU FLUTUANTE ATIVIDADES ── -->
@@ -6538,6 +6621,116 @@ function initStatusButtons() {
   }
 }
 document.addEventListener('DOMContentLoaded', initStatusButtons);
+
+/* ── LIVROS DIGITAIS ── */
+var _livStatus=JSON.parse(localStorage.getItem('liv_status')||'{}');
+var _livUrls=JSON.parse(localStorage.getItem('liv_urls')||'{}');
+function _livSalvar(){localStorage.setItem('liv_status',JSON.stringify(_livStatus));}
+
+var _LIV_DISCS={
+  t1:[
+    {id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},
+    {id:'tl',nm:'Trilhas de Linguagens',cor:'d-tl'},
+    {id:'tc',nm:'Trilhas de C. Humanas',cor:'d-tc'}
+  ],
+  t2:[
+    {id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},
+    {id:'tl',nm:'Trilhas de Linguagens',cor:'d-tl'},
+    {id:'tc',nm:'Trilhas de C. Humanas',cor:'d-tc'},
+    {id:'ar',nm:'Artes',cor:'d-ar'}
+  ],
+  t3:[
+    {id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},
+    {id:'tl',nm:'Trilhas de Linguagens',cor:'d-tl'},
+    {id:'tc',nm:'Trilhas de C. Humanas',cor:'d-tc'},
+    {id:'ar',nm:'Artes',cor:'d-ar'}
+  ]
+};
+var _LIV_ICS={'':{ic:'📘',lbl:'Não iniciado'},'criando':{ic:'📕',lbl:'Criando'},'concluido':{ic:'📗',lbl:'Concluído'}};
+
+function livTab(turma,btn){
+  document.querySelectorAll('.liv-page').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.liv-tab').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('liv-page-'+turma).classList.add('on');
+  btn.classList.add('on');
+}
+
+function livSetStatus(key,st,evt){
+  if(evt)evt.stopPropagation();
+  _livStatus[key]=(_livStatus[key]===st)?'':st;
+  _livSalvar();
+  var card=document.querySelector('[data-liv="'+key+'"]');
+  if(card)_livAtualizarCard(card,key);
+}
+
+function livAcessar(key,evt){
+  if(evt)evt.stopPropagation();
+  var url=_livUrls[key];
+  if(url)window.open(url,'_blank');
+}
+
+function _livAtualizarCard(card,key){
+  var st=_livStatus[key]||'';
+  card.classList.remove('criando','concluido');
+  if(st)card.classList.add(st);
+  var ic=card.querySelector('.liv-card-ic');
+  if(ic)ic.textContent=_LIV_ICS[st]?_LIV_ICS[st].ic:'📘';
+  var lbl=card.querySelector('.liv-card-nm');
+  if(lbl)lbl.textContent=(_LIV_ICS[st]?_LIV_ICS[st].lbl:'Não iniciado');
+  var aceBtn=card.querySelector('.b-ace');
+  if(aceBtn){aceBtn.disabled=!_livUrls[key];}
+}
+
+function livRender(){
+  ['t1','t2','t3'].forEach(function(turma){
+    var page=document.getElementById('liv-page-'+turma);
+    if(!page)return;
+    (_LIV_DISCS[turma]||[]).forEach(function(disc){
+      var sec=document.createElement('div');
+      sec.className='liv-disc';
+      sec.innerHTML='<div class="liv-disc-h"><span class="ld '+disc.cor+'" style="width:12px;height:12px;border-radius:3px;flex-shrink:0;display:inline-block"></span>'+disc.nm+'</div>'
+        +'<div class="liv-grid" id="liv-g-'+turma+'-'+disc.id+'"></div>';
+      page.appendChild(sec);
+      var grid=document.getElementById('liv-g-'+turma+'-'+disc.id);
+      for(var b=1;b<=4;b++){
+        (function(bim){
+          var key=turma+'-'+disc.id+'-b'+bim;
+          var st=_livStatus[key]||'';
+          var card=document.createElement('div');
+          card.className='liv-card'+(st?' '+st:'');
+          card.setAttribute('data-liv',key);
+          card.innerHTML=
+            '<div class="liv-card-bim">'+bim+'º Bimestre</div>'
+            +'<span class="liv-card-ic">'+(_LIV_ICS[st]?_LIV_ICS[st].ic:'📘')+'</span>'
+            +'<div class="liv-card-nm">'+(_LIV_ICS[st]?_LIV_ICS[st].lbl:'Não iniciado')+'</div>'
+            +'<div class="liv-btns">'
+              +'<button class="liv-btn b-cri" onclick="livSetStatus(\''+key+'\',\'criando\',event)">📝 Criando</button>'
+              +'<button class="liv-btn b-con" onclick="livSetStatus(\''+key+'\',\'concluido\',event)">✅ Concluído</button>'
+              +'<button class="liv-btn b-ace"'+(!_livUrls[key]?' disabled':'')+' onclick="livAcessar(\''+key+'\',event)">🔗 Acessar</button>'
+            +'</div>';
+          card.addEventListener('click',function(e){
+            if(e.target.closest('.liv-btn'))return;
+            var wasOpen=this.classList.contains('open');
+            document.querySelectorAll('.liv-card.open').forEach(function(c){c.classList.remove('open');});
+            if(!wasOpen)this.classList.add('open');
+          });
+          grid.appendChild(card);
+        })(b);
+      }
+    });
+  });
+}
+
+// Função pública: Claude chama isso para registrar URL de um livro concluído
+// Uso: livRegistrarUrl('t1-lp-b1', 'https://...')
+function livRegistrarUrl(key,url){
+  _livUrls[key]=url;
+  localStorage.setItem('liv_urls',JSON.stringify(_livUrls));
+  var aceBtn=document.querySelector('[data-liv="'+key+'"] .b-ace');
+  if(aceBtn)aceBtn.disabled=false;
+}
+
+document.addEventListener('DOMContentLoaded',livRender);
 </script>
 <!-- TOOLBAR EDITOR -->
 <div id="toolbar-texto">
