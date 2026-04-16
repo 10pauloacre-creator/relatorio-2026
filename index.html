@@ -6216,7 +6216,11 @@ const ATIVIDADES={
 
 /* ── ATIVIDADES INTERATIVAS ── */
 var _atvManual=JSON.parse(localStorage.getItem('atv_manual')||'{}');
-function _atvSalvar(){localStorage.setItem('atv_manual',JSON.stringify(_atvManual));}
+function _atvSalvar(){
+  localStorage.setItem('atv_manual',JSON.stringify(_atvManual));
+  if(_db) _db.collection('app_data').doc('atv_manual').set(_atvManual)
+    .catch(function(e){console.error('[SYNC atv]',e.code,e.message);});
+}
 var _atvMenuAberto=null;
 
 function _atvStatus(atvId,n,cfg){
@@ -6605,14 +6609,14 @@ function initStatusButtons() {
     });
   });
 
-  // Se Firebase disponível, sincronizar por cima
+  // Sincronização Firestore em tempo real: qualquer mudança num dispositivo
+  // aparece imediatamente em todos os outros
   if (_db) {
-    _db.collection('plano_status').get().then(snap => {
+    _db.collection('plano_status').onSnapshot(snap => {
       snap.forEach(doc => {
         const item = document.querySelector(`[data-fbkey="${doc.id}"]`);
         if (!item) return;
         const data = doc.data();
-        // Salvar no localStorage também
         localStorage.setItem('ps_' + doc.id, JSON.stringify(data));
         BOTOES.forEach(({cls}) => {
           if (data[cls] !== undefined) {
@@ -6621,7 +6625,7 @@ function initStatusButtons() {
           }
         });
       });
-    }).catch(()=>{});
+    }, ()=>{});
   }
 }
 document.addEventListener('DOMContentLoaded', initStatusButtons);
@@ -6629,7 +6633,11 @@ document.addEventListener('DOMContentLoaded', initStatusButtons);
 /* ── LIVROS DIGITAIS ── */
 var _livStatus=JSON.parse(localStorage.getItem('liv_status')||'{}');
 var _livUrls=JSON.parse(localStorage.getItem('liv_urls')||'{}');
-function _livSalvar(){localStorage.setItem('liv_status',JSON.stringify(_livStatus));}
+function _livSalvar(){
+  localStorage.setItem('liv_status',JSON.stringify(_livStatus));
+  if(_db) _db.collection('app_data').doc('livros').set({status:_livStatus,urls:_livUrls})
+    .catch(function(e){console.error('[SYNC livros]',e.code,e.message);});
+}
 
 var _LIV_DISCS={
   t1:[
@@ -6730,11 +6738,93 @@ function livRender(){
 function livRegistrarUrl(key,url){
   _livUrls[key]=url;
   localStorage.setItem('liv_urls',JSON.stringify(_livUrls));
+  if(_db) _db.collection('app_data').doc('livros').set({status:_livStatus,urls:_livUrls})
+    .catch(function(e){console.error('[SYNC livros url]',e.code,e.message);});
   var aceBtn=document.querySelector('[data-liv="'+key+'"] .b-ace');
   if(aceBtn)aceBtn.disabled=false;
 }
 
 document.addEventListener('DOMContentLoaded',livRender);
+
+// ═══════════════════════════════════════════════════════
+// SYNC UNIVERSAL — tudo que muda num dispositivo aparece
+// em todos os outros em tempo real via Firestore
+// ═══════════════════════════════════════════════════════
+
+// Aplica dados de atividades vindos do Firestore ao DOM
+function _syncAplicarAtv(data) {
+  if (!data) return;
+  var atvIds = {};
+  Object.keys(data).forEach(function(k) {
+    _atvManual[k] = data[k];
+    var idx = k.lastIndexOf('_');
+    if (idx < 0) return;
+    var atvId = k.slice(0, idx);
+    var n = parseInt(k.slice(idx + 1));
+    var cell = document.querySelector('[data-atv="'+atvId+'"][data-n="'+n+'"]');
+    if (cell) _atvAtualizarCelula(cell, data[k]);
+    atvIds[atvId] = true;
+  });
+  localStorage.setItem('atv_manual', JSON.stringify(_atvManual));
+  Object.keys(atvIds).forEach(function(atvId){ _atvAtualizarStat(atvId); });
+}
+
+// Aplica dados de livros vindos do Firestore
+function _syncAplicarLivros(data) {
+  if (!data) return;
+  var mudou = false;
+  if (data.status && JSON.stringify(data.status) !== JSON.stringify(_livStatus)) {
+    _livStatus = data.status;
+    localStorage.setItem('liv_status', JSON.stringify(_livStatus));
+    mudou = true;
+  }
+  if (data.urls && JSON.stringify(data.urls) !== JSON.stringify(_livUrls)) {
+    _livUrls = data.urls;
+    localStorage.setItem('liv_urls', JSON.stringify(_livUrls));
+    mudou = true;
+  }
+  if (mudou) livRender();
+}
+
+var _syncUnsubs = [];
+
+function iniciarSyncUniversal() {
+  // Cancela listeners anteriores
+  _syncUnsubs.forEach(function(u){ try{ u(); }catch(e){} });
+  _syncUnsubs = [];
+  if (!_db) return;
+
+  // 1. Leitura forçada do servidor (ignora cache offline do SDK)
+  _db.collection('app_data').doc('atv_manual').get({source:'server'})
+    .then(function(doc){ if(doc.exists) _syncAplicarAtv(doc.data()); })
+    .catch(function(){});
+  _db.collection('app_data').doc('livros').get({source:'server'})
+    .then(function(doc){ if(doc.exists) _syncAplicarLivros(doc.data()); })
+    .catch(function(){});
+
+  // 2. Listeners em tempo real para mudanças futuras
+  // hasPendingWrites: ignora snapshot gerado pela nossa própria escrita
+  _syncUnsubs.push(
+    _db.collection('app_data').doc('atv_manual').onSnapshot(
+      {includeMetadataChanges: true},
+      function(doc) {
+        if (!doc.exists || doc.metadata.hasPendingWrites) return;
+        _syncAplicarAtv(doc.data());
+      },
+      function(e){ console.warn('[SYNC atv]', e.message); }
+    )
+  );
+  _syncUnsubs.push(
+    _db.collection('app_data').doc('livros').onSnapshot(
+      {includeMetadataChanges: true},
+      function(doc) {
+        if (!doc.exists || doc.metadata.hasPendingWrites) return;
+        _syncAplicarLivros(doc.data());
+      },
+      function(e){ console.warn('[SYNC livros]', e.message); }
+    )
+  );
+}
 </script>
 <!-- TOOLBAR EDITOR -->
 <div id="toolbar-texto">
@@ -6896,7 +6986,8 @@ function claudeListenFirebase() {
 document.addEventListener('visibilitychange', function() {
   if (document.visibilityState === 'visible') {
     _claudeFBRetries = 0;
-    claudeListenFirebase();
+    claudeListenFirebase();    // re-sincroniza timers Claude
+    iniciarSyncUniversal();    // re-sincroniza atividades, livros, etc.
   }
 });
 
@@ -7108,8 +7199,8 @@ function setModo(modo) {
 document.addEventListener('DOMContentLoaded', function() {
   claudeRenderizar();
   setInterval(claudeTick, 1000);
-  // Sincronização Firebase em tempo real
-  claudeListenFirebase();
+  claudeListenFirebase();    // timers Claude
+  iniciarSyncUniversal();    // atividades, livros, plano (via onSnapshot já registrado)
 });
 
 // ── IndexedDB: sincroniza timers para o Service Worker ──
