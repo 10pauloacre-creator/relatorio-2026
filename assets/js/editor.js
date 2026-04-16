@@ -574,12 +574,13 @@ function edRedo() {
 function _salvarAlteracoes() {
   try {
     var main = document.querySelector('.main');
-    if (main) localStorage.setItem('ed_main_html', main.innerHTML);
+    if (main) localStorage.setItem('ed_main_html_v2', main.innerHTML);
   } catch(e) { console.warn('[Editor] Erro ao salvar:', e); }
 }
 
 function limparAlteracoes() {
   if (!confirm('Restaurar o site ao estado original? Todas as edições visuais serão perdidas.')) return;
+  localStorage.removeItem('ed_main_html_v2');
   localStorage.removeItem('ed_main_html');
   window.location.reload();
 }
@@ -647,14 +648,16 @@ function _rgbToHex(rgb) {
 document.addEventListener('DOMContentLoaded', function() {
 
   // 1. Restaura edições visuais salvas pelo editor
+  // Chave v2: descarta saves anteriores ao fix de livros duplicados
+  localStorage.removeItem('ed_main_html'); // limpa chave antiga corrompida
   try {
-    var salvo = localStorage.getItem('ed_main_html');
+    var salvo = localStorage.getItem('ed_main_html_v2');
     if (salvo) {
       var main = document.querySelector('.main');
       if (main) {
         main.innerHTML = salvo;
-        // Após restaurar o HTML, re-renderiza apenas o necessário
-        // (renderPresenca, renderAtividades, livRender já estão no HTML salvo)
+        // Após restaurar, re-renderiza seções dinâmicas que não fazem parte do HTML estático
+        if (typeof livRender === 'function') livRender();
         if (typeof claudeRenderizar === 'function') claudeRenderizar();
       }
     }
