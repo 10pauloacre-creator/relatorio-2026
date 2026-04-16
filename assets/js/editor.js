@@ -643,8 +643,24 @@ function _rgbToHex(rgb) {
   return '#' + [m[1],m[2],m[3]].map(function(n) { return ('0'+parseInt(n).toString(16)).slice(-2); }).join('');
 }
 
-// Carrega contas Claude salvas no localStorage
+// ─── INICIALIZAÇÃO: restaura edições visuais + contas Claude ─
 document.addEventListener('DOMContentLoaded', function() {
+
+  // 1. Restaura edições visuais salvas pelo editor
+  try {
+    var salvo = localStorage.getItem('ed_main_html');
+    if (salvo) {
+      var main = document.querySelector('.main');
+      if (main) {
+        main.innerHTML = salvo;
+        // Após restaurar o HTML, re-renderiza apenas o necessário
+        // (renderPresenca, renderAtividades, livRender já estão no HTML salvo)
+        if (typeof claudeRenderizar === 'function') claudeRenderizar();
+      }
+    }
+  } catch(e) { console.warn('[Editor] Erro ao restaurar:', e); }
+
+  // 2. Carrega contas Claude salvas
   try {
     var contasSalvas = localStorage.getItem('cl_contas');
     if (contasSalvas && typeof CLAUDE_CONTAS !== 'undefined') {
