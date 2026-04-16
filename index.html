@@ -6850,9 +6850,8 @@ function _claudeFetchServidor() {
     .catch(function(e) {
       console.error('[Claude Timer] Erro ao buscar do servidor:', e.code, e.message);
       _claudeFBStatus(false, e.code);
-      // Tenta do cache como fallback
-      _db.collection('claude_timers').get({ source: 'cache' })
-        .then(_claudeAplicarSnap).catch(function(){});
+      // NÃO limpa localStorage — mantém timers locais íntegros em caso de erro
+      claudeRenderizar();
     });
 }
 
