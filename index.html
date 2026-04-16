@@ -6789,7 +6789,9 @@ var CLAUDE_CONTAS = [
 var CLAUDE_ESPERA_MS = 5 * 60 * 60 * 1000;
 
 // ── Firebase helpers (compat API) ──────────────────────
+var _claudeFirestoreDB = null;
 function _claudeDB() {
+  if (_claudeFirestoreDB) return _claudeFirestoreDB;
   try {
     if (typeof firebase === 'undefined') return null;
     if (!firebase.apps || !firebase.apps.length) {
@@ -6799,7 +6801,8 @@ function _claudeDB() {
         projectId:'relatorio-c693d'
       });
     }
-    return firebase.firestore();
+    _claudeFirestoreDB = firebase.firestore();
+    return _claudeFirestoreDB;
   } catch(e) { return null; }
 }
 
@@ -6812,34 +6815,71 @@ function _claudeSyncFB(id, fim) {
   }
 }
 
-var _claudeFBListening = false;
+// ── Sincronização Firebase em tempo real — robusto ─────
+var _claudeUnsub = null;        // função de cancelamento do listener atual
+var _claudeFBRetries = 0;       // contador de tentativas
+var _claudeFBRetryTimer = null; // setTimeout pendente
+
 function claudeListenFirebase() {
-  if (_claudeFBListening) return;
-  var db = _claudeDB(); if (!db) return;
-  _claudeFBListening = true;
-  db.collection('claude_timers').onSnapshot(function(snap) {
+  // Cancela retry timer pendente para evitar chamadas duplicadas
+  if (_claudeFBRetryTimer) { clearTimeout(_claudeFBRetryTimer); _claudeFBRetryTimer = null; }
+
+  var db = _claudeDB();
+  if (!db) {
+    // Firebase ainda não carregou — tenta novamente com backoff
+    if (_claudeFBRetries < 15) {
+      _claudeFBRetries++;
+      _claudeFBRetryTimer = setTimeout(claudeListenFirebase, 1500);
+    }
+    return;
+  }
+
+  // Cancela listener anterior (se houver) para não ter listeners duplicados
+  if (_claudeUnsub) { try { _claudeUnsub(); } catch(e){} _claudeUnsub = null; }
+
+  _claudeUnsub = db.collection('claude_timers').onSnapshot(function(snap) {
+    _claudeFBRetries = 0; // conexão estabelecida — reseta contador
+
+    // Atualiza localStorage para cada timer ativo no Firestore
     snap.forEach(function(doc) {
       var d = doc.data();
       if (d && d.fim) {
+        var fim = parseInt(d.fim);
         var local = parseInt(localStorage.getItem('cl_fim_' + doc.id) || '0');
-        if (d.fim !== local) {
-          localStorage.setItem('cl_fim_' + doc.id, d.fim.toString());
+        if (fim !== local) {
+          localStorage.setItem('cl_fim_' + doc.id, fim.toString());
           localStorage.removeItem('cl_notif_' + doc.id);
         }
       }
     });
+
+    // Remove do localStorage timers que foram deletados no Firestore
     snap.docChanges().forEach(function(chg) {
       if (chg.type === 'removed') {
         localStorage.removeItem('cl_fim_' + chg.doc.id);
         localStorage.removeItem('cl_notif_' + chg.doc.id);
       }
     });
+
     claudeRenderizar();
   }, function(err) {
-    _claudeFBListening = false; // retry on next call
-    console.warn('[Claude Timer] Firestore error:', err.message);
+    _claudeUnsub = null;
+    console.warn('[Claude Timer] Firestore desconectado:', err.message);
+    // Reconecta com backoff exponencial (máx 30s)
+    var delay = Math.min(30000, 3000 * Math.pow(2, _claudeFBRetries));
+    _claudeFBRetries++;
+    _claudeFBRetryTimer = setTimeout(claudeListenFirebase, delay);
   });
 }
+
+// Reconecta quando a página fica visível novamente
+// (cobre: celular que saiu do sono, troca de aba, retorno ao app)
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible') {
+    _claudeFBRetries = 0;
+    claudeListenFirebase(); // cancela o listener antigo e abre um novo
+  }
+});
 
 // ── Notification Triggers (agenda notificação com app fechado) ──
 async function _claudeAgendarNotifSistema(id, nome, timestampFim) {
