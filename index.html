@@ -6109,6 +6109,10 @@ document.getElementById('p6ano').classList.add('active');
   <span>🔔 Ative as notificações para ser avisado quando a conta liberar</span>
   <button onclick="claudePedirPermissao()">Ativar Notificações</button>
 </div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+  <span id="cl-fb-status" style="font-size:.78rem;font-weight:600;color:#aaa">● Conectando ao Firestore…</span>
+  <button onclick="_claudeFBRetries=0;claudeListenFirebase()" style="font-size:.75rem;padding:5px 13px;border:1px solid var(--cl);background:transparent;color:var(--cm);border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif">🔄 Sincronizar agora</button>
+</div>
 <div class="cl-grid" id="claude-cards"></div>
 <!-- Popup Definir Hora -->
 <div id="cl-popup-hora" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
@@ -6788,96 +6792,112 @@ var CLAUDE_CONTAS = [
 ];
 var CLAUDE_ESPERA_MS = 5 * 60 * 60 * 1000;
 
-// ── Firebase helpers (compat API) ──────────────────────
-var _claudeFirestoreDB = null;
-function _claudeDB() {
-  if (_claudeFirestoreDB) return _claudeFirestoreDB;
-  try {
-    if (typeof firebase === 'undefined') return null;
-    if (!firebase.apps || !firebase.apps.length) {
-      firebase.initializeApp(window.FIREBASE_CONFIG || {
-        apiKey:'AIzaSyDO-BTsc6pYMBd89WIKEUcz4_iaaD46tR4',
-        authDomain:'relatorio-c693d.firebaseapp.com',
-        projectId:'relatorio-c693d'
-      });
-    }
-    _claudeFirestoreDB = firebase.firestore();
-    return _claudeFirestoreDB;
-  } catch(e) { return null; }
+// ── Claude Timer — sincronização Firebase ──────────────
+// Usa _db já inicializado pelo bloco do Plano Anual (linha ~6524)
+
+function _claudeFBStatus(ok, msg) {
+  var el = document.getElementById('cl-fb-status');
+  if (!el) return;
+  el.textContent = ok ? '● Firestore OK' : '● ' + (msg || 'Firestore offline');
+  el.style.color = ok ? '#4a9467' : '#c0392b';
 }
 
 function _claudeSyncFB(id, fim) {
-  var db = _claudeDB(); if (!db) return;
+  if (!_db) { console.warn('[Claude Timer] _db não disponível'); return; }
   if (fim) {
-    db.collection('claude_timers').doc(id).set({ fim: fim, ts: Date.now() });
+    _db.collection('claude_timers').doc(id).set({ fim: fim, ts: Date.now() })
+      .then(function() { _claudeFBStatus(true); })
+      .catch(function(e) {
+        console.error('[Claude Timer] ERRO ao salvar no Firestore:', e.code, e.message);
+        _claudeFBStatus(false, 'Erro: ' + e.code);
+      });
   } else {
-    db.collection('claude_timers').doc(id).delete().catch(function(){});
+    _db.collection('claude_timers').doc(id).delete()
+      .then(function() { _claudeFBStatus(true); })
+      .catch(function(e) { console.error('[Claude Timer] ERRO ao remover:', e.code, e.message); });
   }
 }
 
-// ── Sincronização Firebase em tempo real — robusto ─────
-var _claudeUnsub = null;        // função de cancelamento do listener atual
-var _claudeFBRetries = 0;       // contador de tentativas
-var _claudeFBRetryTimer = null; // setTimeout pendente
+// Aplica snapshot do Firestore ao localStorage e re-renderiza
+function _claudeAplicarSnap(snap) {
+  var idsFB = [];
+  snap.forEach(function(doc) {
+    var d = doc.data();
+    idsFB.push(doc.id);
+    if (d && d.fim) {
+      var fim = parseInt(d.fim);
+      localStorage.setItem('cl_fim_' + doc.id, fim.toString());
+      localStorage.removeItem('cl_notif_' + doc.id);
+    }
+  });
+  // Limpa localStorage para contas que não existem mais no Firestore
+  CLAUDE_CONTAS.forEach(function(conta) {
+    if (idsFB.indexOf(conta.id) === -1) {
+      localStorage.removeItem('cl_fim_' + conta.id);
+    }
+  });
+  claudeRenderizar();
+}
+
+// Leitura forçada do servidor (ignora cache offline do SDK)
+function _claudeFetchServidor() {
+  if (!_db) return;
+  _db.collection('claude_timers').get({ source: 'server' })
+    .then(function(snap) {
+      _claudeFBStatus(true);
+      _claudeAplicarSnap(snap);
+    })
+    .catch(function(e) {
+      console.error('[Claude Timer] Erro ao buscar do servidor:', e.code, e.message);
+      _claudeFBStatus(false, e.code);
+      // Tenta do cache como fallback
+      _db.collection('claude_timers').get({ source: 'cache' })
+        .then(_claudeAplicarSnap).catch(function(){});
+    });
+}
+
+// Listener em tempo real — fica ouvindo mudanças depois do fetch inicial
+var _claudeUnsub = null;
+var _claudeFBRetries = 0;
+var _claudeFBRetryTimer = null;
 
 function claudeListenFirebase() {
-  // Cancela retry timer pendente para evitar chamadas duplicadas
   if (_claudeFBRetryTimer) { clearTimeout(_claudeFBRetryTimer); _claudeFBRetryTimer = null; }
-
-  var db = _claudeDB();
-  if (!db) {
-    // Firebase ainda não carregou — tenta novamente com backoff
-    if (_claudeFBRetries < 15) {
-      _claudeFBRetries++;
-      _claudeFBRetryTimer = setTimeout(claudeListenFirebase, 1500);
-    }
+  if (!_db) {
+    if (_claudeFBRetries < 15) { _claudeFBRetries++; _claudeFBRetryTimer = setTimeout(claudeListenFirebase, 1500); }
     return;
   }
-
-  // Cancela listener anterior (se houver) para não ter listeners duplicados
   if (_claudeUnsub) { try { _claudeUnsub(); } catch(e){} _claudeUnsub = null; }
 
-  _claudeUnsub = db.collection('claude_timers').onSnapshot(function(snap) {
-    _claudeFBRetries = 0; // conexão estabelecida — reseta contador
+  // Busca do servidor primeiro para ignorar cache offline
+  _claudeFetchServidor();
 
-    // Atualiza localStorage para cada timer ativo no Firestore
-    snap.forEach(function(doc) {
-      var d = doc.data();
-      if (d && d.fim) {
-        var fim = parseInt(d.fim);
-        var local = parseInt(localStorage.getItem('cl_fim_' + doc.id) || '0');
-        if (fim !== local) {
-          localStorage.setItem('cl_fim_' + doc.id, fim.toString());
-          localStorage.removeItem('cl_notif_' + doc.id);
-        }
-      }
-    });
-
-    // Remove do localStorage timers que foram deletados no Firestore
-    snap.docChanges().forEach(function(chg) {
-      if (chg.type === 'removed') {
-        localStorage.removeItem('cl_fim_' + chg.doc.id);
-        localStorage.removeItem('cl_notif_' + chg.doc.id);
-      }
-    });
-
-    claudeRenderizar();
-  }, function(err) {
-    _claudeUnsub = null;
-    console.warn('[Claude Timer] Firestore desconectado:', err.message);
-    // Reconecta com backoff exponencial (máx 30s)
-    var delay = Math.min(30000, 3000 * Math.pow(2, _claudeFBRetries));
-    _claudeFBRetries++;
-    _claudeFBRetryTimer = setTimeout(claudeListenFirebase, delay);
-  });
+  // Depois mantém listener de tempo real para mudanças futuras
+  _claudeUnsub = _db.collection('claude_timers').onSnapshot(
+    { includeMetadataChanges: false },
+    function(snap) {
+      _claudeFBRetries = 0;
+      _claudeFBStatus(true);
+      // Ignora snapshots que vieram apenas do cache local
+      if (snap.metadata && snap.metadata.fromCache) return;
+      _claudeAplicarSnap(snap);
+    },
+    function(err) {
+      _claudeUnsub = null;
+      console.warn('[Claude Timer] Listener desconectado:', err.message);
+      _claudeFBStatus(false, err.code || 'desconectado');
+      var delay = Math.min(30000, 3000 * Math.pow(2, _claudeFBRetries));
+      _claudeFBRetries++;
+      _claudeFBRetryTimer = setTimeout(claudeListenFirebase, delay);
+    }
+  );
 }
 
-// Reconecta quando a página fica visível novamente
-// (cobre: celular que saiu do sono, troca de aba, retorno ao app)
+// Reconecta + força leitura do servidor ao voltar ao app
 document.addEventListener('visibilitychange', function() {
   if (document.visibilityState === 'visible') {
     _claudeFBRetries = 0;
-    claudeListenFirebase(); // cancela o listener antigo e abre um novo
+    claudeListenFirebase();
   }
 });
 
