@@ -6697,6 +6697,7 @@ function livRender(){
   ['t1','t2','t3'].forEach(function(turma){
     var page=document.getElementById('liv-page-'+turma);
     if(!page)return;
+    page.innerHTML=''; // limpa antes de reconstruir — evita duplicação
     (_LIV_DISCS[turma]||[]).forEach(function(disc){
       var sec=document.createElement('div');
       sec.className='liv-disc';
@@ -6772,18 +6773,12 @@ function _syncAplicarAtv(data) {
 // Aplica dados de livros vindos do Firestore
 function _syncAplicarLivros(data) {
   if (!data) return;
-  var mudou = false;
-  if (data.status && JSON.stringify(data.status) !== JSON.stringify(_livStatus)) {
-    _livStatus = data.status;
-    localStorage.setItem('liv_status', JSON.stringify(_livStatus));
-    mudou = true;
-  }
-  if (data.urls && JSON.stringify(data.urls) !== JSON.stringify(_livUrls)) {
-    _livUrls = data.urls;
-    localStorage.setItem('liv_urls', JSON.stringify(_livUrls));
-    mudou = true;
-  }
-  if (mudou) livRender();
+  if (data.status) { _livStatus = data.status; localStorage.setItem('liv_status', JSON.stringify(_livStatus)); }
+  if (data.urls)   { _livUrls   = data.urls;   localStorage.setItem('liv_urls',   JSON.stringify(_livUrls));   }
+  // Atualiza apenas os cards já renderizados — sem reconstruir o DOM (evita duplicação)
+  document.querySelectorAll('[data-liv]').forEach(function(card) {
+    _livAtualizarCard(card, card.getAttribute('data-liv'));
+  });
 }
 
 var _syncUnsubs = [];
