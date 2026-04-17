@@ -314,7 +314,11 @@ body.modo-escuro .bi{background:#1e1e2a!important;color:#d0d0e8!important;border
 body.modo-escuro .lesson-item{background:#1e1e2a!important;color:#d0d0e8!important;border-color:rgba(255,255,255,.08)!important}
 body.modo-escuro .lesson-title{color:#e2e2f4!important}
 body.modo-escuro .lesson-sub{color:#9898b8!important}
-body.modo-escuro .lesson-num{color:#d0d8f0!important}
+body.modo-escuro .lesson-num{color:#d0d8f0!important;border:1px solid rgba(255,255,255,.15)!important}
+body.modo-escuro .lp .lesson-num{background:#162035!important;color:#7ab4e8!important}
+body.modo-escuro .lgg .lesson-num{background:#152515!important;color:#7fddaa!important}
+body.modo-escuro .chs .lesson-num{background:#251a10!important;color:#f0a050!important}
+body.modo-escuro .arte .lesson-num{background:#22102a!important;color:#c98fe8!important}
 body.modo-escuro .lesson-list{background:#1a1a28!important;box-shadow:none!important}
 body.modo-escuro .bim-header{background:#151524!important;border-color:rgba(255,255,255,.12)!important}
 body.modo-escuro .bim-header h3{color:#d0d8f0!important}
@@ -328,7 +332,14 @@ body.modo-escuro .bim-tab.active{color:#7fddaa!important;background:#1a3a2a!impo
 body.modo-escuro .plano-wrapper .header{background:#0d1520!important}
 body.modo-escuro .lesson-item.st-ap{background:#152510!important}
 body.modo-escuro .lesson-item.st-pu{background:#252015!important}
-body.modo-escuro .lesson-actions button{background:#252533!important;color:#c0c0d0!important;border-color:rgba(255,255,255,.1)!important}
+body.modo-escuro .btn-st.pl{border-color:#9b59b6!important;color:#c39bd3!important}
+body.modo-escuro .btn-st.pl.on{background:#5a1e7a!important;color:#e8c8f8!important;border-color:#9b59b6!important}
+body.modo-escuro .btn-st.ap{border-color:#4a9467!important;color:#7fddaa!important}
+body.modo-escuro .btn-st.ap.on{background:#1a4a30!important;color:#7fddaa!important;border-color:#4a9467!important}
+body.modo-escuro .btn-st.pu{border-color:#c87941!important;color:#f0a050!important}
+body.modo-escuro .btn-st.pu.on{background:#4a2a10!important;color:#f5b870!important;border-color:#c87941!important}
+body.modo-escuro .btn-st.sm{border-color:#5a8cc8!important;color:#a8c8f0!important}
+body.modo-escuro .btn-st.sm.on{background:#1a2a4a!important;color:#a8c8f0!important;border-color:#5a8cc8!important}
 body.modo-escuro .liv-card{background:#1e1e2a!important;border-color:rgba(255,255,255,.1)!important}
 body.modo-escuro .liv-card.criando{background:#2a1515!important;border-color:#874040!important}
 body.modo-escuro .liv-card.concluido{background:#152510!important;border-color:#3a7a50!important}
@@ -395,10 +406,9 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .cl-btn-hora{width:100%;font-size:.75rem;background:rgba(41,128,185,.1)!important;color:#2980b9!important;border-color:rgba(41,128,185,.3)!important;margin-top:2px}
 .cl-btn-hora:hover{background:rgba(41,128,185,.25)!important}
 /* ── STATUS BUTTONS ── */
-.lesson-item{cursor:pointer}
-.lesson-actions{display:none;gap:5px;margin-top:9px;flex-wrap:wrap;padding-top:7px;border-top:1px solid var(--cl)}
-.lesson-item.aberto .lesson-actions{display:flex}
-.btn-st{padding:4px 11px;border-radius:20px;font-size:.72rem;font-weight:700;border:2px solid;cursor:pointer;transition:all .18s;background:transparent;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.lesson-item{cursor:default;align-items:center!important}
+.lesson-actions{display:grid;grid-template-columns:1fr 1fr;gap:3px;flex-shrink:0;width:152px;margin-right:4px}
+.btn-st{padding:3px 6px;border-radius:12px;font-size:.64rem;font-weight:700;border:2px solid;cursor:pointer;transition:all .18s;background:transparent;font-family:'DM Sans',sans-serif;white-space:nowrap;text-align:center;line-height:1.3}
 .btn-st.pl{border-color:#6c3483;color:#6c3483}.btn-st.pl.on{background:#6c3483;color:#fff}
 .btn-st.ap{border-color:var(--vm);color:var(--vm)}.btn-st.ap.on{background:var(--vm);color:#fff}
 .btn-st.pu{border-color:var(--og);color:var(--og)}.btn-st.pu.on{background:var(--ou);color:#fff}
@@ -409,6 +419,14 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .lesson-item.st-sm{background:#f3f4f6!important;filter:grayscale(1);opacity:.55}
 .lesson-item.st-sm .lesson-title{color:#374151;text-decoration:line-through}
 .lesson-item.st-sm .lesson-num{background:#e5e7eb!important;color:#6b7280!important}
+/* ── PLANO — ÚLTIMA MODIFICAÇÃO ── */
+#plano-ultima-mod{display:none;align-items:center;gap:10px;padding:10px 16px;margin-bottom:12px;background:rgba(74,148,103,.08);border:1px solid rgba(74,148,103,.25);border-radius:10px;font-size:.82rem;color:var(--ce)}
+#plano-ultima-mod.on{display:flex}
+.pum-ic{font-size:1rem;flex-shrink:0}
+.pum-txt{line-height:1.5}
+.pum-det{color:var(--cm);font-size:.78rem}
+body.modo-escuro #plano-ultima-mod{background:rgba(74,148,103,.12);border-color:rgba(74,148,103,.3);color:#c8e8d8}
+body.modo-escuro .pum-det{color:#8ab8a0}
 /* ── LIVROS DIGITAIS ── */
 .liv-tabs{display:flex;gap:4px;margin-bottom:22px;border-bottom:2px solid var(--cl);padding-bottom:0}
 .liv-tab{padding:9px 20px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:600;color:var(--cm);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap}
@@ -714,6 +732,7 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
   <p>E.E. Rural Padre Carlos Casavequia · Senador Guiomard – AC · Língua Portuguesa, Artes, Trilhas de Linguagens e Trilhas de Ciências Humanas</p>
 </div>
 
+<div id="plano-ultima-mod"><span class="pum-ic">🕐</span><span class="pum-txt"></span></div>
 <div class="main-tabs">
   <div class="main-tab active" onclick="planShowPage('p6ano',this)">🎨 6º Ano (Arte)</div>
   <div class="main-tab" onclick="planShowPage('p1serie',this)">📖 1ª Série</div>
@@ -6571,19 +6590,64 @@ function aplicarEstadoVisual(btn, item, cls, ativo) {
   if (cls === 'sm') item.classList.toggle('st-sm', ativo);
 }
 
+// ── Última modificação do Plano Anual ───────────────────
+const _SERIE_NOMES = {p6ano:'6º Ano',p1serie:'1ª Série',p2serie:'2ª Série',p3serie:'3ª Série'};
+const _BTN_NOMES   = {pl:'Planejada',ap:'Aplicada',pu:'Pulada',sm:'SIMAED'};
+
+function _exibirUltimaModPlano(r) {
+  const el = document.getElementById('plano-ultima-mod');
+  if (!el || !r) return;
+  const txt = el.querySelector('.pum-txt');
+  if (txt) txt.innerHTML = '<strong>Última atualização:</strong> '
+    + r.dia + ' — ' + r.hora
+    + ' <span class="pum-det">(' + r.serie + ' · ' + r.bim
+    + ' · Aula ' + r.num + ' marcada como <strong>' + r.acao + '</strong>)</span>';
+  el.classList.add('on');
+}
+
+function _registrarUltimaModPlano(item, cls) {
+  try {
+    const agora  = new Date();
+    const dias   = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+    const dia    = dias[agora.getDay()];
+    const hora   = agora.getHours().toString().padStart(2,'0') + ':' + agora.getMinutes().toString().padStart(2,'0');
+    const pageId = item.closest('.page')?.id || '';
+    const serie  = _SERIE_NOMES[pageId] || pageId || '?';
+    const h3     = item.closest('.bim-panel')?.querySelector('.bim-header h3');
+    const bimRaw = h3 ? h3.textContent.replace(/[📅]/g,'').trim() : '?';
+    const bimM   = bimRaw.match(/(\d+)[oº°]\s*Bimestre/i);
+    const bim    = bimM ? bimM[1] + 'º Bimestre' : bimRaw.split('–')[0].trim();
+    const num    = item.querySelector('.lesson-num')?.textContent.trim() || '?';
+    const acao   = _BTN_NOMES[cls] || cls;
+    const r = { ts: agora.getTime(), dia, hora, serie, bim, num, acao };
+    localStorage.setItem('plano_ultima_mod', JSON.stringify(r));
+    _exibirUltimaModPlano(r);
+    // Sync Firestore
+    if (_db) _db.collection('app_data').doc('plano_ultima_mod').set(r)
+      .catch(e => console.warn('[Plano mod]', e.code));
+  } catch(e) { console.warn('[Plano] registrar mod:', e); }
+}
+
 function toggleSt(btn, item, key, cls) {
   const ativo = !btn.classList.contains('on');
   aplicarEstadoVisual(btn, item, cls, ativo);
   salvarStatus(key, cls, ativo);
+  if (ativo) _registrarUltimaModPlano(item, cls);
 }
 
 function initStatusButtons() {
   document.querySelectorAll('.plano-wrapper .lesson-item').forEach(item => {
     const titleEl = item.querySelector('.lesson-title');
-    if (!titleEl || item.querySelector('.lesson-actions')) return;
+    if (!titleEl) return;
+
+    // Remove actions div anterior (se existir) para reposicionar à esquerda
+    const old = item.querySelector('.lesson-actions');
+    if (old) old.remove();
+
     const key = gerarChave(titleEl.textContent);
     item.dataset.fbkey = key;
 
+    // Cria div de botões sempre visíveis
     const div = document.createElement('div');
     div.className = 'lesson-actions';
 
@@ -6594,10 +6658,9 @@ function initStatusButtons() {
       btn.onclick = (e) => { e.stopPropagation(); toggleSt(btn, item, key, cls); };
       div.appendChild(btn);
     });
-    item.querySelector('.lesson-text').appendChild(div);
 
-    // Clicar na aula abre/fecha os botões
-    item.addEventListener('click', () => item.classList.toggle('aberto'));
+    // Insere como PRIMEIRO filho do lesson-item (à esquerda do número)
+    item.insertBefore(div, item.firstChild);
 
     // Carregar do localStorage imediatamente
     const salvo = carregarStatusLocal(key);
@@ -6628,7 +6691,24 @@ function initStatusButtons() {
     }, ()=>{});
   }
 }
-document.addEventListener('DOMContentLoaded', initStatusButtons);
+document.addEventListener('DOMContentLoaded', function() {
+  initStatusButtons();
+  // Restaura última modificação salva
+  try {
+    const salvo = localStorage.getItem('plano_ultima_mod');
+    if (salvo) _exibirUltimaModPlano(JSON.parse(salvo));
+  } catch(e) {}
+  // Sincroniza última modificação do Firestore (outro dispositivo pode ter atualizado)
+  if (_db) {
+    _db.collection('app_data').doc('plano_ultima_mod').onSnapshot(doc => {
+      if (doc.exists && !doc.metadata.hasPendingWrites) {
+        const r = doc.data();
+        localStorage.setItem('plano_ultima_mod', JSON.stringify(r));
+        _exibirUltimaModPlano(r);
+      }
+    }, () => {});
+  }
+});
 
 /* ── LIVROS DIGITAIS ── */
 var _livStatus=JSON.parse(localStorage.getItem('liv_status')||'{}');
