@@ -660,6 +660,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof claudeRenderizar === 'function') claudeRenderizar();
         // Reconstrói botões do plano (handlers se perdem no innerHTML replace)
         if (typeof initStatusButtons === 'function') initStatusButtons();
+        // Reconstrói células de presença e atividades (handlers perdidos no replace)
+        if (typeof renderPresenca === 'function') renderPresenca();
+        if (typeof renderAtividades === 'function') renderAtividades();
+        // Re-sincroniza dados dos alunos com os novos registros
+        if (typeof _sincronizarRegistros === 'function') _sincronizarRegistros();
+        // Verifica regra das 3 abas obrigatórias
+        if (typeof verificarAbasRelatos === 'function') verificarAbasRelatos();
         // Restaura banner de última modificação
         try {
           var ult = localStorage.getItem('plano_ultima_mod');

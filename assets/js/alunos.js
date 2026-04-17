@@ -13,6 +13,7 @@ function initAlunos() {
     if (!sec) return;
     var th = sec.querySelector('.th');
     if (!th) return;
+    if (th.querySelector('.btn-alunos')) return; // evita duplicação
     var btn = document.createElement('button');
     btn.className = 'btn-alunos';
     btn.innerHTML = '👥 Alunos';
