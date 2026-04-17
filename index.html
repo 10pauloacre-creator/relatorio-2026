@@ -95,6 +95,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .ar2 .ai3{font-size:.85rem;flex-shrink:0}.ar2 .anm{flex:1}
 .ar2 .atg{font-size:.62rem;font-weight:700;padding:1px 5px;border-radius:3px}
 .tgf{background:var(--ra);color:#fff}.tgfj{background:var(--ou);color:#fff}
+.ea-aviso-abas{background:rgba(220,80,80,.08);border:1px dashed rgba(220,80,80,.4);border-radius:6px;padding:6px 12px;font-size:.75rem;color:#c04040;margin:4px 0 0;display:flex;align-items:center;gap:6px}
 .pres-av{background:var(--os);border:1px solid #e0c87a;border-radius:var(--rs2);padding:9px 13px;font-size:.81rem;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start}
 .atv-tema{background:var(--cr);border-left:3px solid var(--ou);padding:10px 14px;border-radius:0 var(--rs2) var(--rs2) 0;font-size:.87rem;margin-bottom:12px}
 .atv-stat{font-size:.72rem;color:var(--cm);margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap}
@@ -204,7 +205,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .sem{text-align:center;padding:55px 40px;color:var(--cm)}
 .sem .ic{font-size:2.8rem;margin-bottom:11px;opacity:.4;display:block}
 footer{background:var(--vd);color:rgba(255,255,255,.5);text-align:center;padding:18px 40px;font-size:.76rem;letter-spacing:.04em}
-@media(max-width:680px){.cab-i{padding:20px 15px;flex-direction:column;text-align:center}.main{padding:18px 13px 40px}.nav-i{padding:0 6px}.nb{padding:10px 10px;font-size:.76rem}.sr{grid-template-columns:repeat(2,1fr)}.cg,.rcg{grid-template-columns:1fr}.brow{grid-template-columns:repeat(2,1fr)}.edb{min-width:68px;padding:13px 9px}.pres-grid,.atv-grid{grid-template-columns:1fr}.cl-grid{grid-template-columns:1fr!important}.cl-timer{font-size:2rem!important}}
+@media(max-width:680px){.cab-i{padding:20px 15px;flex-direction:column;text-align:center}.main{padding:18px 13px 40px}.nav-i{padding:0 6px}.nb{padding:10px 10px;font-size:.76rem}.sr{grid-template-columns:repeat(2,1fr)}.cg,.rcg{grid-template-columns:1fr}.brow{grid-template-columns:repeat(2,1fr)}.edb{min-width:68px;padding:13px 9px}.pres-grid,.atv-grid{grid-template-columns:1fr}.cl-grid{grid-template-columns:1fr!important}.cl-timer{font-size:2rem!important}#cl-notif-bar{display:none!important}}
 /* ── CLAUDE TIMER ── */
 .cl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
 .cl-card{background:var(--bg3);border-radius:14px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;border:2px solid transparent;transition:background .4s,border-color .4s}
@@ -407,7 +408,7 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .cl-btn-hora:hover{background:rgba(41,128,185,.25)!important}
 /* ── STATUS BUTTONS ── */
 .lesson-item{align-items:center!important;flex-wrap:nowrap!important}
-.lesson-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:3px;flex-shrink:0!important;width:160px;margin-left:auto;padding-left:8px}
+.lesson-actions{display:flex!important;flex-direction:row;gap:3px;flex-shrink:0!important;margin-left:auto;padding-left:8px;align-items:center}
 .btn-st{padding:3px 7px;border-radius:12px;font-size:.63rem;font-weight:700;border:2px solid;cursor:pointer!important;transition:all .18s;background:transparent;font-family:'DM Sans',sans-serif;white-space:nowrap;text-align:center;line-height:1.4;pointer-events:auto!important}
 .btn-st.pl{border-color:#6c3483;color:#6c3483}.btn-st.pl.on{background:#6c3483;color:#fff}
 .btn-st.ap{border-color:var(--vm);color:var(--vm)}.btn-st.ap.on{background:var(--vm);color:#fff}
@@ -6208,6 +6209,24 @@ const PRESENCA={
   'pl-t2-0416lp':{turma:'t2',faltaram:[],faltJ:[]}
 };
 
+/* ── PRESENÇA MANUAL (overrides clicáveis) ── */
+var _presManual=JSON.parse(localStorage.getItem('pres_manual')||'{}');
+function _presManualSalvar(){
+  localStorage.setItem('pres_manual',JSON.stringify(_presManual));
+  if(_db) _db.collection('app_data').doc('pres_manual').set(_presManual)
+    .catch(function(e){console.error('[SYNC pres]',e.code,e.message);});
+}
+var _presIcons={pr:'✓',fa:'✗',fj:'⚠'};
+var _presLabels={pr:'',fa:'<span class="atg tgf">F</span>',fj:'<span class="atg tgfj">FJ</span>'};
+function _presProximoStatus(s){return s==='pr'?'fa':s==='fa'?'fj':'pr';}
+function _presAplicarVisual(row,s){
+  row.className='ar2 '+s;
+  row.querySelector('.ai3').textContent=_presIcons[s];
+  var tg=row.querySelector('.atg');
+  if(s==='pr'){if(tg)tg.remove();}
+  else{if(!tg){tg=document.createElement('span');row.appendChild(tg);}tg.className='atg '+(s==='fa'?'tgf':'tgfj');tg.textContent=s==='fa'?'F':'FJ';}
+}
+
 function renderPresenca(){
   Object.entries(PRESENCA).forEach(([id,cfg])=>{
     const el=document.getElementById(id);if(!el)return;
@@ -6216,11 +6235,24 @@ function renderPresenca(){
     if(cfg.parcial){const av=document.createElement('div');av.className='pres-av';av.innerHTML='<span>⚠️</span><span><strong>Lista parcial:</strong> 5 presentes, nomes não registrados. Atualize quando possível.</span>';el.before(av);}
     else{const st=document.createElement('div');st.className='pres-stat';st.innerHTML=`<span>✓ Presentes: <strong>${pr}</strong></span><span>✗ Faltas: <strong>${fa}</strong></span><span>⚠ FJ: <strong>${fj}</strong></span><span>Total: <strong>${al.length}</strong></span>`;el.before(st);}
     al.forEach(a=>{
-      const isF=cfg.faltaram.includes(a.n),isFJ=cfg.faltJ.includes(a.n);
-      const cls=isF?'fa':isFJ?'fj':'pr',ic=isF?'✗':isFJ?'⚠':'✓';
-      const tg=isF?'<span class="atg tgf">F</span>':isFJ?'<span class="atg tgfj">FJ</span>':'';
-      const row=document.createElement('div');row.className='ar2 '+cls;
+      const manKey=id+'_'+a.n;
+      const manualStatus=_presManual[manKey];
+      const baseStatus=cfg.faltaram.includes(a.n)?'fa':cfg.faltJ.includes(a.n)?'fj':'pr';
+      const s=manualStatus||baseStatus;
+      const ic=_presIcons[s],tg=_presLabels[s];
+      const row=document.createElement('div');
+      row.className='ar2 '+s;
+      row.style.cursor='pointer';
+      row.title='Clique para alternar presença';
       row.innerHTML=`<span class="an">${a.n}</span><span class="ai3">${ic}</span><span class="anm">${a.nm}</span>${tg}`;
+      row.addEventListener('click',function(){
+        const cur=row.className.replace('ar2 ','').trim();
+        const prox=_presProximoStatus(cur);
+        _presAplicarVisual(row,prox);
+        if(prox===baseStatus){delete _presManual[manKey];}
+        else{_presManual[manKey]=prox;}
+        _presManualSalvar();
+      });
       el.appendChild(row);
     });
   });
@@ -6349,6 +6381,54 @@ function renderAtividades(){
   });
 }
 
+/* ★ ANCORAGEM AUTOMÁTICA — monta REGISTROS e ATIVIDADES_BIMESTRE a partir de PRESENCA/ATIVIDADES ★ */
+var REGISTROS = {};
+var ATIVIDADES_BIMESTRE = {};
+var TURMAS = [
+  {id:'t1',nome:'1ª Série'},
+  {id:'t2',nome:'2ª Série'},
+  {id:'t3',nome:'3ª Série'},
+  {id:'t6',nome:'6º Ano'}
+];
+
+function _sincronizarRegistros(){
+  // Reconstrói REGISTROS zerado
+  REGISTROS={};
+  ['t1','t2','t3','t6'].forEach(function(tid){
+    REGISTROS[tid]={};
+    (ALUNOS[tid]||[]).forEach(function(a){ REGISTROS[tid][a.n]={faltas:[],obs:[],atividades:{},notaProva:null}; });
+  });
+
+  // Popula faltas a partir de PRESENCA (inclui overrides manuais _presManual)
+  Object.entries(PRESENCA).forEach(function([id,cfg]){
+    var m=id.match(/^pl-(t[^-]+)-(.+)$/);if(!m)return;
+    var tid=m[1],mmdd=m[2];
+    (ALUNOS[tid]||[]).forEach(function(a){
+      if(!REGISTROS[tid][a.n])return;
+      var manKey=id+'_'+a.n;
+      var s=_presManual[manKey]||(cfg.faltaram.includes(a.n)?'fa':cfg.faltJ.includes(a.n)?'fj':'pr');
+      if(s==='fa'||s==='fj') REGISTROS[tid][a.n].faltas.push(mmdd);
+    });
+  });
+
+  // Popula atividades a partir de ATIVIDADES (inclui overrides manuais _atvManual)
+  ATIVIDADES_BIMESTRE={};
+  Object.entries(ATIVIDADES).forEach(function([atvId,cfg]){
+    var m2=atvId.match(/^atv-(t[^-]+)-(.+)$/);if(!m2)return;
+    var tid=m2[1],mmdd=m2[2];
+    if(!ATIVIDADES_BIMESTRE[tid])ATIVIDADES_BIMESTRE[tid]=[];
+    if(!ATIVIDADES_BIMESTRE[tid].find(function(x){return x.id===atvId;}))
+      ATIVIDADES_BIMESTRE[tid].push({id:atvId,data:mmdd});
+    (ALUNOS[tid]||[]).forEach(function(a){
+      if(!REGISTROS[tid]||!REGISTROS[tid][a.n])return;
+      var key=atvId+'_'+a.n;
+      var manual=_atvManual[key];
+      var base=cfg.fez.includes(a.n)?'fz':cfg.naoFez.includes(a.n)?'nf':cfg.parcial?'ag':'pd';
+      REGISTROS[tid][a.n].atividades[atvId]=manual||base;
+    });
+  });
+}
+
 /* ★ CONTADOR ★ */
 const BASE=new Date(2026,2,30);
 const DISC=[
@@ -6384,7 +6464,31 @@ function renderCont(){
     cnt.appendChild(cc);
   });
 }
-document.addEventListener('DOMContentLoaded',()=>{renderPresenca();renderAtividades();renderCont();});
+/* ── REGRA: todo relato deve ter Relato + Presença + Atividades ── */
+function verificarAbasRelatos(){
+  document.querySelectorAll('.ea').forEach(function(ea){
+    var ec2=ea.querySelector('.ec2');if(!ec2)return;
+    var itabs=ec2.querySelector('.itabs');if(!itabs)return;
+    var labels=Array.from(itabs.querySelectorAll('.itab')).map(function(b){return b.textContent.trim();});
+    var temRelato=labels.some(function(l){return l.includes('Relato');});
+    var temPresenca=labels.some(function(l){return l.includes('Prese');});
+    var temAtividades=labels.some(function(l){return l.includes('Atividade');});
+    var jaAviso=itabs.querySelector('.ea-aviso-abas');
+    if((!temPresenca||!temAtividades)&&!jaAviso){
+      var faltando=[];
+      if(!temPresenca)faltando.push('Presença');
+      if(!temAtividades)faltando.push('Atividades');
+      var av=document.createElement('div');
+      av.className='ea-aviso-abas';
+      av.innerHTML='⚠️ Faltam abas: <strong>'+faltando.join(', ')+'</strong>';
+      itabs.appendChild(av);
+    } else if(temPresenca&&temAtividades&&jaAviso){
+      jaAviso.remove();
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded',()=>{renderPresenca();renderAtividades();renderCont();_sincronizarRegistros();verificarAbasRelatos();});
 
 /* ── PERFIL DO ALUNO ── */
 function abrirPerfil(turma,numAluno){
@@ -6577,10 +6681,10 @@ function gerarChave(texto) {
 
 // Botões: Planejada | Aplicada | Pulada | SIMAED
 const BOTOES = [
-  {cls:'pl', label:'📅 Planejada',  cor:'#6c3483'},
-  {cls:'ap', label:'✓ Aplicada',   cor:'var(--vm)'},
-  {cls:'pu', label:'⤳ Pulada',     cor:'var(--og)'},
-  {cls:'sm', label:'📋 SIMAED',    cor:'var(--ai)'}
+  {cls:'pl', label:'📅 Planj.',  cor:'#6c3483'},
+  {cls:'ap', label:'✓ Aplic.',   cor:'var(--vm)'},
+  {cls:'pu', label:'⤳ Pulad.',   cor:'var(--og)'},
+  {cls:'sm', label:'📋 SIMAED',  cor:'var(--ai)'}
 ];
 
 function aplicarEstadoVisual(btn, item, cls, ativo) {
@@ -7245,6 +7349,8 @@ function claudePedirPermissao() {
 }
 
 function claudeAtualizarNotifBar() {
+  // Notificações desabilitadas no mobile
+  if (window.innerWidth <= 680 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) return;
   var bar = document.getElementById('cl-notif-bar');
   if (!bar) return;
   bar.style.display = ('Notification' in window && Notification.permission !== 'granted') ? 'flex' : 'none';

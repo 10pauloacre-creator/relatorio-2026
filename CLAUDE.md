@@ -311,3 +311,6 @@ Quando o professor envia o rascunho **diretamente no chat**, Claude:
 4. **Encoding UTF-8** sempre — usar `TextDecoder`/`TextEncoder` para base64
 5. **Não usar `onclick` inline com aspas simples dentro de strings JS** — escapar com `\'`
 6. **Não usar scripts Python em produção** — são apenas para manutenção pontual
+7. **Todo relato diário OBRIGATORIAMENTE deve ter 3 abas:** `📄 Relato`, `👥 Presença` e `📝 Atividades` — a função `verificarAbasRelatos()` exibe aviso visual quando alguma falta
+8. **Botões do Plano Anual em linha única:** `[ N ]  Título          [📅 Planj.][✓ Aplic.][⤳ Pulad.][📋 SIMAED]`
+9. **Notificações desativadas no mobile** (≤680px ou User-Agent Mobi/Android/iPhone)
