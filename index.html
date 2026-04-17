@@ -406,9 +406,9 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .cl-btn-hora{width:100%;font-size:.75rem;background:rgba(41,128,185,.1)!important;color:#2980b9!important;border-color:rgba(41,128,185,.3)!important;margin-top:2px}
 .cl-btn-hora:hover{background:rgba(41,128,185,.25)!important}
 /* ── STATUS BUTTONS ── */
-.lesson-item{cursor:default;align-items:center!important}
-.lesson-actions{display:grid;grid-template-columns:1fr 1fr;gap:3px;flex-shrink:0;width:152px;margin-right:4px}
-.btn-st{padding:3px 6px;border-radius:12px;font-size:.64rem;font-weight:700;border:2px solid;cursor:pointer;transition:all .18s;background:transparent;font-family:'DM Sans',sans-serif;white-space:nowrap;text-align:center;line-height:1.3}
+.lesson-item{align-items:center!important;flex-wrap:nowrap!important}
+.lesson-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:3px;flex-shrink:0!important;width:160px;margin-left:auto;padding-left:8px}
+.btn-st{padding:3px 7px;border-radius:12px;font-size:.63rem;font-weight:700;border:2px solid;cursor:pointer!important;transition:all .18s;background:transparent;font-family:'DM Sans',sans-serif;white-space:nowrap;text-align:center;line-height:1.4;pointer-events:auto!important}
 .btn-st.pl{border-color:#6c3483;color:#6c3483}.btn-st.pl.on{background:#6c3483;color:#fff}
 .btn-st.ap{border-color:var(--vm);color:var(--vm)}.btn-st.ap.on{background:var(--vm);color:#fff}
 .btn-st.pu{border-color:var(--og);color:var(--og)}.btn-st.pu.on{background:var(--ou);color:#fff}
@@ -493,6 +493,18 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <div class="sr"><div class="sc2"><div class="n">5</div><div class="l">Dias de Aula</div></div><div class="sc2"><div class="n">20</div><div class="l">H/aulas</div></div><div class="sc2"><div class="n">4</div><div class="l">Turmas</div></div><div class="sc2 al"><div class="n">14+</div><div class="l">Obs. Comportamentais</div></div></div>
 <p style="color:var(--cm);font-size:.84rem;margin-bottom:20px">Selecione a aba da turma para o diário completo com presença e atividades.</p>
 <!-- RELATOS_INICIO -->
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">17</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Sexta-feira · Sem aula — Ônibus em manutenção</div><div class="ec"><span class="ch ch-h">⏰ Dia todo</span><span class="ch ch-i">🚌 Transporte indisponível</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="st">Ocorrência</div><div class="ct">Não houve aula na sexta-feira (17/04). Os dois ônibus escolares estavam em manutenção. Nenhuma turma teve atividade presencial neste dia.</div></div></div></div>
+
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">16</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">2ª Série · T.C.H. + L.P. · 4h · Avaliação Diagnóstica</div><div class="ec"><span class="ch ch-h">⏰ 07:00–11:15</span><span class="ch ch-p">👥 2ª Série</span><span class="ch ch-i">📖 Avaliação diagnóstica</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="st">Relato do Dia — 16/04 (Quinta-feira)</div><div class="ct">Aula realizada pela manhã com a <strong>2ª Série</strong>, dedicada à aplicação da <strong>avaliação diagnóstica</strong>. Aulas lançadas no SIMAED: <strong>2h de Trilhas de C. Humanas</strong> (07:00–09:00) e <strong>2h de Língua Portuguesa</strong> (09:15–11:15). Sem ausências registradas.</div></div></div></div>
+
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">14</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Terça-feira · Aula virtual — Chuva intensa</div><div class="ec"><span class="ch ch-h">⏰ 13:00–17:15</span><span class="ch ch-p">👥 Presença integral — 2ª e 3ª Série</span><span class="ch ch-i">📱 Conteúdo via sala de aula virtual</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="st">Relato do Dia — 14/04 (Terça-feira)</div><div class="ct">Não houve aula presencial por causa da chuva intensa. Conteúdo enviado via <strong>sala de aula virtual</strong>. Presença registrada para todos.<br><br><strong>3ª Série (13:00–14:00) — L.P.:</strong> Tema 4 — Processos de coordenação e subordinação: efeitos de uso. Análise de períodos complexos em textos argumentativos e literários.<br><strong>3ª Série (14:00–15:00) — T. Linguagens:</strong> Tema 3 — Herança cultural nas mídias digitais. Como tradições, mitos e memórias de povos são (ou não) representados online.<br><strong>2ª Série (15:15–16:15) — T. Linguagens:</strong> Tema 3 — Informação digital: circulação e veracidade. Como uma informação se espalha e como verificar sua autenticidade.<br><strong>2ª Série (16:15–17:15) — L.P.:</strong> Tema 4 — Como analisar a força e eficácia de um argumento. Critérios de análise; argumentos fortes e fracos; falácias.</div></div></div></div>
+
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">13</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">1ª Série · L.P. · 2h/aula</div><div class="ec"><span class="ch ch-h">⏰ 07:00–09:00</span><span class="ch ch-p">👥 10 presentes</span><span class="ch ch-i">📖 Intertextualidade</span><span class="ch ch-a">⚠️ 5 faltas</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="st">📖 Conteúdo</div><div class="ct"><strong>Intertextualidade: Referências, Alusões e Retomadas entre Textos.</strong><br>Estudo teórico e início da atividade. Visto válido somente para entrega no mesmo dia.<br><strong>Entregaram:</strong> Juliana, Yudi, Maria Eduarda, Eduarda, Jady.<br><strong>Não entregaram:</strong> Daniel, Felipe, Gustavo, Maria Valéria, Isabelle.<br><strong>Faltaram:</strong> Cleiton, Gabriel, João Pedro, Lauane, Paulo Henrique.</div></div></div></div>
+
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">13</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">2ª Série · L.P. · 2h/aula</div><div class="ec"><span class="ch ch-h">⏰ 09:15–11:15</span><span class="ch ch-p">👥 14 presentes</span><span class="ch ch-i">📖 Gêneros Argumentativos</span><span class="ch ch-a">⚠️ 9 faltas</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="st">📖 Conteúdo</div><div class="ct"><strong>Tema 3 — Gêneros Argumentativos: debate, comentário, artigo de opinião.</strong><br>Apresentação do novo livro interativo. Leitura prévia individual e atividade do tema 3 para entrega no mesmo dia.<br><strong>Entregaram:</strong> Alice, Beatriz, Samuel, Elanne, Fabio Henrique, Francielly, Jorge, Pietro, Guilherme.<br><strong>Não entregaram (presentes):</strong> Anthonny, Francisco Gabriel, Kayo, Wesley, Êmilly.<br><strong>Faltaram:</strong> Eslane, Everton, Kauesley, Lília, Maria Clara, Maria Eduarda, Nathaly, Sabrina, Tamíres.</div><div class="st">⚠️ Observação</div><div class="ng"><span>📝</span><span>Turmas unificadas toda segunda-feira. Conversas constantes e difíceis de controlar. Professor alertou que a falta de comprometimento vai refletir na nota.</span></div></div></div></div>
+
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">13</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">3ª Série · L.P. · 2h/aula</div><div class="ec"><span class="ch ch-h">⏰ 09:15–11:15</span><span class="ch ch-p">👥 14 presentes</span><span class="ch ch-i">📖 Sintaxe: Ordem dos Constituintes</span><span class="ch ch-a">⚠️ 4 faltas</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="st">📖 Conteúdo</div><div class="ct"><strong>Tema 3 — Aspectos Sintáticos do Português: ordem dos constituintes; inversão e seus efeitos; estrutura dos sintagmas; categorias sintáticas.</strong><br>Apresentação do novo livro interativo. Leitura prévia individual e atividade do tema 3 para entrega no mesmo dia.<br><strong>Entregaram:</strong> Joaiz, Gabriella, Karina, Natanael, Alonso, Matheus Henrique, Kevison.<br><strong>Não entregaram (presentes):</strong> Antoniel, Kiara, Lourival, Maria Beatriz, Mayco, Sara, Sibelly.<br><strong>Faltaram:</strong> Maria Eduarda, João Paulo, Hana Beatryz, Gabriel.</div><div class="st">⚠️ Observação</div><div class="ng"><span>📝</span><span>Turmas unificadas toda segunda-feira. Conversas constantes e difíceis de controlar. Professor alertou que a falta de comprometimento vai refletir na nota.</span></div></div></div></div>
+
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">10</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Artes · LP · Trilhas — 6º Ano · 1ª · 2ª · 3ª Série</div><div class="ec"><span class="ch ch-h">⏰ 07h–17h15</span><span class="ch ch-i">🎨 Arte · Pré-Enem · Democracia · Cultura Digital</span><span class="ch ch-a">⚠️ 10 obs.</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="ct">Sexta-feira intensa. <strong>6º Ano (07h–08h) — Artes:</strong> 1ª aula do professor na turma (herdada após 4 aulas de outra professora). Apresentação e introdução ao conceito de Arte. 30 presentes; 6 faltaram (Anthony Mayksson: just. consulta psiquiátrica). <strong>3ª Série (07h–11h15) — Pré-Enem Legal:</strong> Videoaulas + slide + atividades sobre Gêneros Literários. 11 presentes; 7 faltaram (2 just.: Beatriz e Eduarda). Ocorrências: Natanael, Alonso, Antoniel, Lourival, João Paulo, Kiara, Karina e Gabrielle desatentos — conversa e celular. Hana e Joaiz se destacaram. <strong>1ª Série (14h–16h15) — T.C.H. + T.Ling.:</strong> Democracia Direta e Representativa — leitura, debate e atividade no caderno. Cleiton não participou da leitura; João Pedro não realizou a atividade. Todos trazem na próxima sexta. <strong>2ª Série (15h15–17h15) — Trilhas C.H. (conteúdo LGG):</strong> Cultura Digital Pan-Amazônica. Todos entregaram a atividade. <strong>3ª Série (16h15–17h15) — Trilhas C.H.:</strong> Origens da Democracia e da Cidadania. Atividade ficou para próxima aula.</div></div></div></div>
 
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">09</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Artes — 2ª e 3ª Série</div><div class="ec"><span class="ch ch-h">⏰ 15h15–17h15</span><span class="ch ch-p">👥 15 · 16 presentes</span><span class="ch ch-i">🎨 Linguagem Visual · Arte Sustentável</span><span class="ch ch-a">⚠️ 4 obs.</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="ct">Quinta-feira. <strong>2ª Série (15h15–16h15) — Artes:</strong> 15 presentes. Formas da Linguagem Visual (Textura, Dimensão, Volume e Direção). Estudo teórico e início da atividade. Ocorrências: Kayo (virado perturbando Êmilly); Wesley Emanuel (batendo caderno); Maria Eduarda e Ana Beatriz (conversando alto); Jorge (conversando com Êmilly e Kayo). 8 faltaram. <strong>3ª Série (16h15–17h15) — Artes:</strong> 16 presentes. Desenvolvimento Sustentável na Arte — análise de obras, criação com materiais reciclados. Alunos pediram para gravar vídeo — concedido. Sem ocorrências. Maria Beatriz e Maria Eduarda: ausentes justificadas (questões médicas).</div></div></div></div>
@@ -512,6 +524,8 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <div class="sr"><div class="sc2"><div class="n">3</div><div class="l">Dias de Aula</div></div><div class="sc2"><div class="n">8</div><div class="l">H/aulas (LP)</div></div><div class="sc2"><div class="n">12</div><div class="l">Presentes 07/04</div></div><div class="sc2 al"><div class="n">7</div><div class="l">Alunos c/ obs.</div></div></div>
 
 <!-- T1_INICIO -->
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">13</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Língua Portuguesa — 2h/aula</div><div class="ec"><span class="ch ch-h">⏰ 07:00–09:00</span><span class="ch ch-p">👥 10 presentes</span><span class="ch ch-i">📖 Intertextualidade: Referências, Alusões e Retomadas</span><span class="ch ch-a">⚠️ 5 faltas</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t1-0413')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t1-0413')">👥 Presença</button><button class="itab" onclick="itab(this,'a-t1-0413')">📝 Atividades</button></div><div class="ipane on" id="r-t1-0413"><div class="st">📖 Conteúdo</div><div class="ct"><strong>Intertextualidade: Referências, Alusões e Retomadas entre Textos.</strong><br>Estudo teórico do tema e início da atividade em sala. O visto só valeria para entrega no mesmo dia.</div><div class="st">📋 Entregas</div><div class="ng" style="background:#f0faf4;border-color:#86efac"><span>✅</span><span><strong>Entregaram:</strong> Juliana · Yudi · Maria Eduarda · Eduarda · Jady.</span></div><div class="ng"><span>📝</span><span><strong>Não entregaram:</strong> Daniel · Felipe · Gustavo · Maria Valéria · Isabelle.</span></div><div class="st">📋 Faltas</div><div class="ng"><span>📝</span><span><strong>Cleiton · Gabriel · João Pedro · Lauane · Paulo Henrique</strong> — sem justificativa.</span></div></div><div class="ipane" id="p-t1-0413"><div id="pl-t1-0413" class="pres-grid"></div></div><div class="ipane" id="a-t1-0413"><div class="st">📋 Atividade</div><div class="atv-tema"><strong>Intertextualidade — Atividade de fixação</strong><br><span style="font-size:.82rem;color:var(--cm)">L.P. 13/04/2026 · Entrega no mesmo dia</span></div><div id="atv-t1-0413" class="atv-grid"></div></div></div></div>
+
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">10</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Trilhas C.H. + Trilhas de Linguagens — 2 h/aula</div><div class="ec"><span class="ch ch-h">⏰ 14h–16h15</span><span class="ch ch-i">📖 Democracia Direta e Representativa</span><span class="ch ch-a">⚠️ 2 obs.</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t1-0410')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t1-0410')">👥 Presença</button><button class="itab" onclick="itab(this,'a-t1-0410')">📝 Atividades</button></div><div class="ipane on" id="r-t1-0410"><div class="lembrete"><div class="lembrete-tag">🔔 Lembrete Interno</div><div class="lembrete-txt">Horário de <strong>Trilhas de Linguagens (15h15–16h15)</strong> usado para atividade do conteúdo de <strong>Trilhas C.H.</strong> — Democracia Direta e Representativa. Registrado no SIMAED como T.Ling. conforme grade.</div></div><div class="st">📖 Conteúdo</div><div class="ct"><strong>T.C.H. (14h–15h) — Democracia Direta e Representativa.</strong><br>Continuação da apostila pela sala de aula virtual. Leitura ativa e debate sobre o tema.<br><strong>T.Ling. (15h15–16h15) — Atividade sobre o mesmo tema.</strong><br>Alunos escreveram as perguntas e responderam no caderno. Todos ficam de trazer pronta na próxima aula de sexta.</div><div class="st">🔎 Comportamento</div><div class="ol"><div class="oi"><span class="oi-ic">😶</span><div><div class="oa">Cleiton Silva Santana</div><div class="od">Não quis participar da leitura ativa. 1ª ocorrência — monitorar.</div></div></div><div class="oi"><span class="oi-ic">😶</span><div><div class="oa">João Pedro Gomes da Silva</div><div class="od">Não quis realizar a atividade no caderno. 1ª ocorrência — monitorar.</div></div></div></div><div class="ai2"><div class="ai2h"><div class="tg">✦ Análise IA</div><span>2 obs. leves — recusa de participação</span></div><div class="ai2i"><div class="ai2a">Cleiton</div><div class="ai2p warn">⚠ 1ª obs. — recusa na leitura</div><div class="ai2t">Conversa individual. Verificar se há dificuldade com leitura em voz alta.</div></div><div class="ai2i"><div class="ai2a">João Pedro</div><div class="ai2p warn">⚠ 1ª obs. — recusa na atividade</div><div class="ai2t">Monitorar padrão. Trazer atividade na próxima aula — cobrar na entrada.</div></div><div class="ai2s">💡 Registrar entregas na próxima sexta. Retomar leitura com dinâmica diferente para engajar os dois.</div></div></div><div class="ipane" id="p-t1-0410"><div class="pres-av"><span>ℹ️</span><span>Presença não registrada individualmente nesta aula. Atualizar se necessário.</span></div></div><div class="ipane" id="a-t1-0410"><div class="st">📋 Atividade</div><div class="atv-tema"><strong>Democracia Direta e Representativa — Atividade no caderno</strong><br><span style="font-size:.82rem;color:var(--cm)">T.Ling. 10/04/2026 · Prazo: próxima sexta-feira</span></div><div class="atv-av"><span>📋</span><span>Todos trazem prontas na próxima aula. Cobrar na entrada.</span></div></div></div></div>
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">06</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Língua Portuguesa — 2 h/aula</div><div class="ec"><span class="ch ch-h">⏰ 07h–09h</span><span class="ch ch-p">👥 7 presentes</span><span class="ch ch-i">📖 O que é Texto?</span><span class="ch ch-a">⚠️ 1 obs.</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t1-0406')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t1-0406')">👥 Presença</button><button class="itab" onclick="itab(this,'a-t1-0406')">📝 Atividades</button></div><div class="ipane on" id="r-t1-0406"><div class="st">📖 Conteúdo</div><div class="ct"><strong>O que é Texto? Texto, Discurso e Condições de Produção.</strong><br>Início do eixo temático do bimestre. Instrução para acessar a sala de aula virtual do Google, onde os assuntos do bimestre estão anexados. Após o acesso, estudo teórico do conteúdo. Atividade iniciada em sala — pelo curto tempo disponível, foi autorizado trazer pronta na próxima aula apenas para receber o visto. Alunos ausentes informados via WhatsApp do grupo para acessarem a sala virtual e resolverem a atividade.</div><div class="st">🔎 Comportamento</div><div class="ol"><div class="oi nt"><span class="oi-ic">⏰</span><div><div class="oa">João Pedro</div><div class="od">Chegou atrasado (~7h30) e não participou ativamente da aula. 1ª ocorrência — monitorar.</div></div></div></div><div class="st">📋 Faltas</div><div class="ng"><span>📝</span><span><strong>Juliana</strong> — justificou complicações de labirintite. <strong>Paulo Henrique</strong> — justificou uso de melatonina; informou que mudará o horário do remédio na semana seguinte para poder vir no período matutino.</span></div><div class="ai2"><div class="ai2h"><div class="tg">✦ Análise IA</div><span>Faltas justificadas · 1 obs. leve</span></div><div class="ai2i"><div class="ai2a">João Pedro</div><div class="ai2p warn">⚠ 1ª obs. — atraso + baixo engajamento</div><div class="ai2t">Monitorar presença e participação. Conversa individual se repetir.</div></div><div class="ai2s">💡 Registrar atrasos futuros. Engajar João Pedro com perguntas direcionadas durante a aula.</div></div></div><div class="ipane" id="p-t1-0406"><div class="pres-av"><span>ℹ️</span><span>7 presentes: Yudi, Jady, Eduarda, Isabelle, João Pedro, Gustavo e Gabriel · Faltas c/ justificativa: Juliana (labirintite) e Paulo Henrique (melatonina)</span></div><div id="pl-t1-0406" class="pres-grid"></div></div><div class="ipane" id="a-t1-0406"><div class="st">📋 Atividade</div><div class="atv-tema"><strong>O que é Texto? — Atividade de fixação</strong><br><span style="font-size:.82rem;color:var(--cm)">Iniciada em sala · 06/04/2026 · Prazo: próxima aula (receber visto)</span></div><div class="atv-av"><span>📋</span><span>Todos trarão prontas na próxima aula — recebem visto de entrega. Ausentes: resolver via sala virtual.</span></div></div></div></div>
 
@@ -539,6 +553,16 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <div class="sr"><div class="sc2"><div class="n">4</div><div class="l">Dias de Aula</div></div><div class="sc2"><div class="n">11</div><div class="l">H/aulas</div></div><div class="sc2"><div class="n">17</div><div class="l">Presentes 07/04</div></div><div class="sc2 al"><div class="n">5+</div><div class="l">Alunos c/ obs.</div></div></div>
 
 <!-- T2_INICIO -->
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">16</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Trilhas de C. Humanas — 2h/aula</div><div class="ec"><span class="ch ch-h">⏰ 07:00–09:00</span><span class="ch ch-i">📖 Avaliação Diagnóstica</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t2-0416tc')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t2-0416tc')">👥 Presença</button></div><div class="ipane on" id="r-t2-0416tc"><div class="st">📖 Conteúdo</div><div class="ct"><strong>Avaliação Diagnóstica.</strong><br>Aula registrada no SIMAED como 2h de Trilhas de C. Humanas. Sem ausências registradas.</div></div><div class="ipane" id="p-t2-0416tc"><div id="pl-t2-0416tc" class="pres-grid"></div></div></div></div>
+
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">16</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Língua Portuguesa — 2h/aula</div><div class="ec"><span class="ch ch-h">⏰ 09:15–11:15</span><span class="ch ch-i">📖 Avaliação Diagnóstica</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t2-0416lp')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t2-0416lp')">👥 Presença</button></div><div class="ipane on" id="r-t2-0416lp"><div class="st">📖 Conteúdo</div><div class="ct"><strong>Avaliação Diagnóstica (continuação).</strong><br>Aula registrada no SIMAED como 2h de Língua Portuguesa. Sem ausências registradas.</div></div><div class="ipane" id="p-t2-0416lp"><div id="pl-t2-0416lp" class="pres-grid"></div></div></div></div>
+
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">14</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Trilhas de Linguagens — 1h/aula (virtual)</div><div class="ec"><span class="ch ch-h">⏰ 15:15–16:15</span><span class="ch ch-p">👥 Presença integral</span><span class="ch ch-i">📱 Tema 3 — Informação digital</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t2-0414tl')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t2-0414tl')">👥 Presença</button></div><div class="ipane on" id="r-t2-0414tl"><div class="lembrete"><div class="lembrete-tag">📱 Aula Virtual</div><div class="lembrete-txt">Sem aula presencial por causa da chuva intensa. Conteúdo enviado via sala de aula virtual. Presença registrada para todos os alunos.</div></div><div class="st">📖 Conteúdo</div><div class="ct"><strong>Tema 3 — Informação digital: circulação e veracidade.</strong><br>Como uma informação se espalha e como verificar sua autenticidade.</div></div><div class="ipane" id="p-t2-0414tl"><div id="pl-t2-0414tl" class="pres-grid"></div></div></div></div>
+
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">14</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Língua Portuguesa — 1h/aula (virtual)</div><div class="ec"><span class="ch ch-h">⏰ 16:15–17:15</span><span class="ch ch-p">👥 Presença integral</span><span class="ch ch-i">📱 Tema 4 — Força de argumentos</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t2-0414lp')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t2-0414lp')">👥 Presença</button></div><div class="ipane on" id="r-t2-0414lp"><div class="lembrete"><div class="lembrete-tag">📱 Aula Virtual</div><div class="lembrete-txt">Sem aula presencial por causa da chuva intensa. Conteúdo enviado via sala de aula virtual. Presença registrada para todos os alunos.</div></div><div class="st">📖 Conteúdo</div><div class="ct"><strong>Tema 4 — Como analisar a força e eficácia de um argumento.</strong><br>Critérios de análise; argumentos fortes e fracos; falácias.</div></div><div class="ipane" id="p-t2-0414lp"><div id="pl-t2-0414lp" class="pres-grid"></div></div></div></div>
+
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">13</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Língua Portuguesa — 2h/aula</div><div class="ec"><span class="ch ch-h">⏰ 09:15–11:15</span><span class="ch ch-p">👥 14 presentes</span><span class="ch ch-i">📖 Gêneros Argumentativos</span><span class="ch ch-a">⚠️ 9 faltas</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t2-0413')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t2-0413')">👥 Presença</button><button class="itab" onclick="itab(this,'a-t2-0413')">📝 Atividades</button></div><div class="ipane on" id="r-t2-0413"><div class="lembrete"><div class="lembrete-tag">🔔 Turmas Unificadas</div><div class="lembrete-txt">Toda segunda-feira a 2ª e 3ª Série ficam na mesma sala. Conversas alheias constantes — professor alertou que a falta de comprometimento vai refletir na nota final.</div></div><div class="st">📖 Conteúdo</div><div class="ct"><strong>Tema 3 — Gêneros Argumentativos: debate, comentário, artigo de opinião.</strong><br>Apresentação do novo livro interativo. Leitura prévia individual e atividade do tema 3 para entrega no mesmo dia.</div><div class="st">📋 Entregas</div><div class="ng" style="background:#f0faf4;border-color:#86efac"><span>✅</span><span><strong>Entregaram:</strong> Alice · Beatriz · Samuel · Elanne · Fabio Henrique · Francielly · Jorge · Pietro · Guilherme.</span></div><div class="ng"><span>📝</span><span><strong>Não entregaram:</strong> Anthonny · Francisco Gabriel · Kayo · Wesley · Êmilly.</span></div><div class="st">📋 Faltas</div><div class="ng"><span>📝</span><span><strong>Eslane · Everton · Kauesley · Lília · Maria Clara · Maria Eduarda · Nathaly · Sabrina · Tamíres</strong> — sem justificativa.</span></div></div><div class="ipane" id="p-t2-0413"><div id="pl-t2-0413" class="pres-grid"></div></div><div class="ipane" id="a-t2-0413"><div class="st">📋 Atividade</div><div class="atv-tema"><strong>Gêneros Argumentativos — Atividade do tema 3</strong><br><span style="font-size:.82rem;color:var(--cm)">L.P. 13/04/2026 · Entrega no mesmo dia</span></div><div id="atv-t2-0413" class="atv-grid"></div></div></div></div>
+
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">10</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Trilhas C.H. (conteúdo LGG) — 2 h/aula</div><div class="ec"><span class="ch ch-h">⏰ 15h15–17h15</span><span class="ch ch-i">📖 Cultura Digital Pan-Amazônica</span><span class="ch ch-a">✅ Todos entregaram</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t2-0410')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t2-0410')">👥 Presença</button><button class="itab" onclick="itab(this,'a-t2-0410')">📝 Atividades</button></div><div class="ipane on" id="r-t2-0410"><div class="lembrete"><div class="lembrete-tag">🔔 Lembrete Interno</div><div class="lembrete-txt">Horário de <strong>Trilhas de C. Humanas</strong> usado para conteúdo de <strong>Linguagens (LGG)</strong> — Cultura Digital Pan-Amazônica. Lançado no SIMAED como T.C.H. conforme grade.</div></div><div class="st">📖 Conteúdo</div><div class="ct"><strong>Cultura Digital Pan-Amazônica.</strong><br>Para antecipar contato com o assunto de LGG, o conteúdo foi abordado no horário de CHS. As 2 horas foram dedicadas à leitura, debate e realização da atividade sobre o tema.</div><div class="st">🔎 Comportamento</div><div class="ol"><div class="oi nt"><span class="oi-ic">✅</span><div><div class="oa" style="color:var(--ai)">Nenhuma ocorrência registrada</div><div class="od">Turma colaborativa — todos entregaram a atividade.</div></div></div></div><div class="st">📋 Entrega</div><div class="ng" style="background:#f0faf4;border-color:#86efac"><span>✅</span><span><strong>Todos os alunos presentes</strong> entregaram a atividade no mesmo dia.</span></div><div class="ai2"><div class="ai2h"><div class="tg">✦ Análise IA</div><span>Sem ocorrências · Entrega total — aula excelente</span></div><div class="ai2s">💡 Registrar como referência positiva de engajamento. Manter dinâmica de leitura + debate + atividade.</div></div></div><div class="ipane" id="p-t2-0410"><div class="pres-av"><span>ℹ️</span><span>Presença não registrada individualmente nesta aula. Atualizar se necessário.</span></div></div><div class="ipane" id="a-t2-0410"><div class="st">📋 Atividade</div><div class="atv-tema"><strong>Cultura Digital Pan-Amazônica — Atividade em sala</strong><br><span style="font-size:.82rem;color:var(--cm)">T.C.H. 10/04/2026 · Todos entregaram</span></div><div class="atv-av"><span>✅</span><span>Entrega completa. Nenhum pendente.</span></div></div></div></div>
 
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">09</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Artes — 1 h/aula</div><div class="ec"><span class="ch ch-h">⏰ 15h15–16h15</span><span class="ch ch-p">👥 15 presentes</span><span class="ch ch-i">🎨 Linguagem Visual: Textura, Dimensão, Volume e Direção</span><span class="ch ch-a">⚠️ 4 obs.</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t2-0409')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t2-0409')">👥 Presença</button><button class="itab" onclick="itab(this,'a-t2-0409')">📝 Atividades</button></div><div class="ipane on" id="r-t2-0409"><div class="st">📖 Conteúdo</div><div class="ct"><strong>Formas da Linguagem Visual: Textura, Dimensão, Volume e Direção.</strong><br>Estudo teórico do tema e início da atividade em sala.</div><div class="st">🔎 Comportamento</div><div class="ol"><div class="oi"><span class="oi-ic">💬</span><div><div class="oa">Kayo dos Anjos Coutinho</div><div class="od">Participativo, porém constantemente virado para trás perturbando Êmilly. 1ª ocorrência.</div></div></div><div class="oi"><span class="oi-ic">🥁</span><div><div class="oa">Wesley Emanuel Lima da Silva</div><div class="od">Batendo caderno na mesa e fazendo barulho. 1ª ocorrência.</div></div></div><div class="oi"><span class="oi-ic">💬</span><div><div class="oa">Maria Eduarda Silva de Jesus · Ana Beatriz Nascimento Maia</div><div class="od">Conversando muito alto mesmo durante a realização da atividade. 1ª ocorrência para ambas.</div></div></div><div class="oi"><span class="oi-ic">💬</span><div><div class="oa">Jorge Arnaldo Félix Pereira</div><div class="od">Conversando com Êmilly e Kayo durante a atividade. 1ª ocorrência.</div></div></div></div><div class="st">📋 Faltas</div><div class="ng"><span>📝</span><span><strong>Antonio Samuel</strong> · <strong>Eslane</strong> · <strong>Everton</strong> · <strong>Francisco Gabriel</strong> · <strong>Luiz Guilherme</strong> · <strong>Maria Clara</strong> · <strong>Sabrina</strong> · <strong>Tamíres</strong> — sem justificativa.</span></div><div class="ai2"><div class="ai2h"><div class="tg">✦ Análise IA</div><span>4 obs. leves · 8 faltas</span></div><div class="ai2i"><div class="ai2a">Kayo · Wesley · Jorge</div><div class="ai2p warn">⚠ 1ª obs.</div><div class="ai2t">Monitorar. Em reincidência: intervenção direta + registro formal.</div></div><div class="ai2i"><div class="ai2a">Maria Eduarda · Ana Beatriz</div><div class="ai2p warn">⚠ 1ª obs. — conversa alta</div><div class="ai2t">Separar os lugares se repetir.</div></div><div class="ai2s">💡 Definir regra clara de silêncio durante atividades. Monitorar padrão de faltas — 8 ausentes em uma aula de Artes é alto.</div></div></div><div class="ipane" id="p-t2-0409"><div class="pres-av"><span>ℹ️</span><span>15 presentes · Faltaram: Antonio Samuel, Eslane, Everton, Francisco Gabriel, Luiz Guilherme, Maria Clara, Sabrina, Tamíres</span></div><div id="pl-t2-0409" class="pres-grid"></div></div><div class="ipane" id="a-t2-0409"><div class="st">📋 Atividade</div><div class="atv-tema"><strong>Linguagem Visual: Textura, Dimensão, Volume e Direção</strong><br><span style="font-size:.82rem;color:var(--cm)">Iniciada em sala · 09/04/2026</span></div><div class="atv-av"><span>📋</span><span>Atividade iniciada em sala. Acompanhar conclusão na próxima aula.</span></div></div></div></div>
@@ -577,6 +601,12 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <div class="sr"><div class="sc2"><div class="n">3</div><div class="l">Dias de Aula</div></div><div class="sc2"><div class="n">6</div><div class="l">H/aulas</div></div><div class="sc2"><div class="n">13</div><div class="l">Presentes 07/04</div></div><div class="sc2 al"><div class="n">5</div><div class="l">Alunos c/ obs.</div></div></div>
 
 <!-- T3_INICIO -->
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">14</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Língua Portuguesa — 1h/aula (virtual)</div><div class="ec"><span class="ch ch-h">⏰ 13:00–14:00</span><span class="ch ch-p">👥 Presença integral</span><span class="ch ch-i">📱 Tema 4 — Coordenação e subordinação</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t3-0414lp')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t3-0414lp')">👥 Presença</button></div><div class="ipane on" id="r-t3-0414lp"><div class="lembrete"><div class="lembrete-tag">📱 Aula Virtual</div><div class="lembrete-txt">Sem aula presencial por causa da chuva intensa. Conteúdo enviado via sala de aula virtual. Presença registrada para todos os alunos.</div></div><div class="st">📖 Conteúdo</div><div class="ct"><strong>Tema 4 — Processos de coordenação e subordinação: efeitos de uso.</strong><br>Análise de períodos complexos em textos argumentativos e literários.</div></div><div class="ipane" id="p-t3-0414lp"><div id="pl-t3-0414lp" class="pres-grid"></div></div></div></div>
+
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">14</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Trilhas de Linguagens — 1h/aula (virtual)</div><div class="ec"><span class="ch ch-h">⏰ 14:00–15:00</span><span class="ch ch-p">👥 Presença integral</span><span class="ch ch-i">📱 Tema 3 — Herança cultural nas mídias digitais</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t3-0414tl')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t3-0414tl')">👥 Presença</button></div><div class="ipane on" id="r-t3-0414tl"><div class="lembrete"><div class="lembrete-tag">📱 Aula Virtual</div><div class="lembrete-txt">Sem aula presencial por causa da chuva intensa. Conteúdo enviado via sala de aula virtual. Presença registrada para todos os alunos.</div></div><div class="st">📖 Conteúdo</div><div class="ct"><strong>Tema 3 — Herança cultural nas mídias digitais.</strong><br>Como tradições, mitos e memórias de povos são (ou não) representados online.</div></div><div class="ipane" id="p-t3-0414tl"><div id="pl-t3-0414tl" class="pres-grid"></div></div></div></div>
+
+<div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">13</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Língua Portuguesa — 2h/aula</div><div class="ec"><span class="ch ch-h">⏰ 09:15–11:15</span><span class="ch ch-p">👥 14 presentes</span><span class="ch ch-i">📖 Sintaxe: Ordem dos Constituintes</span><span class="ch ch-a">⚠️ 4 faltas</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t3-0413')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t3-0413')">👥 Presença</button><button class="itab" onclick="itab(this,'a-t3-0413')">📝 Atividades</button></div><div class="ipane on" id="r-t3-0413"><div class="lembrete"><div class="lembrete-tag">🔔 Turmas Unificadas</div><div class="lembrete-txt">Toda segunda-feira a 2ª e 3ª Série ficam na mesma sala. Conversas alheias constantes — professor alertou que a falta de comprometimento vai refletir na nota final.</div></div><div class="st">📖 Conteúdo</div><div class="ct"><strong>Tema 3 — Aspectos Sintáticos do Português: ordem dos constituintes; inversão e seus efeitos; estrutura dos sintagmas; categorias sintáticas.</strong><br>Apresentação do novo livro interativo. Leitura prévia individual e atividade do tema 3 para entrega no mesmo dia.</div><div class="st">📋 Entregas</div><div class="ng" style="background:#f0faf4;border-color:#86efac"><span>✅</span><span><strong>Entregaram:</strong> Joaiz · Gabriella · Karina · Natanael · Alonso · Matheus Henrique · Kevison.</span></div><div class="ng"><span>📝</span><span><strong>Não entregaram:</strong> Antoniel · Kiara · Lourival · Maria Beatriz · Mayco · Sara · Sibelly.</span></div><div class="st">📋 Faltas</div><div class="ng"><span>📝</span><span><strong>Maria Eduarda · João Paulo · Hana Beatryz · Gabriel</strong> — sem justificativa.</span></div></div><div class="ipane" id="p-t3-0413"><div id="pl-t3-0413" class="pres-grid"></div></div><div class="ipane" id="a-t3-0413"><div class="st">📋 Atividade</div><div class="atv-tema"><strong>Sintaxe — Atividade do tema 3</strong><br><span style="font-size:.82rem;color:var(--cm)">L.P. 13/04/2026 · Entrega no mesmo dia</span></div><div id="atv-t3-0413" class="atv-grid"></div></div></div></div>
+
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">10</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">LP — Pré-Enem Legal · 5 h/aula (SIMAED)</div><div class="ec"><span class="ch ch-h">⏰ 07h–11h15</span><span class="ch ch-p">👥 11 presentes</span><span class="ch ch-i">📖 Gêneros Literários</span><span class="ch ch-a">⚠️ 8 obs.</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t3-0410a')">📄 Relato</button><button class="itab" onclick="itab(this,'p-t3-0410a')">👥 Presença</button><button class="itab" onclick="itab(this,'a-t3-0410a')">📝 Atividades</button></div><div class="ipane on" id="r-t3-0410a"><div class="lembrete"><div class="lembrete-tag">🔔 Lembrete Interno</div><div class="lembrete-txt">Na prática foram <strong>4 horas de aula do Pré-Enem Legal</strong> (das 8h às 11h15 com o professor presente). Das 7h às 8h os alunos assistiram a videoaula enquanto o professor estava no 6º Ano. No <strong>SIMAED será lançado como 5h/aula</strong> de Língua Portuguesa.</div></div><div class="st">📖 Conteúdo</div><div class="ct"><strong>Pré-Enem Legal — Gêneros Literários.</strong><br>Das 7h às 8h: alunos assistiram a videoaula de forma autônoma (professor no 6º Ano). Das 8h em diante: videoaulas + apresentação e análise de slide + realização das atividades propostas.</div><div class="st">🔎 Comportamento</div><div class="ol"><div class="oi"><span class="oi-ic">💬</span><div><div class="oa">Natanael · Alonso · Antoniel · Lourival · João Paulo · Kiara · Karina · Gabrielle</div><div class="od">Não estavam atentos à videoaula — conversando e mexendo no celular.</div></div></div><div class="oi nt"><span class="oi-ic">⭐</span><div><div class="oa" style="color:var(--ai)">Hana Beatryz · Joaiz Muniz</div><div class="od">Únicos que estavam realmente prestando atenção. Destaque positivo.</div></div></div></div><div class="st">📋 Faltas</div><div class="ng"><span>📝</span><span><strong>Francisco Kevison</strong> · <strong>Gabriel Oliveira</strong> · <strong>Matheus Henrique</strong> · <strong>Mayco Gabriel</strong> · <strong>Sara</strong> — sem justificativa. <strong>Maria Beatriz</strong> e <strong>Maria Eduarda</strong> — justificadas (questões médicas).</span></div><div class="ai2"><div class="ai2h"><div class="tg">✦ Análise IA</div><span>8 desatentos · 2 destaques positivos · 7 faltas</span></div><div class="ai2i"><div class="ai2a">Natanael · Alonso · Antoniel · Lourival · João Paulo · Kiara · Karina · Gabrielle</div><div class="ai2p warn">⚠ Desatenção coletiva durante videoaula</div><div class="ai2t">Considerar pausas com perguntas durante a videoaula. Registrar padrão.</div></div><div class="ai2i"><div class="ai2a">Hana · Joaiz</div><div class="ai2p" style="color:var(--ai)">⭐ Destaque positivo</div><div class="ai2t">Reconhecer publicamente o engajamento.</div></div><div class="ai2s">💡 Videoaulas longas tendem a gerar dispersão. Intercalar com perguntas orais ou mini-atividades a cada 15 min.</div></div></div><div class="ipane" id="p-t3-0410a"><div class="pres-av"><span>ℹ️</span><span>11 presentes · Faltaram: Francisco Kevison, Gabriel Oliveira, Matheus Henrique, Mayco, Sara · Justificadas: Maria Beatriz e Maria Eduarda (questões médicas)</span></div><div id="pl-t3-0410a" class="pres-grid"></div></div><div class="ipane" id="a-t3-0410a"><div class="st">📋 Atividade</div><div class="atv-tema"><strong>Pré-Enem Legal — Gêneros Literários</strong><br><span style="font-size:.82rem;color:var(--cm)">10/04/2026 · 5h/aula SIMAED</span></div><div class="atv-av"><span>📋</span><span>Atividades realizadas em sala durante a aula.</span></div></div></div></div>
 
 <div class="ea"><div class="eh" onclick="tog(this)"><div class="edb"><div class="d">10</div><div class="my">Abr 2026</div></div><div class="em"><div class="ed">Trilhas de C. Humanas — 1 h/aula</div><div class="ec"><span class="ch ch-h">⏰ 16h15–17h15</span><span class="ch ch-i">📖 Origens da Democracia e da Cidadania</span></div></div><div class="et">▾</div></div><div class="ec2"><div class="itabs"><button class="itab on" onclick="itab(this,'r-t3-0410b')">📄 Relato</button><button class="itab" onclick="itab(this,'a-t3-0410b')">📝 Atividades</button></div><div class="ipane on" id="r-t3-0410b"><div class="st">📖 Conteúdo</div><div class="ct"><strong>Origens da Democracia e da Cidadania.</strong><br>Discussão sobre o tema. Atividade ficou para ser realizada na próxima aula.</div><div class="st">🔎 Comportamento</div><div class="ol"><div class="oi nt"><span class="oi-ic">✅</span><div><div class="oa" style="color:var(--ai)">Nenhuma ocorrência registrada</div><div class="od">Turma colaborativa na discussão.</div></div></div></div><div class="ai2"><div class="ai2h"><div class="tg">✦ Análise IA</div><span>Sem ocorrências · Atividade pendente</span></div><div class="ai2s">💡 Cobrar a atividade no início da próxima aula de Trilhas C.H.</div></div></div><div class="ipane" id="a-t3-0410b"><div class="st">📋 Atividade</div><div class="atv-tema"><strong>Origens da Democracia e da Cidadania — Atividade pendente</strong><br><span style="font-size:.82rem;color:var(--cm)">T.C.H. 10/04/2026 · Prazo: próxima aula</span></div><div class="atv-av"><span>📋</span><span>Atividade não realizada nesta aula — cobrar na próxima.</span></div></div></div></div>
@@ -4346,7 +4376,7 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <div class="disc-tabs">
 <div class="disc-tab lp active" onclick="planShowDisc('d3lp',this,'lp')">Língua Portuguesa</div>
 <div class="disc-tab lgg " onclick="planShowDisc('d3lgg',this,'lgg')">Trilhas de Linguagens</div>
-<div class="disc-tab chs " onclick="planShowDisc('d3chs',this,'chs')">Trilhas de CHS – Amazônia</div>
+<div class="disc-tab chs " onclick="planShowDisc('d3chs',this,'chs')">Trilhas de C. Humanas</div>
 <div class="disc-tab arte " onclick="planShowDisc('d3arte',this,'arte')">Artes</div>
 </div>
 <div class="disc-panel active" id="d3lp">
@@ -5463,301 +5493,261 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <div class="bim-tab  chs" onclick="planShowBim('d3chs_b4',this,'chs')">4º Bimestre</div>
 </div>
 <div class="bim-panel active" id="d3chs_b1">
-<div class="bim-header chs"><h3>📅 1º Bimestre – Amazônia: Identidades, Narrativas e Conhecimentos</h3><span class="badge">10 aulas</span></div>
+<div class="bim-header chs"><h3>📅 1º Bimestre – Direitos Humanos e Método Científico</h3><span class="badge">10 aulas</span></div>
 <div class="lesson-list">
 <div class="lesson-item chs ">
   <div class="lesson-num">1</div>
   <div class="lesson-text">
-    <div class="lesson-title">Amazônia: construção social, subjetividades e imaginários</div>
-    <div class='lesson-sub'>O que é a Amazônia? Visões de dentro e de fora</div>
+    <div class="lesson-title">O que são Direitos Humanos? Origem e fundamentos</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">2</div>
   <div class="lesson-text">
-    <div class="lesson-title">Amazônia e Amazônias: legal, internacional, urbana e rural</div>
-    <div class='lesson-sub'>Pluralidade do conceito; diferentes Amazônias existentes</div>
+    <div class="lesson-title">Declaração dos Direitos do Homem e do Cidadão (1789)</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">3</div>
   <div class="lesson-text">
-    <div class="lesson-title">Amazônia e tradição oral: narrativas que o povo conta</div>
-    <div class='lesson-sub'>Oralidade como forma de conhecimento; metodologia da história oral</div>
+    <div class="lesson-title">Declaração dos Direitos da Mulher — Olympe de Gouges</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">4</div>
   <div class="lesson-text">
-    <div class="lesson-title">Narrativas amazônicas: lendas, mitos e literatura regional</div>
-    <div class='lesson-sub'>O Boto, a Iara, a Cobra Grande; análise literária e cultural</div>
+    <div class="lesson-title">Declaração Universal dos Direitos Humanos (1948)</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">5</div>
   <div class="lesson-text">
-    <div class="lesson-title">Cultures digitais: tecnologias, internet e redes sociais na Amazônia</div>
-    <div class='lesson-sub'>Conectividade e exclusão digital; identidade e tecnologia</div>
+    <div class="lesson-title">Movimentos feministas: ondas históricas e conquistas</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">6</div>
   <div class="lesson-text">
-    <div class="lesson-title">Saberes tradicionais: medicina, cura e etnobotânica amazônica</div>
-    <div class='lesson-sub'>Conhecimentos dos povos da floresta; bioprospecção e biopirataria</div>
+    <div class="lesson-title">A Constituição Federal de 1988 e a justiça social</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">7</div>
   <div class="lesson-text">
-    <div class="lesson-title">Bioeconomia: do extrativismo às indústrias sustentáveis</div>
-    <div class='lesson-sub'>Castanha, açaí, madeira certificada; mercados verdes</div>
+    <div class="lesson-title">O princípio da dignidade humana</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">8</div>
   <div class="lesson-text">
-    <div class="lesson-title">Políticas públicas, legislações ambientais e sustentabilidade</div>
-    <div class='lesson-sub'>SNUC, Código Florestal, REDD+; análise crítica das políticas</div>
+    <div class="lesson-title">Estado de Direito: todos são iguais perante a lei?</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">9</div>
   <div class="lesson-text">
-    <div class="lesson-title">Análise de fontes sobre a Amazônia: leitura crítica de dados e imagens</div>
-    <div class='lesson-sub'>Desinformação sobre a Amazônia; dados reais vs. mitos</div>
+    <div class="lesson-title">Desafios dos Direitos Humanos na sociedade globalizada</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">10</div>
   <div class="lesson-text">
-    <div class="lesson-title">Sistematização: Amazônia – identidades, narrativas e conhecimentos</div>
-    <div class='lesson-sub'>Revisão; exercício escrito ou mapa conceitual</div>
+    <div class="lesson-title">Desinformação e Direitos Humanos: como combater fake news sobre direitos?</div>
   </div>
 </div>
 </div>
 </div>
 <div class="bim-panel " id="d3chs_b2">
-<div class="bim-header chs"><h3>📅 2º Bimestre – Povos Tradicionais, Conflitos e Patrimônio Amazônico</h3><span class="badge">10 aulas</span></div>
+<div class="bim-header chs"><h3>📅 2º Bimestre – Democracia, Cidadania + Projeto de Seminário I</h3><span class="badge">10 aulas</span></div>
 <div class="lesson-list">
 <div class="lesson-item chs ">
   <div class="lesson-num">1</div>
   <div class="lesson-text">
-    <div class="lesson-title">Povos tradicionais da Amazônia: diversidade cultural e linguística</div>
-    <div class='lesson-sub'>Quem são os povos tradicionais? Direitos e territórios</div>
+    <div class="lesson-title">O Brasil e a justiça social: desigualdades históricas</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">2</div>
   <div class="lesson-text">
-    <div class="lesson-title">Conflitos socioambientais e perspectivas de desenvolvimento na Amazônia</div>
-    <div class='lesson-sub'>Tensões entre agronegócio, mineração e populações tradicionais</div>
+    <div class="lesson-title">História do voto no Brasil: da exclusão à universalização</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">3</div>
   <div class="lesson-text">
-    <div class="lesson-title">Movimentos sociais na Amazônia: resistências históricas e contemporâneas</div>
-    <div class='lesson-sub'>Chico Mendes; movimento seringueiro; lutas indígenas; MAB</div>
+    <div class="lesson-title">Eleições livres e regulares: todos têm direito de votar?</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">4</div>
   <div class="lesson-text">
-    <div class="lesson-title">Patrimônios históricos, culturais, materiais e imateriais das Amazônias</div>
-    <div class='lesson-sub'>Bens culturais; preservação; turismo e memória coletiva</div>
+    <div class="lesson-title">Democracia formal e substancial: diferenças e desafios</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">5</div>
   <div class="lesson-text">
-    <div class="lesson-title">Cosmovisões amazônicas: relação dos povos com a floresta</div>
-    <div class='lesson-sub'>Perspectivas indígenas, ribeirinhas e quilombolas sobre natureza</div>
+    <div class="lesson-title">Pluralismo político: partidos, ideologias e visões de mundo</div>
   </div>
 </div>
-<div class="lesson-item chs ">
+<div class="lesson-item chs aval">
   <div class="lesson-num">6</div>
   <div class="lesson-text">
-    <div class="lesson-title">Antropoceno, colonialismo e bioética amazônica</div>
-    <div class='lesson-sub'>Impactos humanos no planeta; ética da relação com a natureza</div>
+    <div class="lesson-title">Projeto Seminário I: escolha dos temas e formação dos grupos<span class="proj-badge">🎓 SEMINÁRIO</span></div>
   </div>
 </div>
-<div class="lesson-item chs ">
+<div class="lesson-item chs aval">
   <div class="lesson-num">7</div>
   <div class="lesson-text">
-    <div class="lesson-title">Cultura(s) e identidade(s) amazônida(s): plural ou singular?</div>
-    <div class='lesson-sub'>Diversidade identitária; globalização e regionalismo na Amazônia</div>
+    <div class="lesson-title">Projeto Seminário I: pesquisa e elaboração do trabalho<span class="proj-badge">🎓 SEMINÁRIO</span></div>
   </div>
 </div>
-<div class="lesson-item chs ">
+<div class="lesson-item chs aval">
   <div class="lesson-num">8</div>
   <div class="lesson-text">
-    <div class="lesson-title">Novas perspectivas de trabalho na Amazônia do século XXI</div>
-    <div class='lesson-sub'>Ecoturismo, etnoturismo, bioeconomia; empreendedorismo amazônico</div>
+    <div class="lesson-title">Projeto Seminário I: produção dos materiais de apresentação<span class="proj-badge">🎓 SEMINÁRIO</span></div>
   </div>
 </div>
-<div class="lesson-item chs ">
+<div class="lesson-item chs aval">
   <div class="lesson-num">9</div>
   <div class="lesson-text">
-    <div class="lesson-title">Planejamento do projeto: tema, metodologia e produto</div>
-    <div class='lesson-sub'>Definição do tema; coleta de dados; divisão de tarefas</div>
+    <div class="lesson-title">Projeto Seminário I: ensaio e orientação com o professor<span class="proj-badge">🎓 SEMINÁRIO</span></div>
   </div>
 </div>
 <div class="lesson-item chs aval">
   <div class="lesson-num">10</div>
   <div class="lesson-text">
-    <div class="lesson-title">AVALIAÇÃO – Apresentação de Projeto: Amazônia e Identidades<span class="proj-badge">🎯 AVALIAÇÃO – PROJETO</span></div>
-    <div class='lesson-sub'>Produto final: documentário, seminário, campanha, exposição</div>
+    <div class="lesson-title">Projeto Seminário I: apresentação para a escola<span class="proj-badge">🎯 CULMINÂNCIA</span></div>
   </div>
 </div>
 </div>
 </div>
 <div class="bim-panel " id="d3chs_b3">
-<div class="bim-header chs"><h3>📅 3º Bimestre – DNA Cultural da Amazônia: Festas, Arte e Floresta</h3><span class="badge">10 aulas</span></div>
+<div class="bim-header chs"><h3>📅 3º Bimestre – Meio Ambiente, Tecnologia e Sustentabilidade</h3><span class="badge">10 aulas</span></div>
 <div class="lesson-list">
 <div class="lesson-item chs ">
   <div class="lesson-num">1</div>
   <div class="lesson-text">
-    <div class="lesson-title">DNA das Amazônias: culturas e identidades pelo pensamento decolonial</div>
-    <div class='lesson-sub'>O que é pensamento decolonial? Aplicação no contexto amazônico</div>
+    <div class="lesson-title">Equidade social: direito ao trabalho, educação, saúde, habitação e cultura</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">2</div>
   <div class="lesson-text">
-    <div class="lesson-title">Festivais, feiras e ritmos da Amazônia: expressões culturais vivas</div>
-    <div class='lesson-sub'>Boi Caprichoso, Parintins, guitarrada; diversidade cultural amazônica</div>
+    <div class="lesson-title">Degradação ambiental: causas e consequências</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">3</div>
   <div class="lesson-text">
-    <div class="lesson-title">Religiosidades amazônicas: diversidade e sincretismo</div>
-    <div class='lesson-sub'>Espiritualidade indígena, pajelança, catolicismo popular; diversidade</div>
+    <div class="lesson-title">Preservação do meio ambiente: ações locais e globais</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">4</div>
   <div class="lesson-text">
-    <div class="lesson-title">Folclore e alimentação como identidade cultural na Amazônia</div>
-    <div class='lesson-sub'>Tacacá, pato no tucupi, açaí; folclore como patrimônio imaterial</div>
+    <div class="lesson-title">Antropoceno: a era em que o humano mudou o planeta</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">5</div>
   <div class="lesson-text">
-    <div class="lesson-title">Literatura amazônica: contos, crônicas, poesias e romances regionais</div>
-    <div class='lesson-sub'>Dalcídio Jurandir, Márcio Souza, Milton Hatoum; análise literária</div>
+    <div class="lesson-title">Crise climática: dados, evidências e realidade</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">6</div>
   <div class="lesson-text">
-    <div class="lesson-title">Arco do desmatamento: agropecuária e exploração mineral</div>
-    <div class='lesson-sub'>Dados sobre desmatamento; atores e interesses em conflito</div>
+    <div class="lesson-title">Ancestralidade e cosmovisões indígenas sobre a natureza</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">7</div>
   <div class="lesson-text">
-    <div class="lesson-title">Povos indígenas: políticas públicas, direito à terra e demarcação</div>
-    <div class='lesson-sub'>FUNAI; marco temporal; resistência indígena; análise política</div>
+    <div class="lesson-title">Direito ao meio ambiente equilibrado (CF 1988, Art. 225)</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">8</div>
   <div class="lesson-text">
-    <div class="lesson-title">Comunidades quilombolas: territórios e resistências na Amazônia</div>
-    <div class='lesson-sub'>Quilombolas no Acre e na Amazônia; direitos territoriais</div>
+    <div class="lesson-title">Racismo ambiental: quem sofre mais com a crise climática?</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">9</div>
   <div class="lesson-text">
-    <div class="lesson-title">Análise crítica: como a mídia retrata a Amazônia?</div>
-    <div class='lesson-sub'>Imagens da floresta no noticiário; estereótipos e realidade</div>
+    <div class="lesson-title">Acordos internacionais: COP, Protocolo de Kyoto e Acordo de Paris</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">10</div>
   <div class="lesson-text">
-    <div class="lesson-title">Sistematização: DNA Cultural da Amazônia</div>
-    <div class='lesson-sub'>Revisão integradora; exercício escrito ou apresentação oral</div>
+    <div class="lesson-title">Consumo responsável e sustentabilidade no cotidiano</div>
   </div>
 </div>
 </div>
 </div>
 <div class="bim-panel " id="d3chs_b4">
-<div class="bim-header chs"><h3>📅 4º Bimestre – Amazônia do Século XXI: Desafios e Possibilidades</h3><span class="badge">10 aulas</span></div>
+<div class="bim-header chs"><h3>📅 4º Bimestre – Mundo Digital, Trabalho e Projeto de Seminário II</h3><span class="badge">10 aulas</span></div>
 <div class="lesson-list">
 <div class="lesson-item chs ">
   <div class="lesson-num">1</div>
   <div class="lesson-text">
-    <div class="lesson-title">Amazônia do século XXI: desafios e possibilidades</div>
-    <div class='lesson-sub'>Cenários futuros; desenvolvimento sustentável; COP e acordos climáticos</div>
+    <div class="lesson-title">Avanço tecnológico e cultura digital: oportunidades e riscos</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">2</div>
   <div class="lesson-text">
-    <div class="lesson-title">Globalização e regionalismo na Amazônia: tensões e equilíbrios</div>
-    <div class='lesson-sub'>Como a globalização afeta as culturas e economias locais</div>
+    <div class="lesson-title">Inteligência Artificial: impactos sociais, éticos e no mundo do trabalho</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">3</div>
   <div class="lesson-text">
-    <div class="lesson-title">Comunidades ribeirinhas, seringueiros e posseiros</div>
-    <div class='lesson-sub'>Modos de vida; direitos; conflitos fundiários na Amazônia</div>
+    <div class="lesson-title">Informação e desinformação: fake news e seus efeitos na sociedade</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">4</div>
   <div class="lesson-text">
-    <div class="lesson-title">Marco temporal e seus impactos sobre os povos indígenas</div>
-    <div class='lesson-sub'>Análise jurídica e política; mobilizações; direitos territoriais</div>
+    <div class="lesson-title">Democracia digital: redes sociais, eleições e notícias falsas</div>
   </div>
 </div>
 <div class="lesson-item chs ">
   <div class="lesson-num">5</div>
   <div class="lesson-text">
-    <div class="lesson-title">A bioeconomia como perspectiva de desenvolvimento sustentável</div>
-    <div class='lesson-sub'>Casos de sucesso; limitações; escala e política pública</div>
+    <div class="lesson-title">Fragmentação do poder: Estados-nacionais, identidades e territorialidades</div>
   </div>
 </div>
-<div class="lesson-item chs ">
+<div class="lesson-item chs aval">
   <div class="lesson-num">6</div>
   <div class="lesson-text">
-    <div class="lesson-title">Saberes tradicionais e medicina da floresta: entre a prática e a proteção</div>
-    <div class='lesson-sub'>Conhecimento ancestral e propriedade intelectual; biopirataria</div>
+    <div class="lesson-title">Projeto Seminário II: escolha dos temas e formação dos grupos<span class="proj-badge">🎓 SEMINÁRIO</span></div>
   </div>
 </div>
-<div class="lesson-item chs ">
+<div class="lesson-item chs aval">
   <div class="lesson-num">7</div>
   <div class="lesson-text">
-    <div class="lesson-title">Protagonismo juvenil na Amazônia: jovens como agentes de mudança</div>
-    <div class='lesson-sub'>Exemplos de jovens amazônidas em ação; projeto de vida regional</div>
+    <div class="lesson-title">Projeto Seminário II: pesquisa e elaboração do trabalho<span class="proj-badge">🎓 SEMINÁRIO</span></div>
   </div>
 </div>
-<div class="lesson-item chs ">
+<div class="lesson-item chs aval">
   <div class="lesson-num">8</div>
   <div class="lesson-text">
-    <div class="lesson-title">Arte e cultura amazônida como meio de subsistência e resistência</div>
-    <div class='lesson-sub'>Artistas, músicos, escritores e cineastas amazônidas; mercado cultural</div>
+    <div class="lesson-title">Projeto Seminário II: produção dos materiais de apresentação<span class="proj-badge">🎓 SEMINÁRIO</span></div>
   </div>
 </div>
-<div class="lesson-item chs ">
+<div class="lesson-item chs aval">
   <div class="lesson-num">9</div>
   <div class="lesson-text">
-    <div class="lesson-title">Projeto final: preparação e ensaio da apresentação</div>
-    <div class='lesson-sub'>Organização do material; ensaio geral; ajustes finais</div>
+    <div class="lesson-title">Projeto Seminário II: ensaio e orientação com o professor<span class="proj-badge">🎓 SEMINÁRIO</span></div>
   </div>
 </div>
 <div class="lesson-item chs aval">
   <div class="lesson-num">10</div>
   <div class="lesson-text">
-    <div class="lesson-title">AVALIAÇÃO – Apresentação de Projeto Final: Amazônia do Século XXI<span class="proj-badge">🎯 AVALIAÇÃO – PROJETO</span></div>
-    <div class='lesson-sub'>Culminância anual das Trilhas de CHS: produto de impacto social</div>
+    <div class="lesson-title">Projeto Seminário II: apresentação para a escola<span class="proj-badge">🎯 CULMINÂNCIA</span></div>
   </div>
 </div>
 </div>
@@ -6115,7 +6105,7 @@ document.getElementById('p6ano').classList.add('active');
 
 <section class="sec" id="sec-cont">
 <div class="th"><div class="tb gz">📊</div><div class="ti"><h2>Contador de Aulas</h2><p>Progresso por disciplina · Trilhas divididas em Linguagens e C. Humanas · Metas proporcionais às h/aula</p></div></div>
-<div class="ci"><h3>📈 Como funciona</h3><p>Feitas = relatos diários. Datas = estimativas (sem feriados). Metas de T.Ling e T.C.H divididas proporcionalmente às h/aula semanais. Atualize a cada relato.</p><div class="ci-up">📅 Última atualização: 10/04/2026</div></div>
+<div class="ci"><h3>📈 Como funciona</h3><p>Feitas = relatos diários. Datas = estimativas (sem feriados). Metas de T.Ling e T.C.H divididas proporcionalmente às h/aula semanais. Atualize a cada relato.</p><div class="ci-up">📅 Última atualização: 16/04/2026</div></div>
 <div class="cgt"><h3>Língua Portuguesa</h3><span class="bd bd-lp">LP</span></div><div class="ccards" id="cnt-lp"></div>
 <div class="cgt"><h3>Trilhas de Linguagens</h3><span class="bd bd-tl">T. LING.</span></div><div class="ccards" id="cnt-tl"></div>
 <div class="cgt"><h3>Trilhas de Ciências Humanas</h3><span class="bd bd-tc">T. C. HUM.</span></div><div class="ccards" id="cnt-tc"></div>
@@ -6206,7 +6196,16 @@ const PRESENCA={
   'pl-t2-0409':{turma:'t2',faltaram:[4,6,7,10,15,16,20,21],faltJ:[]},
   'pl-t3-0409':{turma:'t3',faltaram:[],faltJ:[12,13]},
   'pl-t6-0410':{turma:'t6',faltaram:[4,12,14,15,31],faltJ:[3]},
-  'pl-t3-0410':{turma:'t3',faltaram:[3,4,14,15,17],faltJ:[12,13]}
+  'pl-t3-0410':{turma:'t3',faltaram:[3,4,14,15,17],faltJ:[12,13]},
+  'pl-t1-0413':{turma:'t1',faltaram:[2,6,9,11,14],faltJ:[]},
+  'pl-t2-0413':{turma:'t2',faltaram:[6,7,12,14,16,17,18,20,21],faltJ:[]},
+  'pl-t3-0413':{turma:'t3',faltaram:[4,6,8,13],faltJ:[]},
+  'pl-t2-0414tl':{turma:'t2',faltaram:[],faltJ:[]},
+  'pl-t2-0414lp':{turma:'t2',faltaram:[],faltJ:[]},
+  'pl-t3-0414lp':{turma:'t3',faltaram:[],faltJ:[]},
+  'pl-t3-0414tl':{turma:'t3',faltaram:[],faltJ:[]},
+  'pl-t2-0416tc':{turma:'t2',faltaram:[],faltJ:[]},
+  'pl-t2-0416lp':{turma:'t2',faltaram:[],faltJ:[]}
 };
 
 function renderPresenca(){
@@ -6230,7 +6229,10 @@ function renderPresenca(){
 /* ★ ATIVIDADES — fez/naoFez = números de chamada; parcial = lista incompleta ★ */
 const ATIVIDADES={
   'atv-t1-0402':{turma:'t1',fez:[15],naoFez:[],parcial:true},
-  'atv-t2-0402':{turma:'t2',fez:[8,13],naoFez:[],parcial:true}
+  'atv-t2-0402':{turma:'t2',fez:[8,13],naoFez:[],parcial:true},
+  'atv-t1-0413':{turma:'t1',fez:[4,8,10,12,15],naoFez:[3,5,7,13,16]},
+  'atv-t2-0413':{turma:'t2',fez:[1,2,4,5,8,9,11,15,19],naoFez:[3,10,13,24,25]},
+  'atv-t3-0413':{turma:'t3',fez:[1,3,5,7,9,14,16],naoFez:[2,10,11,12,15,17,18]}
 };
 
 /* ── ATIVIDADES INTERATIVAS ── */
@@ -6350,14 +6352,14 @@ function renderAtividades(){
 /* ★ CONTADOR ★ */
 const BASE=new Date(2026,2,30);
 const DISC=[
-  {g:'lp',t:'1ª Série',d:'Língua Portuguesa',sw:2,feitas:8, bim:20,tot:80},
-  {g:'lp',t:'2ª Série',d:'Língua Portuguesa',sw:4,feitas:9, bim:30,tot:120},
-  {g:'lp',t:'3ª Série',d:'Língua Portuguesa',sw:3,feitas:11,bim:30,tot:120},
+  {g:'lp',t:'1ª Série',d:'Língua Portuguesa',sw:2,feitas:10,bim:20,tot:80},
+  {g:'lp',t:'2ª Série',d:'Língua Portuguesa',sw:4,feitas:14,bim:30,tot:120},
+  {g:'lp',t:'3ª Série',d:'Língua Portuguesa',sw:3,feitas:14,bim:30,tot:120},
   {g:'tl',t:'1ª Série',d:'Trilhas de Linguagens',sw:1,feitas:1,bim:10,tot:40},
-  {g:'tl',t:'2ª Série',d:'Trilhas de Linguagens',sw:1,feitas:2,bim:10,tot:40},
-  {g:'tl',t:'3ª Série',d:'Trilhas de Linguagens',sw:1,feitas:2,bim:10,tot:40},
+  {g:'tl',t:'2ª Série',d:'Trilhas de Linguagens',sw:1,feitas:3,bim:10,tot:40},
+  {g:'tl',t:'3ª Série',d:'Trilhas de Linguagens',sw:1,feitas:3,bim:10,tot:40},
   {g:'tc',t:'1ª Série',d:'Trilhas de C. Humanas',sw:1,feitas:1,bim:10,tot:40},
-  {g:'tc',t:'2ª Série',d:'Trilhas de C. Humanas',sw:2,feitas:2,bim:20,tot:80},
+  {g:'tc',t:'2ª Série',d:'Trilhas de C. Humanas',sw:2,feitas:4,bim:20,tot:80},
   {g:'tc',t:'3ª Série',d:'Trilhas de C. Humanas',sw:1,feitas:1,bim:10,tot:40},
   {g:'ar',t:'6º Ano',  d:'Artes',sw:1,feitas:5,bim:10,tot:40},
   {g:'ar',t:'2ª Série',d:'Artes',sw:1,feitas:1,bim:10,tot:40},
@@ -6659,8 +6661,8 @@ function initStatusButtons() {
       div.appendChild(btn);
     });
 
-    // Insere como PRIMEIRO filho do lesson-item (à esquerda do número)
-    item.insertBefore(div, item.firstChild);
+    // Adiciona ao FINAL do lesson-item (borda direita)
+    item.appendChild(div);
 
     // Carregar do localStorage imediatamente
     const salvo = carregarStatusLocal(key);
