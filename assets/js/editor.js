@@ -574,14 +574,13 @@ function edRedo() {
 function _salvarAlteracoes() {
   try {
     var main = document.querySelector('.main');
-    if (main) localStorage.setItem('ed_main_html_v2', main.innerHTML);
+    if (main) localStorage.setItem('ed_main_html_v3', main.innerHTML);
   } catch(e) { console.warn('[Editor] Erro ao salvar:', e); }
 }
 
 function limparAlteracoes() {
   if (!confirm('Restaurar o site ao estado original? Todas as edições visuais serão perdidas.')) return;
-  localStorage.removeItem('ed_main_html_v2');
-  localStorage.removeItem('ed_main_html');
+  ['ed_main_html','ed_main_html_v2','ed_main_html_v3'].forEach(function(k){ localStorage.removeItem(k); });
   window.location.reload();
 }
 
@@ -648,17 +647,24 @@ function _rgbToHex(rgb) {
 document.addEventListener('DOMContentLoaded', function() {
 
   // 1. Restaura edições visuais salvas pelo editor
-  // Chave v2: descarta saves anteriores ao fix de livros duplicados
-  localStorage.removeItem('ed_main_html'); // limpa chave antiga corrompida
+  localStorage.removeItem('ed_main_html');    // chave v1 — descartada
+  localStorage.removeItem('ed_main_html_v2'); // chave v2 — descartada (layout errado dos botões)
   try {
-    var salvo = localStorage.getItem('ed_main_html_v2');
+    var salvo = localStorage.getItem('ed_main_html_v3');
     if (salvo) {
       var main = document.querySelector('.main');
       if (main) {
         main.innerHTML = salvo;
-        // Após restaurar, re-renderiza seções dinâmicas que não fazem parte do HTML estático
+        // Após restaurar, re-inicializa seções que dependem de event listeners
         if (typeof livRender === 'function') livRender();
         if (typeof claudeRenderizar === 'function') claudeRenderizar();
+        // Reconstrói botões do plano (handlers se perdem no innerHTML replace)
+        if (typeof initStatusButtons === 'function') initStatusButtons();
+        // Restaura banner de última modificação
+        try {
+          var ult = localStorage.getItem('plano_ultima_mod');
+          if (ult && typeof _exibirUltimaModPlano === 'function') _exibirUltimaModPlano(JSON.parse(ult));
+        } catch(e2) {}
       }
     }
   } catch(e) { console.warn('[Editor] Erro ao restaurar:', e); }
