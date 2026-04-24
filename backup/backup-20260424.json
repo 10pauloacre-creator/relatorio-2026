@@ -1,0 +1,269 @@
+{
+  "meta": {
+    "projeto": "Diário Escolar 2026 — Prof. Paulo Roberto Ramalho Magalhães",
+    "escola": "E.E. Rural Pe. Carlos Casavequia — Senador Guiomard, AC",
+    "github": "https://github.com/10pauloacre-creator/relatorio-2026",
+    "site": "https://10pauloacre-creator.github.io/relatorio-2026",
+    "gerado_em": "24/04/2026",
+    "ultima_aula": "21/04/2026",
+    "sw_cache_version": "relatorio-2026-v8"
+  },
+
+  "contador_aulas": {
+    "descricao": "h/aulas dadas por disciplina até 21/04/2026",
+    "dados": [
+      {"disciplina":"Língua Portuguesa","turma":"1ª Série","feitas":10,"meta_bimestre":20,"meta_anual":80,"sw":2},
+      {"disciplina":"Língua Portuguesa","turma":"2ª Série","feitas":15,"meta_bimestre":30,"meta_anual":120,"sw":4},
+      {"disciplina":"Língua Portuguesa","turma":"3ª Série","feitas":15,"meta_bimestre":30,"meta_anual":120,"sw":3},
+      {"disciplina":"Trilhas de Linguagens","turma":"1ª Série","feitas":2,"meta_bimestre":10,"meta_anual":40,"sw":1},
+      {"disciplina":"Trilhas de Linguagens","turma":"2ª Série","feitas":4,"meta_bimestre":10,"meta_anual":40,"sw":1},
+      {"disciplina":"Trilhas de Linguagens","turma":"3ª Série","feitas":4,"meta_bimestre":10,"meta_anual":40,"sw":1},
+      {"disciplina":"Trilhas de C. Humanas","turma":"1ª Série","feitas":2,"meta_bimestre":10,"meta_anual":40,"sw":1},
+      {"disciplina":"Trilhas de C. Humanas","turma":"2ª Série","feitas":6,"meta_bimestre":20,"meta_anual":80,"sw":2},
+      {"disciplina":"Trilhas de C. Humanas","turma":"3ª Série","feitas":2,"meta_bimestre":10,"meta_anual":40,"sw":1},
+      {"disciplina":"Artes","turma":"6º Ano","feitas":6,"meta_bimestre":10,"meta_anual":40,"sw":1,"obs":"4 aulas da professora anterior + 2 do Prof. Paulo (10/04 e 17/04 virtual)"},
+      {"disciplina":"Artes","turma":"2ª Série","feitas":1,"meta_bimestre":10,"meta_anual":40,"sw":1},
+      {"disciplina":"Artes","turma":"3ª Série","feitas":1,"meta_bimestre":10,"meta_anual":40,"sw":1}
+    ]
+  },
+
+  "relatos": {
+    "descricao": "Lista cronológica de todos os relatos diários (do mais recente ao mais antigo)",
+    "secao_geral": [
+      {"data":"21/04/2026","dia":"Terça-feira · Tiradentes","turmas":"2ª e 3ª Série","periodo":"07:00–11:15","disciplinas":"LP · T. Linguagens","obs":"Aula presencial matutina — transporte não funcionou"},
+      {"data":"17/04/2026","dia":"Sexta-feira","turmas":"Todas","periodo":"Virtual","disciplinas":"TCH · TL · Artes","obs":"Ônibus em manutenção — conteúdo enviado online"},
+      {"data":"16/04/2026","dia":"Quinta-feira","turmas":"2ª Série","periodo":"07:00–11:15","disciplinas":"T.C.H. + L.P.","obs":"Avaliação Diagnóstica SIMAED — TCH Temas 4 e 5 / LP Temas 15 e 16"},
+      {"data":"14/04/2026","dia":"Terça-feira","turmas":"2ª e 3ª Série","periodo":"13:00–17:15","disciplinas":"LP · T. Linguagens","obs":"Aula virtual — chuva intensa"},
+      {"data":"13/04/2026","dia":"Segunda-feira","turmas":"1ª, 2ª e 3ª Série","periodo":"07:00–11:15","disciplinas":"L.P.","obs":"Intertextualidade (1ª) · Gêneros Argumentativos (2ª) · Sintaxe (3ª)"},
+      {"data":"10/04/2026","dia":"Sexta-feira","turmas":"6º Ano, 1ª, 2ª e 3ª Série","periodo":"07h–17h15","disciplinas":"Artes · LP · Trilhas","obs":"Dia cheio — 1ª aula de Paulo com 6º Ano"},
+      {"data":"09/04/2026","dia":"Quinta-feira","turmas":"2ª e 3ª Série","periodo":"15h15–17h15","disciplinas":"Artes","obs":"Linguagem Visual · Arte Sustentável"},
+      {"data":"07/04/2026","dia":"Terça-feira","turmas":"2ª e 3ª Série","periodo":"13h–17h15","disciplinas":"LP · T. Linguagens","obs":"Encerrado às 16h15 por chuvas"},
+      {"data":"06/04/2026","dia":"Segunda-feira","turmas":"1ª, 2ª e 3ª Série","periodo":"07h–11h15","disciplinas":"L.P.","obs":"O que é Texto? — 1ª aula regular das 3 séries"},
+      {"data":"02/04/2026","dia":"Quinta-feira","turmas":"1ª e 2ª (contra-turno)","periodo":"07h–10h20","disciplinas":"LP (SIMAED) / conteúdo TCH","obs":"Encerrado para palestra do Dia do Autismo"},
+      {"data":"31/03/2026","dia":"Terça-feira","turmas":"2ª e 3ª Série","periodo":"13h–17h15","disciplinas":"LP + T. Linguagens","obs":"Projeto Colando com Sabedoria — IA"},
+      {"data":"30/03/2026","dia":"Segunda-feira","turmas":"1ª, 2ª e 3ª Série","periodo":"07h–11h15","disciplinas":"L.P.","obs":"1º dia letivo — diagnóstica"}
+    ],
+    "turma_t1_1serie": [
+      {"data":"17/04","disciplina":"T.C.H. (virtual)","id":"r-t1-0417tch"},
+      {"data":"17/04","disciplina":"T.Ling. (virtual)","id":"r-t1-0417tl"},
+      {"data":"13/04","disciplina":"L.P. 2h","id":"r-t1-0413"},
+      {"data":"10/04","disciplina":"T.C.H.+T.Ling. 2h","id":"r-t1-0410"},
+      {"data":"06/04","disciplina":"L.P. 2h","id":"r-t1-0406"},
+      {"data":"02/04","disciplina":"L.P. 4h (contra-turno)","id":"r-t1-0402"},
+      {"data":"30/03","disciplina":"L.P. 2h","id":"r-t1-0330"}
+    ],
+    "turma_t2_2serie": [
+      {"data":"21/04","disciplina":"T.Ling. 1h","id":"r-t2-0421tl"},
+      {"data":"21/04","disciplina":"L.P. 1h","id":"r-t2-0421lp"},
+      {"data":"17/04","disciplina":"T.C.H. 2h (virtual)","id":"r-t2-0417tch"},
+      {"data":"16/04","disciplina":"T.C.H. 2h — Diagnóstica","id":"r-t2-0416tc"},
+      {"data":"16/04","disciplina":"L.P. 2h — Diagnóstica","id":"r-t2-0416lp"},
+      {"data":"14/04","disciplina":"T.Ling. 1h (virtual)","id":"r-t2-0414tl"},
+      {"data":"14/04","disciplina":"L.P. 1h (virtual)","id":"r-t2-0414lp"},
+      {"data":"13/04","disciplina":"L.P. 2h","id":"r-t2-0413"},
+      {"data":"10/04","disciplina":"T.C.H. (LGG) 2h","id":"r-t2-0410"},
+      {"data":"09/04","disciplina":"Artes 1h","id":"r-t2-0409"},
+      {"data":"07/04","disciplina":"T.Ling.+LP 2h","id":"r-t2-0407"},
+      {"data":"06/04","disciplina":"L.P. 2h","id":"r-t2-0406"},
+      {"data":"02/04","disciplina":"L.P. 4h (contra-turno)","id":"r-t2-0402"},
+      {"data":"31/03","disciplina":"LP+T.Ling. (Colando)","id":"r-t2-0331"},
+      {"data":"30/03","disciplina":"L.P. 2h (diagnóstica)","id":"r-t2-0330"}
+    ],
+    "turma_t3_3serie": [
+      {"data":"21/04","disciplina":"L.P. 1h","id":"r-t3-0421lp"},
+      {"data":"21/04","disciplina":"T.Ling. 1h","id":"r-t3-0421tl"},
+      {"data":"17/04","disciplina":"T.C.H. 1h (virtual)","id":"r-t3-0417tch"},
+      {"data":"14/04","disciplina":"L.P. 1h (virtual)","id":"r-t3-0414lp"},
+      {"data":"14/04","disciplina":"T.Ling. 1h (virtual)","id":"r-t3-0414tl"},
+      {"data":"13/04","disciplina":"L.P. 2h","id":"r-t3-0413"},
+      {"data":"10/04","disciplina":"LP/Pré-Enem 5h","id":"r-t3-0410a"},
+      {"data":"10/04","disciplina":"T.C.H. 1h","id":"r-t3-0410b"},
+      {"data":"09/04","disciplina":"Artes 1h","id":"r-t3-0409"},
+      {"data":"07/04","disciplina":"LP+T.Ling. 2h","id":"r-t3-0407"},
+      {"data":"06/04","disciplina":"L.P. 2h","id":"r-t3-0406"},
+      {"data":"31/03","disciplina":"LP+T.Ling. (Colando)","id":"r-t3-0331"},
+      {"data":"30/03","disciplina":"L.P. 2h (diagnóstica)","id":"r-t3-0330"}
+    ],
+    "turma_t6_6ano": [
+      {"data":"17/04","disciplina":"Artes 1h (virtual) — Tema 2: Teatro Ocidental","id":"r-t6-0417"},
+      {"data":"10/04","disciplina":"Artes 1h — 1ª aula do Prof. Paulo com a turma","id":"r-t6-0410"}
+    ]
+  },
+
+  "presenca": {
+    "descricao": "Registro de faltas por número de chamada. faltaram=sem justificativa, faltJ=justificados, parcial=lista incompleta",
+    "dados": {
+      "pl-t1-0330": {"turma":"t1","faltaram":[],"faltJ":[],"parcial":true},
+      "pl-t1-0402": {"turma":"t1","faltaram":[3,5,13],"faltJ":[]},
+      "pl-t2-0330": {"turma":"t2","faltaram":[],"faltJ":[]},
+      "pl-t2-0331": {"turma":"t2","faltaram":[],"faltJ":[]},
+      "pl-t2-0402": {"turma":"t2","faltaram":[1,4,7,10,15,16,18,21,24,25],"faltJ":[]},
+      "pl-t2-0407": {"turma":"t2","faltaram":[6,7,14,15,18,21],"faltJ":[]},
+      "pl-t3-0330": {"turma":"t3","faltaram":[],"faltJ":[]},
+      "pl-t3-0331": {"turma":"t3","faltaram":[],"faltJ":[]},
+      "pl-t3-0407": {"turma":"t3","faltaram":[3,4,13,14],"faltJ":[12]},
+      "pl-t2-0409": {"turma":"t2","faltaram":[4,6,7,10,15,16,20,21],"faltJ":[]},
+      "pl-t3-0409": {"turma":"t3","faltaram":[],"faltJ":[12,13]},
+      "pl-t6-0410": {"turma":"t6","faltaram":[4,12,14,15,31],"faltJ":[3]},
+      "pl-t3-0410": {"turma":"t3","faltaram":[3,4,14,15,17],"faltJ":[12,13]},
+      "pl-t1-0413": {"turma":"t1","faltaram":[2,6,9,11,14],"faltJ":[]},
+      "pl-t2-0413": {"turma":"t2","faltaram":[6,7,12,14,16,17,18,20,21],"faltJ":[]},
+      "pl-t3-0413": {"turma":"t3","faltaram":[4,6,8,13],"faltJ":[]},
+      "pl-t2-0414tl": {"turma":"t2","faltaram":[],"faltJ":[]},
+      "pl-t2-0414lp": {"turma":"t2","faltaram":[],"faltJ":[]},
+      "pl-t3-0414lp": {"turma":"t3","faltaram":[],"faltJ":[]},
+      "pl-t3-0414tl": {"turma":"t3","faltaram":[],"faltJ":[]},
+      "pl-t2-0416tc": {"turma":"t2","faltaram":[],"faltJ":[]},
+      "pl-t2-0416lp": {"turma":"t2","faltaram":[],"faltJ":[]},
+      "pl-t1-0417tch": {"turma":"t1","faltaram":[],"faltJ":[]},
+      "pl-t1-0417tl": {"turma":"t1","faltaram":[],"faltJ":[]},
+      "pl-t2-0417tch": {"turma":"t2","faltaram":[],"faltJ":[]},
+      "pl-t3-0417tch": {"turma":"t3","faltaram":[],"faltJ":[]},
+      "pl-t6-0417": {"turma":"t6","faltaram":[],"faltJ":[]},
+      "pl-t3-0421lp": {"turma":"t3","faltaram":[],"faltJ":[]},
+      "pl-t3-0421tl": {"turma":"t3","faltaram":[],"faltJ":[]},
+      "pl-t2-0421tl": {"turma":"t2","faltaram":[],"faltJ":[]},
+      "pl-t2-0421lp": {"turma":"t2","faltaram":[],"faltJ":[]}
+    }
+  },
+
+  "alunos": {
+    "t1_1serie": [
+      {"n":2,"nm":"Cleiton Silva Santana"},
+      {"n":3,"nm":"Daniel Henrique Rodrigues Galvão"},
+      {"n":4,"nm":"Eduarda Pereira Santiago"},
+      {"n":5,"nm":"Felipe Costa Bezerra"},
+      {"n":6,"nm":"Gabriel Souza Silva"},
+      {"n":7,"nm":"Gustavo Gomes da Silva"},
+      {"n":8,"nm":"Jady Kamilly de Oliveira Amorim"},
+      {"n":9,"nm":"João Pedro Gomes da Silva"},
+      {"n":10,"nm":"Juliana da Silva Euripe"},
+      {"n":11,"nm":"Lauane da Silva Santos"},
+      {"n":12,"nm":"Maria Eduarda da Silva de Paula"},
+      {"n":13,"nm":"Maria Valéria Aparecida Nunes de Lima"},
+      {"n":14,"nm":"Paulo Henrique Chaves Teixeira"},
+      {"n":15,"nm":"Yudi Oliveira de Araujo"},
+      {"n":16,"nm":"Isabelle Moura dos Santos"}
+    ],
+    "t2_2serie": [
+      {"n":1,"nm":"Alice Ferreira de Souza"},
+      {"n":2,"nm":"Ana Beatriz Nascimento Maia"},
+      {"n":3,"nm":"Anthonny Gabriel Almeida Paiva"},
+      {"n":4,"nm":"Antonio Samuel de Oliveira Barreto"},
+      {"n":5,"nm":"Elanne Melo de Souza"},
+      {"n":6,"nm":"Eslane Moraes Ribeiro"},
+      {"n":7,"nm":"Everton Oliveira da Silva"},
+      {"n":8,"nm":"Fabio Henrique Barbosa Rosas"},
+      {"n":9,"nm":"Francielly da Silveira Braga Santiago"},
+      {"n":10,"nm":"Francisco Gabriel de Queiroz Brasil"},
+      {"n":11,"nm":"Jorge Arnaldo Félix Pereira"},
+      {"n":12,"nm":"Kauesley dos Anjos Dantas"},
+      {"n":13,"nm":"Kayo dos Anjos Coutinho"},
+      {"n":14,"nm":"Lília da Silva Ramos"},
+      {"n":15,"nm":"Luiz Guilherme da Silva Santiago"},
+      {"n":16,"nm":"Maria Clara Lima da Silva"},
+      {"n":17,"nm":"Maria Eduarda Silva de Jesus"},
+      {"n":18,"nm":"Nathaly Yasmim Castro Jardim"},
+      {"n":19,"nm":"Pietro Fidelis Miranda"},
+      {"n":20,"nm":"Sabrina Damazio Alves Araújo"},
+      {"n":21,"nm":"Tamíres Lima Fernandes"},
+      {"n":24,"nm":"Wesley Emanuel Lima da Silva"},
+      {"n":25,"nm":"Êmilly Nathasha Martins Sá"}
+    ],
+    "t3_3serie": [
+      {"n":1,"nm":"Alonso Queiroz Santiago"},
+      {"n":2,"nm":"Antoniel Araujo de Lima"},
+      {"n":3,"nm":"Francisco Kevison de Lima Paixão"},
+      {"n":4,"nm":"Gabriel Oliveira Evangelista"},
+      {"n":5,"nm":"Gabriella Farias Moreira"},
+      {"n":6,"nm":"Hana Beatryz Araujo Sales"},
+      {"n":7,"nm":"Joaiz Muniz de Souza Júnior"},
+      {"n":8,"nm":"João Paulo Barreto Chaves"},
+      {"n":9,"nm":"Karina Paiva Lima"},
+      {"n":10,"nm":"Kiara Kasiele Silva Paixão"},
+      {"n":11,"nm":"Lourival Wagner Aparecido Nunes de Lima"},
+      {"n":12,"nm":"Maria Beatriz Oliveira da Gama"},
+      {"n":13,"nm":"Maria Eduarda Souza Teixeira"},
+      {"n":14,"nm":"Matheus Henrique Silveira Santiago"},
+      {"n":15,"nm":"Mayco Gabriel da Silva Dias"},
+      {"n":16,"nm":"Natanael Ovides de Sousa"},
+      {"n":17,"nm":"Sara Machado do Amor Divino"},
+      {"n":18,"nm":"Sibelly Victória Santiago de Sousa"}
+    ],
+    "t6_6ano": [
+      {"n":1,"nm":"Àghata Luiza Soouza da Silva"},
+      {"n":2,"nm":"Angelo de Freitas Soares"},
+      {"n":3,"nm":"Anthony Mayksson Willames Silva de Lima"},
+      {"n":4,"nm":"Antônio Yuri da Silva Santos"},
+      {"n":5,"nm":"Asheley Prince Miranda Lima"},
+      {"n":6,"nm":"Bianca Alves Bulin"},
+      {"n":7,"nm":"Cayki Silva de Farias"},
+      {"n":8,"nm":"Daniel Magalhães de Lima"},
+      {"n":9,"nm":"Davi Oliveira de Amorim"},
+      {"n":10,"nm":"Douglas Oliveira Queiroz da Silva"},
+      {"n":11,"nm":"Fabrício Nunes Ataíde"},
+      {"n":12,"nm":"Guilherme Castro Pereira"},
+      {"n":13,"nm":"Hadassa Walthier da Silva"},
+      {"n":14,"nm":"Hagata Gabriely da Silva Santos"},
+      {"n":15,"nm":"Isaac Souza Fernandes"},
+      {"n":17,"nm":"João Pedro Maia de Oliveira"},
+      {"n":18,"nm":"Joel do Nascimento Cruz"},
+      {"n":19,"nm":"José Otávio da Silva Paixão"},
+      {"n":20,"nm":"Lazaro da Silva Martins"},
+      {"n":21,"nm":"Maria Isabele de Lima Paixão"},
+      {"n":22,"nm":"Mirella Barroso Lima"},
+      {"n":23,"nm":"Murilo Santana de Souza"},
+      {"n":24,"nm":"Nayla Vitória de Sousa Santana"},
+      {"n":25,"nm":"Neemias de Sousa Amim"},
+      {"n":26,"nm":"Nicolas da Silva Nogueira"},
+      {"n":27,"nm":"Pamella Letycia Souza Lino"},
+      {"n":28,"nm":"Pedro Lucas Fidelis dos Reis"},
+      {"n":29,"nm":"Sabrina Silva Ribeiro"},
+      {"n":30,"nm":"Thaemmy Silva de Farias"},
+      {"n":31,"nm":"Victor Emanoel da Silva do Nascimento"},
+      {"n":32,"nm":"Vidal Wanderley de Lima"},
+      {"n":33,"nm":"Wandson Santiago de Sousa"},
+      {"n":34,"nm":"Yan Lima Rodrigues"},
+      {"n":35,"nm":"Yasmin Victória Vasconcelos Silva"},
+      {"n":36,"nm":"Breno Barroso da Silva"}
+    ]
+  },
+
+  "configuracoes": {
+    "firebase_project": "relatorio-c693d",
+    "firebase_app_id": "1:457657450375:web:15b1335aed2ba9939bdd22",
+    "firebase_auth_domain": "relatorio-c693d.firebaseapp.com",
+    "github_user": "10pauloacre-creator",
+    "github_repo": "relatorio-2026",
+    "github_branch": "main",
+    "pwa_cache": "relatorio-2026-v8",
+    "credenciais_sensiveis": "Token GitHub e chave Groq ficam APENAS no localStorage do navegador — nunca no código"
+  },
+
+  "vistoria_20260424": {
+    "bugs_encontrados": [
+      {
+        "id": "SW_CACHE_STALE",
+        "descricao": "Service Worker cache v7 nunca era atualizado entre deploys. index.html estava pré-cacheado e podia ser servido em versão antiga.",
+        "correcao": "Cache bumped para v8. index.html removido da lista de ASSETS pré-cacheados.",
+        "arquivo": "sw.js",
+        "status": "CORRIGIDO"
+      },
+      {
+        "id": "ABA_PRESENCA_FALTANDO",
+        "descricao": "Relato r-t3-0410b (Trilhas C.H. 10/04 — 3ª Série) estava sem a aba 👥 Presença, violando a regra de 3 abas.",
+        "correcao": "Adicionada aba Presença com div pl-t3-0410b.",
+        "arquivo": "index.html",
+        "status": "CORRIGIDO"
+      }
+    ],
+    "inconsistencias_menores": [
+      "Relatos de aulas virtuais (17/04, 21/04) têm apenas 2 abas (Relato + Presença) — sem aba Atividades pois não houve atividade formal. verificarAbasRelatos() exibirá aviso visual.",
+      "pl-t1-0402 registrado como LP no SIMAED mas conteúdo foi T.C.H. — lembrete já inserido no relato.",
+      "pl-t2-0407 e pl-t3-0407: horas registradas como T.Ling. no SIMAED mas conteúdo foi LP — lembretes já inseridos."
+    ],
+    "firestore_analise": "onSnapshot handlers verificados: plano_status toca apenas [data-fbkey], atv_manual toca [data-atv], livros toca [data-liv]. Nenhum handler apaga ou substitui relatos. Causa do bug era exclusivamente o SW cache.",
+    "js_externos_carregados": ["assets/js/editor.js (✓ apenas gerencia modo de edição)", "assets/js/alunos.js (✓ apenas insere botão 👥 e modal de alunos)"],
+    "js_nao_carregados": ["assets/js/app.js", "assets/js/firebase.js", "assets/js/contador.js", "assets/js/presenca.js", "assets/js/cronograma.js", "assets/js/atividades.js", "assets/js/plano.js", "assets/js/blocks.js", "assets/js/data.js"]
+  }
+}

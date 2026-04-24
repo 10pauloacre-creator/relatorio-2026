@@ -228,24 +228,24 @@ Quando o professor envia o rascunho **diretamente no chat**, Claude:
 
 ---
 
-## 9. CONTADOR DE AULAS — ESTADO ATUAL (10/04/2026)
+## 9. CONTADOR DE AULAS — ESTADO ATUAL (21/04/2026)
 
 | Disciplina | Turma | H/aulas dadas | Meta bimestral | Meta anual |
 |---|---|---|---|---|
-| LP | 1ª Série | 8 | 20 | 80 |
-| LP | 2ª Série | 9 | 30 | 120 |
-| LP | 3ª Série | 11 | 30 | 120 |
-| T.Ling. | 1ª Série | 1 | 10 | 40 |
-| T.Ling. | 2ª Série | 2 | 10 | 40 |
-| T.Ling. | 3ª Série | 2 | 10 | 40 |
-| T.C.H. | 1ª Série | 1 | 10 | 40 |
-| T.C.H. | 2ª Série | 2 | 20 | 80 |
-| T.C.H. | 3ª Série | 1 | 10 | 40 |
-| Artes | 6º Ano | 5 | 10 | 40 |
+| LP | 1ª Série | 10 | 20 | 80 |
+| LP | 2ª Série | 15 | 30 | 120 |
+| LP | 3ª Série | 15 | 30 | 120 |
+| T.Ling. | 1ª Série | 2 | 10 | 40 |
+| T.Ling. | 2ª Série | 4 | 10 | 40 |
+| T.Ling. | 3ª Série | 4 | 10 | 40 |
+| T.C.H. | 1ª Série | 2 | 10 | 40 |
+| T.C.H. | 2ª Série | 6 | 20 | 80 |
+| T.C.H. | 3ª Série | 2 | 10 | 40 |
+| Artes | 6º Ano | 6 | 10 | 40 |
 | Artes | 2ª Série | 1 | 10 | 40 |
 | Artes | 3ª Série | 1 | 10 | 40 |
 
-> **Atenção 6º Ano:** O professor herdou a turma após 4 aulas de outra professora. O contador parte de 5 (4 anteriores + 1 do professor).
+> **Atenção 6º Ano:** O professor herdou a turma após 4 aulas de outra professora. O contador parte de 5 (4 anteriores + 1 do professor em 10/04) + 1 virtual em 17/04 = 6.
 
 ---
 
@@ -270,7 +270,7 @@ Quando o professor envia o rascunho **diretamente no chat**, Claude:
 
 ---
 
-## 11. BUGS CORRIGIDOS NESTA SESSÃO
+## 11. BUGS CORRIGIDOS
 
 | Bug | Causa | Correção |
 |---|---|---|
@@ -278,22 +278,33 @@ Quando o professor envia o rascunho **diretamente no chat**, Claude:
 | String não fechada travando todo o JS | Faltava `'` no final da linha 6197 | Adicionado `'` antes da vírgula |
 | "Marcador RELATOS_INICIO não encontrado" | Arquivo >1MB: GitHub API não retorna `content` inline | Fallback para `download_url` quando `fileData.content` é vazio |
 | Erro UTF-8 ao publicar | `decodeURIComponent(escape(atob(...)))` quebrava com caracteres portugueses | Substituído por `new TextDecoder('utf-8').decode(Uint8Array.from(...))` |
+| **Relatos somem após reload** | SW cache `v7` nunca atualizado + `index.html` pré-cacheado. Browsers serviam HTML desatualizado do cache | Bumped cache para `v8`, removido `index.html` e URL raiz da lista ASSETS no `sw.js` |
+| Relato `r-t3-0410b` sem aba Presença | Aba 👥 esquecida na criação | Adicionadas aba e div `pl-t3-0410b` |
 
 ---
 
-## 12. PENDÊNCIAS E PRÓXIMOS PASSOS
+## 12. BACKUP
+
+**Arquivo:** `backup/backup-YYYYMMDD.json`  
+**Conteúdo:** DISC, PRESENÇA, ALUNOS, lista de relatos, config, relatório de vistoria  
+**Regra:** Atualizar o backup a cada novo relato (`cp` ou reescrever o JSON com os novos dados)
+
+Backup atual: `backup/backup-20260424.json`
+
+---
+
+## 13. PENDÊNCIAS E PRÓXIMOS PASSOS
 
 ### Imediato
 - [ ] Testar o botão "✏️ Novo Relato" com a chave Groq configurada no navegador (fluxo completo)
 - [ ] Adicionar marcador `<!-- T6_INICIO -->` na seção do 6º Ano para injeção automática
 
 ### Em breve
-- [ ] Atualizar `PRESENCA` para 10/04 das turmas que não tiveram presença registrada individualmente (1ª e 2ª série)
-- [ ] Atualizar o plano anual das demais disciplinas se houver mudanças
+- [ ] Relatos com apenas 2 abas (aulas virtuais sem atividade formal) mostrarão aviso do `verificarAbasRelatos()` — é esperado; pode ser ignorado ou adicionar aba vazia se incomodar
 
 ### Quando o professor enviar novo relato
 1. Ele escreve rascunho no chat
-2. Claude gera HTML → injeta → atualiza PRESENCA + DISC → `git push`
+2. Claude gera HTML → injeta → atualiza PRESENCA + DISC → atualiza `backup/backup-YYYYMMDD.json` → `git push`
 3. Ou: usar o botão "✏️ Novo Relato" diretamente no site (fluxo automático via Groq)
 
 ### Não implementado ainda
@@ -303,7 +314,7 @@ Quando o professor envia o rascunho **diretamente no chat**, Claude:
 
 ---
 
-## 13. REGRAS FIXAS DO PROJETO
+## 14. REGRAS FIXAS DO PROJETO
 
 1. **Vanilla JS apenas** — sem React, Vue ou qualquer framework
 2. **Arquivo único** — tudo em `index.html`, sem múltiplos arquivos HTML
