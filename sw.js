@@ -1,12 +1,10 @@
-const CACHE = 'relatorio-2026-v7';
+const CACHE = 'relatorio-2026-v8';
+// ⚠️ index.html NÃO entra no pre-cache — conteúdo dinâmico nunca deve ser
+// servido estático. Apenas assets verdadeiramente estáticos são pré-cacheados.
 const ASSETS = [
-  '/relatorio-2026/',
-  '/relatorio-2026/index.html',
   '/relatorio-2026/icon-192.png',
   '/relatorio-2026/icon-512.png',
-  'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap',
-  'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',
-  'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js'
+  'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap'
 ];
 
 // Instalar e cachear recursos
