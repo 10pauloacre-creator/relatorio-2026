@@ -570,16 +570,17 @@ function edRedo() {
 }
 
 // ─── PERSISTÊNCIA ────────────────────────────────────────
+// ⚠️ ATENÇÃO: salvar/restaurar o HTML inteiro (.main.innerHTML) foi REMOVIDO.
+// Esse comportamento causava os relatos novos desaparecerem após reload
+// (o localStorage sobrescrevia o HTML novo do servidor com uma versão antiga).
+// O HTML canônico vive SEMPRE no index.html no servidor (GitHub Pages).
+// Edições visuais feitas no editor não persistem entre sessões — use git push.
 
 function _salvarAlteracoes() {
-  try {
-    var main = document.querySelector('.main');
-    if (main) localStorage.setItem('ed_main_html_v3', main.innerHTML);
-  } catch(e) { console.warn('[Editor] Erro ao salvar:', e); }
+  // Intencionalmente vazia — não salva mais o HTML no localStorage.
 }
 
 function limparAlteracoes() {
-  if (!confirm('Restaurar o site ao estado original? Todas as edições visuais serão perdidas.')) return;
   ['ed_main_html','ed_main_html_v2','ed_main_html_v3'].forEach(function(k){ localStorage.removeItem(k); });
   window.location.reload();
 }
@@ -643,40 +644,19 @@ function _rgbToHex(rgb) {
   return '#' + [m[1],m[2],m[3]].map(function(n) { return ('0'+parseInt(n).toString(16)).slice(-2); }).join('');
 }
 
-// ─── INICIALIZAÇÃO: restaura edições visuais + contas Claude ─
-document.addEventListener('DOMContentLoaded', function() {
-
-  // 1. Restaura edições visuais salvas pelo editor
-  localStorage.removeItem('ed_main_html');    // chave v1 — descartada
-  localStorage.removeItem('ed_main_html_v2'); // chave v2 — descartada (layout errado dos botões)
+// ─── INICIALIZAÇÃO ────────────────────────────────────────
+// Limpa IMEDIATAMENTE (síncrono, antes do DOMContentLoaded) qualquer HTML
+// salvo anteriormente pelo editor — impede sobrescrita do HTML do servidor.
+(function() {
   try {
-    var salvo = localStorage.getItem('ed_main_html_v3');
-    if (salvo) {
-      var main = document.querySelector('.main');
-      if (main) {
-        main.innerHTML = salvo;
-        // Após restaurar, re-inicializa seções que dependem de event listeners
-        if (typeof livRender === 'function') livRender();
-        if (typeof claudeRenderizar === 'function') claudeRenderizar();
-        // Reconstrói botões do plano (handlers se perdem no innerHTML replace)
-        if (typeof initStatusButtons === 'function') initStatusButtons();
-        // Reconstrói células de presença e atividades (handlers perdidos no replace)
-        if (typeof renderPresenca === 'function') renderPresenca();
-        if (typeof renderAtividades === 'function') renderAtividades();
-        // Re-sincroniza dados dos alunos com os novos registros
-        if (typeof _sincronizarRegistros === 'function') _sincronizarRegistros();
-        // Verifica regra das 3 abas obrigatórias
-        if (typeof verificarAbasRelatos === 'function') verificarAbasRelatos();
-        // Restaura banner de última modificação
-        try {
-          var ult = localStorage.getItem('plano_ultima_mod');
-          if (ult && typeof _exibirUltimaModPlano === 'function') _exibirUltimaModPlano(JSON.parse(ult));
-        } catch(e2) {}
-      }
-    }
-  } catch(e) { console.warn('[Editor] Erro ao restaurar:', e); }
+    ['ed_main_html', 'ed_main_html_v2', 'ed_main_html_v3'].forEach(function(k) {
+      localStorage.removeItem(k);
+    });
+  } catch(e) {}
+})();
 
-  // 2. Carrega contas Claude salvas
+document.addEventListener('DOMContentLoaded', function() {
+  // Carrega contas Claude salvas (única coisa que persiste entre sessões)
   try {
     var contasSalvas = localStorage.getItem('cl_contas');
     if (contasSalvas && typeof CLAUDE_CONTAS !== 'undefined') {

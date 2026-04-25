@@ -487,7 +487,7 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <div class="sp"></div>
 <button id="btn-editar" class="nb" style="background:rgba(74,148,103,.2);color:#7fddaa;border:1px solid rgba(74,148,103,.4);border-radius:6px;margin:6px 4px">✏️ Editar</button>
 </div></nav>
-<main class="main">
+<main class="main" data-build="20260424">
 
 <section class="sec on" id="sec-all">
 <div class="th"><div class="tb">2026</div><div class="ti"><h2>Visão Geral — Todas as Turmas</h2><p>LP · Artes · Trilhas de Linguagens · Trilhas de C. Humanas</p></div></div>
@@ -7069,6 +7069,20 @@ function iniciarSyncUniversal() {
   <div id="hist-lista" class="hist-lista"></div>
 </div>
 
+<!-- Invalida cache visual do editor se o site foi atualizado -->
+<script>
+(function(){
+  try {
+    var build = (document.querySelector('.main')||{}).dataset&&document.querySelector('.main').dataset.build;
+    if (!build) return;
+    var salvo = localStorage.getItem('ed_main_html_v3');
+    if (salvo && !salvo.includes('data-build="'+build+'"')) {
+      localStorage.removeItem('ed_main_html_v3');
+      console.log('[Editor] Cache visual descartado — site atualizado para build ' + build);
+    }
+  } catch(e) {}
+})();
+</script>
 <script src="assets/js/editor.js"></script>
 <script src="assets/js/alunos.js"></script>
 <script>

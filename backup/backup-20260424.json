@@ -250,6 +250,13 @@
         "status": "CORRIGIDO"
       },
       {
+        "id": "EDITOR_LOCALSTORAGE_OVERWRITE",
+        "descricao": "editor.js salva o HTML inteiro da .main no localStorage (ed_main_html_v3) e restaura no DOMContentLoaded, sobrescrevendo o HTML novo do servidor com versão antiga. Causa: 'relatos somem' e 'abre na seção errada'.",
+        "correcao": "Adicionado data-build='20260424' ao .main. Script inline antes do editor.js invalida o localStorage se o build mudou.",
+        "arquivo": "index.html + editor.js (comportamento)",
+        "status": "CORRIGIDO"
+      },
+      {
         "id": "ABA_PRESENCA_FALTANDO",
         "descricao": "Relato r-t3-0410b (Trilhas C.H. 10/04 — 3ª Série) estava sem a aba 👥 Presença, violando a regra de 3 abas.",
         "correcao": "Adicionada aba Presença com div pl-t3-0410b.",
