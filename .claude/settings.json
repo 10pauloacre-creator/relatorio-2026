@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Recurse -Force)",
+      "Bash(Select-Object FullName, Length)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(awk '$1>1 {print $0}')",
+      "Bash(cat > *)",
+      "Read(//tmp/**)",
+      "Bash(grep -oE \"'pl-t[^']*':\" \"/c/Downloads/relatorio-2026/index.html\" | sed \"s/'//g\" | sed \"s/://g\" | sort -u > /tmp/presenca_keys.txt && echo \"Total em PRESENCA object: $\\(wc -l < /tmp/presenca_keys.txt\\)\")",
+      "Bash(tee /tmp/functions.txt)",
+      "Bash(grep -oE \"{n:[0-9]+,nm:\" \"/c/Downloads/relatorio-2026/index.html\")",
+      "Bash(awk 'NR==1{prev=$1} {if \\($1 != prev+1 && NR>1\\) print \"Faltando entre\", prev, \"e\", $1; prev=$1}')",
+      "Bash(read func *)",
+      "Bash(grep -q '__TRACKED_VAR__\\(' /c/Downloads/relatorio-2026/index.html)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
+    ]
+  }
+}
