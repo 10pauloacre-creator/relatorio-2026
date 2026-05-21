@@ -63,7 +63,13 @@ img {
 
 <script>
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  // Limpa todos os caches antigos imediatamente
+  caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      reg.update(); // força verificação de atualização do SW
+    }).catch(() => {});
+  });
 }
 </script>
 </body>
