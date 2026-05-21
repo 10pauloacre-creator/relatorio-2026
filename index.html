@@ -3,198 +3,271 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0f2318">
+<meta name="theme-color" content="#0b1e12">
 <link rel="manifest" href="manifest.json">
 <title>Relatórios — Prof. Paulo Roberto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg: #0f2318;
-    --bg2: #162d1f;
-    --gold: #f5c842;
-    --gold2: #e0b030;
-    --text: #e8f0e9;
-    --sub: #8aab8e;
-    --card: #1a3a2a;
-    --card-hover: #1f4530;
-    --border: #2a5038;
-    --shadow: rgba(0,0,0,.5);
-  }
+:root {
+  --bg:     #0b1e12;
+  --bg2:    #0f2618;
+  --gold:   #f0c040;
+  --gold2:  #d4a820;
+  --text:   #eef4ef;
+  --muted:  #7a9e82;
+  --card1:  #0d1f3c;   /* Casavequia — azul */
+  --card2:  #0d2518;   /* Hermínio — verde */
+  --border: rgba(255,255,255,.08);
+  --glow1:  rgba(70,130,210,.18);
+  --glow2:  rgba(50,180,100,.15);
+}
 
-  html, body {
-    min-height: 100vh;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-  }
+html { scroll-behavior: smooth; }
 
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 20px;
-  }
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(30,80,50,.35) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 100%, rgba(20,50,100,.25) 0%, transparent 60%);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px 48px;
+}
 
-  /* ── LOGO / HEADER ── */
-  .dash-logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 48px;
-  }
-  .dash-logo img {
-    width: 72px;
-    height: 72px;
-    border-radius: 18px;
-    object-fit: cover;
-    box-shadow: 0 4px 20px var(--shadow);
-  }
-  .dash-logo h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.9rem;
-    color: var(--gold);
-    letter-spacing: .02em;
-    text-align: center;
-  }
-  .dash-logo p {
-    font-size: .85rem;
-    color: var(--sub);
-    text-align: center;
-    line-height: 1.5;
-  }
+/* ── TOPO ── */
+.hero {
+  text-align: center;
+  margin-bottom: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
 
-  /* ── SCHOOL CARDS ── */
-  .dash-grid {
-    display: flex;
-    gap: 28px;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 780px;
-    width: 100%;
-  }
+.hero-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 22px;
+  object-fit: cover;
+  box-shadow: 0 0 0 3px rgba(240,192,64,.25), 0 8px 32px rgba(0,0,0,.5);
+}
 
-  .school-card {
-    background: var(--card);
-    border: 2px solid var(--border);
-    border-radius: 20px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform .2s, border-color .2s, box-shadow .2s;
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    width: 340px;
-    box-shadow: 0 4px 24px var(--shadow);
-  }
-  .school-card:hover {
-    transform: translateY(-6px);
-    border-color: var(--gold);
-    box-shadow: 0 12px 40px rgba(0,0,0,.6);
-    background: var(--card-hover);
-  }
-  .school-card img.btn-img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    display: block;
-    border-bottom: 2px solid var(--border);
-    transition: filter .2s;
-  }
-  .school-card:hover img.btn-img {
-    filter: brightness(1.05);
-  }
-  .school-card-info {
-    padding: 18px 20px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .school-card-info .sc-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.05rem;
-    color: var(--gold);
-    line-height: 1.35;
-  }
-  .school-card-info .sc-sub {
-    font-size: .78rem;
-    color: var(--sub);
-    line-height: 1.5;
-  }
-  .school-card-info .sc-badge {
-    margin-top: 8px;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: .72rem;
-    font-weight: 600;
-    color: var(--bg);
-    background: var(--gold);
-    border-radius: 6px;
-    padding: 3px 9px;
-    align-self: flex-start;
-  }
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: -.01em;
+  line-height: 1.15;
+}
 
-  /* ── FOOTER ── */
-  .dash-footer {
-    margin-top: 52px;
-    font-size: .73rem;
-    color: var(--sub);
-    opacity: .6;
-    text-align: center;
-  }
+.hero-sub {
+  font-size: .88rem;
+  color: var(--muted);
+  font-weight: 400;
+  line-height: 1.6;
+}
 
-  /* ── RESPONSIVE ── */
-  @media (max-width: 720px) {
-    .dash-logo h1 { font-size: 1.4rem; }
-    .school-card { width: 100%; max-width: 380px; }
-    .school-card img.btn-img { height: 170px; }
-    .dash-grid { gap: 18px; }
-    .dash-logo { margin-bottom: 32px; }
-  }
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(240,192,64,.1);
+  border: 1px solid rgba(240,192,64,.25);
+  border-radius: 99px;
+  padding: 5px 16px;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: .04em;
+}
+
+/* ── GRID DE ESCOLAS ── */
+.schools {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
+  max-width: 820px;
+}
+
+/* ── CARD ── */
+.card {
+  text-decoration: none;
+  color: inherit;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.03);
+  backdrop-filter: blur(12px);
+  transition: transform .25s cubic-bezier(.34,1.4,.64,1),
+              box-shadow .25s ease,
+              border-color .25s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  opacity: 0;
+  transition: opacity .25s ease;
+  pointer-events: none;
+}
+
+.card.c1::before { background: radial-gradient(ellipse at top, var(--glow1), transparent 70%); }
+.card.c2::before { background: radial-gradient(ellipse at top, var(--glow2), transparent 70%); }
+
+.card:hover {
+  transform: translateY(-8px) scale(1.01);
+  border-color: rgba(240,192,64,.4);
+  box-shadow: 0 24px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(240,192,64,.15);
+}
+.card:hover::before { opacity: 1; }
+
+/* imagem banner */
+.card-img-wrap {
+  width: 100%;
+  aspect-ratio: 16/8;
+  overflow: hidden;
+  position: relative;
+  background: #0c1a30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card.c2 .card-img-wrap { background: #0c2015; }
+
+.card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  padding: 12px 16px;
+  transition: transform .3s ease;
+}
+.card:hover .card-img-wrap img { transform: scale(1.04); }
+
+/* separador dourado */
+.card-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold2), transparent);
+  opacity: .35;
+}
+.card:hover .card-divider { opacity: .65; }
+
+/* info */
+.card-body {
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.card-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1.3;
+}
+
+.card-desc {
+  font-size: .78rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.card-cta {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .76rem;
+  font-weight: 700;
+  color: var(--bg);
+  background: var(--gold);
+  border-radius: 10px;
+  padding: 7px 14px;
+  align-self: flex-start;
+  transition: background .2s;
+  letter-spacing: .02em;
+}
+.card:hover .card-cta { background: #ffe066; }
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 52px;
+  font-size: .72rem;
+  color: var(--muted);
+  opacity: .5;
+  text-align: center;
+  line-height: 1.8;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  body { padding: 24px 14px 40px; }
+  .hero { margin-bottom: 36px; }
+  .schools { grid-template-columns: 1fr; max-width: 420px; gap: 16px; }
+  .card-img-wrap { aspect-ratio: 16/7; }
+  .card:hover { transform: translateY(-4px) scale(1); }
+}
 </style>
 </head>
 <body>
 
-<div class="dash-logo">
-  <img src="iconv2.png" alt="Ícone Relatórios">
-  <h1>Relatórios 2026</h1>
-  <p>Prof. Paulo Roberto Ramalho Magalhães<br>Senador Guiomard — AC</p>
-</div>
+<header class="hero">
+  <img class="hero-logo" src="iconv2.png" alt="Relatórios 2026">
+  <h1 class="hero-title">Relatórios 2026</h1>
+  <p class="hero-sub">Prof. Paulo Roberto Ramalho Magalhães<br>Senador Guiomard — AC</p>
+  <div class="hero-pill">&#127979; Diário Escolar Digital</div>
+</header>
 
-<div class="dash-grid">
+<section class="schools">
 
-  <!-- Escola 1: Pe. Carlos Casavequia -->
-  <a class="school-card" href="casavequia.html">
-    <img class="btn-img" src="botãocasavequia.png" alt="E.E. Rural Pe. Carlos Casavequia">
-    <div class="school-card-info">
-      <div class="sc-name">E.E. Rural Pe. Carlos Casavequia</div>
-      <div class="sc-sub">1ª, 2ª e 3ª Série E.M. · 6º Ano E.F.<br>LP · T.Ling. · T.C.H. · Artes</div>
-      <div class="sc-badge">📋 Abrir diário</div>
+  <a class="card c1" href="casavequia.html">
+    <div class="card-img-wrap">
+      <img src="botãocasavequia.png" alt="E.E. Rural Pe. Carlos Casavequia">
+    </div>
+    <div class="card-divider"></div>
+    <div class="card-body">
+      <div class="card-name">E.E. Rural Pe. Carlos Casavequia</div>
+      <div class="card-desc">1&#170;, 2&#170; e 3&#170; Série E.M. · 6&#186; Ano E.F.<br>LP · T.Ling. · T.C.H. · Artes</div>
+      <div class="card-cta">&#128203; Abrir diário</div>
     </div>
   </a>
 
-  <!-- Escola 2: Raimundo Hermínio de Melo -->
-  <a class="school-card" href="herminio.html">
-    <img class="btn-img" src="botãoherminio.png" alt="E.E. Raimundo Hermínio de Melo">
-    <div class="school-card-info">
-      <div class="sc-name">E.E. Raimundo Hermínio de Melo</div>
-      <div class="sc-sub">8º/9º Ano · 1ª Série · 2ª/3ª Série E.M.<br>LP · Inglês · Espanhol</div>
-      <div class="sc-badge">📋 Abrir diário</div>
+  <a class="card c2" href="herminio.html">
+    <div class="card-img-wrap">
+      <img src="botãoherminio.png" alt="E.E. Raimundo Hermínio de Melo">
+    </div>
+    <div class="card-divider"></div>
+    <div class="card-body">
+      <div class="card-name">E.E. Raimundo Hermínio de Melo</div>
+      <div class="card-desc">8&#186;/9&#186; Ano · 1&#170; Série · 2&#170;/3&#170; Série E.M.<br>LP · Inglês · Espanhol</div>
+      <div class="card-cta">&#128203; Abrir diário</div>
     </div>
   </a>
 
-</div>
+</section>
 
-<div class="dash-footer">
-  Diário Escolar Digital · 2026 · Acesse pelo celular ou computador
-</div>
+<footer class="footer">
+  Diário Escolar Digital · Ano Letivo 2026<br>Acesse pelo celular ou computador
+</footer>
 
 <script>
 if ('serviceWorker' in navigator) {
