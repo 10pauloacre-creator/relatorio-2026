@@ -9,40 +9,45 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* mobile-first: coluna por padrão */
 body {
   min-height: 100vh;
   background: #0b1e12;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 60px;
-  padding: 24px;
+  gap: 32px;
+  padding: 20px;
 }
 
 a {
   display: block;
-  border-radius: 28px;
+  border-radius: 24px;
   overflow: hidden;
   flex-shrink: 0;
   transition: transform .22s cubic-bezier(.34,1.4,.64,1), box-shadow .22s ease;
 }
 
 a:hover {
-  transform: translateY(-8px) scale(1.05);
+  transform: scale(1.04);
   box-shadow: 0 28px 64px rgba(0,0,0,.6);
 }
 
 img {
-  width: 320px;
-  height: 320px;
+  width: 82vw;
+  height: 82vw;
+  max-width: 340px;
+  max-height: 340px;
   object-fit: contain;
   display: block;
 }
 
-@media (max-width: 700px) {
-  body { flex-direction: column; gap: 28px; padding: 20px; }
-  img { width: 78vw; height: 78vw; max-width: 360px; max-height: 360px; }
-  a { border-radius: 22px; }
+/* desktop: lado a lado */
+@media (min-width: 700px) {
+  body { flex-direction: row; gap: 60px; padding: 24px; }
+  img { width: 320px; height: 320px; max-width: none; max-height: none; }
+  a:hover { transform: translateY(-8px) scale(1.05); }
 }
 </style>
 </head>
