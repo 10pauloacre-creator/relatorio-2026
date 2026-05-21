@@ -12,7 +12,12 @@
       "Bash(grep -oE \"{n:[0-9]+,nm:\" \"/c/Downloads/relatorio-2026/index.html\")",
       "Bash(awk 'NR==1{prev=$1} {if \\($1 != prev+1 && NR>1\\) print \"Faltando entre\", prev, \"e\", $1; prev=$1}')",
       "Bash(read func *)",
-      "Bash(grep -q '__TRACKED_VAR__\\(' /c/Downloads/relatorio-2026/index.html)"
+      "Bash(grep -q '__TRACKED_VAR__\\(' /c/Downloads/relatorio-2026/index.html)",
+      "Bash(Select-Object Name)",
+      "PowerShell(\\(Get-Content \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" | Measure-Object -Line\\).Lines)",
+      "PowerShell(Get-Content \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" | Select-Object -Index \\(460..495\\))",
+      "PowerShell(Copy-Item \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" \"c:\\\\Downloads\\\\relatorio-2026\\\\casavequia.html\")",
+      "Bash(git push *)"
     ],
     "additionalDirectories": [
       "\\tmp"
