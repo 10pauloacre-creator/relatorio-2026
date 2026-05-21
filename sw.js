@@ -1,9 +1,12 @@
-const CACHE = 'relatorio-2026-v8';
-// ⚠️ index.html NÃO entra no pre-cache — conteúdo dinâmico nunca deve ser
+const CACHE = 'relatorio-2026-v9';
+// ⚠️ HTMLs NÃO entram no pre-cache — conteúdo dinâmico nunca deve ser
 // servido estático. Apenas assets verdadeiramente estáticos são pré-cacheados.
 const ASSETS = [
+  '/relatorio-2026/iconv2.png',
   '/relatorio-2026/icon-192.png',
   '/relatorio-2026/icon-512.png',
+  '/relatorio-2026/botãocasavequia.png',
+  '/relatorio-2026/botãoherminio.png',
   'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap'
 ];
 
