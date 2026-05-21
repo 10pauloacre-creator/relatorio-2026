@@ -473,29 +473,10 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 </div>
 
 <!-- Header -->
-<header class="cab">
-  <div class="cab-i">
-    <div class="escu" style="background:transparent;border:none;padding:0">
-      <img src="iconv2.png" alt="Logo" style="width:56px;height:56px;border-radius:12px;object-fit:cover">
-    </div>
-    <div class="cab-txt">
-      <div class="cab-t">E.E. Raimundo Hermínio de Melo</div>
-      <div class="cab-s">Prof. Paulo Roberto Ramalho Magalhães · Senador Guiomard – AC</div>
-      <div class="cab-d">LP · Inglês · Espanhol · 2026</div>
-    </div>
-  </div>
-</header>
+<header class="cab"><div class="cab-i"><div class="escu" style="background:transparent;border:none;padding:0"><img src="botãoherminio.png" alt="Logo Hermínio" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))"></div><div class="cab-t"><h1>Relatório Diário de Aulas 2026</h1><div class="sub">E.E. RAIMUNDO HERMÍNIO DE MELO · SENADOR GUIOMARD – AC</div><div class="prof">✦ Prof. Paulo Roberto Ramalho Magalhães · Língua Portuguesa · Inglês · Espanhol ✦</div></div></div></header>
 
 <!-- Navbar -->
-<nav class="nav-w"><div class="nav-i">
-  <button class="nb on" onclick="aba('sec-all',this)">&#128197; Visão Geral</button>
-  <button class="nb" onclick="aba('sec-t89',this)">8&#186;/9&#186; Ano</button>
-  <button class="nb" onclick="aba('sec-t1',this)">1&#170; Série</button>
-  <button class="nb" onclick="aba('sec-t23',this)">2&#170;/3&#170; Série</button>
-  <button class="nb" onclick="aba('sec-plano',this)">&#128203; Plano</button>
-  <button class="nb" onclick="aba('sec-cron',this)">&#128197; Cronograma</button>
-  <button class="nb" onclick="aba('sec-cont',this)">&#128200; Contador</button>
-</div></nav>
+<nav class="nav-w"><div class="nav-i"><button class="nb on" onclick="aba('sec-all',this)">Geral</button><button class="nb" onclick="aba('sec-t89',this)">8&#186;/9&#186; Ano</button><button class="nb" onclick="aba('sec-t1',this)">1&#170; Série</button><button class="nb" onclick="aba('sec-t23',this)">2&#170;/3&#170; Série</button><button class="nb" onclick="aba('sec-plano',this)">&#128203; Plano Anual</button><button class="nb" onclick="aba('sec-cron',this)">&#128197; Cronograma</button><button class="nb" onclick="aba('sec-cont',this)">&#128200; Contador</button><button class="nb" onclick="aba('sec-claude',this)">&#9201; Claude</button><button class="nb" onclick="aba('sec-livros',this)">&#128218; Livros</button><button id="btn-editar-rh" class="nb" style="background:rgba(74,148,103,.2);color:#7fddaa;border:1px solid rgba(74,148,103,.4);border-radius:6px;margin:6px 4px" onclick="abrirModalRH()">&#9999;&#65039; Editar</button></div></nav>
 
 <main class="main">
 
@@ -583,6 +564,56 @@ body.modo-escuro .pum-det{color:#8ab8a0}
   </div>
 </section>
 
+
+<!-- ═══════════════════ SEC-CLAUDE: CONTROLE CLAUDE ═══════════════════ -->
+<section class="sec" id="sec-claude">
+<div class="th"><div class="tb gz">⏱</div><div class="ti"><h2>Controle de Tempo — Claude</h2><p>Gerenciamento das contas · Espera de 5 horas · Notificações locais</p></div></div>
+<div id="cl-notif-bar-rh" class="cl-notif-bar" style="display:none">
+  <span>🔔 Ative as notificações para ser avisado quando a conta liberar</span>
+  <button onclick="rhClaudePedirPermissao()">Ativar Notificações</button>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+  <span id="rh-cl-status" style="font-size:.78rem;font-weight:600;color:#aaa">● Armazenamento local</span>
+  <button onclick="rhClaudeRender()" style="font-size:.75rem;padding:5px 13px;border:1px solid var(--cl);background:transparent;color:var(--cm);border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif">🔄 Atualizar</button>
+</div>
+<div class="cl-grid" id="rh-claude-cards"></div>
+<!-- Popup Definir Hora -->
+<div id="rh-cl-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:var(--cr);border-radius:14px;padding:28px;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+    <div id="rh-cl-popup-label" style="font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:var(--vd);margin-bottom:16px"></div>
+    <label style="font-size:.8rem;font-weight:600;color:var(--cm);display:block;margin-bottom:6px">Horário em que o limite expira:</label>
+    <input type="time" id="rh-cl-hora-input" style="width:100%;padding:10px 14px;border:2px solid var(--cl);border-radius:8px;font-size:1.2rem;font-family:'DM Mono',monospace;color:var(--ce);background:var(--cr);margin-bottom:16px">
+    <div style="display:flex;gap:10px">
+      <button onclick="rhClaudeConfirmarHora()" style="flex:1;background:var(--vm);color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">✅ Confirmar</button>
+      <button onclick="document.getElementById('rh-cl-popup').style.display='none'" style="flex:1;background:var(--cl);color:var(--ce);border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">✕ Cancelar</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════ SEC-LIVROS: LIVROS DIGITAIS ═══════════════════ -->
+<section class="sec" id="sec-livros">
+<div class="th"><div class="tb" style="background:linear-gradient(135deg,#c9a84c,#e8c86a)">📖</div><div class="ti"><h2>Livros Digitais</h2><p>Produção e acompanhamento dos livros digitais por disciplina e bimestre — R. Hermínio</p></div></div>
+<div class="liv-legend">
+  <div class="liv-leg-item"><div class="liv-dot nd"></div>Não iniciado</div>
+  <div class="liv-leg-item"><div class="liv-dot cr"></div>Em criação</div>
+  <div class="liv-leg-item"><div class="liv-dot co"></div>Concluído</div>
+</div>
+<div class="liv-tabs">
+  <button class="liv-tab on" onclick="rhLivTab('lp',this)">📚 Língua Portuguesa</button>
+  <button class="liv-tab" onclick="rhLivTab('ing',this)">📚 Inglês</button>
+  <button class="liv-tab" onclick="rhLivTab('esp',this)">📚 Espanhol</button>
+</div>
+<div id="rh-liv-page-lp" class="liv-page on">
+  <div style="padding:24px;color:var(--cm);font-size:.88rem">Livros de LP serão listados aqui conforme produção.</div>
+</div>
+<div id="rh-liv-page-ing" class="liv-page">
+  <div style="padding:24px;color:var(--cm);font-size:.88rem">Livros de Inglês serão listados aqui conforme produção.</div>
+</div>
+<div id="rh-liv-page-esp" class="liv-page">
+  <div style="padding:24px;color:var(--cm);font-size:.88rem">Livros de Espanhol serão listados aqui conforme produção.</div>
+</div>
+</section>
 </main>
 
 <script>
@@ -735,6 +766,139 @@ function renderContRH() {
 //  INIT
 // ═══════════════════════════════════════════════════════
 
+
+// ═══════════════════════════════════════════════════════
+//  NAVEGAÇÃO — aba() atualizada para suportar novas seções
+// ═══════════════════════════════════════════════════════
+// (sobrescreve a definição anterior)
+function aba(id, btn) {
+  document.querySelectorAll('.sec').forEach(function(s){ s.classList.remove('on'); });
+  document.querySelectorAll('.nb').forEach(function(b){ b.classList.remove('on'); });
+  var sec = document.getElementById(id);
+  if (sec) sec.classList.add('on');
+  if (btn) btn.classList.add('on');
+  if (id === 'sec-cont') renderContRH();
+  if (id === 'sec-claude') rhClaudeRender();
+}
+
+// ═══════════════════════════════════════════════════════
+//  LIVROS — troca de aba
+// ═══════════════════════════════════════════════════════
+function rhLivTab(disc, btn) {
+  document.querySelectorAll('.liv-tab').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('.liv-page').forEach(function(p){ p.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  var pg = document.getElementById('rh-liv-page-' + disc);
+  if (pg) pg.classList.add('on');
+}
+
+// ═══════════════════════════════════════════════════════
+//  CLAUDE TIMER — versão localStorage (sem Firebase)
+// ═══════════════════════════════════════════════════════
+var RH_CONTAS_CLAUDE = [
+  { id:'rh1', nome:'Conta 1', tipo:'Pro' },
+  { id:'rh2', nome:'Conta 2', tipo:'Pro' },
+  { id:'rh3', nome:'Conta 3', tipo:'Free' },
+  { id:'rh4', nome:'Conta 4', tipo:'Free' },
+  { id:'rh5', nome:'Conta 5', tipo:'Free' },
+  { id:'rh6', nome:'Conta 6', tipo:'Free' }
+];
+
+var _rhClTick = null;
+var _rhClPopupId = null;
+
+function rhClaudeRender() {
+  var el = document.getElementById('rh-claude-cards');
+  if (!el) return;
+  var agora = Date.now();
+  var html = '<div class="cl-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px">';
+  RH_CONTAS_CLAUDE.forEach(function(c) {
+    var key = 'rh_cl_fim_' + c.id;
+    var fim = parseInt(localStorage.getItem(key) || '0');
+    var livre = fim === 0 || agora >= fim;
+    var restante = fim > agora ? fim - agora : 0;
+    var hh = Math.floor(restante / 3600000);
+    var mm = Math.floor((restante % 3600000) / 60000);
+    var ss = Math.floor((restante % 60000) / 1000);
+    var display = livre ? '✅ Livre' : (hh + 'h ' + (mm<10?'0':'')+mm + 'm ' + (ss<10?'0':'')+ss + 's');
+    var cor = livre ? '#4a9467' : (restante < 1800000 ? '#c9a84c' : '#c0392b');
+    html += '<div class="ccard" style="border:1px solid ' + cor + '30;border-radius:12px;padding:16px;background:var(--cr)">'
+          + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+          + '<div style="font-weight:700;font-size:.9rem">' + c.nome + '</div>'
+          + '<div class="cl-tipo" style="font-size:.72rem;padding:2px 8px;border-radius:10px;background:' + cor + '20;color:' + cor + ';font-weight:600">' + c.tipo + '</div>'
+          + '</div>'
+          + '<div class="cl-timer" style="font-family:\'DM Mono\',monospace;font-size:1.3rem;font-weight:700;color:' + cor + ';margin-bottom:12px">' + display + '</div>'
+          + '<div style="display:flex;gap:8px">'
+          + '<button onclick="rhClaudeDefinir(\'' + c.id + '\',\'' + c.nome + '\')" style="flex:1;font-size:.75rem;padding:7px;border:1px solid var(--cl);background:var(--vm);color:#fff;border-radius:8px;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-weight:600">⏱ Definir</button>'
+          + '<button onclick="rhClaudeLimpar(\'' + c.id + '\')" style="flex:1;font-size:.75rem;padding:7px;border:1px solid var(--cl);background:transparent;color:var(--cm);border-radius:8px;cursor:pointer;font-family:\'DM Sans\',sans-serif">✕ Limpar</button>'
+          + '</div>'
+          + '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function rhClaudeDefinir(id, nome) {
+  _rhClPopupId = id;
+  document.getElementById('rh-cl-popup-label').textContent = 'Definir expiração — ' + nome;
+  document.getElementById('rh-cl-popup').style.display = 'flex';
+}
+
+function rhClaudeConfirmarHora() {
+  var val = document.getElementById('rh-cl-hora-input').value;
+  if (!val) return;
+  var parts = val.split(':');
+  var agora = new Date();
+  var fim = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), parseInt(parts[0]), parseInt(parts[1]), 0, 0).getTime();
+  if (fim <= Date.now()) fim += 86400000;
+  localStorage.setItem('rh_cl_fim_' + _rhClPopupId, fim.toString());
+  document.getElementById('rh-cl-popup').style.display = 'none';
+  rhClaudeRender();
+}
+
+function rhClaudeLimpar(id) {
+  localStorage.removeItem('rh_cl_fim_' + id);
+  rhClaudeRender();
+}
+
+function rhClaudePedirPermissao() {
+  if (!('Notification' in window)) { alert('Navegador não suporta notificações.'); return; }
+  Notification.requestPermission().then(function(p) {
+    if (p === 'granted') {
+      document.getElementById('cl-notif-bar-rh').style.display = 'none';
+    }
+  });
+}
+
+// tick a cada segundo para atualizar os timers
+setInterval(function() {
+  var sec = document.getElementById('sec-claude');
+  if (sec && sec.classList.contains('on')) rhClaudeRender();
+}, 1000);
+
+// ═══════════════════════════════════════════════════════
+//  MODAL EDITAR — Novo Relato (R. Hermínio)
+// ═══════════════════════════════════════════════════════
+function abrirModalRH() {
+  var m = document.getElementById('rh-modal-relato');
+  if (m) { m.style.display = 'flex'; return; }
+  // Cria modal simples na primeira vez
+  var el = document.createElement('div');
+  el.id = 'rh-modal-relato';
+  el.style = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px';
+  el.innerHTML = '<div style="background:var(--cr);border-radius:16px;padding:28px;max-width:520px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.5);max-height:90vh;overflow-y:auto">'
+    + '<div style="font-family:\'Playfair Display\',serif;font-size:1.2rem;font-weight:700;color:var(--vd);margin-bottom:6px">✏️ Novo Relato — R. Hermínio de Melo</div>'
+    + '<div style="font-size:.8rem;color:var(--cm);margin-bottom:18px">Escreva o rascunho. Claude irá formatar o HTML.</div>'
+    + '<textarea id="rh-rascunho" rows="10" placeholder="Ex: Hoje, 20/05, 8º/9º Ano — LP, 2h. Conteúdo: figuras de linguagem..." style="width:100%;padding:12px;border:2px solid var(--cl);border-radius:10px;font-family:\'DM Sans\',sans-serif;font-size:.88rem;color:var(--ce);background:var(--cr);resize:vertical;margin-bottom:14px"></textarea>'
+    + '<div style="font-size:.78rem;color:var(--cm);background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:10px 14px;margin-bottom:16px">'
+    + '💡 Cole o rascunho no chat com Claude Code — ele irá gerar o HTML e injetar diretamente no arquivo.</div>'
+    + '<div style="display:flex;gap:10px">'
+    + '<button onclick="navigator.clipboard.writeText(document.getElementById(\'rh-rascunho\').value)" style="flex:1;background:var(--vm);color:#fff;border:none;border-radius:10px;padding:11px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:.88rem">📋 Copiar rascunho</button>'
+    + '<button onclick="document.getElementById(\'rh-modal-relato\').style.display=\'none\'" style="flex:1;background:var(--cl);color:var(--ce);border:none;border-radius:10px;padding:11px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:.88rem">✕ Fechar</button>'
+    + '</div></div>';
+  document.body.appendChild(el);
+  el.addEventListener('click', function(e) { if (e.target === el) el.style.display = 'none'; });
+}
 document.addEventListener('DOMContentLoaded', function() {
   renderPresencaRH();
   renderAtividadesRH();
@@ -748,3 +912,6 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
+
+
+
