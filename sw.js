@@ -1,4 +1,4 @@
-const CACHE = 'relatorio-2026-v11';
+const CACHE = 'relatorio-2026-v12';
 // ⚠️ HTMLs NÃO entram no pre-cache — conteúdo dinâmico nunca deve ser
 // servido estático. Apenas assets verdadeiramente estáticos são pré-cacheados.
 const ASSETS = [
@@ -28,9 +28,15 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Estratégia: Network first, cache como fallback
+// Estratégia: HTML = sempre network (nunca cachear); assets = network first com fallback
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  const url = e.request.url;
+  // Nunca cachear arquivos HTML — sempre buscar da rede
+  if (url.endsWith('.html') || url.endsWith('/') || url === self.registration.scope) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
   e.respondWith(
     fetch(e.request)
       .then(resp => {
