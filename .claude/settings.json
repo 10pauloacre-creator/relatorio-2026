@@ -17,7 +17,8 @@
       "PowerShell(\\(Get-Content \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" | Measure-Object -Line\\).Lines)",
       "PowerShell(Get-Content \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" | Select-Object -Index \\(460..495\\))",
       "PowerShell(Copy-Item \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" \"c:\\\\Downloads\\\\relatorio-2026\\\\casavequia.html\")",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "PowerShell($content = Get-Content \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" -Raw; $content.Length)"
     ],
     "additionalDirectories": [
       "\\tmp"
