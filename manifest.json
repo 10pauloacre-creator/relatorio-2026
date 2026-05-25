@@ -15,12 +15,6 @@
       "sizes": "1254x1254",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "iconv2.png",
-      "sizes": "1254x1254",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ]
 }
