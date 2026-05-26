@@ -18,7 +18,9 @@
       "PowerShell(Get-Content \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" | Select-Object -Index \\(460..495\\))",
       "PowerShell(Copy-Item \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" \"c:\\\\Downloads\\\\relatorio-2026\\\\casavequia.html\")",
       "Bash(git push *)",
-      "PowerShell($content = Get-Content \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" -Raw; $content.Length)"
+      "PowerShell($content = Get-Content \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" -Raw; $content.Length)",
+      "Bash(Get-Content \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\")",
+      "Bash(Select-Object -First 100)"
     ],
     "additionalDirectories": [
       "\\tmp"
