@@ -873,7 +873,10 @@ function aba(id, btn) {
 
 function tog(h) {
   var p = h.parentElement;
-  p.classList.toggle('open');
+  var ec2 = p.querySelector('.ec2');
+  var et = h.querySelector('.et');
+  if (ec2) ec2.classList.toggle('on');
+  if (et) et.classList.toggle('op');
 }
 
 function itab(btn, pid) {
