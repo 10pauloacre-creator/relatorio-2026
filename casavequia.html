@@ -208,19 +208,26 @@ footer{background:var(--vd);color:rgba(255,255,255,.5);text-align:center;padding
 @media(max-width:680px){.cab-i{padding:20px 15px;flex-direction:column;text-align:center}.main{padding:18px 13px 40px}.nav-i{padding:0 6px}.nb{padding:10px 10px;font-size:.76rem}.sr{grid-template-columns:repeat(2,1fr)}.cg,.rcg{grid-template-columns:1fr}.brow{grid-template-columns:repeat(2,1fr)}.edb{min-width:68px;padding:13px 9px}.pres-grid,.atv-grid{grid-template-columns:1fr}.cl-grid{grid-template-columns:1fr!important}.cl-timer{font-size:2rem!important}#cl-notif-bar{display:none!important}}
 /* ── CLAUDE TIMER ── */
 .cl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
-.cl-card{background:var(--bg3);border-radius:14px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;border:2px solid transparent;transition:background .4s,border-color .4s}
-.cl-card.ocupado{background:rgba(225,6,0,.13);border-color:var(--red)}
-.cl-card.livre{background:rgba(0,212,106,.13);border-color:var(--green)}
-.cl-nome{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;color:var(--white);text-align:center;word-break:break-all}
-.cl-tipo{font-size:.7rem;color:var(--gray2);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em}
-.cl-timer{font-family:'DM Mono',monospace;font-size:2.8rem;font-weight:500;letter-spacing:.04em;color:var(--white);line-height:1;margin:4px 0}
-.cl-card.ocupado .cl-timer{color:#ff4444}
-.cl-card.livre .cl-timer{color:var(--green)}
-.cl-status{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em}
-.cl-card.ocupado .cl-status{color:#ff4444}
-.cl-card.livre .cl-status{color:var(--green)}
-.cl-btn{margin-top:4px;background:var(--bg4);color:var(--white);border:1px solid var(--border);border-radius:8px;padding:7px 18px;font-size:.82rem;font-family:'Barlow',sans-serif;font-weight:600;cursor:pointer;transition:background .2s,color .2s}
-.cl-btn:hover{background:rgba(201,168,76,.8);color:#000}
+.cl-card{background:var(--cr);border-radius:16px;overflow:hidden;border:2px solid var(--cl);transition:border-color .4s,box-shadow .4s;display:flex;flex-direction:column}
+.cl-card.ocupado{border-color:rgba(192,57,43,.5);box-shadow:0 4px 20px rgba(192,57,43,.1)}
+.cl-card.livre{border-color:rgba(46,160,102,.5);box-shadow:0 4px 20px rgba(46,160,102,.08)}
+.cl-card-hd{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--cl);gap:8px}
+.cl-card.livre .cl-card-hd{background:rgba(46,160,102,.06)}
+.cl-card.ocupado .cl-card-hd{background:rgba(192,57,43,.05)}
+.cl-card-nome{font-weight:700;font-size:.82rem;color:var(--ce);word-break:break-all;letter-spacing:.01em;flex:1;min-width:0}
+.cl-card-tipo{font-size:.6rem;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:20px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;background:rgba(201,168,76,.12);color:var(--ou)}
+.cl-card.livre .cl-card-tipo{background:rgba(46,160,102,.14);color:#2a8a5a}
+.cl-card.ocupado .cl-card-tipo{background:rgba(192,57,43,.1);color:var(--ra)}
+.cl-card-body{padding:14px;display:flex;flex-direction:column;gap:10px;flex:1}
+.cl-timer-wrap{text-align:center;padding:6px 0 2px}
+.cl-timer{font-family:'DM Mono',monospace;font-size:2.35rem;font-weight:700;letter-spacing:.07em;line-height:1;color:var(--ce)}
+.cl-card.livre .cl-timer{color:#2a8a5a;text-shadow:0 0 18px rgba(46,160,102,.2)}
+.cl-card.ocupado .cl-timer{color:var(--ra);text-shadow:0 0 18px rgba(192,57,43,.18)}
+.cl-status{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;margin-top:3px;color:var(--cm)}
+.cl-card.livre .cl-status{color:#2a8a5a}
+.cl-card.ocupado .cl-status{color:var(--ra)}
+.cl-btn{flex:1;font-size:.7rem;padding:7px 5px;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid transparent}
+.cl-btn:hover{filter:brightness(.88)}
 .cl-notif-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:18px;padding:10px 16px;background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.25);border-radius:10px;font-size:.83rem;color:var(--yellow)}
 .cl-notif-bar button{background:rgba(255,214,0,.2);color:var(--yellow);border:1px solid rgba(255,214,0,.4);border-radius:6px;padding:5px 14px;font-size:.78rem;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600}
 @media(min-width:681px) and (max-width:900px){.cl-grid{grid-template-columns:repeat(2,1fr)!important}}
@@ -253,9 +260,28 @@ body.modo-escuro .sc2 .l{color:#a0a0b0}
 body.modo-escuro .brow .bi{background:#1e1e2a;color:#e8e8f0}
 body.modo-escuro .sem{background:#1e1e2a;color:#a0a0b0}
 body.modo-escuro footer{background:#0a1210;color:rgba(255,255,255,.4)}
-body.modo-escuro .cl-card.livre{background:rgba(0,212,106,.15);border-color:#00d46a}
-body.modo-escuro .cl-card.ocupado{background:rgba(225,6,0,.15);border-color:#e10600}
-body.modo-escuro .cl-btn{background:#252533;color:#e8e8f0;border-color:rgba(255,255,255,.15)}
+body.modo-escuro .cl-card{background:#1e1e2a;border-color:rgba(255,255,255,.1)}
+body.modo-escuro .cl-card.livre{border-color:rgba(0,212,106,.5);box-shadow:0 4px 20px rgba(0,212,106,.1)}
+body.modo-escuro .cl-card.livre .cl-card-hd{background:rgba(0,212,106,.08)}
+body.modo-escuro .cl-card.livre .cl-card-tipo{background:rgba(0,212,106,.18);color:#4dd498}
+body.modo-escuro .cl-card.livre .cl-timer{color:#4dd498;text-shadow:0 0 18px rgba(0,212,106,.3)}
+body.modo-escuro .cl-card.livre .cl-status{color:#4dd498}
+body.modo-escuro .cl-card.ocupado{border-color:rgba(225,6,0,.55);box-shadow:0 4px 20px rgba(225,6,0,.12)}
+body.modo-escuro .cl-card.ocupado .cl-card-hd{background:rgba(225,6,0,.08)}
+body.modo-escuro .cl-card.ocupado .cl-card-tipo{background:rgba(225,6,0,.18);color:#ff6b6b}
+body.modo-escuro .cl-card.ocupado .cl-timer{color:#ff4444;text-shadow:0 0 18px rgba(255,68,68,.3)}
+body.modo-escuro .cl-card.ocupado .cl-status{color:#ff6b6b}
+body.modo-escuro .cl-livro-box{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
+body.modo-escuro .cl-livro-box:hover{background:rgba(255,255,255,.08)}
+body.modo-escuro .cl-livro-txt{color:rgba(255,255,255,.65)}
+body.modo-escuro .cl-det-btn{border-top-color:rgba(255,255,255,.07);color:rgba(255,255,255,.4)}
+body.modo-escuro .cl-det-btn:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.8)}
+body.modo-escuro .cl-hist-inner{background:#1e1e2a}
+body.modo-escuro .cl-hist-hd{background:#1e1e2a;border-bottom-color:rgba(255,255,255,.1)}
+body.modo-escuro .cl-livro-atual{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
+body.modo-escuro .cl-livro-campo input{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);color:#e8e8f0}
+body.modo-escuro .cl-tema-item input[type=text]{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1);color:#e8e8f0}
+body.modo-escuro .cl-hist-item{background:rgba(0,212,106,.05);border-color:rgba(0,212,106,.15)}
 body.modo-escuro .nb{color:rgba(255,255,255,.75)}
 body.modo-escuro .edb{background:#0d1f15}
 body.modo-escuro .ed{color:#a8d8b8}
@@ -399,13 +425,48 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .pe-close{background:#f5f3ee;color:#5a5a5a;width:100%}
 .ed-float-btn{position:fixed;z-index:7999;background:#1a3a2a;color:#fff;border:none;border-radius:24px;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3)}
 .ed-remove-card{position:absolute;top:8px;right:8px;background:#fdecea;color:#c0392b;border:1px solid #f5c6c0;border-radius:50%;width:26px;height:26px;font-size:.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10}
-.cl-card{position:relative}
-/* ── CLAUDE TIMER BOTÕES ── */
+/* ── CLAUDE TIMER BOTÕES + LIVRO + HISTÓRICO ── */
 .cl-btns{display:flex;gap:6px;width:100%}
-.cl-btns .cl-btn{flex:1;font-size:.72rem;padding:6px 8px}
-.cl-btn-parar{background:rgba(192,57,43,.15)!important;color:#c0392b!important;border-color:rgba(192,57,43,.3)!important}
-.cl-btn-hora{width:100%;font-size:.75rem;background:rgba(41,128,185,.1)!important;color:#2980b9!important;border-color:rgba(41,128,185,.3)!important;margin-top:2px}
-.cl-btn-hora:hover{background:rgba(41,128,185,.25)!important}
+.cl-btn-parar{background:rgba(192,57,43,.1);color:#c0392b;border-color:rgba(192,57,43,.28)}
+.cl-btn-hora{background:rgba(41,128,185,.1);color:#2176ae;border-color:rgba(41,128,185,.28)}
+.cl-livro-box{background:rgba(0,0,0,.03);border:1px solid var(--cl);border-radius:9px;padding:8px 11px;cursor:pointer;transition:background .2s}
+.cl-livro-box:hover{background:rgba(0,0,0,.06)}
+.cl-livro-lbl{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--cm);margin-bottom:3px;opacity:.8}
+.cl-livro-txt{font-size:.74rem;color:var(--ce);line-height:1.35}
+.cl-livro-txt strong{color:var(--vd)}
+.cl-livro-vazio{font-size:.72rem;color:var(--cm);font-style:italic;opacity:.75}
+.cl-det-btn{width:100%;background:transparent;border:none;border-top:1px solid var(--cl);padding:8px 12px;font-size:.7rem;color:var(--cm);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;margin-top:2px}
+.cl-det-btn:hover{background:rgba(0,0,0,.04);color:var(--vd)}
+.cl-det-arrow{transition:transform .2s;font-size:.6rem;opacity:.7}
+/* ── MODAL HISTÓRICO CLAUDE ── */
+.cl-hist-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px}
+.cl-hist-inner{background:var(--cr);border-radius:16px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.35);display:flex;flex-direction:column}
+.cl-hist-hd{padding:20px 22px 15px;border-bottom:1px solid var(--cl);position:sticky;top:0;background:var(--cr);z-index:1}
+.cl-hist-hd h3{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--vd);margin-bottom:2px}
+.cl-hist-hd p{font-size:.74rem;color:var(--cm)}
+.cl-hist-close{position:absolute;top:16px;right:16px;background:var(--cl);border:none;color:var(--cm);border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.cl-hist-close:hover{background:var(--ra);color:#fff}
+.cl-hist-body{padding:18px 22px 22px;display:flex;flex-direction:column;gap:18px}
+.cl-hist-sec-lbl{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:var(--cm);margin-bottom:8px}
+.cl-livro-atual{background:rgba(0,0,0,.025);border:1px solid var(--cl);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.cl-livro-campo{display:flex;flex-direction:column;gap:3px}
+.cl-livro-campo label{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--cm)}
+.cl-livro-campo input{background:var(--cr);border:1.5px solid var(--cl);border-radius:7px;padding:7px 10px;font-size:.83rem;color:var(--ce);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;width:100%}
+.cl-livro-campo input:focus{border-color:var(--vm)}
+.cl-temas-lista{display:flex;flex-direction:column;gap:5px;margin-top:3px}
+.cl-tema-item{display:flex;align-items:center;gap:7px}
+.cl-tema-item input[type=checkbox]{width:14px;height:14px;accent-color:var(--vm);cursor:pointer;flex-shrink:0}
+.cl-tema-item input[type=text]{flex:1;background:var(--cr);border:1.5px solid var(--cl);border-radius:6px;padding:5px 8px;font-size:.78rem;color:var(--ce);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.cl-tema-item input[type=text]:focus{border-color:var(--vm)}
+.cl-tema-del{background:none;border:none;color:rgba(192,57,43,.4);cursor:pointer;font-size:.82rem;padding:2px 4px;border-radius:4px;flex-shrink:0;transition:all .18s}
+.cl-tema-del:hover{color:var(--ra);background:var(--rs)}
+.cl-hist-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(46,160,102,.05);border:1px solid rgba(46,160,102,.18);border-radius:8px}
+.cl-hist-item .ci{font-size:1rem;flex-shrink:0;margin-top:2px}
+.cl-hist-item .cd{flex:1}
+.cl-hist-item .ct{font-size:.82rem;font-weight:700;color:var(--ce);margin-bottom:2px}
+.cl-hist-item .cs{font-size:.67rem;color:#2a8a5a;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+.cl-hist-item .cm2{font-size:.7rem;color:var(--cm);margin-top:2px}
+.cl-hist-vazio{font-size:.8rem;color:var(--cm);font-style:italic;text-align:center;padding:16px}
 /* ── STATUS BUTTONS ── */
 .lesson-item{align-items:center!important;flex-wrap:nowrap!important}
 .lesson-actions{display:flex!important;flex-direction:row;gap:3px;flex-shrink:0!important;margin-left:auto;padding-left:8px;align-items:center}
@@ -7457,18 +7518,151 @@ function claudeRenderizar() {
     var restante = fim - agora;
     var livre = restante <= 0;
     var cls = livre ? 'livre' : 'ocupado';
-    return '<div class="cl-card ' + cls + '" id="card-' + conta.id + '">' +
-      '<div class="cl-nome">' + conta.nome + '</div>' +
-      '<div class="cl-tipo">Claude ' + conta.tipo + '</div>' +
-      '<div class="cl-timer" id="timer-' + conta.id + '">' + claudeFormatarTempo(restante) + '</div>' +
-      '<div class="cl-status" id="status-' + conta.id + '">' + (livre ? 'Livre ✓' : 'Aguardando...') + '</div>' +
-      '<div class="cl-btns">' +
-        '<button class="cl-btn cl-btn-hora" onclick="claudeDefinirHora(\'' + conta.id + '\',\'' + conta.nome.replace(/'/g, "\\'") + '\')">🕐 Definir hora</button>' +
-        '<button class="cl-btn cl-btn-parar" onclick="claudeParar(\'' + conta.id + '\')">⏹ Parar</button>' +
-      '</div>' +
-      '</div>';
+    var livro = _clGetLivro(conta.id);
+    var livroHtml;
+    if (livro && livro.titulo) {
+      var temasConcl = (livro.temas||[]).filter(function(t){return t.ok;}).length;
+      var temasTotal = (livro.temas||[]).length;
+      livroHtml = '<div class="cl-livro-txt"><strong>' + _clEsc(livro.titulo) + '</strong>'
+        + (livro.disciplina ? '<br><span style="opacity:.75">' + _clEsc(livro.disciplina)
+          + (livro.bimestre ? ' · ' + _clEsc(livro.bimestre) : '')
+          + (livro.turma ? ' · ' + _clEsc(livro.turma) : '') + '</span>' : '')
+        + (temasTotal > 0 ? '<br><span style="font-size:.68rem;opacity:.6">' + temasConcl + '/' + temasTotal + ' temas concluídos</span>' : '')
+        + '</div>';
+    } else {
+      livroHtml = '<div class="cl-livro-vazio">Nenhum livro em criação</div>';
+    }
+    var nomeEsc = conta.nome.replace(/'/g, "\\'");
+    return '<div class="cl-card ' + cls + '" id="card-' + conta.id + '">'
+      + '<div class="cl-card-hd">'
+      + '<div class="cl-card-nome">' + _clEsc(conta.nome) + '</div>'
+      + '<div class="cl-card-tipo">Claude ' + conta.tipo + '</div>'
+      + '</div>'
+      + '<div class="cl-card-body">'
+      + '<div class="cl-timer-wrap">'
+      + '<div class="cl-timer" id="timer-' + conta.id + '">' + claudeFormatarTempo(restante) + '</div>'
+      + '<div class="cl-status" id="status-' + conta.id + '">' + (livre ? 'LIVRE ✓' : 'AGUARDANDO…') + '</div>'
+      + '</div>'
+      + '<div class="cl-btns">'
+      + '<button class="cl-btn cl-btn-hora" onclick="claudeDefinirHora(\'' + conta.id + '\',\'' + nomeEsc + '\')">⏱ Definir hora</button>'
+      + '<button class="cl-btn cl-btn-parar" onclick="claudeParar(\'' + conta.id + '\')">⏹ Parar</button>'
+      + '</div>'
+      + '<div class="cl-livro-box" onclick="claudeHistorico(\'' + conta.id + '\',\'' + nomeEsc + '\')">'
+      + '<div class="cl-livro-lbl">📖 Livro em criação</div>'
+      + livroHtml
+      + '</div>'
+      + '</div>'
+      + '<button class="cl-det-btn" onclick="claudeHistorico(\'' + conta.id + '\',\'' + nomeEsc + '\')">'
+      + '<span class="cl-det-arrow">▾</span> Detalhes e histórico'
+      + '</button>'
+      + '</div>';
   }).join('');
   claudeAtualizarNotifBar();
+}
+
+function _clEsc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function _clGetLivro(id){try{return JSON.parse(localStorage.getItem('cl_livro_'+id)||'null');}catch(e){return null;}}
+function _clGetHist(id){try{return JSON.parse(localStorage.getItem('cl_hist_'+id)||'[]');}catch(e){return [];}  }
+function _clSaveLivro(id,obj){localStorage.setItem('cl_livro_'+id,JSON.stringify(obj));}
+function _clSaveHist(id,arr){localStorage.setItem('cl_hist_'+id,JSON.stringify(arr));}
+
+var _clHistId=null, _clHistNome='';
+
+function claudeHistorico(id, nome) {
+  _clHistId = id; _clHistNome = nome;
+  var livro = _clGetLivro(id) || {titulo:'',disciplina:'',bimestre:'',turma:'',temas:[]};
+  var hist = _clGetHist(id);
+  var temasHtml = (livro.temas||[]).map(function(t,i){
+    return '<div class="cl-tema-item">'
+      +'<input type="checkbox" '+(t.ok?'checked':'')+' onchange="_clTogTema(\''+id+'\','+i+',this.checked)">'
+      +'<input type="text" value="'+_clEsc(t.t||'')+'" placeholder="Nome do tema" oninput="_clEditTema(\''+id+'\','+i+',this.value)">'
+      +'<button class="cl-tema-del" onclick="_clDelTema(\''+id+'\','+i+')">✕</button>'
+      +'</div>';
+  }).join('');
+  var histHtml = hist.length ? hist.slice().reverse().map(function(h){
+    return '<div class="cl-hist-item"><div class="ci">✅</div><div class="cd">'
+      +'<div class="ct">'+_clEsc(h.titulo||'Sem título')+'</div>'
+      +'<div class="cs">Concluído · '+_clEsc(h.data||'')+'</div>'
+      +'<div class="cm2">'+_clEsc(h.disciplina||'')+(h.bimestre?' · '+_clEsc(h.bimestre):'')+(h.turma?' · '+_clEsc(h.turma):'')+'</div>'
+      +'</div></div>';
+  }).join('') : '<div class="cl-hist-vazio">Nenhum livro concluído ainda.</div>';
+  var old = document.getElementById('cl-hist-modal');
+  if(old) old.remove();
+  var div = document.createElement('div');
+  div.id = 'cl-hist-modal';
+  div.className = 'cl-hist-overlay';
+  div.addEventListener('click', function(e){if(e.target===div)claudeFecharHist();});
+  div.innerHTML = '<div class="cl-hist-inner">'
+    +'<div class="cl-hist-hd"><h3>📚 '+_clEsc(nome)+'</h3><p>Livro atual e histórico de criação</p>'
+    +'<button class="cl-hist-close" onclick="claudeFecharHist()">✕</button></div>'
+    +'<div class="cl-hist-body">'
+    +'<div><div class="cl-hist-sec-lbl">✦ Livro em criação</div>'
+    +'<div class="cl-livro-atual">'
+    +'<div class="cl-livro-campo"><label>Título</label><input type="text" id="cl-liv-titulo" value="'+_clEsc(livro.titulo||'')+'" placeholder="Ex: Caderno LP 1ª Série 1º Bim."></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+    +'<div class="cl-livro-campo"><label>Disciplina</label><input type="text" id="cl-liv-disc" value="'+_clEsc(livro.disciplina||'')+'" placeholder="Língua Portuguesa"></div>'
+    +'<div class="cl-livro-campo"><label>Bimestre</label><input type="text" id="cl-liv-bim" value="'+_clEsc(livro.bimestre||'')+'" placeholder="1º Bimestre"></div>'
+    +'</div>'
+    +'<div class="cl-livro-campo"><label>Turma</label><input type="text" id="cl-liv-turma" value="'+_clEsc(livro.turma||'')+'" placeholder="Ex: 1ª Série"></div>'
+    +'<div class="cl-livro-campo"><label>Temas</label>'
+    +'<div class="cl-temas-lista" id="cl-temas-lista">'+temasHtml+'</div>'
+    +'<button onclick="_clAddTema(\''+id+'\')" style="margin-top:6px;font-size:.7rem;background:transparent;border:1px dashed var(--cl);color:var(--cm);border-radius:6px;padding:5px 12px;cursor:pointer;font-family:\'DM Sans\',sans-serif;transition:all .2s">+ Adicionar tema</button>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px;margin-top:2px">'
+    +'<button onclick="claudeSalvarLivro(\''+id+'\')" style="flex:1;background:var(--vm);color:#fff;border:none;border-radius:8px;padding:9px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:.8rem">💾 Salvar</button>'
+    +'<button onclick="claudeMarcarConcluido(\''+id+'\')" style="flex:1;background:rgba(46,160,102,.1);color:#2a8a5a;border:1.5px solid rgba(46,160,102,.3);border-radius:8px;padding:9px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:.8rem">✅ Marcar concluído</button>'
+    +'</div>'
+    +'</div></div>'
+    +'<div><div class="cl-hist-sec-lbl">✦ Histórico de livros concluídos</div>'+histHtml+'</div>'
+    +'</div></div>';
+  document.body.appendChild(div);
+}
+
+function claudeFecharHist(){var m=document.getElementById('cl-hist-modal');if(m)m.remove();claudeRenderizar();}
+
+function claudeSalvarLivro(id){
+  var livro=_clGetLivro(id)||{temas:[]};
+  livro.titulo=(document.getElementById('cl-liv-titulo')||{}).value||'';
+  livro.disciplina=(document.getElementById('cl-liv-disc')||{}).value||'';
+  livro.bimestre=(document.getElementById('cl-liv-bim')||{}).value||'';
+  livro.turma=(document.getElementById('cl-liv-turma')||{}).value||'';
+  livro.titulo=livro.titulo.trim(); livro.disciplina=livro.disciplina.trim();
+  livro.bimestre=livro.bimestre.trim(); livro.turma=livro.turma.trim();
+  _clSaveLivro(id,livro);
+  var btn=event.currentTarget; btn.textContent='✔ Salvo!';
+  setTimeout(function(){btn.textContent='💾 Salvar';},1600);
+}
+
+function claudeMarcarConcluido(id){
+  var livro=_clGetLivro(id);
+  if(!livro||!livro.titulo){alert('Defina o título do livro antes de marcar como concluído.');return;}
+  claudeSalvarLivro(id);
+  livro=_clGetLivro(id);
+  var hist=_clGetHist(id);
+  var hoje=new Date();
+  var data=('0'+hoje.getDate()).slice(-2)+'/'+('0'+(hoje.getMonth()+1)).slice(-2)+'/'+hoje.getFullYear();
+  hist.push({titulo:livro.titulo,disciplina:livro.disciplina,bimestre:livro.bimestre,turma:livro.turma,data:data});
+  _clSaveHist(id,hist);
+  _clSaveLivro(id,{titulo:'',disciplina:'',bimestre:'',turma:'',temas:[]});
+  claudeFecharHist();
+}
+
+function _clTogTema(id,idx,ok){var l=_clGetLivro(id)||{temas:[]};if(l.temas[idx])l.temas[idx].ok=ok;_clSaveLivro(id,l);}
+function _clEditTema(id,idx,val){var l=_clGetLivro(id)||{temas:[]};if(l.temas[idx]!==undefined)l.temas[idx].t=val;_clSaveLivro(id,l);}
+function _clDelTema(id,idx){
+  var l=_clGetLivro(id)||{temas:[]};l.temas.splice(idx,1);_clSaveLivro(id,l);
+  claudeHistorico(_clHistId,_clHistNome);
+}
+function _clAddTema(id){
+  var l=_clGetLivro(id)||{temas:[]};l.temas.push({t:'',ok:false});_clSaveLivro(id,l);
+  var container=document.getElementById('cl-temas-lista');if(!container)return;
+  var idx=l.temas.length-1;
+  var div=document.createElement('div');div.className='cl-tema-item';
+  div.innerHTML='<input type="checkbox" onchange="_clTogTema(\''+id+'\','+idx+',this.checked)">'
+    +'<input type="text" value="" placeholder="Nome do tema" oninput="_clEditTema(\''+id+'\','+idx+',this.value)">'
+    +'<button class="cl-tema-del" onclick="_clDelTema(\''+id+'\','+idx+')">✕</button>';
+  container.appendChild(div);
+  div.querySelector('input[type=text]').focus();
 }
 
 function claudeTick() {
