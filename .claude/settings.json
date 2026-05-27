@@ -20,7 +20,9 @@
       "Bash(git push *)",
       "PowerShell($content = Get-Content \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" -Raw; $content.Length)",
       "Bash(Get-Content \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\")",
-      "Bash(Select-Object -First 100)"
+      "Bash(Select-Object -First 100)",
+      "Bash(head -20 \"/mnt/c/Downloads/relatorio-2026/casavequia.html\")",
+      "Read(//mnt/c/Downloads/relatorio-2026/**)"
     ],
     "additionalDirectories": [
       "\\tmp"
