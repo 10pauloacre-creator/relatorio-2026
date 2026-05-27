@@ -551,9 +551,8 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <nav class="nav-w"><div class="nav-i">
 <button class="nb on" onclick="aba('all',this)">📋 Geral</button><div class="sp"></div>
 <button class="nb" onclick="aba('t1',this)">1ª Série</button><div class="sp"></div>
-<button class="nb" onclick="aba('t2',this)">2ª Série</button><div class="sp"></div>
-<button class="nb" onclick="aba('t3',this)">3ª Série</button><div class="sp"></div>
-<button class="nb" onclick="aba('t6',this)">6º Ano</button><div class="sp"></div>
+<button class="nb" onclick="aba('t2',this)">2ª/3ª Série</button><div class="sp"></div>
+<button class="nb" onclick="aba('t3',this)">8º/9º Ano</button><div class="sp"></div>
 <button class="nb" onclick="aba('plano',this)">📚 Plano Anual</button><div class="sp"></div>
     <button class="nb" onclick="aba('cron',this)">📅 Cronograma</button><div class="sp"></div>
 <button class="nb" onclick="aba('cont',this)">📊 Contador</button>
@@ -620,7 +619,7 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 </section>
 
 <section class="sec" id="sec-t1">
-<div class="th"><div class="tb">1ª</div><div class="ti"><h2>1ª Série — Ensino Médio</h2><p>LP · T. Linguagens · T. C. Humanas · 15 alunos</p></div></div>
+<div class="th"><div class="tb">1ª</div><div class="ti"><h2>1ª Série — Ensino Médio</h2><p>LP · T. Linguagens · T. C. Humanas · 5 alunos</p></div></div>
 <div class="sr"><div class="sc2"><div class="n">3</div><div class="l">Dias de Aula</div></div><div class="sc2"><div class="n">8</div><div class="l">H/aulas (LP)</div></div><div class="sc2"><div class="n">12</div><div class="l">Presentes 07/04</div></div><div class="sc2 al"><div class="n">7</div><div class="l">Alunos c/ obs.</div></div></div>
 
 <!-- T1_INICIO -->
@@ -669,7 +668,7 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 </section>
 
 <section class="sec" id="sec-t2">
-<div class="th"><div class="tb az">2ª</div><div class="ti"><h2>2ª Série — Ensino Médio</h2><p>LP · T. Linguagens · T. C. Humanas · Artes · 23 alunos</p></div></div>
+<div class="th"><div class="tb az">2/3</div><div class="ti"><h2>2ª e 3ª Série — Ensino Médio</h2><p>LP · T. Linguagens · T. C. Humanas · Artes · 20 alunos</p></div></div>
 <div class="sr"><div class="sc2"><div class="n">4</div><div class="l">Dias de Aula</div></div><div class="sc2"><div class="n">11</div><div class="l">H/aulas</div></div><div class="sc2"><div class="n">17</div><div class="l">Presentes 07/04</div></div><div class="sc2 al"><div class="n">5+</div><div class="l">Alunos c/ obs.</div></div></div>
 
 <!-- T2_INICIO -->
@@ -755,7 +754,7 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 </section>
 
 <section class="sec" id="sec-t3">
-<div class="th"><div class="tb og">3ª</div><div class="ti"><h2>3ª Série — Ensino Médio</h2><p>LP · T. Linguagens · T. C. Humanas · Artes · 18 alunos</p></div></div>
+<div class="th"><div class="tb og">8/9</div><div class="ti"><h2>8º e 9º Ano — Ensino Fundamental II</h2><p>11 alunos · Tarde · Turma Única</p></div></div>
 <div class="sr"><div class="sc2"><div class="n">3</div><div class="l">Dias de Aula</div></div><div class="sc2"><div class="n">6</div><div class="l">H/aulas</div></div><div class="sc2"><div class="n">13</div><div class="l">Presentes 07/04</div></div><div class="sc2 al"><div class="n">5</div><div class="l">Alunos c/ obs.</div></div></div>
 
 <!-- T3_INICIO -->
@@ -6374,10 +6373,48 @@ function itab(btn,pid){const ec=btn.closest('.ec2');ec.querySelectorAll('.itab')
 (function(){const m={1:'seg',2:'ter',4:'qui',5:'sex'},d=new Date().getDay(),id=m[d];if(!id)return;const h=document.getElementById('hd-'+id);if(h){const t=document.createElement('span');t.className='hj';t.textContent='Hoje';h.appendChild(t);}})();
 
 const ALUNOS={
-  t1:[{n:2,nm:'Cleiton Silva Santana'},{n:3,nm:'Daniel Henrique Rodrigues Galvão'},{n:4,nm:'Eduarda Pereira Santiago'},{n:5,nm:'Felipe Costa Bezerra'},{n:6,nm:'Gabriel Souza Silva'},{n:7,nm:'Gustavo Gomes da Silva'},{n:8,nm:'Jady Kamilly de Oliveira Amorim'},{n:9,nm:'João Pedro Gomes da Silva'},{n:10,nm:'Juliana da Silva Euripe'},{n:11,nm:'Lauane da Silva Santos'},{n:12,nm:'Maria Eduarda da Silva de Paula'},{n:13,nm:'Maria Valéria Aparecida Nunes de Lima'},{n:14,nm:'Paulo Henrique Chaves Teixeira'},{n:15,nm:'Yudi Oliveira de Araujo'},{n:16,nm:'Isabelle Moura dos Santos'}],
-  t2:[{n:1,nm:'Alice Ferreira de Souza'},{n:2,nm:'Ana Beatriz Nascimento Maia'},{n:3,nm:'Anthonny Gabriel Almeida Paiva'},{n:4,nm:'Antonio Samuel de Oliveira Barreto'},{n:5,nm:'Elanne Melo de Souza'},{n:6,nm:'Eslane Moraes Ribeiro'},{n:7,nm:'Everton Oliveira da Silva'},{n:8,nm:'Fabio Henrique Barbosa Rosas'},{n:9,nm:'Francielly da Silveira Braga Santiago'},{n:10,nm:'Francisco Gabriel de Queiroz Brasil'},{n:11,nm:'Jorge Arnaldo Félix Pereira'},{n:12,nm:'Kauesley dos Anjos Dantas'},{n:13,nm:'Kayo dos Anjos Coutinho'},{n:14,nm:'Lília da Silva Ramos'},{n:15,nm:'Luiz Guilherme da Silva Santiago'},{n:16,nm:'Maria Clara Lima da Silva'},{n:17,nm:'Maria Eduarda Silva de Jesus'},{n:18,nm:'Nathaly Yasmim Castro Jardim'},{n:19,nm:'Pietro Fidelis Miranda'},{n:20,nm:'Sabrina Damazio Alves Araújo'},{n:21,nm:'Tamíres Lima Fernandes'},{n:24,nm:'Wesley Emanuel Lima da Silva'},{n:25,nm:'Êmilly Nathasha Martins Sá'}],
-  t3:[{n:1,nm:'Alonso Queiroz Santiago'},{n:2,nm:'Antoniel Araujo de Lima'},{n:3,nm:'Francisco Kevison de Lima Paixão'},{n:4,nm:'Gabriel Oliveira Evangelista'},{n:5,nm:'Gabriella Farias Moreira'},{n:6,nm:'Hana Beatryz Araujo Sales'},{n:7,nm:'Joaiz Muniz de Souza Júnior'},{n:8,nm:'João Paulo Barreto Chaves'},{n:9,nm:'Karina Paiva Lima'},{n:10,nm:'Kiara Kasiele Silva Paixão'},{n:11,nm:'Lourival Wagner Aparecido Nunes de Lima'},{n:12,nm:'Maria Beatriz Oliveira da Gama'},{n:13,nm:'Maria Eduarda Souza Teixeira'},{n:14,nm:'Matheus Henrique Silveira Santiago'},{n:15,nm:'Mayco Gabriel da Silva Dias'},{n:16,nm:'Natanael Ovides de Sousa'},{n:17,nm:'Sara Machado do Amor Divino'},{n:18,nm:'Sibelly Victória Santiago de Sousa'}],
-  t6:[{n:1,nm:'Àghata Luiza Soouza da Silva'},{n:2,nm:'Angelo de Freitas Soares'},{n:3,nm:'Anthony Mayksson Willames Silva de Lima'},{n:4,nm:'Antônio Yuri da Silva Santos'},{n:5,nm:'Asheley Prince Miranda Lima'},{n:6,nm:'Bianca Alves Bulin'},{n:7,nm:'Cayki Silva de Farias'},{n:8,nm:'Daniel Magalhães de Lima'},{n:9,nm:'Davi Oliveira de Amorim'},{n:10,nm:'Douglas Oliveira Queiroz da Silva'},{n:11,nm:'Fabrício Nunes Ataíde'},{n:12,nm:'Guilherme Castro Pereira'},{n:13,nm:'Hadassa Walthier da Silva'},{n:14,nm:'Hagata Gabriely da Silva Santos'},{n:15,nm:'Isaac Souza Fernandes'},{n:17,nm:'João Pedro Maia de Oliveira'},{n:18,nm:'Joel do Nascimento Cruz'},{n:19,nm:'José Otávio da Silva Paixão'},{n:20,nm:'Lazaro da Silva Martins'},{n:21,nm:'Maria Isabele de Lima Paixão'},{n:22,nm:'Mirella Barroso Lima'},{n:23,nm:'Murilo Santana de Souza'},{n:24,nm:'Nayla Vitória de Sousa Santana'},{n:25,nm:'Neemias de Sousa Amim'},{n:26,nm:'Nicolas da Silva Nogueira'},{n:27,nm:'Pamella Letycia Souza Lino'},{n:28,nm:'Pedro Lucas Fidelis dos Reis'},{n:29,nm:'Sabrina Silva Ribeiro'},{n:30,nm:'Thaemmy Silva de Farias'},{n:31,nm:'Victor Emanoel da Silva do Nascimento'},{n:32,nm:'Vidal Wanderley de Lima'},{n:33,nm:'Wandson Santiago de Sousa'},{n:34,nm:'Yan Lima Rodrigues'},{n:35,nm:'Yasmin Victória Vasconcelos Silva'},{n:36,nm:'Breno Barroso da Silva'}]
+  t1:[
+    {n:1,nm:'Fernanda Victória Batista Machado'},
+    {n:2,nm:'Larissa Bruna de Sousa Machado'},
+    {n:3,nm:'Marlon Pereira Matos'},
+    {n:4,nm:'Mayron Pereira Matos'},
+    {n:5,nm:'Miquéias Rocha Macelino dos Santos'}
+  ],
+  t2:[
+    {n:1,nm:'Ana Vitória Simão de Oliveira'},
+    {n:2,nm:'Átila Estevam Chaves Correa'},
+    {n:3,nm:'Dayane Nunes de Sousa'},
+    {n:4,nm:'Fernando Lima Altino'},
+    {n:5,nm:'Geovana da Silva Conceição'},
+    {n:6,nm:'Isvi Antony de Azevedo Damião'},
+    {n:7,nm:'João Vítor Matos de Aguiar'},
+    {n:8,nm:'Nely de Souza Bonfim'},
+    {n:9,nm:'Pedro Henrique do Vino Silva'},
+    {n:10,nm:'Rayely da Costa Lopes'},
+    {n:11,nm:'Tamyres Soares dos Santos'},
+    {n:12,nm:'Tiago Oliveira da Silva'},
+    {n:13,nm:'Aquis Ferreira de Oliveira'},
+    {n:14,nm:'Diego da Silva Lima'},
+    {n:15,nm:'Erislene Tavares Ricardo'},
+    {n:16,nm:'Heloá do Nascimento Fernandes'},
+    {n:17,nm:'Mariana Soares da Silva'},
+    {n:18,nm:'Rafael da Silva Ramalho'},
+    {n:19,nm:'Vitória de Souza Rodrigues'},
+    {n:20,nm:'Yago de Oliveira Carneiro'}
+  ],
+  t3:[
+    {n:1,nm:'Ana Clara da Silva Araújo'},
+    {n:2,nm:'Arthur Miguel de Sousa Nonato'},
+    {n:3,nm:'Larissa Ferreira de Souza'},
+    {n:4,nm:'Mailson Pereira Matos'},
+    {n:5,nm:'Pedro Henrique Ramalho Magalhães'},
+    {n:6,nm:'Jefferson Garcia Cordeiro'},
+    {n:7,nm:'Nicole Ferreira de Oliveira'},
+    {n:8,nm:'Rafaela da Silva Ramalho'},
+    {n:9,nm:'Ramicléia Ketoly de Oliveira da Costa'},
+    {n:10,nm:'Rayane Nunes Sampaio'},
+    {n:11,nm:'Samuel Sólis Severino'}
+  ]
 };
 
 /* ★ PRESENÇA — faltaram/faltJ = números de chamada ★ */
