@@ -80,7 +80,7 @@ function renderResumoCronograma() {
     </div>
     <div class="res-item ri-azul">
       <div class="res-label">2ª Série</div>
-      <div class="res-val">LP: <strong>4</strong>/sem &nbsp;·&nbsp; Trilhas: <strong>3</strong>/sem &nbsp;·&nbsp; Arte: <strong>1</strong>/sem</div>
+      <div class="res-val">LP: <strong>3</strong>/sem &nbsp;·&nbsp; Trilhas: <strong>3</strong>/sem &nbsp;·&nbsp; Arte: <strong>1</strong>/sem</div>
     </div>
     <div class="res-item ri-ouro">
       <div class="res-label">3ª Série</div>

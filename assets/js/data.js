@@ -139,7 +139,7 @@ const CRONOGRAMA = {
     { hora: '13h00 – 14h00', disc: 'Língua Portuguesa', turma: '3ª Série', tipo: 'lp', haula: 1 },
     { hora: '14h00 – 15h00', disc: 'Trilhas', turma: '3ª Série', tipo: 'tri', haula: 1 },
     { hora: '15h00 – 16h15', disc: 'Trilhas', turma: '2ª Série', tipo: 'tri', haula: 1 },
-    { hora: '15h15 – 17h15', disc: 'Língua Portuguesa', turma: '2ª Série', tipo: 'lp', haula: 2 }
+    { hora: '15h15 – 17h15', disc: 'Língua Portuguesa', turma: '2ª Série', tipo: 'lp', haula: 1 }
   ],
   qui: [
     { hora: '15h15 – 16h15', disc: 'Artes', turma: '2ª Série', tipo: 'art', haula: 1 },
