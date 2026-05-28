@@ -520,7 +520,7 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <header class="cab"><div class="cab-i"><div class="escu" style="background:transparent;border:none;padding:0"><img src="botãoherminio.png" alt="Logo Hermínio" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))"></div><div class="cab-t"><h1>Relatório Diário de Aulas 2026</h1><div class="sub">E.E. RAIMUNDO HERMÍNIO DE MELO · SENADOR GUIOMARD – AC</div><div class="prof">✦ Prof. Paulo Roberto Ramalho Magalhães · Língua Portuguesa · Inglês · Espanhol ✦</div></div></div></header>
 
 <!-- Navbar -->
-<nav class="nav-w"><div class="nav-i"><button class="nb on" onclick="aba('sec-all',this)">Geral</button><button class="nb" onclick="aba('sec-t89',this)">8&#186;/9&#186; Ano</button><button class="nb" onclick="aba('sec-t1',this)">1&#170; Série</button><button class="nb" onclick="aba('sec-t23',this)">2&#170;/3&#170; Série</button><button class="nb" onclick="aba('sec-plano',this)">&#128203; Plano Anual</button><button class="nb" onclick="aba('sec-cron',this)">&#128197; Cronograma</button><button class="nb" onclick="aba('sec-cont',this)">&#128200; Contador</button><button class="nb" onclick="aba('sec-claude',this)">&#9201; Claude</button><button class="nb" onclick="aba('sec-livros',this)">&#128218; Livros</button><button id="btn-editar-rh" class="nb" style="background:rgba(74,148,103,.2);color:#7fddaa;border:1px solid rgba(74,148,103,.4);border-radius:6px;margin:6px 4px" onclick="abrirModalRH()">&#9999;&#65039; Editar</button></div></nav>
+<nav class="nav-w"><div class="nav-i"><button class="nb on" onclick="aba('sec-all',this)">Geral</button><button class="nb" onclick="aba('sec-t89',this)">8&#186;/9&#186; Ano</button><button class="nb" onclick="aba('sec-t1',this)">1&#170; Série</button><button class="nb" onclick="aba('sec-t23',this)">2&#170;/3&#170; Série</button><button class="nb" onclick="aba('sec-plano',this)">&#128203; Plano Anual</button><button class="nb" onclick="aba('sec-cron',this)">&#128197; Cronograma</button><button class="nb" onclick="aba('sec-cont',this)">&#128200; Contador</button><button class="nb" onclick="aba('sec-claude',this)">&#9201; Claude</button><button class="nb" onclick="aba('sec-livros',this)">&#128218; Livros</button><button class="nb" onclick="aba('sec-sequencias',this)">&#128450; Sequências</button><button id="btn-editar-rh" class="nb" style="background:rgba(74,148,103,.2);color:#7fddaa;border:1px solid rgba(74,148,103,.4);border-radius:6px;margin:6px 4px" onclick="abrirModalRH()">&#9999;&#65039; Editar</button></div></nav>
 
 <main class="main">
 
@@ -1036,6 +1036,24 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <div id="rh-liv-page-ing" class="liv-page"></div>
 <div id="rh-liv-page-esp" class="liv-page"></div>
 </section>
+
+<section class="sec" id="sec-sequencias">
+<div class="th"><div class="tb" style="background:linear-gradient(135deg,#8c6a2a,#d8b45b)">🗂</div><div class="ti"><h2>Sequências Didáticas</h2><p>Acompanhamento das sequências por turma, disciplina e bimestre — R. Hermínio</p></div></div>
+<div class="liv-legend">
+  <div class="liv-leg-item"><div class="liv-dot nd"></div>Não iniciado</div>
+  <div class="liv-leg-item"><div class="liv-dot cr"></div>Em criação</div>
+  <div class="liv-leg-item"><div class="liv-dot co"></div>Concluído</div>
+  <div class="liv-leg-item" style="margin-left:auto;font-size:.72rem;opacity:.7">Cada bimestre possui uma sequência com edição completa</div>
+</div>
+<div class="liv-tabs">
+  <button class="liv-tab on" onclick="rhSeqTab('t89',this)">📚 8º/9º Ano</button>
+  <button class="liv-tab" onclick="rhSeqTab('t1',this)">📚 1ª Série</button>
+  <button class="liv-tab" onclick="rhSeqTab('t23',this)">📚 2ª/3ª Série</button>
+</div>
+<div id="rh-seq-page-t89" class="liv-page on"></div>
+<div id="rh-seq-page-t1" class="liv-page"></div>
+<div id="rh-seq-page-t23" class="liv-page"></div>
+</section>
 </main>
 
 <script>
@@ -1147,6 +1165,13 @@ const RH_LIV_ICS = {
 
 var _rhLivStatus = JSON.parse(localStorage.getItem('rh_liv_status') || '{}');
 var _rhLivUrls = JSON.parse(localStorage.getItem('rh_liv_urls') || '{}');
+const RH_SEQ_DISCS = {
+  t89:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'}],
+  t1:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'}],
+  t23:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'}]
+};
+const RH_SEQ_ICS = {'':{ic:'🗂',lbl:'Não iniciado'},criando:{ic:'📝',lbl:'Criando'},concluido:{ic:'✅',lbl:'Concluído'}};
+var _rhSeqStatus = JSON.parse(localStorage.getItem('rh_seq_status') || '{}');
 
 const RH_MESES = {
   Jan: 0, Fev: 1, Mar: 2, Abr: 3, Mai: 4, Jun: 5,
@@ -1446,15 +1471,27 @@ function aba(id, btn) {
 //  LIVROS — troca de aba
 // ═══════════════════════════════════════════════════════
 function rhLivTab(disc, btn) {
-  document.querySelectorAll('.liv-tab').forEach(function(b){ b.classList.remove('on'); });
-  document.querySelectorAll('.liv-page').forEach(function(p){ p.classList.remove('on'); });
+  document.querySelectorAll('#sec-livros .liv-tab').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('#sec-livros .liv-page').forEach(function(p){ p.classList.remove('on'); });
   if (btn) btn.classList.add('on');
   var pg = document.getElementById('rh-liv-page-' + disc);
   if (pg) pg.classList.add('on');
 }
 
+function rhSeqTab(turma, btn) {
+  document.querySelectorAll('#sec-sequencias .liv-tab').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('#sec-sequencias .liv-page').forEach(function(p){ p.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  var pg = document.getElementById('rh-seq-page-' + turma);
+  if (pg) pg.classList.add('on');
+}
+
 function rhLivSalvarStatus() {
   localStorage.setItem('rh_liv_status', JSON.stringify(_rhLivStatus));
+}
+
+function rhSeqSalvarStatus() {
+  localStorage.setItem('rh_seq_status', JSON.stringify(_rhSeqStatus));
 }
 
 function rhLivRegistrarUrl(key, url) {
@@ -1479,6 +1516,25 @@ function rhLivAtualizarCard(card, key) {
   if (ic) ic.textContent = RH_LIV_ICS[st] ? RH_LIV_ICS[st].ic : '📘';
   var lbl = card.querySelector('.liv-card-nm');
   if (lbl) lbl.textContent = livro.titulo ? livro.titulo : (RH_LIV_ICS[st] ? RH_LIV_ICS[st].lbl : 'Não iniciado');
+}
+
+function rhSeqSetStatus(key, st, evt) {
+  if (evt) evt.stopPropagation();
+  _rhSeqStatus[key] = (_rhSeqStatus[key] === st) ? '' : st;
+  rhSeqSalvarStatus();
+  var card = document.querySelector('[data-rh-seq="' + key + '"]');
+  if (card) rhSeqAtualizarCard(card, key);
+}
+
+function rhSeqAtualizarCard(card, key) {
+  var st = _rhSeqStatus[key] || '';
+  var seq = _rhGetSequencia(key) || {};
+  card.classList.remove('criando', 'concluido');
+  if (st) card.classList.add(st);
+  var ic = card.querySelector('.liv-card-ic');
+  if (ic) ic.textContent = RH_SEQ_ICS[st] ? RH_SEQ_ICS[st].ic : '🗂';
+  var lbl = card.querySelector('.liv-card-nm');
+  if (lbl) lbl.textContent = seq.titulo ? seq.titulo : (RH_SEQ_ICS[st] ? RH_SEQ_ICS[st].lbl : 'Não iniciado');
 }
 
 function rhLivRender() {
@@ -1528,6 +1584,50 @@ function rhLivRender() {
   });
 }
 
+function rhSeqRender() {
+  ['t89','t1','t23'].forEach(function(turmaId) {
+    var page = document.getElementById('rh-seq-page-' + turmaId);
+    if (!page) return;
+    page.innerHTML = '';
+    (RH_SEQ_DISCS[turmaId] || []).forEach(function(disc) {
+      var sec = document.createElement('div');
+      sec.className = 'liv-disc';
+      sec.innerHTML =
+        '<div class="liv-disc-h"><span class="ld ' + disc.cor + '" style="width:12px;height:12px;border-radius:3px;flex-shrink:0;display:inline-block"></span>'
+        + disc.nm + '</div>'
+        + '<div class="liv-grid" id="rh-seq-g-' + turmaId + '-' + disc.id + '"></div>';
+      page.appendChild(sec);
+      var grid = document.getElementById('rh-seq-g-' + turmaId + '-' + disc.id);
+      for (var b = 1; b <= 4; b++) {
+        (function(bim) {
+          var key = turmaId + '-' + disc.id + '-sqb' + bim;
+          var st = _rhSeqStatus[key] || '';
+          var seq = _rhGetSequencia(key) || {};
+          var card = document.createElement('div');
+          card.className = 'liv-card' + (st ? ' ' + st : '');
+          card.setAttribute('data-rh-seq', key);
+          card.innerHTML =
+            '<div class="liv-card-bim">' + bim + 'º Bimestre</div>'
+            + '<span class="liv-card-ic">' + (RH_SEQ_ICS[st] ? RH_SEQ_ICS[st].ic : '🗂') + '</span>'
+            + '<div class="liv-card-nm">' + (seq.titulo || (RH_SEQ_ICS[st] ? RH_SEQ_ICS[st].lbl : 'Não iniciado')) + '</div>'
+            + '<div class="liv-btns">'
+              + '<button class="liv-btn b-cri" onclick="rhSeqSetStatus(\'' + key + '\',\'criando\',event)">📝 Criando</button>'
+              + '<button class="liv-btn b-con" onclick="rhSeqSetStatus(\'' + key + '\',\'concluido\',event)">✅ Concluído</button>'
+              + '<button class="liv-btn b-ace" onclick="rhSequenciaAbrirModal(\'' + key + '\',\'' + turmaId + '\',\'' + disc.nm.replace(/'/g, "\\'") + '\',\'' + bim + 'º Bimestre\',event)">✏️ Editar</button>'
+            + '</div>';
+          card.addEventListener('click', function(e) {
+            if (e.target.closest('.liv-btn')) return;
+            var aberto = this.classList.contains('open');
+            document.querySelectorAll('#sec-sequencias .liv-card.open').forEach(function(c) { c.classList.remove('open'); });
+            if (!aberto) this.classList.add('open');
+          });
+          grid.appendChild(card);
+        })(b);
+      }
+    });
+  });
+}
+
 // ═══════════════════════════════════════════════════════
 //  CLAUDE TIMER — versão localStorage (sem Firebase)
 // ═══════════════════════════════════════════════════════
@@ -1553,13 +1653,19 @@ function _rhGetLivro(id){try{return JSON.parse(localStorage.getItem('rh_livro_'+
 function _rhGetHist(id){try{return JSON.parse(localStorage.getItem('rh_hist_'+id)||'[]');}catch(e){return [];}}
 function _rhSaveLivro(id,obj){localStorage.setItem('rh_livro_'+id,JSON.stringify(obj));}
 function _rhSaveHist(id,arr){localStorage.setItem('rh_hist_'+id,JSON.stringify(arr));}
+function _rhGetSequencia(id){try{return JSON.parse(localStorage.getItem('rh_seq_'+id)||'null');}catch(e){return null;}}
+function _rhGetSeqHist(id){try{return JSON.parse(localStorage.getItem('rh_seq_hist_'+id)||'[]');}catch(e){return [];}}
+function _rhSaveSequencia(id,obj){localStorage.setItem('rh_seq_'+id,JSON.stringify(obj));}
+function _rhSaveSeqHist(id,arr){localStorage.setItem('rh_seq_hist_'+id,JSON.stringify(arr));}
 var _rhHistId=null, _rhHistNome='';
 var _rhLivroCtx=null;
+var _rhSeqId=null, _rhSeqNome='';
 
 function _rhReabrirLivroModal(){
   if(!_rhLivroCtx)return;
   if(_rhLivroCtx.kind==='claude') rhClaudeHistorico(_rhLivroCtx.id,_rhLivroCtx.nome);
   if(_rhLivroCtx.kind==='grade') rhLivroAbrirModal(_rhLivroCtx.id,_rhLivroCtx.turmaId,_rhLivroCtx.disciplina,_rhLivroCtx.bimestre);
+  if(_rhLivroCtx.kind==='sequencia') rhSequenciaAbrirModal(_rhLivroCtx.id,_rhLivroCtx.turmaId,_rhLivroCtx.disciplina,_rhLivroCtx.bimestre);
 }
 
 function rhClaudeRender() {
@@ -1777,6 +1883,52 @@ function rhLivroAbrirModal(id, turmaId, disciplina, bimestre, evt) {
   document.body.appendChild(div);
 }
 
+function rhSequenciaAbrirModal(id, turmaId, disciplina, bimestre, evt) {
+  if (evt) evt.stopPropagation();
+  _rhSeqId = id;
+  _rhSeqNome = RH_TURMA_LABELS[turmaId] + ' · ' + disciplina + ' · ' + bimestre;
+  _rhLivroCtx = { kind:'sequencia', id:id, turmaId:turmaId, disciplina:disciplina, bimestre:bimestre };
+  var seq = _rhGetSequencia(id) || {titulo:'',disciplina:disciplina,bimestre:bimestre,turma:RH_TURMA_LABELS[turmaId],objetivo:'',ferramentas:'',etapas:'',observacoes:'',url:''};
+  var hist = _rhGetSeqHist(id);
+  var histHtml = hist.length ? hist.slice().reverse().map(function(h){
+    return '<div class="cl-hist-item"><div class="ci">✅</div><div class="cd">'
+      +'<div class="ct">'+_rhEsc(h.titulo||'Sem título')+'</div>'
+      +'<div class="cs">Concluída · '+_rhEsc(h.data||'')+'</div>'
+      +'<div class="cm2">'+_rhEsc(h.disciplina||'')+(h.bimestre?' · '+_rhEsc(h.bimestre):'')+(h.turma?' · '+_rhEsc(h.turma):'')+'</div>'
+      +'</div></div>';
+  }).join('') : '<div class="cl-hist-vazio">Nenhuma sequência concluída ainda.</div>';
+  var old = document.getElementById('rh-hist-modal');
+  if(old) old.remove();
+  var div = document.createElement('div');
+  div.id = 'rh-hist-modal';
+  div.className = 'cl-hist-overlay';
+  div.addEventListener('click', function(e){if(e.target===div)rhClaudeFecharHist();});
+  div.innerHTML = '<div class="cl-hist-inner">'
+    +'<div class="cl-hist-hd"><h3>🗂 '+_rhEsc(_rhSeqNome)+'</h3><p>Sequência atual e histórico por bimestre</p>'
+    +'<button class="cl-hist-close" onclick="rhClaudeFecharHist()">✕</button></div>'
+    +'<div class="cl-hist-body">'
+    +'<div><div class="cl-hist-sec-lbl">✦ Sequência em produção</div>'
+    +'<div class="cl-livro-atual">'
+    +'<div class="cl-livro-campo"><label>Título</label><input type="text" id="rh-seq-titulo" value="'+_rhEsc(seq.titulo||'')+'" placeholder="Ex: Sequência didática de leitura crítica"></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+    +'<div class="cl-livro-campo"><label>Disciplina</label><input type="text" id="rh-seq-disc" value="'+_rhEsc(seq.disciplina||'')+'"></div>'
+    +'<div class="cl-livro-campo"><label>Bimestre</label><input type="text" id="rh-seq-bim" value="'+_rhEsc(seq.bimestre||'')+'"></div>'
+    +'</div>'
+    +'<div class="cl-livro-campo"><label>Turma</label><input type="text" id="rh-seq-turma" value="'+_rhEsc(seq.turma||'')+'"></div>'
+    +'<div class="cl-livro-campo"><label>Objetivo</label><input type="text" id="rh-seq-obj" value="'+_rhEsc(seq.objetivo||'')+'" placeholder="Objetivo central da sequência"></div>'
+    +'<div class="cl-livro-campo"><label>Ferramentas/recursos</label><input type="text" id="rh-seq-fer" value="'+_rhEsc(seq.ferramentas||'')+'" placeholder="Slides, formulário, IA, texto-base..."></div>'
+    +'<div class="cl-livro-campo"><label>Etapas</label><input type="text" id="rh-seq-etp" value="'+_rhEsc(seq.etapas||'')+'" placeholder="Diagnóstico, leitura, produção, revisão..."></div>'
+    +'<div class="cl-livro-campo"><label>Observações</label><input type="text" id="rh-seq-obs" value="'+_rhEsc(seq.observacoes||'')+'" placeholder="Anotações importantes"></div>'
+    +'<div class="cl-livro-campo"><label>URL/arquivo</label><input type="text" id="rh-seq-url" value="'+_rhEsc(seq.url||'')+'" placeholder="https://..."></div>'
+    +'<div style="display:flex;gap:8px;margin-top:2px">'
+    +'<button onclick="rhSequenciaSalvar(\''+id+'\')" style="flex:1;background:var(--vm);color:#fff;border:none;border-radius:8px;padding:9px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:.8rem">💾 Salvar</button>'
+    +'<button onclick="rhSequenciaMarcarConcluida(\''+id+'\')" style="flex:1;background:rgba(46,160,102,.1);color:#2a8a5a;border:1.5px solid rgba(46,160,102,.3);border-radius:8px;padding:9px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:.8rem">✅ Marcar concluída</button>'
+    +'</div></div></div>'
+    +'<div><div class="cl-hist-sec-lbl">✦ Histórico de sequências concluídas</div>'+histHtml+'</div>'
+    +'</div></div>';
+  document.body.appendChild(div);
+}
+
 function rhClaudeFecharHist(){var m=document.getElementById('rh-hist-modal');if(m)m.remove();rhClaudeRender();rhLivRender();}
 
 function rhSalvarLivro(id){
@@ -1811,6 +1963,41 @@ function rhMarcarConcluido(id){
   rhClaudeFecharHist();
 }
 
+function rhSequenciaSalvar(id){
+  var seq=_rhGetSequencia(id)||{};
+  seq.titulo=((document.getElementById('rh-seq-titulo')||{}).value||'').trim();
+  seq.disciplina=((document.getElementById('rh-seq-disc')||{}).value||'').trim();
+  seq.bimestre=((document.getElementById('rh-seq-bim')||{}).value||'').trim();
+  seq.turma=((document.getElementById('rh-seq-turma')||{}).value||'').trim();
+  seq.objetivo=((document.getElementById('rh-seq-obj')||{}).value||'').trim();
+  seq.ferramentas=((document.getElementById('rh-seq-fer')||{}).value||'').trim();
+  seq.etapas=((document.getElementById('rh-seq-etp')||{}).value||'').trim();
+  seq.observacoes=((document.getElementById('rh-seq-obs')||{}).value||'').trim();
+  seq.url=((document.getElementById('rh-seq-url')||{}).value||'').trim();
+  _rhSaveSequencia(id,seq);
+  rhSeqRender();
+  var btn=(typeof event!=='undefined'&&event&&event.currentTarget)?event.currentTarget:null;
+  if(btn){
+    btn.textContent='✔ Salvo!';
+    setTimeout(function(){btn.textContent='💾 Salvar';},1600);
+  }
+}
+
+function rhSequenciaMarcarConcluida(id){
+  var seq=_rhGetSequencia(id);
+  if(!seq||!seq.titulo){alert('Defina o título da sequência antes de marcar como concluída.');return;}
+  rhSequenciaSalvar(id); seq=_rhGetSequencia(id);
+  var hist=_rhGetSeqHist(id);
+  var hoje=new Date();
+  var data=('0'+hoje.getDate()).slice(-2)+'/'+('0'+(hoje.getMonth()+1)).slice(-2)+'/'+hoje.getFullYear();
+  hist.push({titulo:seq.titulo,disciplina:seq.disciplina,bimestre:seq.bimestre,turma:seq.turma,data:data});
+  _rhSaveSeqHist(id,hist);
+  _rhSeqStatus[id]='concluido';
+  rhSeqSalvarStatus();
+  _rhSaveSequencia(id,{titulo:'',disciplina:seq.disciplina,bimestre:seq.bimestre,turma:seq.turma,objetivo:'',ferramentas:'',etapas:'',observacoes:'',url:''});
+  rhClaudeFecharHist();
+}
+
 function _rhTogTema(id,idx,ok){var l=_rhGetLivro(id)||{temas:[]};if(l.temas[idx])l.temas[idx].ok=ok;_rhSaveLivro(id,l);}
 function _rhEditTema(id,idx,val){var l=_rhGetLivro(id)||{temas:[]};if(l.temas[idx]!==undefined)l.temas[idx].t=val;_rhSaveLivro(id,l);}
 function _rhDelTema(id,idx){
@@ -1837,6 +2024,7 @@ setInterval(function() {
 
 document.addEventListener('DOMContentLoaded', function() {
   rhLivRender();
+  rhSeqRender();
 });
 
 // ═══════════════════════════════════════════════════════
