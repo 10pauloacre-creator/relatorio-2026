@@ -892,12 +892,86 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <section class="sec" id="sec-cron">
   <div class="sh">
     <div class="sti">&#128197; Cronograma</div>
-    <div class="sst">Grade horária semanal — a preencher</div>
+    <div class="sst">Grade horária semanal — organização por disciplina</div>
   </div>
-  <div style="padding:48px;text-align:center;color:var(--cm)">
-    <div style="font-size:2rem;margin-bottom:12px">&#128197;</div>
-    <div style="font-weight:600;margin-bottom:6px">Cronograma em elaboração</div>
-    <div style="font-size:.85rem">A grade de horários será inserida em breve.</div>
+  <div class="cron-intro">
+    <strong>Grade atual.</strong> As turmas não foram fixadas nesta etapa. O atendimento será feito em
+    <strong>rodízio de 70 dias por turma</strong> e, ao concluir um ciclo, o cronograma segue para a próxima turma.
+  </div>
+  <div class="cleg">
+    <div class="cl2"><div class="ld d-lp"></div><span>Língua Portuguesa</span></div>
+    <div class="cl2"><div class="ld" style="background:var(--az)"></div><span>Língua Espanhola</span></div>
+  </div>
+  <div class="cg">
+    <div class="dc" id="rh-card-seg">
+      <div class="dch c-se">Segunda-feira</div>
+      <div class="db">
+        <div class="sl sl-lp">
+          <div class="sh">12:45h - 17:00h</div>
+          <div class="sd">Língua Portuguesa</div>
+          <div class="st2">Turma em rodízio · ciclo de 70 dias</div>
+        </div>
+      </div>
+    </div>
+    <div class="dc" id="rh-card-ter">
+      <div class="dch c-te">Terça-feira</div>
+      <div class="db">
+        <div class="sl" style="background:#dbeeff;border-left:3px solid var(--az)">
+          <div class="sh">07:00h - 11:30h</div>
+          <div class="sd" style="color:var(--az)">Língua Espanhola</div>
+          <div class="st2">Turma em rodízio · ciclo de 70 dias</div>
+        </div>
+      </div>
+    </div>
+    <div class="dc" id="rh-card-qua">
+      <div class="dch" style="background:#5b3a77">Quarta-feira</div>
+      <div class="db">
+        <div class="sl sl-lp">
+          <div class="sh">07:00h - 11:30h</div>
+          <div class="sd">Língua Portuguesa</div>
+          <div class="st2">Turma em rodízio · ciclo de 70 dias</div>
+        </div>
+        <div class="sl" style="background:#dbeeff;border-left:3px solid var(--az)">
+          <div class="sh">12:45h - 17:00h</div>
+          <div class="sd" style="color:var(--az)">Língua Espanhola</div>
+          <div class="st2">Turma em rodízio · ciclo de 70 dias</div>
+        </div>
+      </div>
+    </div>
+    <div class="dc" id="rh-card-qui">
+      <div class="dch c-qu">Quinta-feira</div>
+      <div class="db">
+        <div class="sl sl-lp">
+          <div class="sh">07:00h - 11:30h</div>
+          <div class="sd">Língua Portuguesa</div>
+          <div class="st2">Turma em rodízio · ciclo de 70 dias</div>
+        </div>
+      </div>
+    </div>
+    <div class="dc" id="rh-card-sex">
+      <div class="dch c-sx">Sexta-feira</div>
+      <div class="db">
+        <div class="sl" style="background:#dbeeff;border-left:3px solid var(--az)">
+          <div class="sh">07:00h - 11:30h</div>
+          <div class="sd" style="color:var(--az)">Língua Espanhola</div>
+          <div class="st2">Turma em rodízio · ciclo de 70 dias</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="rcg">
+    <div class="ri ri-v">
+      <div class="rl">Língua Portuguesa</div>
+      <div class="rv">Segunda tarde · Quarta manhã · Quinta manhã</div>
+    </div>
+    <div class="ri ri-a">
+      <div class="rl">Língua Espanhola</div>
+      <div class="rv">Terça manhã · Quarta tarde · Sexta manhã</div>
+    </div>
+    <div class="ri ri-o">
+      <div class="rl">Rodízio</div>
+      <div class="rv">70 dias por turma, sem turma fixa nesta grade</div>
+    </div>
   </div>
 </section>
 
@@ -1466,6 +1540,5 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
-
 
 
