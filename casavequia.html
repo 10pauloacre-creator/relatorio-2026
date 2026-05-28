@@ -7264,7 +7264,7 @@ function seqRender(){
             +'<div class="liv-btns">'
               +'<button class="liv-btn b-cri" onclick="seqSetStatus(\''+key+'\',\'criando\',event)">📝 Criando</button>'
               +'<button class="liv-btn b-con" onclick="seqSetStatus(\''+key+'\',\'concluido\',event)">✅ Concluído</button>'
-              +'<button class="liv-btn b-ace" onclick="sequenciaAbrirModal(\''+key+'\',\''+turma+'\',\''+disc.nm.replace(/'/g,\"\\\\'\")+'\',\''+bim+'º Bimestre\',event)">✏️ Editar</button>'
+              +'<button class="liv-btn b-ace" onclick="sequenciaAbrirModal(\''+key+'\',\''+turma+'\',\''+disc.nm.replace(/'/g, "\\'")+'\',\''+bim+'º Bimestre\',event)">✏️ Editar</button>'
             +'</div>';
           card.addEventListener('click',function(e){
             if(e.target.closest('.liv-btn'))return;
