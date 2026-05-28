@@ -562,6 +562,8 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <div class="sp"></div>
 <button class="nb" onclick="aba('livros',this)">📖 Livros</button>
 <div class="sp"></div>
+<button class="nb" onclick="aba('sequencias',this)">🗂 Sequências</button>
+<div class="sp"></div>
 <button id="btn-editar" class="nb" style="background:rgba(74,148,103,.2);color:#7fddaa;border:1px solid rgba(74,148,103,.4);border-radius:6px;margin:6px 4px">✏️ Editar</button>
 </div></nav>
 <main class="main" data-build="20260505">
@@ -6356,6 +6358,27 @@ document.getElementById('p6ano').classList.add('active');
 <div id="liv-page-t3" class="liv-page"></div>
 </section>
 
+<section class="sec" id="sec-sequencias">
+<div class="th"><div class="tb" style="background:linear-gradient(135deg,#8c6a2a,#d8b45b)">🗂</div><div class="ti"><h2>Sequências Didáticas</h2><p>Acompanhamento das sequências por turma, disciplina e bimestre</p></div></div>
+
+<div class="liv-legend">
+  <div class="liv-leg-item"><div class="liv-dot nd"></div>Não iniciado</div>
+  <div class="liv-leg-item"><div class="liv-dot cr"></div>Em criação</div>
+  <div class="liv-leg-item"><div class="liv-dot co"></div>Concluído</div>
+  <div class="liv-leg-item" style="margin-left:auto;font-size:.72rem;opacity:.7">Cada bimestre possui uma sequência própria com edição completa</div>
+</div>
+
+<div class="liv-tabs">
+  <button class="liv-tab on" onclick="seqTab('t1',this)">📚 1ª Série</button>
+  <button class="liv-tab" onclick="seqTab('t2',this)">📚 2ª Série</button>
+  <button class="liv-tab" onclick="seqTab('t3',this)">📚 3ª Série</button>
+</div>
+
+<div id="seq-page-t1" class="liv-page on"></div>
+<div id="seq-page-t2" class="liv-page"></div>
+<div id="seq-page-t3" class="liv-page"></div>
+</section>
+
 </main>
 
 <!-- ── MENU FLUTUANTE ATIVIDADES ── -->
@@ -7096,10 +7119,11 @@ var _LIV_DISCS={
   ]
 };
 var _LIV_ICS={'':{ic:'📘',lbl:'Não iniciado'},'criando':{ic:'📕',lbl:'Criando'},'concluido':{ic:'📗',lbl:'Concluído'}};
+var _SEQ_ICS={'':{ic:'🗂',lbl:'Não iniciado'},'criando':{ic:'📝',lbl:'Criando'},'concluido':{ic:'✅',lbl:'Concluído'}};
 
 function livTab(turma,btn){
-  document.querySelectorAll('.liv-page').forEach(function(p){p.classList.remove('on');});
-  document.querySelectorAll('.liv-tab').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('#sec-livros .liv-page').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('#sec-livros .liv-tab').forEach(function(b){b.classList.remove('on');});
   document.getElementById('liv-page-'+turma).classList.add('on');
   btn.classList.add('on');
 }
@@ -7183,6 +7207,79 @@ function livRegistrarUrl(key,url){
 }
 
 document.addEventListener('DOMContentLoaded',livRender);
+
+function seqTab(turma,btn){
+  document.querySelectorAll('#sec-sequencias .liv-page').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('#sec-sequencias .liv-tab').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('seq-page-'+turma).classList.add('on');
+  btn.classList.add('on');
+}
+
+var _seqStatus=JSON.parse(localStorage.getItem('seq_status')||'{}');
+function _seqSalvarStatus(){localStorage.setItem('seq_status',JSON.stringify(_seqStatus));}
+
+function seqSetStatus(key,st,evt){
+  if(evt)evt.stopPropagation();
+  _seqStatus[key]=(_seqStatus[key]===st)?'':st;
+  _seqSalvarStatus();
+  var card=document.querySelector('[data-seq="'+key+'"]');
+  if(card)_seqAtualizarCard(card,key);
+}
+
+function _seqAtualizarCard(card,key){
+  var st=_seqStatus[key]||'';
+  var seq=_clGetSeq(key)||{};
+  card.classList.remove('criando','concluido');
+  if(st)card.classList.add(st);
+  var ic=card.querySelector('.liv-card-ic');
+  if(ic)ic.textContent=_SEQ_ICS[st]?_SEQ_ICS[st].ic:'🗂';
+  var lbl=card.querySelector('.liv-card-nm');
+  if(lbl)lbl.textContent=seq.titulo?seq.titulo:(_SEQ_ICS[st]?_SEQ_ICS[st].lbl:'Não iniciado');
+}
+
+function seqRender(){
+  ['t1','t2','t3'].forEach(function(turma){
+    var page=document.getElementById('seq-page-'+turma);
+    if(!page)return;
+    page.innerHTML='';
+    (_LIV_DISCS[turma]||[]).forEach(function(disc){
+      var sec=document.createElement('div');
+      sec.className='liv-disc';
+      sec.innerHTML='<div class="liv-disc-h"><span class="ld '+disc.cor+'" style="width:12px;height:12px;border-radius:3px;flex-shrink:0;display:inline-block"></span>'+disc.nm+'</div>'
+        +'<div class="liv-grid" id="seq-g-'+turma+'-'+disc.id+'"></div>';
+      page.appendChild(sec);
+      var grid=document.getElementById('seq-g-'+turma+'-'+disc.id);
+      for(var b=1;b<=4;b++){
+        (function(bim){
+          var key=turma+'-'+disc.id+'-sb'+bim;
+          var st=_seqStatus[key]||'';
+          var seq=_clGetSeq(key)||{};
+          var card=document.createElement('div');
+          card.className='liv-card'+(st?' '+st:'');
+          card.setAttribute('data-seq',key);
+          card.innerHTML=
+            '<div class="liv-card-bim">'+bim+'º Bimestre</div>'
+            +'<span class="liv-card-ic">'+(_SEQ_ICS[st]?_SEQ_ICS[st].ic:'🗂')+'</span>'
+            +'<div class="liv-card-nm">'+(seq.titulo||(_SEQ_ICS[st]?_SEQ_ICS[st].lbl:'Não iniciado'))+'</div>'
+            +'<div class="liv-btns">'
+              +'<button class="liv-btn b-cri" onclick="seqSetStatus(\''+key+'\',\'criando\',event)">📝 Criando</button>'
+              +'<button class="liv-btn b-con" onclick="seqSetStatus(\''+key+'\',\'concluido\',event)">✅ Concluído</button>'
+              +'<button class="liv-btn b-ace" onclick="sequenciaAbrirModal(\''+key+'\',\''+turma+'\',\''+disc.nm.replace(/'/g,\"\\\\'\")+'\',\''+bim+'º Bimestre\',event)">✏️ Editar</button>'
+            +'</div>';
+          card.addEventListener('click',function(e){
+            if(e.target.closest('.liv-btn'))return;
+            var wasOpen=this.classList.contains('open');
+            document.querySelectorAll('#sec-sequencias .liv-card.open').forEach(function(c){c.classList.remove('open');});
+            if(!wasOpen)this.classList.add('open');
+          });
+          grid.appendChild(card);
+        })(b);
+      }
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded',seqRender);
 
 // ═══════════════════════════════════════════════════════
 // SYNC UNIVERSAL — tudo que muda num dispositivo aparece
@@ -7582,8 +7679,13 @@ function _clGetLivro(id){try{return JSON.parse(localStorage.getItem('cl_livro_'+
 function _clGetHist(id){try{return JSON.parse(localStorage.getItem('cl_hist_'+id)||'[]');}catch(e){return [];}  }
 function _clSaveLivro(id,obj){localStorage.setItem('cl_livro_'+id,JSON.stringify(obj));}
 function _clSaveHist(id,arr){localStorage.setItem('cl_hist_'+id,JSON.stringify(arr));}
+function _clGetSeq(id){try{return JSON.parse(localStorage.getItem('cl_seq_'+id)||'null');}catch(e){return null;}}
+function _clGetSeqHist(id){try{return JSON.parse(localStorage.getItem('cl_seq_hist_'+id)||'[]');}catch(e){return [];}}
+function _clSaveSeq(id,obj){localStorage.setItem('cl_seq_'+id,JSON.stringify(obj));}
+function _clSaveSeqHist(id,arr){localStorage.setItem('cl_seq_hist_'+id,JSON.stringify(arr));}
 
 var _clHistId=null, _clHistNome='';
+var _clSeqId=null, _clSeqNome='';
 
 function claudeHistorico(id, nome) {
   _clHistId = id; _clHistNome = nome;
@@ -7680,6 +7782,84 @@ function _clAddTema(id){
     +'<button class="cl-tema-del" onclick="_clDelTema(\''+id+'\','+idx+')">✕</button>';
   container.appendChild(div);
   div.querySelector('input[type=text]').focus();
+}
+
+function sequenciaAbrirModal(id,turma,disciplina,bimestre,evt){
+  if(evt)evt.stopPropagation();
+  _clSeqId=id; _clSeqNome=turma+' · '+disciplina+' · '+bimestre;
+  var seq=_clGetSeq(id)||{titulo:'',disciplina:disciplina,bimestre:bimestre,turma:{t1:'1ª Série',t2:'2ª Série',t3:'3ª Série'}[turma]||turma,objetivo:'',ferramentas:'',etapas:'',observacoes:'',url:''};
+  var hist=_clGetSeqHist(id);
+  var histHtml=hist.length?hist.slice().reverse().map(function(h){
+    return '<div class="cl-hist-item"><div class="ci">✅</div><div class="cd">'
+      +'<div class="ct">'+_clEsc(h.titulo||'Sem título')+'</div>'
+      +'<div class="cs">Concluída · '+_clEsc(h.data||'')+'</div>'
+      +'<div class="cm2">'+_clEsc(h.disciplina||'')+(h.bimestre?' · '+_clEsc(h.bimestre):'')+(h.turma?' · '+_clEsc(h.turma):'')+'</div>'
+      +'</div></div>';
+  }).join(''):'<div class="cl-hist-vazio">Nenhuma sequência concluída ainda.</div>';
+  var old=document.getElementById('cl-seq-modal');
+  if(old)old.remove();
+  var div=document.createElement('div');
+  div.id='cl-seq-modal';
+  div.className='cl-hist-overlay';
+  div.addEventListener('click',function(e){if(e.target===div)sequenciaFecharModal();});
+  div.innerHTML='<div class="cl-hist-inner">'
+    +'<div class="cl-hist-hd"><h3>🗂 '+_clEsc(_clSeqNome)+'</h3><p>Sequência atual e histórico por bimestre</p>'
+    +'<button class="cl-hist-close" onclick="sequenciaFecharModal()">✕</button></div>'
+    +'<div class="cl-hist-body">'
+    +'<div><div class="cl-hist-sec-lbl">✦ Sequência em produção</div>'
+    +'<div class="cl-livro-atual">'
+    +'<div class="cl-livro-campo"><label>Título</label><input type="text" id="cl-seq-titulo" value="'+_clEsc(seq.titulo||'')+'" placeholder="Ex: Sequência didática de argumentação"></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+    +'<div class="cl-livro-campo"><label>Disciplina</label><input type="text" id="cl-seq-disc" value="'+_clEsc(seq.disciplina||'')+'"></div>'
+    +'<div class="cl-livro-campo"><label>Bimestre</label><input type="text" id="cl-seq-bim" value="'+_clEsc(seq.bimestre||'')+'"></div>'
+    +'</div>'
+    +'<div class="cl-livro-campo"><label>Turma</label><input type="text" id="cl-seq-turma" value="'+_clEsc(seq.turma||'')+'"></div>'
+    +'<div class="cl-livro-campo"><label>Objetivo</label><input type="text" id="cl-seq-obj" value="'+_clEsc(seq.objetivo||'')+'" placeholder="Objetivo central da sequência"></div>'
+    +'<div class="cl-livro-campo"><label>Ferramentas/recursos</label><input type="text" id="cl-seq-fer" value="'+_clEsc(seq.ferramentas||'')+'" placeholder="Slides, livro, vídeo, IA, formulário..."></div>'
+    +'<div class="cl-livro-campo"><label>Etapas</label><input type="text" id="cl-seq-etp" value="'+_clEsc(seq.etapas||'')+'" placeholder="Diagnóstico, leitura, produção, revisão..."></div>'
+    +'<div class="cl-livro-campo"><label>Observações</label><input type="text" id="cl-seq-obs" value="'+_clEsc(seq.observacoes||'')+'" placeholder="Anotações importantes"></div>'
+    +'<div class="cl-livro-campo"><label>URL/arquivo</label><input type="text" id="cl-seq-url" value="'+_clEsc(seq.url||'')+'" placeholder="https://..."></div>'
+    +'<div style="display:flex;gap:8px;margin-top:2px">'
+    +'<button onclick="sequenciaSalvar(\''+id+'\')" style="flex:1;background:var(--vm);color:#fff;border:none;border-radius:8px;padding:9px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:.8rem">💾 Salvar</button>'
+    +'<button onclick="sequenciaMarcarConcluida(\''+id+'\')" style="flex:1;background:rgba(46,160,102,.1);color:#2a8a5a;border:1.5px solid rgba(46,160,102,.3);border-radius:8px;padding:9px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:.8rem">✅ Marcar concluída</button>'
+    +'</div></div></div>'
+    +'<div><div class="cl-hist-sec-lbl">✦ Histórico de sequências concluídas</div>'+histHtml+'</div>'
+    +'</div></div>';
+  document.body.appendChild(div);
+}
+
+function sequenciaFecharModal(){var m=document.getElementById('cl-seq-modal');if(m)m.remove();seqRender();}
+
+function sequenciaSalvar(id){
+  var seq=_clGetSeq(id)||{};
+  seq.titulo=((document.getElementById('cl-seq-titulo')||{}).value||'').trim();
+  seq.disciplina=((document.getElementById('cl-seq-disc')||{}).value||'').trim();
+  seq.bimestre=((document.getElementById('cl-seq-bim')||{}).value||'').trim();
+  seq.turma=((document.getElementById('cl-seq-turma')||{}).value||'').trim();
+  seq.objetivo=((document.getElementById('cl-seq-obj')||{}).value||'').trim();
+  seq.ferramentas=((document.getElementById('cl-seq-fer')||{}).value||'').trim();
+  seq.etapas=((document.getElementById('cl-seq-etp')||{}).value||'').trim();
+  seq.observacoes=((document.getElementById('cl-seq-obs')||{}).value||'').trim();
+  seq.url=((document.getElementById('cl-seq-url')||{}).value||'').trim();
+  _clSaveSeq(id,seq);
+  seqRender();
+  var btn=event.currentTarget;btn.textContent='✔ Salvo!';
+  setTimeout(function(){btn.textContent='💾 Salvar';},1600);
+}
+
+function sequenciaMarcarConcluida(id){
+  var seq=_clGetSeq(id);
+  if(!seq||!seq.titulo){alert('Defina o título da sequência antes de marcar como concluída.');return;}
+  sequenciaSalvar(id); seq=_clGetSeq(id);
+  var hist=_clGetSeqHist(id);
+  var hoje=new Date();
+  var data=('0'+hoje.getDate()).slice(-2)+'/'+('0'+(hoje.getMonth()+1)).slice(-2)+'/'+hoje.getFullYear();
+  hist.push({titulo:seq.titulo,disciplina:seq.disciplina,bimestre:seq.bimestre,turma:seq.turma,data:data});
+  _clSaveSeqHist(id,hist);
+  _seqStatus[id]='concluido';
+  _seqSalvarStatus();
+  _clSaveSeq(id,{titulo:'',disciplina:seq.disciplina,bimestre:seq.bimestre,turma:seq.turma,objetivo:'',ferramentas:'',etapas:'',observacoes:'',url:''});
+  sequenciaFecharModal();
 }
 
 function claudeTick() {
