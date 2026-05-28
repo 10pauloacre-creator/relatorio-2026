@@ -1025,21 +1025,16 @@ body.modo-escuro .pum-det{color:#8ab8a0}
   <div class="liv-leg-item"><div class="liv-dot nd"></div>Não iniciado</div>
   <div class="liv-leg-item"><div class="liv-dot cr"></div>Em criação</div>
   <div class="liv-leg-item"><div class="liv-dot co"></div>Concluído</div>
+  <div class="liv-leg-item" style="margin-left:auto;font-size:.72rem;opacity:.7">Clique no livro para registrar o status</div>
 </div>
 <div class="liv-tabs">
   <button class="liv-tab on" onclick="rhLivTab('lp',this)">📚 Língua Portuguesa</button>
   <button class="liv-tab" onclick="rhLivTab('ing',this)">📚 Inglês</button>
   <button class="liv-tab" onclick="rhLivTab('esp',this)">📚 Espanhol</button>
 </div>
-<div id="rh-liv-page-lp" class="liv-page on">
-  <div style="padding:24px;color:var(--cm);font-size:.88rem">Livros de LP serão listados aqui conforme produção.</div>
-</div>
-<div id="rh-liv-page-ing" class="liv-page">
-  <div style="padding:24px;color:var(--cm);font-size:.88rem">Livros de Inglês serão listados aqui conforme produção.</div>
-</div>
-<div id="rh-liv-page-esp" class="liv-page">
-  <div style="padding:24px;color:var(--cm);font-size:.88rem">Livros de Espanhol serão listados aqui conforme produção.</div>
-</div>
+<div id="rh-liv-page-lp" class="liv-page on"></div>
+<div id="rh-liv-page-ing" class="liv-page"></div>
+<div id="rh-liv-page-esp" class="liv-page"></div>
 </section>
 </main>
 
@@ -1137,6 +1132,21 @@ const RH_GRUPOS_CONT = {
   ing:{ container: 'rh-cont-ing', badge: 'ING', badgeStyle: 'background:#e8f9ef;color:#1f7a52', bar: 'linear-gradient(90deg,#27ae60,#58d68d)' },
   esp:{ container: 'rh-cont-esp', badge: 'ESP', badgeStyle: 'background:#f3e9fb;color:#7d3c98', bar: 'linear-gradient(90deg,#8e44ad,#c39bd3)' }
 };
+
+const RH_LIVROS_DISCS = {
+  lp: { nm:'Língua Portuguesa', cor:'d-lp', turmas:['t89','t1','t23'] },
+  ing:{ nm:'Inglês',            cor:'d-lp', turmas:['t89','t1','t23'] },
+  esp:{ nm:'Espanhol',          cor:'d-lp', turmas:['t89','t1','t23'] }
+};
+
+const RH_LIV_ICS = {
+  '':          { ic:'📘', lbl:'Não iniciado' },
+  criando:     { ic:'📕', lbl:'Criando' },
+  concluido:   { ic:'📗', lbl:'Concluído' }
+};
+
+var _rhLivStatus = JSON.parse(localStorage.getItem('rh_liv_status') || '{}');
+var _rhLivUrls = JSON.parse(localStorage.getItem('rh_liv_urls') || '{}');
 
 const RH_MESES = {
   Jan: 0, Fev: 1, Mar: 2, Abr: 3, Mai: 4, Jun: 5,
@@ -1443,6 +1453,81 @@ function rhLivTab(disc, btn) {
   if (pg) pg.classList.add('on');
 }
 
+function rhLivSalvarStatus() {
+  localStorage.setItem('rh_liv_status', JSON.stringify(_rhLivStatus));
+}
+
+function rhLivRegistrarUrl(key, url) {
+  _rhLivUrls[key] = url;
+  localStorage.setItem('rh_liv_urls', JSON.stringify(_rhLivUrls));
+}
+
+function rhLivSetStatus(key, st, evt) {
+  if (evt) evt.stopPropagation();
+  _rhLivStatus[key] = (_rhLivStatus[key] === st) ? '' : st;
+  rhLivSalvarStatus();
+  var card = document.querySelector('[data-rh-liv="' + key + '"]');
+  if (card) rhLivAtualizarCard(card, key);
+}
+
+function rhLivAtualizarCard(card, key) {
+  var st = _rhLivStatus[key] || '';
+  var livro = _rhGetLivro(key) || {};
+  card.classList.remove('criando', 'concluido');
+  if (st) card.classList.add(st);
+  var ic = card.querySelector('.liv-card-ic');
+  if (ic) ic.textContent = RH_LIV_ICS[st] ? RH_LIV_ICS[st].ic : '📘';
+  var lbl = card.querySelector('.liv-card-nm');
+  if (lbl) lbl.textContent = livro.titulo ? livro.titulo : (RH_LIV_ICS[st] ? RH_LIV_ICS[st].lbl : 'Não iniciado');
+}
+
+function rhLivRender() {
+  Object.keys(RH_LIVROS_DISCS).forEach(function(discId) {
+    var page = document.getElementById('rh-liv-page-' + discId);
+    if (!page) return;
+    page.innerHTML = '';
+    var disc = RH_LIVROS_DISCS[discId];
+
+    disc.turmas.forEach(function(turmaId) {
+      var sec = document.createElement('div');
+      sec.className = 'liv-disc';
+      sec.innerHTML =
+        '<div class="liv-disc-h"><span class="ld ' + disc.cor + '" style="width:12px;height:12px;border-radius:3px;flex-shrink:0;display:inline-block"></span>'
+        + RH_TURMA_LABELS[turmaId] + ' · ' + disc.nm + '</div>'
+        + '<div class="liv-grid" id="rh-liv-g-' + discId + '-' + turmaId + '"></div>';
+      page.appendChild(sec);
+
+      var grid = document.getElementById('rh-liv-g-' + discId + '-' + turmaId);
+      for (var b = 1; b <= 4; b++) {
+        (function(bim) {
+          var key = turmaId + '-' + discId + '-b' + bim;
+          var st = _rhLivStatus[key] || '';
+          var livro = _rhGetLivro(key) || {};
+          var card = document.createElement('div');
+          card.className = 'liv-card' + (st ? ' ' + st : '');
+          card.setAttribute('data-rh-liv', key);
+          card.innerHTML =
+            '<div class="liv-card-bim">' + bim + 'º Bimestre</div>'
+            + '<span class="liv-card-ic">' + (RH_LIV_ICS[st] ? RH_LIV_ICS[st].ic : '📘') + '</span>'
+            + '<div class="liv-card-nm">' + (livro.titulo || (RH_LIV_ICS[st] ? RH_LIV_ICS[st].lbl : 'Não iniciado')) + '</div>'
+            + '<div class="liv-btns">'
+              + '<button class="liv-btn b-cri" onclick="rhLivSetStatus(\'' + key + '\',\'criando\',event)">📝 Criando</button>'
+              + '<button class="liv-btn b-con" onclick="rhLivSetStatus(\'' + key + '\',\'concluido\',event)">✅ Concluído</button>'
+              + '<button class="liv-btn b-ace" onclick="rhLivroAbrirModal(\'' + key + '\',\'' + turmaId + '\',\'' + disc.nm.replace(/'/g, "\\'") + '\',\'' + bim + 'º Bimestre\',event)">✏️ Editar</button>'
+            + '</div>';
+          card.addEventListener('click', function(e) {
+            if (e.target.closest('.liv-btn')) return;
+            var aberto = this.classList.contains('open');
+            document.querySelectorAll('.liv-card.open').forEach(function(c) { c.classList.remove('open'); });
+            if (!aberto) this.classList.add('open');
+          });
+          grid.appendChild(card);
+        })(b);
+      }
+    });
+  });
+}
+
 // ═══════════════════════════════════════════════════════
 //  CLAUDE TIMER — versão localStorage (sem Firebase)
 // ═══════════════════════════════════════════════════════
@@ -1469,6 +1554,13 @@ function _rhGetHist(id){try{return JSON.parse(localStorage.getItem('rh_hist_'+id
 function _rhSaveLivro(id,obj){localStorage.setItem('rh_livro_'+id,JSON.stringify(obj));}
 function _rhSaveHist(id,arr){localStorage.setItem('rh_hist_'+id,JSON.stringify(arr));}
 var _rhHistId=null, _rhHistNome='';
+var _rhLivroCtx=null;
+
+function _rhReabrirLivroModal(){
+  if(!_rhLivroCtx)return;
+  if(_rhLivroCtx.kind==='claude') rhClaudeHistorico(_rhLivroCtx.id,_rhLivroCtx.nome);
+  if(_rhLivroCtx.kind==='grade') rhLivroAbrirModal(_rhLivroCtx.id,_rhLivroCtx.turmaId,_rhLivroCtx.disciplina,_rhLivroCtx.bimestre);
+}
 
 function rhClaudeRender() {
   var el = document.getElementById('rh-claude-cards');
@@ -1578,6 +1670,7 @@ function rhClaudePedirPermissao() {
 
 function rhClaudeHistorico(id, nome) {
   _rhHistId = id; _rhHistNome = nome;
+  _rhLivroCtx = { kind:'claude', id:id, nome:nome };
   var livro = _rhGetLivro(id) || {titulo:'',disciplina:'',bimestre:'',turma:'',temas:[]};
   var hist = _rhGetHist(id);
   var temasHtml = (livro.temas||[]).map(function(t,i){
@@ -1626,7 +1719,65 @@ function rhClaudeHistorico(id, nome) {
   document.body.appendChild(div);
 }
 
-function rhClaudeFecharHist(){var m=document.getElementById('rh-hist-modal');if(m)m.remove();rhClaudeRender();}
+function rhLivroAbrirModal(id, turmaId, disciplina, bimestre, evt) {
+  if (evt) evt.stopPropagation();
+  _rhHistId = id;
+  _rhHistNome = RH_TURMA_LABELS[turmaId] + ' · ' + disciplina + ' · ' + bimestre;
+  _rhLivroCtx = { kind:'grade', id:id, turmaId:turmaId, disciplina:disciplina, bimestre:bimestre };
+  var livro = _rhGetLivro(id) || {titulo:'',disciplina:disciplina,bimestre:bimestre,turma:RH_TURMA_LABELS[turmaId],temas:[],url:_rhLivUrls[id]||''};
+  if (!livro.disciplina) livro.disciplina = disciplina;
+  if (!livro.bimestre) livro.bimestre = bimestre;
+  if (!livro.turma) livro.turma = RH_TURMA_LABELS[turmaId];
+  if (livro.url === undefined) livro.url = _rhLivUrls[id] || '';
+  var hist = _rhGetHist(id);
+  var temasHtml = (livro.temas||[]).map(function(t,i){
+    return '<div class="cl-tema-item">'
+      +'<input type="checkbox" '+(t.ok?'checked':'')+' onchange="_rhTogTema(\''+id+'\','+i+',this.checked)">'
+      +'<input type="text" value="'+_rhEsc(t.t||'')+'" placeholder="Nome do tema" oninput="_rhEditTema(\''+id+'\','+i+',this.value)">'
+      +'<button class="cl-tema-del" onclick="_rhDelTema(\''+id+'\','+i+')">✕</button>'
+      +'</div>';
+  }).join('');
+  var histHtml = hist.length ? hist.slice().reverse().map(function(h){
+    return '<div class="cl-hist-item"><div class="ci">✅</div><div class="cd">'
+      +'<div class="ct">'+_rhEsc(h.titulo||'Sem título')+'</div>'
+      +'<div class="cs">Concluído · '+_rhEsc(h.data||'')+'</div>'
+      +'<div class="cm2">'+_rhEsc(h.disciplina||'')+(h.bimestre?' · '+_rhEsc(h.bimestre):'')+(h.turma?' · '+_rhEsc(h.turma):'')+'</div>'
+      +'</div></div>';
+  }).join('') : '<div class="cl-hist-vazio">Nenhum livro concluído ainda.</div>';
+  var old = document.getElementById('rh-hist-modal');
+  if(old) old.remove();
+  var div = document.createElement('div');
+  div.id = 'rh-hist-modal';
+  div.className = 'cl-hist-overlay';
+  div.addEventListener('click', function(e){if(e.target===div)rhClaudeFecharHist();});
+  div.innerHTML = '<div class="cl-hist-inner">'
+    +'<div class="cl-hist-hd"><h3>📚 '+_rhEsc(_rhHistNome)+'</h3><p>Livro atual e histórico de criação</p>'
+    +'<button class="cl-hist-close" onclick="rhClaudeFecharHist()">✕</button></div>'
+    +'<div class="cl-hist-body">'
+    +'<div><div class="cl-hist-sec-lbl">✦ Livro em criação</div>'
+    +'<div class="cl-livro-atual">'
+    +'<div class="cl-livro-campo"><label>Título</label><input type="text" id="rh-liv-titulo" value="'+_rhEsc(livro.titulo||'')+'" placeholder="Ex: Caderno '+_rhEsc(disciplina)+' '+_rhEsc(bimestre)+'"></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+    +'<div class="cl-livro-campo"><label>Disciplina</label><input type="text" id="rh-liv-disc" value="'+_rhEsc(livro.disciplina||'')+'" placeholder="Língua Portuguesa"></div>'
+    +'<div class="cl-livro-campo"><label>Bimestre</label><input type="text" id="rh-liv-bim" value="'+_rhEsc(livro.bimestre||'')+'" placeholder="1º Bimestre"></div>'
+    +'</div>'
+    +'<div class="cl-livro-campo"><label>Turma</label><input type="text" id="rh-liv-turma" value="'+_rhEsc(livro.turma||'')+'" placeholder="Ex: 1ª Série"></div>'
+    +'<div class="cl-livro-campo"><label>URL do livro</label><input type="text" id="rh-liv-url" value="'+_rhEsc(livro.url||'')+'" placeholder="https://..."></div>'
+    +'<div class="cl-livro-campo"><label>Temas</label>'
+    +'<div class="cl-temas-lista" id="rh-temas-lista">'+temasHtml+'</div>'
+    +'<button onclick="_rhAddTema(\''+id+'\')" style="margin-top:6px;font-size:.7rem;background:transparent;border:1px dashed var(--cl);color:var(--cm);border-radius:6px;padding:5px 12px;cursor:pointer;font-family:\'DM Sans\',sans-serif;transition:all .2s">+ Adicionar tema</button>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px;margin-top:2px">'
+    +'<button onclick="rhSalvarLivro(\''+id+'\')" style="flex:1;background:var(--vm);color:#fff;border:none;border-radius:8px;padding:9px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:.8rem">💾 Salvar</button>'
+    +'<button onclick="rhMarcarConcluido(\''+id+'\')" style="flex:1;background:rgba(46,160,102,.1);color:#2a8a5a;border:1.5px solid rgba(46,160,102,.3);border-radius:8px;padding:9px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:.8rem">✅ Marcar concluído</button>'
+    +'</div>'
+    +'</div></div>'
+    +'<div><div class="cl-hist-sec-lbl">✦ Histórico de livros concluídos</div>'+histHtml+'</div>'
+    +'</div></div>';
+  document.body.appendChild(div);
+}
+
+function rhClaudeFecharHist(){var m=document.getElementById('rh-hist-modal');if(m)m.remove();rhClaudeRender();rhLivRender();}
 
 function rhSalvarLivro(id){
   var livro=_rhGetLivro(id)||{temas:[]};
@@ -1634,9 +1785,15 @@ function rhSalvarLivro(id){
   livro.disciplina=((document.getElementById('rh-liv-disc')||{}).value||'').trim();
   livro.bimestre=((document.getElementById('rh-liv-bim')||{}).value||'').trim();
   livro.turma=((document.getElementById('rh-liv-turma')||{}).value||'').trim();
+  livro.url=((document.getElementById('rh-liv-url')||{}).value||'').trim();
   _rhSaveLivro(id,livro);
-  var btn=event.currentTarget; btn.textContent='✔ Salvo!';
-  setTimeout(function(){btn.textContent='💾 Salvar';},1600);
+  rhLivRegistrarUrl(id, livro.url || '');
+  rhLivRender();
+  var btn=(typeof event!=='undefined'&&event&&event.currentTarget)?event.currentTarget:null;
+  if(btn){
+    btn.textContent='✔ Salvo!';
+    setTimeout(function(){btn.textContent='💾 Salvar';},1600);
+  }
 }
 
 function rhMarcarConcluido(id){
@@ -1648,6 +1805,8 @@ function rhMarcarConcluido(id){
   var data=('0'+hoje.getDate()).slice(-2)+'/'+('0'+(hoje.getMonth()+1)).slice(-2)+'/'+hoje.getFullYear();
   hist.push({titulo:livro.titulo,disciplina:livro.disciplina,bimestre:livro.bimestre,turma:livro.turma,data:data});
   _rhSaveHist(id,hist);
+  _rhLivStatus[id]='concluido';
+  rhLivSalvarStatus();
   _rhSaveLivro(id,{titulo:'',disciplina:'',bimestre:'',turma:'',temas:[]});
   rhClaudeFecharHist();
 }
@@ -1656,7 +1815,7 @@ function _rhTogTema(id,idx,ok){var l=_rhGetLivro(id)||{temas:[]};if(l.temas[idx]
 function _rhEditTema(id,idx,val){var l=_rhGetLivro(id)||{temas:[]};if(l.temas[idx]!==undefined)l.temas[idx].t=val;_rhSaveLivro(id,l);}
 function _rhDelTema(id,idx){
   var l=_rhGetLivro(id)||{temas:[]};l.temas.splice(idx,1);_rhSaveLivro(id,l);
-  rhClaudeHistorico(_rhHistId,_rhHistNome);
+  _rhReabrirLivroModal();
 }
 function _rhAddTema(id){
   var l=_rhGetLivro(id)||{temas:[]};l.temas.push({t:'',ok:false});_rhSaveLivro(id,l);
@@ -1675,6 +1834,10 @@ setInterval(function() {
   var sec = document.getElementById('sec-claude');
   if (sec && sec.classList.contains('on')) rhClaudeTick();
 }, 1000);
+
+document.addEventListener('DOMContentLoaded', function() {
+  rhLivRender();
+});
 
 // ═══════════════════════════════════════════════════════
 //  MODAL EDITAR — Novo Relato (R. Hermínio)
