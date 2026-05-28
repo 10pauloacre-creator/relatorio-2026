@@ -981,12 +981,14 @@ body.modo-escuro .pum-det{color:#8ab8a0}
     <div class="sti">&#128200; Contador de H/Aulas</div>
     <div class="sst">Progresso por disciplina — E.E. Raimundo Hermínio de Melo</div>
   </div>
-  <div id="cont-grid-rh" class="cg"></div>
   <div class="ci">
     <h3>&#128202; Como funciona</h3>
-    <p>Feitas = soma da carga horária real registrada nos relatos. Na Raimundo Hermínio, os 15 minutos extras do turno da manhã contam como 0,25 h/aula para não haver perda no acumulado.</p>
-    <div class="ci-up">&#128197; Última atualização: —</div>
+    <p>Feitas = soma da carga horária real registrada nos relatos diários das abas por turma. As metas bimestrais e anuais são calculadas automaticamente quando a carga semanal da disciplina estiver definida.</p>
+    <div class="ci-up" id="rh-cont-upd">&#128197; Última atualização: —</div>
   </div>
+  <div class="cgt"><h3>Língua Portuguesa</h3><span class="bd bd-lp">LP</span></div><div class="ccards" id="rh-cont-lp"></div>
+  <div class="cgt"><h3>Inglês</h3><span class="bd" style="background:#e8f9ef;color:#1f7a52">ING</span></div><div class="ccards" id="rh-cont-ing"></div>
+  <div class="cgt"><h3>Espanhol</h3><span class="bd" style="background:#f3e9fb;color:#7d3c98">ESP</span></div><div class="ccards" id="rh-cont-esp"></div>
 </section>
 
 
@@ -1105,18 +1107,41 @@ const ATIVIDADES_RH = {
 };
 
 /* Contador de h/aulas por disciplina
-   sw = h/aula semanais (a definir), feitas = aulas dadas, bim = meta bimestral, tot = meta anual */
+   feitas = soma automática a partir dos relatos diários por turma */
 const DISC_RH = [
-  { g:'lp',  t:'8º/9º Ano', d:'Língua Portuguesa', sw:0,    feitas:0,    bim:0, tot:0 },
-  { g:'lp',  t:'1ª Série',  d:'Língua Portuguesa', sw:2.25, feitas:4,    bim:0, tot:0 },
-  { g:'lp',  t:'2ª/3ª Série', d:'Língua Portuguesa', sw:0,  feitas:0,    bim:0, tot:0 },
-  { g:'ing', t:'8º/9º Ano', d:'Inglês',            sw:0,    feitas:0,    bim:0, tot:0 },
-  { g:'ing', t:'1ª Série',  d:'Inglês',            sw:0,    feitas:0,    bim:0, tot:0 },
-  { g:'ing', t:'2ª/3ª Série', d:'Inglês',          sw:0,    feitas:0,    bim:0, tot:0 },
-  { g:'esp', t:'8º/9º Ano', d:'Espanhol',          sw:0,    feitas:0,    bim:0, tot:0 },
-  { g:'esp', t:'1ª Série',  d:'Espanhol',          sw:2.25, feitas:8.25, bim:0, tot:0 },
-  { g:'esp', t:'2ª/3ª Série', d:'Espanhol',        sw:0,    feitas:0,    bim:0, tot:0 }
+  { grupo:'lp',  turmaId:'t89', turma:'8º/9º Ano',   disc:'Língua Portuguesa', semanais:0 },
+  { grupo:'lp',  turmaId:'t1',  turma:'1ª Série',    disc:'Língua Portuguesa', semanais:2.25 },
+  { grupo:'lp',  turmaId:'t23', turma:'2ª/3ª Série', disc:'Língua Portuguesa', semanais:0 },
+  { grupo:'ing', turmaId:'t89', turma:'8º/9º Ano',   disc:'Inglês',            semanais:0 },
+  { grupo:'ing', turmaId:'t1',  turma:'1ª Série',    disc:'Inglês',            semanais:0 },
+  { grupo:'ing', turmaId:'t23', turma:'2ª/3ª Série', disc:'Inglês',            semanais:0 },
+  { grupo:'esp', turmaId:'t89', turma:'8º/9º Ano',   disc:'Espanhol',          semanais:0 },
+  { grupo:'esp', turmaId:'t1',  turma:'1ª Série',    disc:'Espanhol',          semanais:2.25 },
+  { grupo:'esp', turmaId:'t23', turma:'2ª/3ª Série', disc:'Espanhol',          semanais:0 }
 ];
+
+const RH_SECOES_TURMA = {
+  'sec-t89': 't89',
+  'sec-t1': 't1',
+  'sec-t23': 't23'
+};
+
+const RH_TURMA_LABELS = {
+  t89: '8º/9º Ano',
+  t1: '1ª Série',
+  t23: '2ª/3ª Série'
+};
+
+const RH_GRUPOS_CONT = {
+  lp: { container: 'rh-cont-lp', badge: 'LP', badgeStyle: 'background:var(--vs);color:var(--vm)', bar: 'linear-gradient(90deg,var(--vm),var(--vc))' },
+  ing:{ container: 'rh-cont-ing', badge: 'ING', badgeStyle: 'background:#e8f9ef;color:#1f7a52', bar: 'linear-gradient(90deg,#27ae60,#58d68d)' },
+  esp:{ container: 'rh-cont-esp', badge: 'ESP', badgeStyle: 'background:#f3e9fb;color:#7d3c98', bar: 'linear-gradient(90deg,#8e44ad,#c39bd3)' }
+};
+
+const RH_MESES = {
+  Jan: 0, Fev: 1, Mar: 2, Abr: 3, Mai: 4, Jun: 5,
+  Jul: 6, Ago: 7, Set: 8, Out: 9, Nov: 10, Dez: 11
+};
 
 function fmtHoraAula(valor) {
   if (valor === 0) return '0';
@@ -1128,6 +1153,97 @@ function fmtHoraAula(valor) {
   if (fracao === 0.5) return inteiro ? inteiro + 'h30' : '0h30';
   if (fracao === 0.75) return inteiro ? inteiro + 'h45' : '0h45';
   return String(valor).replace('.', ',');
+}
+
+function fmtNumeroRH(valor) {
+  return String(Math.round(valor * 100) / 100).replace('.', ',');
+}
+
+function fmtDataRH(data) {
+  return data.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
+}
+
+function parseHorasRH(txt) {
+  if (!txt) return 0;
+  var m = txt.match(/(\d+)h(?:(\d{2}))?/i);
+  if (!m) return 0;
+  var h = parseInt(m[1], 10);
+  var min = m[2] ? parseInt(m[2], 10) : 0;
+  return h + (min / 60);
+}
+
+function normalizarDiscRH(txt) {
+  if (!txt) return null;
+  if (txt.indexOf('Língua Portuguesa') >= 0) return { grupo:'lp', disc:'Língua Portuguesa' };
+  if (txt.indexOf('Inglês') >= 0) return { grupo:'ing', disc:'Inglês' };
+  if (txt.indexOf('Espanhol') >= 0) return { grupo:'esp', disc:'Espanhol' };
+  return null;
+}
+
+function parseDataCardRH(card) {
+  var dia = card.querySelector('.edb .d');
+  var mesAno = card.querySelector('.edb .my');
+  if (!dia || !mesAno) return null;
+  var partes = mesAno.textContent.trim().split(/\s+/);
+  if (partes.length < 2) return null;
+  var mes = RH_MESES[partes[0]];
+  var ano = parseInt(partes[1], 10);
+  if (mes === undefined || !ano) return null;
+  return new Date(ano, mes, parseInt(dia.textContent.trim(), 10));
+}
+
+function coletarAulasLancadasRH() {
+  var mapa = {};
+  var ultimaData = null;
+
+  Object.keys(RH_SECOES_TURMA).forEach(function(secId) {
+    var sec = document.getElementById(secId);
+    if (!sec) return;
+    var turmaId = RH_SECOES_TURMA[secId];
+    sec.querySelectorAll('.ea').forEach(function(card) {
+      var titulo = card.querySelector('.em .ed');
+      if (!titulo) return;
+      var infoDisc = normalizarDiscRH(titulo.textContent);
+      if (!infoDisc) return;
+      var horas = parseHorasRH(titulo.textContent);
+      var chave = turmaId + '_' + infoDisc.disc;
+      mapa[chave] = (mapa[chave] || 0) + horas;
+      var data = parseDataCardRH(card);
+      if (data && (!ultimaData || data > ultimaData)) ultimaData = data;
+    });
+  });
+
+  return { mapa: mapa, ultimaData: ultimaData };
+}
+
+function getBimAtualRH(feitas, bimestre) {
+  if (!bimestre) return 1;
+  for (var b = 1; b <= 4; b++) {
+    if (feitas < b * bimestre) return b;
+  }
+  return 4;
+}
+
+function addDiasRH(data, dias) {
+  var d = new Date(data);
+  d.setDate(d.getDate() + dias);
+  return d;
+}
+
+function calcBimestresRH(disc, feitas, dataRef) {
+  if (!disc.bimestre || !disc.semanais) return [];
+  var atual = [];
+  for (var b = 1; b <= 4; b++) {
+    var meta = b * disc.bimestre;
+    if (feitas >= meta) {
+      atual.push({ b: b, ok: true });
+      continue;
+    }
+    var faltam = meta - feitas;
+    var semanas = Math.ceil(faltam / disc.semanais);
+    atual.push({ b: b, ok: false, data: addDiasRH(dataRef, semanas * 7) });
+  }
+  return atual;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1224,21 +1340,77 @@ function renderAtividadesRH() {
 // ═══════════════════════════════════════════════════════
 
 function renderContRH() {
-  var el = document.getElementById('cont-grid-rh');
-  if (!el) return;
-  var cores = { lp:'#2980b9', ing:'#27ae60', esp:'#8e44ad' };
-  var html = '';
-  DISC_RH.forEach(function(d) {
-    var pct = d.bim > 0 ? Math.round((d.feitas / d.bim) * 100) : 0;
-    var cor = cores[d.g] || '#aaa';
-    html += '<div class="cc">'
-          + '<div class="cc-t">' + d.t + '</div>'
-          + '<div class="cc-d">' + d.d + '</div>'
-          + '<div class="cc-b"><div class="cc-p" style="width:' + Math.min(pct,100) + '%;background:' + cor + '"></div></div>'
-          + '<div class="cc-n"><span>' + fmtHoraAula(d.feitas) + '</span>/' + fmtHoraAula(d.bim) + ' h/aula bim. &nbsp;·&nbsp; ' + fmtHoraAula(d.tot) + ' anuais</div>'
-          + '</div>';
+  Object.keys(RH_GRUPOS_CONT).forEach(function(grupo) {
+    var el = document.getElementById(RH_GRUPOS_CONT[grupo].container);
+    if (el) el.innerHTML = '';
   });
-  el.innerHTML = html || '<div style="padding:24px;color:var(--cm)">Sem dados.</div>';
+
+  var dados = coletarAulasLancadasRH();
+  var dataRef = dados.ultimaData || new Date();
+  var upd = document.getElementById('rh-cont-upd');
+  if (upd) {
+    upd.innerHTML = '&#128197; Última atualização: ' + (dados.ultimaData ? fmtDataRH(dados.ultimaData) : '—');
+  }
+
+  DISC_RH.forEach(function(base) {
+    var confGrupo = RH_GRUPOS_CONT[base.grupo];
+    var container = document.getElementById(confGrupo.container);
+    if (!container) return;
+
+    var feitas = Math.round(((dados.mapa[base.turmaId + '_' + base.disc] || 0) + Number.EPSILON) * 100) / 100;
+    var semanais = base.semanais || 0;
+    var bimestre = semanais ? Math.round((semanais * 10 + Number.EPSILON) * 100) / 100 : 0;
+    var total = semanais ? Math.round((semanais * 40 + Number.EPSILON) * 100) / 100 : 0;
+    var bimAtual = getBimAtualRH(feitas, bimestre);
+    var inicioBim = bimestre ? (bimAtual - 1) * bimestre : 0;
+    var feitasBim = bimestre ? Math.max(0, Math.round(((feitas - inicioBim) + Number.EPSILON) * 100) / 100) : 0;
+    var faltamBim = bimestre ? Math.max(0, Math.round(((bimestre - feitasBim) + Number.EPSILON) * 100) / 100) : 0;
+    var faltamAno = total ? Math.max(0, Math.round(((total - feitas) + Number.EPSILON) * 100) / 100) : 0;
+    var pctBim = bimestre ? Math.min((feitasBim / bimestre) * 100, 100) : 0;
+    var pctAno = total ? Math.min((feitas / total) * 100, 100) : 0;
+    var bimestres = calcBimestresRH({ semanais: semanais, bimestre: bimestre }, feitas, dataRef);
+
+    var card = document.createElement('div');
+    card.className = 'cc';
+
+    var badgeTxt = semanais ? (bimAtual + 'º Bimestre') : confGrupo.badge;
+    var metaTxt = semanais
+      ? base.disc + ' · ' + fmtNumeroRH(semanais) + ' h/aula por semana'
+      : base.disc + ' · meta semanal ainda não definida';
+
+    var previsaoHtml = '';
+    if (bimestres.length) {
+      previsaoHtml = '<div class="brow">' + bimestres.map(function(item) {
+        var cls = item.ok ? 'co' : (item.b === bimAtual ? 'at' : '');
+        var rotulo = item.ok ? '&#10004; Concluído' : fmtDataRH(item.data);
+        return '<div class="bi ' + cls + '"><div class="bn">' + item.b + 'º Bim</div><div class="bd2">' + rotulo + '</div></div>';
+      }).join('') + '</div>';
+    }
+
+    var observacao = semanais
+      ? '<div class="ae">Estimativa calculada a partir dos relatos diários já lançados.</div>'
+      : '<div class="ae">A contagem automática já está ativa. Defina a carga semanal desta disciplina para liberar projeções bimestrais e anuais.</div>';
+
+    card.innerHTML =
+      '<div class="cch">'
+        + '<div><div class="cct">' + RH_TURMA_LABELS[base.turmaId] + '</div><div class="ccm">' + metaTxt + '</div></div>'
+        + '<div class="ccb" style="' + confGrupo.badgeStyle + '">' + badgeTxt + '</div>'
+      + '</div>'
+      + '<div class="ccbody">'
+        + '<div class="pg">'
+          + '<div class="pl"><span class="plt">' + (semanais ? (bimAtual + 'º Bimestre') : 'Aulas lançadas') + '</span><span class="pln">' + fmtHoraAula(bimestre ? feitasBim : feitas) + (bimestre ? ' / ' + fmtHoraAula(bimestre) + ' · faltam ' + fmtHoraAula(faltamBim) : ' h/aula acumuladas') + '</span></div>'
+          + '<div class="pbg"><div class="pf" style="width:' + pctBim + '%;background:' + confGrupo.bar + '"></div></div>'
+        + '</div>'
+        + '<div class="pg">'
+          + '<div class="pl"><span class="plt">Total do ano</span><span class="pln">' + fmtHoraAula(feitas) + (total ? ' / ' + fmtHoraAula(total) + ' · faltam ' + fmtHoraAula(faltamAno) : ' h/aula registradas') + '</span></div>'
+          + '<div class="pbg"><div class="pf dm" style="width:' + pctAno + '%;background:' + confGrupo.bar + '"></div></div>'
+        + '</div>'
+        + previsaoHtml
+        + observacao
+      + '</div>';
+
+    container.appendChild(card);
+  });
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1540,5 +1712,3 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
-
-
