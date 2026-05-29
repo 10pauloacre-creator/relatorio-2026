@@ -13,8 +13,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Relatório — Pe. Carlos Casavequia</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--tl:#6c3483;--tlv:#e8daef;--tc:#0e7a6b;--tcv:#d1f2eb;--la:#c0570a;--lav:#fdebd0;--az:#1a5276;--og:#876020;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -6933,12 +6933,14 @@ const _fbCfg = {
 };
 
 let _db = null;
-try {
-  if (typeof firebase !== 'undefined') {
-    if (!firebase.apps.length) firebase.initializeApp(_fbCfg);
-    _db = firebase.firestore();
-  }
-} catch(e) { _db = null; }
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    if (typeof firebase !== 'undefined') {
+      if (!firebase.apps.length) firebase.initializeApp(_fbCfg);
+      _db = firebase.firestore();
+    }
+  } catch(e) { _db = null; }
+});
 
 // Persistência: Firebase se disponível, senão localStorage
 function salvarStatus(key, cls, ativo) {
