@@ -23,7 +23,10 @@
       "Bash(Select-Object -First 100)",
       "Bash(head -20 \"/mnt/c/Downloads/relatorio-2026/casavequia.html\")",
       "Read(//mnt/c/Downloads/relatorio-2026/**)",
-      "Bash(git revert *)"
+      "Bash(git revert *)",
+      "Bash(node --input-type=module)",
+      "Bash(node -e ' *)",
+      "WebFetch(domain:10pauloacre-creator.github.io)"
     ],
     "additionalDirectories": [
       "\\tmp"
