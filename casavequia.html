@@ -6419,7 +6419,7 @@ document.getElementById('p6ano').classList.add('active');
 <script>
 function aba(id,btn){document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));document.getElementById('sec-'+id).classList.add('on');btn.classList.add('on');}
 function tog(h){const c=h.nextElementSibling,t=h.querySelector('.et'),o=c.classList.contains('on');c.classList.toggle('on',!o);t.classList.toggle('op',!o);}
-function itab(btn,pid){const ec=btn.closest('.ec2');ec.querySelectorAll('.itab').forEach(b=>b.classList.remove('on'));ec.querySelectorAll('.ipane').forEach(p=>p.classList.remove('on'));btn.classList.add('on');document.getElementById(pid).classList.add('on');}
+function itab(btn,pid){const ec=btn.closest('.ec2');ec.querySelectorAll('.itab').forEach(b=>b.classList.remove('on'));ec.querySelectorAll('.ipane').forEach(p=>p.classList.remove('on'));btn.classList.add('on');document.getElementById(pid).classList.add('on');if(pid.startsWith('p-')){renderPresenca();}if(pid.startsWith('a-')){renderAtividades();}}
 (function(){const m={1:'seg',2:'ter',4:'qui',5:'sex'},d=new Date().getDay(),id=m[d];if(!id)return;const h=document.getElementById('hd-'+id);if(h){const t=document.createElement('span');t.className='hj';t.textContent='Hoje';h.appendChild(t);}})();
 
 const ALUNOS={
@@ -6539,7 +6539,7 @@ function _presAplicarVisual(row,s){
 
 function renderPresenca(){
   Object.entries(PRESENCA).forEach(([id,cfg])=>{
-    const el=document.getElementById(id);if(!el)return;
+    const el=document.getElementById(id);if(!el||el.dataset.rendered)return;el.dataset.rendered='1';
     const al=ALUNOS[cfg.turma]||[];
     const fa=cfg.faltaram.length,fj=cfg.faltJ.length,pr=al.length-fa-fj;
     if(cfg.parcial){const av=document.createElement('div');av.className='pres-av';av.innerHTML='<span>⚠️</span><span><strong>Lista parcial:</strong> 5 presentes, nomes não registrados. Atualize quando possível.</span>';el.before(av);}
