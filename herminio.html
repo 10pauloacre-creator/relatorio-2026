@@ -471,10 +471,14 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .disc-tab,.bim-tab,.main-tab{padding:8px 16px;border-radius:10px;cursor:pointer;font-size:.84rem;font-weight:700;border:2px solid var(--cl);background:#fff;color:var(--cm);transition:all .18s}
 .disc-tab.lp{border-color:var(--lp);color:var(--lp)}
 .disc-tab.lp.active{background:var(--lp);color:#fff}
+.disc-tab.ing{border-color:#2e8b57;color:#2e8b57}
+.disc-tab.ing.active{background:#2e8b57;color:#fff}
 .disc-tab.esp{border-color:var(--az);color:var(--az)}
 .disc-tab.esp.active{background:var(--az);color:#fff}
 .bim-tab.lp{border-color:#b9d7f2;color:#285d93;background:#eef6fd}
 .bim-tab.lp.active{background:var(--lp);border-color:var(--lp);color:#fff}
+.bim-tab.ing{border-color:#bfe5cf;color:#1f6b45;background:#eefaf3}
+.bim-tab.ing.active{background:#2e8b57;border-color:#2e8b57;color:#fff}
 .bim-tab.esp{border-color:#cddcf7;color:#3468a8;background:#eef4ff}
 .bim-tab.esp.active{background:var(--az);border-color:var(--az);color:#fff}
 .disc-panel,.bim-panel{display:none}
@@ -1330,13 +1334,14 @@ body.modo-escuro .pum-det{color:#8ab8a0}
       <p>Planejamento organizado por disciplina e bimestre para a Escola Raimundo Hermínio de Melo.</p>
       <div class="plan-meta">
         <span class="plan-pill">Turma: 1ª Série</span>
-        <span class="plan-pill">Disciplinas: Língua Portuguesa e Língua Espanhola</span>
+        <span class="plan-pill">Disciplinas: Língua Portuguesa, Língua Inglesa e Língua Espanhola</span>
         <span class="plan-pill">Organização: por bimestre</span>
       </div>
     </div>
 
     <div class="disc-tabs">
       <div class="disc-tab lp active" onclick="rhPlanShowDisc('rh-d1lp1',this)">Língua Portuguesa</div>
+      <div class="disc-tab ing" onclick="rhPlanShowDisc('rh-d1ing1',this)">Língua Inglesa</div>
       <div class="disc-tab esp" onclick="rhPlanShowDisc('rh-d1esp1',this)">Língua Espanhola</div>
     </div>
 
@@ -1449,6 +1454,75 @@ body.modo-escuro .pum-det{color:#8ab8a0}
       </div>
     </div>
 
+    <div class="disc-panel" id="rh-d1ing1">
+      <div class="bim-tabs">
+        <div class="bim-tab ing active" onclick="rhPlanShowBim('rh-d1ing1-b1',this)">1º Bimestre</div>
+        <div class="bim-tab ing" onclick="rhPlanShowBim('rh-d1ing1-b2',this)">2º Bimestre</div>
+        <div class="bim-tab ing" onclick="rhPlanShowBim('rh-d1ing1-b3',this)">3º Bimestre</div>
+        <div class="bim-tab ing" onclick="rhPlanShowBim('rh-d1ing1-b4',this)">4º Bimestre</div>
+      </div>
+
+      <div class="bim-panel active" id="rh-d1ing1-b1">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura em Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Organização textual e construção do sentido global do texto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Palavras cognatas e pistas gráficas na leitura</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Gêneros textuais diversos em Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Contexto de produção dos gêneros textuais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Finalidade comunicativa, público-alvo e registro linguístico</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Pronomes pessoais em inglês</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Verbo <em>to be</em> no presente simples</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Adjetivos possessivos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title"><em>World Englishes</em>: variedades e usos da Língua Inglesa no mundo</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d1ing1-b2">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Persuasão em textos publicitários</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Recursos verbais e não verbais em campanhas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Cartazes de campanha de conscientização</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Empatia: <em>put oneself in someone’s shoes</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Presente Contínuo — <em>Present Continuous</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Gerúndio em Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura em inglês</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Conectores — <em>Linking Words</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Estrangeirismos: palavras em inglês no vocabulário português</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Pronomes possessivos, caso genitivo e pronomes objetos</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d1ing1-b3">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Repertório artístico-cultural vinculado à Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Manifestações culturais em inglês: literatura, música, cinema, dança e festividades</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title"><em>Black music</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title"><em>Street arts</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title"><em>Graffiti</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title"><em>Song lyrics</em> — letras de músicas em inglês</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Artigo definido e indefinido em inglês</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Adjetivos com sufixos <em>-ed</em> e <em>-ing</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Gêneros textuais escritos e orais: anúncios classificados, cardápios, receitas e notícias</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Anúncios publicitários em Língua Inglesa</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d1ing1-b4">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Expressões, gestos e comportamentos em diferentes contextos culturais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Aspectos culturais da sociedade e comunicação em inglês</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">A importância da prática de exercícios</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Vocabulário relacionado a esportes</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Linguagem em meio digital: “internetês”</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Textos com processos de remidiação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Produções multimídia e transmídia</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Gênero textual: entrevista</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Combate ao bullying e ao discurso de ódio</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Vocabulário sobre características físicas e adjetivos para descrever aparência</div></div></div>
+        </div>
+      </div>
+    </div>
+
     <div class="disc-panel" id="rh-d1esp1">
       <div class="bim-tabs">
         <div class="bim-tab esp active" onclick="rhPlanShowBim('rh-d1esp1-b1',this)">1º Bimestre</div>
@@ -1459,61 +1533,216 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 
       <div class="bim-panel active" id="rh-d1esp1-b1">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Acolhida e integração da turma em Língua Espanhola</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Apresentação pessoal em espanhol: quem sou eu?</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Descrição física, personalidade, sonhos e medos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">A importância de estudar a Língua Espanhola</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">O espanhol no mundo globalizado e nos países hispanohablantes</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Cultura, tradições, comidas, danças, festivais e músicas dos países de língua espanhola</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Profissões e oportunidades com o uso da Língua Espanhola</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Cumprimentos, despedidas e expressões básicas de comunicação em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Vocabulário e produção de frases de apresentação, pedidos e situações cotidianas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral de Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura em Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Pesquisa de textos em ambientes virtuais: interpretação, compreensão, qualidade e validade das informações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Origem e evolução da Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">A importância do Espanhol no mundo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Países e nacionalidades: <em>los países y nacionalidades</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Cumprimentos e despedidas formais e informais: <em>saludar y despedirse</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Apresentação pessoal e apresentação de outras pessoas: <em>presentarse y presentar a alguien</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Informações pessoais: pedir e dar nome, idade, telefone, origem e outras informações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Alfabeto, números, artigos definidos e indefinidos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Pronomes pessoais, pronomes interrogativos, verbos <em>ser</em>, <em>estar</em> e <em>tener</em>, presente do indicativo e sinais de pontuação</div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d1esp1-b2">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Acolhida e apresentação pessoal em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Descrição pessoal: características físicas, personalidade, sonhos e medos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">A importância da Língua Espanhola no mundo globalizado</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Países hispanohablantes e presença do espanhol no mundo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Cultura e tradições dos países de língua espanhola</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Profissões e oportunidades que exigem ou valorizam o espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Vocabulário básico: cumprimentos, agradecimentos e despedidas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Frases de apresentação e interação: nome, origem, gostos e rotina</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Análise audiovisual em espanhol a partir do filme “Godzilla y Kong: El nuevo imperio”: natureza, tecnologia, civilização e opinião crítica</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral de Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Impacto dos aspectos culturais diferentes na comunicação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Exploração de ambientes virtuais, plataformas de streaming, aplicativos e dicionários digitais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Manifestações culturais dos países de língua espanhola, com ênfase nos países latino-americanos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Produções artísticas e culturais de autores hispano-hablantes e latino-americanos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Aspectos sociais, culturais e históricos presentes em produções artísticas da América Latina</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Pluralidade linguística e cultural da Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Verbos no pretérito indefinido</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Diversidade cultural e gastronômica dos países de fala hispana</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Vocabulário de gastronomia: comidas típicas e alimentos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Pedir comida em restaurante e expressar gostos com os verbos <em>gustar</em>, <em>encantar</em>, <em>parecer</em> e <em>apetecer</em></div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d1esp1-b3">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Modo imperativo em espanhol: função comunicativa e importância</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Imperativo afirmativo: uso para instruções, sugestões e comandos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Formação do imperativo afirmativo com verbos regulares</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Formação do imperativo afirmativo com verbos irregulares</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Uso do imperativo afirmativo nas formas “tú”, “vosotros”, “usted” e “ustedes”</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Imperativo negativo: uso para proibições, advertências, conselhos e sugestões negativas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Formação do imperativo negativo com verbos regulares e irregulares</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Produção de frases, diálogos e textos curtos com imperativo afirmativo e negativo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Expressões idiomáticas populares em espanhol e uso contextualizado em textos e conversas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral de Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Cultura dos países falantes da Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Repertório cultural dos países fronteiriços</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Textos literários em língua espanhola: prosa e poesia</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Manifestações artísticas e culturais dos países de língua espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Cultura da Bolívia e do Peru</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">A música como influência cultural na Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Ritmos latino-americanos: <em>flamenco</em>, <em>tango</em> e outros</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Gêneros digitais em Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Textos multissemióticos e multimodais: HQs, tirinhas, charges, cartoons e memes</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Linguagem figurada, uso de <em>haber</em>, <em>estar</em> e <em>tener</em>, gênero e número de substantivos e adjetivos</div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d1esp1-b4">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Pesquisa de textos em ambientes virtuais</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Exploração de plataformas digitais, streaming e aplicativos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Análise e produção de anúncios e campanhas publicitárias em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Ações habituais e consequências para o meio ambiente</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Verbos irregulares no presente do indicativo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Verbos reflexivos e expressões de frequência</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Vocabulário do cotidiano: dias da semana, meses, horas e atividades de ócio</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Preconceitos, estereótipos e relações de poder relacionados a gênero e raça</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Expressões de opinião, gostos, preferências e causa em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Cinema espanhol e latino-americano como patrimônio artístico e influência cultural na língua espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Temas sociais em Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Danças como manifestação cultural nos países de língua espanhola oficial</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Bailes típicos: história e origem</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Pesquisa de textos em ambientes virtuais: interpretação, compreensão e validade das informações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Exploração de ambientes virtuais, plataformas de streaming e aplicativos digitais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Análise e construção de anúncios e campanhas publicitárias</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Ações habituais e suas consequências para o meio ambiente</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Verbos irregulares no presente do indicativo, verbos reflexivos e expressões de frequência</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Vocabulário do cotidiano: dias da semana, meses, horas e atividades de ócio</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Patrimônio artístico, cinema espanhol, cinema latino-americano e influência cultural do cinema na Língua Espanhola</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="plano-wrapper" style="margin-top:28px">
+    <div class="header">
+      <h3>2ª Série — Plano Anual por Disciplina</h3>
+      <p>Planejamento organizado por disciplina e bimestre para a Escola Raimundo Hermínio de Melo.</p>
+      <div class="plan-meta">
+        <span class="plan-pill">Turma: 2ª Série</span>
+        <span class="plan-pill">Disciplinas: Língua Inglesa e Língua Espanhola</span>
+        <span class="plan-pill">Organização: por bimestre</span>
+      </div>
+    </div>
+
+    <div class="disc-tabs">
+      <div class="disc-tab ing active" onclick="rhPlanShowDisc('rh-d2ing1',this)">Língua Inglesa</div>
+      <div class="disc-tab esp" onclick="rhPlanShowDisc('rh-d2esp1',this)">Língua Espanhola</div>
+    </div>
+
+    <div class="disc-panel active" id="rh-d2ing1">
+      <div class="bim-tabs">
+        <div class="bim-tab ing active" onclick="rhPlanShowBim('rh-d2ing1-b1',this)">1º Bimestre</div>
+        <div class="bim-tab ing" onclick="rhPlanShowBim('rh-d2ing1-b2',this)">2º Bimestre</div>
+        <div class="bim-tab ing" onclick="rhPlanShowBim('rh-d2ing1-b3',this)">3º Bimestre</div>
+        <div class="bim-tab ing" onclick="rhPlanShowBim('rh-d2ing1-b4',this)">4º Bimestre</div>
+      </div>
+
+      <div class="bim-panel active" id="rh-d2ing1-b1">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Situações comunicativas orais em sala de aula</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Significados denotativos e conotativos das palavras</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Escolha de vocabulário formal e informal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Contexto e adequação do vocabulário</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Mashup de músicas, filmes ou artes visuais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Uso das TDIC de forma criativa, ética e crítica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Produção, circulação e recepção de textos em ambientes digitais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Uso de aplicativos, plataformas digitais, dicionários digitais, museus online, jogos e softwares para estudo da língua inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Produção, edição e distribuição de conteúdo digital em diferentes semioses: verbal, sonora e visual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Verbos modais: <em>can</em>, <em>could</em>, <em>may</em>, <em>might</em>, <em>must</em>, <em>should</em>, <em>would</em></div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d2ing1-b2">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Preconceito de cor e classe: <em>color and class prejudice</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Preconceito de gênero: <em>gender bias</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Intolerância religiosa: <em>religious intolerance</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Direitos Humanos: compreensão da realidade social em discursos de diferentes práticas de linguagem</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Textos sobre poder, privilégio, racismo e desigualdade social</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Situações comunicativas orais em Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Orações condicionais: <em>if clauses</em>, <em>first conditional</em> e <em>second conditional</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Gêneros textuais orais e escritos: diálogos, letras de música, poemas, entrevistas, cartas e e-mails</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Gêneros de produção autoral e social: HQs, roteiros, pôsteres, textos literários, <em>slam poetry</em> e cartazes de conscientização</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Futuro imediato com <em>to be going to</em> e uso de quantificadores: <em>some</em>, <em>any</em>, <em>much</em>, <em>many</em>, <em>few</em>, <em>a lot of</em>, <em>little</em>, <em>every</em>, <em>each</em></div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d2ing1-b3">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Gêneros textuais diversos em Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Contexto de produção dos gêneros textuais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Período histórico, finalidade comunicativa e público-alvo dos textos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Registro linguístico em diferentes gêneros</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Músicas, filmes, peças de teatro, vídeos e obras de arte de países de língua inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Aspectos culturais e históricos em produções de língua inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Cultura estrangeira: <em>Thanksgiving Day</em>, <em>Halloween</em>, <em>Saint Patrick’s Day</em> e <em>Valentine’s Day</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura em Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Pronomes reflexivos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Obras da literatura inglesa, americana ou de outros países de língua inglesa e adjetivos comparativos de igualdade, superioridade e inferioridade</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d2ing1-b4">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Preconceito de cor, classe, gênero e intolerância religiosa em textos de Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Verbo <em>to be</em> no passado</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Preposições de lugar e tempo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Biografias de defensores dos Direitos Humanos: Nelson Mandela, Martin Luther King Jr. e Mahatma Gandhi</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Passado simples: <em>Simple Past</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title"><em>World Englishes</em>: variedades da Língua Inglesa no mundo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Língua Inglesa como língua franca</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Estrangeirismos no uso social da língua</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Pronomes interrogativos e advérbios</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Obras da literatura inglesa, americana ou de outros países de língua inglesa e pronomes relativos</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disc-panel" id="rh-d2esp1">
+      <div class="bim-tabs">
+        <div class="bim-tab esp active" onclick="rhPlanShowBim('rh-d2esp1-b1',this)">1º Bimestre</div>
+        <div class="bim-tab esp" onclick="rhPlanShowBim('rh-d2esp1-b2',this)">2º Bimestre</div>
+        <div class="bim-tab esp" onclick="rhPlanShowBim('rh-d2esp1-b3',this)">3º Bimestre</div>
+        <div class="bim-tab esp" onclick="rhPlanShowBim('rh-d2esp1-b4',this)">4º Bimestre</div>
+      </div>
+
+      <div class="bim-panel active" id="rh-d2esp1-b1">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Discursos em textos multissemióticos e multimodais: HQs, tirinhas, charges, cartoons e memes</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Gênero reportagem com temática de saúde física e mental</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Vocabulário relacionado à saúde: <em>la salud</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Pronomes complementos: <em>los pronombres complementos</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Estilo direto e indireto em espanhol</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Expressões impessoais: <em>expresiones impersonales</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">A importância do cuidado com a saúde</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title"><em>El doctor en la red</em>: automedicação e uso da internet para buscar informações sobre doenças</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Expressar dor, sintomas e doenças em espanhol</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Verbos e expressões para saúde e conselho: <em>doler</em>, <em>estar</em> y <em>tener dolor de</em>, <em>tener que</em>, <em>hay que</em>, pedir y dar consejos</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d2esp1-b2">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Direitos Humanos e compreensão da realidade social em discursos de diferentes práticas de linguagem</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Cidadania e civismo: respeito e valorização do idoso</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title"><em>El bullying / El acoso</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Vocabulário sobre bullying: <em>los tipos de acoso</em> e <em>la ley</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Gênero discursivo: currículo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Tema contemporâneo transversal: economia e trabalho</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Vocabulário profissional: <em>las carreras profesionales</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Adjetivos e estados de ânimo: <em>adjetivos y estados de ánimo</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Fazer elogios e falar com cortesia: <em>hacer cumplidos</em> e <em>hablar con cortesía</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Danças tradicionais de países de língua espanhola: <em>el flamenco</em>, <em>la salsa</em> y <em>el tango</em></div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d2esp1-b3">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Discursos em textos multissemióticos e multimodais: HQs, tirinhas, charges, cartoons e memes</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Produções artísticas e culturais de autores hispano-hablantes ou latino-americanos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Aspectos sociais, culturais e históricos em produções de língua espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Lendas latino-americanas em contexto amazônico: <em>leyendas latinoamericanas</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Contar algo ouvido ou relatado: <em>contar algo que has oído o que te han contado</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Informar e buscar informação em espanhol: <em>informar a los demás</em> e <em>informarte</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Expressar hipóteses sobre a veracidade de uma informação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Pretérito imperfeito do indicativo: <em>el pretérito imperfecto de indicativo</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Provérbios, expressões idiomáticas e variações fonéticas: <em>refranes</em>, <em>expresiones idiomáticas</em> e <em>yeísmo</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Patrimônio artístico de países de Língua Espanhola, com ênfase na Bolívia e no Peru: obras de arte, obras literárias e danças típicas</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d2esp1-b4">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Letras de música de artistas hispânicos com temas sociais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Discussão de censura, Direitos Humanos, liberdade e igualdade de gênero em músicas hispânicas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Debate sobre a música como forma de resistência</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Morfologia do espanhol: substantivo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Morfologia do espanhol: adjetivo e advérbio</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Expressões de localização e uso de preposições</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Apócope em espanhol</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Ditos populares e frases feitas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Vocabulário sobre estabelecimentos comerciais, cidade, viagem e meios de transporte</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Celebrações e datas festivas nos países hispânicos: calendário cultural latino-americano</div></div></div>
         </div>
       </div>
     </div>
