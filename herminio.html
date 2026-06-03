@@ -459,6 +459,37 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .lesson-item.st-sm{background:#f3f4f6!important;filter:grayscale(1);opacity:.55}
 .lesson-item.st-sm .lesson-title{color:#374151;text-decoration:line-through}
 .lesson-item.st-sm .lesson-num{background:#e5e7eb!important;color:#6b7280!important}
+.plano-wrapper{max-width:1100px;margin:0 auto}
+.plano-wrapper .header{background:linear-gradient(135deg,#173b2f,#24533e);color:#fff;border-radius:18px;padding:22px 24px;margin-bottom:18px;box-shadow:0 10px 28px rgba(0,0,0,.12)}
+.plano-wrapper .header h3{margin:0 0 6px;font-family:'Playfair Display',serif;font-size:1.4rem}
+.plano-wrapper .header p{margin:0;font-size:.9rem;opacity:.92;line-height:1.5}
+.plan-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.plan-pill{padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);font-size:.74rem;font-weight:700;letter-spacing:.03em}
+.disc-tabs,.bim-tabs{display:flex;flex-wrap:wrap;gap:8px}
+.disc-tabs{margin-bottom:16px}
+.bim-tabs{margin:0 0 18px}
+.disc-tab,.bim-tab,.main-tab{padding:8px 16px;border-radius:10px;cursor:pointer;font-size:.84rem;font-weight:700;border:2px solid var(--cl);background:#fff;color:var(--cm);transition:all .18s}
+.disc-tab.lp{border-color:var(--lp);color:var(--lp)}
+.disc-tab.lp.active{background:var(--lp);color:#fff}
+.disc-tab.esp{border-color:var(--az);color:var(--az)}
+.disc-tab.esp.active{background:var(--az);color:#fff}
+.bim-tab.lp{border-color:#b9d7f2;color:#285d93;background:#eef6fd}
+.bim-tab.lp.active{background:var(--lp);border-color:var(--lp);color:#fff}
+.bim-tab.esp{border-color:#cddcf7;color:#3468a8;background:#eef4ff}
+.bim-tab.esp.active{background:var(--az);border-color:var(--az);color:#fff}
+.disc-panel,.bim-panel{display:none}
+.disc-panel.active,.bim-panel.active{display:block}
+.lesson-list{display:grid;gap:10px}
+.lesson-item{display:flex;gap:14px;padding:14px 16px;border:1px solid #e7e1d5;border-radius:14px;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.04)}
+.lesson-num{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0;background:#e7f1fb;color:var(--lp)}
+.lesson-content{min-width:0}
+.lesson-title{font-size:.95rem;font-weight:700;color:var(--ce);line-height:1.35}
+.lesson-sub{font-size:.78rem;color:var(--cm);margin-top:4px;line-height:1.45}
+@media(max-width:680px){
+  .plano-wrapper .header{padding:18px}
+  .lesson-item{padding:12px 13px}
+  .lesson-title{font-size:.9rem}
+}
 /* ── PLANO — ÚLTIMA MODIFICAÇÃO ── */
 #plano-ultima-mod{display:none;align-items:center;gap:10px;padding:10px 16px;margin-bottom:12px;background:rgba(74,148,103,.08);border:1px solid rgba(74,148,103,.25);border-radius:10px;font-size:.82rem;color:var(--ce)}
 #plano-ultima-mod.on{display:flex}
@@ -1188,12 +1219,201 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <section class="sec" id="sec-plano">
   <div class="sh">
     <div class="sti">&#128203; Plano Anual</div>
-    <div class="sst">Planejamento por disciplina — a preencher</div>
+    <div class="sst">Conteúdos por disciplina e por bimestre</div>
   </div>
-  <div style="padding:48px;text-align:center;color:var(--cm)">
-    <div style="font-size:2rem;margin-bottom:12px">&#128203;</div>
-    <div style="font-weight:600;margin-bottom:6px">Plano anual em elaboração</div>
-    <div style="font-size:.85rem">As unidades e bimestros serão preenchidos em breve.</div>
+  <div class="plano-wrapper">
+    <div class="header">
+      <h3>1ª Série — Plano Anual por Disciplina</h3>
+      <p>Planejamento organizado por disciplina e bimestre para a Escola Raimundo Hermínio de Melo.</p>
+      <div class="plan-meta">
+        <span class="plan-pill">Turma: 1ª Série</span>
+        <span class="plan-pill">Disciplinas: Língua Portuguesa e Língua Espanhola</span>
+        <span class="plan-pill">Organização: por bimestre</span>
+      </div>
+    </div>
+
+    <div class="disc-tabs">
+      <div class="disc-tab lp active" onclick="rhPlanShowDisc('rh-d1lp1',this)">Língua Portuguesa</div>
+      <div class="disc-tab esp" onclick="rhPlanShowDisc('rh-d1esp1',this)">Língua Espanhola</div>
+    </div>
+
+    <div class="disc-panel active" id="rh-d1lp1">
+      <div class="bim-tabs">
+        <div class="bim-tab lp active" onclick="rhPlanShowBim('rh-d1lp1-b1',this)">1º Bimestre</div>
+        <div class="bim-tab lp" onclick="rhPlanShowBim('rh-d1lp1-b2',this)">2º Bimestre</div>
+        <div class="bim-tab lp" onclick="rhPlanShowBim('rh-d1lp1-b3',this)">3º Bimestre</div>
+        <div class="bim-tab lp" onclick="rhPlanShowBim('rh-d1lp1-b4',this)">4º Bimestre</div>
+      </div>
+
+      <div class="bim-panel active" id="rh-d1lp1-b1">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Leitura e Interpretação de Textos — Introdução</div><div class="lesson-sub">Plano da Padre Carlos replicado para a 1ª Série.</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Gêneros Textuais: Narração</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Gêneros Textuais: Descrição</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Gêneros Textuais: Dissertação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Ortografia e Acentuação Gráfica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Fonologia: Fonemas e Letras</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Morfologia: Substantivo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Morfologia: Adjetivo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Morfologia: Artigo e Numeral</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Coesão e Coerência Textual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Avaliação Diagnóstica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Correção e Retomada da Avaliação Diagnóstica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Produção Textual: Narrativa Pessoal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Revisão e Reescrita do Texto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Literatura Brasileira: Romantismo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Literatura: Poesia Romântica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Análise de Texto Literário</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Revisão Geral do Bimestre</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Avaliação Bimestral</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Correção e Encerramento do Bimestre</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d1lp1-b2">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Retomada e Correção das Avaliações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Morfologia: Pronome</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Morfologia: Verbo — Conceito e Classificação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Conjugação Verbal: Modo Indicativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Conjugação Verbal: Modo Subjuntivo e Imperativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Regência Verbal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Regência Nominal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Crase</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Pontuação: Vírgula</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Pontuação: Demais Sinais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Literatura: Realismo e Naturalismo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Literatura: Machado de Assis</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Análise de Conto Realista</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Produção Textual: Conto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Revisão do Texto Produzido</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Semântica: Sinonímia e Antonímia</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Semântica: Polissemia e Ambiguidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Revisão Geral do Bimestre</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Avaliação Bimestral</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Correção e Encerramento do Bimestre</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d1lp1-b3">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Retomada e Correção das Avaliações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Sintaxe: Sujeito</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Sintaxe: Predicado</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Sintaxe: Objeto Direto e Indireto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Sintaxe: Adjunto Adnominal e Adverbial</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Período Simples e Composto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Coordenação: Orações Coordenadas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Subordinação: Orações Substantivas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Subordinação: Orações Adjetivas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Subordinação: Orações Adverbiais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Literatura: Modernismo — 1ª Fase</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Literatura: Semana de Arte Moderna</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Análise de Poema Modernista</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Produção Textual: Artigo de Opinião</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Revisão e Reescrita</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Figuras de Linguagem: Metáfora e Metonímia</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Figuras de Linguagem: Outras Figuras</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Revisão Geral do Bimestre</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Avaliação Bimestral</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Correção e Encerramento do Bimestre</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d1lp1-b4">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Retomada e Correção das Avaliações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Variações Linguísticas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Linguagem Formal e Informal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Intertextualidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Literatura: Modernismo — 2ª e 3ª Fase</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Análise de Texto Contemporâneo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Produção Textual: Redação ENEM</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Estrutura da Redação ENEM</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Competências da Redação ENEM</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Proposta de Intervenção</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Revisão para o ENEM</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Simulado de Linguagens e Redação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Revisão Final de Gramática</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Revisão Final de Literatura</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Avaliação Bimestral</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Correção e Encerramento</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Encerramento do Ano Letivo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Revisão Geral</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Última Aula</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Conselho de Classe</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disc-panel" id="rh-d1esp1">
+      <div class="bim-tabs">
+        <div class="bim-tab esp active" onclick="rhPlanShowBim('rh-d1esp1-b1',this)">1º Bimestre</div>
+        <div class="bim-tab esp" onclick="rhPlanShowBim('rh-d1esp1-b2',this)">2º Bimestre</div>
+        <div class="bim-tab esp" onclick="rhPlanShowBim('rh-d1esp1-b3',this)">3º Bimestre</div>
+        <div class="bim-tab esp" onclick="rhPlanShowBim('rh-d1esp1-b4',this)">4º Bimestre</div>
+      </div>
+
+      <div class="bim-panel active" id="rh-d1esp1-b1">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Acolhida e integração da turma em Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Apresentação pessoal em espanhol: quem sou eu?</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Descrição física, personalidade, sonhos e medos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">A importância de estudar a Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">O espanhol no mundo globalizado e nos países hispanohablantes</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Cultura, tradições, comidas, danças, festivais e músicas dos países de língua espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Profissões e oportunidades com o uso da Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Cumprimentos, despedidas e expressões básicas de comunicação em espanhol</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Vocabulário e produção de frases de apresentação, pedidos e situações cotidianas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral de Língua Espanhola</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d1esp1-b2">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Acolhida e apresentação pessoal em espanhol</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Descrição pessoal: características físicas, personalidade, sonhos e medos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">A importância da Língua Espanhola no mundo globalizado</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Países hispanohablantes e presença do espanhol no mundo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Cultura e tradições dos países de língua espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Profissões e oportunidades que exigem ou valorizam o espanhol</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Vocabulário básico: cumprimentos, agradecimentos e despedidas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Frases de apresentação e interação: nome, origem, gostos e rotina</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Análise audiovisual em espanhol a partir do filme “Godzilla y Kong: El nuevo imperio”: natureza, tecnologia, civilização e opinião crítica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral de Língua Espanhola</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d1esp1-b3">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Modo imperativo em espanhol: função comunicativa e importância</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Imperativo afirmativo: uso para instruções, sugestões e comandos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Formação do imperativo afirmativo com verbos regulares</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Formação do imperativo afirmativo com verbos irregulares</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Uso do imperativo afirmativo nas formas “tú”, “vosotros”, “usted” e “ustedes”</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Imperativo negativo: uso para proibições, advertências, conselhos e sugestões negativas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Formação do imperativo negativo com verbos regulares e irregulares</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Produção de frases, diálogos e textos curtos com imperativo afirmativo e negativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Expressões idiomáticas populares em espanhol e uso contextualizado em textos e conversas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral de Língua Espanhola</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d1esp1-b4">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Pesquisa de textos em ambientes virtuais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Exploração de plataformas digitais, streaming e aplicativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Análise e produção de anúncios e campanhas publicitárias em espanhol</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Ações habituais e consequências para o meio ambiente</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Verbos irregulares no presente do indicativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Verbos reflexivos e expressões de frequência</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Vocabulário do cotidiano: dias da semana, meses, horas e atividades de ócio</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Preconceitos, estereótipos e relações de poder relacionados a gênero e raça</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Expressões de opinião, gostos, preferências e causa em espanhol</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Cinema espanhol e latino-americano como patrimônio artístico e influência cultural na língua espanhola</div></div></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -2343,6 +2563,26 @@ document.addEventListener('DOMContentLoaded', function() {
   rhLivRender();
   rhSeqRender();
 });
+
+function rhPlanShowDisc(did, el) {
+  var parent = el.closest('.plano-wrapper');
+  if (!parent) return;
+  parent.querySelectorAll('.disc-panel').forEach(function(p){ p.classList.remove('active'); });
+  parent.querySelectorAll('.disc-tab').forEach(function(t){ t.classList.remove('active'); });
+  var target = document.getElementById(did);
+  if (target) target.classList.add('active');
+  el.classList.add('active');
+}
+
+function rhPlanShowBim(bid, el) {
+  var parent = el.closest('.disc-panel');
+  if (!parent) return;
+  parent.querySelectorAll('.bim-panel').forEach(function(p){ p.classList.remove('active'); });
+  parent.querySelectorAll('.bim-tab').forEach(function(t){ t.classList.remove('active'); });
+  var target = document.getElementById(bid);
+  if (target) target.classList.add('active');
+  el.classList.add('active');
+}
 
 // ═══════════════════════════════════════════════════════
 //  MODAL EDITAR — Novo Relato (R. Hermínio)
