@@ -459,40 +459,53 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .lesson-item.st-sm{background:#f3f4f6!important;filter:grayscale(1);opacity:.55}
 .lesson-item.st-sm .lesson-title{color:#374151;text-decoration:line-through}
 .lesson-item.st-sm .lesson-num{background:#e5e7eb!important;color:#6b7280!important}
-.plano-wrapper{max-width:1100px;margin:0 auto}
-.plano-wrapper .header{background:linear-gradient(135deg,#173b2f,#24533e);color:#fff;border-radius:18px;padding:22px 24px;margin-bottom:18px;box-shadow:0 10px 28px rgba(0,0,0,.12)}
-.plano-wrapper .header h3{margin:0 0 6px;font-family:'Playfair Display',serif;font-size:1.4rem}
-.plano-wrapper .header p{margin:0;font-size:.9rem;opacity:.92;line-height:1.5}
-.plan-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-.plan-pill{padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);font-size:.74rem;font-weight:700;letter-spacing:.03em}
-.disc-tabs,.bim-tabs{display:flex;flex-wrap:wrap;gap:8px}
-.disc-tabs{margin-bottom:16px}
-.bim-tabs{margin:0 0 18px}
-.disc-tab,.bim-tab,.main-tab{padding:8px 16px;border-radius:10px;cursor:pointer;font-size:.84rem;font-weight:700;border:2px solid var(--cl);background:#fff;color:var(--cm);transition:all .18s}
+.plano-wrapper{font-family:'Segoe UI',system-ui,sans-serif;max-width:1100px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(15,23,42,.08)}
+.plano-wrapper .header{background:#1e293b;color:#fff;padding:16px 24px}
+.plano-wrapper .header h1{margin:0;font-size:1.05rem;font-weight:700}
+.plano-wrapper .header p{margin:2px 0 0;font-size:.78rem;opacity:.75;line-height:1.45}
+.main-tabs{display:flex;background:#334155;overflow-x:auto}
+.main-tab{padding:12px 20px;color:rgba(255,255,255,.75);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;font-size:.9rem;transition:all .2s;font-weight:600}
+.main-tab:hover{color:#fff;background:rgba(255,255,255,.1)}
+.main-tab.active{color:#fff;border-bottom-color:#38bdf8}
+.content{max-width:1100px;margin:0 auto;padding:16px;background:#f8fafc}
+.page,.disc-panel,.bim-panel{display:none}
+.page.active,.disc-panel.active,.bim-panel.active{display:block}
+#rh-plan-clone-root{margin-bottom:20px}
+.rh-plan-legacy-hidden{display:none!important}
+.disc-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.disc-tab{padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;border:2px solid;transition:all .2s;background:#fff}
 .disc-tab.lp{border-color:var(--lp);color:var(--lp)}
 .disc-tab.lp.active{background:var(--lp);color:#fff}
-.disc-tab.ing{border-color:#2e8b57;color:#2e8b57}
-.disc-tab.ing.active{background:#2e8b57;color:#fff}
-.disc-tab.esp{border-color:var(--az);color:var(--az)}
-.disc-tab.esp.active{background:var(--az);color:#fff}
-.bim-tab.lp{border-color:#b9d7f2;color:#285d93;background:#eef6fd}
-.bim-tab.lp.active{background:var(--lp);border-color:var(--lp);color:#fff}
-.bim-tab.ing{border-color:#bfe5cf;color:#1f6b45;background:#eefaf3}
-.bim-tab.ing.active{background:#2e8b57;border-color:#2e8b57;color:#fff}
-.bim-tab.esp{border-color:#cddcf7;color:#3468a8;background:#eef4ff}
-.bim-tab.esp.active{background:var(--az);border-color:var(--az);color:#fff}
-.disc-panel,.bim-panel{display:none}
-.disc-panel.active,.bim-panel.active{display:block}
-.lesson-list{display:grid;gap:10px}
-.lesson-item{display:flex;gap:14px;padding:14px 16px;border:1px solid #e7e1d5;border-radius:14px;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.04)}
-.lesson-num{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0;background:#e7f1fb;color:var(--lp)}
-.lesson-content{min-width:0}
-.lesson-title{font-size:.95rem;font-weight:700;color:var(--ce);line-height:1.35}
-.lesson-sub{font-size:.78rem;color:var(--cm);margin-top:4px;line-height:1.45}
+.disc-tab.ing{border-color:#2563eb;color:#2563eb}
+.disc-tab.ing.active{background:#2563eb;color:#fff}
+.disc-tab.esp{border-color:#7c3aed;color:#7c3aed}
+.disc-tab.esp.active{background:#7c3aed;color:#fff}
+.bim-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.bim-tab{padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.8rem;font-weight:600;background:#e2e8f0;color:#374151;transition:all .2s}
+.bim-tab.active.lp{background:var(--lp);color:#fff}
+.bim-tab.active.ing{background:#2563eb;color:#fff}
+.bim-tab.active.esp{background:#7c3aed;color:#fff}
+.bim-header{background:#fff;border-radius:8px 8px 0 0;padding:12px 16px;border-left:4px solid;margin-bottom:0;display:flex;align-items:center;gap:10px}
+.bim-header.lp{border-color:var(--lp)}
+.bim-header.ing{border-color:#2563eb}
+.bim-header.esp{border-color:#7c3aed}
+.bim-header h3{font-size:.95rem;margin:0}
+.bim-header .badge{font-size:.75rem;background:#f1f5f9;padding:2px 8px;border-radius:12px;color:#374151}
+.lesson-list{background:#fff;border-radius:0 0 8px 8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:16px}
+.lesson-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid #f1f5f9;transition:background .15s}
+.lesson-item:last-child{border-bottom:none}
+.lesson-item:hover{background:#f8fafc}
+.lesson-num{font-size:.7rem;font-weight:700;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.lp .lesson-num{background:#e8f5ee;color:var(--lp)}
+.ing .lesson-num{background:#dbeafe;color:#2563eb}
+.esp .lesson-num{background:#f3e8ff;color:#7c3aed}
+.lesson-text,.lesson-content{flex:1;min-width:0}
+.lesson-title{font-size:.85rem;font-weight:600;color:#111827;line-height:1.4}
+.lesson-sub{font-size:.76rem;color:#374151;margin-top:2px;line-height:1.45}
 @media(max-width:680px){
-  .plano-wrapper .header{padding:18px}
-  .lesson-item{padding:12px 13px}
-  .lesson-title{font-size:.9rem}
+  .plano-wrapper .header{padding:16px 18px}
+  .content{padding:12px}
+  .main-tab{padding:11px 16px;font-size:.84rem}
 }
 /* ── PLANO — ÚLTIMA MODIFICAÇÃO ── */
 #plano-ultima-mod{display:none;align-items:center;gap:10px;padding:10px 16px;margin-bottom:12px;background:rgba(74,148,103,.08);border:1px solid rgba(74,148,103,.25);border-radius:10px;font-size:.82rem;color:var(--ce)}
@@ -1328,6 +1341,7 @@ body.modo-escuro .pum-det{color:#8ab8a0}
     <div class="sti">&#128203; Plano Anual</div>
     <div class="sst">Conteúdos por disciplina e por bimestre</div>
   </div>
+  <div id="rh-plan-clone-root"></div>
   <div class="plano-wrapper">
     <div class="header">
       <h3>1ª Série — Plano Anual por Disciplina</h3>
@@ -1595,10 +1609,10 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 
   <div class="plano-wrapper" style="margin-top:28px">
     <div class="header">
-      <h3>2ª Série — Plano Anual por Disciplina</h3>
+      <h3>2ª/3ª Série — Plano Anual por Disciplina</h3>
       <p>Planejamento organizado por disciplina e bimestre para a Escola Raimundo Hermínio de Melo.</p>
       <div class="plan-meta">
-        <span class="plan-pill">Turma: 2ª Série</span>
+        <span class="plan-pill">Turma: 2ª/3ª Série</span>
         <span class="plan-pill">Disciplinas: Língua Inglesa e Língua Espanhola</span>
         <span class="plan-pill">Organização: por bimestre</span>
       </div>
@@ -1619,61 +1633,61 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 
       <div class="bim-panel active" id="rh-d2ing1-b1">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Situações comunicativas orais em sala de aula</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Significados denotativos e conotativos das palavras</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Escolha de vocabulário formal e informal</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Contexto e adequação do vocabulário</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Mashup de músicas, filmes ou artes visuais</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Uso das TDIC de forma criativa, ética e crítica</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Produção, circulação e recepção de textos em ambientes digitais</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Uso de aplicativos, plataformas digitais, dicionários digitais, museus online, jogos e softwares para estudo da língua inglesa</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Produção, edição e distribuição de conteúdo digital em diferentes semioses: verbal, sonora e visual</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Verbos modais: <em>can</em>, <em>could</em>, <em>may</em>, <em>might</em>, <em>must</em>, <em>should</em>, <em>would</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Situações comunicativas orais em Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Vocabulário formal e informal em diferentes contextos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Sentido denotativo e conotativo das palavras</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Questões sociais, ambientais e políticas em escala local, regional e global</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Solidariedade, ética e responsabilidade social</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Conscientização corporal e saúde: <em>Body Awareness Quiz</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Uso das TDIC em práticas de linguagem em inglês</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Produção, edição e circulação de conteúdos digitais multimodais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Mashup de músicas, filmes e artes visuais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Verbos modais e conjunções para expressar habilidade, obrigação, possibilidade, causa, contraste, condição, tempo e adição</div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d2ing1-b2">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Preconceito de cor e classe: <em>color and class prejudice</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Preconceito de gênero: <em>gender bias</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Intolerância religiosa: <em>religious intolerance</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Direitos Humanos: compreensão da realidade social em discursos de diferentes práticas de linguagem</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Textos sobre poder, privilégio, racismo e desigualdade social</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Situações comunicativas orais em Língua Inglesa</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Orações condicionais: <em>if clauses</em>, <em>first conditional</em> e <em>second conditional</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Gêneros textuais orais e escritos: diálogos, letras de música, poemas, entrevistas, cartas e e-mails</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Gêneros de produção autoral e social: HQs, roteiros, pôsteres, textos literários, <em>slam poetry</em> e cartazes de conscientização</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Futuro imediato com <em>to be going to</em> e uso de quantificadores: <em>some</em>, <em>any</em>, <em>much</em>, <em>many</em>, <em>few</em>, <em>a lot of</em>, <em>little</em>, <em>every</em>, <em>each</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Direitos Humanos em textos e discursos de Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Preconceito de cor, classe, gênero e intolerância religiosa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Poder, privilégio, racismo e desigualdade social</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Humor e crítica social em charges, memes e programas de comédia</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Discursos de líderes políticos, ativistas e movimentos sociais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Textos sobre igualdade de gênero, diversidade étnica e mudanças climáticas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Gêneros textuais orais e escritos: diálogos, entrevistas, cartas, e-mails, poemas e letras de música</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Produções de conscientização: pôsteres, cartazes, <em>slam poetry</em> e textos literários</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Orações condicionais: <em>if clauses</em>, <em>first conditional</em> e <em>second conditional</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title"><em>Present Perfect</em>, futuro imediato com <em>to be going to</em>, quantificadores e <em>linking words</em></div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d2ing1-b3">
         <div class="lesson-list">
           <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Gêneros textuais diversos em Língua Inglesa</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Contexto de produção dos gêneros textuais</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Período histórico, finalidade comunicativa e público-alvo dos textos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Registro linguístico em diferentes gêneros</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Músicas, filmes, peças de teatro, vídeos e obras de arte de países de língua inglesa</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Aspectos culturais e históricos em produções de língua inglesa</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Cultura estrangeira: <em>Thanksgiving Day</em>, <em>Halloween</em>, <em>Saint Patrick’s Day</em> e <em>Valentine’s Day</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura em Língua Inglesa</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Pronomes reflexivos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Obras da literatura inglesa, americana ou de outros países de língua inglesa e adjetivos comparativos de igualdade, superioridade e inferioridade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Contexto de produção: período histórico, finalidade, público-alvo e registro linguístico</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura e análise de textos em inglês</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Textos sobre questões culturais, sociais, políticas e globais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Textos argumentativos e expositivos em Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Estruturação de ideias, argumentos e posicionamentos críticos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Músicas, filmes, peças de teatro, vídeos e obras de arte de países de língua inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Literatura em Língua Inglesa, teatro, poesia e <em>storytelling</em> visual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Cultura estrangeira: <em>Thanksgiving Day</em>, <em>Halloween</em>, <em>Saint Patrick’s Day</em> e <em>Valentine’s Day</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Pronomes reflexivos, comparativos e recursos linguísticos para comparação e descrição</div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d2ing1-b4">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Preconceito de cor, classe, gênero e intolerância religiosa em textos de Língua Inglesa</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Verbo <em>to be</em> no passado</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Preposições de lugar e tempo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Biografias de defensores dos Direitos Humanos: Nelson Mandela, Martin Luther King Jr. e Mahatma Gandhi</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Passado simples: <em>Simple Past</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title"><em>World Englishes</em>: variedades da Língua Inglesa no mundo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Língua Inglesa como língua franca</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Estrangeirismos no uso social da língua</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Pronomes interrogativos e advérbios</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Obras da literatura inglesa, americana ou de outros países de língua inglesa e pronomes relativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Textos multimodais em inglês: anúncios, HQs, infográficos, videoclipes, memes e tweets</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Figuras de linguagem em inglês: <em>Figures of Speech</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Inglês acadêmico e profissional</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Produção de currículos, e-mails formais, entrevistas e apresentações em inglês</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Biografias de defensores dos Direitos Humanos: Nelson Mandela, Martin Luther King Jr. e Mahatma Gandhi</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title"><em>Simple Past</em>, verbo <em>to be</em> no passado e contraste entre <em>Simple Past</em> e <em>Present Perfect</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title"><em>World Englishes</em>, inglês como língua franca e estrangeirismos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Preposições de lugar e tempo, pronomes interrogativos, advérbios e pronomes relativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Grau superlativo dos adjetivos: <em>superlative form</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Conjunções aditivas, adversativas, causais e alternativas: <em>and</em>, <em>also</em>, <em>but</em>, <em>however</em>, <em>because</em>, <em>since</em>, <em>or</em></div></div></div>
         </div>
       </div>
     </div>
@@ -1688,61 +1702,61 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 
       <div class="bim-panel active" id="rh-d2esp1-b1">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Discursos em textos multissemióticos e multimodais: HQs, tirinhas, charges, cartoons e memes</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Textos multissemióticos e multimodais: HQs, tirinhas, charges, cartoons e memes</div></div></div>
           <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Gênero reportagem com temática de saúde física e mental</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Vocabulário relacionado à saúde: <em>la salud</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Pronomes complementos: <em>los pronombres complementos</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Estilo direto e indireto em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Expressões impessoais: <em>expresiones impersonales</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">A importância do cuidado com a saúde</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title"><em>El doctor en la red</em>: automedicação e uso da internet para buscar informações sobre doenças</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Expressar dor, sintomas e doenças em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Verbos e expressões para saúde e conselho: <em>doler</em>, <em>estar</em> y <em>tener dolor de</em>, <em>tener que</em>, <em>hay que</em>, pedir y dar consejos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Vocabulário de saúde: <em>la salud</em>, dores, sintomas e doenças</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Cuidado com a saúde, automedicação e uso da internet para buscar informações sobre doenças</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Expressar dor, sintomas, doenças e pedir ou dar conselhos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Verbos e expressões: <em>doler</em>, <em>estar</em> y <em>tener dolor de</em>, <em>tener que</em>, <em>hay que</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Gênero anúncio/classificados e linguagem do mundo do trabalho</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Elaboração de <em>curriculum vitae</em> e vocabulário profissional: <em>las profesiones</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Descrição de vaga de trabalho e orientações para entrevista</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Pronomes complementos, estilo direto e indireto, expressões impessoais, pretérito imperfeito do subjuntivo e estilo indireto</div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d2esp1-b2">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Direitos Humanos e compreensão da realidade social em discursos de diferentes práticas de linguagem</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Cidadania e civismo: respeito e valorização do idoso</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title"><em>El bullying / El acoso</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Vocabulário sobre bullying: <em>los tipos de acoso</em> e <em>la ley</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Gênero discursivo: currículo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Tema contemporâneo transversal: economia e trabalho</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Vocabulário profissional: <em>las carreras profesionales</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Adjetivos e estados de ânimo: <em>adjetivos y estados de ánimo</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Fazer elogios e falar com cortesia: <em>hacer cumplidos</em> e <em>hablar con cortesía</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Danças tradicionais de países de língua espanhola: <em>el flamenco</em>, <em>la salsa</em> y <em>el tango</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Direitos Humanos e compreensão da realidade social em discursos de Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Direitos da Criança e do Adolescente</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Processo de envelhecimento, respeito e valorização do idoso</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Geração Z, <em>millennials</em> e relações intergeracionais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title"><em>El bullying / el acoso</em>: tipos de assédio e legislação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Textos sobre temas globais: igualdade de gênero, diversidade étnica e cultural e mudanças climáticas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Gêneros discursivos: fábulas, contos, tirinhas, charges, HQs, memes, propagandas, infográficos e notícias</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Pretérito imperfeito do indicativo e pretérito perfeito simples do indicativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Operadores argumentativos, expressões de desejo e probabilidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Perífrases verbais: <em>hay que</em> e <em>tener que</em></div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d2esp1-b3">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Discursos em textos multissemióticos e multimodais: HQs, tirinhas, charges, cartoons e memes</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Produções artísticas e culturais de autores hispano-hablantes ou latino-americanos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Aspectos sociais, culturais e históricos em produções de língua espanhola</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Lendas latino-americanas em contexto amazônico: <em>leyendas latinoamericanas</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Contar algo ouvido ou relatado: <em>contar algo que has oído o que te han contado</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Informar e buscar informação em espanhol: <em>informar a los demás</em> e <em>informarte</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Expressar hipóteses sobre a veracidade de uma informação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Pretérito imperfeito do indicativo: <em>el pretérito imperfecto de indicativo</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Provérbios, expressões idiomáticas e variações fonéticas: <em>refranes</em>, <em>expresiones idiomáticas</em> e <em>yeísmo</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Patrimônio artístico de países de Língua Espanhola, com ênfase na Bolívia e no Peru: obras de arte, obras literárias e danças típicas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Textos sobre questões culturais, sociais, políticas e globais em Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Análise de desafios contemporâneos em diferentes partes do mundo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Produções artísticas e culturais de autores hispano-hablantes e latino-americanos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Manifestações artísticas da Bolívia, Peru, Espanha e outros países de língua espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Lendas latino-americanas e narrativas de tradição oral em contexto amazônico</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Saúde mental e bem-estar físico, mental e social</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Atividade física, esportes, emoções e sentimentos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Expressões de dúvida, probabilidade e hipótese</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Expressões condicionais: <em>a condición de</em>, <em>con tal de que</em>, <em>siempre que</em>, <em>salvo que</em>, <em>como</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Uso de <em>ser</em> e <em>estar</em>, comparativos, superlativos, provérbios, expressões idiomáticas e variações fonéticas</div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d2esp1-b4">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Letras de música de artistas hispânicos com temas sociais</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Discussão de censura, Direitos Humanos, liberdade e igualdade de gênero em músicas hispânicas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Debate sobre a música como forma de resistência</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Morfologia do espanhol: substantivo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Morfologia do espanhol: adjetivo e advérbio</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Expressões de localização e uso de preposições</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Apócope em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Ditos populares e frases feitas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Vocabulário sobre estabelecimentos comerciais, cidade, viagem e meios de transporte</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Celebrações e datas festivas nos países hispânicos: calendário cultural latino-americano</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Letras de músicas de artistas hispânicos com temas sociais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Música como forma de resistência: censura, liberdade, Direitos Humanos e igualdade de gênero</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Gênero discursivo receita</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Receitas típicas da Espanha, Peru e Bolívia</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Modo imperativo afirmativo e negativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Posição dos pronomes com o imperativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Conselhos, sugestões e recomendações com uso do condicional</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Expressões de finalidade e perífrases de orientação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Morfologia do espanhol: substantivo, adjetivo, advérbio, apócope, ditos populares e frases feitas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Cidade, viagem, meios de transporte, estabelecimentos comerciais, redes sociais e uso do espanhol no mundo acadêmico e profissional</div></div></div>
         </div>
       </div>
     </div>
@@ -2894,28 +2908,221 @@ setInterval(function() {
 }, 1000);
 
 document.addEventListener('DOMContentLoaded', function() {
+  rhBuildPlanReplica();
   rhLivRender();
   rhSeqRender();
 });
 
+function rhPlanShowPage(pid, el) {
+  var wrapper = el.closest('.plano-wrapper');
+  if (!wrapper) return;
+  wrapper.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  wrapper.querySelectorAll('.main-tab').forEach(function(t){ t.classList.remove('active'); });
+  var target = document.getElementById(pid);
+  if (target) target.classList.add('active');
+  el.classList.add('active');
+}
+
 function rhPlanShowDisc(did, el) {
-  var parent = el.closest('.plano-wrapper');
-  if (!parent) return;
-  parent.querySelectorAll('.disc-panel').forEach(function(p){ p.classList.remove('active'); });
-  parent.querySelectorAll('.disc-tab').forEach(function(t){ t.classList.remove('active'); });
+  var page = el.closest('.page') || el.closest('.plano-wrapper');
+  if (!page) return;
+  page.querySelectorAll('.disc-panel').forEach(function(p){ p.classList.remove('active'); });
+  page.querySelectorAll('.disc-tab').forEach(function(t){ t.classList.remove('active'); });
   var target = document.getElementById(did);
   if (target) target.classList.add('active');
   el.classList.add('active');
 }
 
 function rhPlanShowBim(bid, el) {
-  var parent = el.closest('.disc-panel');
-  if (!parent) return;
-  parent.querySelectorAll('.bim-panel').forEach(function(p){ p.classList.remove('active'); });
-  parent.querySelectorAll('.bim-tab').forEach(function(t){ t.classList.remove('active'); });
+  var panel = el.closest('.disc-panel');
+  if (!panel) return;
+  panel.querySelectorAll('.bim-panel').forEach(function(p){ p.classList.remove('active'); });
+  panel.querySelectorAll('.bim-tab').forEach(function(t){ t.classList.remove('active'); });
   var target = document.getElementById(bid);
   if (target) target.classList.add('active');
   el.classList.add('active');
+}
+
+function rhPlanExtractId(el) {
+  var onclick = el.getAttribute('onclick') || '';
+  var m = onclick.match(/'([^']+)'/);
+  return m ? m[1] : '';
+}
+
+function rhPlanDiscLabel(cls) {
+  if (cls === 'lp') return 'Língua Portuguesa';
+  if (cls === 'ing') return 'Língua Inglesa';
+  return 'Língua Espanhola';
+}
+
+function rhPlanBadgeText(disc, count) {
+  return disc === 'lp' ? count + ' aulas' : count + ' temas';
+}
+
+function rhBuildPlanReplica() {
+  var sec = document.getElementById('sec-plano');
+  var root = document.getElementById('rh-plan-clone-root');
+  if (!sec || !root || root.dataset.ready === '1') return;
+
+  var legacyWrappers = Array.from(sec.querySelectorAll(':scope > .plano-wrapper'));
+  if (!legacyWrappers.length) return;
+
+  var series = legacyWrappers.map(function(wrapper, index) {
+    var title = wrapper.querySelector('.header h3');
+    var serie = title ? title.textContent.split('—')[0].trim() : (index === 0 ? '1ª Série' : '2ª Série');
+    var discs = Array.from(wrapper.querySelectorAll('.disc-tabs .disc-tab')).map(function(tab) {
+      var did = rhPlanExtractId(tab);
+      var panel = did ? wrapper.querySelector('#' + did) : null;
+      var cls = tab.classList.contains('lp') ? 'lp' : (tab.classList.contains('ing') ? 'ing' : 'esp');
+      var bimestres = panel ? Array.from(panel.querySelectorAll('.bim-tabs .bim-tab')).map(function(btab, bidx) {
+        var bid = rhPlanExtractId(btab);
+        var bpanel = bid ? panel.querySelector('#' + bid) : null;
+        var lessons = bpanel ? Array.from(bpanel.querySelectorAll('.lesson-item')).map(function(item) {
+          var titleEl = item.querySelector('.lesson-title');
+          var subEl = item.querySelector('.lesson-sub');
+          return {
+            title: titleEl ? titleEl.innerHTML : '',
+            sub: subEl ? subEl.innerHTML : ''
+          };
+        }) : [];
+        return {
+          id: bid,
+          index: bidx + 1,
+          lessons: lessons
+        };
+      }) : [];
+      return {
+        id: did,
+        cls: cls,
+        label: tab.textContent.trim() || rhPlanDiscLabel(cls),
+        bimestres: bimestres
+      };
+    });
+    return { serie: serie, discs: discs };
+  });
+
+  var html = '<div class="plano-wrapper">'
+    + '<div class="header"><h1>&#128218; Plano de Aulas Anual 2026 — Escola Raimundo Hermínio de Melo</h1>'
+    + '<p>Estrutura, formatação e layout alinhados ao modelo da Escola Padre Carlos Casavequia, com os conteúdos próprios da Raimundo Hermínio.</p></div>'
+    + '<div id="plano-ultima-mod"><span class="pum-ic">&#128336;</span><span class="pum-txt"></span></div>'
+    + '<div class="main-tabs">'
+    + series.map(function(s, idx) {
+      return '<div class="main-tab' + (idx === 0 ? ' active' : '') + '" onclick="rhPlanShowPage(\'rh-plan-page-' + idx + '\',this)">&#128214; ' + s.serie + '</div>';
+    }).join('')
+    + '</div><div class="content">'
+    + series.map(function(s, sidx) {
+      return '<div class="page' + (sidx === 0 ? ' active' : '') + '" id="rh-plan-page-' + sidx + '">'
+        + '<div class="disc-tabs">'
+        + s.discs.map(function(d, didx) {
+          return '<div class="disc-tab ' + d.cls + (didx === 0 ? ' active' : '') + '" onclick="rhPlanShowDisc(\'rh-rep-' + d.id + '\',this)">' + d.label + '</div>';
+        }).join('')
+        + '</div>'
+        + s.discs.map(function(d, didx) {
+          return '<div class="disc-panel' + (didx === 0 ? ' active' : '') + '" id="rh-rep-' + d.id + '">'
+            + '<div class="bim-tabs">'
+            + d.bimestres.map(function(b, bidx) {
+              return '<div class="bim-tab ' + d.cls + (bidx === 0 ? ' active' : '') + '" onclick="rhPlanShowBim(\'rh-rep-' + b.id + '\',this)">' + b.index + 'º Bimestre</div>';
+            }).join('')
+            + '</div>'
+            + d.bimestres.map(function(b, bidx) {
+              return '<div class="bim-panel' + (bidx === 0 ? ' active' : '') + '" id="rh-rep-' + b.id + '">'
+                + '<div class="bim-header ' + d.cls + '"><h3>&#128197; ' + b.index + 'º Bimestre — ' + d.label + '</h3><span class="badge">' + rhPlanBadgeText(d.cls, b.lessons.length) + '</span></div>'
+                + '<div class="lesson-list">'
+                + b.lessons.map(function(lesson, lidx) {
+                  return '<div class="lesson-item ' + d.cls + '"><div class="lesson-num">' + (lidx + 1) + '</div><div class="lesson-text"><div class="lesson-title">' + lesson.title + '</div>' + (lesson.sub ? '<div class="lesson-sub">' + lesson.sub + '</div>' : '') + '</div></div>';
+                }).join('')
+                + '</div></div>';
+            }).join('')
+            + '</div>';
+        }).join('')
+        + '</div>';
+    }).join('')
+    + '</div></div>';
+
+  root.innerHTML = html;
+  root.dataset.ready = '1';
+  legacyWrappers.forEach(function(wrapper) { wrapper.classList.add('rh-plan-legacy-hidden'); });
+  rhPlanInitStatusButtons();
+  rhPlanLoadLastUpdate();
+}
+
+var RH_PLAN_STATUS_BUTTONS = [
+  { cls: 'pl', label: '&#128197; Planj.' },
+  { cls: 'ap', label: '&#10003; Aplic.' },
+  { cls: 'pu', label: '&#10539; Pulad.' },
+  { cls: 'sm', label: '&#128203; SIMAED' }
+];
+
+function rhPlanStorageKey(text) {
+  return 'rh_plan_' + btoa(unescape(encodeURIComponent(text))).replace(/[^a-zA-Z0-9]/g, '').slice(0, 48);
+}
+
+function rhPlanApplyState(btn, item, cls, active) {
+  btn.classList.toggle('on', active);
+  item.classList.toggle('st-' + cls, active);
+}
+
+function rhPlanSaveLastUpdate(item, cls) {
+  var map = { pl: 'Planejada', ap: 'Aplicada', pu: 'Pulada', sm: 'SIMAED' };
+  var now = new Date();
+  var page = item.closest('.page');
+  var header = item.closest('.bim-panel').querySelector('.bim-header h3');
+  var mainTab = document.querySelector('#rh-plan-clone-root .main-tab.active');
+  var payload = {
+    serie: mainTab ? mainTab.textContent.trim() : (page ? page.id : ''),
+    bim: header ? header.textContent.replace(/[📅]/g, '').trim() : '',
+    aula: item.querySelector('.lesson-num').textContent.trim(),
+    acao: map[cls] || cls,
+    hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    dia: now.toLocaleDateString('pt-BR')
+  };
+  localStorage.setItem('rh_plan_last_update', JSON.stringify(payload));
+  rhPlanLoadLastUpdate();
+}
+
+function rhPlanLoadLastUpdate() {
+  var box = document.querySelector('#rh-plan-clone-root #plano-ultima-mod');
+  if (!box) return;
+  var raw = localStorage.getItem('rh_plan_last_update');
+  if (!raw) return;
+  try {
+    var data = JSON.parse(raw);
+    box.classList.add('on');
+    box.querySelector('.pum-txt').innerHTML = '<strong>Última atualização:</strong> ' + data.dia + ' — ' + data.hora + ' <span class="pum-det">(' + data.bim + ' · Aula ' + data.aula + ' marcada como <strong>' + data.acao + '</strong>)</span>';
+  } catch (e) {}
+}
+
+function rhPlanInitStatusButtons() {
+  var root = document.querySelector('#rh-plan-clone-root .plano-wrapper');
+  if (!root) return;
+  root.querySelectorAll('.lesson-item').forEach(function(item) {
+    if (item.querySelector('.lesson-actions')) return;
+    var title = item.querySelector('.lesson-title');
+    if (!title) return;
+    var key = rhPlanStorageKey(title.textContent.trim());
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+    var actions = document.createElement('div');
+    actions.className = 'lesson-actions';
+    RH_PLAN_STATUS_BUTTONS.forEach(function(def) {
+      var btn = document.createElement('button');
+      btn.className = 'btn-st ' + def.cls;
+      btn.innerHTML = def.label;
+      btn.type = 'button';
+      var active = !!saved[def.cls];
+      rhPlanApplyState(btn, item, def.cls, active);
+      btn.addEventListener('click', function() {
+        var current = {};
+        try { current = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+        current[def.cls] = !btn.classList.contains('on');
+        localStorage.setItem(key, JSON.stringify(current));
+        rhPlanApplyState(btn, item, def.cls, current[def.cls]);
+        if (current[def.cls]) rhPlanSaveLastUpdate(item, def.cls);
+      });
+      actions.appendChild(btn);
+    });
+    item.appendChild(actions);
+  });
 }
 
 // ═══════════════════════════════════════════════════════
