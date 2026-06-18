@@ -688,7 +688,7 @@ tbody tr:hover td{
       </div>
       <div class="status-box" style="margin-top:12px;background:rgba(42,110,147,.08);border-color:rgba(42,110,147,.15);color:var(--info)">
         <strong>Base inicial das faltas</strong>
-        As ausências da 1ª Série foram consolidadas a partir das chamadas entre <strong>25/05/2026</strong> e <strong>18/06/2026</strong> já registradas em <code>herminio.html</code>.
+        As ausências da 1ª Série foram consolidadas a partir das chamadas entre <strong>25/05/2026</strong> e <strong>18/06/2026</strong> já registradas em <code>herminio.html</code>, agora com soma por <strong>hora/aula</strong>.
       </div>
     </aside>
   </section>
@@ -724,7 +724,7 @@ tbody tr:hover td{
             <th colspan="3">3º Bimestre</th>
             <th colspan="3">4º Bimestre</th>
             <th rowspan="2">Trab. feitos</th>
-            <th rowspan="2">Faltas</th>
+            <th rowspan="2">Faltas h/aula</th>
             <th rowspan="2">Dias</th>
             <th rowspan="2">Ações</th>
           </tr>
@@ -792,36 +792,36 @@ const STUDENTS = [
 ];
 
 const ABSENCE_RECORDS = [
-  { codigo: "0525a", faltaram: [] },
-  { codigo: "0525b", faltaram: [] },
-  { codigo: "0526a", faltaram: [] },
-  { codigo: "0526b", faltaram: [] },
-  { codigo: "0528a", faltaram: [] },
-  { codigo: "0528b", faltaram: [] },
-  { codigo: "0529a", faltaram: [5] },
-  { codigo: "0529b", faltaram: [5] },
-  { codigo: "0601a", faltaram: [5] },
-  { codigo: "0601b", faltaram: [5] },
-  { codigo: "0602a", faltaram: [5] },
-  { codigo: "0602b", faltaram: [5] },
-  { codigo: "0603a", faltaram: [] },
-  { codigo: "0603b", faltaram: [] },
-  { codigo: "0610a", faltaram: [1, 2, 3, 4, 5] },
-  { codigo: "0610b", faltaram: [1, 2, 3, 4, 5] },
-  { codigo: "0611a", faltaram: [5] },
-  { codigo: "0611b", faltaram: [5] },
-  { codigo: "0612a", faltaram: [1, 3, 4] },
-  { codigo: "0612b", faltaram: [1, 3, 4] },
-  { codigo: "0615a", faltaram: [3, 4, 5] },
-  { codigo: "0615b", faltaram: [3, 4, 5] },
-  { codigo: "0616a", faltaram: [3, 5] },
-  { codigo: "0616b", faltaram: [3, 5] },
-  { codigo: "0617a", faltaram: [5] },
-  { codigo: "0617b", faltaram: [5] },
-  { codigo: "0617c", faltaram: [3, 4, 5] },
-  { codigo: "0617d", faltaram: [3, 4, 5] },
-  { codigo: "0618a", faltaram: [3, 4, 5] },
-  { codigo: "0618b", faltaram: [3, 4, 5] }
+  { codigo: "0525a", carga: 2, faltaram: [] },
+  { codigo: "0525b", carga: 2, faltaram: [] },
+  { codigo: "0526a", carga: 2, faltaram: [] },
+  { codigo: "0526b", carga: 2, faltaram: [] },
+  { codigo: "0528a", carga: 2, faltaram: [] },
+  { codigo: "0528b", carga: 3, faltaram: [] },
+  { codigo: "0529a", carga: 2, faltaram: [5] },
+  { codigo: "0529b", carga: 3, faltaram: [5] },
+  { codigo: "0601a", carga: 2, faltaram: [5] },
+  { codigo: "0601b", carga: 2, faltaram: [5] },
+  { codigo: "0602a", carga: 2, faltaram: [5] },
+  { codigo: "0602b", carga: 3, faltaram: [5] },
+  { codigo: "0603a", carga: 2, faltaram: [] },
+  { codigo: "0603b", carga: 3, faltaram: [] },
+  { codigo: "0610a", carga: 2, faltaram: [1, 2, 3, 4, 5] },
+  { codigo: "0610b", carga: 3, faltaram: [1, 2, 3, 4, 5] },
+  { codigo: "0611a", carga: 2, faltaram: [5] },
+  { codigo: "0611b", carga: 3, faltaram: [5] },
+  { codigo: "0612a", carga: 2, faltaram: [1, 3, 4] },
+  { codigo: "0612b", carga: 3, faltaram: [1, 3, 4] },
+  { codigo: "0615a", carga: 2, faltaram: [3, 4, 5] },
+  { codigo: "0615b", carga: 2, faltaram: [3, 4, 5] },
+  { codigo: "0616a", carga: 2, faltaram: [3, 5] },
+  { codigo: "0616b", carga: 3, faltaram: [3, 5] },
+  { codigo: "0617a", carga: 2, faltaram: [5] },
+  { codigo: "0617b", carga: 3, faltaram: [5] },
+  { codigo: "0617c", carga: 2, faltaram: [3, 4, 5] },
+  { codigo: "0617d", carga: 2, faltaram: [3, 4, 5] },
+  { codigo: "0618a", carga: 2, faltaram: [3, 4, 5] },
+  { codigo: "0618b", carga: 3, faltaram: [3, 4, 5] }
 ];
 
 const searchInput = document.getElementById("searchInput");
@@ -833,7 +833,9 @@ let currentProfileId = null;
 let currentReportId = null;
 
 const ABSENCE_MAP = buildAbsenceMap();
-const TOTAL_CLASSES = ABSENCE_RECORDS.length;
+const TOTAL_HOUR_CLASSES = ABSENCE_RECORDS.reduce(function (sum, record) {
+  return sum + (record.carga || 1);
+}, 0);
 
 let state = loadState();
 renderAll();
@@ -941,10 +943,11 @@ function buildAbsenceMap() {
 
   ABSENCE_RECORDS.forEach(function (record) {
     const data = formatDateCode(record.codigo.slice(0, 4));
+    const carga = record.carga || 1;
     record.faltaram.forEach(function (studentId) {
       const item = map[studentId];
-      item.aulas += 1;
-      item.porDia[data] = (item.porDia[data] || 0) + 1;
+      item.aulas += carga;
+      item.porDia[data] = (item.porDia[data] || 0) + carga;
     });
   });
 
@@ -1055,7 +1058,7 @@ function renderSummary() {
 
   summaryGrid.innerHTML = [
     summaryCard("Alunos cadastrados", String(state.alunos.length), "Base da 1ª Série"),
-    summaryCard("Faltas em aulas", String(totalFaltas), "Somatório das chamadas já lançadas"),
+    summaryCard("Faltas em h/aula", String(totalFaltas), "Somatório da carga horária ausente"),
     summaryCard("Média parcial da turma", mediaTurma === null ? "—" : formatNumber(mediaTurma), mediaTurma === null ? "Preencha as notas para calcular" : "Com base nos bimestres já lançados"),
     summaryCard("Trabalhos realizados", String(totalTrabalhos), "Soma total informada na turma"),
     summaryCard("Relatórios anuais", String(relatoriosPreenchidos), relatoriosPreenchidos === 0 ? "Ainda não há relatórios fixados" : "Alunos com relatório anual preenchido")
@@ -1137,7 +1140,7 @@ function renderProfile(studentId) {
 
   document.getElementById("profileBody").innerHTML =
     '<section class="profile-stats">'
-      + profileMetric("Faltas em aulas", String(absence.aulas), "Chamadas registradas")
+      + profileMetric("Faltas em h/aula", String(absence.aulas), "Carga horária ausente consolidada")
       + profileMetric("Dias ausentes", String(absence.dias.length), "Datas únicas de ausência")
       + profileMetric("Trabalhos realizados", String(calculateWorksTotal(student)), "Soma dos 4 bimestres")
       + profileMetric("Média anual parcial", media === null ? "—" : formatNumber(media) + "/10", media === null ? "Ainda sem notas lançadas" : "Média dos bimestres preenchidos")
@@ -1151,7 +1154,7 @@ function renderProfile(studentId) {
     + '</section>'
     + '<section class="section-block">'
       + '<h3>Faltas e dias em que o aluno faltou</h3>'
-      + '<p class="section-note">A contagem abaixo foi consolidada a partir das chamadas da própria turma já presentes no relatório.</p>'
+      + '<p class="section-note">A contagem abaixo foi consolidada a partir das chamadas da própria turma já presentes no relatório. Cada hora/aula ausente equivale a 1 falta.</p>'
       + renderAbsenceDetails(absence)
     + '</section>'
     + '<section class="section-block">'
@@ -1204,7 +1207,7 @@ function renderAbsenceDetails(absence) {
   }
   return '<div class="absence-chips">'
     + absence.dias.map(function (date) {
-      return '<span class="absence-chip"><strong>' + date + '</strong> · ' + absence.porDia[date] + ' aula(s)</span>';
+      return '<span class="absence-chip"><strong>' + date + '</strong> · ' + absence.porDia[date] + ' falta(s) em h/aula</span>';
     }).join("")
     + '</div>';
 }
@@ -1299,8 +1302,8 @@ function calculateWorksTotal(student) {
 }
 
 function calculateAttendance(student) {
-  if (!TOTAL_CLASSES) return 100;
-  return Math.max(0, ((TOTAL_CLASSES - ABSENCE_MAP[student.id].aulas) / TOTAL_CLASSES) * 100);
+  if (!TOTAL_HOUR_CLASSES) return 100;
+  return Math.max(0, ((TOTAL_HOUR_CLASSES - ABSENCE_MAP[student.id].aulas) / TOTAL_HOUR_CLASSES) * 100);
 }
 
 function defaultBehaviorText(studentId) {
@@ -1346,8 +1349,8 @@ function buildStudentSummary(student) {
     "Turma: " + CLASS_NAME,
     "Aluno: " + student.numero + ". " + student.nome,
     "Média anual parcial: " + (media === null ? "não calculada" : formatNumber(media) + "/10"),
-    "Frequência parcial: " + formatNumber(calculateAttendance(student)) + "% de presença nas aulas registradas.",
-    "Faltas em aulas: " + absence.aulas + ".",
+    "Frequência parcial: " + formatNumber(calculateAttendance(student)) + "% de presença na carga horária registrada.",
+    "Faltas em hora/aula: " + absence.aulas + ".",
     "Dias em que faltou: " + diasFalta,
     "Total de trabalhos realizados: " + calculateWorksTotal(student) + ".",
     "",
@@ -1385,7 +1388,7 @@ function buildClassSummary() {
       return student.numero + ". " + student.nome
         + " | média parcial: " + (calculateAnnualAverage(student) === null ? "—" : formatNumber(calculateAnnualAverage(student)) + "/10")
         + " | trabalhos realizados: " + calculateWorksTotal(student)
-        + " | faltas em aulas: " + absence.aulas
+        + " | faltas em h/aula: " + absence.aulas
         + " | dias ausentes: " + absence.dias.length;
     }).join("\n")
   ].join("\n");
@@ -1400,7 +1403,7 @@ function buildAnnualReportTemplate(student) {
     "Descreva o rendimento do aluno ao longo do ano, considerando trabalhos, provas, evolução e regularidade nas entregas.",
     "",
     "2. Frequência",
-    "Registre que o aluno teve " + absence.aulas + " falta(s) em aula, distribuídas em " + absence.dias.length + " dia(s) com ausência nas chamadas já lançadas.",
+    "Registre que o aluno teve " + absence.aulas + " falta(s) em hora/aula, distribuídas em " + absence.dias.length + " dia(s) com ausência nas chamadas já lançadas.",
     "",
     "3. Comportamento e participação",
     "Analise postura em sala, interação com colegas, participação oral, autonomia e responsabilidade.",
