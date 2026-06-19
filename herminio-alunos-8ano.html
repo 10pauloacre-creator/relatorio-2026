@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<title>Alunos - 1a Serie - Raimundo Herminio de Melo</title>
+<title>Alunos - 8o Ano - Raimundo Herminio de Melo</title>
 <style>
 :root{
   --vd:#1a3a2a;
@@ -704,11 +704,11 @@ tbody tr:hover td{
 <header class="hero">
   <div class="hero-inner">
     <a class="crumbs" href="herminio.html">← Voltar para o relatório da escola</a>
-    <h1>Alunos da 1ª Série</h1>
-    <p>Painel acadêmico da E.E. Raimundo Hermínio de Melo com notas editáveis por bimestre, contagem de trabalhos, faltas consolidadas, observações de comportamento e um modal pronto para o relatório anual de cada aluno.</p>
+    <h1>Alunos do 8º Ano</h1>
+    <p>Painel acadêmico da E.E. Raimundo Hermínio de Melo com notas editáveis por bimestre, contagem de trabalhos, faltas por hora/aula, observações de comportamento e um modal pronto para o relatório anual de cada aluno.</p>
     <div class="hero-meta">
       <span class="hero-chip">🏫 Raimundo Hermínio de Melo</span>
-      <span class="hero-chip">👥 Turma: 1ª Série</span>
+      <span class="hero-chip">👥 Turma: 8º Ano</span>
       <span class="hero-chip">📌 Escala sugerida: trabalhos 0-5, prova 0-5, total automático 0-10</span>
     </div>
   </div>
@@ -720,7 +720,7 @@ tbody tr:hover td{
   <section class="info-panel">
     <div class="panel panel-main">
       <h2 class="panel-title">Como este painel foi refinado</h2>
-      <p>Além da tabela pedida, a página já organiza a frequência real da turma com base nas chamadas lançadas no relatório, calcula a média anual parcial, soma quantos trabalhos cada aluno realizou ao longo dos 4 bimestres e deixa um fluxo pronto para o Codex montar o relatório anual de forma mais consistente.</p>
+      <p>Além da tabela pedida, a página calcula a média anual parcial, soma quantos trabalhos cada aluno realizou ao longo dos 4 bimestres, consolida faltas por hora/aula quando houver registros e deixa um fluxo pronto para o Codex montar o relatório anual de forma mais consistente.</p>
       <ul class="guide-list">
         <li><strong>Clique no nome do aluno</strong> para ver faltas, dias ausentes, observações de comportamento e acompanhamento pedagógico.</li>
         <li><strong>Use os controles + e -</strong> para ajustar notas mais rápido, ou digite diretamente os valores.</li>
@@ -735,7 +735,7 @@ tbody tr:hover td{
       </div>
       <div class="status-box" style="margin-top:12px;background:rgba(42,110,147,.08);border-color:rgba(42,110,147,.15);color:var(--info)">
         <strong>Base inicial das faltas</strong>
-        As ausências da 1ª Série foram consolidadas a partir das chamadas entre <strong>25/05/2026</strong> e <strong>18/06/2026</strong> já registradas em <code>herminio.html</code>, agora com soma por <strong>hora/aula</strong> e sem contar os 15 minutos extras.
+        A base do 8º Ano foi separada conforme a chamada oficial da secretaria. As faltas por hora/aula podem ser atualizadas neste painel assim que os registros dessa turma forem lançados no relatório principal.
       </div>
     </aside>
   </section>
@@ -805,53 +805,22 @@ tbody tr:hover td{
 </div>
 
 <script>
-const STORAGE_KEY = "rh_alunos_1serie_2026_v1";
+const STORAGE_KEY = "rh_alunos_8ano_2026_v1";
 const SCHOOL_NAME = "E.E. Raimundo Hermínio de Melo";
-const CLASS_NAME = "1ª Série";
+const CLASS_NAME = "8º Ano";
 const PERIOD_LABEL = "Ano letivo de 2026";
 const BIMESTERS = ["1", "2", "3", "4"];
 const GRADE_MAX = 5;
 
 const STUDENTS = [
-  { id: 1, numero: 1, nome: "Fernanda Victória Batista Machado" },
-  { id: 2, numero: 2, nome: "Larissa Bruna de Sousa Machado" },
-  { id: 3, numero: 3, nome: "Marlon Pereira Matos" },
-  { id: 4, numero: 4, nome: "Mayron Pereira Matos" },
-  { id: 5, numero: 5, nome: "Miquéias Rocha Macelino dos Santos" }
+  { id: 1, numero: 1, nome: "Ana Clara da Silva Araújo" },
+  { id: 2, numero: 2, nome: "Arthur Miguel de Sousa Nonato" },
+  { id: 3, numero: 3, nome: "Larissa Ferreira de Souza" },
+  { id: 4, numero: 4, nome: "Mailson Pereira Matos" },
+  { id: 5, numero: 5, nome: "Pedro Henrique Ramalho Magalhães" }
 ];
 
-const ABSENCE_RECORDS = [
-  { codigo: "0525a", carga: 2, faltaram: [] },
-  { codigo: "0525b", carga: 2, faltaram: [] },
-  { codigo: "0526a", carga: 2, faltaram: [] },
-  { codigo: "0526b", carga: 2, faltaram: [] },
-  { codigo: "0528a", carga: 2, faltaram: [] },
-  { codigo: "0528b", carga: 2, faltaram: [] },
-  { codigo: "0529a", carga: 2, faltaram: [5] },
-  { codigo: "0529b", carga: 2, faltaram: [5] },
-  { codigo: "0601a", carga: 2, faltaram: [5] },
-  { codigo: "0601b", carga: 2, faltaram: [5] },
-  { codigo: "0602a", carga: 2, faltaram: [5] },
-  { codigo: "0602b", carga: 2, faltaram: [5] },
-  { codigo: "0603a", carga: 2, faltaram: [] },
-  { codigo: "0603b", carga: 2, faltaram: [] },
-  { codigo: "0610a", carga: 2, faltaram: [1, 2, 3, 4, 5] },
-  { codigo: "0610b", carga: 2, faltaram: [1, 2, 3, 4, 5] },
-  { codigo: "0611a", carga: 2, faltaram: [5] },
-  { codigo: "0611b", carga: 2, faltaram: [5] },
-  { codigo: "0612a", carga: 2, faltaram: [1, 3, 4] },
-  { codigo: "0612b", carga: 2, faltaram: [1, 3, 4] },
-  { codigo: "0615a", carga: 2, faltaram: [3, 4, 5] },
-  { codigo: "0615b", carga: 2, faltaram: [3, 4, 5] },
-  { codigo: "0616a", carga: 2, faltaram: [3, 5] },
-  { codigo: "0616b", carga: 2, faltaram: [3, 5] },
-  { codigo: "0617a", carga: 2, faltaram: [5] },
-  { codigo: "0617b", carga: 2, faltaram: [5] },
-  { codigo: "0617c", carga: 2, faltaram: [3, 4, 5] },
-  { codigo: "0617d", carga: 2, faltaram: [3, 4, 5] },
-  { codigo: "0618a", carga: 2, faltaram: [3, 4, 5] },
-  { codigo: "0618b", carga: 2, faltaram: [3, 4, 5] }
-];
+const ABSENCE_RECORDS = [];
 
 const searchInput = document.getElementById("searchInput");
 const tableBody = document.getElementById("tableBody");
@@ -1085,7 +1054,7 @@ function renderSummary() {
   const totalTrabalhos = state.alunos.reduce(function (sum, student) { return sum + calculateWorksTotal(student); }, 0);
 
   summaryGrid.innerHTML = [
-    summaryCard("Alunos cadastrados", String(state.alunos.length), "Base da 1ª Série"),
+    summaryCard("Alunos cadastrados", String(state.alunos.length), "Base do 8º Ano"),
     summaryCard("Faltas em h/aula", String(totalFaltas), "Somatório da carga horária ausente"),
     summaryCard("Média parcial da turma", mediaTurma === null ? "—" : formatNumber(mediaTurma), mediaTurma === null ? "Preencha as notas para calcular" : "Com base nos bimestres já lançados"),
     summaryCard("Trabalhos realizados", String(totalTrabalhos), "Soma total informada na turma"),
