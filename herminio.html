@@ -106,7 +106,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .ai2t{opacity:.85}.ai2s{margin-top:9px;border-top:1px solid rgba(255,255,255,.1);padding-top:9px;font-size:.78rem;opacity:.75;font-style:italic}
 .pres-stat{font-size:.72rem;color:var(--cm);margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap}
 .pres-stat strong{color:var(--ce)}
-.pres-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:5px}
+.pres-grid,.atv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.rh-mark-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d8dece;background:#f4f1e8;color:var(--ce);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem;text-align:left;transition:transform .12s ease,filter .12s ease,border-color .12s ease,background .12s ease;user-select:none}
+.rh-mark-btn:hover{filter:brightness(.98)}
+.rh-mark-btn:active{transform:scale(.985)}
+.rh-mark-btn .mk-num{width:24px;flex-shrink:0;font-family:'DM Mono',monospace;font-size:.7rem;opacity:.72}
+.rh-mark-btn .mk-name{flex:1;line-height:1.35;font-weight:600}
+.rh-mark-btn .mk-flag{flex-shrink:0;font-size:.92rem;opacity:.78}
+.rh-mark-btn.is-green{background:#e9f6ed;border-color:#9cc7aa;color:#1f6a3a}
+.rh-mark-btn.is-red{background:#fdeceb;border-color:#efb9b1;color:#a73424}
+.rh-mark-btn.is-neutral{background:#f5f3ee;border-color:#ddd5c7;color:var(--cm)}
+.rh-mark-help{margin:0 0 10px;font-size:.74rem;color:var(--cm);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rh-mark-help strong{color:var(--ce)}
+.rh-mark-help .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.rh-mark-help .dot.g{background:#4a9467}
+.rh-mark-help .dot.r{background:#c55b4d}
+.rh-mark-help .dot.n{background:#b6aea0}
 .ar2{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.8rem}
 .ar2.pr{background:#f0faf4;color:var(--vm)}.ar2.fa{background:var(--rs);color:var(--ra)}.ar2.fj{background:#fff8e1;color:#7a5c10}
 .ar2 .an{font-family:'DM Mono',monospace;font-size:.67rem;opacity:.6;width:20px;flex-shrink:0}
@@ -333,9 +348,11 @@ body.modo-escuro .eh:hover{background:#1e1e2a}
 body.modo-escuro .oi{background:#2a1a1a;border-color:#5a2020}
 body.modo-escuro .oa{color:#ff7070}
 body.modo-escuro .st{color:#8080a0}
-body.modo-escuro .pres-grid .pc, body.modo-escuro .atv-grid .ac{background:#1e1e2a;color:#e0e0f0}
-body.modo-escuro .pres-grid .pf{background:#3a1515;color:#ff8080}
-body.modo-escuro .pres-grid .pp{background:#1a3a1a;color:#80c080}
+body.modo-escuro .rh-mark-btn{background:#1f2230;border-color:rgba(255,255,255,.08);color:#e7e8f2}
+body.modo-escuro .rh-mark-btn.is-green{background:#173225;border-color:#29563e;color:#87d4a6}
+body.modo-escuro .rh-mark-btn.is-red{background:#3a1717;border-color:#6f3131;color:#ff9f98}
+body.modo-escuro .rh-mark-btn.is-neutral{background:#242632;border-color:#34374a;color:#aeb2c8}
+body.modo-escuro .rh-mark-help strong{color:#e7e8f2}
 body.modo-escuro .cgt{color:#a8d8b8}
 body.modo-escuro .ccard .cp{background:#1a3030;color:#60d0b0}
 body.modo-escuro .lembrete{background:#2a2a15;border-left-color:#c9a84c}
@@ -3309,6 +3326,8 @@ const RH_SEQ_DISCS = {
 };
 const RH_SEQ_ICS = {'':{ic:'🗂',lbl:'Não iniciado'},criando:{ic:'📝',lbl:'Criando'},concluido:{ic:'✅',lbl:'Concluído'}};
 var _rhSeqStatus = JSON.parse(localStorage.getItem('rh_seq_status') || '{}');
+var _rhPresencaCliques = JSON.parse(localStorage.getItem('rh_presenca_cliques') || '{}');
+var _rhAtividadeCliques = JSON.parse(localStorage.getItem('rh_atividade_cliques') || '{}');
 
 const RH_MESES = {
   Jan: 0, Fev: 1, Mar: 2, Abr: 3, Mai: 4, Jun: 5,
@@ -3400,6 +3419,217 @@ function addDiasRH(data, dias) {
   var d = new Date(data);
   d.setDate(d.getDate() + dias);
   return d;
+}
+
+function rhSalvarCliques(tipo) {
+  if (tipo === 'presenca') {
+    localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));
+    return;
+  }
+  localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));
+}
+
+function rhExtrairTurmaDoTitulo(txt) {
+  if (!txt) return null;
+  if (txt.indexOf('1ª Série') >= 0) return 't1';
+  if (txt.indexOf('8º') >= 0 || txt.indexOf('9º') >= 0) return 't89';
+  if (txt.indexOf('2ª') >= 0 || txt.indexOf('3ª') >= 0) return 't23';
+  return null;
+}
+
+function rhDescobrirTurmaPane(pane) {
+  if (!pane) return null;
+  var id = pane.id || '';
+  var match = id.match(/^[pa]-(t89|t1|t23)-/);
+  if (match) return match[1];
+  var card = pane.closest('.ea');
+  if (!card) return null;
+  var titulo = card.querySelector('.em .ed');
+  return rhExtrairTurmaDoTitulo(titulo ? titulo.textContent : '');
+}
+
+function rhDiaBasePane(paneId) {
+  var match = String(paneId || '').match(/(\d{4})/);
+  return match ? match[1] : '';
+}
+
+function rhMapaVazioTurma(turmaId) {
+  var mapa = {};
+  (ALUNOS_RH[turmaId] || []).forEach(function(aluno) {
+    mapa[aluno.n] = null;
+  });
+  return mapa;
+}
+
+function rhEstadoPresencaInicial(pane) {
+  var turmaId = rhDescobrirTurmaPane(pane);
+  if (!turmaId) return {};
+  var paneId = pane.id || '';
+  var mapa = rhMapaVazioTurma(turmaId);
+  var direto = PRESENCA_RH['pl-' + paneId.slice(2)];
+  if (direto) {
+    (ALUNOS_RH[turmaId] || []).forEach(function(aluno) {
+      var faltou = (direto.faltaram || []).indexOf(aluno.n) >= 0 || (direto.faltJ || []).indexOf(aluno.n) >= 0;
+      mapa[aluno.n] = !faltou;
+    });
+    return mapa;
+  }
+  if (paneId.indexOf('p-all-') === 0) {
+    var base = rhDiaBasePane(paneId);
+    var chaves = Object.keys(PRESENCA_RH).filter(function(chave) {
+      return chave.indexOf('pl-' + turmaId + '-' + base) === 0;
+    });
+    if (chaves.length) {
+      (ALUNOS_RH[turmaId] || []).forEach(function(aluno) {
+        var faltouAlguma = chaves.some(function(chave) {
+          var reg = PRESENCA_RH[chave];
+          return (reg.faltaram || []).indexOf(aluno.n) >= 0 || (reg.faltJ || []).indexOf(aluno.n) >= 0;
+        });
+        mapa[aluno.n] = !faltouAlguma;
+      });
+    }
+  }
+  return mapa;
+}
+
+function rhEstadoAtividadeInicial(pane) {
+  var turmaId = rhDescobrirTurmaPane(pane);
+  if (!turmaId) return {};
+  var paneId = pane.id || '';
+  var mapa = rhMapaVazioTurma(turmaId);
+  var direto = ATIVIDADES_RH[paneId];
+  if (direto) {
+    (ALUNOS_RH[turmaId] || []).forEach(function(aluno) {
+      if ((direto.fez || []).indexOf(aluno.n) >= 0) mapa[aluno.n] = true;
+      else if ((direto.naoFez || []).indexOf(aluno.n) >= 0) mapa[aluno.n] = false;
+    });
+    return mapa;
+  }
+  if (paneId.indexOf('a-all-') === 0) {
+    var base = rhDiaBasePane(paneId);
+    var chaves = Object.keys(ATIVIDADES_RH).filter(function(chave) {
+      return chave.indexOf('a-' + turmaId + '-' + base) === 0;
+    });
+    if (chaves.length) {
+      (ALUNOS_RH[turmaId] || []).forEach(function(aluno) {
+        var naoFezAlguma = chaves.some(function(chave) {
+          return (ATIVIDADES_RH[chave].naoFez || []).indexOf(aluno.n) >= 0;
+        });
+        var fezAlguma = chaves.some(function(chave) {
+          return (ATIVIDADES_RH[chave].fez || []).indexOf(aluno.n) >= 0;
+        });
+        mapa[aluno.n] = naoFezAlguma ? false : (fezAlguma ? true : null);
+      });
+    }
+  }
+  return mapa;
+}
+
+function rhGetEstadoAtual(tipo, pane, numeroAluno) {
+  var origem = tipo === 'presenca' ? rhEstadoPresencaInicial(pane) : rhEstadoAtividadeInicial(pane);
+  var cliques = tipo === 'presenca' ? _rhPresencaCliques : _rhAtividadeCliques;
+  var paneMap = cliques[pane.id] || {};
+  if (paneMap[numeroAluno] !== undefined) return paneMap[numeroAluno];
+  return origem[numeroAluno];
+}
+
+function rhProximoEstado(valorAtual) {
+  if (valorAtual === null || valorAtual === undefined) return true;
+  return !valorAtual;
+}
+
+function rhClasseMarcacao(valor) {
+  if (valor === true) return 'is-green';
+  if (valor === false) return 'is-red';
+  return 'is-neutral';
+}
+
+function rhResumoMarcacao(tipo, pane, turmaId) {
+  var alunos = ALUNOS_RH[turmaId] || [];
+  var verd = 0;
+  var verm = 0;
+  var neut = 0;
+  alunos.forEach(function(aluno) {
+    var estado = rhGetEstadoAtual(tipo, pane, aluno.n);
+    if (estado === true) verd += 1;
+    else if (estado === false) verm += 1;
+    else neut += 1;
+  });
+  if (tipo === 'presenca') {
+    return verd + ' presentes · ' + verm + ' faltas' + (neut ? ' · ' + neut + ' sem marcação' : '');
+  }
+  return verd + ' fizeram · ' + verm + ' não fizeram' + (neut ? ' · ' + neut + ' sem marcação' : '');
+}
+
+function rhHtmlMosaico(tipo, pane, turmaId) {
+  var alunos = ALUNOS_RH[turmaId] || [];
+  var gridClass = tipo === 'presenca' ? 'pres-grid' : 'atv-grid';
+  var help = tipo === 'presenca'
+    ? 'Clique para marcar <strong>verde</strong> quem esteve presente e <strong>vermelho</strong> quem faltou.'
+    : 'Clique para marcar <strong>verde</strong> quem fez a atividade e <strong>vermelho</strong> quem não fez.';
+  return '<div class="rh-mark-help"><span class="dot g"></span> Verde <span class="dot r"></span> Vermelho <span class="dot n"></span> Neutro · ' + help + '</div>'
+    + '<div class="' + gridClass + '">'
+    + alunos.map(function(aluno) {
+      var estado = rhGetEstadoAtual(tipo, pane, aluno.n);
+      var classe = rhClasseMarcacao(estado);
+      var flag = estado === true ? '●' : (estado === false ? '●' : '○');
+      return '<button type="button" class="rh-mark-btn ' + classe + '" data-rh-toggle="' + tipo + '" data-pane="' + pane.id + '" data-aluno="' + aluno.n + '">'
+        + '<span class="mk-num">' + aluno.n + '</span>'
+        + '<span class="mk-name">' + aluno.nm + '</span>'
+        + '<span class="mk-flag">' + flag + '</span>'
+      + '</button>';
+    }).join('')
+    + '</div>';
+}
+
+function rhRenderPanePresenca(pane) {
+  var turmaId = rhDescobrirTurmaPane(pane);
+  if (!turmaId) return;
+  var resumo = pane.querySelector('.pres-av');
+  if (!resumo) {
+    resumo = document.createElement('div');
+    resumo.className = 'pres-av';
+    pane.insertBefore(resumo, pane.firstChild);
+  }
+  resumo.textContent = rhResumoMarcacao('presenca', pane, turmaId);
+  var host = pane.querySelector('[data-rh-mosaico="presenca"]');
+  if (!host) {
+    host = document.createElement('div');
+    host.setAttribute('data-rh-mosaico', 'presenca');
+    pane.appendChild(host);
+  }
+  host.innerHTML = rhHtmlMosaico('presenca', pane, turmaId);
+}
+
+function rhRenderPaneAtividade(pane) {
+  var turmaId = rhDescobrirTurmaPane(pane);
+  if (!turmaId) return;
+  var resumo = pane.querySelector('.atv-av');
+  if (!resumo) {
+    resumo = document.createElement('div');
+    resumo.className = 'atv-av';
+    pane.insertBefore(resumo, pane.firstChild);
+  }
+  resumo.textContent = rhResumoMarcacao('atividade', pane, turmaId);
+  var host = pane.querySelector('[data-rh-mosaico="atividade"]');
+  if (!host) {
+    host = document.createElement('div');
+    host.setAttribute('data-rh-mosaico', 'atividade');
+    pane.appendChild(host);
+  }
+  host.innerHTML = rhHtmlMosaico('atividade', pane, turmaId);
+}
+
+function rhRenderPresencaInterativa() {
+  document.querySelectorAll('.ipane[id^="p-"]').forEach(function(pane) {
+    rhRenderPanePresenca(pane);
+  });
+}
+
+function rhRenderAtividadeInterativa() {
+  document.querySelectorAll('.ipane[id^="a-"]').forEach(function(pane) {
+    rhRenderPaneAtividade(pane);
+  });
 }
 
 function getMetasContRH(base) {
@@ -3598,20 +3828,7 @@ function setModo(m) {
 // ═══════════════════════════════════════════════════════
 
 function renderPresencaRH() {
-  Object.keys(PRESENCA_RH).forEach(function(key) {
-    var p = PRESENCA_RH[key];
-    var el = document.getElementById(key);
-    if (!el) return;
-    var alunos = ALUNOS_RH[p.turma] || [];
-    var html = '';
-    alunos.forEach(function(a) {
-      var faltou = p.faltaram.indexOf(a.n) >= 0;
-      var justif = p.faltJ && p.faltJ.indexOf(a.n) >= 0;
-      var cls = faltou ? (justif ? 'fj' : 'fa') : 'fp';
-      html += '<div class="pc ' + cls + '"><span class="pn">' + a.n + '</span><span class="pnm">' + a.nm + '</span></div>';
-    });
-    el.innerHTML = html || '<div style="color:var(--cm);font-size:.85rem;padding:8px">Sem dados</div>';
-  });
+  rhRenderPresencaInterativa();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -3619,20 +3836,7 @@ function renderPresencaRH() {
 // ═══════════════════════════════════════════════════════
 
 function renderAtividadesRH() {
-  Object.keys(ATIVIDADES_RH).forEach(function(key) {
-    var a = ATIVIDADES_RH[key];
-    var el = document.getElementById(key);
-    if (!el) return;
-    var alunos = ALUNOS_RH[a.turma] || [];
-    var html = '';
-    alunos.forEach(function(al) {
-      var fez = a.fez.indexOf(al.n) >= 0;
-      var nf  = a.naoFez.indexOf(al.n) >= 0;
-      var cls = fez ? 'af' : (nf ? 'an' : 'ap');
-      html += '<div class="pc ' + cls + '"><span class="pn">' + al.n + '</span><span class="pnm">' + al.nm + '</span></div>';
-    });
-    el.innerHTML = html || '<div style="color:var(--cm);font-size:.85rem;padding:8px">Sem dados</div>';
-  });
+  rhRenderAtividadeInterativa();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4534,6 +4738,29 @@ document.addEventListener('DOMContentLoaded', function() {
   renderPresencaRH();
   renderAtividadesRH();
   rhRefreshHeroStats();
+});
+
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('[data-rh-toggle]');
+  if (!btn) return;
+  var tipo = btn.getAttribute('data-rh-toggle');
+  var paneId = btn.getAttribute('data-pane');
+  var aluno = btn.getAttribute('data-aluno');
+  var pane = document.getElementById(paneId);
+  if (!pane || !aluno) return;
+  var atual = rhGetEstadoAtual(tipo, pane, aluno);
+  var proximo = rhProximoEstado(atual);
+  if (tipo === 'presenca') {
+    if (!_rhPresencaCliques[paneId]) _rhPresencaCliques[paneId] = {};
+    _rhPresencaCliques[paneId][aluno] = proximo;
+    rhSalvarCliques('presenca');
+    rhRenderPanePresenca(pane);
+    return;
+  }
+  if (!_rhAtividadeCliques[paneId]) _rhAtividadeCliques[paneId] = {};
+  _rhAtividadeCliques[paneId][aluno] = proximo;
+  rhSalvarCliques('atividade');
+  rhRenderPaneAtividade(pane);
 });
 
 if ('serviceWorker' in navigator) {
