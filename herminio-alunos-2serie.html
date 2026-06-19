@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Alunos - 2a Serie - Raimundo Herminio de Melo</title>
+<style>
+:root{
+  --vd:#1a3a2a;
+  --vm:#2d6147;
+  --vc:#4a9467;
+  --vs:#dbeee1;
+  --ou:#c9a84c;
+  --os:#f5e6be;
+  --bg:#faf8f2;
+  --card:#fffdf8;
+  --ink:#243127;
+  --muted:#5e655f;
+  --line:#e7dfd0;
+  --danger:#b54832;
+  --danger-soft:#fdecea;
+  --info:#2a6e93;
+  --info-soft:#ddeef7;
+  --shadow:0 16px 40px rgba(26,58,42,.10);
+  --radius:18px;
+  --radius-sm:12px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:'DM Sans',sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at top right, rgba(201,168,76,.18), transparent 28%),
+    linear-gradient(180deg, #f3ecdd 0%, var(--bg) 28%, #fff 100%);
+}
+a{color:inherit}
+button,input,textarea{font:inherit}
+.hero{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg,var(--vd),var(--vm) 58%,var(--vc));
+  color:#fff;
+}
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:auto -70px -90px auto;
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  background:rgba(201,168,76,.18);
+}
+.hero-inner{
+  position:relative;
+  z-index:1;
+  max-width:1320px;
+  margin:0 auto;
+  padding:34px 28px 30px;
+}
+.crumbs{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 14px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  text-decoration:none;
+  font-size:.82rem;
+  margin-bottom:18px;
+}
+.hero h1{
+  margin:0;
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.7rem,4vw,2.7rem);
+}
+.hero p{
+  margin:12px 0 0;
+  max-width:820px;
+  font-size:.97rem;
+  line-height:1.7;
+  color:rgba(255,255,255,.86);
+}
+.hero-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:18px;
+}
+.hero-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.14);
+  font-size:.8rem;
+  color:#f8f4ea;
+}
+.page{
+  max-width:1320px;
+  margin:0 auto;
+  padding:28px 28px 56px;
+}
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:14px;
+  margin-bottom:16px;
+}
+.summary-card{
+  background:var(--card);
+  border:1px solid rgba(201,168,76,.28);
+  border-radius:var(--radius);
+  padding:18px 18px 16px;
+  box-shadow:var(--shadow);
+}
+.summary-label{
+  font-size:.72rem;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--muted);
+  font-weight:700;
+}
+.summary-value{
+  margin-top:8px;
+  font-family:'DM Mono',monospace;
+  font-size:1.9rem;
+  color:var(--vd);
+}
+.summary-foot{
+  margin-top:6px;
+  font-size:.82rem;
+  color:var(--muted);
+}
+.info-panel{
+  display:grid;
+  grid-template-columns:minmax(0,1.5fr) minmax(290px,1fr);
+  gap:16px;
+  margin-bottom:18px;
+}
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.panel-main{
+  padding:20px 22px;
+}
+.panel-title{
+  margin:0 0 10px;
+  font-family:'Playfair Display',serif;
+  color:var(--vd);
+  font-size:1.22rem;
+}
+.panel-main p{
+  margin:0;
+  font-size:.93rem;
+  line-height:1.75;
+  color:var(--muted);
+}
+.guide-list{
+  margin:14px 0 0;
+  padding:0;
+  list-style:none;
+  display:grid;
+  gap:8px;
+}
+.guide-list li{
+  font-size:.88rem;
+  color:var(--ink);
+  background:#fbf6ea;
+  border:1px solid rgba(201,168,76,.24);
+  border-radius:var(--radius-sm);
+  padding:10px 12px;
+}
+.panel-side{
+  padding:20px 22px;
+  background:linear-gradient(180deg,#fffdf9, #f7f1e4);
+}
+.panel-side .panel-title{
+  font-size:1.1rem;
+}
+.status-box{
+  padding:12px 14px;
+  border-radius:var(--radius-sm);
+  background:rgba(74,148,103,.08);
+  border:1px solid rgba(74,148,103,.16);
+  color:var(--vm);
+  font-size:.84rem;
+  line-height:1.6;
+}
+.status-box strong{
+  display:block;
+  color:var(--vd);
+  margin-bottom:4px;
+}
+.toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.toolbar-left,
+.toolbar-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.search-input{
+  width:min(360px, 100%);
+  padding:12px 14px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#fff;
+  color:var(--ink);
+  box-shadow:0 6px 18px rgba(26,58,42,.06);
+}
+.ghost-btn,
+.primary-btn,
+.warning-btn{
+  border:none;
+  border-radius:999px;
+  padding:11px 16px;
+  cursor:pointer;
+  font-weight:700;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.ghost-btn{
+  background:#fff;
+  color:var(--vd);
+  border:1px solid var(--line);
+  box-shadow:0 6px 16px rgba(26,58,42,.06);
+}
+.primary-btn{
+  background:linear-gradient(135deg,var(--ou),#e4bf60);
+  color:#4b3810;
+  box-shadow:0 10px 24px rgba(201,168,76,.22);
+}
+.warning-btn{
+  background:rgba(181,72,50,.10);
+  color:var(--danger);
+  border:1px solid rgba(181,72,50,.18);
+}
+.ghost-btn:hover,
+.primary-btn:hover,
+.warning-btn:hover{
+  transform:translateY(-1px);
+}
+.table-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:calc(var(--radius) + 2px);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.table-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  padding:18px 22px;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,#fffdfa,#f7f1e4);
+}
+.table-head h2{
+  margin:0 0 6px;
+  font-family:'Playfair Display',serif;
+  color:var(--vd);
+  font-size:1.18rem;
+}
+.table-head p{
+  margin:0;
+  color:var(--muted);
+  font-size:.88rem;
+}
+.table-wrap{
+  overflow:auto;
+}
+table{
+  width:100%;
+  min-width:980px;
+  border-collapse:separate;
+  border-spacing:0;
+  table-layout:fixed;
+}
+thead th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#f6efe0;
+  color:var(--vd);
+  border-bottom:1px solid var(--line);
+  padding:12px 10px;
+  font-size:.78rem;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+thead tr:first-child th{
+  border-bottom:none;
+}
+thead tr:last-child th{
+  background:#fbf7ed;
+  font-size:.72rem;
+}
+thead th:first-child,
+tbody td:first-child{
+  width:40%;
+}
+thead th:not(:first-child),
+tbody td:not(:first-child){
+  width:15%;
+  text-align:center;
+}
+tbody td{
+  padding:12px 10px;
+  border-bottom:1px solid #f0e7d8;
+  vertical-align:middle;
+  background:#fff;
+}
+tbody tr:nth-child(even) td{
+  background:#fffdfa;
+}
+tbody tr:hover td{
+  background:#fcf7ec;
+}
+.student-cell{
+  min-width:0;
+}
+.student-number{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  margin-right:10px;
+  border-radius:50%;
+  background:var(--vs);
+  color:var(--vm);
+  font-size:.75rem;
+  font-weight:700;
+}
+.student-name{
+  font-weight:700;
+  color:var(--vd);
+  line-height:1.45;
+}
+.student-name-btn{
+  padding:0;
+  border:none;
+  background:transparent;
+  color:var(--vd);
+  font-weight:700;
+  line-height:1.45;
+  text-align:left;
+  cursor:pointer;
+}
+.student-name-btn:hover{
+  color:var(--vm);
+  text-decoration:underline;
+}
+.student-meta{
+  margin-top:4px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.mini-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#f3f7f4;
+  color:var(--muted);
+  font-size:.72rem;
+}
+.stepper{
+  display:grid;
+  grid-template-columns:28px minmax(58px, 72px) 28px;
+  align-items:center;
+  gap:6px;
+}
+.stepper button{
+  width:28px;
+  height:28px;
+  border:none;
+  border-radius:8px;
+  background:var(--vd);
+  color:#fff;
+  cursor:pointer;
+  font-weight:700;
+}
+.stepper input{
+  width:100%;
+  padding:8px 6px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  text-align:center;
+  background:#fff;
+  color:var(--ink);
+}
+.stepper input::-webkit-outer-spin-button,
+.stepper input::-webkit-inner-spin-button{
+  -webkit-appearance:none;
+  margin:0;
+}
+.total-pill{
+  min-width:82px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:9px 10px;
+  border-radius:999px;
+  background:#edf7f0;
+  color:var(--vm);
+  font-family:'DM Mono',monospace;
+  font-weight:700;
+}
+.total-pill.empty{
+  background:#f2efe8;
+  color:var(--muted);
+}
+.grade-badge{
+  width:100%;
+  min-width:0;
+  max-width:136px;
+  margin:0 auto;
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:10px 12px;
+  border-radius:16px;
+  border:1px solid transparent;
+  background:#f2efe8;
+  color:var(--muted);
+  text-align:center;
+}
+.grade-badge.good{
+  background:#edf7f0;
+  border-color:#bfe2c9;
+  color:#1f6a3a;
+}
+.grade-badge.recovery{
+  background:#fdecea;
+  border-color:#efc0b6;
+  color:#9c2f1b;
+}
+.grade-badge strong{
+  font-family:'DM Mono',monospace;
+  font-size:1rem;
+}
+.grade-badge small{
+  font-size:.7rem;
+  font-weight:700;
+  letter-spacing:.04em;
+}
+.actions-cell{
+  white-space:nowrap;
+}
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:50;
+  background:rgba(17,26,20,.68);
+  padding:24px;
+  overflow:auto;
+}
+.modal.open{
+  display:block;
+}
+.modal-card{
+  width:min(1020px,100%);
+  margin:0 auto;
+  background:var(--card);
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0 30px 70px rgba(0,0,0,.24);
+}
+.modal-card.report{
+  width:min(920px,100%);
+}
+.modal-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  padding:24px 24px 18px;
+  background:linear-gradient(135deg,var(--vd),var(--vm) 60%,var(--vc));
+  color:#fff;
+}
+.modal-title{
+  margin:0;
+  font-family:'Playfair Display',serif;
+  font-size:1.5rem;
+}
+.modal-subtitle{
+  margin-top:6px;
+  font-size:.86rem;
+  color:rgba(255,255,255,.84);
+}
+.close-btn{
+  width:40px;
+  height:40px;
+  border:none;
+  border-radius:50%;
+  background:rgba(255,255,255,.16);
+  color:#fff;
+  cursor:pointer;
+  font-size:1.15rem;
+}
+.modal-body{
+  padding:22px 24px 26px;
+}
+.profile-stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+.profile-card{
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:16px 16px 14px;
+  background:#fff;
+}
+.profile-card .summary-label{
+  color:var(--muted);
+}
+.profile-card .summary-value{
+  font-size:1.45rem;
+}
+.section-block{
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:#fff;
+  padding:18px;
+  margin-bottom:16px;
+}
+.section-block h3{
+  margin:0 0 10px;
+  font-family:'Playfair Display',serif;
+  color:var(--vd);
+  font-size:1.1rem;
+}
+.section-note{
+  margin:0 0 12px;
+  color:var(--muted);
+  font-size:.86rem;
+  line-height:1.65;
+}
+.bim-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
+  gap:12px;
+}
+.bim-card{
+  border:1px solid #ede3cf;
+  border-radius:16px;
+  background:#fffaf0;
+  padding:14px;
+}
+.bim-card-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:10px;
+}
+.bim-card-title{
+  font-weight:700;
+  color:var(--vd);
+}
+.bim-card-total{
+  font-family:'DM Mono',monospace;
+  color:var(--vm);
+  font-weight:700;
+}
+.field-stack{
+  display:grid;
+  gap:10px;
+}
+.field-stack label,
+.text-stack label{
+  display:block;
+  margin-bottom:5px;
+  font-size:.74rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:700;
+  color:var(--muted);
+}
+.absence-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.absence-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 10px;
+  border-radius:999px;
+  background:var(--danger-soft);
+  color:var(--danger);
+  font-size:.8rem;
+  border:1px solid rgba(181,72,50,.18);
+}
+.absence-chip strong{
+  color:#8a311f;
+}
+.empty-state{
+  padding:14px;
+  border-radius:14px;
+  background:#f4f7f5;
+  color:var(--muted);
+  font-size:.86rem;
+}
+.text-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:12px;
+}
+.text-stack textarea,
+.report-area{
+  width:100%;
+  min-height:132px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  resize:vertical;
+  line-height:1.65;
+  color:var(--ink);
+  background:#fff;
+}
+.report-alert{
+  padding:14px 16px;
+  border-radius:16px;
+  background:linear-gradient(135deg,#fff6df,#f7ecd2);
+  border:1px solid rgba(201,168,76,.28);
+  color:#5c4715;
+  font-size:.9rem;
+  line-height:1.7;
+  margin-bottom:16px;
+}
+.report-tools{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+.report-meta{
+  margin:0 0 12px;
+  color:var(--muted);
+  font-size:.84rem;
+}
+.report-preview{
+  padding:14px 16px;
+  border-radius:16px;
+  background:#f7faf8;
+  border:1px solid #d7e7dd;
+  color:var(--ink);
+  font-size:.86rem;
+  line-height:1.7;
+  margin-bottom:16px;
+  white-space:pre-wrap;
+}
+.table-empty{
+  padding:30px 20px;
+  text-align:center;
+  color:var(--muted);
+}
+@media (max-width: 980px){
+  .info-panel{
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width: 760px){
+  .hero-inner,
+  .page{
+    padding-left:18px;
+    padding-right:18px;
+  }
+  .modal{
+    padding:12px;
+  }
+  .modal-header,
+  .modal-body{
+    padding-left:18px;
+    padding-right:18px;
+  }
+  .search-input{
+    width:100%;
+  }
+  .toolbar-left,
+  .toolbar-right{
+    width:100%;
+  }
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <a class="crumbs" href="herminio.html">← Voltar para o relatório da escola</a>
+    <h1>Alunos da 2ª Série</h1>
+    <p>Painel acadêmico da E.E. Raimundo Hermínio de Melo com notas editáveis por bimestre, contagem de trabalhos, faltas por hora/aula, observações de comportamento e um modal pronto para o relatório anual de cada aluno.</p>
+    <div class="hero-meta">
+      <span class="hero-chip">🏫 Raimundo Hermínio de Melo</span>
+      <span class="hero-chip">👥 Turma: 2ª Série</span>
+      <span class="hero-chip">📌 Escala sugerida: trabalhos 0-5, prova 0-5, total automático 0-10</span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <section class="summary-grid" id="summaryGrid"></section>
+
+  <section class="info-panel">
+    <div class="panel panel-main">
+      <h2 class="panel-title">Como este painel foi refinado</h2>
+      <p>Além da tabela pedida, a página calcula a média anual parcial, soma quantos trabalhos cada aluno realizou ao longo dos 4 bimestres, consolida faltas por hora/aula quando houver registros e deixa um fluxo pronto para o Codex montar o relatório anual de forma mais consistente.</p>
+      <ul class="guide-list">
+        <li><strong>Clique no nome do aluno</strong> para ver faltas, dias ausentes, observações de comportamento e acompanhamento pedagógico.</li>
+        <li><strong>Use os controles + e -</strong> para ajustar notas mais rápido, ou digite diretamente os valores.</li>
+        <li><strong>Abra "Relatório geral"</strong> no perfil para copiar um resumo completo do aluno e pedir ao Codex a análise anual.</li>
+      </ul>
+    </div>
+    <aside class="panel panel-side">
+      <h2 class="panel-title">Status do painel</h2>
+      <div class="status-box" id="saveStatusBox">
+        <strong>Salvamento local automático</strong>
+        <span id="saveStatusText">Aguardando alterações.</span>
+      </div>
+      <div class="status-box" style="margin-top:12px;background:rgba(42,110,147,.08);border-color:rgba(42,110,147,.15);color:var(--info)">
+        <strong>Base inicial das faltas</strong>
+        A base da 2ª Série foi separada conforme a chamada oficial da secretaria. As faltas por hora/aula podem ser atualizadas neste painel assim que os registros dessa turma forem lançados no relatório principal.
+      </div>
+    </aside>
+  </section>
+
+  <section class="toolbar">
+    <div class="toolbar-left">
+      <input class="search-input" id="searchInput" type="search" placeholder="Buscar aluno por nome ou número">
+    </div>
+    <div class="toolbar-right">
+      <button class="ghost-btn" type="button" id="copyClassSummaryBtn">Copiar resumo da turma</button>
+      <button class="warning-btn" type="button" id="resetDataBtn">Restaurar modelo</button>
+    </div>
+  </section>
+
+  <section class="table-card">
+    <div class="table-head">
+      <div>
+        <h2>Tabela geral da turma</h2>
+        <p>Visão resumida com as notas finais dos 4 bimestres. Os detalhes de trabalhos e prova continuam no perfil do aluno.</p>
+      </div>
+      <div class="status-box" style="max-width:340px;background:rgba(26,58,42,.05);border-color:rgba(26,58,42,.10);color:var(--muted)">
+        <strong>Colunas da tabela</strong>
+        Notas abaixo de 7 ficam em vermelho com aviso de recuperação. Clique no nome do aluno para abrir o perfil completo.
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Aluno</th>
+            <th>1º Bimestre</th>
+            <th>2º Bimestre</th>
+            <th>3º Bimestre</th>
+            <th>4º Bimestre</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="profileModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title" id="profileTitle"></h2>
+        <div class="modal-subtitle" id="profileSubtitle"></div>
+      </div>
+      <button class="close-btn" type="button" data-close-modal="profileModal">✕</button>
+    </div>
+    <div class="modal-body" id="profileBody"></div>
+  </div>
+</div>
+
+<div class="modal" id="reportModal">
+  <div class="modal-card report">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title" id="reportTitle"></h2>
+        <div class="modal-subtitle" id="reportSubtitle"></div>
+      </div>
+      <button class="close-btn" type="button" data-close-modal="reportModal">✕</button>
+    </div>
+    <div class="modal-body" id="reportBody"></div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "rh_alunos_2serie_2026_v1";
+const SCHOOL_NAME = "E.E. Raimundo Hermínio de Melo";
+const CLASS_NAME = "2ª Série";
+const PERIOD_LABEL = "Ano letivo de 2026";
+const BIMESTERS = ["1", "2", "3", "4"];
+const GRADE_MAX = 5;
+
+const STUDENTS = [
+  { id: 1, numero: 1, nome: "Ana Vitória Simão de Oliveira" },
+  { id: 2, numero: 2, nome: "Átila Estevam Chaves Correa" },
+  { id: 3, numero: 3, nome: "Dayane Nunes de Sousa" },
+  { id: 4, numero: 4, nome: "Fernando Lima Altino" },
+  { id: 5, numero: 5, nome: "Geovana da Silva Conceição" },
+  { id: 6, numero: 6, nome: "Isvi Antony de Azevedo Damião" },
+  { id: 7, numero: 7, nome: "João Vítor Matos de Aguiar" },
+  { id: 8, numero: 8, nome: "Nely de Souza Bonfim" },
+  { id: 9, numero: 9, nome: "Pedro Henrique do Vino Silva" },
+  { id: 10, numero: 10, nome: "Rayely da Costa Lopes" },
+  { id: 11, numero: 11, nome: "Tamyres Soares dos Santos" },
+  { id: 12, numero: 12, nome: "Tiago Oliveira da Silva" }
+];
+
+const ABSENCE_RECORDS = [];
+
+const searchInput = document.getElementById("searchInput");
+const tableBody = document.getElementById("tableBody");
+const summaryGrid = document.getElementById("summaryGrid");
+const saveStatusText = document.getElementById("saveStatusText");
+
+let currentProfileId = null;
+let currentReportId = null;
+
+const ABSENCE_MAP = buildAbsenceMap();
+const TOTAL_HOUR_CLASSES = ABSENCE_RECORDS.reduce(function (sum, record) {
+  return sum + (record.carga || 1);
+}, 0);
+
+let state = loadState();
+renderAll();
+setSaveStatus("Painel carregado com sucesso.");
+
+searchInput.addEventListener("input", renderTable);
+
+document.getElementById("resetDataBtn").addEventListener("click", function () {
+  const confirmar = window.confirm("Deseja restaurar o modelo original desta página? Isso apaga as edições salvas localmente.");
+  if (!confirmar) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state = buildDefaultState();
+  renderAll();
+  closeModal("profileModal");
+  closeModal("reportModal");
+  setSaveStatus("Modelo restaurado.");
+});
+
+document.getElementById("copyClassSummaryBtn").addEventListener("click", function () {
+  copyText(buildClassSummary());
+  setSaveStatus("Resumo da turma copiado.");
+});
+
+document.addEventListener("click", function (event) {
+  const stepButton = event.target.closest("[data-step]");
+  if (stepButton) {
+    adjustStepper(stepButton);
+    return;
+  }
+
+  const profileButton = event.target.closest("[data-open-profile]");
+  if (profileButton) {
+    openProfile(Number(profileButton.dataset.openProfile));
+    return;
+  }
+
+  const reportButton = event.target.closest("[data-open-report]");
+  if (reportButton) {
+    openReport(Number(reportButton.dataset.openReport));
+    return;
+  }
+
+  const closeButton = event.target.closest("[data-close-modal]");
+  if (closeButton) {
+    closeModal(closeButton.dataset.closeModal);
+    return;
+  }
+
+  const copyStudentButton = event.target.closest("[data-copy-student-summary]");
+  if (copyStudentButton) {
+    const studentId = Number(copyStudentButton.dataset.copyStudentSummary);
+    copyText(buildStudentSummary(getStudent(studentId)));
+    setSaveStatus("Resumo do aluno copiado para o Codex.");
+    return;
+  }
+
+  const insertTemplateButton = event.target.closest("[data-insert-report-template]");
+  if (insertTemplateButton) {
+    const studentId = Number(insertTemplateButton.dataset.insertReportTemplate);
+    const student = getStudent(studentId);
+    student.relatorioGeral = buildAnnualReportTemplate(student);
+    persistAndRefresh(studentId, "Modelo-base do relatório inserido.");
+  }
+});
+
+document.addEventListener("change", function (event) {
+  const numericInput = event.target.closest("input[data-student][data-bimester][data-field]");
+  if (numericInput) {
+    updateNumericFieldFromInput(numericInput);
+    return;
+  }
+});
+
+document.addEventListener("input", function (event) {
+  const textArea = event.target.closest("textarea[data-student][data-textfield]");
+  if (!textArea) return;
+  const student = getStudent(Number(textArea.dataset.student));
+  if (!student) return;
+  student[textArea.dataset.textfield] = textArea.value;
+  saveState("Texto atualizado.");
+});
+
+window.addEventListener("keydown", function (event) {
+  if (event.key !== "Escape") return;
+  if (document.getElementById("reportModal").classList.contains("open")) {
+    closeModal("reportModal");
+    return;
+  }
+  if (document.getElementById("profileModal").classList.contains("open")) {
+    closeModal("profileModal");
+  }
+});
+
+document.querySelectorAll(".modal").forEach(function (modal) {
+  modal.addEventListener("click", function (event) {
+    if (event.target === modal) closeModal(modal.id);
+  });
+});
+
+function buildAbsenceMap() {
+  const map = {};
+  STUDENTS.forEach(function (student) {
+    map[student.id] = { aulas: 0, porDia: {}, dias: [] };
+  });
+
+  ABSENCE_RECORDS.forEach(function (record) {
+    const data = formatDateCode(record.codigo.slice(0, 4));
+    const carga = record.carga || 1;
+    record.faltaram.forEach(function (studentId) {
+      const item = map[studentId];
+      item.aulas += carga;
+      item.porDia[data] = (item.porDia[data] || 0) + carga;
+    });
+  });
+
+  Object.keys(map).forEach(function (studentId) {
+    map[studentId].dias = Object.keys(map[studentId].porDia).sort(function (a, b) {
+      return parsePtBrDate(b) - parsePtBrDate(a);
+    });
+  });
+
+  return map;
+}
+
+function buildDefaultState() {
+  return {
+    escola: SCHOOL_NAME,
+    turma: CLASS_NAME,
+    periodo: PERIOD_LABEL,
+    alunos: STUDENTS.map(function (student) {
+      return {
+        id: student.id,
+        numero: student.numero,
+        nome: student.nome,
+        bimestres: {
+          "1": { trabalhos: "", prova: "", trabalhosRealizados: 0 },
+          "2": { trabalhos: "", prova: "", trabalhosRealizados: 0 },
+          "3": { trabalhos: "", prova: "", trabalhosRealizados: 0 },
+          "4": { trabalhos: "", prova: "", trabalhosRealizados: 0 }
+        },
+        observacoesComportamento: defaultBehaviorText(student.id),
+        encaminhamentos: defaultReferralText(student.id),
+        destaques: "",
+        necessidadesApoio: "",
+        relatorioGeral: ""
+      };
+    })
+  };
+}
+
+function loadState() {
+  const base = buildDefaultState();
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return base;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.alunos)) return base;
+
+    return {
+      escola: parsed.escola || base.escola,
+      turma: parsed.turma || base.turma,
+      periodo: parsed.periodo || base.periodo,
+      alunos: base.alunos.map(function (student) {
+        const saved = parsed.alunos.find(function (item) { return item.id === student.id; }) || {};
+        return mergeStudent(student, saved);
+      })
+    };
+  } catch (error) {
+    return base;
+  }
+}
+
+function mergeStudent(baseStudent, savedStudent) {
+  const merged = {
+    id: baseStudent.id,
+    numero: baseStudent.numero,
+    nome: baseStudent.nome,
+    observacoesComportamento: savedStudent.observacoesComportamento !== undefined ? savedStudent.observacoesComportamento : baseStudent.observacoesComportamento,
+    encaminhamentos: savedStudent.encaminhamentos !== undefined ? savedStudent.encaminhamentos : baseStudent.encaminhamentos,
+    destaques: savedStudent.destaques !== undefined ? savedStudent.destaques : baseStudent.destaques,
+    necessidadesApoio: savedStudent.necessidadesApoio !== undefined ? savedStudent.necessidadesApoio : baseStudent.necessidadesApoio,
+    relatorioGeral: savedStudent.relatorioGeral !== undefined ? savedStudent.relatorioGeral : baseStudent.relatorioGeral,
+    bimestres: {}
+  };
+
+  BIMESTERS.forEach(function (bim) {
+    const savedBim = savedStudent.bimestres && savedStudent.bimestres[bim] ? savedStudent.bimestres[bim] : {};
+    merged.bimestres[bim] = {
+      trabalhos: sanitizeFieldValue("trabalhos", savedBim.trabalhos !== undefined ? savedBim.trabalhos : baseStudent.bimestres[bim].trabalhos),
+      prova: sanitizeFieldValue("prova", savedBim.prova !== undefined ? savedBim.prova : baseStudent.bimestres[bim].prova),
+      trabalhosRealizados: sanitizeFieldValue("trabalhosRealizados", savedBim.trabalhosRealizados !== undefined ? savedBim.trabalhosRealizados : baseStudent.bimestres[bim].trabalhosRealizados)
+    };
+  });
+
+  return merged;
+}
+
+function saveState(message) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  if (message) setSaveStatus(message);
+}
+
+function renderAll() {
+  renderSummary();
+  renderTable();
+  if (currentProfileId !== null && document.getElementById("profileModal").classList.contains("open")) {
+    renderProfile(currentProfileId);
+  }
+  if (currentReportId !== null && document.getElementById("reportModal").classList.contains("open")) {
+    renderReport(currentReportId);
+  }
+}
+
+function renderSummary() {
+  const medias = state.alunos.map(calculateAnnualAverage).filter(function (value) { return value !== null; });
+  const mediaTurma = medias.length ? medias.reduce(function (sum, value) { return sum + value; }, 0) / medias.length : null;
+  const totalFaltas = state.alunos.reduce(function (sum, student) { return sum + ABSENCE_MAP[student.id].aulas; }, 0);
+  const totalTrabalhos = state.alunos.reduce(function (sum, student) { return sum + calculateWorksTotal(student); }, 0);
+
+  summaryGrid.innerHTML = [
+    summaryCard("Alunos cadastrados", String(state.alunos.length), "Base da 2ª Série"),
+    summaryCard("Faltas em h/aula", String(totalFaltas), "Somatório da carga horária ausente"),
+    summaryCard("Média parcial da turma", mediaTurma === null ? "—" : formatNumber(mediaTurma), mediaTurma === null ? "Preencha as notas para calcular" : "Com base nos bimestres já lançados"),
+    summaryCard("Trabalhos realizados", String(totalTrabalhos), "Soma total informada na turma"),
+    summaryCard("Relatórios anuais", String(state.alunos.length), "Todos podem ser gerados automaticamente pelo sistema")
+  ].join("");
+}
+
+function summaryCard(label, value, foot) {
+  return '<article class="summary-card">'
+    + '<div class="summary-label">' + escapeHtml(label) + "</div>"
+    + '<div class="summary-value">' + escapeHtml(value) + "</div>"
+    + '<div class="summary-foot">' + escapeHtml(foot) + "</div>"
+    + "</article>";
+}
+
+function renderTable() {
+  const query = normalizeText(searchInput.value || "");
+  const rows = state.alunos.filter(function (student) {
+    if (!query) return true;
+    const haystack = normalizeText(student.nome + " " + student.numero);
+    return haystack.includes(query);
+  });
+
+  if (!rows.length) {
+    tableBody.innerHTML = '<tr><td class="table-empty" colspan="5">Nenhum aluno encontrado para esta busca.</td></tr>';
+    return;
+  }
+
+  tableBody.innerHTML = rows.map(function (student) {
+    const media = calculateAnnualAverage(student);
+    return '<tr>'
+      + '<td class="student-cell">'
+      + '<span class="student-number">' + student.numero + "</span>"
+      + '<button class="student-name-btn" type="button" data-open-profile="' + student.id + '"><span class="student-name">' + escapeHtml(student.nome) + "</span></button>"
+      + '<div class="student-meta">'
+      + '<span class="mini-chip">Média parcial: ' + (media === null ? "—" : formatNumber(media) + "/10") + "</span>"
+      + '<span class="mini-chip">Frequência: ' + formatNumber(calculateAttendance(student)) + "%</span>"
+      + "</div>"
+      + "</td>"
+      + BIMESTERS.map(function (bim) {
+        return '<td>' + renderBimGradeBadge(student, bim) + '</td>';
+      }).join("")
+      + "</tr>";
+  }).join("");
+}
+
+function renderBimGradeBadge(student, bim) {
+  const total = calculateBimTotal(student, bim);
+  if (total === null) {
+    return '<span class="grade-badge"><strong>—</strong><small>Sem nota</small></span>';
+  }
+  const isRecovery = total < 7;
+  return '<span class="grade-badge ' + (isRecovery ? 'recovery' : 'good') + '">'
+    + '<strong>' + (isRecovery ? '⚠️ ' : '✅ ') + formatNumber(total) + '/10</strong>'
+    + '<small>' + (isRecovery ? 'Recuperação' : 'Acima de 7') + '</small>'
+    + '</span>';
+}
+
+function renderStepper(studentId, bim, field, value) {
+  const step = getFieldStep(field);
+  const max = getFieldMax(field);
+  return '<div class="stepper">'
+    + '<button type="button" data-step="-'+ step +'" data-student="'+ studentId +'" data-bimester="'+ bim +'" data-field="'+ field +'">-</button>'
+    + '<input type="number" min="0" max="' + max + '" step="' + step + '" value="' + formatInputValue(value) + '" data-student="' + studentId + '" data-bimester="' + bim + '" data-field="' + field + '">'
+    + '<button type="button" data-step="'+ step +'" data-student="'+ studentId +'" data-bimester="'+ bim +'" data-field="'+ field +'">+</button>'
+    + "</div>";
+}
+
+function openProfile(studentId) {
+  currentProfileId = studentId;
+  renderProfile(studentId);
+  openModal("profileModal");
+}
+
+function renderProfile(studentId) {
+  const student = getStudent(studentId);
+  if (!student) return;
+  const absence = ABSENCE_MAP[student.id];
+  const media = calculateAnnualAverage(student);
+
+  document.getElementById("profileTitle").textContent = student.numero + ". " + student.nome;
+  document.getElementById("profileSubtitle").textContent = SCHOOL_NAME + " · " + CLASS_NAME + " · " + PERIOD_LABEL;
+
+  document.getElementById("profileBody").innerHTML =
+    '<section class="profile-stats">'
+      + profileMetric("Faltas em h/aula", String(absence.aulas), "Carga horária ausente consolidada")
+      + profileMetric("Dias ausentes", String(absence.dias.length), "Datas únicas de ausência")
+      + profileMetric("Trabalhos realizados", String(calculateWorksTotal(student)), "Soma dos 4 bimestres")
+      + profileMetric("Média anual parcial", media === null ? "—" : formatNumber(media) + "/10", media === null ? "Ainda sem notas lançadas" : "Média dos bimestres preenchidos")
+    + '</section>'
+    + '<section class="section-block">'
+      + '<h3>Panorama por bimestre</h3>'
+      + '<p class="section-note">Aqui você pode ajustar as notas, informar quantos trabalhos o aluno realizou em cada bimestre e acompanhar o total automático.</p>'
+      + '<div class="bim-grid">'
+      + BIMESTERS.map(function (bim) { return renderBimCard(student, bim); }).join("")
+      + '</div>'
+    + '</section>'
+    + '<section class="section-block">'
+      + '<h3>Faltas e dias em que o aluno faltou</h3>'
+      + '<p class="section-note">A contagem abaixo foi consolidada a partir das chamadas da própria turma já presentes no relatório. Cada hora/aula ausente equivale a 1 falta, e blocos de 2h15 contam como 2 faltas.</p>'
+      + renderAbsenceDetails(absence)
+    + '</section>'
+    + '<section class="section-block">'
+      + '<h3>Observações de comportamento e acompanhamento</h3>'
+      + '<div class="text-grid">'
+        + renderTextArea(student, "observacoesComportamento", "Observações de comportamento", "Descreva postura, participação, convivência, atenção, comportamento recorrente ou evolução.")
+        + renderTextArea(student, "encaminhamentos", "Encaminhamentos pedagógicos", "Registre intervenções, conversas com responsáveis, reforço, pactos e próximos passos.")
+      + '</div>'
+    + '</section>'
+    + '<section class="section-block">'
+      + '<h3>Refinamentos importantes para o perfil</h3>'
+      + '<div class="text-grid">'
+        + renderTextArea(student, "destaques", "Pontos fortes do aluno", "Participação, produção, oralidade, escrita, responsabilidade, liderança ou avanços observados.")
+        + renderTextArea(student, "necessidadesApoio", "Necessidades de apoio", "Dificuldades frequentes, lacunas de aprendizagem, frequência, motivação e estratégias de apoio.")
+      + '</div>'
+    + '</section>'
+    + '<div class="report-tools">'
+      + '<button class="primary-btn" type="button" data-open-report="' + student.id + '">Relatório geral</button>'
+      + '<button class="ghost-btn" type="button" data-copy-student-summary="' + student.id + '">Copiar resumo para o Codex</button>'
+    + '</div>';
+}
+
+function profileMetric(label, value, foot) {
+  return '<article class="profile-card">'
+    + '<div class="summary-label">' + escapeHtml(label) + "</div>"
+    + '<div class="summary-value">' + escapeHtml(value) + "</div>"
+    + '<div class="summary-foot">' + escapeHtml(foot) + "</div>"
+    + "</article>";
+}
+
+function renderBimCard(student, bim) {
+  const dados = student.bimestres[bim];
+  const total = calculateBimTotal(student, bim);
+  return '<article class="bim-card">'
+    + '<div class="bim-card-head">'
+      + '<div class="bim-card-title">' + bim + "º Bimestre</div>"
+      + '<div class="bim-card-total">' + (total === null ? "—" : formatNumber(total) + "/10") + "</div>"
+    + '</div>'
+    + '<div class="field-stack">'
+      + '<div><label>Nota de trabalhos</label>' + renderStepper(student.id, bim, "trabalhos", dados.trabalhos) + '</div>'
+      + '<div><label>Nota de prova</label>' + renderStepper(student.id, bim, "prova", dados.prova) + '</div>'
+      + '<div><label>Trabalhos realizados</label>' + renderStepper(student.id, bim, "trabalhosRealizados", dados.trabalhosRealizados) + '</div>'
+    + '</div>'
+    + "</article>";
+}
+
+function renderAbsenceDetails(absence) {
+  if (!absence.dias.length) {
+    return '<div class="empty-state">Nenhuma falta registrada para este aluno nas chamadas lançadas até agora.</div>';
+  }
+  return '<div class="absence-chips">'
+    + absence.dias.map(function (date) {
+      return '<span class="absence-chip"><strong>' + date + '</strong> · ' + absence.porDia[date] + ' falta(s) em h/aula</span>';
+    }).join("")
+    + '</div>';
+}
+
+function renderTextArea(student, field, label, placeholder) {
+  return '<div class="text-stack">'
+    + '<label>' + escapeHtml(label) + '</label>'
+    + '<textarea data-student="' + student.id + '" data-textfield="' + field + '" placeholder="' + escapeHtml(placeholder) + '">' + escapeHtml(student[field] || "") + "</textarea>"
+    + "</div>";
+}
+
+function openReport(studentId) {
+  currentReportId = studentId;
+  renderReport(studentId);
+  openModal("reportModal");
+}
+
+function renderReport(studentId) {
+  const student = getStudent(studentId);
+  if (!student) return;
+  const generatedReport = buildAutoAnnualReport(student);
+  document.getElementById("reportTitle").textContent = "Relatório geral - " + student.nome;
+  document.getElementById("reportSubtitle").textContent = SCHOOL_NAME + " · " + CLASS_NAME + " · relatório anual do aluno";
+  document.getElementById("reportBody").innerHTML =
+    '<div class="report-alert">Este relatório anual é montado automaticamente com base nas notas, faltas, trabalhos realizados, frequência e observações pedagógicas registradas no perfil do aluno.</div>'
+    + '<div class="report-tools">'
+      + '<button class="primary-btn" type="button" data-copy-student-summary="' + student.id + '">Copiar resumo completo para o Codex</button>'
+    + '</div>'
+    + '<p class="report-meta">Resumo estruturado do aluno:</p>'
+    + '<div class="report-preview">' + escapeHtml(buildStudentSummary(student)) + '</div>'
+    + '<label class="summary-label" style="display:block;margin-bottom:6px">Relatório anual gerado automaticamente</label>'
+    + '<textarea class="report-area" readonly>' + escapeHtml(generatedReport) + "</textarea>";
+}
+
+function adjustStepper(button) {
+  const studentId = Number(button.dataset.student);
+  const bim = button.dataset.bimester;
+  const field = button.dataset.field;
+  const delta = Number(button.dataset.step);
+  const student = getStudent(studentId);
+  if (!student) return;
+
+  const current = toNumber(student.bimestres[bim][field]);
+  const next = sanitizeFieldValue(field, (current === null ? 0 : current) + delta);
+  student.bimestres[bim][field] = next;
+  persistAndRefresh(studentId, "Valor atualizado.");
+}
+
+function updateNumericFieldFromInput(input) {
+  const studentId = Number(input.dataset.student);
+  const bim = input.dataset.bimester;
+  const field = input.dataset.field;
+  const student = getStudent(studentId);
+  if (!student) return;
+
+  student.bimestres[bim][field] = sanitizeFieldValue(field, input.value);
+  persistAndRefresh(studentId, "Valor atualizado.");
+}
+
+function persistAndRefresh(studentId, message) {
+  saveState(message);
+  renderAll();
+  if (currentProfileId === studentId && document.getElementById("profileModal").classList.contains("open")) {
+    renderProfile(studentId);
+  }
+  if (currentReportId === studentId && document.getElementById("reportModal").classList.contains("open")) {
+    renderReport(studentId);
+  }
+}
+
+function getStudent(studentId) {
+  return state.alunos.find(function (student) { return student.id === studentId; });
+}
+
+function calculateBimTotal(student, bim) {
+  const trabalhos = toNumber(student.bimestres[bim].trabalhos);
+  const prova = toNumber(student.bimestres[bim].prova);
+  if (trabalhos === null && prova === null) return null;
+  return Number(((trabalhos || 0) + (prova || 0)).toFixed(1));
+}
+
+function calculateAnnualAverage(student) {
+  const totals = BIMESTERS.map(function (bim) { return calculateBimTotal(student, bim); }).filter(function (value) { return value !== null; });
+  if (!totals.length) return null;
+  return Number((totals.reduce(function (sum, value) { return sum + value; }, 0) / totals.length).toFixed(1));
+}
+
+function calculateWorksTotal(student) {
+  return BIMESTERS.reduce(function (sum, bim) {
+    return sum + (Number(student.bimestres[bim].trabalhosRealizados) || 0);
+  }, 0);
+}
+
+function calculateAttendance(student) {
+  if (!TOTAL_HOUR_CLASSES) return 100;
+  return Math.max(0, ((TOTAL_HOUR_CLASSES - ABSENCE_MAP[student.id].aulas) / TOTAL_HOUR_CLASSES) * 100);
+}
+
+function defaultBehaviorText(studentId) {
+  const absence = ABSENCE_MAP[studentId];
+  if (absence.dias.length >= 5) {
+    return "Acompanhar frequência com atenção: o aluno apresenta ausências recorrentes, o que pode impactar rendimento, participação e continuidade das atividades.";
+  }
+  if (absence.dias.length >= 2) {
+    return "Sem registro comportamental grave até o momento, mas vale observar participação e devolutivas em razão de algumas ausências.";
+  }
+  return "Sem observações comportamentais registradas até o momento.";
+}
+
+function defaultReferralText(studentId) {
+  const absence = ABSENCE_MAP[studentId];
+  if (absence.dias.length >= 5) {
+    return "Priorizar conversa com o aluno e com os responsáveis sobre frequência, recuperar atividades pendentes e monitorar permanência em sala.";
+  }
+  if (absence.dias.length >= 2) {
+    return "Manter acompanhamento de rotina, conferir devolução das atividades e registrar possíveis oscilações de participação.";
+  }
+  return "Manter acompanhamento pedagógico regular e registrar novas evidências ao longo do ano.";
+}
+
+function buildStudentSummary(student) {
+  const absence = ABSENCE_MAP[student.id];
+  const media = calculateAnnualAverage(student);
+  const bimLines = BIMESTERS.map(function (bim) {
+    const dados = student.bimestres[bim];
+    const total = calculateBimTotal(student, bim);
+    return bim + "º bimestre: trabalhos " + printableNumber(dados.trabalhos, "/5")
+      + ", prova " + printableNumber(dados.prova, "/5")
+      + ", total " + (total === null ? "não preenchido" : formatNumber(total) + "/10")
+      + ", trabalhos realizados " + (dados.trabalhosRealizados || 0) + ".";
+  }).join("\n");
+
+  const diasFalta = absence.dias.length ? absence.dias.map(function (date) {
+    return date + " (" + absence.porDia[date] + " falta(s) em h/aula)";
+  }).join(", ") : "Nenhum dia ausente registrado.";
+
+  return [
+    "Escola: " + SCHOOL_NAME,
+    "Turma: " + CLASS_NAME,
+    "Aluno: " + student.numero + ". " + student.nome,
+    "Média anual parcial: " + (media === null ? "não calculada" : formatNumber(media) + "/10"),
+    "Frequência parcial: " + formatNumber(calculateAttendance(student)) + "% de presença na carga horária registrada.",
+    "Faltas em hora/aula: " + absence.aulas + ".",
+    "Dias em que faltou: " + diasFalta,
+    "Total de trabalhos realizados: " + calculateWorksTotal(student) + ".",
+    "",
+    "Notas por bimestre:",
+    bimLines,
+    "",
+    "Observações de comportamento:",
+    student.observacoesComportamento || "Sem observações registradas.",
+    "",
+    "Encaminhamentos pedagógicos:",
+    student.encaminhamentos || "Sem encaminhamentos registrados.",
+    "",
+    "Pontos fortes:",
+    student.destaques || "Sem destaques registrados.",
+    "",
+    "Necessidades de apoio:",
+    student.necessidadesApoio || "Sem necessidades registradas.",
+    "",
+    "Relatório anual automático:",
+    buildAutoAnnualReport(student)
+  ].join("\n");
+}
+
+function buildClassSummary() {
+  const medias = state.alunos.map(calculateAnnualAverage).filter(function (value) { return value !== null; });
+  const mediaTurma = medias.length ? formatNumber(medias.reduce(function (sum, value) { return sum + value; }, 0) / medias.length) + "/10" : "não calculada";
+  return [
+    "Resumo da turma - " + SCHOOL_NAME + " - " + CLASS_NAME,
+    "Período: " + PERIOD_LABEL,
+    "Quantidade de alunos: " + state.alunos.length,
+    "Média parcial da turma: " + mediaTurma,
+    "",
+    state.alunos.map(function (student) {
+      const absence = ABSENCE_MAP[student.id];
+      return student.numero + ". " + student.nome
+        + " | média parcial: " + (calculateAnnualAverage(student) === null ? "—" : formatNumber(calculateAnnualAverage(student)) + "/10")
+        + " | trabalhos realizados: " + calculateWorksTotal(student)
+        + " | faltas em h/aula: " + absence.aulas
+        + " | dias ausentes: " + absence.dias.length;
+    }).join("\n")
+  ].join("\n");
+}
+
+function buildAutoAnnualReport(student) {
+  const absence = ABSENCE_MAP[student.id];
+  const media = calculateAnnualAverage(student);
+  const works = calculateWorksTotal(student);
+  const filledBimesters = BIMESTERS.filter(function (bim) { return calculateBimTotal(student, bim) !== null; }).length;
+  const lowerBimesters = BIMESTERS.filter(function (bim) {
+    const total = calculateBimTotal(student, bim);
+    return total !== null && total < 7;
+  });
+  const higherBimesters = BIMESTERS.filter(function (bim) {
+    const total = calculateBimTotal(student, bim);
+    return total !== null && total >= 7;
+  });
+
+  return [
+    "RELATÓRIO ANUAL - " + student.nome,
+    "",
+    buildPerformanceParagraph(student, media, works, filledBimesters, lowerBimesters, higherBimesters),
+    "",
+    buildFrequencyParagraph(student, absence),
+    "",
+    buildBehaviorParagraph(student),
+    "",
+    buildRecommendationParagraph(student, media, absence, lowerBimesters)
+  ].join("\n");
+}
+
+function buildPerformanceParagraph(student, media, works, filledBimesters, lowerBimesters, higherBimesters) {
+  const intro = media === null
+    ? "O aluno ainda não possui bimestres suficientes preenchidos para o cálculo de uma média anual parcial."
+    : "O aluno apresenta média anual parcial de " + formatNumber(media) + "/10, com " + filledBimesters + " bimestre(s) já lançado(s) no sistema.";
+
+  const progress = lowerBimesters.length
+    ? "Há necessidade de recuperação nos bimestres " + lowerBimesters.join(", ") + ", pois as notas ficaram abaixo de 7,0."
+    : (higherBimesters.length ? "Os bimestres já preenchidos permanecem com desempenho igual ou superior a 7,0." : "Ainda não há notas bimestrais lançadas.");
+
+  return "1. Desempenho acadêmico: " + intro + " Ao todo, o aluno soma " + works + " trabalho(s) realizado(s) ao longo do ano. " + progress;
+}
+
+function buildFrequencyParagraph(student, absence) {
+  const attendance = formatNumber(calculateAttendance(student));
+  const days = absence.dias.length
+    ? absence.dias.map(function (date) { return date + " (" + absence.porDia[date] + " falta(s))"; }).join(", ")
+    : "sem registros de ausência até o momento";
+  return "2. Frequência: o aluno possui " + absence.aulas + " falta(s) em hora/aula, distribuídas em " + absence.dias.length + " dia(s) de ausência, com frequência parcial de " + attendance + "%. Dias registrados: " + days + ".";
+}
+
+function buildBehaviorParagraph(student) {
+  const comportamento = (student.observacoesComportamento || "").trim() || "Sem observações comportamentais registradas.";
+  const encaminhamentos = (student.encaminhamentos || "").trim() || "Sem encaminhamentos pedagógicos registrados.";
+  const destaques = (student.destaques || "").trim();
+  const apoio = (student.necessidadesApoio || "").trim();
+  return "3. Comportamento e participação: " + comportamento + " Encaminhamentos atuais: " + encaminhamentos + (destaques ? " Pontos fortes observados: " + destaques + "." : "") + (apoio ? " Necessidades de apoio identificadas: " + apoio + "." : "");
+}
+
+function buildRecommendationParagraph(student, media, absence, lowerBimesters) {
+  const recomendacoes = [];
+  if (media !== null && media < 7) recomendacoes.push("reforçar o acompanhamento das aprendizagens e priorizar estratégias de recuperação paralela");
+  if (absence.aulas >= 6) recomendacoes.push("monitorar a frequência com atenção e retomar conteúdos perdidos nas ausências");
+  if ((student.necessidadesApoio || "").trim()) recomendacoes.push("manter intervenções focadas nas necessidades pedagógicas já registradas");
+  if ((student.destaques || "").trim()) recomendacoes.push("valorizar os pontos fortes do aluno para sustentar seu avanço");
+  if (!recomendacoes.length) recomendacoes.push("manter o acompanhamento contínuo para consolidar o desempenho acadêmico e a participação");
+
+  return "4. Encaminhamentos e recomendações: recomenda-se " + recomendacoes.join("; ") + "." + (lowerBimesters.length ? " Os bimestres em recuperação devem receber atenção prioritária: " + lowerBimesters.join(", ") + "." : "");
+}
+
+function setSaveStatus(message) {
+  const agora = new Date();
+  saveStatusText.textContent = message + " Última atualização: " + agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + ".";
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove("open");
+  if (!document.getElementById("profileModal").classList.contains("open") && !document.getElementById("reportModal").classList.contains("open")) {
+    document.body.style.overflow = "";
+  }
+}
+
+function getFieldStep(field) {
+  return field === "trabalhosRealizados" ? 1 : 0.5;
+}
+
+function getFieldMax(field) {
+  return field === "trabalhosRealizados" ? 10 : GRADE_MAX;
+}
+
+function sanitizeFieldValue(field, rawValue) {
+  if (rawValue === "" || rawValue === null || rawValue === undefined) {
+    return field === "trabalhosRealizados" ? 0 : "";
+  }
+
+  const number = Number(rawValue);
+  if (!Number.isFinite(number)) {
+    return field === "trabalhosRealizados" ? 0 : "";
+  }
+
+  const max = getFieldMax(field);
+  const rounded = field === "trabalhosRealizados" ? Math.round(number) : Math.round(number * 2) / 2;
+  const clamped = Math.max(0, Math.min(max, rounded));
+  return field === "trabalhosRealizados" ? clamped : Number(clamped.toFixed(1));
+}
+
+function toNumber(value) {
+  if (value === "" || value === null || value === undefined) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function formatInputValue(value) {
+  if (value === "" || value === null || value === undefined) return "";
+  return String(value);
+}
+
+function printableNumber(value, suffix) {
+  const parsed = toNumber(value);
+  return parsed === null ? "não preenchido" : formatNumber(parsed) + suffix;
+}
+
+function formatNumber(value) {
+  return Number(value).toFixed(1).replace(".", ",");
+}
+
+function normalizeText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function formatDateCode(code) {
+  const mes = code.slice(0, 2);
+  const dia = code.slice(2, 4);
+  return dia + "/" + mes + "/2026";
+}
+
+function parsePtBrDate(dateString) {
+  const parts = dateString.split("/");
+  return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).catch(function () {
+      fallbackCopyText(text);
+    });
+    return;
+  }
+  fallbackCopyText(text);
+}
+
+function fallbackCopyText(text) {
+  const area = document.createElement("textarea");
+  area.value = text;
+  document.body.appendChild(area);
+  area.select();
+  document.execCommand("copy");
+  area.remove();
+}
+</script>
+</body>
+</html>
