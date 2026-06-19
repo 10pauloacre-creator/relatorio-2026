@@ -1070,9 +1070,6 @@ function getStudentMetrics(student) {
 }
 
 function getStudentMetricsById(studentId) {
-  const student = getStudent(studentId);
-  if (student) return getStudentMetrics(student);
-
   const seed = STUDENTS.find(function (item) { return item.id === studentId; });
   if (!seed) {
     return {
