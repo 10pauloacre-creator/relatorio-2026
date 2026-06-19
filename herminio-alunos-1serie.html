@@ -1066,7 +1066,11 @@ function buildSyncedStudentMetrics(student) {
 }
 
 function getStudentMetrics(student) {
-  return buildSyncedStudentMetrics(student);
+  try {
+    return buildSyncedStudentMetrics(student);
+  } catch (error) {
+    return buildFallbackStudentMetrics(student);
+  }
 }
 
 function getStudentMetricsById(studentId) {
@@ -1195,6 +1199,9 @@ function saveState(message) {
 }
 
 function renderAll() {
+  if (!state || !Array.isArray(state.alunos) || !state.alunos.length) {
+    state = buildDefaultState();
+  }
   renderSummary();
   renderTable();
   if (currentProfileId !== null && document.getElementById("profileModal").classList.contains("open")) {
