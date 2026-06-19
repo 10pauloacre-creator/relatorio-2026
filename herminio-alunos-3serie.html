@@ -846,8 +846,10 @@ const saveStatusText = document.getElementById("saveStatusText");
 let currentProfileId = null;
 let currentReportId = null;
 
-const ABSENCE_MAP = buildAbsenceMap();
-const TOTAL_HOUR_CLASSES = ABSENCE_RECORDS.reduce(function (sum, record) {
+const RH_ALUNO_SYNC_KEY = "rh_alunos_sync_v1";
+const CLASS_REPORT_GROUP = resolveReportGroup();
+const FALLBACK_ABSENCE_MAP = buildAbsenceMap();
+const FALLBACK_TOTAL_HOUR_CLASSES = ABSENCE_RECORDS.reduce(function (sum, record) {
   return sum + (record.carga || 1);
 }, 0);
 
@@ -856,6 +858,10 @@ renderAll();
 setSaveStatus("Painel carregado com sucesso.");
 
 searchInput.addEventListener("input", renderTable);
+window.addEventListener("focus", renderAll);
+window.addEventListener("storage", function (event) {
+  if (event.key === RH_ALUNO_SYNC_KEY) renderAll();
+});
 
 document.getElementById("resetDataBtn").addEventListener("click", function () {
   const confirmar = window.confirm("Deseja restaurar o modelo original desta página? Isso apaga as edições salvas localmente.");
@@ -948,6 +954,117 @@ document.querySelectorAll(".modal").forEach(function (modal) {
     if (event.target === modal) closeModal(modal.id);
   });
 });
+
+function resolveReportGroup() {
+  if (CLASS_NAME.indexOf("1") >= 0) return "t1";
+  if (CLASS_NAME.indexOf("8") >= 0 || CLASS_NAME.indexOf("9") >= 0) return "t89";
+  return "t23";
+}
+
+function normalizeLookupText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function buildFallbackStudentMetrics(student) {
+  const absence = FALLBACK_ABSENCE_MAP[student.id] || { aulas: 0, porDia: {}, dias: [] };
+  const atividadesPorBimestre = {};
+  BIMESTERS.forEach(function (bim) {
+    atividadesPorBimestre[bim] = Number(student.bimestres[bim].trabalhosRealizados) || 0;
+  });
+
+  return {
+    aulas: absence.aulas || 0,
+    presencas: Math.max(0, FALLBACK_TOTAL_HOUR_CLASSES - (absence.aulas || 0)),
+    totalAulas: FALLBACK_TOTAL_HOUR_CLASSES,
+    porDia: absence.porDia || {},
+    dias: Array.isArray(absence.dias) ? absence.dias : [],
+    atividadesFeitas: BIMESTERS.reduce(function (sum, bim) {
+      return sum + atividadesPorBimestre[bim];
+    }, 0),
+    atividadesPorBimestre: atividadesPorBimestre
+  };
+}
+
+function readDailySyncData() {
+  try {
+    const raw = localStorage.getItem(RH_ALUNO_SYNC_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && parsed.classes ? parsed : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function buildSyncedStudentMetrics(student) {
+  const fallback = buildFallbackStudentMetrics(student);
+  const synced = readDailySyncData();
+  if (!synced || !synced.classes || !synced.classes[CLASS_REPORT_GROUP] || !Array.isArray(synced.classes[CLASS_REPORT_GROUP].students)) {
+    return fallback;
+  }
+
+  const syncedStudent = synced.classes[CLASS_REPORT_GROUP].students.find(function (item) {
+    return normalizeLookupText(item.nome) === normalizeLookupText(student.nome);
+  });
+
+  if (!syncedStudent) return fallback;
+
+  const porDia = syncedStudent.porDia && typeof syncedStudent.porDia === "object" ? syncedStudent.porDia : {};
+  const dias = Object.keys(porDia).sort(function (a, b) {
+    return parsePtBrDate(b) - parsePtBrDate(a);
+  });
+  const atividadesPorBimestre = {};
+
+  BIMESTERS.forEach(function (bim) {
+    atividadesPorBimestre[bim] = Number(syncedStudent.atividadesPorBimestre && syncedStudent.atividadesPorBimestre[bim]) || 0;
+  });
+
+  return {
+    aulas: Number(syncedStudent.faltas) || 0,
+    presencas: Number(syncedStudent.presencas) || 0,
+    totalAulas: Number(syncedStudent.totalAulas) || 0,
+    porDia: porDia,
+    dias: dias,
+    atividadesFeitas: Number(syncedStudent.atividadesFeitas) || BIMESTERS.reduce(function (sum, bim) {
+      return sum + atividadesPorBimestre[bim];
+    }, 0),
+    atividadesPorBimestre: atividadesPorBimestre
+  };
+}
+
+function getStudentMetrics(student) {
+  return buildSyncedStudentMetrics(student);
+}
+
+function getStudentMetricsById(studentId) {
+  const student = getStudent(studentId);
+  if (student) return getStudentMetrics(student);
+
+  const seed = STUDENTS.find(function (item) { return item.id === studentId; });
+  if (!seed) {
+    return {
+      aulas: 0,
+      presencas: 0,
+      totalAulas: 0,
+      porDia: {},
+      dias: [],
+      atividadesFeitas: 0,
+      atividadesPorBimestre: { "1": 0, "2": 0, "3": 0, "4": 0 }
+    };
+  }
+
+  const bimestres = {};
+  BIMESTERS.forEach(function (bim) {
+    bimestres[bim] = { trabalhosRealizados: 0 };
+  });
+
+  return getStudentMetrics({ id: seed.id, nome: seed.nome, bimestres: bimestres });
+}
 
 function buildAbsenceMap() {
   const map = {};
@@ -1066,14 +1183,16 @@ function renderAll() {
 function renderSummary() {
   const medias = state.alunos.map(calculateAnnualAverage).filter(function (value) { return value !== null; });
   const mediaTurma = medias.length ? medias.reduce(function (sum, value) { return sum + value; }, 0) / medias.length : null;
-  const totalFaltas = state.alunos.reduce(function (sum, student) { return sum + ABSENCE_MAP[student.id].aulas; }, 0);
+  const totalFaltas = state.alunos.reduce(function (sum, student) { return sum + getStudentMetrics(student).aulas; }, 0);
+  const totalPresencas = state.alunos.reduce(function (sum, student) { return sum + getStudentMetrics(student).presencas; }, 0);
   const totalTrabalhos = state.alunos.reduce(function (sum, student) { return sum + calculateWorksTotal(student); }, 0);
 
   summaryGrid.innerHTML = [
     summaryCard("Alunos cadastrados", String(state.alunos.length), "Base da 3ª Série"),
     summaryCard("Faltas em h/aula", String(totalFaltas), "Somatório da carga horária ausente"),
+    summaryCard("Presencas em h/aula", String(totalPresencas), "Sincronizadas pelos relatos diarios"),
     summaryCard("Média parcial da turma", mediaTurma === null ? "—" : formatNumber(mediaTurma), mediaTurma === null ? "Preencha as notas para calcular" : "Com base nos bimestres já lançados"),
-    summaryCard("Trabalhos realizados", String(totalTrabalhos), "Soma total informada na turma"),
+    summaryCard("Atividades feitas", String(totalTrabalhos), "Contagem automatica dos relatos diarios"),
     summaryCard("Relatórios anuais", String(state.alunos.length), "Todos podem ser gerados automaticamente pelo sistema")
   ].join("");
 }
@@ -1148,7 +1267,7 @@ function openProfile(studentId) {
 function renderProfile(studentId) {
   const student = getStudent(studentId);
   if (!student) return;
-  const absence = ABSENCE_MAP[student.id];
+  const absence = getStudentMetrics(student);
   const media = calculateAnnualAverage(student);
 
   document.getElementById("profileTitle").textContent = student.numero + ". " + student.nome;
@@ -1157,13 +1276,13 @@ function renderProfile(studentId) {
   document.getElementById("profileBody").innerHTML =
     '<section class="profile-stats">'
       + profileMetric("Faltas em h/aula", String(absence.aulas), "Carga horária ausente consolidada")
-      + profileMetric("Dias ausentes", String(absence.dias.length), "Datas únicas de ausência")
-      + profileMetric("Trabalhos realizados", String(calculateWorksTotal(student)), "Soma dos 4 bimestres")
+      + profileMetric("Presencas em h/aula", String(absence.presencas), "Presencas registradas nos relatos diarios")
+      + profileMetric("Atividades feitas", String(calculateWorksTotal(student)), "Soma automatica registrada nos relatos")
       + profileMetric("Média anual parcial", media === null ? "—" : formatNumber(media) + "/10", media === null ? "Ainda sem notas lançadas" : "Média dos bimestres preenchidos")
     + '</section>'
     + '<section class="section-block">'
       + '<h3>Panorama por bimestre</h3>'
-      + '<p class="section-note">Aqui você pode ajustar as notas, informar quantos trabalhos o aluno realizou em cada bimestre e acompanhar o total automático.</p>'
+      + '<p class="section-note">Aqui você pode ajustar as notas. A quantidade de atividades feitas em cada bimestre agora é sincronizada automaticamente a partir dos cliques nos relatos diarios.</p>'
       + '<div class="bim-grid">'
       + BIMESTERS.map(function (bim) { return renderBimCard(student, bim); }).join("")
       + '</div>'
@@ -1212,7 +1331,7 @@ function renderBimCard(student, bim) {
     + '<div class="field-stack">'
       + '<div><label>Nota de trabalhos</label>' + renderStepper(student.id, bim, "trabalhos", dados.trabalhos) + '</div>'
       + '<div><label>Nota de prova</label>' + renderStepper(student.id, bim, "prova", dados.prova) + '</div>'
-      + '<div><label>Trabalhos realizados</label>' + renderStepper(student.id, bim, "trabalhosRealizados", dados.trabalhosRealizados) + '</div>'
+      + '<div class="summary-foot">Atividades feitas nos relatos diarios: ' + getBimesterWorksCount(student, bim) + '</div>'
     + '</div>'
     + "</article>";
 }
@@ -1248,7 +1367,7 @@ function renderReport(studentId) {
   document.getElementById("reportTitle").textContent = "Relatório geral - " + student.nome;
   document.getElementById("reportSubtitle").textContent = SCHOOL_NAME + " · " + CLASS_NAME + " · relatório anual do aluno";
   document.getElementById("reportBody").innerHTML =
-    '<div class="report-alert">Este relatório anual é montado automaticamente com base nas notas, faltas, trabalhos realizados, frequência e observações pedagógicas registradas no perfil do aluno.</div>'
+    '<div class="report-alert">Este relatório anual é montado automaticamente com base nas notas, faltas, presencas, atividades feitas nos relatos diarios e observações pedagógicas registradas no perfil do aluno.</div>'
     + '<div class="report-tools">'
       + '<button class="primary-btn" type="button" data-copy-student-summary="' + student.id + '">Copiar resumo completo para o Codex</button>'
     + '</div>'
@@ -1312,18 +1431,21 @@ function calculateAnnualAverage(student) {
 }
 
 function calculateWorksTotal(student) {
-  return BIMESTERS.reduce(function (sum, bim) {
-    return sum + (Number(student.bimestres[bim].trabalhosRealizados) || 0);
-  }, 0);
+  return getStudentMetrics(student).atividadesFeitas;
+}
+
+function getBimesterWorksCount(student, bim) {
+  return getStudentMetrics(student).atividadesPorBimestre[bim] || 0;
 }
 
 function calculateAttendance(student) {
-  if (!TOTAL_HOUR_CLASSES) return 100;
-  return Math.max(0, ((TOTAL_HOUR_CLASSES - ABSENCE_MAP[student.id].aulas) / TOTAL_HOUR_CLASSES) * 100);
+  const metrics = getStudentMetrics(student);
+  if (!metrics.totalAulas) return 100;
+  return Math.max(0, (metrics.presencas / metrics.totalAulas) * 100);
 }
 
 function defaultBehaviorText(studentId) {
-  const absence = ABSENCE_MAP[studentId];
+  const absence = getStudentMetricsById(studentId);
   if (absence.dias.length >= 5) {
     return "Acompanhar frequência com atenção: o aluno apresenta ausências recorrentes, o que pode impactar rendimento, participação e continuidade das atividades.";
   }
@@ -1334,7 +1456,7 @@ function defaultBehaviorText(studentId) {
 }
 
 function defaultReferralText(studentId) {
-  const absence = ABSENCE_MAP[studentId];
+  const absence = getStudentMetricsById(studentId);
   if (absence.dias.length >= 5) {
     return "Priorizar conversa com o aluno e com os responsáveis sobre frequência, recuperar atividades pendentes e monitorar permanência em sala.";
   }
@@ -1345,7 +1467,7 @@ function defaultReferralText(studentId) {
 }
 
 function buildStudentSummary(student) {
-  const absence = ABSENCE_MAP[student.id];
+  const absence = getStudentMetrics(student);
   const media = calculateAnnualAverage(student);
   const bimLines = BIMESTERS.map(function (bim) {
     const dados = student.bimestres[bim];
@@ -1353,7 +1475,7 @@ function buildStudentSummary(student) {
     return bim + "º bimestre: trabalhos " + printableNumber(dados.trabalhos, "/5")
       + ", prova " + printableNumber(dados.prova, "/5")
       + ", total " + (total === null ? "não preenchido" : formatNumber(total) + "/10")
-      + ", trabalhos realizados " + (dados.trabalhosRealizados || 0) + ".";
+      + ", atividades feitas " + getBimesterWorksCount(student, bim) + ".";
   }).join("\n");
 
   const diasFalta = absence.dias.length ? absence.dias.map(function (date) {
@@ -1367,8 +1489,9 @@ function buildStudentSummary(student) {
     "Média anual parcial: " + (media === null ? "não calculada" : formatNumber(media) + "/10"),
     "Frequência parcial: " + formatNumber(calculateAttendance(student)) + "% de presença na carga horária registrada.",
     "Faltas em hora/aula: " + absence.aulas + ".",
+    "Presencas em hora/aula: " + absence.presencas + ".",
     "Dias em que faltou: " + diasFalta,
-    "Total de trabalhos realizados: " + calculateWorksTotal(student) + ".",
+    "Total de atividades feitas: " + calculateWorksTotal(student) + ".",
     "",
     "Notas por bimestre:",
     bimLines,
@@ -1400,18 +1523,18 @@ function buildClassSummary() {
     "Média parcial da turma: " + mediaTurma,
     "",
     state.alunos.map(function (student) {
-      const absence = ABSENCE_MAP[student.id];
+      const absence = getStudentMetrics(student);
       return student.numero + ". " + student.nome
         + " | média parcial: " + (calculateAnnualAverage(student) === null ? "—" : formatNumber(calculateAnnualAverage(student)) + "/10")
-        + " | trabalhos realizados: " + calculateWorksTotal(student)
+        + " | atividades feitas: " + calculateWorksTotal(student)
         + " | faltas em h/aula: " + absence.aulas
-        + " | dias ausentes: " + absence.dias.length;
+        + " | presencas em h/aula: " + absence.presencas;
     }).join("\n")
   ].join("\n");
 }
 
 function buildAutoAnnualReport(student) {
-  const absence = ABSENCE_MAP[student.id];
+  const absence = getStudentMetrics(student);
   const media = calculateAnnualAverage(student);
   const works = calculateWorksTotal(student);
   const filledBimesters = BIMESTERS.filter(function (bim) { return calculateBimTotal(student, bim) !== null; }).length;
