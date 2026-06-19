@@ -36,6 +36,29 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .tb.la{background:var(--la)}.tb.az{background:var(--az)}.tb.og{background:var(--og)}.tb.gz{background:#444}
 .ti h2{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--vd)}
 .ti p{font-size:.82rem;color:var(--cm);margin-top:2px}
+.rh-hero{position:relative;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,.9fr);gap:18px;margin:0 0 24px;padding:24px 24px 22px;border-radius:22px;background:linear-gradient(135deg,rgba(26,58,42,.98),rgba(39,86,63,.94) 52%,rgba(74,148,103,.9));box-shadow:0 16px 40px rgba(26,58,42,.18);overflow:hidden}
+.rh-hero::before{content:'';position:absolute;inset:-60px auto auto -50px;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.26),transparent 70%)}
+.rh-hero::after{content:'';position:absolute;right:-70px;bottom:-90px;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.08),transparent 68%)}
+.rh-hero-main,.rh-hero-side{position:relative;z-index:1}
+.rh-hero-kicker{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#f8e9bf;margin-bottom:12px}
+.rh-hero-title{font-family:'Playfair Display',serif;font-size:clamp(1.45rem,2.4vw,2.1rem);line-height:1.08;color:#fff;margin:0 0 10px}
+.rh-hero-copy{max-width:720px;font-size:.9rem;line-height:1.72;color:rgba(255,255,255,.82);margin:0}
+.rh-hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.rh-hero-btn,.rh-hero-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:10px 15px;border-radius:999px;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.01em;text-decoration:none;cursor:pointer;transition:transform .16s ease,background .16s ease,box-shadow .16s ease,border-color .16s ease}
+.rh-hero-btn:hover,.rh-hero-link:hover{transform:translateY(-1px)}
+.rh-hero-btn.primary,.rh-hero-link.primary{background:linear-gradient(135deg,var(--ou),#ecd48b);color:#43310e;border:1px solid rgba(255,255,255,.12);box-shadow:0 10px 24px rgba(201,168,76,.18)}
+.rh-hero-btn.ghost,.rh-hero-link.ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.16)}
+.rh-hero-btn.soft,.rh-hero-link.soft{background:rgba(255,255,255,.14);color:#f8f3e5;border:1px solid rgba(255,255,255,.12)}
+.rh-hero-btn{border:none}
+.rh-hero-status{margin-top:14px;font-size:.78rem;color:rgba(255,255,255,.72)}
+.rh-hero-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.rh-hero-stat{padding:15px 16px;border-radius:18px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(4px)}
+.rh-hero-stat-label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.66);margin-bottom:7px}
+.rh-hero-stat-value{display:block;font-family:'Playfair Display',serif;font-size:1.35rem;line-height:1.1;color:#fff}
+.rh-hero-stat-meta{display:block;margin-top:5px;font-size:.74rem;line-height:1.45;color:rgba(255,255,255,.7)}
+.rh-hero-quicktabs{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.rh-hero-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);font-size:.72rem;font-weight:600;color:#fff;text-decoration:none;cursor:pointer}
+.rh-hero-pill:hover{background:rgba(255,255,255,.14)}
 .sr{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:13px;margin-bottom:28px}
 .sc2{background:#fff;border-radius:var(--rs2);padding:15px 17px;box-shadow:var(--sc);border-left:4px solid var(--vc)}
 .sc2 .n{font-family:'DM Mono',monospace;font-size:1.75rem;font-weight:500;color:var(--vm);line-height:1}
@@ -201,6 +224,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .sem .ic{font-size:2.8rem;margin-bottom:11px;opacity:.4;display:block}
 footer{background:var(--vd);color:rgba(255,255,255,.5);text-align:center;padding:18px 40px;font-size:.76rem;letter-spacing:.04em}
 @media(max-width:680px){.cab-i{padding:20px 15px;flex-direction:column;text-align:center}.main{padding:18px 13px 40px}.nav-i{padding:0 6px}.nb{padding:10px 10px;font-size:.76rem}.sr{grid-template-columns:repeat(2,1fr)}.cg,.rcg{grid-template-columns:1fr}.brow{grid-template-columns:repeat(2,1fr)}.edb{min-width:68px;padding:13px 9px}.pres-grid,.atv-grid{grid-template-columns:1fr}.cl-grid{grid-template-columns:1fr!important}.cl-timer{font-size:2rem!important}#cl-notif-bar{display:none!important}}
+@media(max-width:900px){.rh-hero{grid-template-columns:1fr}.rh-hero-side{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.rh-hero{padding:20px 16px 18px;border-radius:18px}.rh-hero-title{font-size:1.35rem}.rh-hero-copy{font-size:.84rem}.rh-hero-actions{gap:8px}.rh-hero-btn,.rh-hero-link{width:100%;justify-content:flex-start}.rh-hero-side{grid-template-columns:1fr}.rh-hero-stat-value{font-size:1.18rem}}
 /* ── CLAUDE TIMER ── */
 .cl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
 .cl-card{background:#fff;border-radius:14px;overflow:hidden;border:1.5px solid #dde8dc;padding:18px;display:flex;flex-direction:column;gap:13px;transition:border-color .3s,box-shadow .3s}
@@ -574,9 +599,46 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 
 <!-- ═══════════════════ SEC-ALL: VISÃO GERAL ═══════════════════ -->
 <section class="sec on" id="sec-all">
-  <div class="sh">
-    <div class="sti">&#128197; Visão Geral</div>
-    <div class="sst">Todos os relatos — E.E. Raimundo Hermínio de Melo</div>
+  <div class="rh-hero">
+    <div class="rh-hero-main">
+      <div class="rh-hero-kicker">Central Pedagógica</div>
+      <h2 class="rh-hero-title">Relatórios Gerais e Panorama das Turmas</h2>
+      <p class="rh-hero-copy">Acompanhe os relatos lançados, localize o registro mais recente com rapidez, abra ou feche os detalhes em lote e navegue para os painéis das turmas sem perder o contexto do ano letivo.</p>
+      <div class="rh-hero-actions">
+        <button class="rh-hero-btn primary" type="button" onclick="rhHeroToggleSection('sec-all', true)">Abrir todos os relatos</button>
+        <button class="rh-hero-btn ghost" type="button" onclick="rhHeroToggleSection('sec-all', false)">Fechar todos</button>
+        <button class="rh-hero-btn ghost" type="button" onclick="rhHeroScrollLatest('sec-all')">Ir para o mais recente</button>
+        <button class="rh-hero-btn soft" type="button" onclick="rhHeroCopySectionSummary('sec-all')">Copiar resumo desta aba</button>
+      </div>
+      <div class="rh-hero-quicktabs">
+        <button class="rh-hero-pill" type="button" onclick="rhGoTab('sec-t89')">8º/9º ano</button>
+        <button class="rh-hero-pill" type="button" onclick="rhGoTab('sec-t1')">1ª série</button>
+        <button class="rh-hero-pill" type="button" onclick="rhGoTab('sec-t23')">2ª/3ª série</button>
+      </div>
+      <div class="rh-hero-status" id="rh-hero-status-sec-all">Painel geral pronto para consulta.</div>
+    </div>
+    <div class="rh-hero-side">
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Lançamentos</span>
+        <strong class="rh-hero-stat-value" id="rh-stat-count-sec-all">--</strong>
+        <span class="rh-hero-stat-meta">Total de registros nesta visão.</span>
+      </div>
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Último registro</span>
+        <strong class="rh-hero-stat-value" id="rh-stat-last-sec-all">--</strong>
+        <span class="rh-hero-stat-meta">Data do lançamento mais recente.</span>
+      </div>
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Relatos abertos</span>
+        <strong class="rh-hero-stat-value" id="rh-stat-open-sec-all">0</strong>
+        <span class="rh-hero-stat-meta">Atualizado conforme a sua navegação.</span>
+      </div>
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Cobertura</span>
+        <strong class="rh-hero-stat-value">4 frentes</strong>
+        <span class="rh-hero-stat-meta">Geral, 8º/9º, 1ª e 2ª/3ª série.</span>
+      </div>
+    </div>
   </div>
 <!-- RH_GERAL_INICIO -->
 <div class="ea">
@@ -1156,15 +1218,42 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 
 <!-- ═══════════════════ SEC-T89: 8º/9º ANO ═══════════════════ -->
 <section class="sec" id="sec-t89">
-  <div class="sh">
-    <div class="sti">8&#186;/9&#186; Ano</div>
-    <div class="sst">Turmas unificadas · LP · Inglês · Espanhol</div>
-  </div>
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 18px">
-    <div style="font-size:.82rem;color:var(--cm)">Painéis separados para o 8º e 9º ano com notas por bimestre, faltas, perfil individual e relatório anual automático.</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <a href="herminio-alunos-8ano.html" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--ou),#e8c86a);color:#4b3810;text-decoration:none;border-radius:999px;padding:10px 16px;font-size:.82rem;font-weight:700;box-shadow:0 8px 22px rgba(201,168,76,.28)">👥 Alunos 8º</a>
-      <a href="herminio-alunos-9ano.html" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--ou),#e8c86a);color:#4b3810;text-decoration:none;border-radius:999px;padding:10px 16px;font-size:.82rem;font-weight:700;box-shadow:0 8px 22px rgba(201,168,76,.28)">👥 Alunos 9º</a>
+  <div class="rh-hero">
+    <div class="rh-hero-main">
+      <div class="rh-hero-kicker">Ensino Fundamental II</div>
+      <h2 class="rh-hero-title">8º e 9º Ano com acompanhamento integrado</h2>
+      <p class="rh-hero-copy">Organize os relatos da turma unificada, acompanhe frequência e atividades e acesse os painéis individuais de alunos do 8º e do 9º ano em poucos cliques.</p>
+      <div class="rh-hero-actions">
+        <button class="rh-hero-btn primary" type="button" onclick="rhHeroToggleSection('sec-t89', true)">Abrir relatos da turma</button>
+        <button class="rh-hero-btn ghost" type="button" onclick="rhHeroToggleSection('sec-t89', false)">Fechar relatos</button>
+        <button class="rh-hero-btn ghost" type="button" onclick="rhHeroScrollLatest('sec-t89')">Ir para o mais recente</button>
+        <button class="rh-hero-btn soft" type="button" onclick="rhHeroCopySectionSummary('sec-t89')">Copiar resumo da turma</button>
+        <a class="rh-hero-link primary" href="herminio-alunos-8ano.html">Alunos 8º</a>
+        <a class="rh-hero-link ghost" href="herminio-alunos-9ano.html">Alunos 9º</a>
+      </div>
+      <div class="rh-hero-status" id="rh-hero-status-sec-t89">Painel da turma preparado para uso.</div>
+    </div>
+    <div class="rh-hero-side">
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Lançamentos</span>
+        <strong class="rh-hero-stat-value" id="rh-stat-count-sec-t89">--</strong>
+        <span class="rh-hero-stat-meta">Registros vinculados ao 8º/9º ano.</span>
+      </div>
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Último registro</span>
+        <strong class="rh-hero-stat-value" id="rh-stat-last-sec-t89">--</strong>
+        <span class="rh-hero-stat-meta">Data mais recente lançada nesta aba.</span>
+      </div>
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Relatos abertos</span>
+        <strong class="rh-hero-stat-value" id="rh-stat-open-sec-t89">0</strong>
+        <span class="rh-hero-stat-meta">Atualizado conforme os painéis expandidos.</span>
+      </div>
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Painéis de alunos</span>
+        <strong class="rh-hero-stat-value">8º + 9º</strong>
+        <span class="rh-hero-stat-meta">Notas, faltas e relatório anual automático.</span>
+      </div>
     </div>
   </div>
 <!-- RH_T89_INICIO -->
@@ -1174,13 +1263,42 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 
 <!-- ═══════════════════ SEC-T1: 1ª SÉRIE ═══════════════════ -->
 <section class="sec" id="sec-t1">
-  <div class="sh">
-    <div class="sti">1&#170; Série</div>
-    <div class="sst">LP · Inglês · Espanhol</div>
-  </div>
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 18px">
-    <div style="font-size:.82rem;color:var(--cm)">Painel de alunos com notas por bimestre, faltas, perfil individual e relatório anual.</div>
-    <a href="herminio-alunos-1serie.html" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--ou),#e8c86a);color:#4b3810;text-decoration:none;border-radius:999px;padding:10px 16px;font-size:.82rem;font-weight:700;box-shadow:0 8px 22px rgba(201,168,76,.28)">👥 Alunos</a>
+  <div class="rh-hero">
+    <div class="rh-hero-main">
+      <div class="rh-hero-kicker">Ensino Médio</div>
+      <h2 class="rh-hero-title">1ª Série com visão diária e painel completo de alunos</h2>
+      <p class="rh-hero-copy">Concentre os relatos da turma, acompanhe presença e atividades e entre direto no painel dos alunos para notas bimestrais, faltas por hora/aula e relatório anual automático.</p>
+      <div class="rh-hero-actions">
+        <button class="rh-hero-btn primary" type="button" onclick="rhHeroToggleSection('sec-t1', true)">Abrir relatos da série</button>
+        <button class="rh-hero-btn ghost" type="button" onclick="rhHeroToggleSection('sec-t1', false)">Fechar relatos</button>
+        <button class="rh-hero-btn ghost" type="button" onclick="rhHeroScrollLatest('sec-t1')">Ir para o mais recente</button>
+        <button class="rh-hero-btn soft" type="button" onclick="rhHeroCopySectionSummary('sec-t1')">Copiar resumo da série</button>
+        <a class="rh-hero-link primary" href="herminio-alunos-1serie.html">Abrir painel de alunos</a>
+      </div>
+      <div class="rh-hero-status" id="rh-hero-status-sec-t1">Painel da 1ª série pronto para consulta.</div>
+    </div>
+    <div class="rh-hero-side">
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Lançamentos</span>
+        <strong class="rh-hero-stat-value" id="rh-stat-count-sec-t1">--</strong>
+        <span class="rh-hero-stat-meta">Registros disponíveis desta série.</span>
+      </div>
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Último registro</span>
+        <strong class="rh-hero-stat-value" id="rh-stat-last-sec-t1">--</strong>
+        <span class="rh-hero-stat-meta">Última data registrada na aba.</span>
+      </div>
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Relatos abertos</span>
+        <strong class="rh-hero-stat-value" id="rh-stat-open-sec-t1">0</strong>
+        <span class="rh-hero-stat-meta">Atualização dinâmica durante a navegação.</span>
+      </div>
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Acompanhamento</span>
+        <strong class="rh-hero-stat-value">Alunos + notas</strong>
+        <span class="rh-hero-stat-meta">Perfil, frequência e relatório anual no mesmo fluxo.</span>
+      </div>
+    </div>
   </div>
 <!-- RH_T1_INICIO -->
 <div class="ea">
@@ -2408,15 +2526,42 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 
 <!-- ═══════════════════ SEC-T23: 2ª/3ª SÉRIE ═══════════════════ -->
 <section class="sec" id="sec-t23">
-  <div class="sh">
-    <div class="sti">2&#170;/3&#170; Série</div>
-    <div class="sst">Turmas unificadas · LP · Inglês · Espanhol</div>
-  </div>
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 18px">
-    <div style="font-size:.82rem;color:var(--cm)">Painéis separados para a 2ª e a 3ª Série com notas por bimestre, faltas, perfil individual e relatório anual automático.</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <a href="herminio-alunos-2serie.html" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--ou),#e8c86a);color:#4b3810;text-decoration:none;border-radius:999px;padding:10px 16px;font-size:.82rem;font-weight:700;box-shadow:0 8px 22px rgba(201,168,76,.28)">👥 Alunos 2ª</a>
-      <a href="herminio-alunos-3serie.html" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--ou),#e8c86a);color:#4b3810;text-decoration:none;border-radius:999px;padding:10px 16px;font-size:.82rem;font-weight:700;box-shadow:0 8px 22px rgba(201,168,76,.28)">👥 Alunos 3ª</a>
+  <div class="rh-hero">
+    <div class="rh-hero-main">
+      <div class="rh-hero-kicker">Ensino Médio Avançado</div>
+      <h2 class="rh-hero-title">2ª e 3ª Série com acompanhamento unificado</h2>
+      <p class="rh-hero-copy">Use esta aba para concentrar os relatos da turma integrada e acesse rapidamente os painéis separados da 2ª e da 3ª série para lançar desempenho, faltas e relatórios anuais dos alunos.</p>
+      <div class="rh-hero-actions">
+        <button class="rh-hero-btn primary" type="button" onclick="rhHeroToggleSection('sec-t23', true)">Abrir relatos da turma</button>
+        <button class="rh-hero-btn ghost" type="button" onclick="rhHeroToggleSection('sec-t23', false)">Fechar relatos</button>
+        <button class="rh-hero-btn ghost" type="button" onclick="rhHeroScrollLatest('sec-t23')">Ir para o mais recente</button>
+        <button class="rh-hero-btn soft" type="button" onclick="rhHeroCopySectionSummary('sec-t23')">Copiar resumo da turma</button>
+        <a class="rh-hero-link primary" href="herminio-alunos-2serie.html">Alunos 2ª</a>
+        <a class="rh-hero-link ghost" href="herminio-alunos-3serie.html">Alunos 3ª</a>
+      </div>
+      <div class="rh-hero-status" id="rh-hero-status-sec-t23">Painel da 2ª/3ª série preparado para navegação.</div>
+    </div>
+    <div class="rh-hero-side">
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Lançamentos</span>
+        <strong class="rh-hero-stat-value" id="rh-stat-count-sec-t23">--</strong>
+        <span class="rh-hero-stat-meta">Registros vinculados à turma integrada.</span>
+      </div>
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Último registro</span>
+        <strong class="rh-hero-stat-value" id="rh-stat-last-sec-t23">--</strong>
+        <span class="rh-hero-stat-meta">Última data lançada nesta aba.</span>
+      </div>
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Relatos abertos</span>
+        <strong class="rh-hero-stat-value" id="rh-stat-open-sec-t23">0</strong>
+        <span class="rh-hero-stat-meta">Acompanha os cartões expandidos em tela.</span>
+      </div>
+      <div class="rh-hero-stat">
+        <span class="rh-hero-stat-label">Painéis de alunos</span>
+        <strong class="rh-hero-stat-value">2ª + 3ª</strong>
+        <span class="rh-hero-stat-meta">Controle separado por série com relatório automático.</span>
+      </div>
     </div>
   </div>
 <!-- RH_T23_INICIO -->
@@ -3295,6 +3440,7 @@ function aba(id, btn) {
   if (sec) sec.classList.add('on');
   if (btn) btn.classList.add('on');
   if (id === 'sec-cont') renderContRH();
+  rhUpdateHeroStats(id);
 }
 
 function tog(h) {
@@ -3303,6 +3449,8 @@ function tog(h) {
   var et = h.querySelector('.et');
   if (ec2) ec2.classList.toggle('on');
   if (et) et.classList.toggle('op');
+  var sec = h.closest('.sec');
+  if (sec) rhUpdateHeroStats(sec.id);
 }
 
 function itab(btn, pid) {
@@ -3313,6 +3461,120 @@ function itab(btn, pid) {
   btn.classList.add('on');
   var pane = document.getElementById(pid);
   if (pane) pane.classList.add('on');
+}
+
+function rhHeroFormatLastDate(sectionId) {
+  var sec = document.getElementById(sectionId);
+  if (!sec) return '—';
+  var primeiro = sec.querySelector('.ea');
+  if (!primeiro) return 'Sem lançamentos';
+  var dia = primeiro.querySelector('.edb .d');
+  var mesAno = primeiro.querySelector('.edb .my');
+  if (!dia || !mesAno) return 'Sem data';
+  return dia.textContent.trim() + ' ' + mesAno.textContent.trim();
+}
+
+function rhUpdateHeroStats(sectionId) {
+  var sec = document.getElementById(sectionId);
+  if (!sec) return;
+  var cards = sec.querySelectorAll('.ea');
+  var abertos = sec.querySelectorAll('.ea .ec2.on');
+  var countEl = document.getElementById('rh-stat-count-' + sectionId);
+  var lastEl = document.getElementById('rh-stat-last-' + sectionId);
+  var openEl = document.getElementById('rh-stat-open-' + sectionId);
+  if (countEl) countEl.textContent = String(cards.length);
+  if (lastEl) lastEl.textContent = rhHeroFormatLastDate(sectionId);
+  if (openEl) openEl.textContent = String(abertos.length);
+}
+
+function rhRefreshHeroStats() {
+  ['sec-all', 'sec-t89', 'sec-t1', 'sec-t23'].forEach(function(id) {
+    rhUpdateHeroStats(id);
+  });
+}
+
+function rhSetHeroStatus(sectionId, message) {
+  var el = document.getElementById('rh-hero-status-' + sectionId);
+  if (el) el.textContent = message;
+}
+
+function rhHeroToggleSection(sectionId, expandir) {
+  var sec = document.getElementById(sectionId);
+  if (!sec) return;
+  sec.querySelectorAll('.ea').forEach(function(card) {
+    var ec2 = card.querySelector('.ec2');
+    var et = card.querySelector('.et');
+    if (ec2) ec2.classList.toggle('on', expandir);
+    if (et) et.classList.toggle('op', expandir);
+  });
+  rhUpdateHeroStats(sectionId);
+  rhSetHeroStatus(sectionId, expandir ? 'Todos os relatos desta aba foram abertos.' : 'Todos os relatos desta aba foram recolhidos.');
+}
+
+function rhHeroScrollLatest(sectionId) {
+  var sec = document.getElementById(sectionId);
+  if (!sec) return;
+  var card = sec.querySelector('.ea');
+  if (!card) {
+    rhSetHeroStatus(sectionId, 'Ainda não há relatos nesta aba.');
+    return;
+  }
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  rhSetHeroStatus(sectionId, 'Rolagem posicionada no lançamento mais recente.');
+}
+
+function rhHeroBuildSummary(sectionId) {
+  var sec = document.getElementById(sectionId);
+  if (!sec) return '';
+  var titulo = sec.querySelector('.rh-hero-title');
+  var cards = Array.from(sec.querySelectorAll('.ea'));
+  var linhas = [
+    (titulo ? titulo.textContent.trim() : sectionId),
+    'Lançamentos: ' + cards.length,
+    'Último registro: ' + rhHeroFormatLastDate(sectionId),
+    'Relatos abertos: ' + sec.querySelectorAll('.ea .ec2.on').length,
+    ''
+  ];
+  cards.slice(0, 5).forEach(function(card, index) {
+    var nome = card.querySelector('.em .ed');
+    var info = card.querySelector('.em .ec');
+    linhas.push((index + 1) + '. ' + (nome ? nome.textContent.trim() : 'Registro sem título'));
+    if (info) linhas.push('   ' + info.textContent.trim().replace(/\s+/g, ' '));
+  });
+  return linhas.join('\n');
+}
+
+function rhHeroCopyFallback(texto) {
+  var area = document.createElement('textarea');
+  area.value = texto;
+  document.body.appendChild(area);
+  area.select();
+  document.execCommand('copy');
+  area.remove();
+}
+
+function rhHeroCopySectionSummary(sectionId) {
+  var resumo = rhHeroBuildSummary(sectionId);
+  if (!resumo) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(resumo).then(function() {
+      rhSetHeroStatus(sectionId, 'Resumo da aba copiado com sucesso.');
+    }).catch(function() {
+      rhHeroCopyFallback(resumo);
+      rhSetHeroStatus(sectionId, 'Resumo da aba copiado com fallback local.');
+    });
+    return;
+  }
+  rhHeroCopyFallback(resumo);
+  rhSetHeroStatus(sectionId, 'Resumo da aba copiado com fallback local.');
+}
+
+function rhGoTab(sectionId) {
+  var btn = Array.from(document.querySelectorAll('.nb')).find(function(item) {
+    return (item.getAttribute('onclick') || '').indexOf("'" + sectionId + "'") >= 0;
+  });
+  aba(sectionId, btn || null);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ═══════════════════════════════════════════════════════
@@ -3469,6 +3731,7 @@ function aba(id, btn) {
   if (btn) btn.classList.add('on');
   if (id === 'sec-cont') renderContRH();
   if (id === 'sec-claude') rhClaudeRender();
+  rhUpdateHeroStats(id);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4270,6 +4533,7 @@ function abrirModalRH() {
 document.addEventListener('DOMContentLoaded', function() {
   renderPresencaRH();
   renderAtividadesRH();
+  rhRefreshHeroStats();
 });
 
 if ('serviceWorker' in navigator) {
