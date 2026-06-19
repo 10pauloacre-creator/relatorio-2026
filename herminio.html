@@ -3578,6 +3578,8 @@ function rhMontarResumoAlunosSync() {
     });
     classes[turmaId] = {
       turma: RH_TURMA_LABELS[turmaId] || turmaId,
+      atividadesAplicadas: 0,
+      atividadesAplicadasPorBimestre: { '1': 0, '2': 0, '3': 0, '4': 0 },
       students: students
     };
   });
@@ -3609,6 +3611,8 @@ function rhMontarResumoAlunosSync() {
     var turmaId = rhDescobrirTurmaPane(pane);
     if (!turmaId || !classes[turmaId]) return;
     var bim = rhBimestrePorCodigo(rhDiaBasePane(pane.id));
+    classes[turmaId].atividadesAplicadas += 1;
+    classes[turmaId].atividadesAplicadasPorBimestre[bim] = (classes[turmaId].atividadesAplicadasPorBimestre[bim] || 0) + 1;
 
     classes[turmaId].students.forEach(function(aluno) {
       var estado = rhGetEstadoAtual('atividade', pane, aluno.numero);

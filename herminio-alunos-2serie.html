@@ -1005,6 +1005,12 @@ function readDailySyncData() {
   }
 }
 
+function getAppliedActivitiesCount() {
+  const synced = readDailySyncData();
+  if (!synced || !synced.classes || !synced.classes[CLASS_REPORT_GROUP]) return 0;
+  return Number(synced.classes[CLASS_REPORT_GROUP].atividadesAplicadas) || 0;
+}
+
 function buildSyncedStudentMetrics(student) {
   const fallback = buildFallbackStudentMetrics(student);
   const synced = readDailySyncData();
@@ -1193,14 +1199,14 @@ function renderSummary() {
   const mediaTurma = medias.length ? medias.reduce(function (sum, value) { return sum + value; }, 0) / medias.length : null;
   const totalFaltas = state.alunos.reduce(function (sum, student) { return sum + getStudentMetrics(student).aulas; }, 0);
   const totalPresencas = state.alunos.reduce(function (sum, student) { return sum + getStudentMetrics(student).presencas; }, 0);
-  const totalTrabalhos = state.alunos.reduce(function (sum, student) { return sum + calculateWorksTotal(student); }, 0);
+  const totalAtividadesAplicadas = getAppliedActivitiesCount();
 
   summaryGrid.innerHTML = [
     summaryCard("Alunos cadastrados", String(state.alunos.length), "Base da 2ª Série"),
     summaryCard("Faltas em h/aula", String(totalFaltas), "Somatório da carga horária ausente"),
     summaryCard("Presencas em h/aula", String(totalPresencas), "Sincronizadas pelos relatos diarios"),
     summaryCard("Média parcial da turma", mediaTurma === null ? "—" : formatNumber(mediaTurma), mediaTurma === null ? "Preencha as notas para calcular" : "Com base nos bimestres já lançados"),
-    summaryCard("Atividades feitas", String(totalTrabalhos), "Contagem automatica dos relatos diarios"),
+    summaryCard("Atividades aplicadas", String(totalAtividadesAplicadas), "Cada tema registrado conta como 1 atividade aplicada"),
     summaryCard("Relatórios anuais", String(state.alunos.length), "Todos podem ser gerados automaticamente pelo sistema")
   ].join("");
 }
