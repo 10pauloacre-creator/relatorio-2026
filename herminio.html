@@ -3328,6 +3328,7 @@ const RH_SEQ_ICS = {'':{ic:'🗂',lbl:'Não iniciado'},criando:{ic:'📝',lbl:'C
 var _rhSeqStatus = JSON.parse(localStorage.getItem('rh_seq_status') || '{}');
 var _rhPresencaCliques = JSON.parse(localStorage.getItem('rh_presenca_cliques') || '{}');
 var _rhAtividadeCliques = JSON.parse(localStorage.getItem('rh_atividade_cliques') || '{}');
+const RH_ALUNOS_SYNC_KEY = 'rh_alunos_sync_v1';
 
 const RH_MESES = {
   Jan: 0, Fev: 1, Mar: 2, Abr: 3, Mai: 4, Jun: 5,
@@ -3531,6 +3532,100 @@ function rhGetEstadoAtual(tipo, pane, numeroAluno) {
   var paneMap = cliques[pane.id] || {};
   if (paneMap[numeroAluno] !== undefined) return paneMap[numeroAluno];
   return origem[numeroAluno];
+}
+
+function rhFormatDateCodeSync(code) {
+  if (!code || code.length < 4) return '';
+  return code.slice(2, 4) + '/' + code.slice(0, 2) + '/2026';
+}
+
+function rhBimestrePorCodigo(code) {
+  var mes = parseInt(String(code || '').slice(0, 2), 10);
+  if (!mes || mes <= 4) return '1';
+  if (mes <= 7) return '2';
+  if (mes <= 9) return '3';
+  return '4';
+}
+
+function rhHorasPainel(pane) {
+  if (!pane) return 1;
+  var card = pane.closest('.ea');
+  if (!card) return 1;
+  var titulo = card.querySelector('.em .ed');
+  if (!titulo) return 1;
+  return Math.max(1, Math.floor(parseHorasRH(titulo.textContent) || 0));
+}
+
+function rhResumoAlunoBase(aluno) {
+  return {
+    numero: aluno.n,
+    nome: aluno.nm,
+    faltas: 0,
+    presencas: 0,
+    totalAulas: 0,
+    porDia: {},
+    atividadesFeitas: 0,
+    atividadesPorBimestre: { '1': 0, '2': 0, '3': 0, '4': 0 }
+  };
+}
+
+function rhMontarResumoAlunosSync() {
+  var classes = {};
+
+  Object.keys(ALUNOS_RH).forEach(function(turmaId) {
+    var students = (ALUNOS_RH[turmaId] || []).map(function(aluno) {
+      return rhResumoAlunoBase(aluno);
+    });
+    classes[turmaId] = {
+      turma: RH_TURMA_LABELS[turmaId] || turmaId,
+      students: students
+    };
+  });
+
+  document.querySelectorAll('[id^="p-"]').forEach(function(pane) {
+    if (pane.id.indexOf('p-all-') === 0) return;
+    var turmaId = rhDescobrirTurmaPane(pane);
+    if (!turmaId || !classes[turmaId]) return;
+    var carga = rhHorasPainel(pane);
+    var data = rhFormatDateCodeSync(rhDiaBasePane(pane.id));
+
+    classes[turmaId].students.forEach(function(aluno) {
+      var estado = rhGetEstadoAtual('presenca', pane, aluno.numero);
+      if (estado === true) {
+        aluno.presencas += carga;
+        aluno.totalAulas += carga;
+        return;
+      }
+      if (estado === false) {
+        aluno.faltas += carga;
+        aluno.totalAulas += carga;
+        if (data) aluno.porDia[data] = (aluno.porDia[data] || 0) + carga;
+      }
+    });
+  });
+
+  document.querySelectorAll('[id^="a-"]').forEach(function(pane) {
+    if (pane.id.indexOf('a-all-') === 0) return;
+    var turmaId = rhDescobrirTurmaPane(pane);
+    if (!turmaId || !classes[turmaId]) return;
+    var bim = rhBimestrePorCodigo(rhDiaBasePane(pane.id));
+
+    classes[turmaId].students.forEach(function(aluno) {
+      var estado = rhGetEstadoAtual('atividade', pane, aluno.numero);
+      if (estado !== true) return;
+      aluno.atividadesFeitas += 1;
+      aluno.atividadesPorBimestre[bim] = (aluno.atividadesPorBimestre[bim] || 0) + 1;
+    });
+  });
+
+  return {
+    updatedAt: new Date().toISOString(),
+    classes: classes
+  };
+}
+
+function rhSincronizarResumoAlunos() {
+  localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(rhMontarResumoAlunosSync()));
 }
 
 function rhProximoEstado(valorAtual) {
@@ -4737,6 +4832,7 @@ function abrirModalRH() {
 document.addEventListener('DOMContentLoaded', function() {
   renderPresencaRH();
   renderAtividadesRH();
+  rhSincronizarResumoAlunos();
   rhRefreshHeroStats();
 });
 
@@ -4755,12 +4851,14 @@ document.addEventListener('click', function(e) {
     _rhPresencaCliques[paneId][aluno] = proximo;
     rhSalvarCliques('presenca');
     rhRenderPanePresenca(pane);
+    rhSincronizarResumoAlunos();
     return;
   }
   if (!_rhAtividadeCliques[paneId]) _rhAtividadeCliques[paneId] = {};
   _rhAtividadeCliques[paneId][aluno] = proximo;
   rhSalvarCliques('atividade');
   rhRenderPaneAtividade(pane);
+  rhSincronizarResumoAlunos();
 });
 
 if ('serviceWorker' in navigator) {
