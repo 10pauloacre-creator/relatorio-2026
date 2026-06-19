@@ -289,9 +289,10 @@ button,input,textarea{font:inherit}
 }
 table{
   width:100%;
-  min-width:1400px;
+  min-width:980px;
   border-collapse:separate;
   border-spacing:0;
+  table-layout:fixed;
 }
 thead th{
   position:sticky;
@@ -312,6 +313,15 @@ thead tr:last-child th{
   background:#fbf7ed;
   font-size:.72rem;
 }
+thead th:first-child,
+tbody td:first-child{
+  width:40%;
+}
+thead th:not(:first-child),
+tbody td:not(:first-child){
+  width:15%;
+  text-align:center;
+}
 tbody td{
   padding:12px 10px;
   border-bottom:1px solid #f0e7d8;
@@ -325,7 +335,7 @@ tbody tr:hover td{
   background:#fcf7ec;
 }
 .student-cell{
-  min-width:250px;
+  min-width:0;
 }
 .student-number{
   display:inline-flex;
@@ -423,7 +433,10 @@ tbody tr:hover td{
   color:var(--muted);
 }
 .grade-badge{
-  min-width:120px;
+  width:100%;
+  min-width:0;
+  max-width:136px;
+  margin:0 auto;
   display:inline-flex;
   flex-direction:column;
   align-items:center;
