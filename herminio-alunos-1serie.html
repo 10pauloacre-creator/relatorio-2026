@@ -688,7 +688,7 @@ tbody tr:hover td{
       </div>
       <div class="status-box" style="margin-top:12px;background:rgba(42,110,147,.08);border-color:rgba(42,110,147,.15);color:var(--info)">
         <strong>Base inicial das faltas</strong>
-        As ausências da 1ª Série foram consolidadas a partir das chamadas entre <strong>25/05/2026</strong> e <strong>18/06/2026</strong> já registradas em <code>herminio.html</code>, agora com soma por <strong>hora/aula</strong>.
+        As ausências da 1ª Série foram consolidadas a partir das chamadas entre <strong>25/05/2026</strong> e <strong>18/06/2026</strong> já registradas em <code>herminio.html</code>, agora com soma por <strong>hora/aula</strong> e sem contar os 15 minutos extras.
       </div>
     </aside>
   </section>
@@ -797,31 +797,31 @@ const ABSENCE_RECORDS = [
   { codigo: "0526a", carga: 2, faltaram: [] },
   { codigo: "0526b", carga: 2, faltaram: [] },
   { codigo: "0528a", carga: 2, faltaram: [] },
-  { codigo: "0528b", carga: 3, faltaram: [] },
+  { codigo: "0528b", carga: 2, faltaram: [] },
   { codigo: "0529a", carga: 2, faltaram: [5] },
-  { codigo: "0529b", carga: 3, faltaram: [5] },
+  { codigo: "0529b", carga: 2, faltaram: [5] },
   { codigo: "0601a", carga: 2, faltaram: [5] },
   { codigo: "0601b", carga: 2, faltaram: [5] },
   { codigo: "0602a", carga: 2, faltaram: [5] },
-  { codigo: "0602b", carga: 3, faltaram: [5] },
+  { codigo: "0602b", carga: 2, faltaram: [5] },
   { codigo: "0603a", carga: 2, faltaram: [] },
-  { codigo: "0603b", carga: 3, faltaram: [] },
+  { codigo: "0603b", carga: 2, faltaram: [] },
   { codigo: "0610a", carga: 2, faltaram: [1, 2, 3, 4, 5] },
-  { codigo: "0610b", carga: 3, faltaram: [1, 2, 3, 4, 5] },
+  { codigo: "0610b", carga: 2, faltaram: [1, 2, 3, 4, 5] },
   { codigo: "0611a", carga: 2, faltaram: [5] },
-  { codigo: "0611b", carga: 3, faltaram: [5] },
+  { codigo: "0611b", carga: 2, faltaram: [5] },
   { codigo: "0612a", carga: 2, faltaram: [1, 3, 4] },
-  { codigo: "0612b", carga: 3, faltaram: [1, 3, 4] },
+  { codigo: "0612b", carga: 2, faltaram: [1, 3, 4] },
   { codigo: "0615a", carga: 2, faltaram: [3, 4, 5] },
   { codigo: "0615b", carga: 2, faltaram: [3, 4, 5] },
   { codigo: "0616a", carga: 2, faltaram: [3, 5] },
-  { codigo: "0616b", carga: 3, faltaram: [3, 5] },
+  { codigo: "0616b", carga: 2, faltaram: [3, 5] },
   { codigo: "0617a", carga: 2, faltaram: [5] },
-  { codigo: "0617b", carga: 3, faltaram: [5] },
+  { codigo: "0617b", carga: 2, faltaram: [5] },
   { codigo: "0617c", carga: 2, faltaram: [3, 4, 5] },
   { codigo: "0617d", carga: 2, faltaram: [3, 4, 5] },
   { codigo: "0618a", carga: 2, faltaram: [3, 4, 5] },
-  { codigo: "0618b", carga: 3, faltaram: [3, 4, 5] }
+  { codigo: "0618b", carga: 2, faltaram: [3, 4, 5] }
 ];
 
 const searchInput = document.getElementById("searchInput");
@@ -1154,7 +1154,7 @@ function renderProfile(studentId) {
     + '</section>'
     + '<section class="section-block">'
       + '<h3>Faltas e dias em que o aluno faltou</h3>'
-      + '<p class="section-note">A contagem abaixo foi consolidada a partir das chamadas da própria turma já presentes no relatório. Cada hora/aula ausente equivale a 1 falta.</p>'
+      + '<p class="section-note">A contagem abaixo foi consolidada a partir das chamadas da própria turma já presentes no relatório. Cada hora/aula ausente equivale a 1 falta, e blocos de 2h15 contam como 2 faltas.</p>'
       + renderAbsenceDetails(absence)
     + '</section>'
     + '<section class="section-block">'
