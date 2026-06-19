@@ -345,6 +345,20 @@ tbody tr:hover td{
   color:var(--vd);
   line-height:1.45;
 }
+.student-name-btn{
+  padding:0;
+  border:none;
+  background:transparent;
+  color:var(--vd);
+  font-weight:700;
+  line-height:1.45;
+  text-align:left;
+  cursor:pointer;
+}
+.student-name-btn:hover{
+  color:var(--vm);
+  text-decoration:underline;
+}
 .student-meta{
   margin-top:4px;
   display:flex;
@@ -407,6 +421,39 @@ tbody tr:hover td{
 .total-pill.empty{
   background:#f2efe8;
   color:var(--muted);
+}
+.grade-badge{
+  min-width:120px;
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:10px 12px;
+  border-radius:16px;
+  border:1px solid transparent;
+  background:#f2efe8;
+  color:var(--muted);
+  text-align:center;
+}
+.grade-badge.good{
+  background:#edf7f0;
+  border-color:#bfe2c9;
+  color:#1f6a3a;
+}
+.grade-badge.recovery{
+  background:#fdecea;
+  border-color:#efc0b6;
+  color:#9c2f1b;
+}
+.grade-badge strong{
+  font-family:'DM Mono',monospace;
+  font-size:1rem;
+}
+.grade-badge small{
+  font-size:.7rem;
+  font-weight:700;
+  letter-spacing:.04em;
 }
 .actions-cell{
   white-space:nowrap;
@@ -707,40 +754,22 @@ tbody tr:hover td{
     <div class="table-head">
       <div>
         <h2>Tabela geral da turma</h2>
-        <p>Notas, faltas e ações rápidas em uma única visão. O total de cada bimestre é calculado automaticamente.</p>
+        <p>Visão resumida com as notas finais dos 4 bimestres. Os detalhes de trabalhos e prova continuam no perfil do aluno.</p>
       </div>
       <div class="status-box" style="max-width:340px;background:rgba(26,58,42,.05);border-color:rgba(26,58,42,.10);color:var(--muted)">
         <strong>Colunas da tabela</strong>
-        Cada bimestre mostra nota de trabalhos, nota de prova e nota total. O perfil detalha trabalhos realizados, comportamento e relatório anual.
+        Notas abaixo de 7 ficam em vermelho com aviso de recuperação. Clique no nome do aluno para abrir o perfil completo.
       </div>
     </div>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th rowspan="2">Aluno</th>
-            <th colspan="3">1º Bimestre</th>
-            <th colspan="3">2º Bimestre</th>
-            <th colspan="3">3º Bimestre</th>
-            <th colspan="3">4º Bimestre</th>
-            <th rowspan="2">Trab. feitos</th>
-            <th rowspan="2">Faltas h/aula</th>
-            <th rowspan="2">Dias</th>
-            <th rowspan="2">Ações</th>
-          </tr>
-          <tr>
-            <th>Trab.</th>
-            <th>Prova</th>
-            <th>Total</th>
-            <th>Trab.</th>
-            <th>Prova</th>
-            <th>Total</th>
-            <th>Trab.</th>
-            <th>Prova</th>
-            <th>Total</th>
-            <th>Trab.</th>
-            <th>Prova</th>
-            <th>Total</th>
+            <th>Aluno</th>
+            <th>1º Bimestre</th>
+            <th>2º Bimestre</th>
+            <th>3º Bimestre</th>
+            <th>4º Bimestre</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -1053,7 +1082,6 @@ function renderSummary() {
   const medias = state.alunos.map(calculateAnnualAverage).filter(function (value) { return value !== null; });
   const mediaTurma = medias.length ? medias.reduce(function (sum, value) { return sum + value; }, 0) / medias.length : null;
   const totalFaltas = state.alunos.reduce(function (sum, student) { return sum + ABSENCE_MAP[student.id].aulas; }, 0);
-  const relatoriosPreenchidos = state.alunos.filter(function (student) { return student.relatorioGeral.trim(); }).length;
   const totalTrabalhos = state.alunos.reduce(function (sum, student) { return sum + calculateWorksTotal(student); }, 0);
 
   summaryGrid.innerHTML = [
@@ -1061,7 +1089,7 @@ function renderSummary() {
     summaryCard("Faltas em h/aula", String(totalFaltas), "Somatório da carga horária ausente"),
     summaryCard("Média parcial da turma", mediaTurma === null ? "—" : formatNumber(mediaTurma), mediaTurma === null ? "Preencha as notas para calcular" : "Com base nos bimestres já lançados"),
     summaryCard("Trabalhos realizados", String(totalTrabalhos), "Soma total informada na turma"),
-    summaryCard("Relatórios anuais", String(relatoriosPreenchidos), relatoriosPreenchidos === 0 ? "Ainda não há relatórios fixados" : "Alunos com relatório anual preenchido")
+    summaryCard("Relatórios anuais", String(state.alunos.length), "Todos podem ser gerados automaticamente pelo sistema")
   ].join("");
 }
 
@@ -1082,35 +1110,38 @@ function renderTable() {
   });
 
   if (!rows.length) {
-    tableBody.innerHTML = '<tr><td class="table-empty" colspan="17">Nenhum aluno encontrado para esta busca.</td></tr>';
+    tableBody.innerHTML = '<tr><td class="table-empty" colspan="5">Nenhum aluno encontrado para esta busca.</td></tr>';
     return;
   }
 
   tableBody.innerHTML = rows.map(function (student) {
-    const absence = ABSENCE_MAP[student.id];
     const media = calculateAnnualAverage(student);
     return '<tr>'
       + '<td class="student-cell">'
       + '<span class="student-number">' + student.numero + "</span>"
-      + '<span class="student-name">' + escapeHtml(student.nome) + "</span>"
+      + '<button class="student-name-btn" type="button" data-open-profile="' + student.id + '"><span class="student-name">' + escapeHtml(student.nome) + "</span></button>"
       + '<div class="student-meta">'
       + '<span class="mini-chip">Média parcial: ' + (media === null ? "—" : formatNumber(media) + "/10") + "</span>"
       + '<span class="mini-chip">Frequência: ' + formatNumber(calculateAttendance(student)) + "%</span>"
       + "</div>"
       + "</td>"
       + BIMESTERS.map(function (bim) {
-        const dados = student.bimestres[bim];
-        const total = calculateBimTotal(student, bim);
-        return '<td>' + renderStepper(student.id, bim, "trabalhos", dados.trabalhos) + '</td>'
-          + '<td>' + renderStepper(student.id, bim, "prova", dados.prova) + '</td>'
-          + '<td><span class="total-pill' + (total === null ? " empty" : "") + '">' + (total === null ? "—" : formatNumber(total) + '<small>/10</small>') + "</span></td>";
+        return '<td>' + renderBimGradeBadge(student, bim) + '</td>';
       }).join("")
-      + '<td><span class="total-pill">' + calculateWorksTotal(student) + "</span></td>"
-      + '<td><span class="total-pill">' + absence.aulas + "</span></td>"
-      + '<td><span class="total-pill">' + absence.dias.length + "</span></td>"
-      + '<td class="actions-cell"><button class="ghost-btn" type="button" data-open-profile="' + student.id + '">Perfil</button></td>'
       + "</tr>";
   }).join("");
+}
+
+function renderBimGradeBadge(student, bim) {
+  const total = calculateBimTotal(student, bim);
+  if (total === null) {
+    return '<span class="grade-badge"><strong>—</strong><small>Sem nota</small></span>';
+  }
+  const isRecovery = total < 7;
+  return '<span class="grade-badge ' + (isRecovery ? 'recovery' : 'good') + '">'
+    + '<strong>' + (isRecovery ? '⚠️ ' : '✅ ') + formatNumber(total) + '/10</strong>'
+    + '<small>' + (isRecovery ? 'Recuperação' : 'Acima de 7') + '</small>'
+    + '</span>';
 }
 
 function renderStepper(studentId, bim, field, value) {
@@ -1228,18 +1259,18 @@ function openReport(studentId) {
 function renderReport(studentId) {
   const student = getStudent(studentId);
   if (!student) return;
+  const generatedReport = buildAutoAnnualReport(student);
   document.getElementById("reportTitle").textContent = "Relatório geral - " + student.nome;
   document.getElementById("reportSubtitle").textContent = SCHOOL_NAME + " · " + CLASS_NAME + " · relatório anual do aluno";
   document.getElementById("reportBody").innerHTML =
-    '<div class="report-alert">No VSCode, peça ao Codex para analisar todas as informações relatadas sobre este aluno e para escrever um relatório detalhado sobre ele e fixar no modal "Relatório" da escola e turma deste aluno. Este relatório será anual.</div>'
+    '<div class="report-alert">Este relatório anual é montado automaticamente com base nas notas, faltas, trabalhos realizados, frequência e observações pedagógicas registradas no perfil do aluno.</div>'
     + '<div class="report-tools">'
       + '<button class="primary-btn" type="button" data-copy-student-summary="' + student.id + '">Copiar resumo completo para o Codex</button>'
-      + '<button class="ghost-btn" type="button" data-insert-report-template="' + student.id + '">Inserir modelo-base</button>'
     + '</div>'
-    + '<p class="report-meta">Resumo estruturado que será copiado para o Codex:</p>'
+    + '<p class="report-meta">Resumo estruturado do aluno:</p>'
     + '<div class="report-preview">' + escapeHtml(buildStudentSummary(student)) + '</div>'
-    + '<label class="summary-label" style="display:block;margin-bottom:6px">Relatório anual fixado neste modal</label>'
-    + '<textarea class="report-area" data-student="' + student.id + '" data-textfield="relatorioGeral" placeholder="Cole aqui o relatório anual final do aluno.">' + escapeHtml(student.relatorioGeral || "") + "</textarea>";
+    + '<label class="summary-label" style="display:block;margin-bottom:6px">Relatório anual gerado automaticamente</label>'
+    + '<textarea class="report-area" readonly>' + escapeHtml(generatedReport) + "</textarea>";
 }
 
 function adjustStepper(button) {
@@ -1341,7 +1372,7 @@ function buildStudentSummary(student) {
   }).join("\n");
 
   const diasFalta = absence.dias.length ? absence.dias.map(function (date) {
-    return date + " (" + absence.porDia[date] + " aula(s))";
+    return date + " (" + absence.porDia[date] + " falta(s) em h/aula)";
   }).join(", ") : "Nenhum dia ausente registrado.";
 
   return [
@@ -1369,8 +1400,8 @@ function buildStudentSummary(student) {
     "Necessidades de apoio:",
     student.necessidadesApoio || "Sem necessidades registradas.",
     "",
-    "Relatório anual já fixado no modal:",
-    student.relatorioGeral || "Ainda não preenchido."
+    "Relatório anual automático:",
+    buildAutoAnnualReport(student)
   ].join("\n");
 }
 
@@ -1394,23 +1425,70 @@ function buildClassSummary() {
   ].join("\n");
 }
 
-function buildAnnualReportTemplate(student) {
+function buildAutoAnnualReport(student) {
   const absence = ABSENCE_MAP[student.id];
+  const media = calculateAnnualAverage(student);
+  const works = calculateWorksTotal(student);
+  const filledBimesters = BIMESTERS.filter(function (bim) { return calculateBimTotal(student, bim) !== null; }).length;
+  const lowerBimesters = BIMESTERS.filter(function (bim) {
+    const total = calculateBimTotal(student, bim);
+    return total !== null && total < 7;
+  });
+  const higherBimesters = BIMESTERS.filter(function (bim) {
+    const total = calculateBimTotal(student, bim);
+    return total !== null && total >= 7;
+  });
+
   return [
     "RELATÓRIO ANUAL - " + student.nome,
     "",
-    "1. Desempenho acadêmico",
-    "Descreva o rendimento do aluno ao longo do ano, considerando trabalhos, provas, evolução e regularidade nas entregas.",
+    buildPerformanceParagraph(student, media, works, filledBimesters, lowerBimesters, higherBimesters),
     "",
-    "2. Frequência",
-    "Registre que o aluno teve " + absence.aulas + " falta(s) em hora/aula, distribuídas em " + absence.dias.length + " dia(s) com ausência nas chamadas já lançadas.",
+    buildFrequencyParagraph(student, absence),
     "",
-    "3. Comportamento e participação",
-    "Analise postura em sala, interação com colegas, participação oral, autonomia e responsabilidade.",
+    buildBehaviorParagraph(student),
     "",
-    "4. Encaminhamentos e recomendações",
-    "Indique necessidades de apoio, estratégias pedagógicas, diálogo com responsáveis e metas para continuidade do acompanhamento."
+    buildRecommendationParagraph(student, media, absence, lowerBimesters)
   ].join("\n");
+}
+
+function buildPerformanceParagraph(student, media, works, filledBimesters, lowerBimesters, higherBimesters) {
+  const intro = media === null
+    ? "O aluno ainda não possui bimestres suficientes preenchidos para o cálculo de uma média anual parcial."
+    : "O aluno apresenta média anual parcial de " + formatNumber(media) + "/10, com " + filledBimesters + " bimestre(s) já lançado(s) no sistema.";
+
+  const progress = lowerBimesters.length
+    ? "Há necessidade de recuperação nos bimestres " + lowerBimesters.join(", ") + ", pois as notas ficaram abaixo de 7,0."
+    : (higherBimesters.length ? "Os bimestres já preenchidos permanecem com desempenho igual ou superior a 7,0." : "Ainda não há notas bimestrais lançadas.");
+
+  return "1. Desempenho acadêmico: " + intro + " Ao todo, o aluno soma " + works + " trabalho(s) realizado(s) ao longo do ano. " + progress;
+}
+
+function buildFrequencyParagraph(student, absence) {
+  const attendance = formatNumber(calculateAttendance(student));
+  const days = absence.dias.length
+    ? absence.dias.map(function (date) { return date + " (" + absence.porDia[date] + " falta(s))"; }).join(", ")
+    : "sem registros de ausência até o momento";
+  return "2. Frequência: o aluno possui " + absence.aulas + " falta(s) em hora/aula, distribuídas em " + absence.dias.length + " dia(s) de ausência, com frequência parcial de " + attendance + "%. Dias registrados: " + days + ".";
+}
+
+function buildBehaviorParagraph(student) {
+  const comportamento = (student.observacoesComportamento || "").trim() || "Sem observações comportamentais registradas.";
+  const encaminhamentos = (student.encaminhamentos || "").trim() || "Sem encaminhamentos pedagógicos registrados.";
+  const destaques = (student.destaques || "").trim();
+  const apoio = (student.necessidadesApoio || "").trim();
+  return "3. Comportamento e participação: " + comportamento + " Encaminhamentos atuais: " + encaminhamentos + (destaques ? " Pontos fortes observados: " + destaques + "." : "") + (apoio ? " Necessidades de apoio identificadas: " + apoio + "." : "");
+}
+
+function buildRecommendationParagraph(student, media, absence, lowerBimesters) {
+  const recomendacoes = [];
+  if (media !== null && media < 7) recomendacoes.push("reforçar o acompanhamento das aprendizagens e priorizar estratégias de recuperação paralela");
+  if (absence.aulas >= 6) recomendacoes.push("monitorar a frequência com atenção e retomar conteúdos perdidos nas ausências");
+  if ((student.necessidadesApoio || "").trim()) recomendacoes.push("manter intervenções focadas nas necessidades pedagógicas já registradas");
+  if ((student.destaques || "").trim()) recomendacoes.push("valorizar os pontos fortes do aluno para sustentar seu avanço");
+  if (!recomendacoes.length) recomendacoes.push("manter o acompanhamento contínuo para consolidar o desempenho acadêmico e a participação");
+
+  return "4. Encaminhamentos e recomendações: recomenda-se " + recomendacoes.join("; ") + "." + (lowerBimesters.length ? " Os bimestres em recuperação devem receber atenção prioritária: " + lowerBimesters.join(", ") + "." : "");
 }
 
 function setSaveStatus(message) {
