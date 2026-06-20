@@ -537,6 +537,29 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 .liv-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
 .liv-dot.nd{background:var(--cl);border:1px solid #ccc}
 .liv-dot.cr{background:#e87878}.liv-dot.co{background:#4a9467}
+/* ── HERO INTERATIVO DAS TURMAS ── */
+.pc-sec-enhanced>.th{display:none}
+.pc-hero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(290px,380px);gap:16px;background:linear-gradient(135deg,#173628,#2d6147 58%,#4a9467);border-radius:24px;padding:24px 24px 22px;margin-bottom:18px;color:#fff;box-shadow:0 20px 46px rgba(26,58,42,.18);position:relative;overflow:hidden}
+.pc-hero:after{content:"";position:absolute;right:-60px;bottom:-80px;width:240px;height:240px;border-radius:50%;background:rgba(201,168,76,.16)}
+.pc-hero-main,.pc-hero-side{position:relative;z-index:1}
+.pc-hero-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.14);font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+.pc-hero-title{margin:0;font-family:'Playfair Display',serif;font-size:1.8rem;line-height:1.1}
+.pc-hero-copy{margin:11px 0 0;color:rgba(255,255,255,.86);font-size:.92rem;line-height:1.72;max-width:760px}
+.pc-hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.pc-hero-btn,.pc-hero-link,.pc-hero-pill{border:none;border-radius:999px;padding:11px 16px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .15s ease,box-shadow .15s ease}
+.pc-hero-btn:hover,.pc-hero-link:hover,.pc-hero-pill:hover{transform:translateY(-1px)}
+.pc-hero-btn.primary{background:linear-gradient(135deg,#c9a84c,#e3bf62);color:#4b3810;box-shadow:0 10px 24px rgba(201,168,76,.18)}
+.pc-hero-btn.ghost,.pc-hero-link{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.16)}
+.pc-hero-btn.soft{background:rgba(255,255,255,.92);color:#173628}
+.pc-hero-quicktabs{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.pc-hero-pill{background:rgba(255,255,255,.09);color:#f8f4ea;border:1px solid rgba(255,255,255,.14);padding:8px 13px}
+.pc-hero-status{margin-top:14px;font-size:.8rem;color:rgba(255,255,255,.72)}
+.pc-hero-side{display:grid;gap:10px}
+.pc-hero-stat{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13);border-radius:18px;padding:14px 15px;backdrop-filter:blur(6px)}
+.pc-hero-stat-label{display:block;font-size:.71rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.68);font-weight:700}
+.pc-hero-stat-value{display:block;margin-top:5px;font-family:'DM Mono',monospace;font-size:1.38rem;color:#fff}
+.pc-hero-stat-meta{display:block;margin-top:4px;font-size:.78rem;color:rgba(255,255,255,.7);line-height:1.55}
+@media(max-width:920px){.pc-hero{grid-template-columns:1fr}}
 @media(max-width:680px){.liv-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 <link rel="stylesheet" href="assets/css/editor.css">
@@ -6485,6 +6508,8 @@ document.getElementById('p6ano').classList.add('active');
 function aba(id,btn){document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));document.getElementById('sec-'+id).classList.add('on');btn.classList.add('on');}
 function tog(h){const c=h.nextElementSibling,t=h.querySelector('.et'),o=c.classList.contains('on');c.classList.toggle('on',!o);t.classList.toggle('op',!o);}
 function itab(btn,pid){const ec=btn.closest('.ec2');ec.querySelectorAll('.itab').forEach(b=>b.classList.remove('on'));ec.querySelectorAll('.ipane').forEach(p=>p.classList.remove('on'));btn.classList.add('on');document.getElementById(pid).classList.add('on');if(pid.startsWith('p-')){renderPresenca();}if(pid.startsWith('a-')){renderAtividades();}}
+var _pcOrigTog=tog;
+tog=function(h){_pcOrigTog(h);if(typeof pcRefreshHeroStats==='function')pcRefreshHeroStats();};
 (function(){const m={1:'seg',2:'ter',4:'qui',5:'sex'},d=new Date().getDay(),id=m[d];if(!id)return;const h=document.getElementById('hd-'+id);if(h){const t=document.createElement('span');t.className='hj';t.textContent='Hoje';h.appendChild(t);}})();
 
 const ALUNOS={
@@ -6616,6 +6641,7 @@ function _presManualSalvar(){
   localStorage.setItem('pres_manual',JSON.stringify(_presManual));
   if(_db) _db.collection('app_data').doc('pres_manual').set(_presManual)
     .catch(function(e){console.error('[SYNC pres]',e.code,e.message);});
+  if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
 }
 var _presIcons={pr:'✓',fa:'✗',fj:'⚠'};
 var _presLabels={pr:'',fa:'<span class="atg tgf">F</span>',fj:'<span class="atg tgfj">FJ</span>'};
@@ -6674,6 +6700,7 @@ function _atvSalvar(){
   localStorage.setItem('atv_manual',JSON.stringify(_atvManual));
   if(_db) _db.collection('app_data').doc('atv_manual').set(_atvManual)
     .catch(function(e){console.error('[SYNC atv]',e.code,e.message);});
+  if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
 }
 var _atvMenuAberto=null;
 
@@ -6830,6 +6857,211 @@ function _sincronizarRegistros(){
   });
 }
 
+var PC_ALUNOS_SYNC_KEY='pc_alunos_sync_v1';
+var PC_ALUNOS_PAGES={t1:'casavequia-alunos-1serie.html',t2:'casavequia-alunos-2serie.html',t3:'casavequia-alunos-3serie.html',t6:'casavequia-alunos-6ano.html'};
+
+function pcNormalizeText(v){
+  return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+}
+function pcResolveBimFromKey(id){
+  var m=id.match(/-(\d{2})(\d{2})/);if(!m)return'1';
+  var mes=parseInt(m[1],10);
+  if(mes<=4)return'1';
+  if(mes<=6)return'2';
+  if(mes<=9)return'3';
+  return'4';
+}
+function pcFormatCardDate(card){
+  if(!card)return'';
+  var d=card.querySelector('.edb .d'),my=card.querySelector('.edb .my');
+  if(!d||!my)return'';
+  var txt=(d.textContent.trim()+' '+my.textContent.trim()).replace(/\s+/g,' ');
+  var mt=txt.match(/^(\d{1,2})\s+([A-Za-zÇçéÉãÃ]+)\s+(\d{4})$/);
+  if(!mt)return txt;
+  var meses={jan:'01',fev:'02',mar:'03',abr:'04',mai:'05',jun:'06',jul:'07',ago:'08',set:'09',out:'10',nov:'11',dez:'12'};
+  var mm=meses[pcNormalizeText(mt[2]).slice(0,3)]||'01';
+  return String(mt[1]).padStart(2,'0')+'/'+mm+'/'+mt[3];
+}
+function pcResolveEntryLoad(entryId,cfg){
+  var pane=document.getElementById(entryId);
+  var card=pane?pane.closest('.ea'):null;
+  var ed=card?card.querySelector('.em .ed'):null;
+  var txt=ed?ed.textContent:'';
+  var mh=txt&&txt.match(/(\d+)\s*h\/aula/i);
+  if(mh)return Math.max(1,parseInt(mh[1],10)||1);
+  if(cfg&&cfg.parcial)return 0;
+  return 1;
+}
+function pcFindStudentByName(turma,nome){
+  var alvo=pcNormalizeText(nome);
+  if(!alvo||alvo==='multiplos sem identificacao nominal')return null;
+  var alunos=ALUNOS[turma]||[];
+  var exato=alunos.find(function(a){return pcNormalizeText(a.nm)===alvo;});
+  if(exato)return exato;
+  var possiveis=alunos.filter(function(a){
+    var full=pcNormalizeText(a.nm);
+    return full.indexOf(alvo)>=0||alvo.indexOf(full)>=0;
+  });
+  if(possiveis.length===1)return possiveis[0];
+  var partes=alvo.split(' ').filter(Boolean);
+  if(partes.length){
+    possiveis=alunos.filter(function(a){
+      var full=pcNormalizeText(a.nm);
+      return partes.every(function(p){return full.indexOf(p)>=0;});
+    });
+    if(possiveis.length===1)return possiveis[0];
+  }
+  return null;
+}
+function pcSplitNames(raw){
+  return String(raw||'').split('·').map(function(s){return s.trim();}).filter(Boolean);
+}
+function pcExtractObservationsByClass(){
+  var map={t1:{},t2:{},t3:{},t6:{}};
+  ['t1','t2','t3','t6'].forEach(function(turma){
+    var sec=document.getElementById('sec-'+turma);if(!sec)return;
+    sec.querySelectorAll('.ea').forEach(function(card){
+      var data=pcFormatCardDate(card);
+      card.querySelectorAll('.oi').forEach(function(item){
+        var oa=item.querySelector('.oa'),od=item.querySelector('.od');
+        if(!oa||!od)return;
+        pcSplitNames(oa.textContent).forEach(function(nome){
+          var aluno=pcFindStudentByName(turma,nome);
+          if(!aluno)return;
+          if(!map[turma][aluno.n])map[turma][aluno.n]=[];
+          map[turma][aluno.n].push({data:data,titulo:nome,texto:od.textContent.trim()});
+        });
+      });
+    });
+  });
+  return map;
+}
+function pcBuildSyncPayload(){
+  var payload={updatedAt:new Date().toISOString(),school:'E.E. Rural Pe. Carlos Casavequia',classes:{}};
+  var obsMap=pcExtractObservationsByClass();
+  ['t1','t2','t3','t6'].forEach(function(turma){
+    var alunos=(ALUNOS[turma]||[]).map(function(a){
+      return{numero:a.n,nome:a.nm,faltas:0,presencas:0,totalAulas:0,porDia:{},dias:[],atividadesFeitas:0,atividadesPorBimestre:{'1':0,'2':0,'3':0,'4':0},observacoes:(obsMap[turma]&&obsMap[turma][a.n])?obsMap[turma][a.n].slice():[]};
+    });
+    var byNum={};alunos.forEach(function(a){byNum[a.numero]=a;});
+    var totalAulasTurma=0;
+    Object.entries(PRESENCA).forEach(function(pair){
+      var id=pair[0],cfg=pair[1];if(cfg.turma!==turma)return;
+      var carga=pcResolveEntryLoad(id,cfg);if(!carga)return;
+      totalAulasTurma+=carga;
+      var mmdd=id.replace('pl-'+turma+'-','');
+      var data=mmdd.slice(2)+'/'+mmdd.slice(0,2)+'/2026';
+      (ALUNOS[turma]||[]).forEach(function(al){
+        var item=byNum[al.n];if(!item)return;
+        item.totalAulas+=carga;
+        var manKey=id+'_'+al.n;
+        var s=_presManual[manKey]||(cfg.faltaram.includes(al.n)?'fa':cfg.faltJ.includes(al.n)?'fj':'pr');
+        if(s==='fa'||s==='fj'){
+          item.faltas+=carga;
+          item.porDia[data]=(item.porDia[data]||0)+carga;
+        }else{
+          item.presencas+=carga;
+        }
+      });
+    });
+    var atividadesAplicadas=0;
+    Object.entries(ATIVIDADES).forEach(function(pair){
+      var atvId=pair[0],cfg=pair[1];if(cfg.turma!==turma)return;
+      atividadesAplicadas+=1;
+      var bim=pcResolveBimFromKey(atvId);
+      (ALUNOS[turma]||[]).forEach(function(al){
+        var item=byNum[al.n];if(!item)return;
+        var s=_atvStatus(atvId,al.n,cfg);
+        if(s==='fz'){
+          item.atividadesFeitas+=1;
+          item.atividadesPorBimestre[bim]=(item.atividadesPorBimestre[bim]||0)+1;
+        }
+      });
+    });
+    alunos.forEach(function(item){
+      item.dias=Object.keys(item.porDia).sort(function(a,b){
+        var pa=a.split('/'),pb=b.split('/');
+        return new Date(pb[2],pb[1]-1,pb[0])-new Date(pa[2],pa[1]-1,pa[0]);
+      });
+      if(!item.totalAulas)item.totalAulas=totalAulasTurma;
+      if(item.presencas===0&&item.totalAulas>item.faltas)item.presencas=item.totalAulas-item.faltas;
+    });
+    payload.classes[turma]={id:turma,nome:{t1:'1ª Série',t2:'2ª Série',t3:'3ª Série',t6:'6º Ano'}[turma]||turma,updatedAt:payload.updatedAt,totalAulas:totalAulasTurma,atividadesAplicadas:atividadesAplicadas,students:alunos};
+  });
+  return payload;
+}
+function pcSyncAndBroadcast(){
+  _sincronizarRegistros();
+  try{localStorage.setItem(PC_ALUNOS_SYNC_KEY,JSON.stringify(pcBuildSyncPayload()));}catch(e){console.warn('[PC sync]',e.message);}
+}
+function pcCountOpenCards(section){return Array.from(section.querySelectorAll('.ec2')).filter(function(el){return el.classList.contains('on');}).length;}
+function pcGetSectionCards(section){return Array.from(section.querySelectorAll('.ea'));}
+function pcGetLastDate(section){
+  var first=section.querySelector('.ea .edb');if(!first)return'--';
+  var d=first.querySelector('.d'),my=first.querySelector('.my');if(!d||!my)return'--';
+  return d.textContent.trim()+' '+my.textContent.trim();
+}
+function pcHeroToggleSection(sectionId,open){
+  var sec=document.getElementById(sectionId);if(!sec)return;
+  sec.querySelectorAll('.ea>.eh').forEach(function(h){
+    var body=h.nextElementSibling,et=h.querySelector('.et');if(!body||!et)return;
+    body.classList.toggle('on',!!open);et.classList.toggle('op',!!open);
+  });
+  pcRefreshHeroStats();
+}
+function pcHeroScrollLatest(sectionId){
+  var sec=document.getElementById(sectionId);if(!sec)return;
+  var card=sec.querySelector('.ea');if(card)card.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function pcGoTab(tabId){
+  var btn=Array.from(document.querySelectorAll('.nb')).find(function(item){return(item.getAttribute('onclick')||'').indexOf("aba('"+tabId+"'")>=0;});
+  if(btn)aba(tabId,btn);
+}
+function pcOpenStudentPage(turma){var url=PC_ALUNOS_PAGES[turma];if(url)window.location.href=url;}
+function pcCopySectionSummary(sectionId){
+  var sec=document.getElementById(sectionId);if(!sec)return;
+  var title=sec.getAttribute('data-hero-title')||sectionId;
+  var linhas=['Pe. Carlos Casavequia - '+title,'Registros nesta aba: '+pcGetSectionCards(sec).length,'Ultimo registro: '+pcGetLastDate(sec)];
+  pcGetSectionCards(sec).slice(0,8).forEach(function(card){
+    var ed=card.querySelector('.em .ed'),ec=card.querySelector('.ch-i');
+    linhas.push('- '+(ed?ed.textContent.trim():'Registro')+(ec?' | '+ec.textContent.trim():''));
+  });
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(linhas.join('\n')).catch(function(){});}
+}
+function pcDecorateSectionHero(sectionId,cfg){
+  var sec=document.getElementById(sectionId);if(!sec||sec.querySelector('.pc-hero'))return;
+  sec.classList.add('pc-sec-enhanced');
+  sec.setAttribute('data-hero-title',cfg.title);
+  var quick=(cfg.quick||[]).map(function(item){
+    return'<button class="pc-hero-pill" type="button" onclick="pcGoTab(\''+item.id+'\')">'+item.label+'</button>';
+  }).join('');
+  var actions='<div class="pc-hero-actions">'
+    +'<button class="pc-hero-btn primary" type="button" onclick="pcHeroToggleSection(\''+sectionId+'\',true)">Abrir todos os relatos</button>'
+    +'<button class="pc-hero-btn ghost" type="button" onclick="pcHeroToggleSection(\''+sectionId+'\',false)">Fechar todos</button>'
+    +'<button class="pc-hero-btn ghost" type="button" onclick="pcHeroScrollLatest(\''+sectionId+'\')">Ir para o mais recente</button>'
+    +'<button class="pc-hero-btn soft" type="button" onclick="pcCopySectionSummary(\''+sectionId+'\')">Copiar resumo da aba</button>'
+    +(cfg.page?'<a class="pc-hero-link" href="'+cfg.page+'">Abrir pagina de alunos</a>':'')
+    +'</div>';
+  sec.insertAdjacentHTML('afterbegin','<div class="pc-hero"><div class="pc-hero-main"><div class="pc-hero-kicker">'+cfg.kicker+'</div><h2 class="pc-hero-title">'+cfg.title+'</h2><p class="pc-hero-copy">'+cfg.copy+'</p>'+actions+(quick?'<div class="pc-hero-quicktabs">'+quick+'</div>':'')+'<div class="pc-hero-status" id="pc-hero-status-'+sectionId+'">'+cfg.status+'</div></div><div class="pc-hero-side"><div class="pc-hero-stat"><span class="pc-hero-stat-label">Lancamentos</span><strong class="pc-hero-stat-value" id="pc-stat-count-'+sectionId+'">--</strong><span class="pc-hero-stat-meta">Total de registros desta aba.</span></div><div class="pc-hero-stat"><span class="pc-hero-stat-label">Ultimo registro</span><strong class="pc-hero-stat-value" id="pc-stat-last-'+sectionId+'">--</strong><span class="pc-hero-stat-meta">Data do relato mais recente.</span></div><div class="pc-hero-stat"><span class="pc-hero-stat-label">Relatos abertos</span><strong class="pc-hero-stat-value" id="pc-stat-open-'+sectionId+'">0</strong><span class="pc-hero-stat-meta">Atualizado conforme sua navegacao.</span></div><div class="pc-hero-stat"><span class="pc-hero-stat-label">Painel de alunos</span><strong class="pc-hero-stat-value">'+cfg.coverage+'</strong><span class="pc-hero-stat-meta">'+cfg.coverageMeta+'</span></div></div></div>');
+}
+function pcRefreshHeroStats(){
+  ['sec-all','sec-t1','sec-t2','sec-t3','sec-t6'].forEach(function(id){
+    var sec=document.getElementById(id);if(!sec)return;
+    var countEl=document.getElementById('pc-stat-count-'+id),lastEl=document.getElementById('pc-stat-last-'+id),openEl=document.getElementById('pc-stat-open-'+id);
+    if(countEl)countEl.textContent=String(pcGetSectionCards(sec).length);
+    if(lastEl)lastEl.textContent=pcGetLastDate(sec);
+    if(openEl)openEl.textContent=String(pcCountOpenCards(sec));
+  });
+}
+function pcInitSectionHeroes(){
+  pcDecorateSectionHero('sec-all',{kicker:'Central Pedagogica',title:'Relatorios Gerais e Panorama das Turmas',copy:'Acompanhe os registros lancados, localize rapidamente o relato mais recente, copie resumos por aba e acesse os novos paineis de alunos da escola sem sair do fluxo principal do diario.',status:'Painel geral pronto para consulta.',page:'',coverage:'4 turmas',coverageMeta:'1a, 2a, 3a serie e 6o ano.',quick:[{id:'t1',label:'1ª série'},{id:'t2',label:'2ª série'},{id:'t3',label:'3ª série'},{id:'t6',label:'6º ano'}]});
+  pcDecorateSectionHero('sec-t1',{kicker:'Turma em foco',title:'1ª Serie - Diario e Painel de Alunos',copy:'Abra os relatos da turma, acompanhe a frequencia, copie o resumo pedagogico da aba e salte direto para a pagina individual dos alunos da 1ª serie.',status:'Turma pronta para acompanhamento.',page:PC_ALUNOS_PAGES.t1,coverage:'Pagina ativa',coverageMeta:'Notas, faltas e relatorio anual da 1ª serie.'});
+  pcDecorateSectionHero('sec-t2',{kicker:'Turma em foco',title:'2ª Serie - Diario e Painel de Alunos',copy:'Use este cabecalho para navegar com mais rapidez entre relatos, resumo da turma e pagina individual dos alunos da 2ª serie.',status:'Turma pronta para acompanhamento.',page:PC_ALUNOS_PAGES.t2,coverage:'Pagina ativa',coverageMeta:'Notas, faltas e relatorio anual da 2ª serie.'});
+  pcDecorateSectionHero('sec-t3',{kicker:'Turma em foco',title:'3ª Serie - Diario e Painel de Alunos',copy:'Concentre aqui os relatos mais importantes da turma concluinte e avance para o painel de alunos sempre que precisar fechar um panorama anual.',status:'Turma pronta para acompanhamento.',page:PC_ALUNOS_PAGES.t3,coverage:'Pagina ativa',coverageMeta:'Notas, faltas e relatorio anual da 3ª serie.'});
+  pcDecorateSectionHero('sec-t6',{kicker:'Turma em foco',title:'6º Ano - Diario e Painel de Alunos',copy:'Acompanhe os relatos do 6º ano com o mesmo cabecalho interativo e abra a pagina da turma para acessar desempenho, frequencia e relatorio geral de cada aluno.',status:'Turma pronta para acompanhamento.',page:PC_ALUNOS_PAGES.t6,coverage:'Pagina ativa',coverageMeta:'Notas, faltas e relatorio anual do 6º ano.'});
+  pcRefreshHeroStats();
+}
+
 /* ★ CONTADOR ★ */
 const BASE=new Date(2026,2,30);
 const DISC=[
@@ -6889,7 +7121,7 @@ function verificarAbasRelatos(){
   });
 }
 
-document.addEventListener('DOMContentLoaded',()=>{renderPresenca();renderAtividades();renderCont();_sincronizarRegistros();verificarAbasRelatos();});
+document.addEventListener('DOMContentLoaded',()=>{renderPresenca();renderAtividades();renderCont();_sincronizarRegistros();verificarAbasRelatos();pcSyncAndBroadcast();pcInitSectionHeroes();});
 
 /* ── PERFIL DO ALUNO ── */
 function abrirPerfil(turma,numAluno){
@@ -7431,6 +7663,7 @@ function _syncAplicarAtv(data) {
   });
   localStorage.setItem('atv_manual', JSON.stringify(_atvManual));
   Object.keys(atvIds).forEach(function(atvId){ _atvAtualizarStat(atvId); });
+  if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
 }
 
 // Aplica dados de livros vindos do Firestore

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/casavequia-alunos.css">
+<title>Alunos - 6o Ano - Padre Carlos Casavequia</title>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <a class="crumbs" href="casavequia.html">← Voltar para Pe. Carlos Casavequia</a>
+    <h1>Pagina de alunos do 6o Ano</h1>
+    <p>Painel academico da Escola Padre Carlos Casavequia com visao consolidada da turma, frequencia sincronizada com os relatos diarios e relatorio geral individual para acompanhamento do ano letivo.</p>
+    <div class="hero-meta">
+      <span class="hero-chip">🏫 Padre Carlos Casavequia</span>
+      <span class="hero-chip">👥 Turma: 6o Ano</span>
+      <span class="hero-chip">📌 Escala sugerida: trabalhos 0-5, prova 0-5, total automatico 0-10</span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <section class="summary-grid" id="summaryGrid"></section>
+  <section class="info-panel">
+    <div class="panel panel-main">
+      <h2 class="panel-title">Como este painel foi refinado</h2>
+      <p>O 6o ano agora tambem recebe a mesma camada de leitura mais moderna: cards resumidos, tabela de medias, perfil por aluno e relatorio geral anual conectado aos relatos da pagina principal.</p>
+      <ul class="guide-list">
+        <li><strong>Clique no nome do aluno</strong> para abrir faltas, observacoes sincronizadas e acompanhamento individual.</li>
+        <li><strong>Lance notas por bimestre</strong> mantendo o historico da turma organizado.</li>
+        <li><strong>Use o relatorio geral</strong> para produzir o texto anual final com apoio do Codex.</li>
+      </ul>
+    </div>
+    <aside class="panel panel-side">
+      <h2 class="panel-title">Status do painel</h2>
+      <div class="status-box">
+        <strong>Salvamento local automatico</strong>
+        <span id="saveStatusText">Aguardando alteracoes.</span>
+      </div>
+      <div class="status-box" id="syncHintBox" style="margin-top:12px;background:rgba(42,110,147,.08);border-color:rgba(42,110,147,.15);color:var(--info)"></div>
+    </aside>
+  </section>
+  <section class="toolbar">
+    <div class="toolbar-left">
+      <input class="search-input" id="searchInput" type="search" placeholder="Buscar aluno por nome ou numero">
+    </div>
+    <div class="toolbar-right">
+      <button class="ghost-btn" type="button" id="copyClassSummaryBtn">Copiar resumo da turma</button>
+      <button class="warning-btn" type="button" id="resetDataBtn">Restaurar modelo</button>
+    </div>
+  </section>
+  <section class="table-card">
+    <div class="table-head">
+      <div>
+        <h2>Tabela geral da turma</h2>
+        <p>Visao resumida com as notas finais dos 4 bimestres. Os detalhes de trabalhos, prova, faltas e observacoes continuam no perfil do aluno.</p>
+      </div>
+      <div class="status-box" style="max-width:340px;background:rgba(26,58,42,.05);border-color:rgba(26,58,42,.10);color:var(--muted)">
+        <strong>Colunas da tabela</strong>
+        Notas abaixo de 7 ficam em vermelho com aviso de recuperacao. Clique no nome do aluno para abrir o perfil completo.
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Aluno</th>
+            <th>1o Bimestre</th>
+            <th>2o Bimestre</th>
+            <th>3o Bimestre</th>
+            <th>4o Bimestre</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="profileModal"><div class="modal-card"><div class="modal-header"><div><h2 class="modal-title" id="profileTitle"></h2><div class="modal-subtitle" id="profileSubtitle"></div></div><button class="close-btn" type="button" data-close-modal="profileModal">✕</button></div><div class="modal-body" id="profileBody"></div></div></div>
+<div class="modal" id="reportModal"><div class="modal-card report"><div class="modal-header"><div><h2 class="modal-title" id="reportTitle"></h2><div class="modal-subtitle" id="reportSubtitle"></div></div><button class="close-btn" type="button" data-close-modal="reportModal">✕</button></div><div class="modal-body" id="reportBody"></div></div></div>
+
+<script>
+window.CASAVEQUIA_ALUNOS_CONFIG = {
+  storageKey: "pc_alunos_6ano_2026_v1",
+  schoolName: "E.E. Rural Pe. Carlos Casavequia",
+  className: "6o Ano",
+  turmaId: "t6",
+  periodLabel: "Ano letivo de 2026",
+  students: [
+    { id: 1, numero: 1, nome: "Aghata Luiza Soouza da Silva" },
+    { id: 2, numero: 2, nome: "Angelo de Freitas Soares" },
+    { id: 3, numero: 3, nome: "Anthony Mayksson Willames Silva de Lima" },
+    { id: 4, numero: 4, nome: "Antonio Yuri da Silva Santos" },
+    { id: 5, numero: 5, nome: "Asheley Prince Miranda Lima" },
+    { id: 6, numero: 6, nome: "Bianca Alves Bulin" },
+    { id: 7, numero: 7, nome: "Cayki Silva de Farias" },
+    { id: 8, numero: 8, nome: "Daniel Magalhaes de Lima" },
+    { id: 9, numero: 9, nome: "Davi Oliveira de Amorim" },
+    { id: 10, numero: 10, nome: "Douglas Oliveira Queiroz da Silva" },
+    { id: 11, numero: 11, nome: "Fabricio Nunes Ataide" },
+    { id: 12, numero: 12, nome: "Guilherme Castro Pereira" },
+    { id: 13, numero: 13, nome: "Hadassa Walthier da Silva" },
+    { id: 14, numero: 14, nome: "Hagata Gabriely da Silva Santos" },
+    { id: 15, numero: 15, nome: "Isaac Souza Fernandes" },
+    { id: 16, numero: 17, nome: "Joao Pedro Maia de Oliveira" },
+    { id: 17, numero: 18, nome: "Joel do Nascimento Cruz" },
+    { id: 18, numero: 19, nome: "Jose Otavio da Silva Paixao" },
+    { id: 19, numero: 20, nome: "Lazaro da Silva Martins" },
+    { id: 20, numero: 21, nome: "Maria Isabele de Lima Paixao" },
+    { id: 21, numero: 22, nome: "Mirella Barroso Lima" },
+    { id: 22, numero: 23, nome: "Murilo Santana de Souza" },
+    { id: 23, numero: 24, nome: "Nayla Vitoria de Sousa Santana" },
+    { id: 24, numero: 25, nome: "Neemias de Sousa Amim" },
+    { id: 25, numero: 26, nome: "Nicolas da Silva Nogueira" },
+    { id: 26, numero: 27, nome: "Pamella Letycia Souza Lino" },
+    { id: 27, numero: 28, nome: "Pedro Lucas Fidelis dos Reis" },
+    { id: 28, numero: 29, nome: "Sabrina Silva Ribeiro" },
+    { id: 29, numero: 30, nome: "Thaemmy Silva de Farias" },
+    { id: 30, numero: 31, nome: "Victor Emanoel da Silva do Nascimento" },
+    { id: 31, numero: 32, nome: "Vidal Wanderley de Lima" },
+    { id: 32, numero: 33, nome: "Wandson Santiago de Sousa" },
+    { id: 33, numero: 34, nome: "Yan Lima Rodrigues" },
+    { id: 34, numero: 35, nome: "Yasmin Victoria Vasconcelos Silva" },
+    { id: 35, numero: 36, nome: "Breno Barroso da Silva" }
+  ]
+};
+</script>
+<script src="assets/js/casavequia-alunos-shared.js"></script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/casavequia-alunos.css">
+<title>Alunos - 3a Serie - Padre Carlos Casavequia</title>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <a class="crumbs" href="casavequia.html">← Voltar para Pe. Carlos Casavequia</a>
+    <h1>Pagina de alunos da 3a Serie</h1>
+    <p>Painel academico da Escola Padre Carlos Casavequia com tabela da turma, perfil detalhado por aluno e um relatorio geral individual montado a partir dos dados sincronizados da pagina principal.</p>
+    <div class="hero-meta">
+      <span class="hero-chip">🏫 Padre Carlos Casavequia</span>
+      <span class="hero-chip">👥 Turma: 3a Serie</span>
+      <span class="hero-chip">📌 Escala sugerida: trabalhos 0-5, prova 0-5, total automatico 0-10</span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <section class="summary-grid" id="summaryGrid"></section>
+  <section class="info-panel">
+    <div class="panel panel-main">
+      <h2 class="panel-title">Como este painel foi refinado</h2>
+      <p>Esta versao organiza a 3a serie no mesmo formato mais novo: busca rapida, leitura resumida das medias, modal de perfil e relatorio anual individual com base nos dados do diario sincronizado.</p>
+      <ul class="guide-list">
+        <li><strong>Clique no nome do aluno</strong> para abrir o perfil completo.</li>
+        <li><strong>Lance as notas</strong> de trabalhos e prova por bimestre.</li>
+        <li><strong>Copie o resumo individual</strong> para transformar os registros em texto anual com apoio do Codex.</li>
+      </ul>
+    </div>
+    <aside class="panel panel-side">
+      <h2 class="panel-title">Status do painel</h2>
+      <div class="status-box">
+        <strong>Salvamento local automatico</strong>
+        <span id="saveStatusText">Aguardando alteracoes.</span>
+      </div>
+      <div class="status-box" id="syncHintBox" style="margin-top:12px;background:rgba(42,110,147,.08);border-color:rgba(42,110,147,.15);color:var(--info)"></div>
+    </aside>
+  </section>
+  <section class="toolbar">
+    <div class="toolbar-left">
+      <input class="search-input" id="searchInput" type="search" placeholder="Buscar aluno por nome ou numero">
+    </div>
+    <div class="toolbar-right">
+      <button class="ghost-btn" type="button" id="copyClassSummaryBtn">Copiar resumo da turma</button>
+      <button class="warning-btn" type="button" id="resetDataBtn">Restaurar modelo</button>
+    </div>
+  </section>
+  <section class="table-card">
+    <div class="table-head">
+      <div>
+        <h2>Tabela geral da turma</h2>
+        <p>Visao resumida com as notas finais dos 4 bimestres. Os detalhes de trabalhos, prova, faltas e observacoes continuam no perfil do aluno.</p>
+      </div>
+      <div class="status-box" style="max-width:340px;background:rgba(26,58,42,.05);border-color:rgba(26,58,42,.10);color:var(--muted)">
+        <strong>Colunas da tabela</strong>
+        Notas abaixo de 7 ficam em vermelho com aviso de recuperacao. Clique no nome do aluno para abrir o perfil completo.
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Aluno</th>
+            <th>1o Bimestre</th>
+            <th>2o Bimestre</th>
+            <th>3o Bimestre</th>
+            <th>4o Bimestre</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="profileModal"><div class="modal-card"><div class="modal-header"><div><h2 class="modal-title" id="profileTitle"></h2><div class="modal-subtitle" id="profileSubtitle"></div></div><button class="close-btn" type="button" data-close-modal="profileModal">✕</button></div><div class="modal-body" id="profileBody"></div></div></div>
+<div class="modal" id="reportModal"><div class="modal-card report"><div class="modal-header"><div><h2 class="modal-title" id="reportTitle"></h2><div class="modal-subtitle" id="reportSubtitle"></div></div><button class="close-btn" type="button" data-close-modal="reportModal">✕</button></div><div class="modal-body" id="reportBody"></div></div></div>
+
+<script>
+window.CASAVEQUIA_ALUNOS_CONFIG = {
+  storageKey: "pc_alunos_3serie_2026_v1",
+  schoolName: "E.E. Rural Pe. Carlos Casavequia",
+  className: "3a Serie",
+  turmaId: "t3",
+  periodLabel: "Ano letivo de 2026",
+  students: [
+    { id: 1, numero: 1, nome: "Alonso Queiroz Santiago" },
+    { id: 2, numero: 2, nome: "Antoniel Araujo de Lima" },
+    { id: 3, numero: 3, nome: "Francisco Kevison de Lima Paixao" },
+    { id: 4, numero: 4, nome: "Gabriel Oliveira Evangelista" },
+    { id: 5, numero: 5, nome: "Gabriella Farias Moreira" },
+    { id: 6, numero: 6, nome: "Hana Beatryz Araujo Sales" },
+    { id: 7, numero: 7, nome: "Joaiz Muniz de Souza Junior" },
+    { id: 8, numero: 8, nome: "Joao Paulo Barreto Chaves" },
+    { id: 9, numero: 9, nome: "Karina Paiva Lima" },
+    { id: 10, numero: 10, nome: "Kiara Kasiele Silva Paixao" },
+    { id: 11, numero: 11, nome: "Lourival Wagner Aparecido Nunes de Lima" },
+    { id: 12, numero: 12, nome: "Maria Beatriz Oliveira da Gama" },
+    { id: 13, numero: 13, nome: "Maria Eduarda Souza Teixeira" },
+    { id: 14, numero: 14, nome: "Matheus Henrique Silveira Santiago" },
+    { id: 15, numero: 15, nome: "Mayco Gabriel da Silva Dias" },
+    { id: 16, numero: 16, nome: "Natanael Ovides de Sousa" },
+    { id: 17, numero: 17, nome: "Sara Machado do Amor Divino" },
+    { id: 18, numero: 18, nome: "Sibelly Victoria Santiago de Sousa" }
+  ]
+};
+</script>
+<script src="assets/js/casavequia-alunos-shared.js"></script>
+</body>
+</html>
