@@ -539,7 +539,7 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 .liv-dot.cr{background:#e87878}.liv-dot.co{background:#4a9467}
 /* ── HERO INTERATIVO DAS TURMAS ── */
 .pc-sec-enhanced>.th{display:none}
-.pc-hero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(290px,380px);gap:16px;background:linear-gradient(135deg,#173628,#2d6147 58%,#4a9467);border-radius:24px;padding:24px 24px 22px;margin-bottom:18px;color:#fff;box-shadow:0 20px 46px rgba(26,58,42,.18);position:relative;overflow:hidden}
+.pc-hero{display:grid;grid-template-columns:1fr;gap:16px;background:linear-gradient(135deg,#173628,#2d6147 58%,#4a9467);border-radius:24px;padding:24px 24px 22px;margin-bottom:18px;color:#fff;box-shadow:0 20px 46px rgba(26,58,42,.18);position:relative;overflow:hidden}
 .pc-hero:after{content:"";position:absolute;right:-60px;bottom:-80px;width:240px;height:240px;border-radius:50%;background:rgba(201,168,76,.16)}
 .pc-hero-main,.pc-hero-side{position:relative;z-index:1}
 .pc-hero-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.14);font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
@@ -554,12 +554,13 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 .pc-hero-quicktabs{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .pc-hero-pill{background:rgba(255,255,255,.09);color:#f8f4ea;border:1px solid rgba(255,255,255,.14);padding:8px 13px}
 .pc-hero-status{margin-top:14px;font-size:.8rem;color:rgba(255,255,255,.72)}
-.pc-hero-side{display:grid;gap:10px}
-.pc-hero-stat{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13);border-radius:18px;padding:14px 15px;backdrop-filter:blur(6px)}
-.pc-hero-stat-label{display:block;font-size:.71rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.68);font-weight:700}
-.pc-hero-stat-value{display:block;margin-top:5px;font-family:'DM Mono',monospace;font-size:1.38rem;color:#fff}
-.pc-hero-stat-meta{display:block;margin-top:4px;font-size:.78rem;color:rgba(255,255,255,.7);line-height:1.55}
-@media(max-width:920px){.pc-hero{grid-template-columns:1fr}}
+.pc-hero-side{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:stretch}
+.pc-hero-stat{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13);border-radius:16px;padding:10px 11px;backdrop-filter:blur(6px);min-height:108px}
+.pc-hero-stat-label{display:block;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.68);font-weight:700}
+.pc-hero-stat-value{display:block;margin-top:4px;font-family:'DM Mono',monospace;font-size:.96rem;color:#fff;line-height:1.2}
+.pc-hero-stat-meta{display:block;margin-top:4px;font-size:.68rem;color:rgba(255,255,255,.72);line-height:1.45}
+@media(max-width:1180px){.pc-hero-side{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.pc-hero-side{grid-template-columns:1fr}}
 @media(max-width:680px){.liv-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 <link rel="stylesheet" href="assets/css/editor.css">
