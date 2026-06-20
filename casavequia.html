@@ -554,12 +554,16 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 .pc-hero-quicktabs{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .pc-hero-pill{background:rgba(255,255,255,.09);color:#f8f4ea;border:1px solid rgba(255,255,255,.14);padding:8px 13px}
 .pc-hero-status{margin-top:14px;font-size:.8rem;color:rgba(255,255,255,.72)}
-.pc-hero-side{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:stretch}
+.pc-hero-side{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:stretch}
 .pc-hero-stat{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13);border-radius:16px;padding:10px 11px;backdrop-filter:blur(6px);min-height:108px}
 .pc-hero-stat-label{display:block;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.68);font-weight:700}
 .pc-hero-stat-value{display:block;margin-top:4px;font-family:'DM Mono',monospace;font-size:.96rem;color:#fff;line-height:1.2}
 .pc-hero-stat-meta{display:block;margin-top:4px;font-size:.68rem;color:rgba(255,255,255,.72);line-height:1.45}
-@media(max-width:1180px){.pc-hero-side{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pc-hero-stat-lessons .pc-hero-stat-meta{margin-top:8px}
+.pc-hero-lessons{display:grid;gap:5px;margin-top:8px}
+.pc-hero-lesson{display:flex;justify-content:space-between;gap:8px;font-size:.71rem;color:rgba(255,255,255,.84);line-height:1.35}
+.pc-hero-lesson strong{font-weight:700;color:#fff}
+@media(max-width:1180px){.pc-hero-side{grid-template-columns:repeat(2,minmax(0,1fr))}.pc-hero-stat-lessons{grid-column:1/-1}}
 @media(max-width:720px){.pc-hero-side{grid-template-columns:1fr}}
 @media(max-width:680px){.liv-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
@@ -7029,6 +7033,31 @@ function pcCopySectionSummary(sectionId){
   });
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(linhas.join('\n')).catch(function(){});}
 }
+function pcHeroLessonsForSection(sectionId){
+  var turmaMap={'sec-t1':'1ª Série','sec-t2':'2ª Série','sec-t3':'3ª Série','sec-t6':'6º Ano'};
+  if(turmaMap[sectionId]){
+    return DISC.filter(function(item){return item.t===turmaMap[sectionId];}).map(function(item){
+      return {label:item.d,feitas:item.feitas,total:item.tot};
+    });
+  }
+  if(sectionId==='sec-all'){
+    var grouped={};
+    DISC.forEach(function(item){
+      if(!grouped[item.d])grouped[item.d]={label:item.d,feitas:0,total:0};
+      grouped[item.d].feitas+=item.feitas;
+      grouped[item.d].total+=item.tot;
+    });
+    return Object.keys(grouped).map(function(key){return grouped[key];});
+  }
+  return [];
+}
+function pcBuildHeroLessonsHtml(sectionId){
+  var lessons=pcHeroLessonsForSection(sectionId);
+  if(!lessons.length)return '<div class="pc-hero-lesson"><span>Sem materias</span><strong>--</strong></div>';
+  return lessons.map(function(item){
+    return '<div class="pc-hero-lesson"><span>'+item.label+'</span><strong>'+item.feitas+' de '+item.total+'</strong></div>';
+  }).join('');
+}
 function pcDecorateSectionHero(sectionId,cfg){
   var sec=document.getElementById(sectionId);if(!sec||sec.querySelector('.pc-hero'))return;
   sec.classList.add('pc-sec-enhanced');
@@ -7043,15 +7072,15 @@ function pcDecorateSectionHero(sectionId,cfg){
     +'<button class="pc-hero-btn soft" type="button" onclick="pcCopySectionSummary(\''+sectionId+'\')">Copiar resumo da aba</button>'
     +(cfg.page?'<a class="pc-hero-link" href="'+cfg.page+'">Abrir pagina de alunos</a>':'')
     +'</div>';
-  sec.insertAdjacentHTML('afterbegin','<div class="pc-hero"><div class="pc-hero-main"><div class="pc-hero-kicker">'+cfg.kicker+'</div><h2 class="pc-hero-title">'+cfg.title+'</h2><p class="pc-hero-copy">'+cfg.copy+'</p>'+actions+(quick?'<div class="pc-hero-quicktabs">'+quick+'</div>':'')+'<div class="pc-hero-status" id="pc-hero-status-'+sectionId+'">'+cfg.status+'</div></div><div class="pc-hero-side"><div class="pc-hero-stat"><span class="pc-hero-stat-label">Lancamentos</span><strong class="pc-hero-stat-value" id="pc-stat-count-'+sectionId+'">--</strong><span class="pc-hero-stat-meta">Total de registros desta aba.</span></div><div class="pc-hero-stat"><span class="pc-hero-stat-label">Ultimo registro</span><strong class="pc-hero-stat-value" id="pc-stat-last-'+sectionId+'">--</strong><span class="pc-hero-stat-meta">Data do relato mais recente.</span></div><div class="pc-hero-stat"><span class="pc-hero-stat-label">Relatos abertos</span><strong class="pc-hero-stat-value" id="pc-stat-open-'+sectionId+'">0</strong><span class="pc-hero-stat-meta">Atualizado conforme sua navegacao.</span></div><div class="pc-hero-stat"><span class="pc-hero-stat-label">Painel de alunos</span><strong class="pc-hero-stat-value">'+cfg.coverage+'</strong><span class="pc-hero-stat-meta">'+cfg.coverageMeta+'</span></div></div></div>');
+  sec.insertAdjacentHTML('afterbegin','<div class="pc-hero"><div class="pc-hero-main"><div class="pc-hero-kicker">'+cfg.kicker+'</div><h2 class="pc-hero-title">'+cfg.title+'</h2><p class="pc-hero-copy">'+cfg.copy+'</p>'+actions+(quick?'<div class="pc-hero-quicktabs">'+quick+'</div>':'')+'<div class="pc-hero-status" id="pc-hero-status-'+sectionId+'">'+cfg.status+'</div></div><div class="pc-hero-side"><div class="pc-hero-stat"><span class="pc-hero-stat-label">Lancamentos</span><strong class="pc-hero-stat-value" id="pc-stat-count-'+sectionId+'">--</strong><span class="pc-hero-stat-meta">Total de registros desta aba.</span></div><div class="pc-hero-stat"><span class="pc-hero-stat-label">Ultimo registro</span><strong class="pc-hero-stat-value" id="pc-stat-last-'+sectionId+'">--</strong><span class="pc-hero-stat-meta">Data do relato mais recente.</span></div><div class="pc-hero-stat pc-hero-stat-lessons"><span class="pc-hero-stat-label">Contagem de aulas</span><div class="pc-hero-lessons" id="pc-stat-lessons-'+sectionId+'">'+pcBuildHeroLessonsHtml(sectionId)+'</div><span class="pc-hero-stat-meta">Aulas registradas por materia em relacao ao total anual.</span></div></div></div>');
 }
 function pcRefreshHeroStats(){
   ['sec-all','sec-t1','sec-t2','sec-t3','sec-t6'].forEach(function(id){
     var sec=document.getElementById(id);if(!sec)return;
-    var countEl=document.getElementById('pc-stat-count-'+id),lastEl=document.getElementById('pc-stat-last-'+id),openEl=document.getElementById('pc-stat-open-'+id);
+    var countEl=document.getElementById('pc-stat-count-'+id),lastEl=document.getElementById('pc-stat-last-'+id),lessonsEl=document.getElementById('pc-stat-lessons-'+id);
     if(countEl)countEl.textContent=String(pcGetSectionCards(sec).length);
     if(lastEl)lastEl.textContent=pcGetLastDate(sec);
-    if(openEl)openEl.textContent=String(pcCountOpenCards(sec));
+    if(lessonsEl)lessonsEl.innerHTML=pcBuildHeroLessonsHtml(id);
   });
 }
 function pcInitSectionHeroes(){
