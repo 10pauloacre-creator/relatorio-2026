@@ -568,6 +568,46 @@ tbody tr:hover td{
   grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
   gap:12px;
 }
+.boletim-tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:14px;
+}
+.boletim-tab{
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:9px 14px;
+  background:#fff;
+  color:var(--vd);
+  cursor:pointer;
+  font-weight:700;
+  transition:transform .15s ease, background .15s ease, color .15s ease;
+}
+.boletim-tab.active{
+  background:linear-gradient(135deg,var(--vd),var(--vm));
+  color:#fff;
+  border-color:transparent;
+}
+.boletim-tab:hover{
+  transform:translateY(-1px);
+}
+.boletim-panel{
+  display:none;
+}
+.boletim-panel.active{
+  display:block;
+}
+.boletim-panel-note{
+  margin:0 0 12px;
+  padding:12px 14px;
+  border-radius:14px;
+  background:#f7faf8;
+  border:1px solid #d7e7dd;
+  color:var(--muted);
+  font-size:.84rem;
+  line-height:1.65;
+}
 .bim-card{
   border:1px solid #ede3cf;
   border-radius:16px;
@@ -603,6 +643,31 @@ tbody tr:hover td{
   letter-spacing:.08em;
   font-weight:700;
   color:var(--muted);
+}
+.auto-work-note{
+  padding:10px 12px;
+  border-radius:12px;
+  background:#eef7f1;
+  border:1px solid #d4e8da;
+  color:var(--vm);
+  font-size:.8rem;
+  line-height:1.6;
+}
+.manual-work-note{
+  background:#fff4de;
+  border-color:#ecd39a;
+  color:#7a5b16;
+}
+.inline-btn{
+  margin-top:8px;
+  border:none;
+  border-radius:999px;
+  padding:8px 12px;
+  background:#fff;
+  color:var(--vd);
+  border:1px solid var(--line);
+  cursor:pointer;
+  font-weight:700;
 }
 .absence-chips{
   display:flex;
@@ -824,6 +889,12 @@ const CLASS_NAME = "1ª Série";
 const PERIOD_LABEL = "Ano letivo de 2026";
 const BIMESTERS = ["1", "2", "3", "4"];
 const GRADE_MAX = 5;
+const MAIN_DISCIPLINE = "Língua Portuguesa";
+const DISCIPLINES = [
+  { id: "lp", name: "Língua Portuguesa", shortLabel: "LP", automated: true },
+  { id: "ing", name: "Inglês", shortLabel: "Inglês", automated: false },
+  { id: "esp", name: "Espanhol", shortLabel: "Espanhol", automated: false }
+];
 
 const STUDENTS = [
   { id: 1, numero: 1, nome: "Fernanda Victória Batista Machado" },
@@ -873,6 +944,7 @@ const saveStatusText = document.getElementById("saveStatusText");
 
 let currentProfileId = null;
 let currentReportId = null;
+let currentBoletimDiscipline = MAIN_DISCIPLINE;
 
 const RH_ALUNO_SYNC_KEY = "rh_alunos_sync_v1";
 const CLASS_REPORT_GROUP = resolveReportGroup();
@@ -940,6 +1012,25 @@ document.addEventListener("click", function (event) {
     return;
   }
 
+  const boletimTabButton = event.target.closest("[data-boletim-tab]");
+  if (boletimTabButton) {
+    currentBoletimDiscipline = boletimTabButton.dataset.boletimTab || MAIN_DISCIPLINE;
+    if (currentProfileId !== null) {
+      renderProfile(currentProfileId);
+    }
+    return;
+  }
+
+  const resetAutoButton = event.target.closest("[data-reset-auto]");
+  if (resetAutoButton) {
+    clearWorkGradeOverride(
+      Number(resetAutoButton.dataset.resetAuto),
+      resetAutoButton.dataset.bimester,
+      resetAutoButton.dataset.discipline || MAIN_DISCIPLINE
+    );
+    return;
+  }
+
   const insertTemplateButton = event.target.closest("[data-insert-report-template]");
   if (insertTemplateButton) {
     const studentId = Number(insertTemplateButton.dataset.insertReportTemplate);
@@ -998,6 +1089,43 @@ function normalizeLookupText(value) {
     .trim();
 }
 
+function buildEmptyBimesterState() {
+  return { trabalhos: "", prova: "", trabalhosRealizados: 0 };
+}
+
+function buildEmptyDisciplineState() {
+  const bimestres = {};
+  BIMESTERS.forEach(function (bim) {
+    bimestres[bim] = buildEmptyBimesterState();
+  });
+  return { bimestres: bimestres };
+}
+
+function buildDefaultBoletimState() {
+  const boletim = {};
+  DISCIPLINES.forEach(function (discipline) {
+    if (discipline.name === MAIN_DISCIPLINE) return;
+    boletim[discipline.name] = buildEmptyDisciplineState();
+  });
+  return boletim;
+}
+
+function buildEmptyDisciplineMetrics() {
+  return {
+    atividadesFeitas: 0,
+    atividadesPorBimestre: { "1": 0, "2": 0, "3": 0, "4": 0 },
+    atividadesAplicadas: 0,
+    atividadesAplicadasPorBimestre: { "1": 0, "2": 0, "3": 0, "4": 0 }
+  };
+}
+
+function findMatchingDisciplineKey(collection, disciplineName) {
+  if (!collection || typeof collection !== "object") return null;
+  return Object.keys(collection).find(function (key) {
+    return normalizeLookupText(key) === normalizeLookupText(disciplineName);
+  }) || null;
+}
+
 function buildFallbackStudentMetrics(student) {
   const absence = FALLBACK_ABSENCE_MAP[student.id] || { aulas: 0, porDia: {}, dias: [] };
   const atividadesPorBimestre = {};
@@ -1029,10 +1157,15 @@ function readDailySyncData() {
   }
 }
 
-function getAppliedActivitiesCount() {
+function getAppliedActivitiesCount(disciplineName) {
   const synced = readDailySyncData();
   if (!synced || !synced.classes || !synced.classes[CLASS_REPORT_GROUP]) return 0;
-  return Number(synced.classes[CLASS_REPORT_GROUP].atividadesAplicadas) || 0;
+  if (!disciplineName) {
+    return Number(synced.classes[CLASS_REPORT_GROUP].atividadesAplicadas) || 0;
+  }
+  const disciplineKey = findMatchingDisciplineKey(synced.classes[CLASS_REPORT_GROUP].disciplinas, disciplineName);
+  if (!disciplineKey) return 0;
+  return Number(synced.classes[CLASS_REPORT_GROUP].disciplinas[disciplineKey].atividadesAplicadas) || 0;
 }
 
 function buildSyncedStudentMetrics(student) {
@@ -1071,11 +1204,52 @@ function buildSyncedStudentMetrics(student) {
   };
 }
 
+function buildSyncedDisciplineMetrics(student, disciplineName) {
+  const empty = buildEmptyDisciplineMetrics();
+  const synced = readDailySyncData();
+  if (!synced || !synced.classes || !synced.classes[CLASS_REPORT_GROUP]) return empty;
+
+  const syncedClass = synced.classes[CLASS_REPORT_GROUP];
+  const syncedStudent = Array.isArray(syncedClass.students)
+    ? syncedClass.students.find(function (item) {
+        return normalizeLookupText(item.nome) === normalizeLookupText(student.nome);
+      })
+    : null;
+
+  const classDisciplineKey = findMatchingDisciplineKey(syncedClass.disciplinas, disciplineName);
+  const studentDisciplineKey = syncedStudent ? findMatchingDisciplineKey(syncedStudent.disciplinas, disciplineName) : null;
+  const classMetrics = classDisciplineKey ? syncedClass.disciplinas[classDisciplineKey] : null;
+  const studentMetrics = studentDisciplineKey ? syncedStudent.disciplinas[studentDisciplineKey] : null;
+  const result = buildEmptyDisciplineMetrics();
+
+  BIMESTERS.forEach(function (bim) {
+    result.atividadesPorBimestre[bim] = Number(studentMetrics && studentMetrics.atividadesPorBimestre && studentMetrics.atividadesPorBimestre[bim]) || 0;
+    result.atividadesAplicadasPorBimestre[bim] = Number(classMetrics && classMetrics.atividadesAplicadasPorBimestre && classMetrics.atividadesAplicadasPorBimestre[bim]) || 0;
+  });
+
+  result.atividadesFeitas = Number(studentMetrics && studentMetrics.atividadesFeitas) || BIMESTERS.reduce(function (sum, bim) {
+    return sum + result.atividadesPorBimestre[bim];
+  }, 0);
+  result.atividadesAplicadas = Number(classMetrics && classMetrics.atividadesAplicadas) || BIMESTERS.reduce(function (sum, bim) {
+    return sum + result.atividadesAplicadasPorBimestre[bim];
+  }, 0);
+
+  return result;
+}
+
 function getStudentMetrics(student) {
   try {
     return buildSyncedStudentMetrics(student);
   } catch (error) {
     return buildFallbackStudentMetrics(student);
+  }
+}
+
+function getDisciplineMetrics(student, disciplineName) {
+  try {
+    return buildSyncedDisciplineMetrics(student, disciplineName);
+  } catch (error) {
+    return buildEmptyDisciplineMetrics();
   }
 }
 
@@ -1137,11 +1311,12 @@ function buildDefaultState() {
         numero: student.numero,
         nome: student.nome,
         bimestres: {
-          "1": { trabalhos: "", prova: "", trabalhosRealizados: 0 },
-          "2": { trabalhos: "", prova: "", trabalhosRealizados: 0 },
-          "3": { trabalhos: "", prova: "", trabalhosRealizados: 0 },
-          "4": { trabalhos: "", prova: "", trabalhosRealizados: 0 }
+          "1": buildEmptyBimesterState(),
+          "2": buildEmptyBimesterState(),
+          "3": buildEmptyBimesterState(),
+          "4": buildEmptyBimesterState()
         },
+        boletim: buildDefaultBoletimState(),
         observacoesComportamento: defaultBehaviorText(student.id),
         encaminhamentos: defaultReferralText(student.id),
         destaques: "",
@@ -1184,6 +1359,7 @@ function mergeStudent(baseStudent, savedStudent) {
     destaques: savedStudent.destaques !== undefined ? savedStudent.destaques : baseStudent.destaques,
     necessidadesApoio: savedStudent.necessidadesApoio !== undefined ? savedStudent.necessidadesApoio : baseStudent.necessidadesApoio,
     relatorioGeral: savedStudent.relatorioGeral !== undefined ? savedStudent.relatorioGeral : baseStudent.relatorioGeral,
+    boletim: {},
     bimestres: {}
   };
 
@@ -1194,6 +1370,26 @@ function mergeStudent(baseStudent, savedStudent) {
       prova: sanitizeFieldValue("prova", savedBim.prova !== undefined ? savedBim.prova : baseStudent.bimestres[bim].prova),
       trabalhosRealizados: sanitizeFieldValue("trabalhosRealizados", savedBim.trabalhosRealizados !== undefined ? savedBim.trabalhosRealizados : baseStudent.bimestres[bim].trabalhosRealizados)
     };
+  });
+
+  DISCIPLINES.forEach(function (discipline) {
+    if (discipline.name === MAIN_DISCIPLINE) return;
+    const baseDiscipline = baseStudent.boletim && baseStudent.boletim[discipline.name]
+      ? baseStudent.boletim[discipline.name]
+      : buildEmptyDisciplineState();
+    const savedDiscipline = savedStudent.boletim && savedStudent.boletim[discipline.name]
+      ? savedStudent.boletim[discipline.name]
+      : {};
+    merged.boletim[discipline.name] = { bimestres: {} };
+
+    BIMESTERS.forEach(function (bim) {
+      const savedDisciplineBim = savedDiscipline.bimestres && savedDiscipline.bimestres[bim] ? savedDiscipline.bimestres[bim] : {};
+      merged.boletim[discipline.name].bimestres[bim] = {
+        trabalhos: sanitizeFieldValue("trabalhos", savedDisciplineBim.trabalhos !== undefined ? savedDisciplineBim.trabalhos : baseDiscipline.bimestres[bim].trabalhos),
+        prova: sanitizeFieldValue("prova", savedDisciplineBim.prova !== undefined ? savedDisciplineBim.prova : baseDiscipline.bimestres[bim].prova),
+        trabalhosRealizados: sanitizeFieldValue("trabalhosRealizados", savedDisciplineBim.trabalhosRealizados !== undefined ? savedDisciplineBim.trabalhosRealizados : baseDiscipline.bimestres[bim].trabalhosRealizados)
+      };
+    });
   });
 
   return merged;
@@ -1223,14 +1419,14 @@ function renderSummary() {
   const mediaTurma = medias.length ? medias.reduce(function (sum, value) { return sum + value; }, 0) / medias.length : null;
   const totalFaltas = state.alunos.reduce(function (sum, student) { return sum + getStudentMetrics(student).aulas; }, 0);
   const totalPresencas = state.alunos.reduce(function (sum, student) { return sum + getStudentMetrics(student).presencas; }, 0);
-  const totalAtividadesAplicadas = getAppliedActivitiesCount();
+  const totalAtividadesAplicadas = getAppliedActivitiesCount(MAIN_DISCIPLINE);
 
   summaryGrid.innerHTML = [
     summaryCard("Alunos cadastrados", String(state.alunos.length), "Base da 1ª Série"),
     summaryCard("Faltas em h/aula", String(totalFaltas), "Somatório da carga horária ausente"),
     summaryCard("Presencas em h/aula", String(totalPresencas), "Sincronizadas pelos relatos diarios"),
     summaryCard("Média parcial da turma", mediaTurma === null ? "—" : formatNumber(mediaTurma), mediaTurma === null ? "Preencha as notas para calcular" : "Com base nos bimestres já lançados"),
-    summaryCard("Atividades aplicadas", String(totalAtividadesAplicadas), "Cada tema registrado conta como 1 atividade aplicada"),
+    summaryCard("Atividades de LP", String(totalAtividadesAplicadas), "Cada tema de Língua Portuguesa conta como 1 atividade aplicada"),
     summaryCard("Relatórios anuais", String(state.alunos.length), "Todos podem ser gerados automaticamente pelo sistema")
   ].join("");
 }
@@ -1286,13 +1482,14 @@ function renderBimGradeBadge(student, bim) {
     + '</span>';
 }
 
-function renderStepper(studentId, bim, field, value) {
+function renderStepper(studentId, bim, field, value, disciplineName) {
   const step = getFieldStep(field);
   const max = getFieldMax(field);
+  const disciplineAttr = disciplineName ? ' data-discipline="' + escapeHtml(disciplineName) + '"' : "";
   return '<div class="stepper">'
-    + '<button type="button" data-step="-'+ step +'" data-student="'+ studentId +'" data-bimester="'+ bim +'" data-field="'+ field +'">-</button>'
-    + '<input type="number" min="0" max="' + max + '" step="' + step + '" value="' + formatInputValue(value) + '" data-student="' + studentId + '" data-bimester="' + bim + '" data-field="' + field + '">'
-    + '<button type="button" data-step="'+ step +'" data-student="'+ studentId +'" data-bimester="'+ bim +'" data-field="'+ field +'">+</button>'
+    + '<button type="button" data-step="-'+ step +'" data-student="'+ studentId +'" data-bimester="'+ bim +'" data-field="'+ field +'"' + disciplineAttr + '>-</button>'
+    + '<input type="number" min="0" max="' + max + '" step="' + step + '" value="' + formatInputValue(value) + '" data-student="' + studentId + '" data-bimester="' + bim + '" data-field="' + field + '"' + disciplineAttr + '>'
+    + '<button type="button" data-step="'+ step +'" data-student="'+ studentId +'" data-bimester="'+ bim +'" data-field="'+ field +'"' + disciplineAttr + '>+</button>'
     + "</div>";
 }
 
@@ -1319,11 +1516,9 @@ function renderProfile(studentId) {
       + profileMetric("Média anual parcial", media === null ? "—" : formatNumber(media) + "/10", media === null ? "Ainda sem notas lançadas" : "Média dos bimestres preenchidos")
     + '</section>'
     + '<section class="section-block">'
-      + '<h3>Panorama por bimestre</h3>'
-      + '<p class="section-note">Aqui você pode ajustar as notas. A quantidade de atividades feitas em cada bimestre agora é sincronizada automaticamente a partir dos cliques nos relatos diarios.</p>'
-      + '<div class="bim-grid">'
-      + BIMESTERS.map(function (bim) { return renderBimCard(student, bim); }).join("")
-      + '</div>'
+      + '<h3>Boletim por disciplina</h3>'
+      + '<p class="section-note">Língua Portuguesa já calcula automaticamente a nota de trabalhos a partir dos relatos diarios da 1ª série. Nas demais disciplinas, o boletim continua totalmente editável para lançamento manual.</p>'
+      + renderBoletimSection(student)
     + '</section>'
     + '<section class="section-block">'
       + '<h3>Faltas e dias em que o aluno faltou</h3>'
@@ -1358,18 +1553,59 @@ function profileMetric(label, value, foot) {
     + "</article>";
 }
 
-function renderBimCard(student, bim) {
-  const dados = student.bimestres[bim];
-  const total = calculateBimTotal(student, bim);
+function renderBoletimSection(student) {
+  return '<div class="boletim-tabs">'
+    + DISCIPLINES.map(function (discipline) {
+      const active = currentBoletimDiscipline === discipline.name;
+      return '<button class="boletim-tab' + (active ? ' active' : '') + '" type="button" data-boletim-tab="' + escapeHtml(discipline.name) + '">'
+        + escapeHtml(discipline.shortLabel)
+        + '</button>';
+    }).join("")
+    + '</div>'
+    + DISCIPLINES.map(function (discipline) {
+      const active = currentBoletimDiscipline === discipline.name;
+      const metrics = getDisciplineMetrics(student, discipline.name);
+      const note = discipline.automated
+        ? 'Nesta disciplina, cada tema lançado no diário conta como atividade aplicada. A nota de trabalhos usa a proporção automática de atividades feitas no bimestre, com valor máximo de 5,0.'
+        : 'Nesta disciplina, as notas seguem em modo manual por enquanto. Quando a automação for expandida para outras matérias, esta área passará a aproveitar os dados do diário também.';
+      return '<div class="boletim-panel' + (active ? ' active' : '') + '" data-boletim-panel="' + escapeHtml(discipline.name) + '">'
+        + '<div class="boletim-panel-note">'
+        + escapeHtml(note)
+        + (discipline.automated ? ' Atividades registradas na disciplina: ' + metrics.atividadesFeitas + ' de ' + metrics.atividadesAplicadas + '.' : '')
+        + '</div>'
+        + '<div class="bim-grid">'
+        + BIMESTERS.map(function (bim) {
+          return renderBimCard(student, bim, discipline.name);
+        }).join("")
+        + '</div>'
+        + '</div>';
+    }).join("");
+}
+
+function renderBimCard(student, bim, disciplineName) {
+  const dados = getDisciplineBimState(student, disciplineName, bim);
+  const total = calculateDisciplineBimTotal(student, disciplineName, bim);
+  const autoGrade = calculateAutoWorkGrade(student, disciplineName, bim);
+  const effectiveWork = getEffectiveWorkGrade(student, disciplineName, bim);
+  const metrics = getDisciplineMetrics(student, disciplineName);
+  const isManual = hasManualWorkGrade(student, disciplineName, bim);
   return '<article class="bim-card">'
     + '<div class="bim-card-head">'
       + '<div class="bim-card-title">' + bim + "º Bimestre</div>"
       + '<div class="bim-card-total">' + (total === null ? "—" : formatNumber(total) + "/10") + "</div>"
     + '</div>'
     + '<div class="field-stack">'
-      + '<div><label>Nota de trabalhos</label>' + renderStepper(student.id, bim, "trabalhos", dados.trabalhos) + '</div>'
-      + '<div><label>Nota de prova</label>' + renderStepper(student.id, bim, "prova", dados.prova) + '</div>'
-      + '<div class="summary-foot">Atividades feitas nos relatos diarios: ' + getBimesterWorksCount(student, bim) + '</div>'
+      + '<div><label>Nota de trabalhos</label>' + renderStepper(student.id, bim, "trabalhos", effectiveWork, disciplineName) + '</div>'
+      + '<div><label>Nota de prova</label>' + renderStepper(student.id, bim, "prova", dados.prova, disciplineName) + '</div>'
+      + (disciplineName === MAIN_DISCIPLINE
+        ? '<div class="auto-work-note' + (isManual ? ' manual-work-note' : '') + '">'
+          + (isManual
+            ? 'Nota manual em uso. Automática sugerida: ' + (autoGrade === null ? 'ainda indisponível' : formatNumber(autoGrade) + '/5')
+            : 'Nota automática em uso: ' + (autoGrade === null ? 'aguardando atividades registradas' : formatNumber(autoGrade) + '/5'))
+          + '. Atividades feitas: ' + (metrics.atividadesPorBimestre[bim] || 0) + ' de ' + (metrics.atividadesAplicadasPorBimestre[bim] || 0) + '.'
+          + (isManual ? '<button class="inline-btn" type="button" data-reset-auto="' + student.id + '" data-bimester="' + bim + '" data-discipline="' + escapeHtml(disciplineName) + '">Voltar ao automático</button>' : '')
+          + '</div>'
+        : '<div class="summary-foot">Lançamento manual desta disciplina neste teste inicial.</div>')
     + '</div>'
     + "</article>";
 }
@@ -1419,13 +1655,17 @@ function adjustStepper(button) {
   const studentId = Number(button.dataset.student);
   const bim = button.dataset.bimester;
   const field = button.dataset.field;
+  const disciplineName = button.dataset.discipline || MAIN_DISCIPLINE;
   const delta = Number(button.dataset.step);
   const student = getStudent(studentId);
   if (!student) return;
 
-  const current = toNumber(student.bimestres[bim][field]);
+  const dados = getDisciplineBimState(student, disciplineName, bim);
+  const current = field === "trabalhos"
+    ? getEffectiveWorkGrade(student, disciplineName, bim)
+    : toNumber(dados[field]);
   const next = sanitizeFieldValue(field, (current === null ? 0 : current) + delta);
-  student.bimestres[bim][field] = next;
+  dados[field] = next;
   persistAndRefresh(studentId, "Valor atualizado.");
 }
 
@@ -1433,10 +1673,11 @@ function updateNumericFieldFromInput(input) {
   const studentId = Number(input.dataset.student);
   const bim = input.dataset.bimester;
   const field = input.dataset.field;
+  const disciplineName = input.dataset.discipline || MAIN_DISCIPLINE;
   const student = getStudent(studentId);
   if (!student) return;
 
-  student.bimestres[bim][field] = sanitizeFieldValue(field, input.value);
+  getDisciplineBimState(student, disciplineName, bim)[field] = sanitizeFieldValue(field, input.value);
   persistAndRefresh(studentId, "Valor atualizado.");
 }
 
@@ -1451,15 +1692,67 @@ function persistAndRefresh(studentId, message) {
   }
 }
 
+function clearWorkGradeOverride(studentId, bim, disciplineName) {
+  const student = getStudent(studentId);
+  if (!student) return;
+  getDisciplineBimState(student, disciplineName, bim).trabalhos = "";
+  persistAndRefresh(studentId, "Nota de trabalhos voltou ao cálculo automático.");
+}
+
 function getStudent(studentId) {
   return state.alunos.find(function (student) { return student.id === studentId; });
 }
 
-function calculateBimTotal(student, bim) {
-  const trabalhos = toNumber(student.bimestres[bim].trabalhos);
-  const prova = toNumber(student.bimestres[bim].prova);
+function getDisciplineState(student, disciplineName) {
+  if (disciplineName === MAIN_DISCIPLINE) {
+    return { bimestres: student.bimestres };
+  }
+
+  if (!student.boletim) {
+    student.boletim = buildDefaultBoletimState();
+  }
+  if (!student.boletim[disciplineName]) {
+    student.boletim[disciplineName] = buildEmptyDisciplineState();
+  }
+  return student.boletim[disciplineName];
+}
+
+function getDisciplineBimState(student, disciplineName, bim) {
+  const disciplineState = getDisciplineState(student, disciplineName);
+  if (!disciplineState.bimestres[bim]) {
+    disciplineState.bimestres[bim] = buildEmptyBimesterState();
+  }
+  return disciplineState.bimestres[bim];
+}
+
+function calculateAutoWorkGrade(student, disciplineName, bim) {
+  const metrics = getDisciplineMetrics(student, disciplineName);
+  const feitas = Number(metrics.atividadesPorBimestre[bim]) || 0;
+  const aplicadas = Number(metrics.atividadesAplicadasPorBimestre[bim]) || 0;
+  if (!aplicadas) return null;
+  return Number(Math.min(GRADE_MAX, ((feitas / aplicadas) * GRADE_MAX)).toFixed(1));
+}
+
+function getEffectiveWorkGrade(student, disciplineName, bim) {
+  const manual = toNumber(getDisciplineBimState(student, disciplineName, bim).trabalhos);
+  if (manual !== null) return manual;
+  return calculateAutoWorkGrade(student, disciplineName, bim);
+}
+
+function hasManualWorkGrade(student, disciplineName, bim) {
+  return toNumber(getDisciplineBimState(student, disciplineName, bim).trabalhos) !== null;
+}
+
+function calculateDisciplineBimTotal(student, disciplineName, bim) {
+  const dados = getDisciplineBimState(student, disciplineName, bim);
+  const trabalhos = getEffectiveWorkGrade(student, disciplineName, bim);
+  const prova = toNumber(dados.prova);
   if (trabalhos === null && prova === null) return null;
   return Number(((trabalhos || 0) + (prova || 0)).toFixed(1));
+}
+
+function calculateBimTotal(student, bim) {
+  return calculateDisciplineBimTotal(student, MAIN_DISCIPLINE, bim);
 }
 
 function calculateAnnualAverage(student) {
@@ -1507,14 +1800,20 @@ function defaultReferralText(studentId) {
 function buildStudentSummary(student) {
   const absence = getStudentMetrics(student);
   const media = calculateAnnualAverage(student);
-  const bimLines = BIMESTERS.map(function (bim) {
-    const dados = student.bimestres[bim];
-    const total = calculateBimTotal(student, bim);
-    return bim + "º bimestre: trabalhos " + printableNumber(dados.trabalhos, "/5")
-      + ", prova " + printableNumber(dados.prova, "/5")
-      + ", total " + (total === null ? "não preenchido" : formatNumber(total) + "/10")
-      + ", atividades feitas " + getBimesterWorksCount(student, bim) + ".";
-  }).join("\n");
+  const disciplineLines = DISCIPLINES.map(function (discipline) {
+    return discipline.name + ":\n" + BIMESTERS.map(function (bim) {
+      const dados = getDisciplineBimState(student, discipline.name, bim);
+      const total = calculateDisciplineBimTotal(student, discipline.name, bim);
+      const trabalhos = getEffectiveWorkGrade(student, discipline.name, bim);
+      const metrics = getDisciplineMetrics(student, discipline.name);
+      return "- " + bim + "º bimestre: trabalhos "
+        + (trabalhos === null ? "não preenchido" : formatNumber(trabalhos) + "/5")
+        + ", prova " + printableNumber(dados.prova, "/5")
+        + ", total " + (total === null ? "não preenchido" : formatNumber(total) + "/10")
+        + ", atividades feitas " + (metrics.atividadesPorBimestre[bim] || 0)
+        + " de " + (metrics.atividadesAplicadasPorBimestre[bim] || 0) + ".";
+    }).join("\n");
+  }).join("\n\n");
 
   const diasFalta = absence.dias.length ? absence.dias.map(function (date) {
     return date + " (" + absence.porDia[date] + " falta(s) em h/aula)";
@@ -1531,8 +1830,8 @@ function buildStudentSummary(student) {
     "Dias em que faltou: " + diasFalta,
     "Total de atividades feitas: " + calculateWorksTotal(student) + ".",
     "",
-    "Notas por bimestre:",
-    bimLines,
+    "Boletim por disciplina:",
+    disciplineLines,
     "",
     "Observações de comportamento:",
     student.observacoesComportamento || "Sem observações registradas.",
@@ -1655,7 +1954,7 @@ function closeModal(id) {
 }
 
 function getFieldStep(field) {
-  return field === "trabalhosRealizados" ? 1 : 0.5;
+  return field === "trabalhosRealizados" ? 1 : 0.1;
 }
 
 function getFieldMax(field) {
@@ -1673,7 +1972,7 @@ function sanitizeFieldValue(field, rawValue) {
   }
 
   const max = getFieldMax(field);
-  const rounded = field === "trabalhosRealizados" ? Math.round(number) : Math.round(number * 2) / 2;
+  const rounded = field === "trabalhosRealizados" ? Math.round(number) : Math.round(number * 10) / 10;
   const clamped = Math.max(0, Math.min(max, rounded));
   return field === "trabalhosRealizados" ? clamped : Number(clamped.toFixed(1));
 }

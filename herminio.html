@@ -3977,6 +3977,14 @@ function rhDescobrirTurmaPane(pane) {
   return rhExtrairTurmaDoTitulo(titulo ? titulo.textContent : '');
 }
 
+function rhDisciplinaPane(pane) {
+  if (!pane) return null;
+  var card = pane.closest('.ea');
+  if (!card) return null;
+  var titulo = card.querySelector('.em .ed');
+  return normalizarDiscRH(titulo ? titulo.textContent : '');
+}
+
 function rhDiaBasePane(paneId) {
   var match = String(paneId || '').match(/(\d{4})/);
   return match ? match[1] : '';
@@ -4051,6 +4059,13 @@ function rhEstadoAtividadeInicial(pane) {
       });
     }
   }
+  if (rhUsaAtividadeAutomaticaLP1(pane)) {
+    (ALUNOS_RH[turmaId] || []).forEach(function(aluno) {
+      var presente = rhGetEstadoAtual('presenca', pane, aluno.n);
+      if (presente === true) mapa[aluno.n] = true;
+      else if (presente === false) mapa[aluno.n] = false;
+    });
+  }
   return mapa;
 }
 
@@ -4084,6 +4099,33 @@ function rhHorasPainel(pane) {
   return Math.max(1, Math.floor(parseHorasRH(titulo.textContent) || 0));
 }
 
+function rhRelatoRelacionadoPane(pane) {
+  if (!pane || !pane.id) return null;
+  var relatoId = pane.id.replace(/^[pa]-/, 'r-');
+  return document.getElementById(relatoId);
+}
+
+function rhPaneTemTemaRegistrado(pane) {
+  var relato = rhRelatoRelacionadoPane(pane);
+  if (!relato) return false;
+  var textos = Array.from(relato.querySelectorAll('.ct')).map(function(item) {
+    return (item.textContent || '').trim();
+  }).filter(Boolean);
+  if (!textos.length) return false;
+  return textos.some(function(texto) {
+    return texto.toLowerCase().indexOf('sem conteudo registrado') === -1;
+  });
+}
+
+function rhUsaAtividadeAutomaticaLP1(pane) {
+  var turmaId = rhDescobrirTurmaPane(pane);
+  var infoDisc = rhDisciplinaPane(pane);
+  return turmaId === 't1'
+    && !!infoDisc
+    && infoDisc.grupo === 'lp'
+    && rhPaneTemTemaRegistrado(pane);
+}
+
 function rhResumoAlunoBase(aluno) {
   return {
     numero: aluno.n,
@@ -4093,8 +4135,39 @@ function rhResumoAlunoBase(aluno) {
     totalAulas: 0,
     porDia: {},
     atividadesFeitas: 0,
+    atividadesPorBimestre: { '1': 0, '2': 0, '3': 0, '4': 0 },
+    disciplinas: {}
+  };
+}
+
+function rhResumoDisciplinaBase() {
+  return {
+    atividadesAplicadas: 0,
+    atividadesAplicadasPorBimestre: { '1': 0, '2': 0, '3': 0, '4': 0 }
+  };
+}
+
+function rhResumoAlunoDisciplinaBase() {
+  return {
+    atividadesFeitas: 0,
     atividadesPorBimestre: { '1': 0, '2': 0, '3': 0, '4': 0 }
   };
+}
+
+function rhGarantirResumoDisciplinaClasse(classe, disciplina) {
+  if (!classe.disciplinas) classe.disciplinas = {};
+  if (!classe.disciplinas[disciplina]) {
+    classe.disciplinas[disciplina] = rhResumoDisciplinaBase();
+  }
+  return classe.disciplinas[disciplina];
+}
+
+function rhGarantirResumoDisciplinaAluno(aluno, disciplina) {
+  if (!aluno.disciplinas) aluno.disciplinas = {};
+  if (!aluno.disciplinas[disciplina]) {
+    aluno.disciplinas[disciplina] = rhResumoAlunoDisciplinaBase();
+  }
+  return aluno.disciplinas[disciplina];
 }
 
 function rhMontarResumoAlunosSync() {
@@ -4108,6 +4181,7 @@ function rhMontarResumoAlunosSync() {
       turma: RH_TURMA_LABELS[turmaId] || turmaId,
       atividadesAplicadas: 0,
       atividadesAplicadasPorBimestre: { '1': 0, '2': 0, '3': 0, '4': 0 },
+      disciplinas: {},
       students: students
     };
   });
@@ -4139,14 +4213,26 @@ function rhMontarResumoAlunosSync() {
     var turmaId = rhDescobrirTurmaPane(pane);
     if (!turmaId || !classes[turmaId]) return;
     var bim = rhBimestrePorCodigo(rhDiaBasePane(pane.id));
+    var infoDisc = rhDisciplinaPane(pane);
+    var contaTema = rhPaneTemTemaRegistrado(pane);
     classes[turmaId].atividadesAplicadas += 1;
     classes[turmaId].atividadesAplicadasPorBimestre[bim] = (classes[turmaId].atividadesAplicadasPorBimestre[bim] || 0) + 1;
+    if (infoDisc && contaTema) {
+      var resumoDiscClasse = rhGarantirResumoDisciplinaClasse(classes[turmaId], infoDisc.disc);
+      resumoDiscClasse.atividadesAplicadas += 1;
+      resumoDiscClasse.atividadesAplicadasPorBimestre[bim] = (resumoDiscClasse.atividadesAplicadasPorBimestre[bim] || 0) + 1;
+    }
 
     classes[turmaId].students.forEach(function(aluno) {
       var estado = rhGetEstadoAtual('atividade', pane, aluno.numero);
-      if (estado !== true) return;
-      aluno.atividadesFeitas += 1;
-      aluno.atividadesPorBimestre[bim] = (aluno.atividadesPorBimestre[bim] || 0) + 1;
+      if (estado === true) {
+        aluno.atividadesFeitas += 1;
+        aluno.atividadesPorBimestre[bim] = (aluno.atividadesPorBimestre[bim] || 0) + 1;
+      }
+      if (!(infoDisc && contaTema) || estado !== true) return;
+      var resumoDiscAluno = rhGarantirResumoDisciplinaAluno(aluno, infoDisc.disc);
+      resumoDiscAluno.atividadesFeitas += 1;
+      resumoDiscAluno.atividadesPorBimestre[bim] = (resumoDiscAluno.atividadesPorBimestre[bim] || 0) + 1;
     });
   });
 
