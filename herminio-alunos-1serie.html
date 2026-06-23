@@ -217,6 +217,68 @@ button,input,textarea{font:inherit}
   gap:10px;
   flex-wrap:wrap;
 }
+.discipline-picker{
+  position:relative;
+}
+.discipline-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.discipline-menu{
+  position:absolute;
+  top:calc(100% + 10px);
+  left:0;
+  min-width:240px;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:#fffdf8;
+  box-shadow:0 18px 36px rgba(26,58,42,.14);
+  display:none;
+  z-index:8;
+}
+.discipline-picker.open .discipline-menu{
+  display:grid;
+  gap:8px;
+}
+.discipline-option{
+  width:100%;
+  border:none;
+  border-radius:14px;
+  padding:10px 12px;
+  background:#f8f4ea;
+  color:var(--ink);
+  text-align:left;
+  cursor:pointer;
+  font-weight:700;
+}
+.discipline-option.active{
+  background:linear-gradient(135deg,var(--vd),var(--vm));
+  color:#fff;
+}
+.discipline-option small{
+  display:block;
+  margin-top:4px;
+  font-size:.75rem;
+  font-weight:500;
+  opacity:.82;
+}
+.table-head-actions{
+  margin-top:14px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+}
+.section-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
 .search-input{
   width:min(360px, 100%);
   padding:12px 14px;
@@ -823,6 +885,10 @@ tbody tr:hover td{
       <input class="search-input" id="searchInput" type="search" placeholder="Buscar aluno por nome ou número">
     </div>
     <div class="toolbar-right">
+      <div class="discipline-picker" id="tableDisciplinePicker">
+        <button class="ghost-btn discipline-btn" type="button" id="tableDisciplineBtn" data-toggle-discipline-menu="table">Disciplina</button>
+        <div class="discipline-menu" id="tableDisciplineMenu"></div>
+      </div>
       <button class="ghost-btn" type="button" id="copyClassSummaryBtn">Copiar resumo da turma</button>
       <button class="warning-btn" type="button" id="resetDataBtn">Restaurar modelo</button>
     </div>
@@ -831,8 +897,11 @@ tbody tr:hover td{
   <section class="table-card">
     <div class="table-head">
       <div>
-        <h2>Tabela geral da turma</h2>
-        <p>Visão resumida com as notas finais dos 4 bimestres. Os detalhes de trabalhos e prova continuam no perfil do aluno.</p>
+        <h2 id="tableTitle">Tabela geral da turma</h2>
+        <p id="tableDescription">Visão resumida com as notas finais dos 4 bimestres. Os detalhes de trabalhos e prova continuam no perfil do aluno.</p>
+        <div class="table-head-actions">
+          <span class="mini-chip" id="tableDisciplineChip">Disciplina ativa: Língua Portuguesa</span>
+        </div>
       </div>
       <div class="status-box" style="max-width:340px;background:rgba(26,58,42,.05);border-color:rgba(26,58,42,.10);color:var(--muted)">
         <strong>Colunas da tabela</strong>
@@ -941,9 +1010,15 @@ const searchInput = document.getElementById("searchInput");
 const tableBody = document.getElementById("tableBody");
 const summaryGrid = document.getElementById("summaryGrid");
 const saveStatusText = document.getElementById("saveStatusText");
+const tableTitle = document.getElementById("tableTitle");
+const tableDescription = document.getElementById("tableDescription");
+const tableDisciplineBtn = document.getElementById("tableDisciplineBtn");
+const tableDisciplineMenu = document.getElementById("tableDisciplineMenu");
+const tableDisciplineChip = document.getElementById("tableDisciplineChip");
 
 let currentProfileId = null;
 let currentReportId = null;
+let currentTableDiscipline = MAIN_DISCIPLINE;
 let currentBoletimDiscipline = MAIN_DISCIPLINE;
 
 const RH_ALUNO_SYNC_KEY = "rh_alunos_sync_v1";
@@ -954,6 +1029,7 @@ const FALLBACK_TOTAL_HOUR_CLASSES = ABSENCE_RECORDS.reduce(function (sum, record
 }, 0);
 
 let state = loadState();
+renderDisciplineMenus();
 renderAll();
 setSaveStatus("Painel carregado com sucesso.");
 
@@ -975,11 +1051,29 @@ document.getElementById("resetDataBtn").addEventListener("click", function () {
 });
 
 document.getElementById("copyClassSummaryBtn").addEventListener("click", function () {
-  copyText(buildClassSummary());
+  copyText(buildClassSummary(currentTableDiscipline));
   setSaveStatus("Resumo da turma copiado.");
 });
 
 document.addEventListener("click", function (event) {
+  const disciplineToggleButton = event.target.closest("[data-toggle-discipline-menu]");
+  if (disciplineToggleButton) {
+    toggleDisciplineMenu(disciplineToggleButton.dataset.toggleDisciplineMenu);
+    return;
+  }
+
+  const tableDisciplineOption = event.target.closest("[data-select-table-discipline]");
+  if (tableDisciplineOption) {
+    setTableDiscipline(tableDisciplineOption.dataset.selectTableDiscipline || MAIN_DISCIPLINE);
+    return;
+  }
+
+  const profileDisciplineOption = event.target.closest("[data-select-profile-discipline]");
+  if (profileDisciplineOption) {
+    setProfileDiscipline(profileDisciplineOption.dataset.selectProfileDiscipline || MAIN_DISCIPLINE);
+    return;
+  }
+
   const stepButton = event.target.closest("[data-step]");
   if (stepButton) {
     adjustStepper(stepButton);
@@ -988,6 +1082,7 @@ document.addEventListener("click", function (event) {
 
   const profileButton = event.target.closest("[data-open-profile]");
   if (profileButton) {
+    currentBoletimDiscipline = currentTableDiscipline;
     openProfile(Number(profileButton.dataset.openProfile));
     return;
   }
@@ -1037,7 +1132,9 @@ document.addEventListener("click", function (event) {
     const student = getStudent(studentId);
     student.relatorioGeral = buildAnnualReportTemplate(student);
     persistAndRefresh(studentId, "Modelo-base do relatório inserido.");
+    return;
   }
+  closeDisciplineMenus();
 });
 
 document.addEventListener("change", function (event) {
@@ -1404,6 +1501,8 @@ function renderAll() {
   if (!state || !Array.isArray(state.alunos) || !state.alunos.length) {
     state = buildDefaultState();
   }
+  renderDisciplineMenus();
+  updateTableDisciplinePresentation();
   renderSummary();
   renderTable();
   if (currentProfileId !== null && document.getElementById("profileModal").classList.contains("open")) {
@@ -1415,18 +1514,21 @@ function renderAll() {
 }
 
 function renderSummary() {
-  const medias = state.alunos.map(calculateAnnualAverage).filter(function (value) { return value !== null; });
+  const disciplineConfig = getDisciplineConfig(currentTableDiscipline);
+  const medias = state.alunos.map(function (student) {
+    return calculateDisciplineAverage(student, currentTableDiscipline);
+  }).filter(function (value) { return value !== null; });
   const mediaTurma = medias.length ? medias.reduce(function (sum, value) { return sum + value; }, 0) / medias.length : null;
   const totalFaltas = state.alunos.reduce(function (sum, student) { return sum + getStudentMetrics(student).aulas; }, 0);
   const totalPresencas = state.alunos.reduce(function (sum, student) { return sum + getStudentMetrics(student).presencas; }, 0);
-  const totalAtividadesAplicadas = getAppliedActivitiesCount(MAIN_DISCIPLINE);
+  const totalAtividadesAplicadas = getAppliedActivitiesCount(currentTableDiscipline);
 
   summaryGrid.innerHTML = [
     summaryCard("Alunos cadastrados", String(state.alunos.length), "Base da 1ª Série"),
     summaryCard("Faltas em h/aula", String(totalFaltas), "Somatório da carga horária ausente"),
     summaryCard("Presencas em h/aula", String(totalPresencas), "Sincronizadas pelos relatos diarios"),
-    summaryCard("Média parcial da turma", mediaTurma === null ? "—" : formatNumber(mediaTurma), mediaTurma === null ? "Preencha as notas para calcular" : "Com base nos bimestres já lançados"),
-    summaryCard("Atividades de LP", String(totalAtividadesAplicadas), "Cada tema de Língua Portuguesa conta como 1 atividade aplicada"),
+    summaryCard("Média de " + disciplineConfig.shortLabel, mediaTurma === null ? "—" : formatNumber(mediaTurma), mediaTurma === null ? "Preencha as notas desta disciplina para calcular" : "Com base nos bimestres já lançados"),
+    summaryCard("Atividades de " + disciplineConfig.shortLabel, String(totalAtividadesAplicadas), disciplineConfig.automated ? "Cada tema desta disciplina conta como 1 atividade aplicada" : "Esta disciplina ainda está em modo manual"),
     summaryCard("Relatórios anuais", String(state.alunos.length), "Todos podem ser gerados automaticamente pelo sistema")
   ].join("");
 }
@@ -1439,7 +1541,62 @@ function summaryCard(label, value, foot) {
     + "</article>";
 }
 
+function getDisciplineConfig(disciplineName) {
+  return DISCIPLINES.find(function (discipline) {
+    return discipline.name === disciplineName;
+  }) || DISCIPLINES[0];
+}
+
+function renderDisciplineMenus() {
+  if (tableDisciplineMenu) {
+    tableDisciplineMenu.innerHTML = buildDisciplineMenuHtml("table", currentTableDiscipline);
+  }
+}
+
+function buildDisciplineMenuHtml(scope, activeDiscipline) {
+  return DISCIPLINES.map(function (discipline) {
+    const active = activeDiscipline === discipline.name;
+    const dataAttr = scope === "table" ? 'data-select-table-discipline' : 'data-select-profile-discipline';
+    return '<button class="discipline-option' + (active ? ' active' : '') + '" type="button" ' + dataAttr + '="' + escapeHtml(discipline.name) + '">'
+      + escapeHtml(discipline.name)
+      + '<small>' + escapeHtml(discipline.automated ? "Com cálculo automático de trabalhos" : "Notas manuais nesta fase de teste") + '</small>'
+      + '</button>';
+  }).join("");
+}
+
+function toggleDisciplineMenu(scope) {
+  const picker = scope === "profile"
+    ? document.getElementById("profileDisciplinePicker")
+    : document.getElementById("tableDisciplinePicker");
+  if (!picker) return;
+  const shouldOpen = !picker.classList.contains("open");
+  closeDisciplineMenus();
+  if (shouldOpen) picker.classList.add("open");
+}
+
+function closeDisciplineMenus() {
+  document.querySelectorAll(".discipline-picker.open").forEach(function (picker) {
+    picker.classList.remove("open");
+  });
+}
+
+function setTableDiscipline(disciplineName) {
+  currentTableDiscipline = disciplineName;
+  closeDisciplineMenus();
+  renderDisciplineMenus();
+  renderAll();
+}
+
+function setProfileDiscipline(disciplineName) {
+  currentBoletimDiscipline = disciplineName;
+  closeDisciplineMenus();
+  if (currentProfileId !== null) {
+    renderProfile(currentProfileId);
+  }
+}
+
 function renderTable() {
+  const disciplineConfig = getDisciplineConfig(currentTableDiscipline);
   const query = normalizeText(searchInput.value || "");
   const rows = state.alunos.filter(function (student) {
     if (!query) return true;
@@ -1453,25 +1610,25 @@ function renderTable() {
   }
 
   tableBody.innerHTML = rows.map(function (student) {
-    const media = calculateAnnualAverage(student);
+    const media = calculateDisciplineAverage(student, currentTableDiscipline);
     return '<tr>'
       + '<td class="student-cell">'
       + '<span class="student-number">' + student.numero + "</span>"
       + '<button class="student-name-btn" type="button" data-open-profile="' + student.id + '"><span class="student-name">' + escapeHtml(student.nome) + "</span></button>"
       + '<div class="student-meta">'
-      + '<span class="mini-chip">Média parcial: ' + (media === null ? "—" : formatNumber(media) + "/10") + "</span>"
+      + '<span class="mini-chip">Média em ' + escapeHtml(disciplineConfig.shortLabel) + ': ' + (media === null ? "—" : formatNumber(media) + "/10") + "</span>"
       + '<span class="mini-chip">Frequência: ' + formatNumber(calculateAttendance(student)) + "%</span>"
       + "</div>"
       + "</td>"
       + BIMESTERS.map(function (bim) {
-        return '<td>' + renderBimGradeBadge(student, bim) + '</td>';
+        return '<td>' + renderBimGradeBadge(student, bim, currentTableDiscipline) + '</td>';
       }).join("")
       + "</tr>";
   }).join("");
 }
 
-function renderBimGradeBadge(student, bim) {
-  const total = calculateBimTotal(student, bim);
+function renderBimGradeBadge(student, bim, disciplineName) {
+  const total = calculateDisciplineBimTotal(student, disciplineName || MAIN_DISCIPLINE, bim);
   if (total === null) {
     return '<span class="grade-badge"><strong>—</strong><small>Sem nota</small></span>';
   }
@@ -1480,6 +1637,22 @@ function renderBimGradeBadge(student, bim) {
     + '<strong>' + (isRecovery ? '⚠️ ' : '✅ ') + formatNumber(total) + '/10</strong>'
     + '<small>' + (isRecovery ? 'Recuperação' : 'Acima de 7') + '</small>'
     + '</span>';
+}
+
+function updateTableDisciplinePresentation() {
+  const disciplineConfig = getDisciplineConfig(currentTableDiscipline);
+  if (tableTitle) {
+    tableTitle.textContent = "Tabela geral da turma";
+  }
+  if (tableDescription) {
+    tableDescription.textContent = "Página de notas de " + disciplineConfig.name + ". As colunas mostram o total do bimestre desta disciplina; os detalhes continuam no perfil do aluno.";
+  }
+  if (tableDisciplineBtn) {
+    tableDisciplineBtn.textContent = "Disciplina: " + disciplineConfig.shortLabel;
+  }
+  if (tableDisciplineChip) {
+    tableDisciplineChip.textContent = "Disciplina ativa: " + disciplineConfig.name;
+  }
 }
 
 function renderStepper(studentId, bim, field, value, disciplineName) {
@@ -1503,7 +1676,9 @@ function renderProfile(studentId) {
   const student = getStudent(studentId);
   if (!student) return;
   const absence = getStudentMetrics(student);
-  const media = calculateAnnualAverage(student);
+  const disciplineConfig = getDisciplineConfig(currentBoletimDiscipline);
+  const media = calculateDisciplineAverage(student, currentBoletimDiscipline);
+  const disciplineMetrics = getDisciplineMetrics(student, currentBoletimDiscipline);
 
   document.getElementById("profileTitle").textContent = student.numero + ". " + student.nome;
   document.getElementById("profileSubtitle").textContent = SCHOOL_NAME + " · " + CLASS_NAME + " · " + PERIOD_LABEL;
@@ -1512,8 +1687,8 @@ function renderProfile(studentId) {
     '<section class="profile-stats">'
       + profileMetric("Faltas em h/aula", String(absence.aulas), "Carga horária ausente consolidada")
       + profileMetric("Presencas em h/aula", String(absence.presencas), "Presencas registradas nos relatos diarios")
-      + profileMetric("Atividades feitas", String(calculateWorksTotal(student)), "Soma automatica registrada nos relatos")
-      + profileMetric("Média anual parcial", media === null ? "—" : formatNumber(media) + "/10", media === null ? "Ainda sem notas lançadas" : "Média dos bimestres preenchidos")
+      + profileMetric("Atividades em " + disciplineConfig.shortLabel, String(disciplineMetrics.atividadesFeitas || 0), disciplineConfig.automated ? "Contagem automática da disciplina ativa" : "Disciplina em modo manual")
+      + profileMetric("Média em " + disciplineConfig.shortLabel, media === null ? "—" : formatNumber(media) + "/10", media === null ? "Ainda sem notas lançadas nesta disciplina" : "Média dos bimestres preenchidos")
     + '</section>'
     + '<section class="section-block">'
       + '<h3>Boletim por disciplina</h3>'
@@ -1554,13 +1729,13 @@ function profileMetric(label, value, foot) {
 }
 
 function renderBoletimSection(student) {
-  return '<div class="boletim-tabs">'
-    + DISCIPLINES.map(function (discipline) {
-      const active = currentBoletimDiscipline === discipline.name;
-      return '<button class="boletim-tab' + (active ? ' active' : '') + '" type="button" data-boletim-tab="' + escapeHtml(discipline.name) + '">'
-        + escapeHtml(discipline.shortLabel)
-        + '</button>';
-    }).join("")
+  const disciplineConfig = getDisciplineConfig(currentBoletimDiscipline);
+  return '<div class="section-head">'
+    + '<div class="discipline-picker" id="profileDisciplinePicker">'
+      + '<button class="ghost-btn discipline-btn" type="button" data-toggle-discipline-menu="profile">Disciplina: ' + escapeHtml(disciplineConfig.name) + '</button>'
+      + '<div class="discipline-menu">' + buildDisciplineMenuHtml("profile", currentBoletimDiscipline) + '</div>'
+    + '</div>'
+    + '<span class="mini-chip">Página detalhada: ' + escapeHtml(disciplineConfig.shortLabel) + '</span>'
     + '</div>'
     + DISCIPLINES.map(function (discipline) {
       const active = currentBoletimDiscipline === discipline.name;
@@ -1755,10 +1930,16 @@ function calculateBimTotal(student, bim) {
   return calculateDisciplineBimTotal(student, MAIN_DISCIPLINE, bim);
 }
 
-function calculateAnnualAverage(student) {
-  const totals = BIMESTERS.map(function (bim) { return calculateBimTotal(student, bim); }).filter(function (value) { return value !== null; });
+function calculateDisciplineAverage(student, disciplineName) {
+  const totals = BIMESTERS.map(function (bim) {
+    return calculateDisciplineBimTotal(student, disciplineName, bim);
+  }).filter(function (value) { return value !== null; });
   if (!totals.length) return null;
   return Number((totals.reduce(function (sum, value) { return sum + value; }, 0) / totals.length).toFixed(1));
+}
+
+function calculateAnnualAverage(student) {
+  return calculateDisciplineAverage(student, MAIN_DISCIPLINE);
 }
 
 function calculateWorksTotal(student) {
@@ -1850,20 +2031,26 @@ function buildStudentSummary(student) {
   ].join("\n");
 }
 
-function buildClassSummary() {
-  const medias = state.alunos.map(calculateAnnualAverage).filter(function (value) { return value !== null; });
+function buildClassSummary(disciplineName) {
+  const disciplineConfig = getDisciplineConfig(disciplineName || currentTableDiscipline);
+  const medias = state.alunos.map(function (student) {
+    return calculateDisciplineAverage(student, disciplineConfig.name);
+  }).filter(function (value) { return value !== null; });
   const mediaTurma = medias.length ? formatNumber(medias.reduce(function (sum, value) { return sum + value; }, 0) / medias.length) + "/10" : "não calculada";
   return [
     "Resumo da turma - " + SCHOOL_NAME + " - " + CLASS_NAME,
+    "Disciplina ativa: " + disciplineConfig.name,
     "Período: " + PERIOD_LABEL,
     "Quantidade de alunos: " + state.alunos.length,
     "Média parcial da turma: " + mediaTurma,
     "",
     state.alunos.map(function (student) {
       const absence = getStudentMetrics(student);
+      const mediaAluno = calculateDisciplineAverage(student, disciplineConfig.name);
+      const metrics = getDisciplineMetrics(student, disciplineConfig.name);
       return student.numero + ". " + student.nome
-        + " | média parcial: " + (calculateAnnualAverage(student) === null ? "—" : formatNumber(calculateAnnualAverage(student)) + "/10")
-        + " | atividades feitas: " + calculateWorksTotal(student)
+        + " | média parcial: " + (mediaAluno === null ? "—" : formatNumber(mediaAluno) + "/10")
+        + " | atividades feitas: " + (metrics.atividadesFeitas || 0)
         + " | faltas em h/aula: " + absence.aulas
         + " | presencas em h/aula: " + absence.presencas;
     }).join("\n")
