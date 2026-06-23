@@ -4090,6 +4090,68 @@ function rhBimestrePorCodigo(code) {
   return '4';
 }
 
+var RH_BIMESTRE_AULA_LIMITES = {
+  't1|lp': 20,
+  't1|esp': 10,
+  't1|ing': 10
+};
+
+function rhMetaBimestrePorDisciplina(turmaId, grupo, disciplina) {
+  var overrideKey = turmaId + '|' + grupo;
+  if (RH_BIMESTRE_AULA_LIMITES[overrideKey]) {
+    return RH_BIMESTRE_AULA_LIMITES[overrideKey];
+  }
+  var base = DISC_RH.find(function(item) {
+    return item.turmaId === turmaId && item.grupo === grupo && item.disc === disciplina;
+  });
+  return base && Number(base.bimestreMeta) ? Number(base.bimestreMeta) : 0;
+}
+
+function rhColetarMapaBimestresPanes() {
+  var grupos = {};
+  var mapa = {};
+
+  document.querySelectorAll('[id^="a-"]').forEach(function(pane, idx) {
+    if (pane.id.indexOf('a-all-') === 0) return;
+    var turmaId = rhDescobrirTurmaPane(pane);
+    var infoDisc = rhDisciplinaPane(pane);
+    if (!turmaId || !infoDisc) return;
+    var key = turmaId + '|' + infoDisc.grupo;
+    if (!grupos[key]) grupos[key] = [];
+    grupos[key].push({
+      paneId: pane.id,
+      turmaId: turmaId,
+      grupo: infoDisc.grupo,
+      disciplina: infoDisc.disc,
+      carga: rhHorasPainel(pane),
+      baseCode: rhDiaBasePane(pane.id),
+      ordemDom: idx
+    });
+  });
+
+  Object.keys(grupos).forEach(function(key) {
+    var lista = grupos[key];
+    if (!lista || !lista.length) return;
+    lista.sort(function(a, b) {
+      if (a.baseCode === b.baseCode) return a.ordemDom - b.ordemDom;
+      return a.baseCode.localeCompare(b.baseCode);
+    });
+
+    var acumulado = 0;
+    lista.forEach(function(item) {
+      var meta = rhMetaBimestrePorDisciplina(item.turmaId, item.grupo, item.disciplina);
+      if (!meta) {
+        mapa[item.paneId] = rhBimestrePorCodigo(item.baseCode);
+      } else {
+        mapa[item.paneId] = String(Math.min(4, Math.floor(acumulado / meta) + 1));
+      }
+      acumulado += item.carga || 0;
+    });
+  });
+
+  return mapa;
+}
+
 function rhHorasPainel(pane) {
   if (!pane) return 1;
   var card = pane.closest('.ea');
@@ -4122,7 +4184,7 @@ function rhUsaAtividadeAutomaticaLP1(pane) {
   var infoDisc = rhDisciplinaPane(pane);
   return turmaId === 't1'
     && !!infoDisc
-    && infoDisc.grupo === 'lp'
+    && ['lp', 'esp', 'ing'].indexOf(infoDisc.grupo) >= 0
     && rhPaneTemTemaRegistrado(pane);
 }
 
@@ -4172,6 +4234,7 @@ function rhGarantirResumoDisciplinaAluno(aluno, disciplina) {
 
 function rhMontarResumoAlunosSync() {
   var classes = {};
+  var mapaBimestres = rhColetarMapaBimestresPanes();
 
   Object.keys(ALUNOS_RH).forEach(function(turmaId) {
     var students = (ALUNOS_RH[turmaId] || []).map(function(aluno) {
@@ -4212,7 +4275,7 @@ function rhMontarResumoAlunosSync() {
     if (pane.id.indexOf('a-all-') === 0) return;
     var turmaId = rhDescobrirTurmaPane(pane);
     if (!turmaId || !classes[turmaId]) return;
-    var bim = rhBimestrePorCodigo(rhDiaBasePane(pane.id));
+    var bim = mapaBimestres[pane.id] || rhBimestrePorCodigo(rhDiaBasePane(pane.id));
     var infoDisc = rhDisciplinaPane(pane);
     var contaTema = rhPaneTemTemaRegistrado(pane);
     classes[turmaId].atividadesAplicadas += 1;

@@ -961,8 +961,8 @@ const GRADE_MAX = 5;
 const MAIN_DISCIPLINE = "Língua Portuguesa";
 const DISCIPLINES = [
   { id: "lp", name: "Língua Portuguesa", shortLabel: "LP", automated: true },
-  { id: "ing", name: "Inglês", shortLabel: "Inglês", automated: false },
-  { id: "esp", name: "Espanhol", shortLabel: "Espanhol", automated: false }
+  { id: "ing", name: "Inglês", shortLabel: "Inglês", automated: true },
+  { id: "esp", name: "Espanhol", shortLabel: "Espanhol", automated: true }
 ];
 
 const STUDENTS = [
@@ -1692,7 +1692,7 @@ function renderProfile(studentId) {
     + '</section>'
     + '<section class="section-block">'
       + '<h3>Boletim por disciplina</h3>'
-      + '<p class="section-note">Língua Portuguesa já calcula automaticamente a nota de trabalhos a partir dos relatos diarios da 1ª série. Nas demais disciplinas, o boletim continua totalmente editável para lançamento manual.</p>'
+      + '<p class="section-note">As notas de trabalhos da 1ª série agora usam as presenças, faltas e conteúdos registrados em cada período de aula para distribuir automaticamente as atividades dentro do bimestre correto de cada disciplina.</p>'
       + renderBoletimSection(student)
     + '</section>'
     + '<section class="section-block">'
@@ -1741,7 +1741,7 @@ function renderBoletimSection(student) {
       const active = currentBoletimDiscipline === discipline.name;
       const metrics = getDisciplineMetrics(student, discipline.name);
       const note = discipline.automated
-        ? 'Nesta disciplina, cada tema lançado no diário conta como atividade aplicada. A nota de trabalhos usa a proporção automática de atividades feitas no bimestre, com valor máximo de 5,0.'
+        ? 'Nesta disciplina, cada tema lançado no diário conta como atividade aplicada. A nota de trabalhos usa a proporção automática de atividades feitas no bimestre correto, com valor máximo de 5,0.'
         : 'Nesta disciplina, as notas seguem em modo manual por enquanto. Quando a automação for expandida para outras matérias, esta área passará a aproveitar os dados do diário também.';
       return '<div class="boletim-panel' + (active ? ' active' : '') + '" data-boletim-panel="' + escapeHtml(discipline.name) + '">'
         + '<div class="boletim-panel-note">'
@@ -1761,7 +1761,7 @@ function renderBimCard(student, bim, disciplineName) {
   const dados = getDisciplineBimState(student, disciplineName, bim);
   const total = calculateDisciplineBimTotal(student, disciplineName, bim);
   const autoGrade = calculateAutoWorkGrade(student, disciplineName, bim);
-  const effectiveWork = getEffectiveWorkGrade(student, disciplineName, bim);
+  const manualWork = getLaunchedWorkGrade(student, disciplineName, bim);
   const metrics = getDisciplineMetrics(student, disciplineName);
   const isManual = hasManualWorkGrade(student, disciplineName, bim);
   return '<article class="bim-card">'
@@ -1770,17 +1770,17 @@ function renderBimCard(student, bim, disciplineName) {
       + '<div class="bim-card-total">' + (total === null ? "—" : formatNumber(total) + "/10") + "</div>"
     + '</div>'
     + '<div class="field-stack">'
-      + '<div><label>Nota de trabalhos</label>' + renderStepper(student.id, bim, "trabalhos", effectiveWork, disciplineName) + '</div>'
+      + '<div><label>Nota de trabalhos</label>' + renderStepper(student.id, bim, "trabalhos", manualWork, disciplineName) + '</div>'
       + '<div><label>Nota de prova</label>' + renderStepper(student.id, bim, "prova", dados.prova, disciplineName) + '</div>'
       + (disciplineName === MAIN_DISCIPLINE
         ? '<div class="auto-work-note' + (isManual ? ' manual-work-note' : '') + '">'
           + (isManual
             ? 'Nota manual em uso. Automática sugerida: ' + (autoGrade === null ? 'ainda indisponível' : formatNumber(autoGrade) + '/5')
-            : 'Nota automática em uso: ' + (autoGrade === null ? 'aguardando atividades registradas' : formatNumber(autoGrade) + '/5'))
-          + '. Atividades feitas: ' + (metrics.atividadesPorBimestre[bim] || 0) + ' de ' + (metrics.atividadesAplicadasPorBimestre[bim] || 0) + '.'
+            : 'Sugestão automática disponível: ' + (autoGrade === null ? 'aguardando atividades registradas' : formatNumber(autoGrade) + '/5'))
+          + '. A nota bimestral só aparece como lançada depois que o professor confirmar manualmente. Atividades feitas: ' + (metrics.atividadesPorBimestre[bim] || 0) + ' de ' + (metrics.atividadesAplicadasPorBimestre[bim] || 0) + '.'
           + (isManual ? '<button class="inline-btn" type="button" data-reset-auto="' + student.id + '" data-bimester="' + bim + '" data-discipline="' + escapeHtml(disciplineName) + '">Voltar ao automático</button>' : '')
           + '</div>'
-        : '<div class="summary-foot">Lançamento manual desta disciplina neste teste inicial.</div>')
+        : '<div class="summary-foot">Aguardando atividades registradas ou lançamento manual desta disciplina.</div>')
     + '</div>'
     + "</article>";
 }
@@ -1914,13 +1914,17 @@ function getEffectiveWorkGrade(student, disciplineName, bim) {
   return calculateAutoWorkGrade(student, disciplineName, bim);
 }
 
+function getLaunchedWorkGrade(student, disciplineName, bim) {
+  return toNumber(getDisciplineBimState(student, disciplineName, bim).trabalhos);
+}
+
 function hasManualWorkGrade(student, disciplineName, bim) {
   return toNumber(getDisciplineBimState(student, disciplineName, bim).trabalhos) !== null;
 }
 
 function calculateDisciplineBimTotal(student, disciplineName, bim) {
   const dados = getDisciplineBimState(student, disciplineName, bim);
-  const trabalhos = getEffectiveWorkGrade(student, disciplineName, bim);
+  const trabalhos = getLaunchedWorkGrade(student, disciplineName, bim);
   const prova = toNumber(dados.prova);
   if (trabalhos === null && prova === null) return null;
   return Number(((trabalhos || 0) + (prova || 0)).toFixed(1));
