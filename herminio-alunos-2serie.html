@@ -6,6 +6,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="assets/js/supabase-report-sync.js"></script>
 <title>Alunos - 2a Serie - Raimundo Herminio de Melo</title>
 <style>
 :root{
@@ -856,10 +858,17 @@ const FALLBACK_ABSENCE_MAP = buildAbsenceMap();
 const FALLBACK_TOTAL_HOUR_CLASSES = ABSENCE_RECORDS.reduce(function (sum, record) {
   return sum + (record.carga || 1);
 }, 0);
+const RH_SUPABASE_DAILY_SCOPE = "herminio:daily:shared-v1";
+const RH_SUPABASE_PANEL_SCOPE = "herminio:panel:" + STORAGE_KEY;
+
+let remotePanelSync = null;
+let remoteDailySync = null;
+let applyingRemotePanelState = false;
 
 let state = loadState();
 renderAll();
 setSaveStatus("Painel carregado com sucesso.");
+initRemoteSync();
 
 searchInput.addEventListener("input", renderTable);
 window.addEventListener("focus", renderAll);
@@ -1104,6 +1113,7 @@ function buildAbsenceMap() {
 
 function buildDefaultState() {
   return {
+    __syncUpdatedAt: "",
     escola: SCHOOL_NAME,
     turma: CLASS_NAME,
     periodo: PERIOD_LABEL,
@@ -1137,6 +1147,7 @@ function loadState() {
     if (!parsed || !Array.isArray(parsed.alunos)) return base;
 
     return {
+      __syncUpdatedAt: parsed.__syncUpdatedAt || base.__syncUpdatedAt || "",
       escola: parsed.escola || base.escola,
       turma: parsed.turma || base.turma,
       periodo: parsed.periodo || base.periodo,
@@ -1176,8 +1187,78 @@ function mergeStudent(baseStudent, savedStudent) {
 }
 
 function saveState(message) {
+  state.__syncUpdatedAt = new Date().toISOString();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  queueRemotePanelSave("panel-save");
   if (message) setSaveStatus(message);
+}
+
+function applyRemotePanelState(payload, meta) {
+  if (!payload || !Array.isArray(payload.alunos)) return;
+  const localStamp = Date.parse((state && state.__syncUpdatedAt) || "") || 0;
+  const remoteStamp = Date.parse((payload && payload.__syncUpdatedAt) || (meta && meta.updatedAt) || "") || 0;
+  if (localStamp && remoteStamp && localStamp > remoteStamp) {
+    queueRemotePanelSave("keep-local");
+    return;
+  }
+  applyingRemotePanelState = true;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  state = loadState();
+  renderAll();
+  applyingRemotePanelState = false;
+}
+
+function applyRemoteDailyState(payload) {
+  if (!payload || !payload.alunosSync) return;
+  localStorage.setItem(RH_ALUNO_SYNC_KEY, JSON.stringify(payload.alunosSync));
+  renderAll();
+}
+
+function queueRemotePanelSave(reason) {
+  if (applyingRemotePanelState || !remotePanelSync) return;
+  remotePanelSync.schedulePush(reason || "panel-change");
+}
+
+function initRemoteSync() {
+  if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return;
+
+  remotePanelSync = window.RelatorioSupabaseSync.createScopeSync({
+    scope: RH_SUPABASE_PANEL_SCOPE,
+    schoolSlug: "raimundo-herminio-de-melo",
+    classSlug: "2a-serie",
+    source: "herminio-alunos-2serie",
+    debounceMs: 500,
+    getLocalPayload: function () {
+      return state;
+    },
+    onRemotePayload: function (payload, meta) {
+      applyRemotePanelState(payload, meta);
+    },
+    onStatus: function (status) {
+      if (status === "erro") {
+        console.warn("[SupabaseSync] Painel da 2a serie permaneceu em modo local.");
+      }
+    }
+  });
+
+  remoteDailySync = window.RelatorioSupabaseSync.createScopeSync({
+    scope: RH_SUPABASE_DAILY_SCOPE,
+    schoolSlug: "raimundo-herminio-de-melo",
+    classSlug: "relatos-gerais",
+    source: "herminio-alunos-2serie-readonly",
+    readOnly: true,
+    onRemotePayload: function (payload) {
+      applyRemoteDailyState(payload);
+    }
+  });
+
+  remotePanelSync.start().then(function (ready) {
+    if (!ready) return;
+    window.setTimeout(function () {
+      queueRemotePanelSave("bootstrap");
+    }, 900);
+  });
+  remoteDailySync.start();
 }
 
 function renderAll() {
