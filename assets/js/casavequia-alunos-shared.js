@@ -42,16 +42,21 @@
   let currentBoletimDiscipline = MAIN_DISCIPLINE;
   let remotePanelSync = null;
   let remoteDailySync = null;
+  let remoteSyncRetryTimer = null;
+  let remoteSyncRetryCount = 0;
   let applyingRemotePanelState = false;
   let state = loadState();
 
   renderDisciplineMenus();
   renderAll();
   setSaveStatus("Painel carregado com sucesso.");
-  initRemoteSync();
+  requestRemoteSyncInit(0);
 
   searchInput.addEventListener("input", renderTable);
   window.addEventListener("focus", renderAll);
+  window.addEventListener("load", function () {
+    requestRemoteSyncInit(0);
+  });
   window.addEventListener("storage", function (event) {
     if (event.key === SYNC_KEY || event.key === STORAGE_KEY) {
       if (event.key === STORAGE_KEY) {
@@ -59,6 +64,14 @@
       }
       renderAll();
     }
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState !== "hidden" || !remotePanelSync) return;
+    remotePanelSync.pushNow("force");
+  });
+  window.addEventListener("pagehide", function () {
+    if (!remotePanelSync) return;
+    remotePanelSync.pushNow("force");
   });
 
   document.getElementById("resetDataBtn").addEventListener("click", function () {
@@ -1179,8 +1192,30 @@
     remotePanelSync.schedulePush(reason || "panel-change");
   }
 
+  function requestRemoteSyncInit(delayMs) {
+    if (remotePanelSync && remoteDailySync) return;
+    if (remoteSyncRetryTimer) {
+      window.clearTimeout(remoteSyncRetryTimer);
+      remoteSyncRetryTimer = null;
+    }
+    remoteSyncRetryTimer = window.setTimeout(function () {
+      remoteSyncRetryTimer = null;
+      initRemoteSync();
+    }, typeof delayMs === "number" ? delayMs : 250);
+  }
+
   function initRemoteSync() {
-    if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return;
+    if (remotePanelSync && remoteDailySync) return;
+    if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) {
+      remoteSyncRetryCount += 1;
+      if (remoteSyncRetryCount <= 20) {
+        requestRemoteSyncInit(Math.min(3000, 150 * remoteSyncRetryCount));
+      } else {
+        console.warn("[SupabaseSync] Painel da Casavequia nao conseguiu iniciar o modo online.");
+      }
+      return;
+    }
+    remoteSyncRetryCount = 0;
 
     remotePanelSync = window.RelatorioSupabaseSync.createScopeSync({
       scope: PANEL_SCOPE,
