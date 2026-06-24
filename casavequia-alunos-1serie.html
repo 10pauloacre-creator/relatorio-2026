@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/casavequia-alunos.css">
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="assets/js/supabase-report-sync.js"></script>
 <title>Alunos - 1a Serie - Padre Carlos Casavequia</title>
 </head>
 <body>
@@ -51,6 +53,10 @@
       <input class="search-input" id="searchInput" type="search" placeholder="Buscar aluno por nome ou numero">
     </div>
     <div class="toolbar-right">
+      <div class="discipline-picker" id="tableDisciplinePicker">
+        <button class="ghost-btn discipline-btn" type="button" id="tableDisciplineBtn" data-toggle-discipline-menu="table">Disciplina</button>
+        <div class="discipline-menu" id="tableDisciplineMenu"></div>
+      </div>
       <button class="ghost-btn" type="button" id="copyClassSummaryBtn">Copiar resumo da turma</button>
       <button class="warning-btn" type="button" id="resetDataBtn">Restaurar modelo</button>
     </div>
@@ -59,8 +65,11 @@
   <section class="table-card">
     <div class="table-head">
       <div>
-        <h2>Tabela geral da turma</h2>
-        <p>Visao resumida com as notas finais dos 4 bimestres. Os detalhes de trabalhos, prova, faltas e observacoes continuam no perfil do aluno.</p>
+        <h2 id="tableTitle">Tabela geral da turma</h2>
+        <p id="tableDescription">Visao resumida com as notas finais dos 4 bimestres. Os detalhes de trabalhos, prova, faltas e observacoes continuam no perfil do aluno.</p>
+        <div class="table-head-actions">
+          <span class="mini-chip" id="tableDisciplineChip">Disciplina ativa: Lingua Portuguesa</span>
+        </div>
       </div>
       <div class="status-box" style="max-width:340px;background:rgba(26,58,42,.05);border-color:rgba(26,58,42,.10);color:var(--muted)">
         <strong>Colunas da tabela</strong>
@@ -116,7 +125,14 @@ window.CASAVEQUIA_ALUNOS_CONFIG = {
   schoolName: "E.E. Rural Pe. Carlos Casavequia",
   className: "1a Serie",
   turmaId: "t1",
+  classSlug: "1a-serie",
   periodLabel: "Ano letivo de 2026",
+  mainDiscipline: "Língua Portuguesa",
+  disciplines: [
+    { name: "Língua Portuguesa", shortLabel: "LP", aliases: ["L.P.", "LP", "Lingua Portuguesa"] },
+    { name: "Trilhas de Linguagens", shortLabel: "T. Ling.", aliases: ["T.Ling.", "T. Linguagens", "Trilhas Linguagens"] },
+    { name: "Trilhas de C. Humanas", shortLabel: "T. C. H.", aliases: ["T.C.H.", "T. C. Humanas", "Trilhas de Ciencias Humanas", "Trilhas de C.Humanas"] }
+  ],
   students: [
     { id: 1, numero: 2, nome: "Cleiton Silva Santana" },
     { id: 2, numero: 3, nome: "Daniel Henrique Rodrigues Galvao" },
