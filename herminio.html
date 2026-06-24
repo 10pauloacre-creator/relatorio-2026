@@ -16,7 +16,7 @@
 <script defer src="assets/js/supabase-report-sync.js"></script>
 <title>Relatório — R. Hermínio de Melo</title>
 <style>
-:root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--tl:#6c3483;--tlv:#e8daef;--tc:#0e7a6b;--tcv:#d1f2eb;--la:#c0570a;--lav:#fdebd0;--az:#1a5276;--og:#876020;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px}
+:root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--tl:#6c3483;--tlv:#e8daef;--tc:#0e7a6b;--tcv:#d1f2eb;--la:#c0570a;--lav:#fdebd0;--az:#1a5276;--og:#876020;--lp:#1f7a4d;--ing:#2563eb;--esp:#7c3aed;--plan-bg:#f8fafc;--plan-surface:#fff;--plan-dark:#0f172a;--plan-dark-2:#111827;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-height:100vh}
 .cab{background:linear-gradient(135deg,var(--vd),var(--vm) 60%,var(--vc));color:#fff;position:relative;overflow:hidden}
@@ -506,36 +506,48 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .lesson-item.st-sm{background:#f3f4f6!important;filter:grayscale(1);opacity:.55}
 .lesson-item.st-sm .lesson-title{color:#374151;text-decoration:line-through}
 .lesson-item.st-sm .lesson-num{background:#e5e7eb!important;color:#6b7280!important}
+.sh{display:flex;flex-direction:column;gap:4px;margin-bottom:18px}
+.sti{font-family:'DM Mono',monospace;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--la)}
+.sst{font-size:.84rem;color:var(--cm);line-height:1.5}
+.plan-head{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,.9fr);gap:18px;margin:0 auto 18px;padding:22px 24px;border-radius:20px;background:linear-gradient(135deg,#fffdf7,#f5f1e3 58%,#efe5c6);border:1px solid rgba(201,168,76,.28);box-shadow:0 10px 28px rgba(26,58,42,.08)}
+.plan-head-copy h2{font-family:'Playfair Display',serif;font-size:1.55rem;line-height:1.12;color:var(--vd);margin:0 0 8px}
+.plan-head-copy p{font-size:.89rem;line-height:1.7;color:var(--cm);margin:0}
+.plan-head-kicker{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:999px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.26);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8a6620;margin-bottom:12px}
+.plan-head-meta{display:flex;flex-wrap:wrap;align-content:flex-start;gap:10px}
+.plan-head-badge{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.7);border:1px solid rgba(26,58,42,.1);font-size:.78rem;font-weight:700;color:var(--vd);box-shadow:0 6px 18px rgba(26,58,42,.06)}
 .plano-wrapper{font-family:'Segoe UI',system-ui,sans-serif;max-width:1100px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(15,23,42,.08)}
 .plano-wrapper .header{background:#1e293b;color:#fff;padding:16px 24px}
 .plano-wrapper .header h1{margin:0;font-size:1.05rem;font-weight:700}
 .plano-wrapper .header p{margin:2px 0 0;font-size:.78rem;opacity:.75;line-height:1.45}
+.plan-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.plano-wrapper > .plan-meta{padding:0 24px 14px;background:#1e293b}
+.plan-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.16);font-size:.72rem;font-weight:700;color:#e5edf7}
 .main-tabs{display:flex;background:#334155;overflow-x:auto}
 .main-tab{padding:12px 20px;color:rgba(255,255,255,.75);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;font-size:.9rem;transition:all .2s;font-weight:600}
 .main-tab:hover{color:#fff;background:rgba(255,255,255,.1)}
 .main-tab.active{color:#fff;border-bottom-color:#38bdf8}
-.content{max-width:1100px;margin:0 auto;padding:16px;background:#f8fafc}
+.content{max-width:1100px;margin:0 auto;padding:16px;background:var(--plan-bg)}
 .page,.disc-panel,.bim-panel{display:none}
 .page.active,.disc-panel.active,.bim-panel.active{display:block}
 #rh-plan-clone-root{margin-bottom:20px}
 .rh-plan-legacy-hidden{display:none!important}
 .disc-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.disc-tab{padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;border:2px solid;transition:all .2s;background:#fff}
+.disc-tab{padding:8px 16px;border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:700;border:2px solid;transition:all .2s;background:#fff}
 .disc-tab.lp{border-color:var(--lp);color:var(--lp)}
 .disc-tab.lp.active{background:var(--lp);color:#fff}
-.disc-tab.ing{border-color:#2563eb;color:#2563eb}
-.disc-tab.ing.active{background:#2563eb;color:#fff}
-.disc-tab.esp{border-color:#7c3aed;color:#7c3aed}
-.disc-tab.esp.active{background:#7c3aed;color:#fff}
+.disc-tab.ing{border-color:var(--ing);color:var(--ing)}
+.disc-tab.ing.active{background:var(--ing);color:#fff}
+.disc-tab.esp{border-color:var(--esp);color:var(--esp)}
+.disc-tab.esp.active{background:var(--esp);color:#fff}
 .bim-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
 .bim-tab{padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.8rem;font-weight:600;background:#e2e8f0;color:#374151;transition:all .2s}
 .bim-tab.active.lp{background:var(--lp);color:#fff}
-.bim-tab.active.ing{background:#2563eb;color:#fff}
-.bim-tab.active.esp{background:#7c3aed;color:#fff}
+.bim-tab.active.ing{background:var(--ing);color:#fff}
+.bim-tab.active.esp{background:var(--esp);color:#fff}
 .bim-header{background:#fff;border-radius:8px 8px 0 0;padding:12px 16px;border-left:4px solid;margin-bottom:0;display:flex;align-items:center;gap:10px}
 .bim-header.lp{border-color:var(--lp)}
-.bim-header.ing{border-color:#2563eb}
-.bim-header.esp{border-color:#7c3aed}
+.bim-header.ing{border-color:var(--ing)}
+.bim-header.esp{border-color:var(--esp)}
 .bim-header h3{font-size:.95rem;margin:0}
 .bim-header .badge{font-size:.75rem;background:#f1f5f9;padding:2px 8px;border-radius:12px;color:#374151}
 .lesson-list{background:#fff;border-radius:0 0 8px 8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:16px}
@@ -544,12 +556,14 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .lesson-item:hover{background:#f8fafc}
 .lesson-num{font-size:.7rem;font-weight:700;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 .lp .lesson-num{background:#e8f5ee;color:var(--lp)}
-.ing .lesson-num{background:#dbeafe;color:#2563eb}
-.esp .lesson-num{background:#f3e8ff;color:#7c3aed}
+.ing .lesson-num{background:#dbeafe;color:var(--ing)}
+.esp .lesson-num{background:#f3e8ff;color:var(--esp)}
 .lesson-text,.lesson-content{flex:1;min-width:0}
 .lesson-title{font-size:.85rem;font-weight:600;color:#111827;line-height:1.4}
 .lesson-sub{font-size:.76rem;color:#374151;margin-top:2px;line-height:1.45}
 @media(max-width:680px){
+  .plan-head{grid-template-columns:1fr;padding:18px 16px}
+  .plan-head-copy h2{font-size:1.28rem}
   .plano-wrapper .header{padding:16px 18px}
   .content{padding:12px}
   .main-tab{padding:11px 16px;font-size:.84rem}
@@ -562,6 +576,44 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .pum-det{color:var(--cm);font-size:.78rem}
 body.modo-escuro #plano-ultima-mod{background:rgba(74,148,103,.12);border-color:rgba(74,148,103,.3);color:#c8e8d8}
 body.modo-escuro .pum-det{color:#8ab8a0}
+body.modo-escuro .sh .sti{color:#f0c977}
+body.modo-escuro .sh .sst{color:#aeb6c7}
+body.modo-escuro .plan-head{background:linear-gradient(135deg,#101927,#172235 58%,#1c2c40);border-color:rgba(148,163,184,.18);box-shadow:0 18px 36px rgba(0,0,0,.28)}
+body.modo-escuro .plan-head-copy h2{color:#f8fafc}
+body.modo-escuro .plan-head-copy p{color:#cbd5e1}
+body.modo-escuro .plan-head-kicker{background:rgba(240,201,119,.12);border-color:rgba(240,201,119,.24);color:#f5d788}
+body.modo-escuro .plan-head-badge{background:rgba(15,23,42,.78);border-color:rgba(148,163,184,.18);color:#e2e8f0}
+body.modo-escuro #rh-plan-clone-root{background:transparent!important}
+body.modo-escuro #rh-plan-clone-root .plano-wrapper{background:var(--plan-dark)!important;box-shadow:0 18px 40px rgba(0,0,0,.35)!important}
+body.modo-escuro #rh-plan-clone-root .header{background:#101827!important}
+body.modo-escuro #rh-plan-clone-root .header h1,body.modo-escuro #rh-plan-clone-root .header p{color:#f8fafc!important}
+body.modo-escuro #rh-plan-clone-root .plano-wrapper>.plan-meta{background:#101827!important}
+body.modo-escuro #rh-plan-clone-root .plan-pill{background:rgba(148,163,184,.14)!important;border-color:rgba(148,163,184,.18)!important;color:#dbe7f5!important}
+body.modo-escuro #rh-plan-clone-root .main-tabs{background:#172235!important}
+body.modo-escuro #rh-plan-clone-root .main-tab{background:transparent!important;color:#b8c4d6!important}
+body.modo-escuro #rh-plan-clone-root .main-tab:hover{background:rgba(255,255,255,.06)!important;color:#f8fafc!important}
+body.modo-escuro #rh-plan-clone-root .main-tab.active{background:#101827!important;color:#f8fafc!important;border-bottom-color:#38bdf8!important}
+body.modo-escuro #rh-plan-clone-root .content,body.modo-escuro #rh-plan-clone-root .page,body.modo-escuro #rh-plan-clone-root .disc-panel,body.modo-escuro #rh-plan-clone-root .bim-panel{background:var(--plan-dark-2)!important}
+body.modo-escuro #rh-plan-clone-root .disc-tab{background:#0f172a!important}
+body.modo-escuro #rh-plan-clone-root .disc-tab.lp{color:#9ae6b4!important;border-color:#2e8b57!important}
+body.modo-escuro #rh-plan-clone-root .disc-tab.lp.active{background:#185b39!important;color:#f8fafc!important;border-color:#2e8b57!important}
+body.modo-escuro #rh-plan-clone-root .disc-tab.ing{color:#93c5fd!important;border-color:#3b82f6!important}
+body.modo-escuro #rh-plan-clone-root .disc-tab.ing.active{background:#1d4ed8!important;color:#f8fafc!important;border-color:#3b82f6!important}
+body.modo-escuro #rh-plan-clone-root .disc-tab.esp{color:#d8b4fe!important;border-color:#8b5cf6!important}
+body.modo-escuro #rh-plan-clone-root .disc-tab.esp.active{background:#6d28d9!important;color:#f8fafc!important;border-color:#8b5cf6!important}
+body.modo-escuro #rh-plan-clone-root .bim-tab{background:#1e293b!important;color:#cbd5e1!important}
+body.modo-escuro #rh-plan-clone-root .bim-tab.active.lp{background:#185b39!important;color:#f8fafc!important}
+body.modo-escuro #rh-plan-clone-root .bim-tab.active.ing{background:#1d4ed8!important;color:#f8fafc!important}
+body.modo-escuro #rh-plan-clone-root .bim-tab.active.esp{background:#6d28d9!important;color:#f8fafc!important}
+body.modo-escuro #rh-plan-clone-root .bim-header{background:#111827!important}
+body.modo-escuro #rh-plan-clone-root .bim-header h3{color:#f8fafc!important}
+body.modo-escuro #rh-plan-clone-root .bim-header .badge{background:#1e293b!important;color:#cbd5e1!important}
+body.modo-escuro #rh-plan-clone-root .lesson-list{background:#0f172a!important;box-shadow:none!important}
+body.modo-escuro #rh-plan-clone-root .lesson-item{background:#0f172a!important;color:#e5e7eb!important;border-color:rgba(148,163,184,.12)!important}
+body.modo-escuro #rh-plan-clone-root .lesson-item:hover{background:#172033!important}
+body.modo-escuro #rh-plan-clone-root .lesson-title{color:#f8fafc!important}
+body.modo-escuro #rh-plan-clone-root .lesson-sub{color:#cbd5e1!important}
+body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!important;opacity:.75!important}
 /* ── LIVROS DIGITAIS ── */
 .liv-tabs{display:flex;gap:4px;margin-bottom:22px;border-bottom:2px solid var(--cl);padding-bottom:0}
 .liv-tab{padding:9px 20px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:600;color:var(--cm);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap}
@@ -3215,7 +3267,255 @@ body.modo-escuro .pum-det{color:#8ab8a0}
     <div class="sti">&#128203; Plano Anual</div>
     <div class="sst">Conteúdos por disciplina e por bimestre</div>
   </div>
+  <div class="plan-head">
+    <div class="plan-head-copy">
+      <div class="plan-head-kicker">&#10022; CabeÃ§alho interativo do planejamento</div>
+      <h2>Plano de Aula Anual da Raimundo HermÃ­nio</h2>
+      <p>Visualize os planejamentos do 8Âº/9Âº ano, da 1Âª sÃ©rie e da 2Âª/3Âª sÃ©rie com separaÃ§Ã£o por disciplina e por bimestre, mantendo o mesmo padrÃ£o visual em qualquer aparelho.</p>
+    </div>
+    <div class="plan-head-meta">
+      <span class="plan-head-badge">3 frentes de turma</span>
+      <span class="plan-head-badge">4 bimestres por disciplina</span>
+      <span class="plan-head-badge">Status de planejamento e aplicaÃ§Ã£o</span>
+      <span class="plan-head-badge">Tema claro e escuro revisados</span>
+    </div>
+  </div>
   <div id="rh-plan-clone-root"></div>
+  <div class="plano-wrapper">
+    <div class="header">
+      <h3>8º/9º Ano — Plano Anual por Disciplina</h3>
+      <p>Planejamento organizado por disciplina e bimestre para a Escola Raimundo Hermínio de Melo.</p>
+      <div class="plan-meta">
+        <span class="plan-pill">Turma: 8º/9º Ano</span>
+        <span class="plan-pill">Disciplinas: Língua Portuguesa e Língua Inglesa</span>
+        <span class="plan-pill">Cargas: LP 30h/aula · Inglês 10h/aula</span>
+        <span class="plan-pill">Organização: por bimestre</span>
+      </div>
+    </div>
+
+    <div class="disc-tabs">
+      <div class="disc-tab lp active" onclick="rhPlanShowDisc('rh-d89lp1',this)">Língua Portuguesa</div>
+      <div class="disc-tab ing" onclick="rhPlanShowDisc('rh-d89ing1',this)">Língua Inglesa</div>
+    </div>
+
+    <div class="disc-panel active" id="rh-d89lp1">
+      <div class="bim-tabs">
+        <div class="bim-tab lp active" onclick="rhPlanShowBim('rh-d89lp1-b1',this)">1º Bimestre</div>
+        <div class="bim-tab lp" onclick="rhPlanShowBim('rh-d89lp1-b2',this)">2º Bimestre</div>
+        <div class="bim-tab lp" onclick="rhPlanShowBim('rh-d89lp1-b3',this)">3º Bimestre</div>
+        <div class="bim-tab lp" onclick="rhPlanShowBim('rh-d89lp1-b4',this)">4º Bimestre</div>
+      </div>
+
+      <div class="bim-panel active" id="rh-d89lp1-b1">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Apresentação da disciplina, diagnóstico de leitura e escrita</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Oralidade: fala espontânea e fala planejada</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Leitura expressiva de textos literários</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Leitura expressiva de textos literários — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Variações linguísticas: regional, social, histórica e situacional</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Preconceito linguístico e respeito aos diferentes modos de falar</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Textos literários: conto, crônica, poema e narrativa curta</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Elementos da narrativa: enredo, personagens, tempo, espaço e narrador</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Texto dramático: estrutura, fala das personagens e rubricas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Texto dramático — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura: antecipação, inferência e levantamento de hipóteses</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Informações explícitas e implícitas no texto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Sentido de palavras e expressões pelo contexto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Valores sociais, culturais e humanos em textos literários</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Comparação de textos sobre o mesmo tema</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Textos jornalísticos: notícia, reportagem e entrevista</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Fato central, circunstâncias e tema em notícias</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Diferença entre fato e opinião</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Fake news e verificação de informações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">21</div><div class="lesson-content"><div class="lesson-title">Liberdade de expressão e discurso de ódio</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">22</div><div class="lesson-content"><div class="lesson-title">Argumentação e contra-argumentação em debates</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">23</div><div class="lesson-content"><div class="lesson-title">Tese, opinião e posicionamento explícito</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">24</div><div class="lesson-content"><div class="lesson-title">Recursos persuasivos em textos argumentativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">25</div><div class="lesson-content"><div class="lesson-title">Modalização em textos jornalísticos e argumentativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">26</div><div class="lesson-content"><div class="lesson-title">Pontuação e efeitos de sentido</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">27</div><div class="lesson-content"><div class="lesson-title">Coesão textual: pronomes, substituições e conectores</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">28</div><div class="lesson-content"><div class="lesson-title">Produção textual: notícia ou relato jornalístico</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">29</div><div class="lesson-content"><div class="lesson-title">Revisão, reescrita e socialização dos textos produzidos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">30</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d89lp1-b2">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Retomada do bimestre anterior e leitura diagnóstica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Linguagem oral e linguagem escrita: diferenças e usos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Linguagem oral e linguagem escrita — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Texto dramático: linguagem teatral, cena e diálogo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Texto dramático em teatro, televisão e cinema</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Oralização de textos literários: entonação, ritmo e pausa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Oralização de textos literários — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Recursos expressivos em poemas: rima, ritmo, aliteração e sonoridade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Figuras de linguagem: comparação, metáfora e personificação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Figuras de linguagem — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Tirinhas, charges, memes e gifs: humor, ironia e crítica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Tirinhas, charges, memes e gifs — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Intertextualidade e diálogo entre textos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Intertextualidade — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Textos do cotidiano: avisos, convites, listas, agendas e calendários</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Leitura e compreensão de textos do cotidiano</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Textos injuntivos e instrucionais: receitas, regras e instruções</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Textos injuntivos e instrucionais — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Intenção do autor e finalidade do texto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Dados e informações em diferentes fontes</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">21</div><div class="lesson-content"><div class="lesson-title">Recursos persuasivos em textos argumentativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">22</div><div class="lesson-content"><div class="lesson-title">Espaços de participação do leitor em jornais, sites e redes sociais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">23</div><div class="lesson-content"><div class="lesson-title">Concordância nominal e verbal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">24</div><div class="lesson-content"><div class="lesson-title">Concordância nominal e verbal — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">25</div><div class="lesson-content"><div class="lesson-title">Verbos de ligação e predicativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">26</div><div class="lesson-content"><div class="lesson-title">Conjunções e locuções conjuntivas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">27</div><div class="lesson-content"><div class="lesson-title">Orações adjetivas restritivas e explicativas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">28</div><div class="lesson-content"><div class="lesson-title">Produção de conto, crônica ou miniconto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">29</div><div class="lesson-content"><div class="lesson-title">Revisão, edição e reescrita do texto literário</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">30</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d89lp1-b3">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Retomada de leitura e interpretação textual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Campo jornalístico-midiático: gêneros, mídias e cultura digital</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Notícia, reportagem, fotorreportagem e postagem em rede social</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Estrutura da notícia: título, lide, corpo do texto e fonte</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Estrutura da notícia — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Reportagem: aprofundamento do fato e pesquisa de informações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Reportagem — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Comparação de informações sobre o mesmo fato</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Confiabilidade das fontes e checagem de informações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Elementos visuais em textos jornalísticos: imagem, ângulo, cor e foco</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Elementos sonoros e audiovisuais em reportagens e vídeos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Efeitos de sentido em textos multissemióticos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Peças publicitárias: público-alvo, linguagem e intenção</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Recursos estilísticos e semióticos em textos publicitários</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Recursos persuasivos em anúncios e propagandas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Fato, opinião e posicionamento em textos jornalísticos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Mecanismos de progressão temática</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Coesão textual: retomadas, substituições e conectores</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Termos constitutivos da oração</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Sujeito e predicado</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">21</div><div class="lesson-content"><div class="lesson-title">Transitividade verbal e complementos verbais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">22</div><div class="lesson-content"><div class="lesson-title">Período simples e período composto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">23</div><div class="lesson-content"><div class="lesson-title">Orações coordenadas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">24</div><div class="lesson-content"><div class="lesson-title">Orações subordinadas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">25</div><div class="lesson-content"><div class="lesson-title">Pontuação no período composto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">26</div><div class="lesson-content"><div class="lesson-title">Discurso direto, indireto e indireto livre</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">27</div><div class="lesson-content"><div class="lesson-title">Paráfrase e citação em textos jornalísticos e literários</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">28</div><div class="lesson-content"><div class="lesson-title">Planejamento de reportagem impressa ou digital</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">29</div><div class="lesson-content"><div class="lesson-title">Produção e revisão de reportagem</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">30</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d89lp1-b4">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Retomada de argumentação e leitura crítica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Textos de opinião: artigo de opinião, editorial, carta de leitor e comentário</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Textos de opinião — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Tese, opinião, posicionamento explícito e implícito</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Argumentos e contra-argumentos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Argumentos e contra-argumentos — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Tipos de argumento: exemplificação, causa, consequência, autoridade e comparação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Sustentação, refutação e negociação em textos argumentativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Coerência na argumentação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Coesão, coerência e progressão temática</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Conectores argumentativos: adição, oposição, conclusão e explicação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Modalização epistêmica: certeza, dúvida e possibilidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Marcas linguísticas de opinião</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Pontuação em textos argumentativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Verbos no modo indicativo: presente, passado e futuro</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Regência nominal e verbal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Colocação pronominal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Morfossintaxe aplicada à produção textual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Textos legais e normativos: estrutura e finalidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Cartas abertas, abaixo-assinados e petições online</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">21</div><div class="lesson-content"><div class="lesson-title">Textos reivindicatórios e propositivos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">22</div><div class="lesson-content"><div class="lesson-title">Textos reivindicatórios e propositivos — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">23</div><div class="lesson-content"><div class="lesson-title">Planejamento de artigo de opinião</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">24</div><div class="lesson-content"><div class="lesson-title">Produção de artigo de opinião</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">25</div><div class="lesson-content"><div class="lesson-title">Produção de artigo de opinião — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">26</div><div class="lesson-content"><div class="lesson-title">Revisão e edição do artigo de opinião</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">27</div><div class="lesson-content"><div class="lesson-title">Produção de textos jornalísticos multimidiáticos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">28</div><div class="lesson-content"><div class="lesson-title">Apresentação oral de posicionamentos sobre temas controversos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">29</div><div class="lesson-content"><div class="lesson-title">Revisão geral dos conteúdos do ano</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">30</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disc-panel" id="rh-d89ing1">
+      <div class="bim-tabs">
+        <div class="bim-tab ing active" onclick="rhPlanShowBim('rh-d89ing1-b1',this)">1º Bimestre</div>
+        <div class="bim-tab ing" onclick="rhPlanShowBim('rh-d89ing1-b2',this)">2º Bimestre</div>
+        <div class="bim-tab ing" onclick="rhPlanShowBim('rh-d89ing1-b3',this)">3º Bimestre</div>
+        <div class="bim-tab ing" onclick="rhPlanShowBim('rh-d89ing1-b4',this)">4º Bimestre</div>
+      </div>
+
+      <div class="bim-panel active" id="rh-d89ing1-b1">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">A Língua Inglesa no mundo: expansão, culturas e importância global</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Repertório artístico-cultural em Língua Inglesa: música, cinema, literatura e festividades</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Leitura de textos informativos e multimodais em inglês</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Planos futuros com <em>going to</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Previsões futuras com <em>will</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Futuro e planos pessoais/profissionais — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title"><em>If clauses</em>: situações reais e prováveis</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Argumentação e persuasão em textos publicitários</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Produção de <em>slogan</em> ou anúncio curto em inglês</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d89ing1-b2">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Expressões, gestos e comportamentos em diferentes culturas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Culturas indígenas, cultura amazônica e contato intercultural</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Revisão de presente simples e passado simples</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title"><em>Relative clauses</em>: uso de <em>who</em>, <em>which</em>, <em>that</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title"><em>Relative clauses</em> — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Patrimônio artístico-literário em Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">A importância do inglês para ciência, economia e política</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Estratégias de apresentação oral: notas, gráficos e tabelas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Produção escrita: planejamento, rascunho, revisão e edição final</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d89ing1-b3">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Variação linguística e comunicação entre culturas diferentes</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Adjetivos em inglês: descrição de pessoas, lugares e objetos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Grau comparativo dos adjetivos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Grau superlativo dos adjetivos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Comparativo e superlativo — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Formação de palavras: prefixos e sufixos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Dedução de palavras desconhecidas em textos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Verbos modais: <em>may</em>, <em>might</em>, <em>should</em>, <em>must</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Temas sociais em inglês: meio ambiente, violência e comunidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d89ing1-b4">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Inglês, identidade e comunicação no mundo globalizado</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Vocabulário: alimentos, lugares públicos e espaços da cidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Substantivos contáveis e incontáveis</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title"><em>There is / There are</em>: existência e quantidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title"><em>How much / How many</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Quantificadores: <em>some</em>, <em>any</em>, <em>many</em>, <em>much</em>, <em>few</em>, <em>little</em>, <em>enough</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Quantificadores — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Gêneros digitais: redes sociais, e-mails, fóruns, memes e internetês</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Leitura crítica: opinião, argumento, contra-argumento e revisão textual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="plano-wrapper">
     <div class="header">
       <h3>1ª Série — Plano Anual por Disciplina</h3>
@@ -5513,11 +5813,13 @@ function rhBuildPlanReplica() {
   var root = document.getElementById('rh-plan-clone-root');
   if (!sec || !root || root.dataset.ready === '1') return;
 
-  var legacyWrappers = Array.from(sec.querySelectorAll(':scope > .plano-wrapper'));
+  var legacyWrappers = Array.from(sec.children).filter(function(node) {
+    return node && node.classList && node.classList.contains('plano-wrapper');
+  });
   if (!legacyWrappers.length) return;
 
   var series = legacyWrappers.map(function(wrapper, index) {
-    var title = wrapper.querySelector('.header h3');
+    var title = wrapper.querySelector('.header h3, .header h2, .header h1');
     var serie = title ? title.textContent.split('—')[0].trim() : (index === 0 ? '1ª Série' : '2ª Série');
     var discs = Array.from(wrapper.querySelectorAll('.disc-tabs .disc-tab')).map(function(tab) {
       var did = rhPlanExtractId(tab);
@@ -5546,13 +5848,24 @@ function rhBuildPlanReplica() {
         label: tab.textContent.trim() || rhPlanDiscLabel(cls),
         bimestres: bimestres
       };
+    }).filter(function(disc) {
+      return disc.id && disc.bimestres.length;
     });
     return { serie: serie, discs: discs };
+  }).filter(function(serie) {
+    return serie.discs.length;
   });
+
+  if (!series.length) {
+    root.innerHTML = '<div class="plano-wrapper"><div class="content"><div class="sem"><span class="ic">&#128218;</span><div>Nenhum plano anual disponÃ­vel para exibiÃ§Ã£o.</div></div></div></div>';
+    root.dataset.ready = '1';
+    return;
+  }
 
   var html = '<div class="plano-wrapper">'
     + '<div class="header"><h1>&#128218; Plano de Aulas Anual 2026 — Escola Raimundo Hermínio de Melo</h1>'
     + '<p>Estrutura, formatação e layout alinhados ao modelo da Escola Padre Carlos Casavequia, com os conteúdos próprios da Raimundo Hermínio.</p></div>'
+    + '<div class="plan-meta"><span class="plan-pill">Turmas: 8Âº/9Âº Ano, 1Âª SÃ©rie e 2Âª/3Âª SÃ©rie</span><span class="plan-pill">Visual sincronizado para claro e escuro</span><span class="plan-pill">Acompanhamento por aula e por bimestre</span></div>'
     + '<div id="plano-ultima-mod"><span class="pum-ic">&#128336;</span><span class="pum-txt"></span></div>'
     + '<div class="main-tabs">'
     + series.map(function(s, idx) {
