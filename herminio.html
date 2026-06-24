@@ -12,6 +12,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="assets/js/supabase-report-sync.js"></script>
 <title>Relatório — R. Hermínio de Melo</title>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--tl:#6c3483;--tlv:#e8daef;--tc:#0e7a6b;--tcv:#d1f2eb;--la:#c0570a;--lav:#fdebd0;--az:#1a5276;--og:#876020;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px}
@@ -3962,6 +3964,10 @@ var _rhSeqStatus = JSON.parse(localStorage.getItem('rh_seq_status') || '{}');
 var _rhPresencaCliques = JSON.parse(localStorage.getItem('rh_presenca_cliques') || '{}');
 var _rhAtividadeCliques = JSON.parse(localStorage.getItem('rh_atividade_cliques') || '{}');
 const RH_ALUNOS_SYNC_KEY = 'rh_alunos_sync_v1';
+const RH_SUPABASE_DAILY_SCOPE = 'herminio:daily:shared-v1';
+const RH_DAILY_LOCAL_TS_KEY = 'rh_daily_sync_local_ts';
+var _rhRemoteDailySync = null;
+var _rhAplicandoSyncRemoto = false;
 
 const RH_MESES = {
   Jan: 0, Fev: 1, Mar: 2, Abr: 3, Mai: 4, Jun: 5,
@@ -4056,11 +4062,14 @@ function addDiasRH(data, dias) {
 }
 
 function rhSalvarCliques(tipo) {
+  localStorage.setItem(RH_DAILY_LOCAL_TS_KEY, new Date().toISOString());
   if (tipo === 'presenca') {
     localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));
+    rhAgendarSyncRemoto('presenca');
     return;
   }
   localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));
+  rhAgendarSyncRemoto('atividade');
 }
 
 function rhExtrairTurmaDoTitulo(txt) {
@@ -4412,6 +4421,79 @@ function rhMontarResumoAlunosSync() {
 
 function rhSincronizarResumoAlunos() {
   localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(rhMontarResumoAlunosSync()));
+}
+
+function rhMontarPayloadSyncRemoto() {
+  return {
+    localUpdatedAt: localStorage.getItem(RH_DAILY_LOCAL_TS_KEY) || new Date().toISOString(),
+    presencaCliques: _rhPresencaCliques,
+    atividadeCliques: _rhAtividadeCliques,
+    alunosSync: rhMontarResumoAlunosSync()
+  };
+}
+
+function rhAplicarSyncRemoto(payload, meta) {
+  if (!payload || typeof payload !== 'object') return;
+  var localStamp = Date.parse(localStorage.getItem(RH_DAILY_LOCAL_TS_KEY) || '') || 0;
+  var remoteStamp = Date.parse((payload && payload.localUpdatedAt) || (meta && meta.updatedAt) || '') || 0;
+  if (localStamp && remoteStamp && localStamp > remoteStamp) {
+    rhAgendarSyncRemoto('keep-local');
+    return;
+  }
+  _rhAplicandoSyncRemoto = true;
+
+  _rhPresencaCliques = payload.presencaCliques && typeof payload.presencaCliques === 'object'
+    ? payload.presencaCliques
+    : {};
+  _rhAtividadeCliques = payload.atividadeCliques && typeof payload.atividadeCliques === 'object'
+    ? payload.atividadeCliques
+    : {};
+
+  localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));
+  localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));
+  localStorage.setItem(RH_DAILY_LOCAL_TS_KEY, payload.localUpdatedAt || (meta && meta.updatedAt) || new Date().toISOString());
+  localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(payload.alunosSync || rhMontarResumoAlunosSync()));
+
+  rhRenderPresencaInterativa();
+  rhRenderAtividadeInterativa();
+  rhSincronizarResumoAlunos();
+
+  _rhAplicandoSyncRemoto = false;
+}
+
+function rhAgendarSyncRemoto(reason) {
+  if (_rhAplicandoSyncRemoto || !_rhRemoteDailySync) return;
+  _rhRemoteDailySync.schedulePush(reason || 'daily-change');
+}
+
+function rhIniciarSyncRemoto() {
+  if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return;
+
+  _rhRemoteDailySync = window.RelatorioSupabaseSync.createScopeSync({
+    scope: RH_SUPABASE_DAILY_SCOPE,
+    schoolSlug: 'raimundo-herminio-de-melo',
+    classSlug: 'relatos-gerais',
+    source: 'herminio-html',
+    debounceMs: 550,
+    getLocalPayload: function () {
+      return rhMontarPayloadSyncRemoto();
+    },
+    onRemotePayload: function (payload, meta) {
+      rhAplicarSyncRemoto(payload, meta);
+    },
+    onStatus: function (status) {
+      if (status === 'erro') {
+        console.warn('[SupabaseSync] Raimundo Herminio permaneceu em modo local.');
+      }
+    }
+  });
+
+  _rhRemoteDailySync.start().then(function(ready) {
+    if (!ready) return;
+    window.setTimeout(function() {
+      rhAgendarSyncRemoto('bootstrap');
+    }, 900);
+  });
 }
 
 function rhProximoEstado(valorAtual) {
@@ -5620,6 +5702,7 @@ document.addEventListener('DOMContentLoaded', function() {
   renderAtividadesRH();
   rhSincronizarResumoAlunos();
   rhRefreshHeroStats();
+  rhIniciarSyncRemoto();
 });
 
 document.addEventListener('click', function(e) {
