@@ -16,7 +16,7 @@
 <script defer src="assets/js/supabase-report-sync.js"></script>
 <title>Relatório — R. Hermínio de Melo</title>
 <style>
-:root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--tl:#6c3483;--tlv:#e8daef;--tc:#0e7a6b;--tcv:#d1f2eb;--la:#c0570a;--lav:#fdebd0;--az:#1a5276;--og:#876020;--lp:#1f7a4d;--ing:#2563eb;--esp:#7c3aed;--plan-bg:#f8fafc;--plan-surface:#fff;--plan-dark:#0f172a;--plan-dark-2:#111827;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px}
+:root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--tl:#6c3483;--tlv:#e8daef;--tc:#0e7a6b;--tcv:#d1f2eb;--la:#c0570a;--lav:#fdebd0;--az:#1a5276;--og:#876020;--lp:#1f7a4d;--ing:#2563eb;--esp:#7c3aed;--art:#d97706;--plan-bg:#f8fafc;--plan-surface:#fff;--plan-dark:#0f172a;--plan-dark-2:#111827;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-height:100vh}
 .cab{background:linear-gradient(135deg,var(--vd),var(--vm) 60%,var(--vc));color:#fff;position:relative;overflow:hidden}
@@ -539,15 +539,19 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .disc-tab.ing.active{background:var(--ing);color:#fff}
 .disc-tab.esp{border-color:var(--esp);color:var(--esp)}
 .disc-tab.esp.active{background:var(--esp);color:#fff}
+.disc-tab.art{border-color:var(--art);color:var(--art)}
+.disc-tab.art.active{background:var(--art);color:#fff}
 .bim-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
 .bim-tab{padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.8rem;font-weight:600;background:#e2e8f0;color:#374151;transition:all .2s}
 .bim-tab.active.lp{background:var(--lp);color:#fff}
 .bim-tab.active.ing{background:var(--ing);color:#fff}
 .bim-tab.active.esp{background:var(--esp);color:#fff}
+.bim-tab.active.art{background:var(--art);color:#fff}
 .bim-header{background:#fff;border-radius:8px 8px 0 0;padding:12px 16px;border-left:4px solid;margin-bottom:0;display:flex;align-items:center;gap:10px}
 .bim-header.lp{border-color:var(--lp)}
 .bim-header.ing{border-color:var(--ing)}
 .bim-header.esp{border-color:var(--esp)}
+.bim-header.art{border-color:var(--art)}
 .bim-header h3{font-size:.95rem;margin:0}
 .bim-header .badge{font-size:.75rem;background:#f1f5f9;padding:2px 8px;border-radius:12px;color:#374151}
 .lesson-list{background:#fff;border-radius:0 0 8px 8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:16px}
@@ -558,6 +562,7 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .lp .lesson-num{background:#e8f5ee;color:var(--lp)}
 .ing .lesson-num{background:#dbeafe;color:var(--ing)}
 .esp .lesson-num{background:#f3e8ff;color:var(--esp)}
+.art .lesson-num{background:#ffedd5;color:var(--art)}
 .lesson-text,.lesson-content{flex:1;min-width:0}
 .lesson-title{font-size:.85rem;font-weight:600;color:#111827;line-height:1.4}
 .lesson-sub{font-size:.76rem;color:#374151;margin-top:2px;line-height:1.45}
@@ -601,10 +606,13 @@ body.modo-escuro #rh-plan-clone-root .disc-tab.ing{color:#93c5fd!important;borde
 body.modo-escuro #rh-plan-clone-root .disc-tab.ing.active{background:#1d4ed8!important;color:#f8fafc!important;border-color:#3b82f6!important}
 body.modo-escuro #rh-plan-clone-root .disc-tab.esp{color:#d8b4fe!important;border-color:#8b5cf6!important}
 body.modo-escuro #rh-plan-clone-root .disc-tab.esp.active{background:#6d28d9!important;color:#f8fafc!important;border-color:#8b5cf6!important}
+body.modo-escuro #rh-plan-clone-root .disc-tab.art{color:#fdba74!important;border-color:#f59e0b!important}
+body.modo-escuro #rh-plan-clone-root .disc-tab.art.active{background:#b45309!important;color:#f8fafc!important;border-color:#f59e0b!important}
 body.modo-escuro #rh-plan-clone-root .bim-tab{background:#1e293b!important;color:#cbd5e1!important}
 body.modo-escuro #rh-plan-clone-root .bim-tab.active.lp{background:#185b39!important;color:#f8fafc!important}
 body.modo-escuro #rh-plan-clone-root .bim-tab.active.ing{background:#1d4ed8!important;color:#f8fafc!important}
 body.modo-escuro #rh-plan-clone-root .bim-tab.active.esp{background:#6d28d9!important;color:#f8fafc!important}
+body.modo-escuro #rh-plan-clone-root .bim-tab.active.art{background:#b45309!important;color:#f8fafc!important}
 body.modo-escuro #rh-plan-clone-root .bim-header{background:#111827!important}
 body.modo-escuro #rh-plan-clone-root .bim-header h3{color:#f8fafc!important}
 body.modo-escuro #rh-plan-clone-root .bim-header .badge{background:#1e293b!important;color:#cbd5e1!important}
@@ -3740,8 +3748,8 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
       <p>Planejamento organizado por disciplina e bimestre para a Escola Raimundo Hermínio de Melo.</p>
       <div class="plan-meta">
         <span class="plan-pill">Turma: 8º/9º Ano</span>
-        <span class="plan-pill">Disciplinas: Língua Portuguesa, Língua Inglesa e Língua Espanhola</span>
-        <span class="plan-pill">Cargas: LP 40h/aula · Inglês 10h/aula · Espanhol 10h/aula</span>
+        <span class="plan-pill">Disciplinas: Língua Portuguesa, Língua Inglesa, Língua Espanhola e Arte</span>
+        <span class="plan-pill">Cargas: LP 40h/aula · Inglês 10h/aula · Espanhol 10h/aula · Arte 10h/aula</span>
         <span class="plan-pill">Organização: por bimestre</span>
       </div>
     </div>
@@ -3750,6 +3758,7 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
       <div class="disc-tab lp active" onclick="rhPlanShowDisc('rh-d89lp1',this)">Língua Portuguesa</div>
       <div class="disc-tab ing" onclick="rhPlanShowDisc('rh-d89ing1',this)">Língua Inglesa</div>
       <div class="disc-tab esp" onclick="rhPlanShowDisc('rh-d89esp1',this)">Língua Espanhola</div>
+      <div class="disc-tab art" onclick="rhPlanShowDisc('rh-d89art1',this)">Arte</div>
     </div>
 
     <div class="disc-panel active" id="rh-d89lp1">
@@ -3762,44 +3771,44 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
 
       <div class="bim-panel active" id="rh-d89lp1-b1">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Apresentação da disciplina e diagnóstico de leitura</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Diagnóstico de escrita e interpretação textual</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Oralidade: fala espontânea e fala planejada</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Situações comunicativas formais e informais</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Leitura expressiva de textos literários</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Leitura expressiva de textos literários — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Ritmo, pausa, entonação e fluência leitora</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Variações linguísticas: regional, social e histórica</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Variações linguísticas — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Preconceito linguístico e respeito aos diferentes modos de falar</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Textos literários: conto, crônica, poema e narrativa curta</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Elementos da narrativa: enredo, personagens, tempo e espaço</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Elementos da narrativa: foco narrativo e tipos de narrador</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Texto dramático: estrutura, falas e rubricas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Texto dramático — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Leitura de textos literários com valores sociais e culturais</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Valores sociais, culturais e humanos em textos literários</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura: antecipação e levantamento de hipóteses</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura: inferência e validação de hipóteses</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Informações explícitas e implícitas no texto</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">21</div><div class="lesson-content"><div class="lesson-title">Sentido de palavras e expressões pelo contexto</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">22</div><div class="lesson-content"><div class="lesson-title">Comparação de textos sobre o mesmo tema</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">23</div><div class="lesson-content"><div class="lesson-title">Diferenças e semelhanças no tratamento de uma informação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">24</div><div class="lesson-content"><div class="lesson-title">Textos jornalísticos: notícia, reportagem e entrevista</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">25</div><div class="lesson-content"><div class="lesson-title">Fato central, circunstâncias e tema em notícias</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">26</div><div class="lesson-content"><div class="lesson-title">Diferença entre fato e opinião</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">27</div><div class="lesson-content"><div class="lesson-title">Fake news e verificação de informações</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">28</div><div class="lesson-content"><div class="lesson-title">Checagem de fontes: autoria, data, veículo e confiabilidade</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">29</div><div class="lesson-content"><div class="lesson-title">Liberdade de expressão e discurso de ódio</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">30</div><div class="lesson-content"><div class="lesson-title">Argumentação e contra-argumentação em debates</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">31</div><div class="lesson-content"><div class="lesson-title">Tese, opinião e posicionamento explícito</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">32</div><div class="lesson-content"><div class="lesson-title">Recursos persuasivos em textos argumentativos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">33</div><div class="lesson-content"><div class="lesson-title">Modalização em textos jornalísticos e argumentativos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">34</div><div class="lesson-content"><div class="lesson-title">Pontuação e efeitos de sentido</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">35</div><div class="lesson-content"><div class="lesson-title">Coesão textual: pronomes, substituições e conectores</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">36</div><div class="lesson-content"><div class="lesson-title">Discurso direto, indireto e indireto livre</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">37</div><div class="lesson-content"><div class="lesson-title">Produção textual: notícia ou relato jornalístico</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">38</div><div class="lesson-content"><div class="lesson-title">Revisão e reescrita da produção textual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Apresentação da disciplina e diagnóstico de leitura e escrita</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Linguagem oral em diferentes situações comunicativas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Fala planejada e fala espontânea</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Planejamento de textos orais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Planejamento de textos orais — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Produção de textos jornalísticos orais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Produção de textos jornalísticos orais — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Modulação da voz, entonação, ritmo e intensidade na fala</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Postura corporal, gestualidade e expressão facial na comunicação oral</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Planejamento coletivo de debate</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Planejamento coletivo de debate — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Regras de participação em debate regrado</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Levantamento de informações para sustentar posicionamento</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Seleção de argumentos para debate</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Estratégias de convencimento em debate</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Participação ética, crítica e respeitosa em debates</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Ideias divergentes e respeito ao posicionamento do outro</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Textos jornalísticos: notícia, reportagem, fotorreportagem e entrevista</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Identificação do fato central em notícias</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Circunstâncias e decorrências do fato noticiado</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">21</div><div class="lesson-content"><div class="lesson-title">Reportagem e fotorreportagem: tema e perspectiva de abordagem</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">22</div><div class="lesson-content"><div class="lesson-title">Entrevista: tema, subtemas, explicações e teses defendidas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">23</div><div class="lesson-content"><div class="lesson-title">Tirinhas, charges, memes e gifs: crítica, ironia e humor</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">24</div><div class="lesson-content"><div class="lesson-title">Textos de opinião: artigo de opinião e editorial</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">25</div><div class="lesson-content"><div class="lesson-title">Textos de opinião: carta de leitor, comentário e post de rede social</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">26</div><div class="lesson-content"><div class="lesson-title">Posicionamento crítico, ético e fundamentado diante de fatos e opiniões</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">27</div><div class="lesson-content"><div class="lesson-title">Relações entre partes do texto: encadeamento lógico</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">28</div><div class="lesson-content"><div class="lesson-title">Relações entre partes do texto: causa e consequência</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">29</div><div class="lesson-content"><div class="lesson-title">Relações entre partes do texto: fato e opinião</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">30</div><div class="lesson-content"><div class="lesson-title">Relações entre partes do texto: proposição e argumento</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">31</div><div class="lesson-content"><div class="lesson-title">Formas de composição da notícia</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">32</div><div class="lesson-content"><div class="lesson-title">Formas de composição da reportagem</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">33</div><div class="lesson-content"><div class="lesson-title">Formas de composição da entrevista</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">34</div><div class="lesson-content"><div class="lesson-title">Formas de composição do artigo de opinião e editorial</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">35</div><div class="lesson-content"><div class="lesson-title">Coesão e coerência em textos argumentativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">36</div><div class="lesson-content"><div class="lesson-title">Progressão temática em textos argumentativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">37</div><div class="lesson-content"><div class="lesson-title">Operadores argumentativos: concordância, discordância e ponto de vista</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">38</div><div class="lesson-content"><div class="lesson-title">Produção de texto jornalístico escrito</div></div></div>
           <div class="lesson-item"><div class="lesson-num">39</div><div class="lesson-content"><div class="lesson-title">Revisão geral dos conteúdos do bimestre</div></div></div>
           <div class="lesson-item"><div class="lesson-num">40</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
         </div>
@@ -3808,43 +3817,43 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
       <div class="bim-panel" id="rh-d89lp1-b2">
         <div class="lesson-list">
           <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Retomada do bimestre anterior e leitura diagnóstica</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Linguagem oral e linguagem escrita</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Linguagem oral e linguagem escrita — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Oralidade em debates, entrevistas e apresentações</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Planejamento de fala pública</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Escuta ativa e posicionamento diante da fala do outro</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Texto dramático: linguagem teatral e cena</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Texto dramático em teatro, televisão e cinema</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Leitura dramática: entonação, gestos e expressividade</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Oralização de textos literários — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Poema: estrutura, verso, estrofe e ritmo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Poema: rima, sonoridade e musicalidade</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Figuras de linguagem: comparação e metáfora</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Figuras de linguagem: personificação e hipérbole</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Figuras de linguagem: ironia, antítese e paradoxo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Figuras de linguagem — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Denotação e conotação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Efeitos de sentido em textos poéticos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Tirinhas, charges, memes e gifs: humor e crítica</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Tirinhas, charges, memes e gifs — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">21</div><div class="lesson-content"><div class="lesson-title">Linguagem verbal e não verbal</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">22</div><div class="lesson-content"><div class="lesson-title">Textos multissemióticos: imagem, cor, foco e ângulo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">23</div><div class="lesson-content"><div class="lesson-title">Intertextualidade e diálogo entre textos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">24</div><div class="lesson-content"><div class="lesson-title">Intertextualidade — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">25</div><div class="lesson-content"><div class="lesson-title">Paráfrase e citação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">26</div><div class="lesson-content"><div class="lesson-title">Discursos direto, indireto e indireto livre</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">27</div><div class="lesson-content"><div class="lesson-title">Textos do cotidiano: avisos, convites, listas e calendários</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">28</div><div class="lesson-content"><div class="lesson-title">Textos injuntivos e instrucionais: regras, receitas e instruções</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">29</div><div class="lesson-content"><div class="lesson-title">Textos injuntivos e instrucionais — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">30</div><div class="lesson-content"><div class="lesson-title">Intenção do autor e finalidade do texto</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">31</div><div class="lesson-content"><div class="lesson-title">Concordância nominal</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">32</div><div class="lesson-content"><div class="lesson-title">Concordância verbal</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">33</div><div class="lesson-content"><div class="lesson-title">Concordância nominal e verbal — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">34</div><div class="lesson-content"><div class="lesson-title">Verbos de ligação e predicativo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">35</div><div class="lesson-content"><div class="lesson-title">Conjunções e locuções conjuntivas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">36</div><div class="lesson-content"><div class="lesson-title">Orações adjetivas restritivas e explicativas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">37</div><div class="lesson-content"><div class="lesson-title">Produção textual: conto, crônica ou miniconto</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">38</div><div class="lesson-content"><div class="lesson-title">Revisão, edição e reescrita do texto literário</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Adequação da fala aos usos formais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Vocabulário, pronúncia e organização da fala formal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Registro de debates, palestras e apresentações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Registro de debates, palestras e apresentações — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Anotações como apoio à fala planejada</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Discussões orais: posições e interesses em jogo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Comparação de diferentes posicionamentos em discussões orais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Validade e força dos argumentos em discussões orais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Formulação e negociação de propostas coletivas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Recursos persuasivos em textos argumentativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Título, escolha lexical e efeito de sentido</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Construções metafóricas em textos argumentativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Explicitação e ocultação de fontes de informação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura: levantamento de hipóteses</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura antes, durante e depois da leitura</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Textos expositivos: estrutura e organização interna</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Textos expositivos — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Identificação do tema em textos expositivos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Informações principais e complementares no texto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">21</div><div class="lesson-content"><div class="lesson-title">Relação entre texto e recursos suplementares</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">22</div><div class="lesson-content"><div class="lesson-title">Releitura, consulta a fontes e esclarecimento de dúvidas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">23</div><div class="lesson-content"><div class="lesson-title">Seleção de informações para estudo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">24</div><div class="lesson-content"><div class="lesson-title">Elaboração de resumo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">25</div><div class="lesson-content"><div class="lesson-title">Elaboração de esquema</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">26</div><div class="lesson-content"><div class="lesson-title">Procedimentos de estudo: grifo e anotações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">27</div><div class="lesson-content"><div class="lesson-title">Procedimentos de estudo: síntese, quadro e mapa conceitual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">28</div><div class="lesson-content"><div class="lesson-title">Convenções da língua escrita</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">29</div><div class="lesson-content"><div class="lesson-title">Regularidade ortográfica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">30</div><div class="lesson-content"><div class="lesson-title">Irregularidade ortográfica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">31</div><div class="lesson-content"><div class="lesson-title">Regras de acentuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">32</div><div class="lesson-content"><div class="lesson-title">Crase</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">33</div><div class="lesson-content"><div class="lesson-title">Segmentação, paragrafação e pontuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">34</div><div class="lesson-content"><div class="lesson-title">Busca de informação ortográfica no dicionário e em outras fontes</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">35</div><div class="lesson-content"><div class="lesson-title">Norma-padrão e variedades da língua falada</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">36</div><div class="lesson-content"><div class="lesson-title">Preconceito linguístico</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">37</div><div class="lesson-content"><div class="lesson-title">Narração, descrição e conversação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">38</div><div class="lesson-content"><div class="lesson-title">Produção de texto teatral a partir de narrativas</div></div></div>
           <div class="lesson-item"><div class="lesson-num">39</div><div class="lesson-content"><div class="lesson-title">Revisão geral dos conteúdos do bimestre</div></div></div>
           <div class="lesson-item"><div class="lesson-num">40</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
         </div>
@@ -3852,44 +3861,44 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
 
       <div class="bim-panel" id="rh-d89lp1-b3">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Retomada de leitura e interpretação textual</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Campo jornalístico-midiático: gêneros, mídias e circulação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Notícia, reportagem, fotorreportagem e postagem em rede social</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Estrutura da notícia: título, lide, corpo do texto e fonte</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Estrutura da notícia — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Reportagem: aprofundamento do fato e pesquisa de informações</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Reportagem — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Entrevista: perguntas, respostas e organização textual</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Entrevista — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Comparação de informações sobre o mesmo fato</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Confiabilidade das fontes e checagem de informações</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Procedimentos de curadoria de informação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Elementos visuais em textos jornalísticos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Elementos sonoros e audiovisuais em reportagens e vídeos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Efeitos de sentido em textos multissemióticos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Fotorreportagem e foto-denúncia</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Peças publicitárias: público-alvo, linguagem e intenção</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Recursos estilísticos em textos jornalísticos e publicitários</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Recursos semióticos em textos jornalísticos e publicitários</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Recursos persuasivos em anúncios e propagandas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">21</div><div class="lesson-content"><div class="lesson-title">Escolhas lexicais e efeitos de sentido</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">22</div><div class="lesson-content"><div class="lesson-title">Fato, opinião e posicionamento em textos jornalísticos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">23</div><div class="lesson-content"><div class="lesson-title">Tese e argumento em textos de opinião</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">24</div><div class="lesson-content"><div class="lesson-title">Argumento e evidência</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">25</div><div class="lesson-content"><div class="lesson-title">Mecanismos de progressão temática</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">26</div><div class="lesson-content"><div class="lesson-title">Coesão textual: retomadas e substituições</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">27</div><div class="lesson-content"><div class="lesson-title">Coesão textual: conectores e articuladores</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">28</div><div class="lesson-content"><div class="lesson-title">Termos constitutivos da oração</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">29</div><div class="lesson-content"><div class="lesson-title">Sujeito e predicado</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">30</div><div class="lesson-content"><div class="lesson-title">Transitividade verbal e complementos verbais</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">31</div><div class="lesson-content"><div class="lesson-title">Período simples e período composto</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">32</div><div class="lesson-content"><div class="lesson-title">Orações coordenadas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">33</div><div class="lesson-content"><div class="lesson-title">Orações subordinadas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">34</div><div class="lesson-content"><div class="lesson-title">Pontuação no período composto</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">35</div><div class="lesson-content"><div class="lesson-title">Modalização: certeza, dúvida e possibilidade</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">36</div><div class="lesson-content"><div class="lesson-title">Planejamento de reportagem impressa ou digital</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">37</div><div class="lesson-content"><div class="lesson-title">Produção de reportagem</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">38</div><div class="lesson-content"><div class="lesson-title">Revisão e edição da reportagem</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Retomada de leitura, oralidade e escrita</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Adequação da fala ao objetivo comunicativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Adequação da fala ao contexto e ao interlocutor</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Variações linguísticas: geográficas, urbanas e rurais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Variações linguísticas históricas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Variações linguísticas sociais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Variações linguísticas e usos da língua no cotidiano</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Representação de cenas ou textos dramáticos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Aspectos linguísticos e paralinguísticos da fala teatral</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Timbre, tom de voz, pausas e hesitações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Entonação, expressividade e registros linguísticos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Gestos, deslocamentos, figurino e maquiagem na cena</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Rubricas, cenário e trilha sonora no texto dramático</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Textos narrativos ficcionais: formas de composição</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Enredo e foco narrativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Espaço físico e espaço psicológico na narrativa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Tempo cronológico e tempo psicológico</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Narrador e personagens</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Discurso direto e discurso indireto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Verbos de enunciação e vozes no texto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">21</div><div class="lesson-content"><div class="lesson-title">Pontuação expressiva em narrativas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">22</div><div class="lesson-content"><div class="lesson-title">Palavras e expressões conotativas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">23</div><div class="lesson-content"><div class="lesson-title">Processos figurativos em textos narrativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">24</div><div class="lesson-content"><div class="lesson-title">Recursos linguístico-gramaticais em narrativas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">25</div><div class="lesson-content"><div class="lesson-title">Procedimentos e estratégias de leitura em diferentes gêneros</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">26</div><div class="lesson-content"><div class="lesson-title">Leitura de romances, contos e minicontos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">27</div><div class="lesson-content"><div class="lesson-title">Leitura de crônicas, fábulas e narrativas de suspense</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">28</div><div class="lesson-content"><div class="lesson-title">Leitura de poemas, haicais, poemas concretos e ciberpoemas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">29</div><div class="lesson-content"><div class="lesson-title">Preferências de leitura: gêneros, temas e autores</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">30</div><div class="lesson-content"><div class="lesson-title">Autores nacionais e autores acreanos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">31</div><div class="lesson-content"><div class="lesson-title">Ortografia aplicada à produção textual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">32</div><div class="lesson-content"><div class="lesson-title">Regência nominal e verbal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">33</div><div class="lesson-content"><div class="lesson-title">Concordância nominal e verbal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">34</div><div class="lesson-content"><div class="lesson-title">Modos e tempos verbais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">35</div><div class="lesson-content"><div class="lesson-title">Pontuação na produção textual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">36</div><div class="lesson-content"><div class="lesson-title">Planejamento, textualização e revisão de textos literários</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">37</div><div class="lesson-content"><div class="lesson-title">Condições de produção: leitor, suporte, circulação e finalidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">38</div><div class="lesson-content"><div class="lesson-title">Aprimoramento da coesão e coerência</div></div></div>
           <div class="lesson-item"><div class="lesson-num">39</div><div class="lesson-content"><div class="lesson-title">Revisão geral dos conteúdos do bimestre</div></div></div>
           <div class="lesson-item"><div class="lesson-num">40</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
         </div>
@@ -3897,44 +3906,44 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
 
       <div class="bim-panel" id="rh-d89lp1-b4">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Retomada de argumentação e leitura crítica</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Textos de opinião: artigo de opinião, editorial e comentário</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Textos de opinião — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Carta de leitor e comentário argumentativo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Tese, opinião e posicionamento explícito</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Posicionamento implícito e inferência argumentativa</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Argumentos e contra-argumentos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Argumentos e contra-argumentos — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Tipos de argumento: exemplificação e comparação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Tipos de argumento: causa, consequência e autoridade</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Sustentação, refutação e negociação argumentativa</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Coerência na argumentação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Coesão e progressão temática</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Conectores argumentativos: adição e explicação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Conectores argumentativos: oposição e conclusão</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Marcas linguísticas de opinião</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Modalização epistêmica: certeza, dúvida e possibilidade</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Pontuação em textos argumentativos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Verbos no modo indicativo: presente, passado e futuro</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Verbos no modo subjuntivo em construções argumentativas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">21</div><div class="lesson-content"><div class="lesson-title">Regência nominal</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">22</div><div class="lesson-content"><div class="lesson-title">Regência verbal</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">23</div><div class="lesson-content"><div class="lesson-title">Crase</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">24</div><div class="lesson-content"><div class="lesson-title">Colocação pronominal</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">25</div><div class="lesson-content"><div class="lesson-title">Morfossintaxe aplicada à produção textual</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">26</div><div class="lesson-content"><div class="lesson-title">Textos legais e normativos: estrutura e finalidade</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">27</div><div class="lesson-content"><div class="lesson-title">Estatuto, regimento, lei e norma de convivência</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">28</div><div class="lesson-content"><div class="lesson-title">Cartas abertas, abaixo-assinados e petições online</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">29</div><div class="lesson-content"><div class="lesson-title">Textos reivindicatórios e propositivos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">30</div><div class="lesson-content"><div class="lesson-title">Textos reivindicatórios e propositivos — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">31</div><div class="lesson-content"><div class="lesson-title">Planejamento de artigo de opinião</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">32</div><div class="lesson-content"><div class="lesson-title">Produção de artigo de opinião</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">33</div><div class="lesson-content"><div class="lesson-title">Produção de artigo de opinião — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">34</div><div class="lesson-content"><div class="lesson-title">Revisão e edição do artigo de opinião</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">35</div><div class="lesson-content"><div class="lesson-title">Produção de texto jornalístico multimidiático</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">36</div><div class="lesson-content"><div class="lesson-title">Apresentação oral de posicionamentos sobre temas controversos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">37</div><div class="lesson-content"><div class="lesson-title">Socialização das produções finais</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">38</div><div class="lesson-content"><div class="lesson-title">Autoavaliação e reescrita orientada</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Retomada dos gêneros literários e digitais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Textos dramáticos e suas especificidades</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Representação de cenas dramáticas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Representação de cenas dramáticas — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Texto dramático em teatro, televisão e cinema</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Recursos linguísticos e semióticos no texto dramático</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Recursos de cenário, trilha sonora e interpretação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Oralização de textos literários</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Oralização de textos literários — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Leitura em voz alta de poemas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">11</div><div class="lesson-content"><div class="lesson-title">Leitura em voz alta de contos e crônicas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">12</div><div class="lesson-content"><div class="lesson-title">Contação e recontação de histórias da tradição oral</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">13</div><div class="lesson-content"><div class="lesson-title">Ritmo, pausa e entonação na leitura expressiva</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">14</div><div class="lesson-content"><div class="lesson-title">Recursos gráficos: negrito, itálico, caixa-alta e ilustrações</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">15</div><div class="lesson-content"><div class="lesson-title">Produção de audiobooks ou podcasts de leitura dramática</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">16</div><div class="lesson-content"><div class="lesson-title">Declamação de poemas de forma livre e forma fixa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">17</div><div class="lesson-content"><div class="lesson-title">Recursos linguísticos, paralinguísticos e cinésicos na declamação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">18</div><div class="lesson-content"><div class="lesson-title">Procedimentos e estratégias de leitura em gêneros diversos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">19</div><div class="lesson-content"><div class="lesson-title">Romances, novelas e narrativas de aventura</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">20</div><div class="lesson-content"><div class="lesson-title">Narrativas de ficção científica e suspense</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">21</div><div class="lesson-content"><div class="lesson-title">Crônicas visuais e poemas digitais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">22</div><div class="lesson-content"><div class="lesson-title">Avaliação pessoal do texto lido</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">23</div><div class="lesson-content"><div class="lesson-title">Compartilhamento de preferências de leitura</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">24</div><div class="lesson-content"><div class="lesson-title">Recursos de coesão sequencial</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">25</div><div class="lesson-content"><div class="lesson-title">Recursos de coesão referencial</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">26</div><div class="lesson-content"><div class="lesson-title">Coesão lexical e pronominal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">27</div><div class="lesson-content"><div class="lesson-title">Construções passivas e impessoais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">28</div><div class="lesson-content"><div class="lesson-title">Discurso direto e indireto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">29</div><div class="lesson-content"><div class="lesson-title">Aspectos gramaticais e sentido do texto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">30</div><div class="lesson-content"><div class="lesson-title">Estruturas complexas de oração e período</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">31</div><div class="lesson-content"><div class="lesson-title">Autocorreção durante a produção textual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">32</div><div class="lesson-content"><div class="lesson-title">Revisão do próprio texto passo a passo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">33</div><div class="lesson-content"><div class="lesson-title">Leitura crítica do texto do colega</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">34</div><div class="lesson-content"><div class="lesson-title">Respeito às ideias e ao estilo do outro</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">35</div><div class="lesson-content"><div class="lesson-title">Colaboração no aprimoramento da escrita do colega</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">36</div><div class="lesson-content"><div class="lesson-title">Revisão integral antes da versão final</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">37</div><div class="lesson-content"><div class="lesson-title">Gêneros digitais e práticas de linguagem na tecnologia</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">38</div><div class="lesson-content"><div class="lesson-title">Produção e revisão de texto digital</div></div></div>
           <div class="lesson-item"><div class="lesson-num">39</div><div class="lesson-content"><div class="lesson-title">Revisão geral dos conteúdos do ano</div></div></div>
           <div class="lesson-item"><div class="lesson-num">40</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
         </div>
@@ -3951,60 +3960,60 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
 
       <div class="bim-panel active" id="rh-d89ing1-b1">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">A Língua Inglesa no mundo: expansão, culturas e importância global</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Repertório artístico-cultural em Língua Inglesa: música, cinema, literatura e festividades</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Leitura de textos informativos e multimodais em inglês</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Planos futuros com <em>going to</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Previsões futuras com <em>will</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Futuro e planos pessoais/profissionais — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title"><em>If clauses</em>: situações reais e prováveis</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Argumentação e persuasão em textos publicitários</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Produção de <em>slogan</em> ou anúncio curto em inglês</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">A Língua Inglesa como língua de circulação mundial</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Expansão da Língua Inglesa pelo mundo: colonização, história e globalização</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Importância do inglês para ciência, tecnologia, economia e política</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Repertório artístico-cultural em Língua Inglesa: música, cinema, literatura, dança e artes visuais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Datas comemorativas em países de Língua Inglesa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Comparação entre celebrações culturais de países de Língua Inglesa e do Brasil</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Adjetivos em inglês: descrição de pessoas, lugares, objetos e manifestações culturais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Grau comparativo dos adjetivos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Grau superlativo dos adjetivos</div></div></div>
           <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d89ing1-b2">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Expressões, gestos e comportamentos em diferentes culturas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Culturas indígenas, cultura amazônica e contato intercultural</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Revisão de presente simples e passado simples</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title"><em>Relative clauses</em>: uso de <em>who</em>, <em>which</em>, <em>that</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title"><em>Relative clauses</em> — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Patrimônio artístico-literário em Língua Inglesa</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">A importância do inglês para ciência, economia e política</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Estratégias de apresentação oral: notas, gráficos e tabelas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Produção escrita: planejamento, rascunho, revisão e edição final</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Revisão de vocabulário: objetos, pessoas, lugares e espaços da cidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Existência e quantidade em inglês: uso de <em>there is</em> e <em>there are</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title"><em>There is</em> e <em>there are</em> — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Vocabulário de alimentos: despensa, geladeira e rotina doméstica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Substantivos contáveis e incontáveis</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Artigos indefinidos: <em>a</em> e <em>an</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Perguntas com <em>how much</em> e <em>how many</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Quantificadores: <em>some</em>, <em>any</em>, <em>many</em>, <em>much</em>, <em>few</em>, <em>little</em>, <em>enough</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Pronomes indefinidos e uso contextualizado em frases</div></div></div>
           <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d89ing1-b3">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Variação linguística e comunicação entre culturas diferentes</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Adjetivos em inglês: descrição de pessoas, lugares e objetos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Grau comparativo dos adjetivos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Grau superlativo dos adjetivos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Comparativo e superlativo — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Formação de palavras: prefixos e sufixos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Dedução de palavras desconhecidas em textos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Verbos modais: <em>may</em>, <em>might</em>, <em>should</em>, <em>must</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Temas sociais em inglês: meio ambiente, violência e comunidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Eventos futuros: planos, previsões e expectativas pessoais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Futuro com <em>going to</em> para planos e intenções</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Futuro com <em>going to</em> — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Futuro simples com <em>will</em> para previsões</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Futuro simples com <em>will</em> — continuação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Presente contínuo com sentido de futuro</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Verbos modais: <em>may</em> e <em>might</em> para probabilidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Verbos modais: <em>should</em>, <em>have to</em> e <em>must</em> para recomendação, necessidade e obrigação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Produção oral e escrita sobre planos de vida pessoal, familiar, comunitária ou profissional</div></div></div>
           <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d89ing1-b4">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Inglês, identidade e comunicação no mundo globalizado</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Vocabulário: alimentos, lugares públicos e espaços da cidade</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Substantivos contáveis e incontáveis</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title"><em>There is / There are</em>: existência e quantidade</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title"><em>How much / How many</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Quantificadores: <em>some</em>, <em>any</em>, <em>many</em>, <em>much</em>, <em>few</em>, <em>little</em>, <em>enough</em></div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Quantificadores — continuação</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Gêneros digitais: redes sociais, e-mails, fóruns, memes e internetês</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Leitura crítica: opinião, argumento, contra-argumento e revisão textual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura em inglês: palavras cognatas, pistas gráficas e organização textual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura: <em>skimming</em> e <em>scanning</em></div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Inferência de informações implícitas em textos verbais e não verbais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Leitura crítica de textos sobre meio ambiente e violência</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Orações condicionais: <em>if clauses</em> tipo 1</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Orações condicionais: <em>if clauses</em> tipo 2</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title"><em>Main clause</em>, <em>first conditional</em> e <em>second conditional</em> em situações comunicativas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Persuasão em textos publicitários: recursos verbais e não verbais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title"><em>Linking words</em>: conectores de adição, condição, oposição, contraste, conclusão e síntese</div></div></div>
           <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
         </div>
       </div>
@@ -4020,60 +4029,129 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
 
       <div class="bim-panel active" id="rh-d89esp1-b1">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">A expansão da Língua Espanhola pelo mundo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Países hispânicos, colonização, imigração e presença do espanhol nas Américas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Língua Espanhola, tecnologia e aproximação entre culturas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Léxico da cidade: lugares públicos e espaços urbanos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Como pedir e dar informações de localização em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Uso do modo imperativo afirmativo em instruções e orientações</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Uso do modo imperativo negativo em instruções e orientações</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura em textos publicitários e jornalísticos</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Recursos de persuasão e argumentação em textos em espanhol</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">A Língua Espanhola no mundo: países falantes e importância cultural</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Formação e expansão da Língua Espanhola pela América Latina e outros continentes</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Relação do Brasil com países hispânicos e membros do MERCOSUL</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Comunicação intercultural e valorização das identidades no mundo globalizado</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Cultura dos países fronteiriços: Bolívia e Peru</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Manifestações artístico-culturais em Língua Espanhola: música, dança, cinema e literatura</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Artistas, escritores e obras da Espanha, Bolívia e Peru</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Patrimônio cultural mundial na Espanha, Bolívia e Peru</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Adjetivos: descrição, comparativo e superlativo em espanhol</div></div></div>
           <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d89esp1-b2">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">A importância da Língua Espanhola para a ciência, economia e política</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Língua Espanhola no cenário mundial e nas relações internacionais</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Produção de enunciados orais em situações comunicativas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Orações condicionais: situações reais e prováveis</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Orações condicionais: situações hipotéticas e improváveis</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Pretérito imperfeito do subjuntivo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Condicional simples</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Pretérito imperfeito do indicativo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Produção e compartilhamento de textos autorais sobre temas sociais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Leitura de textos artístico-literários em Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Contos, poemas, lendas e mitos hispano-americanos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Estratégias de leitura: palavras-chave, palavras cognatas, prefixos e sufixos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Construção do sentido global do texto</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Inferência de informações implícitas em textos escritos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Léxico: alimentos, partes da casa e espaços da cidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Substantivos contáveis e incontáveis</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Uso de interrogativos, artigos indefinidos e quantificadores</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Comparações entre espaço rural e urbano: produtos, trabalho e relações sociais</div></div></div>
           <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d89esp1-b3">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Leitura de notícias atuais publicadas em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Notícias científicas e descobertas relevantes para a sociedade</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Prêmio Nobel e divulgação científica em Língua Espanhola</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Indicação de probabilidade em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Indicação de recomendação em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Indicação de necessidade e obrigação em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Perífrases de obrigação: <em>hay que</em>, <em>tiene que</em>, <em>debe</em> + infinitivo</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Temas sociais: cultura indígena, respeito às diferenças e violência na escola</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Produção de texto crítico em espanhol sobre problema da comunidade local</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Similaridades e diferenças entre pessoas, objetos, lugares e culturas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Comparativo e superlativo aplicados ao campo e à cidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Descrição de características rurais e urbanas em espanhol</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Vantagens e desvantagens do espaço rural e urbano</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Verbos no futuro: planos, previsões e expectativas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Projeto de vida: ações de curto, médio e longo prazo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Variações linguísticas entre falantes da Língua Espanhola</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Semelhanças entre Português e Espanhol: escrita, pronúncia e vocabulário cotidiano</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Produção oral sobre cultura, identidade e modos de vida no campo e na cidade</div></div></div>
           <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
         </div>
       </div>
 
       <div class="bim-panel" id="rh-d89esp1-b4">
         <div class="lesson-list">
-          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Comunicação intercultural em Língua Espanhola</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Língua Espanhola, identidade e mundo globalizado</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Uso da Língua Espanhola em ambientes virtuais de pesquisa</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Qualidade e validade das informações em textos digitais</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Exposição de ponto de vista em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Argumentos e contra-argumentos em situações orais e escritas</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Tomada de notas a partir de textos orais em espanhol</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Gêneros digitais: blogs, redes sociais, fóruns, infográficos e memes</div></div></div>
-          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Novas formas de escrita digital: abreviações, símbolos, números e pictogramas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Gêneros textuais em Língua Espanhola: contos, poemas, romances, propagandas e artigos de opinião</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Leitura crítica: organização, função social, intencionalidade e público-alvo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Textos publicitários e de propaganda: linguagem verbal e não verbal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Recursos de persuasão: imagens, cores, palavras e efeitos de convencimento</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Textos argumentativos: fato, opinião, argumento e evidência</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Produção escrita sobre temas sociais: meio ambiente, urbanização, saneamento e tecnologia</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Construção da argumentação: ideia central, dados, evidências e exemplos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Conectores de adição, condição, oposição, contraste, conclusão e síntese</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Orações condicionais, perífrases de obrigação e expressão de probabilidade, recomendação, necessidade e obrigação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disc-panel" id="rh-d89art1">
+      <div class="bim-tabs">
+        <div class="bim-tab art active" onclick="rhPlanShowBim('rh-d89art1-b1',this)">1º Bimestre</div>
+        <div class="bim-tab art" onclick="rhPlanShowBim('rh-d89art1-b2',this)">2º Bimestre</div>
+        <div class="bim-tab art" onclick="rhPlanShowBim('rh-d89art1-b3',this)">3º Bimestre</div>
+        <div class="bim-tab art" onclick="rhPlanShowBim('rh-d89art1-b4',this)">4º Bimestre</div>
+      </div>
+
+      <div class="bim-panel active" id="rh-d89art1-b1">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Artes visuais: conceito, linguagem visual e formas de expressão artística</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Teoria da cor: cores neutras, frias, quentes, primárias e secundárias</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Teoria da cor — continuação: contraste, claro-escuro, matiz e harmonia visual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Pintura: suportes, materiais tradicionais e materiais alternativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Pigmentos naturais e produção artística com elementos do meio ambiente</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Estética nas artes visuais e relação figura-fundo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Autorretrato: identidade, expressão pessoal e processo criativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Estilos de pintura: Art Nouveau, Classicismo, Cubismo, Expressionismo, Impressionismo e Surrealismo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Arte moderna e contemporânea: Semana de Arte Moderna de 1922, Pop Art, Land Art, Arte Abstrata e Arte Conceitual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d89art1-b2">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Dança como linguagem artística: corpo, movimento, ritmo e expressão</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Danças populares, tradicionais, indígenas e acreanas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Diversidade corpórea e respeito às diferentes formas de expressão corporal</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Elementos estruturais da dança: movimento, espaço, som, silêncio, cenário, figurino e iluminação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Improvisação em dança: movimentos do cotidiano e movimento dançado</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Dança livre e dança estruturada</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Ações básicas de esforço de Rudolf Laban: socar, talhar, pontuar, sacudir, pressionar, torcer, deslizar e flutuar</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Dança clássica, dança moderna e dança contemporânea</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Criação coletiva de composição coreográfica inspirada em diferentes culturas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d89art1-b3">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Música como linguagem artística: som, escuta e expressão</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Elementos do som: timbre, altura, duração e intensidade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Intensidade, dinâmica, ritmo e movimentos melódicos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Instrumentos musicais convencionais e não convencionais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Produção de instrumentos musicais com materiais alternativos e recursos do meio ambiente</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Improvisação musical com voz, corpo, objetos e instrumentos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Música acreana, músicas étnicas, nacionais e regionais</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Música erudita no Brasil: principais correntes até o século XX</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Música Popular Brasileira e samba: características, história, estilos e compositores</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d89art1-b4">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Teatro como linguagem artística: corpo, voz, espaço e ação cênica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Jogos teatrais e exercícios de improvisação cênica</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Criação de cenas teatrais a partir de textos dramáticos, imagens, músicas e objetos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Elementos da criação cênica: diálogo, espaço cênico, cenário, iluminação, maquiagem, sonoplastia e figurino</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Máscaras, adereços teatrais e caracterização de personagens</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Teatro moderno e contemporâneo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Gêneros e estilos teatrais: trágico, cômico, dramático, épico, realista, naturalista, melodramático e musical</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Texto dramático: prólogo, cenas, atos e epílogo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Profissionais do teatro: ator, diretor, dramaturgo, iluminador, cenógrafo, figurinista, sonoplasta e contrarregra</div></div></div>
           <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Prova bimestral</div></div></div>
         </div>
       </div>
