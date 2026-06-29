@@ -95,6 +95,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .pres-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:5px}
 .ar2{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.8rem}
 .ar2.pr{background:#f0faf4;color:var(--vm)}.ar2.fa{background:var(--rs);color:var(--ra)}.ar2.fj{background:#fff8e1;color:#7a5c10}
+.ar2.tr{background:#f0f0f0;color:#aaa;opacity:.5;filter:grayscale(1);cursor:default;pointer-events:none}
+.ar2.tr .atg{display:none}
+.atv-r.tr{background:#f0f0f0;color:#aaa;opacity:.5;filter:grayscale(1);cursor:default;pointer-events:none}
 .ar2 .an{font-family:'DM Mono',monospace;font-size:.67rem;opacity:.6;width:20px;flex-shrink:0}
 .ar2 .ai3{font-size:.85rem;flex-shrink:0}.ar2 .anm{flex:1}
 .ar2 .atg{font-size:.62rem;font-weight:700;padding:1px 5px;border-radius:3px}
@@ -6580,9 +6583,9 @@ tog=function(h){_pcOrigTog(h);if(typeof pcRefreshHeroStats==='function')pcRefres
 (function(){const m={1:'seg',2:'ter',4:'qui',5:'sex'},d=new Date().getDay(),id=m[d];if(!id)return;const h=document.getElementById('hd-'+id);if(h){const t=document.createElement('span');t.className='hj';t.textContent='Hoje';h.appendChild(t);}})();
 
 const ALUNOS={
-  t1:[{n:2,nm:'Cleiton Silva Santana'},{n:3,nm:'Daniel Henrique Rodrigues Galvão'},{n:4,nm:'Eduarda Pereira Santiago'},{n:5,nm:'Felipe Costa Bezerra'},{n:6,nm:'Gabriel Souza Silva'},{n:7,nm:'Gustavo Gomes da Silva'},{n:8,nm:'Jady Kamilly de Oliveira Amorim'},{n:9,nm:'João Pedro Gomes da Silva'},{n:10,nm:'Juliana da Silva Euripe'},{n:11,nm:'Lauane da Silva Santos'},{n:12,nm:'Maria Eduarda da Silva de Paula'},{n:13,nm:'Maria Valéria Aparecida Nunes de Lima'},{n:14,nm:'Paulo Henrique Chaves Teixeira'},{n:15,nm:'Yudi Oliveira de Araujo'},{n:16,nm:'Isabelle Moura dos Santos'}],
-  t2:[{n:1,nm:'Alice Ferreira de Souza'},{n:2,nm:'Ana Beatriz Nascimento Maia'},{n:3,nm:'Anthonny Gabriel Almeida Paiva'},{n:4,nm:'Antonio Samuel de Oliveira Barreto'},{n:5,nm:'Elanne Melo de Souza'},{n:6,nm:'Eslane Moraes Ribeiro'},{n:7,nm:'Everton Oliveira da Silva'},{n:8,nm:'Fabio Henrique Barbosa Rosas'},{n:9,nm:'Francielly da Silveira Braga Santiago'},{n:10,nm:'Francisco Gabriel de Queiroz Brasil'},{n:11,nm:'Jorge Arnaldo Félix Pereira'},{n:12,nm:'Kauesley dos Anjos Dantas'},{n:13,nm:'Kayo dos Anjos Coutinho'},{n:14,nm:'Lília da Silva Ramos'},{n:15,nm:'Luiz Guilherme da Silva Santiago'},{n:16,nm:'Maria Clara Lima da Silva'},{n:17,nm:'Maria Eduarda Silva de Jesus'},{n:18,nm:'Nathaly Yasmim Castro Jardim'},{n:19,nm:'Pietro Fidelis Miranda'},{n:20,nm:'Sabrina Damazio Alves Araújo'},{n:21,nm:'Tamíres Lima Fernandes'},{n:22,nm:'Ruan da Silva e Silva'},{n:24,nm:'Wesley Emanuel Lima da Silva'},{n:25,nm:'Êmilly Nathasha Martins Sá'}],
-  t3:[{n:1,nm:'Alonso Queiroz Santiago'},{n:2,nm:'Antoniel Araujo de Lima'},{n:3,nm:'Francisco Kevison de Lima Paixão'},{n:4,nm:'Gabriel Oliveira Evangelista'},{n:5,nm:'Gabriella Farias Moreira'},{n:6,nm:'Hana Beatryz Araujo Sales'},{n:7,nm:'Joaiz Muniz de Souza Júnior'},{n:8,nm:'João Paulo Barreto Chaves'},{n:9,nm:'Karina Paiva Lima'},{n:10,nm:'Kiara Kasiele Silva Paixão'},{n:11,nm:'Lourival Wagner Aparecido Nunes de Lima'},{n:12,nm:'Maria Beatriz Oliveira da Gama'},{n:13,nm:'Maria Eduarda Souza Teixeira'},{n:14,nm:'Matheus Henrique Silveira Santiago'},{n:15,nm:'Mayco Gabriel da Silva Dias'},{n:16,nm:'Natanael Ovides de Sousa'},{n:17,nm:'Sara Machado do Amor Divino'},{n:18,nm:'Sibelly Victória Santiago de Sousa'}],
+  t1:[{n:1,nm:'Clarice Costa Bezerra',tr:true},{n:2,nm:'Cleiton Silva Santana',tr:true},{n:3,nm:'Daniel Henrique Rodrigues Galvão'},{n:4,nm:'Eduarda Pereira Santiago'},{n:5,nm:'Felipe Costa Bezerra',tr:true},{n:6,nm:'Gabriel Souza Silva'},{n:7,nm:'Gustavo Gomes da Silva',tr:true},{n:8,nm:'Jady Kamilly de Oliveira Amorim'},{n:9,nm:'João Pedro Gomes da Silva',tr:true},{n:10,nm:'Juliana da Silva Euripe'},{n:11,nm:'Lauane da Silva Santos'},{n:12,nm:'Maria Eduarda da Silva de Paula'},{n:13,nm:'Maria Valéria Aparecida Nunes de Lima'},{n:14,nm:'Paulo Henrique Chaves Teixeira'},{n:15,nm:'Yudi Oliveira de Araujo'},{n:16,nm:'Isabelle Moura dos Santos'}],
+  t2:[{n:1,nm:'Alice Ferreira de Souza'},{n:2,nm:'Ana Beatriz Nascimento Maia'},{n:3,nm:'Anthonny Gabriel Almeida Paiva'},{n:4,nm:'Antonio Samuel de Oliveira Barreto'},{n:5,nm:'Elanne Melo de Souza'},{n:6,nm:'Eslane Moraes Ribeiro'},{n:7,nm:'Everton Oliveira da Silva',tr:true},{n:8,nm:'Fabio Henrique Barbosa Rosas'},{n:9,nm:'Francielly da Silveira Braga Santiago'},{n:10,nm:'Francisco Gabriel de Queiroz Brasil',tr:true},{n:11,nm:'Jorge Arnaldo Félix Pereira'},{n:12,nm:'Kauesley dos Anjos Dantas'},{n:13,nm:'Kayo dos Anjos Coutinho'},{n:14,nm:'Lília da Silva Ramos'},{n:15,nm:'Luiz Guilherme da Silva Santiago'},{n:16,nm:'Maria Clara Lima da Silva'},{n:17,nm:'Maria Eduarda Silva de Jesus'},{n:18,nm:'Nathaly Yasmim Castro Jardim'},{n:19,nm:'Pietro Fidelis Miranda'},{n:20,nm:'Sabrina Damazio Alves Araújo'},{n:21,nm:'Tamíres Lima Fernandes'},{n:22,nm:'Ruan da Silva e Silva'},{n:23,nm:'Wellyson da Silva Oliveira',tr:true},{n:24,nm:'Wesley Emanuel Lima da Silva'},{n:25,nm:'Êmilly Nathasha Martins Sá'},{n:26,nm:'Wendell da Silva Oliveira',tr:true}],
+  t3:[{n:1,nm:'Alonso Queiroz Santiago'},{n:2,nm:'Antoniel Araujo de Lima'},{n:3,nm:'Francisco Kevison de Lima Paixão'},{n:4,nm:'Gabriel Oliveira Evangelista'},{n:5,nm:'Gabriella Farias Moreira'},{n:6,nm:'Hana Beatryz Araujo Sales'},{n:7,nm:'Joaiz Muniz de Souza Júnior'},{n:8,nm:'João Paulo Barreto Chaves'},{n:9,nm:'Karina Paiva Lima'},{n:10,nm:'Kiara Kasiele Silva Paixão'},{n:11,nm:'Lourival Wagner Aparecido Nunes de Lima'},{n:12,nm:'Maria Beatriz Oliveira da Gama'},{n:13,nm:'Maria Eduarda Souza Teixeira'},{n:14,nm:'Matheus Henrique Silveira Santiago'},{n:15,nm:'Mayco Gabriel da Silva Dias'},{n:16,nm:'Natanael Ovides de Sousa'},{n:17,nm:'Sara Machado do Amor Divino'},{n:18,nm:'Sibelly Victória Santiago de Sousa'},{n:19,nm:'Mateus Oliveira da Silva',tr:true}],
   t6:[{n:1,nm:'Àghata Luiza Soouza da Silva'},{n:2,nm:'Angelo de Freitas Soares'},{n:3,nm:'Anthony Mayksson Willames Silva de Lima'},{n:4,nm:'Antônio Yuri da Silva Santos'},{n:5,nm:'Asheley Prince Miranda Lima'},{n:6,nm:'Bianca Alves Bulin'},{n:7,nm:'Cayki Silva de Farias'},{n:8,nm:'Daniel Magalhães de Lima'},{n:9,nm:'Davi Oliveira de Amorim'},{n:10,nm:'Douglas Oliveira Queiroz da Silva'},{n:11,nm:'Fabrício Nunes Ataíde'},{n:12,nm:'Guilherme Castro Pereira'},{n:13,nm:'Hadassa Walthier da Silva'},{n:14,nm:'Hagata Gabriely da Silva Santos'},{n:15,nm:'Isaac Souza Fernandes'},{n:17,nm:'João Pedro Maia de Oliveira'},{n:18,nm:'Joel do Nascimento Cruz'},{n:19,nm:'José Otávio da Silva Paixão'},{n:20,nm:'Lazaro da Silva Martins'},{n:21,nm:'Maria Isabele de Lima Paixão'},{n:22,nm:'Mirella Barroso Lima'},{n:23,nm:'Murilo Santana de Souza'},{n:24,nm:'Nayla Vitória de Sousa Santana'},{n:25,nm:'Neemias de Sousa Amim'},{n:26,nm:'Nicolas da Silva Nogueira'},{n:27,nm:'Pamella Letycia Souza Lino'},{n:28,nm:'Pedro Lucas Fidelis dos Reis'},{n:29,nm:'Sabrina Silva Ribeiro'},{n:30,nm:'Thaemmy Silva de Farias'},{n:31,nm:'Victor Emanoel da Silva do Nascimento'},{n:32,nm:'Vidal Wanderley de Lima'},{n:33,nm:'Wandson Santiago de Sousa'},{n:34,nm:'Yan Lima Rodrigues'},{n:35,nm:'Yasmin Victória Vasconcelos Silva'},{n:36,nm:'Breno Barroso da Silva'}]
 };
 
@@ -6749,16 +6752,23 @@ function renderPresenca(){
   Object.entries(PRESENCA).forEach(([id,cfg])=>{
     const el=document.getElementById(id);if(!el||el.dataset.rendered)return;el.dataset.rendered='1';
     const al=ALUNOS[cfg.turma]||[];
-    const fa=cfg.faltaram.length,fj=cfg.faltJ.length,pr=al.length-fa-fj;
+    const ativos=al.filter(a=>!a.tr);
+    const fa=cfg.faltaram.length,fj=cfg.faltJ.length,pr=ativos.length-fa-fj;
     if(cfg.parcial){const av=document.createElement('div');av.className='pres-av';av.innerHTML='<span>⚠️</span><span><strong>Lista parcial:</strong> 5 presentes, nomes não registrados. Atualize quando possível.</span>';el.before(av);}
-    else{const st=document.createElement('div');st.className='pres-stat';st.innerHTML=`<span>✓ Presentes: <strong>${pr}</strong></span><span>✗ Faltas: <strong>${fa}</strong></span><span>⚠ FJ: <strong>${fj}</strong></span><span>Total: <strong>${al.length}</strong></span>`;el.before(st);}
+    else{const st=document.createElement('div');st.className='pres-stat';st.innerHTML=`<span>✓ Presentes: <strong>${pr}</strong></span><span>✗ Faltas: <strong>${fa}</strong></span><span>⚠ FJ: <strong>${fj}</strong></span><span>Total: <strong>${ativos.length}</strong></span>`;el.before(st);}
     al.forEach(a=>{
+      const row=document.createElement('div');
+      if(a.tr){
+        row.className='ar2 tr';
+        row.innerHTML=`<span class="an">${a.n}</span><span class="ai3">–</span><span class="anm">${a.nm}</span><span class="atg" style="font-size:.6rem;background:#ddd;color:#999;padding:1px 5px;border-radius:3px">Transferido</span>`;
+        el.appendChild(row);
+        return;
+      }
       const manKey=id+'_'+a.n;
       const manualStatus=_presManual[manKey];
       const baseStatus=cfg.faltaram.includes(a.n)?'fa':cfg.faltJ.includes(a.n)?'fj':'pr';
       const s=manualStatus||baseStatus;
       const ic=_presIcons[s],tg=_presLabels[s];
-      const row=document.createElement('div');
       row.className='ar2 '+s;
       row.style.cursor='pointer';
       row.title='Clique para alternar presença';
@@ -6816,7 +6826,7 @@ function _atvAtualizarStat(atvId){
   var cfg=ATIVIDADES[atvId]||{fez:[],naoFez:[],parcial:false};
   var st=document.querySelector('[data-stat="'+atvId+'"]');if(!st)return;
   var fz=0,nf=0,ag=0;
-  al.forEach(function(a){var s=_atvStatus(atvId,a.n,cfg);if(s==='fz')fz++;else if(s==='nf')nf++;else ag++;});
+  al.forEach(function(a){if(a.tr)return;var s=_atvStatus(atvId,a.n,cfg);if(s==='fz')fz++;else if(s==='nf')nf++;else ag++;});
   st.innerHTML='<span>✓ Entregaram: <strong>'+fz+'</strong></span><span>✗ Não entregaram: <strong>'+nf+'</strong></span><span>⏳ Pendente: <strong>'+ag+'</strong></span>';
 }
 
@@ -6860,8 +6870,16 @@ function _atvCriarCelulas(el,atvId,turma,cfg){
     el.before(st);
   }
   al.forEach(function(a){
-    var s=_atvStatus(atvId,a.n,cfg);
     var cell=document.createElement('div');
+    if(a.tr){
+      cell.className='atv-r tr';
+      cell.innerHTML='<span class="aic">–</span>'
+        +'<span class="atv-nm">'+a.nm+'</span>'
+        +'<span style="font-size:.6rem;background:#ddd;color:#999;padding:1px 5px;border-radius:3px;flex-shrink:0">Transferido</span>';
+      el.appendChild(cell);
+      return;
+    }
+    var s=_atvStatus(atvId,a.n,cfg);
     cell.className='atv-r '+s;
     cell.setAttribute('data-atv',atvId);
     cell.setAttribute('data-n',a.n);
