@@ -447,6 +447,37 @@ tbody tr:last-child td{
 .grade-badge.recovery small{
   color:var(--danger);
 }
+/* Alunos transferidos */
+.student-row-transferido td{
+  opacity:.45;
+  filter:grayscale(1);
+}
+.student-row-transferido .student-number{
+  background:#e8e8e8;
+  color:#999;
+}
+.student-name-transferido{
+  display:inline-block;
+  color:#999;
+  font-size:1.02rem;
+  font-weight:700;
+  vertical-align:top;
+}
+.chip-transferido{
+  background:#e8e8e8;
+  color:#999;
+  font-size:.72rem;
+}
+.grade-transferido{
+  background:#f0f0f0;
+  color:#bbb;
+  min-width:80px;
+  min-height:40px;
+}
+.grade-transferido strong{
+  color:#bbb;
+  font-size:1rem;
+}
 .table-empty,
 .empty-state{
   padding:18px;

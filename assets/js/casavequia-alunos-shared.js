@@ -319,6 +319,7 @@
           id: student.id,
           numero: student.numero,
           nome: student.nome,
+          transferido: student.transferido === true,
           bimestres: {
             "1": buildEmptyBimesterState(),
             "2": buildEmptyBimesterState(),
@@ -341,6 +342,7 @@
       id: baseStudent.id,
       numero: baseStudent.numero,
       nome: baseStudent.nome,
+      transferido: baseStudent.transferido === true,
       observacoesComplementares: savedStudent.observacoesComplementares !== undefined ? savedStudent.observacoesComplementares : baseStudent.observacoesComplementares,
       encaminhamentos: savedStudent.encaminhamentos !== undefined ? savedStudent.encaminhamentos : baseStudent.encaminhamentos,
       destaques: savedStudent.destaques !== undefined ? savedStudent.destaques : baseStudent.destaques,
@@ -717,15 +719,17 @@
 
   function renderSummary() {
     const disciplineConfig = getDisciplineConfig(currentTableDiscipline);
-    const medias = state.alunos.map(function (student) {
+    const ativos = state.alunos.filter(function (s) { return !s.transferido; });
+    const medias = ativos.map(function (student) {
       return calculateDisciplineAverage(student, currentTableDiscipline);
     }).filter(function (value) { return value !== null; });
     const mediaTurma = medias.length ? medias.reduce(function (sum, value) { return sum + value; }, 0) / medias.length : null;
-    const totalFaltas = state.alunos.reduce(function (sum, student) { return sum + getStudentMetrics(student).faltas; }, 0);
-    const totalPresencas = state.alunos.reduce(function (sum, student) { return sum + getStudentMetrics(student).presencas; }, 0);
+    const totalFaltas = ativos.reduce(function (sum, student) { return sum + getStudentMetrics(student).faltas; }, 0);
+    const totalPresencas = ativos.reduce(function (sum, student) { return sum + getStudentMetrics(student).presencas; }, 0);
+    const transferidos = state.alunos.length - ativos.length;
 
     summaryGrid.innerHTML = [
-      summaryCard("Alunos cadastrados", String(state.alunos.length), "Base da turma"),
+      summaryCard("Alunos ativos", String(ativos.length), transferidos > 0 ? transferidos + " transferido(s) na lista" : "Base da turma"),
       summaryCard("Faltas em h/aula", String(totalFaltas), "Carga horaria ausente consolidada"),
       summaryCard("Presencas em h/aula", String(totalPresencas), "Sincronizadas pelos relatos diarios"),
       summaryCard("Media de " + disciplineConfig.shortLabel, mediaTurma === null ? "-" : formatNumber(mediaTurma), mediaTurma === null ? "Preencha ou sincronize as notas desta disciplina" : "Com base nos bimestres ja lancados"),
@@ -749,6 +753,18 @@
     }
 
     tableBody.innerHTML = rows.map(function (student) {
+      if (student.transferido) {
+        return '<tr class="student-row-transferido">'
+          + '<td class="student-cell">'
+          + '<span class="student-number">' + student.numero + "</span>"
+          + '<span class="student-name student-name-transferido">' + escapeHtml(student.nome) + "</span>"
+          + '<div class="student-meta"><span class="mini-chip chip-transferido">Transferido</span></div>'
+          + "</td>"
+          + BIMESTERS.map(function () {
+            return '<td><span class="grade-badge grade-transferido"><strong>–</strong></span></td>';
+          }).join("")
+          + "</tr>";
+      }
       const media = calculateDisciplineAverage(student, currentTableDiscipline);
       return "<tr>"
         + '<td class="student-cell">'
