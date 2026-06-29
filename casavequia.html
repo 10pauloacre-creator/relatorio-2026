@@ -6747,6 +6747,7 @@ function _presManualSalvar(){
   if(_db) _db.collection('app_data').doc('pres_manual').set(_presManual)
     .catch(function(e){console.error('[SYNC pres]',e.code,e.message);});
   if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
+  if(typeof pcRefreshAtividadesVisuals==='function')pcRefreshAtividadesVisuals();
 }
 var _presIcons={pr:'✓',fa:'✗',fj:'⚠'};
 var _presLabels={pr:'',fa:'<span class="atg tgf">F</span>',fj:'<span class="atg tgfj">FJ</span>'};
@@ -6819,10 +6820,23 @@ function _atvSalvar(){
 }
 var _atvMenuAberto=null;
 
+function _atvStatusPorPresenca(atvId,n){
+  var presId=atvId.replace(/^atv-/,'pl-');
+  var presCfg=PRESENCA[presId];
+  if(!presCfg)return null;
+  var manKey=presId+'_'+n;
+  return _presManual[manKey]||(presCfg.faltaram.includes(n)?'fa':presCfg.faltJ.includes(n)?'fj':'pr');
+}
+
 function _atvStatus(atvId,n,cfg){
   var key=atvId+'_'+n,m=_atvManual[key];
   if(m)return m;
-  return cfg.fez.includes(n)?'fz':cfg.naoFez.includes(n)?'nf':cfg.parcial?'ag':'pd';
+  if(cfg.fez.includes(n))return'fz';
+  if(cfg.naoFez.includes(n))return'nf';
+  var presStatus=_atvStatusPorPresenca(atvId,n);
+  if(presStatus==='pr')return'ag';
+  if(presStatus==='fa'||presStatus==='fj')return'nf';
+  return cfg.parcial?'ag':'pd';
 }
 var _atvIcons={fz:'✓',nf:'✗',pd:'–',ag:'⏳'};
 
@@ -6838,7 +6852,7 @@ function _atvAtualizarStat(atvId){
   var st=document.querySelector('[data-stat="'+atvId+'"]');if(!st)return;
   var fz=0,nf=0,ag=0;
   al.forEach(function(a){if(a.tr)return;var s=_atvStatus(atvId,a.n,cfg);if(s==='fz')fz++;else if(s==='nf')nf++;else ag++;});
-  st.innerHTML='<span>✓ Entregaram: <strong>'+fz+'</strong></span><span>✗ Não entregaram: <strong>'+nf+'</strong></span><span>⏳ Pendente: <strong>'+ag+'</strong></span>';
+  st.innerHTML='<span>✓ Entregaram: <strong>'+fz+'</strong></span><span>✗ Não entregaram: <strong>'+nf+'</strong></span><span>⏳ Aguardando: <strong>'+ag+'</strong></span>';
 }
 
 function _atvFecharMenu(){
@@ -6972,10 +6986,7 @@ function _sincronizarRegistros(){
       ATIVIDADES_BIMESTRE[tid].push({id:atvId,data:mmdd});
     (ALUNOS[tid]||[]).forEach(function(a){
       if(!REGISTROS[tid]||!REGISTROS[tid][a.n])return;
-      var key=atvId+'_'+a.n;
-      var manual=_atvManual[key];
-      var base=cfg.fez.includes(a.n)?'fz':cfg.naoFez.includes(a.n)?'nf':cfg.parcial?'ag':'pd';
-      REGISTROS[tid][a.n].atividades[atvId]=manual||base;
+      REGISTROS[tid][a.n].atividades[atvId]=_atvStatus(atvId,a.n,cfg);
     });
   });
 }
@@ -7183,13 +7194,7 @@ function pcResolvePresenceStatus(presId,studentNumber,cfg){
   return _presManual[manKey]||(cfg.faltaram.includes(studentNumber)?'fa':cfg.faltJ.includes(studentNumber)?'fj':'pr');
 }
 function pcResolveActivityStatus(atvId,studentNumber,cfg){
-  var status=_atvStatus(atvId,studentNumber,cfg);
-  if(status==='fz'||status==='nf')return status;
-  var presId=atvId.replace(/^atv-/,'pl-');
-  var presCfg=PRESENCA[presId];
-  if(!presCfg)return status;
-  var presStatus=pcResolvePresenceStatus(presId,studentNumber,presCfg);
-  return presStatus==='pr'?'fz':'nf';
+  return _atvStatus(atvId,studentNumber,cfg);
 }
 function pcBuildSyncPayload(){
   var payload={updatedAt:new Date().toISOString(),school:'E.E. Rural Pe. Carlos Casavequia',classes:{}};
