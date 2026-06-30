@@ -5102,9 +5102,9 @@ function parseHorasRH(txt) {
 
 function normalizarDiscRH(txt) {
   if (!txt) return null;
-  if (txt.indexOf('Língua Portuguesa') >= 0) return { grupo:'lp', disc:'Língua Portuguesa' };
-  if (txt.indexOf('Inglês') >= 0) return { grupo:'ing', disc:'Inglês' };
-  if (txt.indexOf('Espanhol') >= 0) return { grupo:'esp', disc:'Espanhol' };
+  if (/(Língua Portuguesa|LP)/i.test(txt)) return { grupo:'lp', disc:'Língua Portuguesa' };
+  if (/(Língua Inglesa|Inglês|Ingles)/i.test(txt)) return { grupo:'ing', disc:'Inglês' };
+  if (/(Língua Espanhola|Espanhol)/i.test(txt)) return { grupo:'esp', disc:'Espanhol' };
   return null;
 }
 
