@@ -7746,6 +7746,7 @@ function pcIniciarSyncRemoto(){
 function pcSyncAndBroadcast(){
   _sincronizarRegistros();
   try{localStorage.setItem(PC_ALUNOS_SYNC_KEY,JSON.stringify(pcBuildSyncPayload()));}catch(e){console.warn('[PC sync]',e.message);}
+  pcSyncProjectionSeed();
   pcScheduleRemoteSync('daily-sync');
 }
 function pcCountOpenCards(section){return Array.from(section.querySelectorAll('.ec2')).filter(function(el){return el.classList.contains('on');}).length;}
@@ -8011,9 +8012,58 @@ function pcProjectionGetAnchorDate(){
   if(monthIndex==null)return new Date().toISOString().slice(0,10);
   return new Date(parseInt(match[2],10)||2026,monthIndex,parseInt(dayText,10)||1,12,0,0).toISOString().slice(0,10);
 }
+function pcProjectionEntryDateFromId(entryId){
+  var match=String(entryId||'').match(/-(\d{2})(\d{2})/);
+  if(!match)return '';
+  return '2026-'+match[1]+'-'+match[2];
+}
+function pcProjectionResolveGroupKey(turmaId,disciplineName){
+  var normDiscipline=pcProjectionNormalizeText(disciplineName);
+  var found=DISC.find(function(item){
+    return PC_PROJECTION_TURMA_ID_MAP[item.t]===turmaId&&pcProjectionNormalizeText(item.d)===normDiscipline;
+  });
+  return found?found.g:'';
+}
+function pcProjectionBuildLessonLog(){
+  var recordsByGroup={};
+  Object.entries(PRESENCA).forEach(function(pair){
+    var entryId=pair[0],cfg=pair[1]||{};
+    var turmaId=cfg.turma||'';
+    if(!turmaId)return;
+    var dateKey=pcProjectionEntryDateFromId(entryId);
+    if(!dateKey)return;
+    var disciplineName=pcResolveDisciplineName(turmaId,entryId);
+    var groupKey=pcProjectionResolveGroupKey(turmaId,disciplineName);
+    var hours=pcResolveEntryLoad(entryId,cfg,disciplineName);
+    if(!groupKey||!hours)return;
+    if(!recordsByGroup[groupKey])recordsByGroup[groupKey]={};
+    if(!recordsByGroup[groupKey][turmaId])recordsByGroup[groupKey][turmaId]=[];
+    recordsByGroup[groupKey][turmaId].push({date:dateKey,hours:hours,source:'relato',entryId:entryId});
+  });
+  Object.keys(recordsByGroup).forEach(function(groupKey){
+    Object.keys(recordsByGroup[groupKey]).forEach(function(turmaId){
+      recordsByGroup[groupKey][turmaId].sort(function(a,b){
+        return a.date.localeCompare(b.date)||a.entryId.localeCompare(b.entryId);
+      });
+    });
+  });
+  return recordsByGroup;
+}
+function pcProjectionLatestLoggedDate(recordsByGroup){
+  var latest='';
+  Object.keys(recordsByGroup||{}).forEach(function(groupKey){
+    Object.keys(recordsByGroup[groupKey]||{}).forEach(function(turmaId){
+      (recordsByGroup[groupKey][turmaId]||[]).forEach(function(entry){
+        if(entry.date&&entry.date>latest)latest=entry.date;
+      });
+    });
+  });
+  return latest||pcProjectionGetAnchorDate();
+}
 function pcBuildProjectionSeed(){
   var calendarSeed=pcProjectionExtractCalendarSeed();
   var schedule=pcProjectionBuildScheduleMap();
+  var lessonLog=pcProjectionBuildLessonLog();
   var turmas=[
     {id:'t1',nome:'1ª Série'},
     {id:'t2',nome:'2ª Série'},
@@ -8036,6 +8086,7 @@ function pcBuildProjectionSeed(){
         grade:{},
         metas:{},
         lancadas:{},
+        registros:{},
         totais:{}
       };
     }
@@ -8048,16 +8099,19 @@ function pcBuildProjectionSeed(){
       var targetDay=days.length?days[days.length-1]:1;
       grade[targetDay]=(grade[targetDay]||0)+(item.sw-weeklySum);
     }
+    var registros=((lessonLog[item.g]||{})[turmaId]||[]).map(function(entry){return Object.assign({},entry);});
+    var totalRegistrado=registros.reduce(function(sum,entry){return sum+(parseInt(entry.hours,10)||0);},0);
     disc.grade[turmaId]=grade;
     disc.metas[turmaId]=item.bim;
-    disc.lancadas[turmaId]=item.feitas;
+    disc.lancadas[turmaId]=Math.max(item.feitas,totalRegistrado);
+    disc.registros[turmaId]=registros;
     disc.totais[turmaId]=item.tot;
   });
   return {
     source:'casavequia-html',
     generatedAt:new Date().toISOString(),
     schoolName:'E.E. Rural Pe. Carlos Casavequia',
-    anchorDate:pcProjectionGetAnchorDate(),
+    anchorDate:pcProjectionLatestLoggedDate(lessonLog),
     recesso:calendarSeed.recesso,
     facultativoLetivo:false,
     feriados:calendarSeed.feriados,
