@@ -992,7 +992,8 @@
 <script>
 const STORAGE_KEY = 'previsoes_aulas_2026_local';
 const SOURCE_KEY = 'casavequia_projection_seed_v1';
-const YEAR = 2026;
+const START_YEAR = 2026;
+const PROJECTION_LIMIT_YEAR = 2027;
 const DIAS_AB = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
 const DISC_CORES = ['#187a63','#6d28d9','#1d4ed8','#c26a06','#be123c','#047857','#7c2d12','#4338ca'];
 const WEEK = [{k:1,ab:'Seg'},{k:2,ab:'Ter'},{k:3,ab:'Qua'},{k:4,ab:'Qui'},{k:5,ab:'Sex'}];
@@ -1007,7 +1008,7 @@ const brDate = k => {
 };
 const brDateShort = k => {
   const p = String(k || '').split('-');
-  return p.length === 3 ? `${p[2]}/${p[1]}` : '--';
+  return p.length === 3 ? (p[0] === String(START_YEAR) ? `${p[2]}/${p[1]}` : `${p[2]}/${p[1]}/${p[0]}`) : '--';
 };
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid = () => 'id' + Math.random().toString(36).slice(2,9);
@@ -1169,15 +1170,15 @@ function countCalendarNotes(){
   return state.feriados.length + (state.recesso && state.recesso.start ? 1 : 0);
 }
 
-function buildDays(){
+function buildDays(endYear = PROJECTION_LIMIT_YEAR){
   const holidayMap = {};
   state.feriados.forEach(item=>{
     if(!holidayMap[item.date]) holidayMap[item.date] = [];
     holidayMap[item.date].push(item);
   });
   const days = [];
-  let cursor = new Date(YEAR,0,1,12,0,0);
-  while(cursor.getFullYear() === YEAR){
+  let cursor = new Date(START_YEAR,0,1,12,0,0);
+  while(cursor.getFullYear() <= endYear){
     const key = mkKey(cursor.getFullYear(), cursor.getMonth(), cursor.getDate());
     const dow = cursor.getDay();
     const notes = (state.notesByDate[key] || []).slice();
@@ -1205,6 +1206,16 @@ function buildDays(){
     cursor.setDate(cursor.getDate() + 1);
   }
   return days;
+}
+
+function projectionLastDate(futureProj){
+  let latest = state.anchorDate;
+  Object.keys((futureProj && futureProj.proj) || {}).forEach(turmaId=>{
+    Object.keys(futureProj.proj[turmaId] || {}).forEach(dateKey=>{
+      if(dateKey > latest) latest = dateKey;
+    });
+  });
+  return latest;
 }
 
 function metaForTurma(disc, turmaId){
@@ -1235,16 +1246,20 @@ function fullProjectionForDiscipline(disc, days){
   const resumo = {};
   turmasForDisc(disc).forEach(turma=>{
     const meta = metaForTurma(disc, turma.id);
+    const total = totalForTurma(disc, turma.id);
     const closes = {};
     let acc = 0;
     let target = 1;
     proj[turma.id] = {};
     days.forEach(day=>{
+      if(acc >= total) return;
       if(!day.isProjectionDay) return;
       const add = numberValue(((disc.grade || {})[turma.id] || {})[day.dow], 0);
       if(add <= 0) return;
-      acc += add;
-      const cell = {cum:acc, add:add, closes:[]};
+      const applied = Math.min(add, Math.max(0, total - acc));
+      if(applied <= 0) return;
+      acc += applied;
+      const cell = {cum:acc, add:applied, closes:[]};
       while(target <= (disc.nBimestres || 4) && acc >= target * meta){
         cell.closes.push(target);
         closes[target] = day.k;
@@ -1264,17 +1279,21 @@ function futureProjectionForDiscipline(disc, days){
   turmasForDisc(disc).forEach(turma=>{
     const meta = metaForTurma(disc, turma.id);
     const launched = launchedForTurma(disc, turma.id);
+    const total = totalForTurma(disc, turma.id);
     const closes = {};
     let acc = launched;
     let target = Math.floor(launched / meta) + 1;
     proj[turma.id] = {};
     proj[turma.id][anchor] = {cum:launched, add:0, closes:[], sync:true};
     days.forEach(day=>{
+      if(acc >= total) return;
       if(day.k <= anchor || !day.isProjectionDay) return;
       const add = numberValue(((disc.grade || {})[turma.id] || {})[day.dow], 0);
       if(add <= 0) return;
-      acc += add;
-      const cell = {cum:acc, add:add, closes:[]};
+      const applied = Math.min(add, Math.max(0, total - acc));
+      if(applied <= 0) return;
+      acc += applied;
+      const cell = {cum:acc, add:applied, closes:[]};
       while(target <= (disc.nBimestres || 4) && acc >= target * meta){
         cell.closes.push(target);
         closes[target] = day.k;
@@ -1334,12 +1353,13 @@ function renderTabs(){
   tabs.innerHTML = html + `<button class="tab add" type="button" onclick="openDisciplinas()">+ disciplina</button>`;
 }
 
-function renderFooterStat(days){
-  const holidays = days.filter(day=>day.status === 'feriado').length;
-  const saturdays = days.filter(day=>day.status === 'sabado').length;
-  const sundays = days.filter(day=>day.status === 'domingo').length;
-  const recess = days.filter(day=>day.status === 'recesso').length;
-  const projectionDays = days.filter(day=>day.isProjectionDay).length;
+function renderFooterStat(days, lastDate){
+  const scoped = days.filter(day=>day.k >= state.anchorDate && day.k <= lastDate);
+  const holidays = scoped.filter(day=>day.status === 'feriado').length;
+  const saturdays = scoped.filter(day=>day.status === 'sabado').length;
+  const sundays = scoped.filter(day=>day.status === 'domingo').length;
+  const recess = scoped.filter(day=>day.status === 'recesso').length;
+  const projectionDays = scoped.filter(day=>day.isProjectionDay).length;
   document.getElementById('statFoot').textContent = `${projectionDays} dias úteis projetáveis · ${holidays} feriados · ${recess} dias de recesso · ${saturdays} sábados · ${sundays} domingos`;
 }
 
@@ -1362,9 +1382,9 @@ function buildTurmaCard(turma, disc, fullInfo, futureInfo){
     if(launched >= target){
       value = fullInfo.closes[bim] ? brDateShort(fullInfo.closes[bim]) : 'concluído';
     }else{
-      value = futureInfo.closes[bim] ? brDateShort(futureInfo.closes[bim]) : 'não fecha em 2026';
+      value = futureInfo.closes[bim] ? brDateShort(futureInfo.closes[bim]) : 'não fecha até 2027';
     }
-    lines += `<div class="statline"><span>${bim}º bimestre</span><span class="value ${value === 'não fecha em 2026' ? 'miss' : ''}">${esc(value)}</span></div>`;
+    lines += `<div class="statline"><span>${bim}º bimestre</span><span class="value ${value === 'não fecha até 2027' ? 'miss' : ''}">${esc(value)}</span></div>`;
   }
   return `<article class="card">
     <h3>${esc(turma.nome)}</h3>
@@ -1373,7 +1393,7 @@ function buildTurmaCard(turma, disc, fullInfo, futureInfo){
     <div class="statline"><span>Bimestre atual</span><span class="value">${currentBim}º · ${currentProgress}/${meta}</span></div>
     <div class="statline"><span>Total anual</span><span class="value">${launched}/${total}</span></div>
     ${lines}
-    <div class="summary-total"><strong>Próxima projeção útil:</strong> ${futureInfo.closes[currentBim] ? esc(brDate(futureInfo.closes[currentBim])) : 'sem fechamento restante em 2026'}.</div>
+    <div class="summary-total"><strong>Próxima projeção útil:</strong> ${futureInfo.closes[currentBim] ? esc(brDate(futureInfo.closes[currentBim])) : 'sem fechamento restante até 2027'}.</div>
   </article>`;
 }
 
@@ -1423,16 +1443,17 @@ function rowClass(day){
   return 'status-letivo';
 }
 
-function shouldKeepRow(day, futureProj){
-  if(!state.showOnlyActive) return day.k >= state.anchorDate;
+function shouldKeepRow(day, futureProj, lastDate){
+  if(day.k > lastDate) return false;
+  if(!state.showOnlyActive) return day.k >= state.anchorDate && day.k <= lastDate;
   if(day.k < state.anchorDate && day.k !== state.anchorDate) return false;
   if(day.status === 'domingo' || day.status === 'sabado' || day.status === 'feriado' || day.status === 'recesso') return true;
   return Object.keys(futureProj.proj || {}).some(turmaId=>!!(futureProj.proj[turmaId] || {})[day.k]);
 }
 
-function renderProjectionTable(disc, days, futureProj){
+function renderProjectionTable(disc, days, futureProj, lastDate){
   const activeTurmas = turmasForDisc(disc);
-  const visibleDays = days.filter(day=>shouldKeepRow(day, futureProj));
+  const visibleDays = days.filter(day=>shouldKeepRow(day, futureProj, lastDate));
   if(!visibleDays.length){
     return `<div class="empty-note">Nenhuma data disponível para esta projeção.</div>`;
   }
@@ -1472,14 +1493,16 @@ function renderPanel(){
   const disc = state.disciplinas.find(item=>item.id === state.activeDisc);
   const panel = document.getElementById('panel');
   const days = buildDays();
-  renderFooterStat(days);
   if(!disc){
+    renderFooterStat(days, state.anchorDate);
     panel.innerHTML = `<div class="empty-note">Nenhuma disciplina disponível. Use o botão de disciplinas para criar uma nova aba.</div>`;
     return;
   }
   const activeTurmas = turmasForDisc(disc);
   const full = fullProjectionForDiscipline(disc, days);
   const future = futureProjectionForDiscipline(disc, days);
+  const lastDate = projectionLastDate(future);
+  renderFooterStat(days, lastDate);
   const launched = sumValues(disc.lancadas || {});
   const weeklyLoad = activeTurmas.reduce((sum,turma)=>sum + weeklyForTurma(disc, turma.id), 0);
   panel.innerHTML = `<div class="discipline-panel">
@@ -1508,14 +1531,14 @@ function renderPanel(){
     <div class="cfg-row">
       <div class="field">
         <label>Data-base das aulas lançadas</label>
-        <input type="date" min="2026-01-01" max="2026-12-31" value="${esc(state.anchorDate)}" onchange="onAnchorDate(this.value)">
+        <input type="date" min="2026-01-01" max="2027-12-31" value="${esc(state.anchorDate)}" onchange="onAnchorDate(this.value)">
       </div>
       <label class="check"><input type="checkbox" ${state.facultativoLetivo ? 'checked' : ''} onchange="toggleFacultativo(this.checked)">Contar pontos facultativos como dias letivos</label>
       <div class="hint">Use esta data para dizer até onde o contador já foi lançado. A tabela seguinte mantém sábado e domingo na sequência para a leitura do ritmo semanal, deixando o domingo em vermelho escuro como limitador visual.</div>
     </div>
 
     <div class="section-title">Linha do tempo das próximas aulas e dos fechamentos</div>
-    ${renderProjectionTable(disc, days, future)}
+    ${renderProjectionTable(disc, days, future, lastDate)}
   </div>`;
 }
 
@@ -1680,8 +1703,8 @@ function openRecesso(){
     <div class="modal-body">
       <div class="hint">As datas deste intervalo ficam bloqueadas na projeção, mesmo aparecendo na linha do tempo.</div>
       <div class="list-row" style="border-bottom:none;padding-top:4px">
-        <input class="date" type="date" id="recStart" min="2026-01-01" max="2026-12-31" value="${esc(state.recesso.start)}">
-        <input class="date" type="date" id="recEnd" min="2026-01-01" max="2026-12-31" value="${esc(state.recesso.end)}">
+        <input class="date" type="date" id="recStart" min="2026-01-01" max="2027-12-31" value="${esc(state.recesso.start)}">
+        <input class="date" type="date" id="recEnd" min="2026-01-01" max="2027-12-31" value="${esc(state.recesso.end)}">
       </div>
     </div>
     <div class="modal-foot">
