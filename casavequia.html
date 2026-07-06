@@ -6746,7 +6746,44 @@ document.getElementById('p6ano').classList.add('active');
 </div>
 </section>
 
-<section class="sec" id="sec-cont">
+<section class="sec pc-sec-enhanced" id="sec-cont">
+<div class="pc-hero">
+  <div class="pc-hero-main">
+    <div class="pc-hero-kicker">Painel de progresso</div>
+    <h2 class="pc-hero-title">Contador de Aulas e Cronograma Semanal</h2>
+    <p class="pc-hero-copy">Acompanhe o avanço das disciplinas, consulte o cronograma integrado da semana e confira rapidamente quantas aulas já foram lançadas em cada frente do relatório.</p>
+    <div class="pc-hero-actions">
+      <button class="pc-hero-btn primary" type="button" onclick="document.getElementById('card-seg-cont').scrollIntoView({behavior:'smooth',block:'start'})">Ver cronograma</button>
+      <button class="pc-hero-btn ghost" type="button" onclick="document.getElementById('cnt-lp').scrollIntoView({behavior:'smooth',block:'start'})">Ir para Língua Portuguesa</button>
+      <button class="pc-hero-btn ghost" type="button" onclick="document.getElementById('cnt-tc').scrollIntoView({behavior:'smooth',block:'start'})">Ir para Trilhas</button>
+      <button class="pc-hero-btn soft" type="button" onclick="pcCopyCounterSummary()">Copiar resumo do contador</button>
+    </div>
+    <div class="pc-hero-quicktabs">
+      <button class="pc-hero-pill" type="button" onclick="document.getElementById('cnt-lp').scrollIntoView({behavior:'smooth',block:'start'})">Língua Portuguesa</button>
+      <button class="pc-hero-pill" type="button" onclick="document.getElementById('cnt-tl').scrollIntoView({behavior:'smooth',block:'start'})">Trilhas de Linguagens</button>
+      <button class="pc-hero-pill" type="button" onclick="document.getElementById('cnt-tc').scrollIntoView({behavior:'smooth',block:'start'})">Trilhas de C. Humanas</button>
+      <button class="pc-hero-pill" type="button" onclick="document.getElementById('cnt-ar').scrollIntoView({behavior:'smooth',block:'start'})">Artes</button>
+    </div>
+    <div class="pc-hero-status" id="pc-hero-status-sec-cont">Painel pronto para acompanhamento do ano letivo.</div>
+  </div>
+  <div class="pc-hero-side">
+    <div class="pc-hero-stat">
+      <span class="pc-hero-stat-label">Aulas lançadas</span>
+      <strong class="pc-hero-stat-value" id="pc-stat-count-sec-cont">--</strong>
+      <span class="pc-hero-stat-meta">Total de aulas já contabilizadas no contador.</span>
+    </div>
+    <div class="pc-hero-stat">
+      <span class="pc-hero-stat-label">Disciplinas ativas</span>
+      <strong class="pc-hero-stat-value" id="pc-stat-last-sec-cont">--</strong>
+      <span class="pc-hero-stat-meta">Frentes acompanhadas nesta aba.</span>
+    </div>
+    <div class="pc-hero-stat pc-hero-stat-lessons">
+      <span class="pc-hero-stat-label">Resumo por área</span>
+      <div class="pc-hero-lessons" id="pc-stat-lessons-sec-cont"></div>
+      <span class="pc-hero-stat-meta">Avanço atual por grupo disciplinar.</span>
+    </div>
+  </div>
+</div>
 <div class="th"><div class="tb gz">📊</div><div class="ti"><h2>Contador de Aulas</h2><p>Progresso por disciplina · Trilhas divididas em Linguagens e C. Humanas · Metas proporcionais às h/aula</p></div></div>
 <div style="margin-bottom:22px">
   <div class="th" style="margin-bottom:16px;padding-bottom:10px">
@@ -7737,6 +7774,40 @@ function pcBuildHeroLessonsHtml(sectionId){
     return '<div class="pc-hero-lesson"><span>'+item.label+'</span><strong>'+item.feitas+' de '+item.total+'</strong></div>';
   }).join('');
 }
+function pcBuildCounterHeroLessonsHtml(){
+  var grouped={};
+  DISC.forEach(function(item){
+    if(!grouped[item.g])grouped[item.g]={label:item.d,feitas:0,total:0};
+    grouped[item.g].feitas+=item.feitas;
+    grouped[item.g].total+=item.tot;
+  });
+  return Object.keys(grouped).map(function(key){
+    var item=grouped[key];
+    return '<div class="pc-hero-lesson"><span>'+item.label+'</span><strong>'+item.feitas+' de '+item.total+'</strong></div>';
+  }).join('');
+}
+function pcRefreshCounterHero(){
+  var totalFeitas=DISC.reduce(function(sum,item){return sum+item.feitas;},0);
+  var totalDisciplinas=DISC.length;
+  var countEl=document.getElementById('pc-stat-count-sec-cont');
+  var discEl=document.getElementById('pc-stat-last-sec-cont');
+  var lessonsEl=document.getElementById('pc-stat-lessons-sec-cont');
+  var statusEl=document.getElementById('pc-hero-status-sec-cont');
+  if(countEl)countEl.textContent=String(totalFeitas);
+  if(discEl)discEl.textContent=String(totalDisciplinas);
+  if(lessonsEl)lessonsEl.innerHTML=pcBuildCounterHeroLessonsHtml();
+  if(statusEl)statusEl.textContent='Painel pronto · '+totalFeitas+' aulas registradas no contador.';
+}
+function pcCopyCounterSummary(){
+  var linhas=['Pe. Carlos Casavequia - Contador de Aulas'];
+  var totalFeitas=DISC.reduce(function(sum,item){return sum+item.feitas;},0);
+  linhas.push('Aulas lancadas: '+totalFeitas);
+  linhas.push('Disciplinas ativas: '+DISC.length);
+  DISC.forEach(function(item){
+    linhas.push('- '+item.t+' | '+item.d+': '+item.feitas+' de '+item.tot);
+  });
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(linhas.join('\n')).catch(function(){});}
+}
 function pcDecorateSectionHero(sectionId,cfg){
   var sec=document.getElementById(sectionId);if(!sec||sec.querySelector('.pc-hero'))return;
   sec.classList.add('pc-sec-enhanced');
@@ -7769,6 +7840,7 @@ function pcInitSectionHeroes(){
   pcDecorateSectionHero('sec-t3',{kicker:'Turma em foco',title:'3ª Serie - Diario e Painel de Alunos',copy:'Concentre aqui os relatos mais importantes da turma concluinte e avance para o painel de alunos sempre que precisar fechar um panorama anual.',status:'Turma pronta para acompanhamento.',page:PC_ALUNOS_PAGES.t3,coverage:'Pagina ativa',coverageMeta:'Notas, faltas e relatorio anual da 3ª serie.'});
   pcDecorateSectionHero('sec-t6',{kicker:'Turma em foco',title:'6º Ano - Diario e Painel de Alunos',copy:'Acompanhe os relatos do 6º ano com o mesmo cabecalho interativo e abra a pagina da turma para acessar desempenho, frequencia e relatorio geral de cada aluno.',status:'Turma pronta para acompanhamento.',page:PC_ALUNOS_PAGES.t6,coverage:'Pagina ativa',coverageMeta:'Notas, faltas e relatorio anual do 6º ano.'});
   pcRefreshHeroStats();
+  pcRefreshCounterHero();
 }
 
 /* ★ CONTADOR ★ */
