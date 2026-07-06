@@ -1157,7 +1157,7 @@ function totalLancadas(){
 }
 
 function countCalendarNotes(){
-  return Object.keys(state.notesByDate || {}).reduce((sum,key)=>sum + (state.notesByDate[key] || []).length, 0);
+  return state.feriados.length + (state.recesso && state.recesso.start ? 1 : 0);
 }
 
 function buildDays(){
@@ -1292,7 +1292,7 @@ function renderHero(){
   document.getElementById('hero-stats').innerHTML = [
     {label:'Aulas já lançadas',value:totalLancadas(),copy:'Contagem importada do contador do relatório.'},
     {label:'Turmas acompanhadas',value:state.turmas.length,copy:'Linhas ativas na projeção semanal.'},
-    {label:'Datas marcadas',value:countCalendarNotes(),copy:'Anotações vindas do calendário escolar oficial.'},
+    {label:'Bloqueios oficiais',value:countCalendarNotes(),copy:'Somente feriados e recesso entram no cálculo.'},
     {label:'Última sincronização',value:generatedLabel,copy:'Base gravada a partir da página principal.'}
   ].map(item=>`<div class="hero-card"><small>${esc(item.label)}</small><strong>${esc(String(item.value))}</strong><span>${esc(item.copy)}</span></div>`).join('');
   document.getElementById('sync-list').innerHTML = [
@@ -1391,12 +1391,9 @@ function dayNotePills(day){
   day.holidays.forEach(item=>{
     pills.push(`<span class="note-pill ${esc(item.tipo)}">${esc(item.nome)}</span>`);
   });
-  day.notes.forEach(note=>{
-    pills.push(`<span class="note-pill">${esc(note)}</span>`);
-  });
-  if(day.status === 'sabado' && !day.holidays.length && !day.notes.length) pills.push(`<span class="note-pill sabado">Sábado visível na linha do tempo</span>`);
+  if(day.status === 'sabado' && !day.holidays.length) pills.push(`<span class="note-pill sabado">Sábado visível na linha do tempo</span>`);
   if(day.status === 'domingo') pills.push(`<span class="note-pill domingo">Domingo · limitador da semana</span>`);
-  if(day.status === 'recesso' && !day.notes.length) pills.push(`<span class="note-pill recesso">Recesso escolar</span>`);
+  if(day.status === 'recesso') pills.push(`<span class="note-pill recesso">Recesso escolar</span>`);
   return pills.length ? pills.join('') : `<span class="note-pill">Projeção regular</span>`;
 }
 
@@ -1412,7 +1409,6 @@ function shouldKeepRow(day, futureProj){
   if(!state.showOnlyActive) return day.k >= state.anchorDate;
   if(day.k < state.anchorDate && day.k !== state.anchorDate) return false;
   if(day.status === 'domingo' || day.status === 'sabado' || day.status === 'feriado' || day.status === 'recesso') return true;
-  if(day.notes.length) return true;
   return state.turmas.some(turma=>!!(futureProj.proj[turma.id] || {})[day.k]);
 }
 
