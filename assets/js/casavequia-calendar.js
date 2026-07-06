@@ -160,6 +160,50 @@
     return raw;
   }
 
+  function isNumericOnlyText(text) {
+    return /^\d{4,6}$/.test(String(text || '').trim());
+  }
+
+  function parseOccurrenceDates(event) {
+    var raw = repairText(event.rangeText || '').replace(/\s+/g, ' ').trim();
+    var start = parseIso(event.start);
+    var end = parseIso(event.end);
+    var result = [];
+
+    if (!raw || /^\d{5}$/.test(raw) || /\ba\b/i.test(raw)) {
+      eachDateInclusive(start, end, function (date) {
+        result.push(toIso(date));
+      });
+      return result;
+    }
+
+    var listText = raw.replace(/\be\b/gi, ',').replace(/\s+/g, ',').replace(/,+/g, ',').replace(/^,|,$/g, '');
+    var tokens = listText ? listText.split(',').filter(Boolean) : [];
+    var dayNumbers = tokens.map(function (token) {
+      return Number(token);
+    }).filter(function (value) {
+      return value >= 1 && value <= 31;
+    });
+
+    if (!dayNumbers.length || dayNumbers.length !== tokens.length) {
+      eachDateInclusive(start, end, function (date) {
+        result.push(toIso(date));
+      });
+      return result;
+    }
+
+    var month = start.getMonth();
+    var year = start.getFullYear();
+    dayNumbers.forEach(function (dayNumber) {
+      var date = new Date(year, month, dayNumber);
+      if (date.getMonth() === month) {
+        result.push(toIso(date));
+      }
+    });
+
+    return Array.from(new Set(result)).sort();
+  }
+
   function sanitizeHexColor(color) {
     var value = String(color || '').trim();
     if (!value) {
@@ -389,8 +433,7 @@
           return;
         }
         allEvents.push(event);
-        eachDateInclusive(parseIso(event.start), parseIso(event.end), function (date) {
-          var iso = toIso(date);
+        (event.occurrenceDates || []).forEach(function (iso) {
           if (!dayMap[iso]) {
             dayMap[iso] = [];
           }
@@ -419,11 +462,17 @@
     }
 
     var scope = override && override.scope ? override.scope : rawEvent.scope;
+    var title = repairText(override && override.title ? override.title : rawEvent.title);
+
+    if (isNumericOnlyText(title)) {
+      return null;
+    }
+
     var event = {
       id: id,
       scope: scope,
       scopeLabel: getScopeLabel(scope, override && override.scopeLabel ? override.scopeLabel : rawEvent.scopeLabel || scopeData.scopeLabel),
-      title: repairText(override && override.title ? override.title : rawEvent.title),
+      title: title,
       category: override && override.category ? override.category : (rawEvent.category || 'agenda'),
       start: override && override.start ? override.start : rawEvent.start,
       end: override && override.end ? override.end : rawEvent.end,
@@ -434,6 +483,7 @@
     };
 
     event.tone = resolveTone(event);
+    event.occurrenceDates = parseOccurrenceDates(event);
     return event;
   }
 
@@ -451,6 +501,7 @@
       sourceType: event.sourceType,
       sourceSheet: event.sourceSheet,
       tone: event.tone,
+      occurrenceDates: event.occurrenceDates ? event.occurrenceDates.slice() : [],
       day: iso
     };
   }
