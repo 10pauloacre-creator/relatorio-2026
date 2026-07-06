@@ -205,7 +205,7 @@
   .btn .ic{width:15px;height:15px;stroke:currentColor;stroke-width:1.8;fill:none;flex:none}
   .shell{
     display:grid;
-    grid-template-columns:312px minmax(0,1fr);
+    grid-template-columns:280px minmax(0,1fr);
     gap:18px;
     align-items:start;
   }
@@ -491,14 +491,15 @@
   }
   .summary-total strong{color:var(--ink)}
   .grid-wrap{
-    overflow:auto;
+    overflow-y:auto;
+    overflow-x:hidden;
     border:1px solid var(--line);
     border-radius:20px;
     background:#fff;
   }
   table.grid{
     width:100%;
-    min-width:920px;
+    table-layout:fixed;
     border-collapse:collapse;
   }
   table.grid th,table.grid td{
@@ -518,20 +519,20 @@
     color:var(--muted);
   }
   table.grid td.turma-cell,table.grid th.turma-cell{
-    position:sticky;
-    left:0;
-    z-index:1;
     text-align:left;
-    min-width:160px;
+    width:118px;
     background:#fcfdfb;
     font-weight:700;
     color:var(--ink);
     border-right:1px solid var(--line);
+    white-space:normal;
+    overflow-wrap:anywhere;
   }
-  table.grid thead th.turma-cell{z-index:2}
   table.grid tbody tr:last-child td{border-bottom:none}
   .grade-in,.meta-in,.done-in,.total-in{
-    width:70px;
+    width:100%;
+    min-width:0;
+    max-width:64px;
     border:1px solid var(--line);
     border-radius:12px;
     padding:8px 7px;
@@ -619,7 +620,8 @@
     box-shadow:0 8px 14px rgba(21,35,24,.06);
   }
   .proj-wrap{
-    overflow:auto;
+    overflow-y:auto;
+    overflow-x:hidden;
     border:1px solid var(--line);
     border-radius:22px;
     background:#fff;
@@ -627,7 +629,7 @@
   }
   table.proj{
     width:100%;
-    min-width:1040px;
+    table-layout:fixed;
     border-collapse:separate;
     border-spacing:0;
   }
@@ -650,13 +652,14 @@
     border-bottom:2px solid var(--line);
   }
   .c-data,.c-dia,.c-event{
-    position:sticky;
     background:#fff;
+    white-space:normal;
+    overflow-wrap:anywhere;
   }
-  .c-data{left:0;z-index:2;min-width:92px;font-family:var(--mono);color:var(--ink-soft);border-right:1px solid var(--line)}
-  .c-dia{left:92px;z-index:2;min-width:74px;color:var(--ink-soft);border-right:1px solid var(--line)}
-  .c-event{left:166px;z-index:2;min-width:300px;border-right:1px solid var(--line)}
-  thead .c-data, thead .c-dia, thead .c-event{z-index:4;background:#f7faf6}
+  .c-data{width:84px;font-family:var(--mono);color:var(--ink-soft);border-right:1px solid var(--line)}
+  .c-dia{width:62px;color:var(--ink-soft);border-right:1px solid var(--line)}
+  .c-event{width:220px;border-right:1px solid var(--line)}
+  thead .c-data, thead .c-dia, thead .c-event{background:#f7faf6}
   .row-mon td{border-top:2px solid rgba(21,35,24,.08)}
   .event-cell{
     display:flex;
@@ -683,7 +686,6 @@
   .note-pill.sabado{background:var(--sat);border-color:rgba(29,78,216,.14);color:var(--accent)}
   .note-pill.domingo{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:#fff}
   .turno{
-    min-width:148px;
     text-align:left;
   }
   .turno-inner{
@@ -694,7 +696,7 @@
     padding:10px 11px;
     background:#f9fbf8;
     border:1px solid rgba(21,35,24,.05);
-    min-height:76px;
+    min-height:68px;
   }
   .turno.sync .turno-inner{background:var(--primary-soft);border-color:rgba(24,122,99,.16)}
   .turno.milestone .turno-inner{background:var(--mile);border-color:var(--mile-bd)}
@@ -725,7 +727,6 @@
     font-weight:700;
   }
   .blank{
-    min-width:148px;
     color:#b2bdb4;
     text-align:center;
     font-family:var(--mono);
@@ -908,8 +909,7 @@
     .tabs{padding:12px}
     .content{padding:0 12px 12px}
     .cards{grid-template-columns:1fr}
-    .c-data,.c-dia,.c-event{position:static}
-    table.proj{min-width:860px}
+    .c-event{width:auto}
   }
   @media print{
     body{background:#fff}
@@ -917,7 +917,6 @@
     .shell{display:block}
     .discipline-panel,.panel-card{box-shadow:none;border:1px solid #ddd}
     .proj-wrap{overflow:visible;box-shadow:none}
-    table.proj thead th,.c-data,.c-dia,.c-event,table.grid th.turma-cell,table.grid td.turma-cell{position:static}
     *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   }
 </style>
@@ -1060,6 +1059,7 @@ function defaultState(){
         nome:'Língua Portuguesa',
         cor:'#187a63',
         nBimestres:4,
+        turmasAtivas:[t1,t2,t3],
         grade:{[t1]:{1:2},[t2]:{1:2,2:2},[t3]:{1:2,2:1}},
         metas:{[t1]:20,[t2]:30,[t3]:30},
         lancadas:{[t1]:0,[t2]:0,[t3]:0},
@@ -1097,6 +1097,15 @@ function normalizeState(){
     disc.metas = disc.metas || {};
     disc.lancadas = disc.lancadas || {};
     disc.totais = disc.totais || {};
+    const inferredTurmas = Array.from(new Set([
+      ...Object.keys(disc.grade),
+      ...Object.keys(disc.metas),
+      ...Object.keys(disc.lancadas),
+      ...Object.keys(disc.totais)
+    ])).filter(id=>state.turmas.some(t=>t.id === id));
+    disc.turmasAtivas = Array.isArray(disc.turmasAtivas) && disc.turmasAtivas.length
+      ? disc.turmasAtivas.filter(id=>state.turmas.some(t=>t.id === id))
+      : inferredTurmas;
     state.turmas.forEach(t=>{
       if(!disc.grade[t.id]) disc.grade[t.id] = {};
       if(disc.metas[t.id] == null) disc.metas[t.id] = 20;
@@ -1214,10 +1223,17 @@ function weeklyForTurma(disc, turmaId){
   return sumValues((disc.grade || {})[turmaId] || {});
 }
 
+function turmasForDisc(disc){
+  const activeIds = Array.isArray(disc.turmasAtivas) && disc.turmasAtivas.length
+    ? disc.turmasAtivas
+    : Object.keys(disc.grade || {}).filter(id=>state.turmas.some(t=>t.id === id));
+  return state.turmas.filter(turma=>activeIds.includes(turma.id));
+}
+
 function fullProjectionForDiscipline(disc, days){
   const proj = {};
   const resumo = {};
-  state.turmas.forEach(turma=>{
+  turmasForDisc(disc).forEach(turma=>{
     const meta = metaForTurma(disc, turma.id);
     const closes = {};
     let acc = 0;
@@ -1245,7 +1261,7 @@ function futureProjectionForDiscipline(disc, days){
   const anchor = state.anchorDate;
   const proj = {};
   const resumo = {};
-  state.turmas.forEach(turma=>{
+  turmasForDisc(disc).forEach(turma=>{
     const meta = metaForTurma(disc, turma.id);
     const launched = launchedForTurma(disc, turma.id);
     const closes = {};
@@ -1306,12 +1322,13 @@ function renderTabs(){
   const tabs = document.getElementById('tabs');
   const html = state.disciplinas.map(disc=>{
     const launched = sumValues(disc.lancadas || {});
+    const activeTurmas = turmasForDisc(disc);
     return `<button class="tab ${disc.id === state.activeDisc ? 'active' : ''}" type="button" onclick="setDisc('${disc.id}')">
       <div class="tab-line">
         <span class="tab-name"><span class="dot" style="background:${esc(disc.cor)}"></span>${esc(disc.nome)}</span>
         <strong>${launched}</strong>
       </div>
-      <div class="tab-meta">${state.turmas.length} turmas · ${disc.nBimestres || 4} bimestres</div>
+      <div class="tab-meta">${activeTurmas.length} turmas · ${disc.nBimestres || 4} bimestres</div>
     </button>`;
   }).join('');
   tabs.innerHTML = html + `<button class="tab add" type="button" onclick="openDisciplinas()">+ disciplina</button>`;
@@ -1361,6 +1378,7 @@ function buildTurmaCard(turma, disc, fullInfo, futureInfo){
 }
 
 function renderGrid(disc){
+  const activeTurmas = turmasForDisc(disc);
   let html = `<div class="grid-wrap"><table class="grid"><thead><tr>
     <th class="turma-cell">Turma</th>
     ${WEEK.map(day=>`<th>${day.ab}</th>`).join('')}
@@ -1369,7 +1387,7 @@ function renderGrid(disc){
     <th>Lançadas</th>
     <th>Total ano</th>
   </tr></thead><tbody>`;
-  state.turmas.forEach(turma=>{
+  activeTurmas.forEach(turma=>{
     const grade = (disc.grade || {})[turma.id] || {};
     html += `<tr><td class="turma-cell">${esc(turma.nome)}</td>`;
     WEEK.forEach(day=>{
@@ -1409,21 +1427,22 @@ function shouldKeepRow(day, futureProj){
   if(!state.showOnlyActive) return day.k >= state.anchorDate;
   if(day.k < state.anchorDate && day.k !== state.anchorDate) return false;
   if(day.status === 'domingo' || day.status === 'sabado' || day.status === 'feriado' || day.status === 'recesso') return true;
-  return state.turmas.some(turma=>!!(futureProj.proj[turma.id] || {})[day.k]);
+  return Object.keys(futureProj.proj || {}).some(turmaId=>!!(futureProj.proj[turmaId] || {})[day.k]);
 }
 
 function renderProjectionTable(disc, days, futureProj){
+  const activeTurmas = turmasForDisc(disc);
   const visibleDays = days.filter(day=>shouldKeepRow(day, futureProj));
   if(!visibleDays.length){
     return `<div class="empty-note">Nenhuma data disponível para esta projeção.</div>`;
   }
   let head = `<tr><th class="c-data">Data</th><th class="c-dia">Dia</th><th class="c-event">Evento / Status</th>`;
-  state.turmas.forEach(turma=>{ head += `<th>${esc(turma.nome)}</th>`; });
+  activeTurmas.forEach(turma=>{ head += `<th>${esc(turma.nome)}</th>`; });
   head += `</tr>`;
   let rows = '';
   visibleDays.forEach(day=>{
     let cells = '';
-    state.turmas.forEach(turma=>{
+    activeTurmas.forEach(turma=>{
       const cell = ((futureProj.proj[turma.id] || {})[day.k]) || null;
       if(cell){
         const tags = cell.closes.map(bim=>`<span class="mile-tag">fecha ${bim}º</span>`).join('');
@@ -1458,10 +1477,11 @@ function renderPanel(){
     panel.innerHTML = `<div class="empty-note">Nenhuma disciplina disponível. Use o botão de disciplinas para criar uma nova aba.</div>`;
     return;
   }
+  const activeTurmas = turmasForDisc(disc);
   const full = fullProjectionForDiscipline(disc, days);
   const future = futureProjectionForDiscipline(disc, days);
   const launched = sumValues(disc.lancadas || {});
-  const weeklyLoad = state.turmas.reduce((sum,turma)=>sum + weeklyForTurma(disc, turma.id), 0);
+  const weeklyLoad = activeTurmas.reduce((sum,turma)=>sum + weeklyForTurma(disc, turma.id), 0);
   panel.innerHTML = `<div class="discipline-panel">
     <div class="panel-hero">
       <div>
@@ -1475,13 +1495,13 @@ function renderPanel(){
       <div class="hero-kpis">
         <div class="mini-card"><small>Aulas lançadas</small><strong>${launched}</strong><span>Soma desta disciplina em todas as turmas.</span></div>
         <div class="mini-card"><small>Carga semanal</small><strong>${weeklyLoad} h/aula</strong><span>Distribuição semanal usada nas próximas projeções.</span></div>
-        <div class="mini-card"><small>Turmas ativas</small><strong>${state.turmas.length}</strong><span>Linhas com metas e saldo individuais.</span></div>
+        <div class="mini-card"><small>Turmas ativas</small><strong>${activeTurmas.length}</strong><span>Linhas com metas e saldo individuais.</span></div>
         <div class="mini-card"><small>Base futura</small><strong>${esc(brDate(state.anchorDate))}</strong><span>Primeira linha sincronizada com o contador atual.</span></div>
       </div>
     </div>
 
     <div class="section-title">Fechamento dos bimestres por turma</div>
-    <div class="cards">${state.turmas.map(turma=>buildTurmaCard(turma, disc, full.resumo[turma.id], future.resumo[turma.id])).join('')}</div>
+    <div class="cards">${activeTurmas.map(turma=>buildTurmaCard(turma, disc, full.resumo[turma.id], future.resumo[turma.id])).join('')}</div>
 
     <div class="section-title">Grade semanal, metas e aulas já lançadas</div>
     ${renderGrid(disc)}
@@ -1600,6 +1620,7 @@ function addTurma(){
 function delTurma(id){
   state.turmas = state.turmas.filter(item=>item.id !== id);
   state.disciplinas.forEach(disc=>{
+    disc.turmasAtivas = Array.isArray(disc.turmasAtivas) ? disc.turmasAtivas.filter(turmaId=>turmaId !== id) : [];
     delete disc.grade[id];
     delete disc.metas[id];
     delete disc.lancadas[id];
@@ -1634,7 +1655,7 @@ function editDisc(id, field, value){
 function addDisc(){
   const id = uid();
   const color = DISC_CORES[state.disciplinas.length % DISC_CORES.length];
-  const disc = {id:id, nome:'Nova disciplina', cor:color, nBimestres:4, grade:{}, metas:{}, lancadas:{}, totais:{}};
+  const disc = {id:id, nome:'Nova disciplina', cor:color, nBimestres:4, turmasAtivas:state.turmas.map(turma=>turma.id), grade:{}, metas:{}, lancadas:{}, totais:{}};
   state.turmas.forEach(turma=>{
     disc.grade[turma.id] = {};
     disc.metas[turma.id] = 20;
