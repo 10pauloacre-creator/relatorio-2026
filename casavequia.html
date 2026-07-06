@@ -777,8 +777,6 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <button class="nb" onclick="aba('cal',this)">📆 Calendário</button><div class="sp"></div>
 <button class="nb" onclick="aba('cont',this)">📊 Contador</button>
 <div class="sp"></div>
-<button class="nb" type="button" onclick="window.open('planejamento-aulas-2026.html','_blank','noopener')">🗂 Planejador</button>
-<div class="sp"></div>
 <button class="nb" onclick="aba('claude',this)">⏱ Claude</button>
 <div class="sp"></div>
 <button class="nb" onclick="aba('livros',this)">📖 Livros</button>
@@ -6769,10 +6767,10 @@ document.getElementById('p6ano').classList.add('active');
   <div class="pc-hero-main">
     <div class="pc-hero-kicker">Painel de progresso</div>
     <h2 class="pc-hero-title">Contador de Aulas e Cronograma Semanal</h2>
-    <p class="pc-hero-copy">Acompanhe o avanço das disciplinas, consulte o cronograma integrado da semana, registre aulas aplicadas com mais rapidez e use o novo planejador para prever próximas aulas e datas de fechamento dos bimestres.</p>
+    <p class="pc-hero-copy">Acompanhe o avanço das disciplinas, consulte o cronograma integrado da semana, registre aulas aplicadas com mais rapidez e use a nova página de projeções para prever próximas aulas e datas de fechamento dos bimestres.</p>
     <div class="pc-hero-actions">
       <button class="pc-hero-btn primary" type="button" onclick="document.getElementById('card-seg-cont').scrollIntoView({behavior:'smooth',block:'start'})">Ver cronograma</button>
-      <button class="pc-hero-btn ghost" type="button" onclick="window.open('planejamento-aulas-2026.html','_blank','noopener')">Abrir planejador</button>
+      <button class="pc-hero-btn ghost" type="button" onclick="window.open('planejamento-aulas-2026.html','_blank','noopener')">Projeções de aulas</button>
       <button class="pc-hero-btn ghost" type="button" onclick="document.getElementById('cnt-lp').scrollIntoView({behavior:'smooth',block:'start'})">Ir para Língua Portuguesa</button>
       <button class="pc-hero-btn ghost" type="button" onclick="document.getElementById('cnt-tc').scrollIntoView({behavior:'smooth',block:'start'})">Ir para Trilhas</button>
       <button class="pc-hero-btn soft" type="button" onclick="pcCopyCounterSummary()">Copiar resumo do contador</button>
@@ -6806,12 +6804,9 @@ document.getElementById('p6ano').classList.add('active');
 <div class="pc-planner-shell" id="pc-planner-shell">
   <div class="pc-planner-head">
     <div>
-      <div class="pc-planner-kicker">Planejador integrado</div>
+      <div class="pc-planner-kicker">Projeções integradas</div>
       <h3>Registro rápido das aulas e projeção dos bimestres</h3>
-      <p>Este painel complementa o Contador para lançar com facilidade o dia, a turma, a disciplina e a quantidade de horas aplicadas, além de prever as próximas aulas e mostrar em que data cada bimestre será encerrado.</p>
-    </div>
-    <div class="pc-planner-actions">
-      <button class="pc-cal-btn primary" type="button" onclick="window.open('planejamento-aulas-2026.html','_blank','noopener')">Abrir página completa</button>
+      <p>Este painel complementa o Contador para sincronizar automaticamente as aulas já lançadas no relatório, cruzar o cronograma semanal com feriados e recessos e prever as próximas datas de aula e de encerramento de cada bimestre.</p>
     </div>
   </div>
   <div class="pc-planner-meta">
@@ -6820,7 +6815,7 @@ document.getElementById('p6ano').classList.add('active');
     <span>Horas por disciplina e turma</span>
     <span>Fechamento dos bimestres</span>
   </div>
-  <iframe id="pc-planner-frame" class="pc-planner-frame" src="planejamento-aulas-2026.html" title="Planejador de aulas 2026" loading="lazy"></iframe>
+  <iframe id="pc-planner-frame" class="pc-planner-frame" src="planejamento-aulas-2026.html" title="Projeções de aulas 2026" loading="lazy"></iframe>
 </div>
 <div class="th"><div class="tb gz">📊</div><div class="ti"><h2>Contador de Aulas</h2><p>Progresso por disciplina · Trilhas divididas em Linguagens e C. Humanas · Metas proporcionais às h/aula</p></div></div>
 <div style="margin-bottom:22px">
@@ -7904,6 +7899,189 @@ function calcBims(disc){let ac=disc.feitas,rf=new Date(BASE),res=[];for(let b=1;
 const FC={lp:'f-lp',tl:'f-tl',tc:'f-tc',ar:'f-ar'};
 const BC={lp:'bd-lp',tl:'bd-tl',tc:'bd-tc',ar:'bd-ar'};
 const CN={lp:'cnt-lp',tl:'cnt-tl',tc:'cnt-tc',ar:'cnt-ar'};
+const PC_PROJECTION_SEED_KEY='casavequia_projection_seed_v1';
+const PC_PROJECTION_COLOR_MAP={lp:'#0f766e',tl:'#6d28d9',tc:'#1d4ed8',ar:'#c26a06'};
+const PC_PROJECTION_TURMA_ID_MAP={'1ª Série':'t1','2ª Série':'t2','3ª Série':'t3','6º Ano':'t6'};
+function pcProjectionNormalizeText(value){
+  return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+}
+function pcProjectionExpandDateRange(start,end){
+  var list=[];if(!start)return list;
+  var cursor=new Date(start+'T12:00:00');
+  var limit=new Date((end||start)+'T12:00:00');
+  while(cursor<=limit){
+    list.push(cursor.toISOString().slice(0,10));
+    cursor.setDate(cursor.getDate()+1);
+  }
+  return list;
+}
+function pcProjectionCleanCalendarTitle(title){
+  var text=String(title||'').replace(/\s+/g,' ').trim();
+  if(!text||/^\d+$/.test(text))return '';
+  return text;
+}
+function pcProjectionHolidayTypeFromTitle(title){
+  var norm=pcProjectionNormalizeText(title);
+  if(!norm||norm.indexOf('dia letivo')>=0)return '';
+  if(norm.indexOf('facultativo')>=0||norm.indexOf('vespera')>=0||norm.indexOf('carnaval')>=0||norm.indexOf('corpus christi')>=0)return 'facultativo';
+  if(norm.indexOf('estadual')>=0||norm.indexOf('acreana')>=0||norm.indexOf('amazonia')>=0||norm.indexOf('petropolis')>=0||norm.indexOf('catolico')>=0||norm.indexOf('evangelico')>=0||norm.indexOf('aniversario do estado')>=0||norm.indexOf('internacional da mulher')>=0)return 'estadual';
+  if(norm.indexOf('feriado')>=0||norm.indexOf('natal')>=0||norm.indexOf('finados')>=0||norm.indexOf('independencia')>=0||norm.indexOf('tiradentes')>=0||norm.indexOf('trabalho')>=0||norm.indexOf('consciencia negra')>=0||norm.indexOf('proclamacao da republica')>=0||norm.indexOf('ano novo')>=0||norm.indexOf('sexta feira santa')>=0||norm.indexOf('nossa senhora')>=0)return 'nacional';
+  return '';
+}
+function pcProjectionExtractCalendarSeed(){
+  var calendar=window.CASAVEQUIA_CALENDAR_DATA||{};
+  var scopes=calendar.scopes||{};
+  var feriadosByKey={};
+  var notesByDate={};
+  var recesso={start:'2026-07-20',end:'2026-07-31'};
+  ['regular','third'].forEach(function(scopeKey){
+    var scope=scopes[scopeKey];
+    if(!scope||!Array.isArray(scope.events))return;
+    scope.events.forEach(function(event){
+      var title=pcProjectionCleanCalendarTitle(event.title);
+      if(!title)return;
+      var norm=pcProjectionNormalizeText(title);
+      var dates=pcProjectionExpandDateRange(event.start,event.end||event.start);
+      if(!dates.length)return;
+      if(norm.indexOf('recesso escolar')>=0){
+        recesso.start=dates[0];
+        recesso.end=dates[dates.length-1];
+        dates.forEach(function(dateKey){
+          if(!notesByDate[dateKey])notesByDate[dateKey]=[];
+          if(notesByDate[dateKey].indexOf('Recesso escolar')<0)notesByDate[dateKey].push('Recesso escolar');
+        });
+        return;
+      }
+      var holidayType=pcProjectionHolidayTypeFromTitle(title);
+      dates.forEach(function(dateKey){
+        if(holidayType){
+          var holidayKey=dateKey+'|'+holidayType+'|'+title;
+          if(!feriadosByKey[holidayKey])feriadosByKey[holidayKey]={date:dateKey,nome:title,tipo:holidayType};
+          return;
+        }
+        if(!notesByDate[dateKey])notesByDate[dateKey]=[];
+        var label=scopeKey==='third'?'3ª Série: '+title:title;
+        if(notesByDate[dateKey].indexOf(label)<0)notesByDate[dateKey].push(label);
+      });
+    });
+  });
+  return {
+    feriados:Object.keys(feriadosByKey).map(function(key){return feriadosByKey[key];}).sort(function(a,b){return a.date.localeCompare(b.date)||a.nome.localeCompare(b.nome);}),
+    notesByDate:notesByDate,
+    recesso:recesso
+  };
+}
+function pcProjectionExtractTurmas(text){
+  var turmaText=String(text||'');
+  var list=[];
+  if(turmaText.indexOf('1ª Série')>=0)list.push('t1');
+  if(turmaText.indexOf('2ª Série')>=0)list.push('t2');
+  if(turmaText.indexOf('3ª Série')>=0)list.push('t3');
+  if(turmaText.indexOf('6º Ano')>=0)list.push('t6');
+  return list;
+}
+function pcProjectionExtractHours(metaText){
+  var text=String(metaText||'');
+  var match=text.match(/(\d+)\s*h\/aula/i)||text.match(/(\d+)h\/aula/i);
+  return match?Math.max(0,parseInt(match[1],10)||0):0;
+}
+function pcProjectionBuildScheduleMap(){
+  var cardMap={'card-seg-cont':1,'card-ter-cont':2,'card-qui-cont':4,'card-sex-cont':5};
+  var schedule={};
+  Object.keys(cardMap).forEach(function(cardId){
+    var day=cardMap[cardId];
+    var card=document.getElementById(cardId);
+    if(!card)return;
+    card.querySelectorAll('.sl').forEach(function(slot){
+      var disc=((slot.querySelector('.sd')||{}).textContent||'').trim();
+      var meta=((slot.querySelector('.st2')||{}).textContent||'').trim();
+      if(!disc||!meta)return;
+      var turmas=pcProjectionExtractTurmas(meta);
+      var hours=pcProjectionExtractHours(meta);
+      if(!turmas.length||!hours)return;
+      if(!schedule[disc])schedule[disc]={};
+      turmas.forEach(function(turmaId){
+        if(!schedule[disc][turmaId])schedule[disc][turmaId]={};
+        schedule[disc][turmaId][day]=(schedule[disc][turmaId][day]||0)+hours;
+      });
+    });
+  });
+  return schedule;
+}
+function pcProjectionGetAnchorDate(){
+  var card=document.querySelector('#sec-all .ea .edb');
+  if(!card)return new Date().toISOString().slice(0,10);
+  var dayText=((card.querySelector('.d')||{}).textContent||'').trim();
+  var monthText=((card.querySelector('.my')||{}).textContent||'').trim();
+  var match=monthText.match(/([A-Za-zçÇãÃéÉíÍóÓúÚ]+)\s+(\d{4})/);
+  var monthMap={jan:0,fev:1,mar:2,abr:3,mai:4,jun:5,jul:6,ago:7,set:8,out:9,nov:10,dez:11};
+  if(!match)return new Date().toISOString().slice(0,10);
+  var monthKey=pcProjectionNormalizeText(match[1]).slice(0,3);
+  var monthIndex=monthMap[monthKey];
+  if(monthIndex==null)return new Date().toISOString().slice(0,10);
+  return new Date(parseInt(match[2],10)||2026,monthIndex,parseInt(dayText,10)||1,12,0,0).toISOString().slice(0,10);
+}
+function pcBuildProjectionSeed(){
+  var calendarSeed=pcProjectionExtractCalendarSeed();
+  var schedule=pcProjectionBuildScheduleMap();
+  var turmas=[
+    {id:'t1',nome:'1ª Série'},
+    {id:'t2',nome:'2ª Série'},
+    {id:'t3',nome:'3ª Série'},
+    {id:'t6',nome:'6º Ano'}
+  ].filter(function(item){
+    return DISC.some(function(entry){return PC_PROJECTION_TURMA_ID_MAP[entry.t]===item.id;});
+  });
+  var disciplinasByGroup={};
+  DISC.forEach(function(item){
+    var turmaId=PC_PROJECTION_TURMA_ID_MAP[item.t];
+    if(!turmaId)return;
+    if(!disciplinasByGroup[item.g]){
+      disciplinasByGroup[item.g]={
+        id:item.g,
+        nome:item.d,
+        cor:PC_PROJECTION_COLOR_MAP[item.g]||'#0f766e',
+        nBimestres:4,
+        grade:{},
+        metas:{},
+        lancadas:{},
+        totais:{}
+      };
+    }
+    var disc=disciplinasByGroup[item.g];
+    var grade=Object.assign({},(schedule[item.d]&&schedule[item.d][turmaId])||{});
+    var weeklySum=Object.keys(grade).reduce(function(sum,key){return sum+(parseInt(grade[key],10)||0);},0);
+    if(weeklySum!==item.sw){
+      var days=Object.keys(grade).map(function(value){return parseInt(value,10)||0;}).filter(Boolean).sort(function(a,b){return a-b;});
+      var targetDay=days.length?days[days.length-1]:1;
+      grade[targetDay]=(grade[targetDay]||0)+(item.sw-weeklySum);
+    }
+    disc.grade[turmaId]=grade;
+    disc.metas[turmaId]=item.bim;
+    disc.lancadas[turmaId]=item.feitas;
+    disc.totais[turmaId]=item.tot;
+  });
+  return {
+    source:'casavequia-html',
+    generatedAt:new Date().toISOString(),
+    schoolName:'E.E. Rural Pe. Carlos Casavequia',
+    anchorDate:pcProjectionGetAnchorDate(),
+    recesso:calendarSeed.recesso,
+    facultativoLetivo:false,
+    feriados:calendarSeed.feriados,
+    notesByDate:calendarSeed.notesByDate,
+    turmas:turmas,
+    disciplinas:['lp','tl','tc','ar'].filter(function(key){return !!disciplinasByGroup[key];}).map(function(key){return disciplinasByGroup[key];}),
+    activeDisc:'lp'
+  };
+}
+function pcSyncProjectionSeed(){
+  try{
+    localStorage.setItem(PC_PROJECTION_SEED_KEY,JSON.stringify(pcBuildProjectionSeed()));
+  }catch(e){
+    console.warn('[PC projection seed]',e.message);
+  }
+}
 function renderCont(){
   DISC.forEach(d=>{
     const cnt=document.getElementById(CN[d.g]);if(!cnt)return;
@@ -7912,7 +8090,7 @@ function renderCont(){
     const bims=calcBims(d),fc=FC[d.g],bc=BC[d.g];
     const bH=bims.map(x=>`<div class="bi ${x.ok?'co':x.b===ba?'at':''}"><div class="bn">${x.b}º Bim</div><div class="bd2">${x.ok?'✔ Concluído':fmt(x.data)}</div></div>`).join('');
     const cc=document.createElement('div');cc.className='cc';
-    cc.innerHTML=`<div class="cch"><div><div class="cct">${d.t}</div><div class="ccm">${d.d} · ${d.sw} h/aula/sem</div></div><div class="ccb ${bc}">${ba}º Bimestre</div></div><div class="ccbody"><div class="pg"><div class="pl"><span class="plt">${ba}º Bimestre</span><span class="pln">${fB}/${d.bim} · faltam ${d.bim-fB}</span></div><div class="pbg"><div class="pf ${fc}" style="width:${pB}%"></div></div></div><div class="pg"><div class="pl"><span class="plt">Total do Ano</span><span class="pln">${d.feitas}/${d.tot} · faltam ${d.tot-d.feitas}</span></div><div class="pbg"><div class="pf ${fc} dm" style="width:${pT}%"></div></div></div><div style="font-size:.69rem;color:var(--cm);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin:13px 0 6px">Previsão de conclusão por bimestre</div><div class="brow">${bH}</div><div class="ae">* Estimativa proporcional sem feriados. Metas divididas por h/aula semanal.</div></div>`;
+    cc.innerHTML=`<div class="cch"><div><div class="cct">${d.t}</div><div class="ccm">${d.d} · ${d.sw} h/aula/sem</div></div><div class="ccb ${bc}">${ba}º Bimestre</div></div><div class="ccbody"><div class="pg"><div class="pl"><span class="plt">${ba}º Bimestre</span><span class="pln">${fB}/${d.bim} · faltam ${d.bim-fB}</span></div><div class="pbg"><div class="pf ${fc}" style="width:${pB}%"></div></div></div><div class="pg"><div class="pl"><span class="plt">Total do Ano</span><span class="pln">${d.feitas}/${d.tot} · faltam ${d.tot-d.feitas}</span></div><div class="pbg"><div class="pf ${fc} dm" style="width:${pT}%"></div></div></div><div style="font-size:.69rem;color:var(--cm);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin:13px 0 6px">Previsão de conclusão por bimestre</div><div class="brow">${bH}</div><div class="ae">* Projeções detalhadas agora consideram cronograma, calendário escolar, recessos e aulas já lançadas na página de Projeções de aulas.</div></div>`;
     cnt.appendChild(cc);
   });
 }
@@ -7940,7 +8118,7 @@ function verificarAbasRelatos(){
   });
 }
 
-document.addEventListener('DOMContentLoaded',()=>{renderPresenca();renderAtividades();renderCont();_sincronizarRegistros();verificarAbasRelatos();pcSyncAndBroadcast();pcInitSectionHeroes();pcIniciarSyncRemoto();});
+document.addEventListener('DOMContentLoaded',()=>{renderPresenca();renderAtividades();renderCont();pcSyncProjectionSeed();_sincronizarRegistros();verificarAbasRelatos();pcSyncAndBroadcast();pcInitSectionHeroes();pcIniciarSyncRemoto();});
 
 /* ── PERFIL DO ALUNO ── */
 function abrirPerfil(turma,numAluno){

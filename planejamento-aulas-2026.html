@@ -3,289 +3,987 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Previsão de Aulas 2026 · Acre</title>
+<title>Projeções de aulas 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f6f8f7; --surface:#ffffff; --surface-2:#eef3f1; --surface-3:#f9fbfa;
-    --ink:#16211d; --ink-soft:#42524c; --muted:#7a8882; --line:#dde5e2; --line-2:#eaf0ee;
-    --primary:#0f766e; --primary-dk:#0b5852; --primary-tint:#d6ebe8;
-    --nac:#c62828; --nac-bg:#fbe9e9;
-    --est:#6d28d9; --est-bg:#efeafd;
-    --fac:#5f6b78; --fac-bg:#eef1f4;
-    --rec:#c26a06; --rec-bg:#fbf1e0;
-    --mile:#0f766e; --mile-bg:#dff2ef; --mile-bd:#8fcfc8;
+    --bg:#eff3ea;
+    --bg-2:#f8f6ef;
+    --surface:#ffffff;
+    --surface-2:#f4f8f2;
+    --surface-3:#eef3ff;
+    --ink:#152318;
+    --ink-soft:#45604d;
+    --muted:#718377;
+    --line:#d6e0d5;
+    --line-2:#e8efe7;
+    --hero:#123726;
+    --hero-2:#24563f;
+    --hero-3:#c7a95a;
+    --primary:#187a63;
+    --primary-dk:#0f5d4b;
+    --primary-soft:#d8efe7;
+    --accent:#1d4ed8;
+    --accent-soft:#dde7ff;
+    --warm:#c26a06;
+    --warm-soft:#f8ecd7;
+    --danger:#7c1221;
+    --danger-soft:#fbe7ea;
+    --nac:#b42318;
+    --nac-bg:#fde8e8;
+    --est:#6d28d9;
+    --est-bg:#f0e8ff;
+    --fac:#4b5563;
+    --fac-bg:#edf1f5;
+    --rec:#c26a06;
+    --rec-bg:#fff0da;
+    --sat:#eef3ff;
+    --sun:#5a0d18;
+    --sun-soft:#ffe4e7;
+    --mile:#dff4eb;
+    --mile-bd:#91d1b8;
     --display:'Space Grotesk',system-ui,sans-serif;
     --body:'IBM Plex Sans',system-ui,sans-serif;
     --mono:'IBM Plex Mono',ui-monospace,monospace;
-    --shadow:0 1px 2px rgba(20,40,35,.06),0 6px 20px rgba(20,40,35,.05);
+    --shadow:0 18px 44px rgba(21,35,24,.10);
   }
   *{box-sizing:border-box}
   html,body{margin:0}
   body{
-    font-family:var(--body); color:var(--ink); background:var(--bg);
-    -webkit-font-smoothing:antialiased; line-height:1.45; font-size:15px;
+    font-family:var(--body);
+    color:var(--ink);
+    background:
+      radial-gradient(circle at top left, rgba(199,169,90,.18), transparent 26%),
+      radial-gradient(circle at right 20%, rgba(24,122,99,.14), transparent 26%),
+      linear-gradient(180deg, #eef4ea 0%, #f8f6ef 48%, #eff5f0 100%);
+    min-height:100vh;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:1200px;margin:0 auto;padding:20px 20px 64px}
-
-  /* ---------- Header ---------- */
-  header.top{margin:8px 0 18px}
+  .wrap{max-width:1440px;margin:0 auto;padding:28px 22px 70px}
+  .hero{
+    position:relative;
+    overflow:hidden;
+    border-radius:28px;
+    padding:28px;
+    color:#fff;
+    background:linear-gradient(135deg,var(--hero),var(--hero-2) 62%, #497b5e 100%);
+    box-shadow:var(--shadow);
+    margin-bottom:22px;
+  }
+  .hero:before{
+    content:"";
+    position:absolute;
+    inset:auto -90px -120px auto;
+    width:280px;
+    height:280px;
+    border-radius:50%;
+    background:rgba(199,169,90,.18);
+  }
+  .hero:after{
+    content:"";
+    position:absolute;
+    inset:-80px auto auto -90px;
+    width:260px;
+    height:260px;
+    border-radius:50%;
+    background:rgba(255,255,255,.05);
+  }
+  .hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(330px,.9fr);gap:22px;align-items:end}
   .eyebrow{
-    font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
-    color:var(--primary);font-weight:600;margin-bottom:6px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border-radius:999px;
+    padding:8px 13px;
+    margin-bottom:14px;
+    border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.10);
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#d7eadf;
+    font-weight:600;
   }
-  header.top h1{
-    font-family:var(--display);font-weight:700;letter-spacing:-.02em;
-    font-size:clamp(26px,4.5vw,40px);line-height:1.02;margin:0;color:var(--ink);
+  .hero h1{
+    margin:0;
+    font-family:var(--display);
+    font-size:clamp(2rem,4vw,3.4rem);
+    line-height:.98;
+    letter-spacing:-.04em;
   }
-  header.top h1 .yr{color:var(--primary)}
-  header.top p.sub{margin:8px 0 0;color:var(--ink-soft);max-width:60ch;font-size:14.5px}
-
-  /* ---------- Toolbar ---------- */
-  .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 6px}
-  .btn{
-    font-family:var(--body);font-weight:500;font-size:13.5px;cursor:pointer;
-    border:1px solid var(--line);background:var(--surface);color:var(--ink);
-    padding:8px 13px;border-radius:9px;display:inline-flex;align-items:center;gap:7px;
-    transition:border-color .12s,background .12s,transform .04s;
+  .hero h1 span{color:#f3dda1}
+  .hero p{
+    margin:12px 0 0;
+    max-width:760px;
+    color:rgba(255,255,255,.84);
+    font-size:1rem;
+    line-height:1.72;
   }
-  .btn:hover{border-color:var(--primary);background:var(--surface-3)}
-  .btn:active{transform:translateY(1px)}
-  .btn:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
-  .btn .ic{width:15px;height:15px;stroke:var(--primary);stroke-width:1.8;fill:none;flex:none}
-  .btn.solid{background:var(--primary);color:#fff;border-color:var(--primary)}
-  .btn.solid .ic{stroke:#fff}
-  .btn.solid:hover{background:var(--primary-dk);border-color:var(--primary-dk)}
+  .hero-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+  }
+  .hero-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 13px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.15);
+    background:rgba(255,255,255,.10);
+    font-size:.82rem;
+    color:#f7f5ee;
+  }
+  .hero-side{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  .hero-card{
+    min-height:118px;
+    border-radius:20px;
+    padding:15px 16px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.08);
+    backdrop-filter:blur(10px);
+  }
+  .hero-card small{
+    display:block;
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.68);
+  }
+  .hero-card strong{
+    display:block;
+    margin-top:8px;
+    font-size:1.45rem;
+    line-height:1.05;
+  }
+  .hero-card span{
+    display:block;
+    margin-top:6px;
+    color:rgba(255,255,255,.78);
+    font-size:.82rem;
+    line-height:1.52;
+  }
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:18px;
+  }
   .toolbar .spacer{flex:1 1 auto}
-
-  /* ---------- Legend ---------- */
-  .legend{display:flex;flex-wrap:wrap;gap:14px 18px;margin:14px 0 20px;padding:12px 15px;
-    background:var(--surface);border:1px solid var(--line);border-radius:11px}
-  .lg{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-soft)}
-  .swatch{width:13px;height:13px;border-radius:4px;flex:none;border:1px solid rgba(0,0,0,.08)}
-  .sw-let{background:var(--surface-2)}
-  .sw-nac{background:var(--nac-bg);border-color:var(--nac)}
-  .sw-est{background:var(--est-bg);border-color:var(--est)}
-  .sw-fac{background:var(--fac-bg);border-color:var(--fac)}
-  .sw-rec{background:var(--rec-bg);border-color:var(--rec)}
-  .sw-mile{background:var(--mile-bg);border-color:var(--mile-bd)}
-
-  /* ---------- Tabs ---------- */
-  .tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:2px solid var(--line);margin-bottom:0}
+  .btn{
+    border:none;
+    border-radius:14px;
+    padding:11px 15px;
+    font-family:var(--body);
+    font-size:.88rem;
+    font-weight:600;
+    cursor:pointer;
+    background:var(--surface);
+    color:var(--ink);
+    border:1px solid rgba(0,0,0,.05);
+    box-shadow:0 8px 20px rgba(21,35,24,.05);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 14px 26px rgba(21,35,24,.08);border-color:rgba(24,122,99,.20)}
+  .btn:active{transform:translateY(0)}
+  .btn.solid{background:linear-gradient(135deg,var(--primary),#2f9b79);color:#fff;border-color:transparent}
+  .btn.ghost{background:rgba(255,255,255,.72)}
+  .btn .ic{width:15px;height:15px;stroke:currentColor;stroke-width:1.8;fill:none;flex:none}
+  .shell{
+    display:grid;
+    grid-template-columns:312px minmax(0,1fr);
+    gap:18px;
+    align-items:start;
+  }
+  .sidebar{
+    position:sticky;
+    top:18px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .panel-card{
+    background:rgba(255,255,255,.82);
+    border:1px solid rgba(255,255,255,.72);
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(12px);
+  }
+  .sidebar-card{padding:18px}
+  .sidebar-card h2,
+  .sidebar-card h3{
+    margin:0;
+    font-family:var(--display);
+    letter-spacing:-.02em;
+  }
+  .sidebar-card h2{font-size:1.08rem}
+  .sidebar-card p{margin:9px 0 0;color:var(--ink-soft);font-size:.88rem;line-height:1.66}
+  .legend{
+    display:grid;
+    gap:10px;
+    margin-top:14px;
+  }
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--ink-soft);
+    font-size:.83rem;
+  }
+  .swatch{
+    width:14px;
+    height:14px;
+    border-radius:5px;
+    flex:none;
+    border:1px solid rgba(0,0,0,.07);
+  }
+  .sw-let{background:#edf6ef}
+  .sw-nac{background:var(--nac-bg);border-color:rgba(180,35,24,.22)}
+  .sw-est{background:var(--est-bg);border-color:rgba(109,40,217,.22)}
+  .sw-fac{background:var(--fac-bg);border-color:rgba(75,85,99,.18)}
+  .sw-rec{background:var(--rec-bg);border-color:rgba(194,106,6,.20)}
+  .sw-sat{background:var(--sat);border-color:rgba(29,78,216,.16)}
+  .sw-sun{background:var(--sun);border-color:rgba(90,13,24,.18)}
+  .sw-mile{background:var(--mile);border-color:var(--mile-bd)}
+  .sync-list{
+    display:grid;
+    gap:10px;
+    margin-top:16px;
+  }
+  .sync-chip{
+    border-radius:16px;
+    padding:12px 13px;
+    background:var(--surface-2);
+    border:1px solid var(--line-2);
+  }
+  .sync-chip small{
+    display:block;
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .sync-chip strong{
+    display:block;
+    margin-top:5px;
+    font-size:.95rem;
+  }
+  .sync-chip span{
+    display:block;
+    margin-top:5px;
+    color:var(--ink-soft);
+    font-size:.8rem;
+    line-height:1.55;
+  }
+  .main{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    padding:16px;
+  }
   .tab{
-    font-family:var(--display);font-weight:600;font-size:14.5px;letter-spacing:-.01em;
-    padding:10px 15px;border:none;background:none;cursor:pointer;color:var(--muted);
-    border-bottom:3px solid transparent;margin-bottom:-2px;position:relative;
-    display:inline-flex;align-items:center;gap:8px;transition:color .12s;
+    border:none;
+    cursor:pointer;
+    border-radius:16px;
+    padding:13px 15px;
+    min-width:180px;
+    text-align:left;
+    background:var(--surface-2);
+    color:var(--ink-soft);
+    border:1px solid transparent;
+    transition:transform .15s ease, border-color .15s ease, background .15s ease;
   }
-  .tab:hover{color:var(--ink-soft)}
-  .tab .dot{width:9px;height:9px;border-radius:50%;flex:none}
-  .tab.active{color:var(--ink)}
-  .tab.add{color:var(--primary);font-weight:600}
-  .tab:focus-visible{outline:2px solid var(--primary);outline-offset:-2px;border-radius:6px}
-
-  /* ---------- Panel ---------- */
-  .panel{background:var(--surface);border:1px solid var(--line);border-top:none;
-    border-radius:0 0 14px 14px;padding:20px;box-shadow:var(--shadow)}
-  .panel-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:4px}
-  .panel-head h2{font-family:var(--display);font-weight:700;font-size:20px;margin:0;letter-spacing:-.01em}
-  .panel-head .accent{width:12px;height:12px;border-radius:3px;flex:none;transform:translateY(1px)}
-  .panel-head .metaline{color:var(--muted);font-size:13px;font-family:var(--mono)}
-
-  .section-title{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--muted);font-weight:600;margin:22px 0 10px;display:flex;align-items:center;gap:10px}
-  .section-title::after{content:"";flex:1;height:1px;background:var(--line-2)}
-
-  /* ---------- Weekly grid editor ---------- */
-  .cfg-row{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-end;margin:2px 0 4px}
-  .field{display:flex;flex-direction:column;gap:4px}
-  .field label{font-size:12px;color:var(--ink-soft);font-weight:500}
-  .field input{font-family:var(--mono);font-size:15px;width:96px;padding:7px 9px;border:1px solid var(--line);
-    border-radius:8px;background:var(--surface-3);color:var(--ink)}
-  .field input:focus{outline:2px solid var(--primary);outline-offset:0;border-color:var(--primary)}
-  .hint{font-size:12px;color:var(--muted);max-width:52ch}
-
-  .grid-tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:11px;margin-top:4px}
-  table.grid{border-collapse:collapse;width:100%;min-width:520px}
-  table.grid th,table.grid td{padding:8px 10px;text-align:center;border-bottom:1px solid var(--line-2)}
-  table.grid thead th{background:var(--surface-2);font-family:var(--mono);font-size:11px;
-    letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+  .tab:hover{transform:translateY(-1px);border-color:rgba(24,122,99,.16)}
+  .tab.active{background:#fff;border-color:rgba(24,122,99,.18);box-shadow:0 10px 22px rgba(21,35,24,.05);color:var(--ink)}
+  .tab.add{min-width:auto;color:var(--primary);font-weight:700}
+  .tab-line{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .tab .dot{width:10px;height:10px;border-radius:999px;flex:none}
+  .tab-name{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font-family:var(--display);
+    font-size:1rem;
+    font-weight:700;
+    letter-spacing:-.02em;
+  }
+  .tab-meta{
+    margin-top:8px;
+    font-size:.8rem;
+    color:var(--muted);
+  }
+  .content{padding:0 16px 16px}
+  .discipline-panel{
+    padding:20px;
+    border-radius:24px;
+    background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(249,251,248,.98));
+    border:1px solid rgba(255,255,255,.70);
+    box-shadow:var(--shadow);
+  }
+  .panel-hero{
+    display:grid;
+    grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);
+    gap:16px;
+    padding:18px;
+    border-radius:22px;
+    background:linear-gradient(135deg, #edf6ef, #f7f6ef 56%, #eef2ff 100%);
+    border:1px solid rgba(24,122,99,.10);
+  }
+  .panel-head{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px 12px;
+  }
+  .accent{width:14px;height:14px;border-radius:5px;flex:none}
+  .panel-head h2{
+    margin:0;
+    font-family:var(--display);
+    font-size:1.75rem;
+    line-height:1.05;
+    letter-spacing:-.04em;
+  }
+  .panel-kicker{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border-radius:999px;
+    padding:7px 12px;
+    margin-bottom:12px;
+    background:#fff;
+    border:1px solid rgba(24,122,99,.12);
+    color:var(--primary);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  .panel-copy{
+    margin:12px 0 0;
+    max-width:760px;
+    color:var(--ink-soft);
+    font-size:.95rem;
+    line-height:1.7;
+  }
+  .hero-kpis{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  .mini-card{
+    border-radius:18px;
+    padding:14px;
+    background:#fff;
+    border:1px solid rgba(24,122,99,.08);
+  }
+  .mini-card small{
+    display:block;
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .mini-card strong{
+    display:block;
+    margin-top:7px;
+    font-size:1.2rem;
+    line-height:1.1;
+  }
+  .mini-card span{
+    display:block;
+    margin-top:5px;
+    color:var(--ink-soft);
+    font-size:.78rem;
+    line-height:1.55;
+  }
+  .section-title{
+    margin:20px 0 12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:600;
+  }
+  .section-title:after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:12px;
+  }
+  .card{
+    border-radius:20px;
+    padding:16px;
+    background:#fff;
+    border:1px solid rgba(24,122,99,.08);
+    box-shadow:0 10px 20px rgba(21,35,24,.04);
+  }
+  .card h3{
+    margin:0;
+    font-family:var(--display);
+    font-size:1.05rem;
+    letter-spacing:-.02em;
+  }
+  .card .lead{
+    margin-top:8px;
+    font-size:.83rem;
+    color:var(--ink-soft);
+  }
+  .statline{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    padding:8px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:.84rem;
+  }
+  .statline:last-child{border-bottom:none}
+  .statline .value{
+    font-family:var(--mono);
+    font-weight:600;
+    color:var(--primary-dk);
+    text-align:right;
+  }
+  .statline .value.miss{color:var(--danger)}
+  .summary-total{
+    margin-top:12px;
+    border-radius:16px;
+    padding:12px;
+    background:var(--surface-2);
+    font-size:.8rem;
+    color:var(--ink-soft);
+  }
+  .summary-total strong{color:var(--ink)}
+  .grid-wrap{
+    overflow:auto;
+    border:1px solid var(--line);
+    border-radius:20px;
+    background:#fff;
+  }
+  table.grid{
+    width:100%;
+    min-width:920px;
+    border-collapse:collapse;
+  }
+  table.grid th,table.grid td{
+    padding:12px 11px;
+    border-bottom:1px solid var(--line-2);
+    text-align:center;
+  }
+  table.grid thead th{
+    position:sticky;
+    top:0;
+    z-index:1;
+    background:#f7faf6;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  table.grid td.turma-cell,table.grid th.turma-cell{
+    position:sticky;
+    left:0;
+    z-index:1;
+    text-align:left;
+    min-width:160px;
+    background:#fcfdfb;
+    font-weight:700;
+    color:var(--ink);
+    border-right:1px solid var(--line);
+  }
+  table.grid thead th.turma-cell{z-index:2}
   table.grid tbody tr:last-child td{border-bottom:none}
-  table.grid td.turma-cell{text-align:left;font-weight:600;color:var(--ink);white-space:nowrap;
-    background:var(--surface-3);border-right:1px solid var(--line-2)}
-  table.grid thead th.turma-cell{text-align:left;background:var(--surface-2)}
-  .grade-in{font-family:var(--mono);font-size:14px;width:56px;padding:6px 4px;text-align:center;
-    border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}
-  .grade-in:focus{outline:2px solid var(--primary);outline-offset:0;border-color:var(--primary)}
-  .grade-in.zero{color:var(--muted);background:var(--surface-3)}
-
-  /* ---------- Summary cards ---------- */
-  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:4px}
-  .card{border:1px solid var(--line);border-radius:12px;padding:14px 15px;background:var(--surface-3)}
-  .card h3{font-family:var(--display);font-size:15.5px;font-weight:600;margin:0 0 10px;letter-spacing:-.01em}
-  .card .bim{display:flex;justify-content:space-between;align-items:center;gap:10px;
-    font-size:13.5px;padding:5px 0;border-bottom:1px dashed var(--line-2)}
-  .card .bim:last-of-type{border-bottom:none}
-  .card .bim .lbl{color:var(--ink-soft)}
-  .card .bim .date{font-family:var(--mono);font-weight:600;color:var(--primary-dk)}
-  .card .bim .date.miss{color:var(--nac);font-weight:500;font-size:12px;font-family:var(--body)}
-  .card .tot{margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)}
-  .card .tot b{color:var(--ink);font-weight:600}
-
-  /* ---------- View toggle ---------- */
-  .view-toggle{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:10px}
-  .view-toggle button{font-family:var(--body);font-size:12.5px;padding:7px 12px;border:none;background:var(--surface);
-    color:var(--ink-soft);cursor:pointer}
-  .view-toggle button.on{background:var(--primary);color:#fff}
-  .view-toggle button:focus-visible{outline:2px solid var(--primary);outline-offset:-2px}
-
-  /* ---------- Projection table ---------- */
-  .proj-wrap{position:relative;max-height:620px;overflow:auto;border:1px solid var(--line);border-radius:12px}
-  table.proj{border-collapse:separate;border-spacing:0;width:100%;font-size:13.5px}
-  table.proj th,table.proj td{padding:6px 11px;white-space:nowrap;border-bottom:1px solid var(--line-2)}
-  table.proj thead th{position:sticky;top:0;z-index:3;background:var(--surface-2);
-    font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
-    color:var(--ink-soft);font-weight:600;text-align:center;border-bottom:2px solid var(--line)}
-  table.proj thead th.c-data,table.proj thead th.c-dia{text-align:left}
-  .c-data{position:sticky;left:0;z-index:2;background:var(--surface);font-family:var(--mono);
-    font-size:12.5px;color:var(--ink-soft);border-right:1px solid var(--line-2)}
-  .c-dia{position:sticky;left:66px;z-index:2;background:var(--surface);color:var(--ink-soft);
-    font-size:12.5px;border-right:1px solid var(--line)}
-  thead .c-data{z-index:4}
-  thead .c-dia{z-index:4}
-  td.turno{text-align:center;font-family:var(--mono);font-weight:500}
-  td.turno .cum{color:var(--ink)}
-  td.blank{text-align:center;color:var(--line);font-family:var(--mono)}
-  tr.row-mon .c-data{border-top:2px solid var(--line)}
-  tr.row-mon td{border-top:2px solid var(--line)}
-
-  /* holiday / recess rows */
-  tr.special td{font-weight:500}
-  tr.special .c-data,tr.special .c-dia{background:inherit}
-  td.special-label{font-size:12.5px;letter-spacing:.01em}
-  td.special-label .badge{font-family:var(--mono);font-size:10px;font-weight:600;
-    padding:1px 7px;border-radius:20px;margin-right:9px;letter-spacing:.04em;text-transform:uppercase}
-  tr.t-nacional{background:var(--nac-bg)} tr.t-nacional td{color:var(--nac)}
-  tr.t-nacional .c-data,tr.t-nacional .c-dia{background:var(--nac-bg)}
-  tr.t-nacional .badge{background:var(--nac);color:#fff}
-  tr.t-estadual{background:var(--est-bg)} tr.t-estadual td{color:var(--est)}
-  tr.t-estadual .c-data,tr.t-estadual .c-dia{background:var(--est-bg)}
-  tr.t-estadual .badge{background:var(--est);color:#fff}
-  tr.t-facultativo{background:var(--fac-bg)} tr.t-facultativo td{color:var(--fac)}
-  tr.t-facultativo .c-data,tr.t-facultativo .c-dia{background:var(--fac-bg)}
-  tr.t-facultativo .badge{background:var(--fac);color:#fff}
-  tr.t-recesso{background:var(--rec-bg)} tr.t-recesso td{color:var(--rec)}
-  tr.t-recesso .c-data,tr.t-recesso .c-dia{background:var(--rec-bg)}
-  tr.t-recesso .badge{background:var(--rec);color:#fff}
-
-  /* milestone cell */
-  td.milestone{background:var(--mile-bg);box-shadow:inset 0 0 0 1px var(--mile-bd)}
-  td.milestone .cum{color:var(--primary-dk);font-weight:600}
-  .mile-tag{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:600;
-    background:var(--primary);color:#fff;padding:1px 5px;border-radius:5px;margin-left:6px;vertical-align:1px}
-
-  .empty-note{padding:26px;text-align:center;color:var(--muted);font-size:14px}
-
-  /* ---------- Modal ---------- */
-  .overlay{position:fixed;inset:0;background:rgba(15,30,25,.42);display:none;align-items:flex-start;
-    justify-content:center;padding:44px 16px;z-index:50;overflow-y:auto}
-  .overlay.open{display:flex}
-  .modal{background:var(--surface);border-radius:16px;max-width:560px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);
-    border:1px solid var(--line);animation:pop .16s ease}
-  @keyframes pop{from{transform:translateY(8px) scale(.99);opacity:0}to{transform:none;opacity:1}}
-  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line-2)}
-  .modal-head h3{font-family:var(--display);font-size:18px;font-weight:700;margin:0;letter-spacing:-.01em}
-  .x{border:none;background:none;cursor:pointer;font-size:22px;line-height:1;color:var(--muted);padding:4px 8px;border-radius:8px}
-  .x:hover{background:var(--surface-2);color:var(--ink)}
-  .modal-body{padding:18px 20px;max-height:64vh;overflow-y:auto}
-  .modal-foot{padding:14px 20px;border-top:1px solid var(--line-2);display:flex;justify-content:flex-end;gap:8px}
-
-  .list-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px dashed var(--line-2)}
-  .list-row:last-child{border-bottom:none}
-  .list-row input.name{flex:1;min-width:0;font-family:var(--body);font-size:14px;padding:7px 9px;
-    border:1px solid var(--line);border-radius:8px;background:var(--surface-3)}
-  .list-row input.date{font-family:var(--mono);font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-3)}
-  .list-row input.num{font-family:var(--mono);width:70px;font-size:13px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-3);text-align:center}
-  .list-row input.color{width:34px;height:34px;padding:0;border:1px solid var(--line);border-radius:8px;background:none;cursor:pointer}
-  .list-row select{font-family:var(--body);font-size:13px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-3)}
-  .list-row .del{border:none;background:none;color:var(--nac);cursor:pointer;font-size:18px;padding:2px 8px;border-radius:7px;flex:none}
-  .list-row .del:hover{background:var(--nac-bg)}
-  .tinytag{font-family:var(--mono);font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.03em;flex:none}
-  .tinytag.nacional{background:var(--nac);color:#fff}
-  .tinytag.estadual{background:var(--est);color:#fff}
-  .tinytag.facultativo{background:var(--fac);color:#fff}
-  .add-line{margin-top:12px}
-  .check{display:flex;align-items:center;gap:9px;margin:14px 0 4px;font-size:13.5px;color:var(--ink-soft)}
-  .check input{width:17px;height:17px;accent-color:var(--primary)}
-  .modal-body .grp{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--muted);font-weight:600;margin:16px 0 4px}
-  .modal-body .grp:first-child{margin-top:0}
-  .dates-2{display:flex;gap:16px;flex-wrap:wrap}
-
-  footer.credit{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
-    font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:space-between}
-  footer.credit .mono{font-family:var(--mono)}
-
-  /* ---------- Responsive ---------- */
-  @media (max-width:640px){
-    .wrap{padding:14px 12px 48px}
-    .c-dia{position:static;left:auto}
-    .cards{grid-template-columns:1fr 1fr}
-    header.top p.sub{font-size:13.5px}
+  .grade-in,.meta-in,.done-in,.total-in{
+    width:70px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:8px 7px;
+    text-align:center;
+    background:#fff;
+    font-family:var(--mono);
+    font-size:.9rem;
+    color:var(--ink);
   }
-  @media (max-width:440px){ .cards{grid-template-columns:1fr} }
-
-  /* ---------- Print ---------- */
+  .done-in{background:#eef8f3;border-color:rgba(24,122,99,.18)}
+  .meta-in{background:#fff6e8;border-color:rgba(194,106,6,.18)}
+  .total-in{
+    background:#f4f5f9;
+    color:var(--muted);
+  }
+  .grade-in.zero{background:#f6f7f6;color:#a0aba3}
+  .week-sum{
+    font-family:var(--mono);
+    font-weight:700;
+    color:var(--primary-dk);
+  }
+  .cfg-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px 20px;
+    align-items:flex-end;
+    margin-top:16px;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .field label{
+    font-size:.78rem;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  .field input{
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:11px 12px;
+    min-width:180px;
+    background:#fff;
+    color:var(--ink);
+    font-family:var(--mono);
+  }
+  .hint{
+    max-width:760px;
+    font-size:.82rem;
+    line-height:1.65;
+    color:var(--muted);
+  }
+  .check{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:.84rem;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+  .check input{width:18px;height:18px;accent-color:var(--primary)}
+  .view-toggle{
+    display:inline-flex;
+    gap:8px;
+    margin-bottom:12px;
+    padding:6px;
+    background:var(--surface-2);
+    border-radius:999px;
+    border:1px solid var(--line);
+  }
+  .view-toggle button{
+    border:none;
+    cursor:pointer;
+    border-radius:999px;
+    padding:9px 14px;
+    background:transparent;
+    color:var(--ink-soft);
+    font-weight:600;
+    font-size:.82rem;
+  }
+  .view-toggle button.on{
+    background:#fff;
+    color:var(--ink);
+    box-shadow:0 8px 14px rgba(21,35,24,.06);
+  }
+  .proj-wrap{
+    overflow:auto;
+    border:1px solid var(--line);
+    border-radius:22px;
+    background:#fff;
+    box-shadow:0 12px 28px rgba(21,35,24,.05);
+  }
+  table.proj{
+    width:100%;
+    min-width:1040px;
+    border-collapse:separate;
+    border-spacing:0;
+  }
+  table.proj th,table.proj td{
+    padding:11px 12px;
+    border-bottom:1px solid var(--line-2);
+    vertical-align:top;
+  }
+  table.proj thead th{
+    position:sticky;
+    top:0;
+    z-index:3;
+    background:#f7faf6;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    text-align:left;
+    border-bottom:2px solid var(--line);
+  }
+  .c-data,.c-dia,.c-event{
+    position:sticky;
+    background:#fff;
+  }
+  .c-data{left:0;z-index:2;min-width:92px;font-family:var(--mono);color:var(--ink-soft);border-right:1px solid var(--line)}
+  .c-dia{left:92px;z-index:2;min-width:74px;color:var(--ink-soft);border-right:1px solid var(--line)}
+  .c-event{left:166px;z-index:2;min-width:300px;border-right:1px solid var(--line)}
+  thead .c-data, thead .c-dia, thead .c-event{z-index:4;background:#f7faf6}
+  .row-mon td{border-top:2px solid rgba(21,35,24,.08)}
+  .event-cell{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .note-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#f4f7f4;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    font-size:.74rem;
+    line-height:1.3;
+  }
+  .note-pill.sync{background:var(--primary-soft);border-color:rgba(24,122,99,.16);color:var(--primary-dk)}
+  .note-pill.nacional{background:var(--nac-bg);border-color:rgba(180,35,24,.14);color:var(--nac)}
+  .note-pill.estadual{background:var(--est-bg);border-color:rgba(109,40,217,.14);color:var(--est)}
+  .note-pill.facultativo{background:var(--fac-bg);border-color:rgba(75,85,99,.12);color:#374151}
+  .note-pill.recesso{background:var(--rec-bg);border-color:rgba(194,106,6,.14);color:var(--rec)}
+  .note-pill.sabado{background:var(--sat);border-color:rgba(29,78,216,.14);color:var(--accent)}
+  .note-pill.domingo{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:#fff}
+  .turno{
+    min-width:148px;
+    text-align:left;
+  }
+  .turno-inner{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    border-radius:16px;
+    padding:10px 11px;
+    background:#f9fbf8;
+    border:1px solid rgba(21,35,24,.05);
+    min-height:76px;
+  }
+  .turno.sync .turno-inner{background:var(--primary-soft);border-color:rgba(24,122,99,.16)}
+  .turno.milestone .turno-inner{background:var(--mile);border-color:var(--mile-bd)}
+  .cum{
+    font-family:var(--mono);
+    font-size:1rem;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .delta{
+    font-size:.74rem;
+    color:var(--ink-soft);
+    line-height:1.4;
+  }
+  .mile-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    width:max-content;
+    padding:4px 8px;
+    border-radius:999px;
+    background:#fff;
+    color:var(--primary-dk);
+    font-family:var(--mono);
+    font-size:.64rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    font-weight:700;
+  }
+  .blank{
+    min-width:148px;
+    color:#b2bdb4;
+    text-align:center;
+    font-family:var(--mono);
+  }
+  tr.status-feriado td{background:#fffdfd}
+  tr.status-feriado .c-data,
+  tr.status-feriado .c-dia,
+  tr.status-feriado .c-event{background:#fffdfd}
+  tr.status-recesso td{background:#fffdf8}
+  tr.status-recesso .c-data,
+  tr.status-recesso .c-dia,
+  tr.status-recesso .c-event{background:#fffdf8}
+  tr.status-sabado td{background:#fbfcff}
+  tr.status-sabado .c-data,
+  tr.status-sabado .c-dia,
+  tr.status-sabado .c-event{background:#fbfcff}
+  tr.status-domingo td{
+    background:var(--sun);
+    color:#fff3f4;
+    border-bottom-color:rgba(255,255,255,.08);
+  }
+  tr.status-domingo .c-data,
+  tr.status-domingo .c-dia,
+  tr.status-domingo .c-event{
+    background:var(--sun);
+    color:#fff3f4;
+    border-right-color:rgba(255,255,255,.08);
+  }
+  tr.status-domingo .blank{color:rgba(255,255,255,.42)}
+  tr.status-domingo .turno-inner{
+    background:rgba(255,255,255,.08);
+    border-color:rgba(255,255,255,.08);
+  }
+  tr.status-domingo .cum,
+  tr.status-domingo .delta{color:#fff3f4}
+  .empty-note{
+    padding:36px 20px;
+    text-align:center;
+    color:var(--muted);
+    font-size:.92rem;
+  }
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(21,35,24,.45);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    padding:34px 16px;
+    z-index:50;
+    overflow-y:auto;
+  }
+  .overlay.open{display:flex}
+  .modal{
+    width:min(760px,100%);
+    border-radius:24px;
+    background:#fff;
+    border:1px solid rgba(255,255,255,.80);
+    box-shadow:0 24px 70px rgba(0,0,0,.22);
+    overflow:hidden;
+  }
+  .modal-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:20px 22px;
+    background:#f7faf6;
+    border-bottom:1px solid var(--line-2);
+  }
+  .modal-head h3{
+    margin:0;
+    font-family:var(--display);
+    letter-spacing:-.02em;
+  }
+  .x{
+    border:none;
+    background:#fff;
+    width:40px;
+    height:40px;
+    border-radius:999px;
+    cursor:pointer;
+    color:var(--muted);
+    font-size:1.1rem;
+  }
+  .modal-body{
+    padding:20px 22px;
+    max-height:68vh;
+    overflow:auto;
+  }
+  .modal-foot{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    padding:16px 22px 22px;
+    border-top:1px solid var(--line-2);
+  }
+  .list-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 0;
+    border-bottom:1px dashed var(--line-2);
+  }
+  .list-row:last-child{border-bottom:none}
+  .list-row input.name,
+  .list-row input.date,
+  .list-row input.num,
+  .list-row input.color,
+  .list-row select{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 11px;
+    background:#fff;
+    color:var(--ink);
+    font-family:var(--body);
+  }
+  .list-row input.name{flex:1;min-width:0}
+  .list-row input.date,
+  .list-row input.num{font-family:var(--mono)}
+  .list-row input.num{width:90px;text-align:center}
+  .list-row input.color{width:42px;height:42px;padding:3px}
+  .list-row .del{
+    border:none;
+    background:none;
+    color:var(--danger);
+    cursor:pointer;
+    font-size:1.2rem;
+    padding:3px 8px;
+  }
+  .tinytag{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 10px;
+    border-radius:999px;
+    font-family:var(--mono);
+    font-size:.68rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    font-weight:700;
+  }
+  .tinytag.nacional{background:var(--nac-bg);color:var(--nac)}
+  .tinytag.estadual{background:var(--est-bg);color:var(--est)}
+  .tinytag.facultativo{background:var(--fac-bg);color:#374151}
+  .grp{
+    margin:18px 0 8px;
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:700;
+  }
+  .add-line{margin-top:14px}
+  footer.credit{
+    margin-top:18px;
+    padding:16px 4px 0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 16px;
+    justify-content:space-between;
+    color:var(--muted);
+    font-size:.82rem;
+  }
+  footer.credit .mono{font-family:var(--mono)}
+  .embedded .wrap{padding:18px 14px 42px}
+  .embedded .hero{padding:22px;margin-bottom:16px}
+  .embedded .shell{grid-template-columns:1fr}
+  .embedded .sidebar{position:static}
+  @media (max-width:1180px){
+    .shell{grid-template-columns:1fr}
+    .sidebar{position:static}
+    .hero-inner,.panel-hero{grid-template-columns:1fr}
+  }
+  @media (max-width:760px){
+    .wrap{padding:16px 12px 46px}
+    .hero,.discipline-panel{padding:18px}
+    .hero-side,.hero-kpis{grid-template-columns:1fr}
+    .tabs{padding:12px}
+    .content{padding:0 12px 12px}
+    .cards{grid-template-columns:1fr}
+    .c-data,.c-dia,.c-event{position:static}
+    table.proj{min-width:860px}
+  }
   @media print{
     body{background:#fff}
-    .toolbar,.tabs .add,.view-toggle,.overlay,footer.credit .mono{display:none !important}
-    .panel{box-shadow:none;border:1px solid #ccc}
-    .proj-wrap{max-height:none;overflow:visible;border:none}
-    table.proj thead th{position:static}
-    .c-data,.c-dia{position:static}
-    tr.special,tr.milestone td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .hero,.toolbar,.sidebar,.overlay,.view-toggle{display:none !important}
+    .shell{display:block}
+    .discipline-panel,.panel-card{box-shadow:none;border:1px solid #ddd}
+    .proj-wrap{overflow:visible;box-shadow:none}
+    table.proj thead th,.c-data,.c-dia,.c-event,table.grid th.turma-cell,table.grid td.turma-cell{position:static}
     *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="top">
-    <div class="eyebrow">Planejamento docente · Estado do Acre</div>
-    <h1>Previsão de Aulas <span class="yr">2026</span></h1>
-    <p class="sub">Projeção do cronograma letivo por turma e disciplina. Descontando fins de semana, feriados nacionais e estaduais (AC) e o recesso escolar, calcula o acúmulo de aulas e o dia de fechamento de cada bimestre.</p>
-  </header>
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="eyebrow">Projeções integradas · contador e calendário escolar</div>
+        <h1>Projeções de aulas <span>2026</span></h1>
+        <p>Esta página cruza as aulas já lançadas no relatório, a carga semanal por turma e disciplina, os feriados oficiais e o recesso escolar para projetar automaticamente as próximas aulas e as datas de encerramento de cada bimestre.</p>
+        <div class="hero-meta" id="hero-meta"></div>
+      </div>
+      <div class="hero-side" id="hero-stats"></div>
+    </div>
+  </section>
 
   <div class="toolbar">
-    <button class="btn" onclick="openTurmas()"><svg class="ic" viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-8 0M3 20a7 7 0 0 1 18 0"/></svg>Turmas</button>
-    <button class="btn" onclick="openDisciplinas()"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/></svg>Disciplinas</button>
-    <button class="btn" onclick="openRecesso()"><svg class="ic" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 9h18M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Recesso</button>
-    <button class="btn" onclick="openFeriados()"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l2.4 6.9H22l-6 4.3 2.3 7-6.3-4.6L5.7 20l2.3-7-6-4.3h7.6z"/></svg>Feriados</button>
+    <button class="btn" type="button" onclick="openTurmas()"><svg class="ic" viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-8 0M3 20a7 7 0 0 1 18 0"/></svg>Turmas</button>
+    <button class="btn" type="button" onclick="openDisciplinas()"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/></svg>Disciplinas</button>
+    <button class="btn" type="button" onclick="openRecesso()"><svg class="ic" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 9h18M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Recesso</button>
+    <button class="btn" type="button" onclick="openFeriados()"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l2.4 6.9H22l-6 4.3 2.3 7-6.3-4.6L5.7 20l2.3-7-6-4.3h7.6z"/></svg>Feriados</button>
     <span class="spacer"></span>
-    <button class="btn" onclick="doImport()"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>Importar</button>
-    <button class="btn" onclick="doExport()"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21V9m0 0l-4 4m4-4l4 4M4 3h16"/></svg>Exportar</button>
-    <button class="btn solid" onclick="window.print()"><svg class="ic" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>Imprimir / PDF</button>
+    <button class="btn ghost" type="button" onclick="doImport()"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>Importar</button>
+    <button class="btn ghost" type="button" onclick="doExport()"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21V9m0 0l-4 4m4-4l4 4M4 3h16"/></svg>Exportar</button>
+    <button class="btn solid" type="button" onclick="window.print()"><svg class="ic" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>Imprimir / PDF</button>
     <input type="file" id="fileIn" accept="application/json" style="display:none">
   </div>
 
-  <div class="legend">
-    <span class="lg"><span class="swatch sw-let"></span>Dia letivo</span>
-    <span class="lg"><span class="swatch sw-nac"></span>Feriado nacional</span>
-    <span class="lg"><span class="swatch sw-est"></span>Feriado estadual (AC)</span>
-    <span class="lg"><span class="swatch sw-fac"></span>Ponto facultativo</span>
-    <span class="lg"><span class="swatch sw-rec"></span>Recesso escolar</span>
-    <span class="lg"><span class="swatch sw-mile"></span>Fecha bimestre</span>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="panel-card sidebar-card">
+        <h2>Leitura visual da tabela</h2>
+        <p>Sábado e domingo aparecem sempre na lista. O domingo fica em vermelho escuro para marcar o corte visual entre as semanas, enquanto os demais bloqueios recebem a cor do calendário oficial.</p>
+        <div class="legend">
+          <div class="legend-item"><span class="swatch sw-let"></span><span>Dia útil com projeção normal</span></div>
+          <div class="legend-item"><span class="swatch sw-nac"></span><span>Feriado nacional</span></div>
+          <div class="legend-item"><span class="swatch sw-est"></span><span>Feriado estadual</span></div>
+          <div class="legend-item"><span class="swatch sw-fac"></span><span>Ponto facultativo</span></div>
+          <div class="legend-item"><span class="swatch sw-rec"></span><span>Recesso escolar</span></div>
+          <div class="legend-item"><span class="swatch sw-sat"></span><span>Sábado visível na sequência</span></div>
+          <div class="legend-item"><span class="swatch sw-sun"></span><span>Domingo como limitador semanal</span></div>
+          <div class="legend-item"><span class="swatch sw-mile"></span><span>Dia que fecha bimestre</span></div>
+        </div>
+      </div>
+      <div class="panel-card sidebar-card">
+        <h3>Sincronização do relatório</h3>
+        <p>A página usa como base as aulas já contabilizadas no relatório principal e projeta o restante do ano a partir dessa data-base.</p>
+        <div class="sync-list" id="sync-list"></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="panel-card">
+        <nav class="tabs" id="tabs"></nav>
+        <div class="content">
+          <section id="panel"></section>
+        </div>
+      </div>
+      <footer class="credit">
+        <span>Sincronizado com o relatório escolar e com o calendário oficial de 2026.</span>
+        <span class="mono" id="statFoot"></span>
+      </footer>
+    </main>
   </div>
-
-  <nav class="tabs" id="tabs"></nav>
-  <section class="panel" id="panel"></section>
-
-  <footer class="credit">
-    <span>Feito por <b>Paulo Roberto</b> + Claude</span>
-    <span class="mono" id="statFoot"></span>
-  </footer>
 </div>
 
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
@@ -293,443 +991,799 @@
 </div>
 
 <script>
-/* =================== Dados fixos =================== */
-const DIAS_AB = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-const WEEK = [ {k:1,ab:'Seg'},{k:2,ab:'Ter'},{k:3,ab:'Qua'},{k:4,ab:'Qui'},{k:5,ab:'Sex'} ];
-const STORAGE_KEY = 'previsao_aulas_2026';
+const STORAGE_KEY = 'previsoes_aulas_2026_local';
+const SOURCE_KEY = 'casavequia_projection_seed_v1';
 const YEAR = 2026;
-
-const FERIADOS_2026 = [
-  {date:'2026-01-01',nome:'Confraternização Universal',tipo:'nacional'},
-  {date:'2026-01-20',nome:'Dia do Católico',tipo:'estadual'},
-  {date:'2026-01-23',nome:'Dia do Evangélico',tipo:'estadual'},
-  {date:'2026-02-16',nome:'Carnaval',tipo:'facultativo'},
-  {date:'2026-02-17',nome:'Carnaval',tipo:'facultativo'},
-  {date:'2026-02-18',nome:'Quarta-feira de Cinzas',tipo:'facultativo'},
-  {date:'2026-03-08',nome:'Dia Internacional da Mulher',tipo:'estadual'},
-  {date:'2026-04-03',nome:'Sexta-feira Santa (Paixão de Cristo)',tipo:'nacional'},
-  {date:'2026-04-21',nome:'Tiradentes',tipo:'nacional'},
-  {date:'2026-05-01',nome:'Dia do Trabalho',tipo:'nacional'},
-  {date:'2026-06-04',nome:'Corpus Christi',tipo:'facultativo'},
-  {date:'2026-06-15',nome:'Aniversário do Estado do Acre',tipo:'estadual'},
-  {date:'2026-08-06',nome:'Início da Revolução Acreana',tipo:'facultativo'},
-  {date:'2026-09-05',nome:'Dia da Amazônia',tipo:'estadual'},
-  {date:'2026-09-07',nome:'Independência do Brasil',tipo:'nacional'},
-  {date:'2026-10-12',nome:'Nossa Senhora Aparecida',tipo:'nacional'},
-  {date:'2026-10-28',nome:'Dia do Servidor Público',tipo:'facultativo'},
-  {date:'2026-11-02',nome:'Finados',tipo:'nacional'},
-  {date:'2026-11-15',nome:'Proclamação da República',tipo:'nacional'},
-  {date:'2026-11-17',nome:'Assinatura do Tratado de Petrópolis',tipo:'estadual'},
-  {date:'2026-11-20',nome:'Dia da Consciência Negra',tipo:'nacional'},
-  {date:'2026-12-24',nome:'Véspera de Natal',tipo:'facultativo'},
-  {date:'2026-12-25',nome:'Natal',tipo:'nacional'},
-  {date:'2026-12-31',nome:'Véspera de Ano Novo',tipo:'facultativo'},
-];
-const TIPO_LABEL = {nacional:'Feriado nacional',estadual:'Feriado estadual (AC)',facultativo:'Ponto facultativo'};
-const DISC_CORES = ['#0f766e','#6d28d9','#c2410c','#1d4ed8','#be123c','#047857','#7c2d12','#4338ca'];
-
-/* =================== Utilidades =================== */
-const pad = n => String(n).padStart(2,'0');
-const mkKey = (y,m,d) => `${y}-${pad(m+1)}-${pad(d)}`;
-const brDate = k => { const p=k.split('-'); return `${p[2]}/${p[1]}`; };
-const uid = () => 'id'+Math.random().toString(36).slice(2,9);
-const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-
-/* =================== Estado =================== */
+const DIAS_AB = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
+const DISC_CORES = ['#187a63','#6d28d9','#1d4ed8','#c26a06','#be123c','#047857','#7c2d12','#4338ca'];
+const WEEK = [{k:1,ab:'Seg'},{k:2,ab:'Ter'},{k:3,ab:'Qua'},{k:4,ab:'Qui'},{k:5,ab:'Sex'}];
+const TIPO_LABEL = {nacional:'Feriado nacional',estadual:'Feriado estadual',facultativo:'Ponto facultativo'};
 let state = null;
-let showAll = true;  // mostrar todos os dias letivos vs só dias com aula
+
+const pad = n => String(n).padStart(2,'0');
+const mkKey = (y,m,d) => `${y}-${pad(m + 1)}-${pad(d)}`;
+const brDate = k => {
+  const p = String(k || '').split('-');
+  return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : '--';
+};
+const brDateShort = k => {
+  const p = String(k || '').split('-');
+  return p.length === 3 ? `${p[2]}/${p[1]}` : '--';
+};
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid = () => 'id' + Math.random().toString(36).slice(2,9);
+const normalizeText = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+
+function sumValues(obj){
+  return Object.keys(obj || {}).reduce((sum,key)=>sum + (parseInt(obj[key],10) || 0), 0);
+}
+function numberValue(value, fallback){
+  const parsed = parseInt(value,10);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+function rangeDates(start,end){
+  if(!start) return [];
+  const cursor = new Date(start + 'T12:00:00');
+  const limit = new Date((end || start) + 'T12:00:00');
+  const list = [];
+  while(cursor <= limit){
+    list.push(cursor.toISOString().slice(0,10));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return list;
+}
+function uniquePush(list, value){
+  if(value && list.indexOf(value) < 0) list.push(value);
+}
 
 function defaultState(){
-  const t1=uid(), t2=uid(), t3=uid();
-  const d1=uid(), d2=uid();
+  const t1 = uid();
+  const t2 = uid();
+  const t3 = uid();
   return {
+    source:'local',
+    generatedAt:new Date().toISOString(),
+    schoolName:'Relatório escolar',
+    anchorDate:'2026-07-06',
     recesso:{start:'2026-07-20', end:'2026-07-31'},
     facultativoLetivo:false,
-    feriados: FERIADOS_2026.map(f=>({...f})),
-    turmas:[ {id:t1,nome:'1º Ano A'},{id:t2,nome:'2º Ano A'},{id:t3,nome:'3º Ano A'} ],
-    disciplinas:[
-      {id:d1,nome:'Língua Portuguesa',cor:'#0f766e',aulasPorBimestre:20,nBimestres:4,
-        grade:{[t1]:{1:2,3:2},[t2]:{2:2,4:2},[t3]:{1:2,5:2}}},
-      {id:d2,nome:'Espanhol',cor:'#6d28d9',aulasPorBimestre:16,nBimestres:4,
-        grade:{[t1]:{5:2},[t2]:{3:2},[t3]:{2:2}}},
+    feriados:[],
+    notesByDate:{},
+    turmas:[
+      {id:t1,nome:'1ª Série'},
+      {id:t2,nome:'2ª Série'},
+      {id:t3,nome:'3ª Série'}
     ],
-    activeDisc:d1,
+    disciplinas:[
+      {
+        id:'lp',
+        nome:'Língua Portuguesa',
+        cor:'#187a63',
+        nBimestres:4,
+        grade:{[t1]:{1:2},[t2]:{1:2,2:2},[t3]:{1:2,2:1}},
+        metas:{[t1]:20,[t2]:30,[t3]:30},
+        lancadas:{[t1]:0,[t2]:0,[t3]:0},
+        totais:{[t1]:80,[t2]:120,[t3]:120}
+      }
+    ],
+    activeDisc:'lp',
+    showOnlyActive:false
   };
 }
 
-function normalize(){
-  // garante grade[turma] para cada disciplina/turma
-  state.disciplinas.forEach(d=>{
-    if(!d.grade) d.grade={};
-    if(!d.cor) d.cor=DISC_CORES[0];
-    if(d.aulasPorBimestre==null) d.aulasPorBimestre=20;
-    if(d.nBimestres==null) d.nBimestres=4;
-    state.turmas.forEach(t=>{ if(!d.grade[t.id]) d.grade[t.id]={}; });
+function normalizeState(){
+  if(!state || typeof state !== 'object') state = defaultState();
+  state.notesByDate = state.notesByDate || {};
+  state.feriados = Array.isArray(state.feriados) ? state.feriados : [];
+  state.turmas = Array.isArray(state.turmas) ? state.turmas : [];
+  state.disciplinas = Array.isArray(state.disciplinas) ? state.disciplinas : [];
+  state.recesso = state.recesso || {start:'2026-07-20', end:'2026-07-31'};
+  if(!state.anchorDate) state.anchorDate = '2026-07-06';
+  if(typeof state.showOnlyActive !== 'boolean') state.showOnlyActive = false;
+
+  const desiredOrder = {t1:1,t2:2,t3:3,t6:4};
+  state.turmas.sort((a,b)=>{
+    const oa = desiredOrder[a.id] || 99;
+    const ob = desiredOrder[b.id] || 99;
+    return oa - ob || String(a.nome).localeCompare(String(b.nome));
   });
-  if(!state.disciplinas.find(d=>d.id===state.activeDisc)){
+
+  state.disciplinas.forEach((disc, index)=>{
+    if(!disc.id) disc.id = uid();
+    if(!disc.nome) disc.nome = 'Nova disciplina';
+    if(!disc.cor) disc.cor = DISC_CORES[index % DISC_CORES.length];
+    if(!disc.nBimestres || disc.nBimestres < 1) disc.nBimestres = 4;
+    disc.grade = disc.grade || {};
+    disc.metas = disc.metas || {};
+    disc.lancadas = disc.lancadas || {};
+    disc.totais = disc.totais || {};
+    state.turmas.forEach(t=>{
+      if(!disc.grade[t.id]) disc.grade[t.id] = {};
+      if(disc.metas[t.id] == null) disc.metas[t.id] = 20;
+      if(disc.lancadas[t.id] == null) disc.lancadas[t.id] = 0;
+      if(disc.totais[t.id] == null) disc.totais[t.id] = (disc.metas[t.id] || 20) * (disc.nBimestres || 4);
+      WEEK.forEach(day=>{
+        const current = numberValue(disc.grade[t.id][day.k], 0);
+        disc.grade[t.id][day.k] = Math.max(0, current);
+      });
+    });
+  });
+  if(!state.disciplinas.find(d=>d.id === state.activeDisc)){
     state.activeDisc = state.disciplinas[0] ? state.disciplinas[0].id : null;
   }
 }
 
 function save(){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){/* sem persistência */}
-}
-function load(){
   try{
-    const raw=localStorage.getItem(STORAGE_KEY);
-    if(raw){ state=JSON.parse(raw); return; }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }catch(e){}
-  state=defaultState();
 }
 
-/* =================== Calendário e projeção =================== */
-function buildDays(){
-  const days=[]; const fer={};
-  state.feriados.forEach(f=>{ fer[f.date]=f; });
-  let dt=new Date(YEAR,0,1);
-  while(dt.getFullYear()===YEAR){
-    const dow=dt.getDay();
-    if(dow>=1 && dow<=5){
-      const k=mkKey(dt.getFullYear(),dt.getMonth(),dt.getDate());
-      let status='letivo', f=null;
-      const hit=fer[k];
-      if(hit){
-        if(hit.tipo==='facultativo' && state.facultativoLetivo){ status='letivo'; }
-        else { status='feriado'; f=hit; }
-      }
-      if(status==='letivo' && k>=state.recesso.start && k<=state.recesso.end){ status='recesso'; }
-      days.push({k,dow,status,fer:f, mon:(dow===1)});
+function readSeed(){
+  try{
+    const raw = localStorage.getItem(SOURCE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    return null;
+  }
+}
+
+function load(){
+  let localState = null;
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) localState = JSON.parse(raw);
+  }catch(e){}
+  const seed = readSeed();
+  if(seed && Array.isArray(seed.disciplinas) && seed.disciplinas.length){
+    state = seed;
+    if(localState){
+      state.showOnlyActive = !!localState.showOnlyActive;
+      if(localState.anchorDate) state.anchorDate = localState.anchorDate;
+      if(localState.activeDisc && seed.disciplinas.some(d=>d.id === localState.activeDisc)) state.activeDisc = localState.activeDisc;
+      if(typeof localState.facultativoLetivo === 'boolean') state.facultativoLetivo = localState.facultativoLetivo;
     }
-    dt.setDate(dt.getDate()+1);
+  }else if(localState){
+    state = localState;
+  }else{
+    state = defaultState();
+  }
+  normalizeState();
+  save();
+}
+
+function totalLancadas(){
+  return state.disciplinas.reduce((sum,disc)=>sum + sumValues(disc.lancadas), 0);
+}
+
+function countCalendarNotes(){
+  return Object.keys(state.notesByDate || {}).reduce((sum,key)=>sum + (state.notesByDate[key] || []).length, 0);
+}
+
+function buildDays(){
+  const holidayMap = {};
+  state.feriados.forEach(item=>{
+    if(!holidayMap[item.date]) holidayMap[item.date] = [];
+    holidayMap[item.date].push(item);
+  });
+  const days = [];
+  let cursor = new Date(YEAR,0,1,12,0,0);
+  while(cursor.getFullYear() === YEAR){
+    const key = mkKey(cursor.getFullYear(), cursor.getMonth(), cursor.getDate());
+    const dow = cursor.getDay();
+    const notes = (state.notesByDate[key] || []).slice();
+    const holidays = (holidayMap[key] || []).slice();
+    let status = 'letivo';
+    if(dow === 0){
+      status = 'domingo';
+    }else if(key >= state.recesso.start && key <= state.recesso.end){
+      status = 'recesso';
+    }else if(holidays.length){
+      const blocked = holidays.filter(item=>!(item.tipo === 'facultativo' && state.facultativoLetivo));
+      if(blocked.length) status = 'feriado';
+    }else if(dow === 6){
+      status = 'sabado';
+    }
+    days.push({
+      k:key,
+      dow,
+      mon:dow === 1,
+      status,
+      notes,
+      holidays,
+      isProjectionDay:dow >= 1 && dow <= 5 && status === 'letivo'
+    });
+    cursor.setDate(cursor.getDate() + 1);
   }
   return days;
 }
 
-function project(disc, days){
-  const proj={}, resumo={};
-  const meta=Number(disc.aulasPorBimestre)||0;
-  const nb=Number(disc.nBimestres)||4;
-  state.turmas.forEach(t=>{
-    proj[t.id]={};
-    const g=disc.grade[t.id]||{};
-    let acc=0,k=1; const closes={};
-    for(const d of days){
-      if(d.status!=='letivo') continue;
-      const add=Number(g[d.dow])||0;
-      if(add>0){
-        acc+=add;
-        const cell={cum:acc,add,closes:[]};
-        while(meta>0 && k<=nb && acc>=k*meta){ cell.closes.push(k); closes[k]=d.k; k++; }
-        proj[t.id][d.k]=cell;
-      }
-    }
-    resumo[t.id]={closes,total:acc,nb,meta};
-  });
-  return {proj,resumo,meta,nb};
+function metaForTurma(disc, turmaId){
+  return Math.max(1, numberValue((disc.metas || {})[turmaId], numberValue(disc.aulasPorBimestre, 20)));
 }
 
-/* =================== Render: abas + rodapé =================== */
+function launchedForTurma(disc, turmaId){
+  return Math.max(0, numberValue((disc.lancadas || {})[turmaId], 0));
+}
+
+function totalForTurma(disc, turmaId){
+  return Math.max(0, numberValue((disc.totais || {})[turmaId], metaForTurma(disc,turmaId) * (disc.nBimestres || 4)));
+}
+
+function weeklyForTurma(disc, turmaId){
+  return sumValues((disc.grade || {})[turmaId] || {});
+}
+
+function fullProjectionForDiscipline(disc, days){
+  const proj = {};
+  const resumo = {};
+  state.turmas.forEach(turma=>{
+    const meta = metaForTurma(disc, turma.id);
+    const closes = {};
+    let acc = 0;
+    let target = 1;
+    proj[turma.id] = {};
+    days.forEach(day=>{
+      if(!day.isProjectionDay) return;
+      const add = numberValue(((disc.grade || {})[turma.id] || {})[day.dow], 0);
+      if(add <= 0) return;
+      acc += add;
+      const cell = {cum:acc, add:add, closes:[]};
+      while(target <= (disc.nBimestres || 4) && acc >= target * meta){
+        cell.closes.push(target);
+        closes[target] = day.k;
+        target += 1;
+      }
+      proj[turma.id][day.k] = cell;
+    });
+    resumo[turma.id] = {closes, total:acc, meta};
+  });
+  return {proj, resumo};
+}
+
+function futureProjectionForDiscipline(disc, days){
+  const anchor = state.anchorDate;
+  const proj = {};
+  const resumo = {};
+  state.turmas.forEach(turma=>{
+    const meta = metaForTurma(disc, turma.id);
+    const launched = launchedForTurma(disc, turma.id);
+    const closes = {};
+    let acc = launched;
+    let target = Math.floor(launched / meta) + 1;
+    proj[turma.id] = {};
+    proj[turma.id][anchor] = {cum:launched, add:0, closes:[], sync:true};
+    days.forEach(day=>{
+      if(day.k <= anchor || !day.isProjectionDay) return;
+      const add = numberValue(((disc.grade || {})[turma.id] || {})[day.dow], 0);
+      if(add <= 0) return;
+      acc += add;
+      const cell = {cum:acc, add:add, closes:[]};
+      while(target <= (disc.nBimestres || 4) && acc >= target * meta){
+        cell.closes.push(target);
+        closes[target] = day.k;
+        target += 1;
+      }
+      proj[turma.id][day.k] = cell;
+    });
+    resumo[turma.id] = {
+      closes,
+      launched,
+      meta,
+      total:totalForTurma(disc, turma.id),
+      currentBim:Math.min(disc.nBimestres || 4, Math.floor(launched / meta) + 1),
+      completedBims:Math.min(disc.nBimestres || 4, Math.floor(launched / meta))
+    };
+  });
+  return {proj, resumo};
+}
+
+function renderHero(){
+  const generatedLabel = state.generatedAt ? new Date(state.generatedAt).toLocaleString('pt-BR') : 'sem horário';
+  const recessoLabel = state.recesso && state.recesso.start ? `${brDateShort(state.recesso.start)} a ${brDateShort(state.recesso.end)}` : 'não definido';
+  const activeDisc = state.disciplinas.find(d=>d.id === state.activeDisc);
+  const meta = document.getElementById('hero-meta');
+  meta.innerHTML = [
+    `<span class="hero-pill">Data-base das lançadas: <strong>${esc(brDate(state.anchorDate))}</strong></span>`,
+    `<span class="hero-pill">Recesso oficial: <strong>${esc(recessoLabel)}</strong></span>`,
+    `<span class="hero-pill">Disciplinas sincronizadas: <strong>${state.disciplinas.length}</strong></span>`,
+    `<span class="hero-pill">Aba ativa: <strong>${esc(activeDisc ? activeDisc.nome : 'nenhuma')}</strong></span>`
+  ].join('');
+  document.getElementById('hero-stats').innerHTML = [
+    {label:'Aulas já lançadas',value:totalLancadas(),copy:'Contagem importada do contador do relatório.'},
+    {label:'Turmas acompanhadas',value:state.turmas.length,copy:'Linhas ativas na projeção semanal.'},
+    {label:'Datas marcadas',value:countCalendarNotes(),copy:'Anotações vindas do calendário escolar oficial.'},
+    {label:'Última sincronização',value:generatedLabel,copy:'Base gravada a partir da página principal.'}
+  ].map(item=>`<div class="hero-card"><small>${esc(item.label)}</small><strong>${esc(String(item.value))}</strong><span>${esc(item.copy)}</span></div>`).join('');
+  document.getElementById('sync-list').innerHTML = [
+    {label:'Escola',value:state.schoolName || 'Relatório escolar',copy:'Fonte principal dos lançamentos sincronizados.'},
+    {label:'Até a data',value:brDate(state.anchorDate),copy:'As próximas linhas projetam o saldo após esta referência.'},
+    {label:'Bloqueios oficiais',value:`${state.feriados.length} feriados`,copy:'Feriados e recesso considerados nas datas futuras.'}
+  ].map(item=>`<div class="sync-chip"><small>${esc(item.label)}</small><strong>${esc(item.value)}</strong><span>${esc(item.copy)}</span></div>`).join('');
+}
+
 function renderTabs(){
-  const el=document.getElementById('tabs');
-  let h='';
-  state.disciplinas.forEach(d=>{
-    h+=`<button class="tab ${d.id===state.activeDisc?'active':''}" onclick="setDisc('${d.id}')">
-      <span class="dot" style="background:${d.cor}"></span>${esc(d.nome)}</button>`;
-  });
-  h+=`<button class="tab add" onclick="openDisciplinas()" title="Gerenciar disciplinas">+ disciplina</button>`;
-  el.innerHTML=h;
+  const tabs = document.getElementById('tabs');
+  const html = state.disciplinas.map(disc=>{
+    const launched = sumValues(disc.lancadas || {});
+    return `<button class="tab ${disc.id === state.activeDisc ? 'active' : ''}" type="button" onclick="setDisc('${disc.id}')">
+      <div class="tab-line">
+        <span class="tab-name"><span class="dot" style="background:${esc(disc.cor)}"></span>${esc(disc.nome)}</span>
+        <strong>${launched}</strong>
+      </div>
+      <div class="tab-meta">${state.turmas.length} turmas · ${disc.nBimestres || 4} bimestres</div>
+    </button>`;
+  }).join('');
+  tabs.innerHTML = html + `<button class="tab add" type="button" onclick="openDisciplinas()">+ disciplina</button>`;
 }
+
 function renderFooterStat(days){
-  const let_=days.filter(d=>d.status==='letivo').length;
-  const fe=days.filter(d=>d.status==='feriado').length;
-  const re=days.filter(d=>d.status==='recesso').length;
-  document.getElementById('statFoot').textContent =
-    `${let_} dias letivos · ${fe} feriados · ${re} de recesso · ${state.turmas.length} turmas · ${state.disciplinas.length} disciplinas`;
+  const holidays = days.filter(day=>day.status === 'feriado').length;
+  const saturdays = days.filter(day=>day.status === 'sabado').length;
+  const sundays = days.filter(day=>day.status === 'domingo').length;
+  const recess = days.filter(day=>day.status === 'recesso').length;
+  const projectionDays = days.filter(day=>day.isProjectionDay).length;
+  document.getElementById('statFoot').textContent = `${projectionDays} dias úteis projetáveis · ${holidays} feriados · ${recess} dias de recesso · ${saturdays} sábados · ${sundays} domingos`;
 }
 
-function setDisc(id){ state.activeDisc=id; save(); renderTabs(); renderPanel(); }
+function setDisc(id){
+  state.activeDisc = id;
+  save();
+  render();
+}
 
-/* =================== Render: painel da disciplina =================== */
-function renderPanel(){
-  const disc=state.disciplinas.find(d=>d.id===state.activeDisc);
-  const panel=document.getElementById('panel');
-  const days=buildDays();
-  renderFooterStat(days);
-
-  if(!disc){
-    panel.innerHTML=`<div class="empty-note">Nenhuma disciplina. Clique em <b>Disciplinas</b> para adicionar.</div>`;
-    return;
+function buildTurmaCard(turma, disc, fullInfo, futureInfo){
+  const meta = futureInfo.meta;
+  const launched = futureInfo.launched;
+  const total = futureInfo.total;
+  const currentBim = Math.min(disc.nBimestres || 4, Math.floor(launched / meta) + 1);
+  const currentProgress = launched - (Math.floor(launched / meta) * meta);
+  let lines = '';
+  for(let bim = 1; bim <= (disc.nBimestres || 4); bim += 1){
+    let value = '';
+    const target = bim * meta;
+    if(launched >= target){
+      value = fullInfo.closes[bim] ? brDateShort(fullInfo.closes[bim]) : 'concluído';
+    }else{
+      value = futureInfo.closes[bim] ? brDateShort(futureInfo.closes[bim]) : 'não fecha em 2026';
+    }
+    lines += `<div class="statline"><span>${bim}º bimestre</span><span class="value ${value === 'não fecha em 2026' ? 'miss' : ''}">${esc(value)}</span></div>`;
   }
-  if(state.turmas.length===0){
-    panel.innerHTML=`<div class="empty-note">Nenhuma turma. Clique em <b>Turmas</b> para adicionar.</div>`;
-    return;
-  }
+  return `<article class="card">
+    <h3>${esc(turma.nome)}</h3>
+    <div class="lead">${esc(disc.nome)} · ${weeklyForTurma(disc, turma.id)} h/aula por semana</div>
+    <div class="statline"><span>Já lançadas</span><span class="value">${launched}</span></div>
+    <div class="statline"><span>Bimestre atual</span><span class="value">${currentBim}º · ${currentProgress}/${meta}</span></div>
+    <div class="statline"><span>Total anual</span><span class="value">${launched}/${total}</span></div>
+    ${lines}
+    <div class="summary-total"><strong>Próxima projeção útil:</strong> ${futureInfo.closes[currentBim] ? esc(brDate(futureInfo.closes[currentBim])) : 'sem fechamento restante em 2026'}.</div>
+  </article>`;
+}
 
-  // Editor da grade semanal
-  let grid=`<div class="grid-tbl-wrap"><table class="grid"><thead><tr>
-    <th class="turma-cell">Turma \\ Dia</th>`;
-  WEEK.forEach(w=>{ grid+=`<th>${w.ab}</th>`; });
-  grid+=`<th>Total/sem.</th></tr></thead><tbody>`;
-  state.turmas.forEach(t=>{
-    const g=disc.grade[t.id]||{};
-    let semana=0;
-    let cells='';
-    WEEK.forEach(w=>{
-      const v=Number(g[w.k])||0; semana+=v;
-      cells+=`<td><input class="grade-in ${v===0?'zero':''}" type="number" min="0" step="1" value="${v}"
-        data-t="${t.id}" data-d="${w.k}" oninput="onGrade(this)" aria-label="${esc(t.nome)} ${w.ab}"></td>`;
+function renderGrid(disc){
+  let html = `<div class="grid-wrap"><table class="grid"><thead><tr>
+    <th class="turma-cell">Turma</th>
+    ${WEEK.map(day=>`<th>${day.ab}</th>`).join('')}
+    <th>Total/sem.</th>
+    <th>Meta/bim.</th>
+    <th>Lançadas</th>
+    <th>Total ano</th>
+  </tr></thead><tbody>`;
+  state.turmas.forEach(turma=>{
+    const grade = (disc.grade || {})[turma.id] || {};
+    html += `<tr><td class="turma-cell">${esc(turma.nome)}</td>`;
+    WEEK.forEach(day=>{
+      const value = numberValue(grade[day.k], 0);
+      html += `<td><input class="grade-in ${value === 0 ? 'zero' : ''}" type="number" min="0" step="1" value="${value}" oninput="onGrade('${disc.id}','${turma.id}',${day.k},this.value)"></td>`;
     });
-    grid+=`<tr><td class="turma-cell">${esc(t.nome)}</td>${cells}
-      <td style="font-family:var(--mono);color:var(--muted)">${semana}</td></tr>`;
+    html += `<td class="week-sum">${weeklyForTurma(disc, turma.id)}</td>`;
+    html += `<td><input class="meta-in" type="number" min="1" step="1" value="${metaForTurma(disc, turma.id)}" oninput="onMeta('${disc.id}','${turma.id}',this.value)"></td>`;
+    html += `<td><input class="done-in" type="number" min="0" step="1" value="${launchedForTurma(disc, turma.id)}" oninput="onLaunched('${disc.id}','${turma.id}',this.value)"></td>`;
+    html += `<td><input class="total-in" type="number" min="0" step="1" value="${totalForTurma(disc, turma.id)}" oninput="onTotal('${disc.id}','${turma.id}',this.value)"></td></tr>`;
   });
-  grid+=`</tbody></table></div>`;
-
-  const cfg=`<div class="cfg-row">
-    <div class="field"><label>Aulas por bimestre</label>
-      <input type="number" min="1" step="1" value="${disc.aulasPorBimestre}" oninput="onCfg('aulasPorBimestre',this.value)"></div>
-    <div class="field"><label>Nº de bimestres</label>
-      <input type="number" min="1" max="8" step="1" value="${disc.nBimestres}" oninput="onCfg('nBimestres',this.value)"></div>
-    <div class="hint">Informe quantas aulas compõem 1 bimestre desta disciplina. A tabela marca o dia em que cada turma atinge a meta e fecha o bimestre.</div>
-  </div>`;
-
-  panel.innerHTML=`
-    <div class="panel-head">
-      <span class="accent" style="background:${disc.cor}"></span>
-      <h2>${esc(disc.nome)}</h2>
-      <span class="metaline">grade semanal fixa · projeção 2026</span>
-    </div>
-    <div class="section-title">Grade semanal (aulas por dia)</div>
-    ${grid}
-    ${cfg}
-    <div id="results"></div>`;
-  renderResults();
+  html += `</tbody></table></div>`;
+  return html;
 }
 
-function renderResults(){
-  const disc=state.disciplinas.find(d=>d.id===state.activeDisc);
-  const days=buildDays();
-  const {proj,resumo,meta,nb}=project(disc,days);
-  const box=document.getElementById('results');
-
-  // Cards resumo
-  let cards='<div class="cards">';
-  state.turmas.forEach(t=>{
-    const r=resumo[t.id];
-    let bims='';
-    for(let b=1;b<=nb;b++){
-      const dt=r.closes[b];
-      bims+=`<div class="bim"><span class="lbl">${b}º bimestre</span>`+
-        (dt?`<span class="date">${brDate(dt)}</span>`:`<span class="date miss">não fecha em ${YEAR}</span>`)+`</div>`;
-    }
-    cards+=`<div class="card"><h3>${esc(t.nome)}</h3>${bims}
-      <div class="tot">Total no ano: <b>${r.total}</b> aulas</div></div>`;
+function dayNotePills(day){
+  const pills = [];
+  if(day.k === state.anchorDate) pills.push(`<span class="note-pill sync">Saldo lançado até ${esc(brDateShort(day.k))}</span>`);
+  day.holidays.forEach(item=>{
+    pills.push(`<span class="note-pill ${esc(item.tipo)}">${esc(item.nome)}</span>`);
   });
-  cards+='</div>';
+  day.notes.forEach(note=>{
+    pills.push(`<span class="note-pill">${esc(note)}</span>`);
+  });
+  if(day.status === 'sabado' && !day.holidays.length && !day.notes.length) pills.push(`<span class="note-pill sabado">Sábado visível na linha do tempo</span>`);
+  if(day.status === 'domingo') pills.push(`<span class="note-pill domingo">Domingo · limitador da semana</span>`);
+  if(day.status === 'recesso' && !day.notes.length) pills.push(`<span class="note-pill recesso">Recesso escolar</span>`);
+  return pills.length ? pills.join('') : `<span class="note-pill">Projeção regular</span>`;
+}
 
-  // Tabela de projeção
-  let head=`<tr><th class="c-data">Data</th><th class="c-dia">Dia</th>`;
-  state.turmas.forEach(t=>{ head+=`<th>${esc(t.nome)}</th>`; });
-  head+=`</tr>`;
+function rowClass(day){
+  if(day.status === 'feriado') return 'status-feriado';
+  if(day.status === 'recesso') return 'status-recesso';
+  if(day.status === 'sabado') return 'status-sabado';
+  if(day.status === 'domingo') return 'status-domingo';
+  return 'status-letivo';
+}
 
-  let rows='';
-  days.forEach(d=>{
-    if(d.status==='feriado'){
-      const tp=d.fer.tipo;
-      rows+=`<tr class="special t-${tp} ${d.mon?'row-mon':''}">
-        <td class="c-data">${brDate(d.k)}</td><td class="c-dia">${DIAS_AB[d.dow]}</td>
-        <td class="special-label" colspan="${state.turmas.length}">
-          <span class="badge">${tp==='nacional'?'Nac':tp==='estadual'?'AC':'Fac'}</span>${esc(d.fer.nome)}</td></tr>`;
-      return;
-    }
-    if(d.status==='recesso'){
-      rows+=`<tr class="special t-recesso ${d.mon?'row-mon':''}">
-        <td class="c-data">${brDate(d.k)}</td><td class="c-dia">${DIAS_AB[d.dow]}</td>
-        <td class="special-label" colspan="${state.turmas.length}"><span class="badge">Rec</span>Recesso escolar</td></tr>`;
-      return;
-    }
-    // letivo
-    let hasAny=false, cells='';
-    state.turmas.forEach(t=>{
-      const c=proj[t.id][d.k];
-      if(c){
-        hasAny=true;
-        const mile=c.closes.length>0;
-        const tag=c.closes.map(b=>`<span class="mile-tag">Fim ${b}º</span>`).join('');
-        cells+=`<td class="turno ${mile?'milestone':''}" title="+${c.add} aula(s) neste dia">
-          <span class="cum">${c.cum}</span>${tag}</td>`;
+function shouldKeepRow(day, futureProj){
+  if(!state.showOnlyActive) return day.k >= state.anchorDate;
+  if(day.k < state.anchorDate && day.k !== state.anchorDate) return false;
+  if(day.status === 'domingo' || day.status === 'sabado' || day.status === 'feriado' || day.status === 'recesso') return true;
+  if(day.notes.length) return true;
+  return state.turmas.some(turma=>!!(futureProj.proj[turma.id] || {})[day.k]);
+}
+
+function renderProjectionTable(disc, days, futureProj){
+  const visibleDays = days.filter(day=>shouldKeepRow(day, futureProj));
+  if(!visibleDays.length){
+    return `<div class="empty-note">Nenhuma data disponível para esta projeção.</div>`;
+  }
+  let head = `<tr><th class="c-data">Data</th><th class="c-dia">Dia</th><th class="c-event">Evento / Status</th>`;
+  state.turmas.forEach(turma=>{ head += `<th>${esc(turma.nome)}</th>`; });
+  head += `</tr>`;
+  let rows = '';
+  visibleDays.forEach(day=>{
+    let cells = '';
+    state.turmas.forEach(turma=>{
+      const cell = ((futureProj.proj[turma.id] || {})[day.k]) || null;
+      if(cell){
+        const tags = cell.closes.map(bim=>`<span class="mile-tag">fecha ${bim}º</span>`).join('');
+        const body = cell.sync
+          ? `<div class="turno-inner"><span class="cum">${cell.cum}</span><span class="delta">aulas já lançadas até esta data</span></div>`
+          : `<div class="turno-inner"><span class="cum">${cell.cum}</span><span class="delta">+${cell.add} aula(s) projetadas</span>${tags}</div>`;
+        cells += `<td class="turno ${cell.sync ? 'sync' : ''} ${cell.closes.length ? 'milestone' : ''}">${body}</td>`;
       }else{
-        cells+=`<td class="blank">·</td>`;
+        cells += `<td class="blank">—</td>`;
       }
     });
-    if(!showAll && !hasAny) return;
-    rows+=`<tr class="row-let ${d.mon?'row-mon':''}">
-      <td class="c-data">${brDate(d.k)}</td><td class="c-dia">${DIAS_AB[d.dow]}</td>${cells}</tr>`;
+    rows += `<tr class="${rowClass(day)} ${day.mon ? 'row-mon' : ''}">
+      <td class="c-data">${esc(brDateShort(day.k))}</td>
+      <td class="c-dia">${esc(DIAS_AB[day.dow])}</td>
+      <td class="c-event"><div class="event-cell">${dayNotePills(day)}</div></td>
+      ${cells}
+    </tr>`;
   });
+  return `<div class="view-toggle" role="group" aria-label="Filtro de linhas">
+    <button class="${!state.showOnlyActive ? 'on' : ''}" type="button" onclick="setShowOnlyActive(false)">Todas as datas</button>
+    <button class="${state.showOnlyActive ? 'on' : ''}" type="button" onclick="setShowOnlyActive(true)">Só datas com movimento</button>
+  </div>
+  <div class="proj-wrap"><table class="proj"><thead>${head}</thead><tbody>${rows}</tbody></table></div>`;
+}
 
-  const toggle=`<div class="view-toggle" role="group" aria-label="Filtro de dias">
-    <button class="${showAll?'on':''}" onclick="setShow(true)">Todos os dias</button>
-    <button class="${!showAll?'on':''}" onclick="setShow(false)">Só dias com aula</button>
-  </div>`;
+function renderPanel(){
+  const disc = state.disciplinas.find(item=>item.id === state.activeDisc);
+  const panel = document.getElementById('panel');
+  const days = buildDays();
+  renderFooterStat(days);
+  if(!disc){
+    panel.innerHTML = `<div class="empty-note">Nenhuma disciplina disponível. Use o botão de disciplinas para criar uma nova aba.</div>`;
+    return;
+  }
+  const full = fullProjectionForDiscipline(disc, days);
+  const future = futureProjectionForDiscipline(disc, days);
+  const launched = sumValues(disc.lancadas || {});
+  const weeklyLoad = state.turmas.reduce((sum,turma)=>sum + weeklyForTurma(disc, turma.id), 0);
+  panel.innerHTML = `<div class="discipline-panel">
+    <div class="panel-hero">
+      <div>
+        <div class="panel-kicker">Disciplina ativa · projeção dinâmica</div>
+        <div class="panel-head">
+          <span class="accent" style="background:${esc(disc.cor)}"></span>
+          <h2>${esc(disc.nome)}</h2>
+        </div>
+        <p class="panel-copy">As horas já lançadas no relatório entram como saldo inicial. A partir de <strong>${esc(brDate(state.anchorDate))}</strong>, a tabela cruza o cronograma semanal com feriados, recesso e marcas do calendário escolar para estimar o restante do ano.</p>
+      </div>
+      <div class="hero-kpis">
+        <div class="mini-card"><small>Aulas lançadas</small><strong>${launched}</strong><span>Soma desta disciplina em todas as turmas.</span></div>
+        <div class="mini-card"><small>Carga semanal</small><strong>${weeklyLoad} h/aula</strong><span>Distribuição semanal usada nas próximas projeções.</span></div>
+        <div class="mini-card"><small>Turmas ativas</small><strong>${state.turmas.length}</strong><span>Linhas com metas e saldo individuais.</span></div>
+        <div class="mini-card"><small>Base futura</small><strong>${esc(brDate(state.anchorDate))}</strong><span>Primeira linha sincronizada com o contador atual.</span></div>
+      </div>
+    </div>
 
-  box.innerHTML=`
     <div class="section-title">Fechamento dos bimestres por turma</div>
-    ${cards}
-    <div class="section-title">Cronograma dia a dia · acúmulo de aulas</div>
-    ${toggle}
-    <div class="proj-wrap"><table class="proj"><thead>${head}</thead><tbody>${rows}</tbody></table></div>`;
+    <div class="cards">${state.turmas.map(turma=>buildTurmaCard(turma, disc, full.resumo[turma.id], future.resumo[turma.id])).join('')}</div>
+
+    <div class="section-title">Grade semanal, metas e aulas já lançadas</div>
+    ${renderGrid(disc)}
+    <div class="cfg-row">
+      <div class="field">
+        <label>Data-base das aulas lançadas</label>
+        <input type="date" min="2026-01-01" max="2026-12-31" value="${esc(state.anchorDate)}" onchange="onAnchorDate(this.value)">
+      </div>
+      <label class="check"><input type="checkbox" ${state.facultativoLetivo ? 'checked' : ''} onchange="toggleFacultativo(this.checked)">Contar pontos facultativos como dias letivos</label>
+      <div class="hint">Use esta data para dizer até onde o contador já foi lançado. A tabela seguinte mantém sábado e domingo na sequência para a leitura do ritmo semanal, deixando o domingo em vermelho escuro como limitador visual.</div>
+    </div>
+
+    <div class="section-title">Linha do tempo das próximas aulas e dos fechamentos</div>
+    ${renderProjectionTable(disc, days, future)}
+  </div>`;
 }
 
-function setShow(v){ showAll=v; renderResults(); }
-
-/* =================== Handlers de edição inline =================== */
-function onGrade(inp){
-  const disc=state.disciplinas.find(d=>d.id===state.activeDisc);
-  const t=inp.dataset.t, dw=inp.dataset.d;
-  let v=parseInt(inp.value,10); if(isNaN(v)||v<0){v=0;}
-  if(!disc.grade[t]) disc.grade[t]={};
-  disc.grade[t][dw]=v;
-  inp.classList.toggle('zero', v===0);
-  save(); renderResults();
-  // atualiza total/semana da linha
-  const tr=inp.closest('tr'); if(tr){ let s=0; tr.querySelectorAll('.grade-in').forEach(i=>s+=parseInt(i.value,10)||0);
-    tr.lastElementChild.textContent=s; }
-}
-function onCfg(field,val){
-  const disc=state.disciplinas.find(d=>d.id===state.activeDisc);
-  let v=parseInt(val,10); if(isNaN(v)||v<1)v=1;
-  disc[field]=v; save(); renderResults();
+function render(){
+  normalizeState();
+  renderHero();
+  renderTabs();
+  renderPanel();
 }
 
-/* =================== Modais =================== */
-function openModal(html){ document.getElementById('modal').innerHTML=html; document.getElementById('overlay').classList.add('open'); }
-function closeModal(){ document.getElementById('overlay').classList.remove('open'); renderTabs(); renderPanel(); }
+function setShowOnlyActive(value){
+  state.showOnlyActive = !!value;
+  save();
+  renderPanel();
+}
 
-/* ---- Turmas ---- */
+function onGrade(discId, turmaId, dow, value){
+  const disc = state.disciplinas.find(item=>item.id === discId);
+  if(!disc) return;
+  if(!disc.grade[turmaId]) disc.grade[turmaId] = {};
+  const parsed = Math.max(0, numberValue(value, 0));
+  disc.grade[turmaId][dow] = parsed;
+  save();
+  renderPanel();
+}
+
+function onMeta(discId, turmaId, value){
+  const disc = state.disciplinas.find(item=>item.id === discId);
+  if(!disc) return;
+  disc.metas[turmaId] = Math.max(1, numberValue(value, 1));
+  save();
+  renderPanel();
+}
+
+function onLaunched(discId, turmaId, value){
+  const disc = state.disciplinas.find(item=>item.id === discId);
+  if(!disc) return;
+  disc.lancadas[turmaId] = Math.max(0, numberValue(value, 0));
+  save();
+  render();
+}
+
+function onTotal(discId, turmaId, value){
+  const disc = state.disciplinas.find(item=>item.id === discId);
+  if(!disc) return;
+  disc.totais[turmaId] = Math.max(0, numberValue(value, 0));
+  save();
+  renderPanel();
+}
+
+function onAnchorDate(value){
+  if(!value) return;
+  state.anchorDate = value;
+  save();
+  render();
+}
+
+function openModal(html){
+  document.getElementById('modal').innerHTML = html;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  render();
+}
+
 function openTurmas(){
-  let rows='';
-  state.turmas.forEach(t=>{
-    rows+=`<div class="list-row">
-      <input class="name" value="${esc(t.nome)}" oninput="editTurma('${t.id}',this.value)">
-      <button class="del" title="Remover" onclick="delTurma('${t.id}')">×</button></div>`;
-  });
-  openModal(`
-    <div class="modal-head"><h3>Turmas</h3><button class="x" onclick="closeModal()">×</button></div>
+  const rows = state.turmas.map(turma=>`<div class="list-row">
+    <input class="name" value="${esc(turma.nome)}" oninput="editTurma('${turma.id}',this.value)">
+    <button class="del" type="button" onclick="delTurma('${turma.id}')">×</button>
+  </div>`).join('');
+  openModal(`<div class="modal-head"><h3>Turmas</h3><button class="x" type="button" onclick="closeModal()">×</button></div>
     <div class="modal-body">
-      <div class="hint" style="margin-bottom:10px">As turmas viram colunas em todas as disciplinas.</div>
-      <div id="turmaList">${rows||'<div class="hint">Nenhuma turma ainda.</div>'}</div>
-      <div class="add-line"><button class="btn" onclick="addTurma()">+ Adicionar turma</button></div>
+      <div class="hint">As turmas aparecem como linhas na grade semanal e também como colunas na projeção futura.</div>
+      ${rows || '<div class="empty-note">Nenhuma turma cadastrada.</div>'}
+      <div class="add-line"><button class="btn" type="button" onclick="addTurma()">+ Adicionar turma</button></div>
     </div>
-    <div class="modal-foot"><button class="btn solid" onclick="closeModal()">Concluir</button></div>`);
+    <div class="modal-foot"><button class="btn solid" type="button" onclick="closeModal()">Concluir</button></div>`);
 }
-function editTurma(id,v){ const t=state.turmas.find(x=>x.id===id); if(t){t.nome=v;save();} }
-function addTurma(){ state.turmas.push({id:uid(),nome:'Nova turma'}); normalize(); save(); openTurmas(); }
+
+function editTurma(id, value){
+  const turma = state.turmas.find(item=>item.id === id);
+  if(!turma) return;
+  turma.nome = value;
+  save();
+}
+
+function addTurma(){
+  const id = uid();
+  state.turmas.push({id:id, nome:'Nova turma'});
+  state.disciplinas.forEach(disc=>{
+    disc.grade[id] = disc.grade[id] || {};
+    disc.metas[id] = disc.metas[id] || 20;
+    disc.lancadas[id] = disc.lancadas[id] || 0;
+    disc.totais[id] = disc.totais[id] || 80;
+  });
+  save();
+  openTurmas();
+}
+
 function delTurma(id){
-  state.turmas=state.turmas.filter(t=>t.id!==id);
-  state.disciplinas.forEach(d=>{ if(d.grade) delete d.grade[id]; });
-  save(); openTurmas();
-}
-
-/* ---- Disciplinas ---- */
-function openDisciplinas(){
-  let rows='';
-  state.disciplinas.forEach(d=>{
-    rows+=`<div class="list-row">
-      <input class="color" type="color" value="${d.cor}" oninput="editDisc('${d.id}','cor',this.value)">
-      <input class="name" value="${esc(d.nome)}" oninput="editDisc('${d.id}','nome',this.value)">
-      <button class="del" title="Remover" onclick="delDisc('${d.id}')">×</button></div>`;
+  state.turmas = state.turmas.filter(item=>item.id !== id);
+  state.disciplinas.forEach(disc=>{
+    delete disc.grade[id];
+    delete disc.metas[id];
+    delete disc.lancadas[id];
+    delete disc.totais[id];
   });
-  openModal(`
-    <div class="modal-head"><h3>Disciplinas</h3><button class="x" onclick="closeModal()">×</button></div>
-    <div class="modal-body">
-      <div class="hint" style="margin-bottom:10px">Cada disciplina tem sua própria aba, grade semanal e meta de aulas por bimestre.</div>
-      <div id="discList">${rows||'<div class="hint">Nenhuma disciplina ainda.</div>'}</div>
-      <div class="add-line"><button class="btn" onclick="addDisc()">+ Adicionar disciplina</button></div>
-    </div>
-    <div class="modal-foot"><button class="btn solid" onclick="closeModal()">Concluir</button></div>`);
-}
-function editDisc(id,f,v){ const d=state.disciplinas.find(x=>x.id===id); if(d){d[f]=v;save();} }
-function addDisc(){
-  const cor=DISC_CORES[state.disciplinas.length % DISC_CORES.length];
-  const id=uid();
-  state.disciplinas.push({id,nome:'Nova disciplina',cor,aulasPorBimestre:20,nBimestres:4,grade:{}});
-  normalize(); state.activeDisc=id; save(); openDisciplinas();
-}
-function delDisc(id){
-  state.disciplinas=state.disciplinas.filter(d=>d.id!==id);
-  if(state.activeDisc===id) state.activeDisc = state.disciplinas[0]?state.disciplinas[0].id:null;
-  save(); openDisciplinas();
+  save();
+  openTurmas();
 }
 
-/* ---- Recesso ---- */
-function openRecesso(){
-  openModal(`
-    <div class="modal-head"><h3>Recesso escolar</h3><button class="x" onclick="closeModal()">×</button></div>
+function openDisciplinas(){
+  const rows = state.disciplinas.map(disc=>`<div class="list-row">
+    <input class="color" type="color" value="${esc(disc.cor)}" oninput="editDisc('${disc.id}','cor',this.value)">
+    <input class="name" value="${esc(disc.nome)}" oninput="editDisc('${disc.id}','nome',this.value)">
+    <button class="del" type="button" onclick="delDisc('${disc.id}')">×</button>
+  </div>`).join('');
+  openModal(`<div class="modal-head"><h3>Disciplinas</h3><button class="x" type="button" onclick="closeModal()">×</button></div>
     <div class="modal-body">
-      <div class="hint" style="margin-bottom:14px">Dias dentro do intervalo não contam como letivos. Padrão adotado: <b>20 a 31 de julho de 2026</b> — ajuste se o seu calendário for diferente.</div>
-      <div class="dates-2">
-        <div class="field"><label>Início</label><input type="date" id="recStart" value="${state.recesso.start}" min="2026-01-01" max="2026-12-31" style="font-family:var(--mono)"></div>
-        <div class="field"><label>Fim</label><input type="date" id="recEnd" value="${state.recesso.end}" min="2026-01-01" max="2026-12-31" style="font-family:var(--mono)"></div>
+      <div class="hint">Cada disciplina ganha sua própria aba com metas, saldo lançado e projeção futura por turma.</div>
+      ${rows || '<div class="empty-note">Nenhuma disciplina cadastrada.</div>'}
+      <div class="add-line"><button class="btn" type="button" onclick="addDisc()">+ Adicionar disciplina</button></div>
+    </div>
+    <div class="modal-foot"><button class="btn solid" type="button" onclick="closeModal()">Concluir</button></div>`);
+}
+
+function editDisc(id, field, value){
+  const disc = state.disciplinas.find(item=>item.id === id);
+  if(!disc) return;
+  disc[field] = value;
+  save();
+}
+
+function addDisc(){
+  const id = uid();
+  const color = DISC_CORES[state.disciplinas.length % DISC_CORES.length];
+  const disc = {id:id, nome:'Nova disciplina', cor:color, nBimestres:4, grade:{}, metas:{}, lancadas:{}, totais:{}};
+  state.turmas.forEach(turma=>{
+    disc.grade[turma.id] = {};
+    disc.metas[turma.id] = 20;
+    disc.lancadas[turma.id] = 0;
+    disc.totais[turma.id] = 80;
+  });
+  state.disciplinas.push(disc);
+  state.activeDisc = id;
+  save();
+  openDisciplinas();
+}
+
+function delDisc(id){
+  state.disciplinas = state.disciplinas.filter(item=>item.id !== id);
+  if(state.activeDisc === id) state.activeDisc = state.disciplinas[0] ? state.disciplinas[0].id : null;
+  save();
+  openDisciplinas();
+}
+
+function openRecesso(){
+  openModal(`<div class="modal-head"><h3>Recesso escolar</h3><button class="x" type="button" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="hint">As datas deste intervalo ficam bloqueadas na projeção, mesmo aparecendo na linha do tempo.</div>
+      <div class="list-row" style="border-bottom:none;padding-top:4px">
+        <input class="date" type="date" id="recStart" min="2026-01-01" max="2026-12-31" value="${esc(state.recesso.start)}">
+        <input class="date" type="date" id="recEnd" min="2026-01-01" max="2026-12-31" value="${esc(state.recesso.end)}">
       </div>
     </div>
     <div class="modal-foot">
-      <button class="btn" onclick="closeModal()">Cancelar</button>
-      <button class="btn solid" onclick="saveRecesso()">Salvar</button>
+      <button class="btn" type="button" onclick="closeModal()">Cancelar</button>
+      <button class="btn solid" type="button" onclick="saveRecesso()">Salvar</button>
     </div>`);
 }
+
 function saveRecesso(){
-  const s=document.getElementById('recStart').value, e=document.getElementById('recEnd').value;
-  if(s&&e){ state.recesso={start:s<e?s:e, end:s<e?e:s}; save(); }
+  const start = document.getElementById('recStart').value;
+  const end = document.getElementById('recEnd').value;
+  if(start && end){
+    state.recesso = start <= end ? {start:start, end:end} : {start:end, end:start};
+    save();
+  }
   closeModal();
 }
 
-/* ---- Feriados ---- */
 function openFeriados(){
-  const groups={nacional:[],estadual:[],facultativo:[]};
-  state.feriados.slice().sort((a,b)=>a.date<b.date?-1:1).forEach(f=>groups[f.tipo].push(f));
-  const block=(arr)=>arr.map(f=>`<div class="list-row">
-      <input class="date" type="date" value="${f.date}" onchange="editFerDate('${f.date}','${f.tipo}',this.value)">
-      <input class="name" value="${esc(f.nome)}" oninput="editFerNome('${f.date}','${f.tipo}',this.value)">
-      <span class="tinytag ${f.tipo}">${f.tipo==='nacional'?'Nac':f.tipo==='estadual'?'AC':'Fac'}</span>
-      <button class="del" title="Remover" onclick="delFer('${f.date}','${f.tipo}')">×</button></div>`).join('');
-  openModal(`
-    <div class="modal-head"><h3>Feriados e pontos facultativos · 2026</h3><button class="x" onclick="closeModal()">×</button></div>
+  const groups = {nacional:[],estadual:[],facultativo:[]};
+  state.feriados.slice().sort((a,b)=>a.date.localeCompare(b.date) || a.nome.localeCompare(b.nome)).forEach(item=>{
+    if(!groups[item.tipo]) groups[item.tipo] = [];
+    groups[item.tipo].push(item);
+  });
+  const block = list => list.map(item=>`<div class="list-row">
+    <input class="date" type="date" value="${esc(item.date)}" onchange="editFerDate('${esc(item.date)}','${esc(item.tipo)}',this.value)">
+    <input class="name" value="${esc(item.nome)}" oninput="editFerName('${esc(item.date)}','${esc(item.tipo)}',this.value)">
+    <span class="tinytag ${esc(item.tipo)}">${esc(item.tipo)}</span>
+    <button class="del" type="button" onclick="delFer('${esc(item.date)}','${esc(item.tipo)}')">×</button>
+  </div>`).join('');
+  openModal(`<div class="modal-head"><h3>Feriados e pontos facultativos</h3><button class="x" type="button" onclick="closeModal()">×</button></div>
     <div class="modal-body">
-      <label class="check"><input type="checkbox" ${state.facultativoLetivo?'checked':''} onchange="toggleFac(this.checked)">
-        Contar pontos facultativos como dia letivo (Carnaval, Corpus Christi etc.)</label>
-      <div class="grp">Nacionais</div>${block(groups.nacional)}
-      <div class="grp">Estaduais (Acre)</div>${block(groups.estadual)}
+      <label class="check"><input type="checkbox" ${state.facultativoLetivo ? 'checked' : ''} onchange="toggleFacultativo(this.checked)">Contar pontos facultativos como dias letivos</label>
+      <div class="grp">Feriados nacionais</div>${block(groups.nacional)}
+      <div class="grp">Feriados estaduais</div>${block(groups.estadual)}
       <div class="grp">Pontos facultativos</div>${block(groups.facultativo)}
-      <div class="add-line"><button class="btn" onclick="addFer()">+ Adicionar data</button></div>
+      <div class="add-line"><button class="btn" type="button" onclick="addFer()">+ Adicionar data</button></div>
     </div>
-    <div class="modal-foot"><button class="btn solid" onclick="closeModal()">Concluir</button></div>`);
+    <div class="modal-foot"><button class="btn solid" type="button" onclick="closeModal()">Concluir</button></div>`);
 }
-function findFer(date,tipo){ return state.feriados.find(f=>f.date===date&&f.tipo===tipo); }
-function editFerDate(oldD,tipo,v){ const f=findFer(oldD,tipo); if(f&&v){f.date=v;save();openFeriados();} }
-function editFerNome(date,tipo,v){ const f=findFer(date,tipo); if(f){f.nome=v;save();} }
-function delFer(date,tipo){ state.feriados=state.feriados.filter(f=>!(f.date===date&&f.tipo===tipo)); save(); openFeriados(); }
-function addFer(){ state.feriados.push({date:'2026-01-01',nome:'Novo feriado',tipo:'estadual'}); save(); openFeriados(); }
-function toggleFac(v){ state.facultativoLetivo=v; save(); }
 
-/* =================== Import / Export =================== */
-function doExport(){
-  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download='previsao-aulas-2026.json'; a.click();
-  URL.revokeObjectURL(a.href);
+function toggleFacultativo(value){
+  state.facultativoLetivo = !!value;
+  save();
+  render();
 }
-function doImport(){ document.getElementById('fileIn').click(); }
-document.getElementById('fileIn').addEventListener('change',function(ev){
-  const file=ev.target.files[0]; if(!file) return;
-  const r=new FileReader();
-  r.onload=()=>{ try{ state=JSON.parse(r.result); normalize(); save(); renderTabs(); renderPanel(); }
-    catch(e){ alert('Arquivo inválido.'); } };
-  r.readAsText(file); ev.target.value='';
+
+function findFer(date, tipo){
+  return state.feriados.find(item=>item.date === date && item.tipo === tipo);
+}
+
+function editFerDate(oldDate, tipo, value){
+  const item = findFer(oldDate, tipo);
+  if(!item || !value) return;
+  item.date = value;
+  save();
+  openFeriados();
+}
+
+function editFerName(date, tipo, value){
+  const item = findFer(date, tipo);
+  if(!item) return;
+  item.nome = value;
+  save();
+}
+
+function delFer(date, tipo){
+  state.feriados = state.feriados.filter(item=>!(item.date === date && item.tipo === tipo));
+  save();
+  openFeriados();
+}
+
+function addFer(){
+  state.feriados.push({date:'2026-01-01', nome:'Novo feriado', tipo:'estadual'});
+  save();
+  openFeriados();
+}
+
+function doExport(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'projecoes-aulas-2026.json';
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function doImport(){
+  document.getElementById('fileIn').click();
+}
+
+document.getElementById('fileIn').addEventListener('change', function(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      state = JSON.parse(reader.result);
+      normalizeState();
+      save();
+      render();
+    }catch(e){
+      alert('Arquivo inválido.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
 });
 
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+document.addEventListener('keydown', event=>{
+  if(event.key === 'Escape') closeModal();
+});
 
-/* =================== Início =================== */
-load(); normalize(); renderTabs(); renderPanel();
+if(window.top !== window.self){
+  document.body.classList.add('embedded');
+}
+
+load();
+render();
 </script>
 </body>
 </html>
