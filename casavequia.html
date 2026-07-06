@@ -7919,6 +7919,7 @@ const FC={lp:'f-lp',tl:'f-tl',tc:'f-tc',ar:'f-ar'};
 const BC={lp:'bd-lp',tl:'bd-tl',tc:'bd-tc',ar:'bd-ar'};
 const CN={lp:'cnt-lp',tl:'cnt-tl',tc:'cnt-tc',ar:'cnt-ar'};
 const PC_PROJECTION_SEED_KEY='casavequia_projection_seed_v1';
+const PC_PROJECTION_LIMIT_YEAR=2027;
 const PC_PROJECTION_COLOR_MAP={lp:'#0f766e',tl:'#6d28d9',tc:'#1d4ed8',ar:'#c26a06'};
 const PC_PROJECTION_TURMA_ID_MAP={'1ª Série':'t1','2ª Série':'t2','3ª Série':'t3','6º Ano':'t6'};
 function pcProjectionNormalizeText(value){
@@ -8146,7 +8147,7 @@ function pcProjectionBuildDays(seed){
   });
   var days=[];
   var cursor=new Date(2026,0,1,12,0,0);
-  while(cursor.getFullYear()===2026){
+  while(cursor.getFullYear()<=PC_PROJECTION_LIMIT_YEAR){
     var key=cursor.toISOString().slice(0,10);
     var dow=cursor.getDay();
     var status='letivo';
@@ -8222,7 +8223,7 @@ function renderCont(){
     const bH=Array.from({length:synced.nBimestres||4},(_,index)=>{
       const b=index+1;
       const ok=feitas>=b*meta;
-      const label=ok?'✔ Concluído':(synced.closes[b]?pcProjectionFormatDateKey(synced.closes[b]):'Não fecha');
+      const label=ok?'✔ Concluído':(synced.closes[b]?pcProjectionFormatDateKey(synced.closes[b]):'Não fecha até 2027');
       return `<div class="bi ${ok?'co':b===ba?'at':''}"><div class="bn">${b}º Bim</div><div class="bd2">${label}</div></div>`;
     }).join('');
     const cc=document.createElement('div');cc.className='cc';
