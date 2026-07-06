@@ -160,6 +160,118 @@
     return raw;
   }
 
+  function sanitizeHexColor(color) {
+    var value = String(color || '').trim();
+    if (!value) {
+      return '';
+    }
+    var match = value.match(/^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/);
+    if (!match) {
+      return '';
+    }
+    var hex = match[1];
+    if (hex.length === 3) {
+      hex = hex.split('').map(function (char) { return char + char; }).join('');
+    }
+    return '#' + hex.toLowerCase();
+  }
+
+  function hexToRgb(color) {
+    var hex = sanitizeHexColor(color).slice(1);
+    return {
+      r: parseInt(hex.slice(0, 2), 16),
+      g: parseInt(hex.slice(2, 4), 16),
+      b: parseInt(hex.slice(4, 6), 16)
+    };
+  }
+
+  function rgbToHex(rgb) {
+    return '#' + [rgb.r, rgb.g, rgb.b].map(function (value) {
+      var clamped = Math.max(0, Math.min(255, Math.round(value)));
+      return clamped.toString(16).padStart(2, '0');
+    }).join('');
+  }
+
+  function mixWithWhite(color, amount) {
+    var rgb = hexToRgb(color);
+    return rgbToHex({
+      r: rgb.r + ((255 - rgb.r) * amount),
+      g: rgb.g + ((255 - rgb.g) * amount),
+      b: rgb.b + ((255 - rgb.b) * amount)
+    });
+  }
+
+  function rgbaFromHex(color, alpha) {
+    var rgb = hexToRgb(color);
+    return 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + alpha + ')';
+  }
+
+  function getReadableTextColor(color) {
+    var rgb = hexToRgb(color);
+    var brightness = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
+    return brightness >= 160 ? '#14324f' : '#ffffff';
+  }
+
+  function getDefaultEventColor(event) {
+    if (event && event.category === 'feriado') {
+      return '#d62828';
+    }
+    return '';
+  }
+
+  function getEventBaseColor(event) {
+    return sanitizeHexColor(event && event.customColor) || getDefaultEventColor(event);
+  }
+
+  function getEventPalette(event) {
+    var base = getEventBaseColor(event);
+    if (!base) {
+      return null;
+    }
+    var baseText = getReadableTextColor(base);
+    var surface = mixWithWhite(base, 0.84);
+    var surfaceText = getReadableTextColor(surface);
+    return {
+      base: base,
+      baseText: baseText,
+      surface: surface,
+      surfaceText: surfaceText,
+      border: mixWithWhite(base, 0.22),
+      muted: rgbaFromHex(surfaceText, 0.78),
+      soft: rgbaFromHex(base, 0.14),
+      countBg: baseText === '#ffffff' ? 'rgba(255,255,255,.22)' : 'rgba(20,50,79,.14)',
+      countText: baseText
+    };
+  }
+
+  function buildStyleAttribute(styleMap) {
+    var parts = [];
+    Object.keys(styleMap || {}).forEach(function (key) {
+      if (styleMap[key] === undefined || styleMap[key] === null || styleMap[key] === '') {
+        return;
+      }
+      parts.push(key + ':' + styleMap[key]);
+    });
+    return parts.length ? ' style="' + escapeHtml(parts.join(';')) + '"' : '';
+  }
+
+  function buildPaletteStyleAttribute(palette) {
+    if (!palette) {
+      return '';
+    }
+    return buildStyleAttribute({
+      '--pc-cal-base': palette.base,
+      '--pc-cal-base-fg': palette.baseText,
+      '--pc-cal-surface': palette.surface,
+      '--pc-cal-surface-fg': palette.surfaceText,
+      '--pc-cal-border': palette.border,
+      '--pc-cal-muted': palette.muted,
+      '--pc-cal-soft': palette.soft,
+      '--pc-cal-count-bg': palette.countBg,
+      '--pc-cal-count-fg': palette.countText
+    });
+  }
+
   function clampDate(date) {
     if (date.getFullYear() !== YEAR) {
       return new Date(YEAR, 0, 1);
@@ -316,6 +428,7 @@
       start: override && override.start ? override.start : rawEvent.start,
       end: override && override.end ? override.end : rawEvent.end,
       rangeText: repairText(override && override.rangeText ? override.rangeText : rawEvent.rangeText),
+      customColor: sanitizeHexColor(override && override.color ? override.color : ''),
       sourceType: rawEvent.sourceType,
       sourceSheet: repairText(rawEvent.sourceSheet)
     };
@@ -334,6 +447,7 @@
       start: event.start,
       end: event.end,
       rangeText: event.rangeText,
+      customColor: event.customColor,
       sourceType: event.sourceType,
       sourceSheet: event.sourceSheet,
       tone: event.tone,
@@ -625,6 +739,8 @@
     var events = getEventsForIso(iso);
     var inMonth = day.getMonth() === options.month;
     var tone = pickDayTone(events);
+    var leadEvent = events.length ? events[0] : null;
+    var palette = leadEvent ? getEventPalette(leadEvent) : null;
     var classes = ['pc-cal-day', options.compact ? 'compact' : 'full'];
     if (!inMonth) {
       classes.push('other-month');
@@ -634,13 +750,16 @@
     }
     if (events.length) {
       classes.push('has-events', toneClassName(tone));
+      if (palette) {
+        classes.push('custom-color');
+      }
     }
     var label = events.length ? events.length + ' registro(s)' : (options.compact ? '' : 'Sem eventos');
     var footer = options.compact
       ? ''
       : '<div class="pc-cal-day-footer">' + escapeHtml(label) + '</div>';
 
-    return '<button type="button" class="' + classes.join(' ') + '" onclick="pcCalendarOpenDay(\'' + iso + '\')">'
+    return '<button type="button" class="' + classes.join(' ') + '"' + buildPaletteStyleAttribute(palette) + ' onclick="pcCalendarOpenDay(\'' + iso + '\')">'
       + '<div class="pc-cal-day-head">'
       + '<span class="pc-cal-day-number">' + day.getDate() + '</span>'
       + (events.length ? '<span class="pc-cal-day-count">' + events.length + '</span>' : '')
@@ -665,7 +784,8 @@
 
   function renderAgendaItem(event, modalMode) {
     var buttonTarget = modalMode ? "pcCalendarStartEdit('" + event.id + "')" : "pcCalendarOpenEvent('" + event.id + "')";
-    return '<button type="button" class="pc-cal-agenda-item ' + toneClassName(event.tone) + '" onclick="' + buttonTarget + '">'
+    var palette = getEventPalette(event);
+    return '<button type="button" class="pc-cal-agenda-item ' + toneClassName(event.tone) + (palette ? ' custom-color' : '') + '"' + buildPaletteStyleAttribute(palette) + ' onclick="' + buttonTarget + '">'
       + '<span class="pc-cal-agenda-range">' + escapeHtml(displayRangeText(event)) + '</span>'
       + '<span class="pc-cal-agenda-body">'
       + '<span class="pc-cal-agenda-meta"><strong>' + escapeHtml(event.scopeLabel) + '</strong><em>' + escapeHtml(CATEGORY_LABELS[event.category] || 'Agenda') + '</em></span>'
@@ -693,7 +813,8 @@
     if (state.editingEventId === event.id) {
       return renderModalEditor(event);
     }
-    return '<article class="pc-cal-modal-card ' + toneClassName(event.tone) + (focused ? ' is-focused' : '') + '">'
+    var palette = getEventPalette(event);
+    return '<article class="pc-cal-modal-card ' + toneClassName(event.tone) + (focused ? ' is-focused' : '') + (palette ? ' custom-color' : '') + '"' + buildPaletteStyleAttribute(palette) + '>'
       + '<div class="pc-cal-modal-card-top"><div><span class="pc-cal-modal-pill">' + escapeHtml(event.scopeLabel) + '</span><span class="pc-cal-modal-pill soft">' + escapeHtml(CATEGORY_LABELS[event.category] || 'Agenda') + '</span></div><strong>' + escapeHtml(displayRangeText(event)) + '</strong></div>'
       + '<h4>' + escapeHtml(event.title) + '</h4>'
       + '<p>' + escapeHtml(rangeLabel(event)) + '</p>'
@@ -706,6 +827,7 @@
   }
 
   function renderModalEditor(event) {
+    var initialColor = sanitizeHexColor(event.customColor) || sanitizeHexColor(getDefaultEventColor(event)) || '#4a9467';
     return '<form class="pc-cal-edit-form" onsubmit="pcCalendarSaveEdit(event,\'' + event.id + '\')">'
       + '<div class="pc-cal-edit-grid">'
       + '<label><span>Título</span><input type="text" name="title" value="' + escapeHtml(event.title) + '" required></label>'
@@ -713,6 +835,7 @@
       + '<label><span>Escopo</span><select name="scope">' + renderScopeOptions(event.scope) + '</select></label>'
       + '<label><span>Data inicial</span><input type="date" name="start" min="' + YEAR + '-01-01" max="' + YEAR + '-12-31" value="' + escapeHtml(event.start) + '" required></label>'
       + '<label><span>Data final</span><input type="date" name="end" min="' + YEAR + '-01-01" max="' + YEAR + '-12-31" value="' + escapeHtml(event.end) + '" required></label>'
+      + '<label class="pc-cal-edit-color"><span>Cor do evento</span><div class="pc-cal-edit-color-row"><input type="color" name="color" value="' + escapeHtml(initialColor) + '"><span class="pc-cal-edit-check"><input type="checkbox" name="useColor"' + (event.customColor ? ' checked' : '') + '> Usar cor personalizada</span></div></label>'
       + '</div>'
       + '<div class="pc-cal-edit-actions">'
       + '<button type="submit" class="pc-cal-action-btn primary">Salvar</button>'
@@ -836,6 +959,7 @@
     var scope = form.elements.scope.value;
     var start = form.elements.start.value;
     var end = form.elements.end.value;
+    var customColor = form.elements.useColor.checked ? sanitizeHexColor(form.elements.color.value) : '';
 
     if (!title || !start || !end) {
       return;
@@ -854,7 +978,8 @@
       scopeLabel: getScopeLabel(scope, scope),
       start: start,
       end: end,
-      rangeText: start === end ? String(parseIso(start).getDate()) : (parseIso(start).getDate() + ' a ' + parseIso(end).getDate())
+      rangeText: start === end ? String(parseIso(start).getDate()) : (parseIso(start).getDate() + ' a ' + parseIso(end).getDate()),
+      color: customColor
     };
     saveOverrides();
     rebuildIndex();

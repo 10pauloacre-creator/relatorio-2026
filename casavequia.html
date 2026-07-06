@@ -247,6 +247,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .pc-cal-day-label-empty{opacity:.45}
 .pc-cal-day-footer{margin-top:auto;font-size:.72rem;font-weight:600;color:rgba(0,0,0,.62)}
 .pc-cal-day.compact .pc-cal-day-footer{display:none}
+.pc-cal-day.custom-color{background:var(--pc-cal-base);color:var(--pc-cal-base-fg);border-color:var(--pc-cal-border)}
+.pc-cal-day.custom-color .pc-cal-day-count{background:var(--pc-cal-count-bg);color:var(--pc-cal-count-fg)}
+.pc-cal-day.custom-color .pc-cal-day-footer{color:var(--pc-cal-base-fg);opacity:.82}
 .pc-cal-day.tone-eval{background:#a9dd59}
 .pc-cal-day.tone-review{background:#f48a2d}
 .pc-cal-day.tone-recovery{background:#ffd66b}
@@ -255,7 +258,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .pc-cal-day.tone-pedagogic{background:#ccb7eb}
 .pc-cal-day.tone-break{background:#f6cdaa}
 .pc-cal-day.tone-milestone{background:#39cf31}
-.pc-cal-day.tone-holiday{background:#f3a8a8}
+.pc-cal-day.tone-holiday{background:#d62828;color:#fff}
 .pc-cal-day.tone-note{background:#d9e6cf}
 .pc-cal-day.tone-eval,.pc-cal-day.tone-review,.pc-cal-day.tone-recovery,.pc-cal-day.tone-focus,.pc-cal-day.tone-physical,.pc-cal-day.tone-pedagogic,.pc-cal-day.tone-break,.pc-cal-day.tone-milestone,.pc-cal-day.tone-holiday,.pc-cal-day.tone-note{border-color:rgba(29,41,29,.14)}
 .pc-cal-day.tone-milestone,.pc-cal-day.tone-review,.pc-cal-day.tone-focus{color:#143a5a}
@@ -274,6 +277,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .pc-cal-agenda-meta em{font-style:normal;opacity:.78}
 .pc-cal-agenda-title{font-size:.98rem;font-weight:700;line-height:1.42;color:#11325b}
 .pc-cal-agenda-source{font-size:.75rem;color:#4d607a;line-height:1.45}
+.pc-cal-agenda-item.custom-color{background:var(--pc-cal-surface);border:1px solid var(--pc-cal-border)}
+.pc-cal-agenda-item.custom-color .pc-cal-agenda-range{background:var(--pc-cal-base);color:var(--pc-cal-base-fg)}
+.pc-cal-agenda-item.custom-color .pc-cal-agenda-meta,.pc-cal-agenda-item.custom-color .pc-cal-agenda-title{color:var(--pc-cal-surface-fg)}
+.pc-cal-agenda-item.custom-color .pc-cal-agenda-source{color:var(--pc-cal-muted)}
 .pc-cal-agenda-item.tone-eval .pc-cal-agenda-range{background:#a9dd59}
 .pc-cal-agenda-item.tone-review .pc-cal-agenda-range{background:#f48a2d}
 .pc-cal-agenda-item.tone-recovery .pc-cal-agenda-range{background:#ffd66b}
@@ -282,7 +289,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .pc-cal-agenda-item.tone-pedagogic .pc-cal-agenda-range{background:#ccb7eb}
 .pc-cal-agenda-item.tone-break .pc-cal-agenda-range{background:#f6cdaa}
 .pc-cal-agenda-item.tone-milestone .pc-cal-agenda-range{background:#39cf31}
-.pc-cal-agenda-item.tone-holiday .pc-cal-agenda-range{background:#f3a8a8}
+.pc-cal-agenda-item.tone-holiday .pc-cal-agenda-range{background:#d62828;color:#fff}
 .pc-cal-agenda-item.tone-note .pc-cal-agenda-range{background:#d9e6cf}
 .pc-cal-day-view{display:flex;flex-direction:column;gap:16px}
 .pc-cal-day-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f7fbf8;border:1px solid rgba(74,148,103,.12);border-radius:16px;padding:15px 16px}
@@ -328,6 +335,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .pc-cal-edit-grid label{display:flex;flex-direction:column;gap:6px}
 .pc-cal-edit-grid label span{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cm)}
 .pc-cal-edit-grid input,.pc-cal-edit-grid select{width:100%;padding:10px 11px;border:1px solid var(--cl);border-radius:10px;background:var(--cr);font-family:'DM Sans',sans-serif;color:var(--ce)}
+.pc-cal-edit-color{grid-column:1/-1}
+.pc-cal-edit-color-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.pc-cal-edit-color-row input[type=color]{width:58px;height:42px;padding:4px;border:1px solid var(--cl);border-radius:10px;background:var(--cr);cursor:pointer}
+.pc-cal-edit-check{display:flex!important;flex-direction:row!important;align-items:center;gap:8px;font-size:.8rem;color:var(--ce)}
+.pc-cal-edit-check input{width:auto!important;padding:0!important;border:none!important}
+.pc-cal-modal-card.custom-color{background:var(--pc-cal-surface);border-color:var(--pc-cal-border);color:var(--pc-cal-surface-fg)}
+.pc-cal-modal-card.custom-color h4,.pc-cal-modal-card.custom-color p,.pc-cal-modal-card.custom-color small,.pc-cal-modal-card.custom-color .pc-cal-modal-card-top strong,.pc-cal-modal-card.custom-color .pc-cal-modal-pill{color:var(--pc-cal-surface-fg)}
+.pc-cal-modal-card.custom-color .pc-cal-modal-pill{background:var(--pc-cal-soft)}
+.pc-cal-modal-card.custom-color .pc-cal-modal-pill.soft{background:rgba(255,255,255,.18);color:var(--pc-cal-surface-fg)}
 .pc-cal-modal-card.tone-eval,.pc-cal-edit-form.tone-eval{background:#edf7d7}
 .pc-cal-modal-card.tone-review{background:#fff0df}
 .pc-cal-modal-card.tone-recovery{background:#fff7d7}
@@ -336,7 +352,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .pc-cal-modal-card.tone-pedagogic{background:#f3ecfb}
 .pc-cal-modal-card.tone-break{background:#fdf0e4}
 .pc-cal-modal-card.tone-milestone{background:#e5f8df}
-.pc-cal-modal-card.tone-holiday{background:#fdeaea}
+.pc-cal-modal-card.tone-holiday{background:#fdeaea;border-color:#d62828}
 .pc-cal-modal-card.tone-note{background:#f3f5ec}
 body.modo-escuro .pc-cal-shell,body.modo-escuro .pc-cal-agenda,body.modo-escuro .pc-cal-week-section,body.modo-escuro .pc-cal-mini-month,body.modo-escuro .pc-cal-modal-inner,body.modo-escuro .pc-cal-edit-form{background:#1e1e2a;border-color:rgba(255,255,255,.08)}
 body.modo-escuro .pc-cal-intro,body.modo-escuro .pc-cal-day-summary{background:#1a2a22;border-color:rgba(127,221,170,.16);color:#d8e9df}
@@ -353,7 +369,7 @@ body.modo-escuro .pc-cal-day:not(.has-events){background:#252533;color:#e8e8f0;b
 body.modo-escuro .pc-cal-day.other-month{background:#232330;color:#8e95a4}
 body.modo-escuro .pc-cal-day-footer,body.modo-escuro .pc-cal-day-summary p,body.modo-escuro .pc-cal-agenda-head span,body.modo-escuro .pc-cal-agenda-source,body.modo-escuro .pc-cal-modal-sub,body.modo-escuro .pc-cal-week-section-top span,body.modo-escuro .pc-cal-modal-card p,body.modo-escuro .pc-cal-modal-card small{color:#aab3c2}
 body.modo-escuro .pc-cal-agenda-item{background:#252533}
-body.modo-escuro .pc-cal-agenda-meta,body.modo-escuro .pc-cal-agenda-title,body.modo-escuro .pc-cal-modal-card h4,body.modo-escuro .pc-cal-modal-card-top strong,body.modo-escuro .pc-cal-modal-pill{color:#e4edf8}
+body.modo-escuro .pc-cal-agenda-meta,body.modo-escuro .pc-cal-agenda-title,body.modo-escuro .pc-cal-modal-card h4,body.modo-escuro .pc-cal-modal-card-top strong,body.modo-escuro .pc-cal-modal-pill,body.modo-escuro .pc-cal-edit-check{color:#e4edf8}
 body.modo-escuro .pc-cal-list-empty{background:#252533;border-color:rgba(255,255,255,.12);color:#a0a0b0}
 body.modo-escuro .pc-cal-modal{background:rgba(0,0,0,.72)}
 @media(max-width:980px){.pc-cal-toolbar-main{grid-template-columns:1fr}.pc-cal-title{text-align:left}.pc-cal-datepick{justify-content:flex-start}.pc-cal-year-grid,.pc-cal-week-sections,.pc-cal-edit-grid{grid-template-columns:1fr}}
