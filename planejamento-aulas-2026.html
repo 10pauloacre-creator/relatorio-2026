@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Previsão de Aulas 2026 · Acre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f8f7; --surface:#ffffff; --surface-2:#eef3f1; --surface-3:#f9fbfa;
+    --ink:#16211d; --ink-soft:#42524c; --muted:#7a8882; --line:#dde5e2; --line-2:#eaf0ee;
+    --primary:#0f766e; --primary-dk:#0b5852; --primary-tint:#d6ebe8;
+    --nac:#c62828; --nac-bg:#fbe9e9;
+    --est:#6d28d9; --est-bg:#efeafd;
+    --fac:#5f6b78; --fac-bg:#eef1f4;
+    --rec:#c26a06; --rec-bg:#fbf1e0;
+    --mile:#0f766e; --mile-bg:#dff2ef; --mile-bd:#8fcfc8;
+    --display:'Space Grotesk',system-ui,sans-serif;
+    --body:'IBM Plex Sans',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --shadow:0 1px 2px rgba(20,40,35,.06),0 6px 20px rgba(20,40,35,.05);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:var(--body); color:var(--ink); background:var(--bg);
+    -webkit-font-smoothing:antialiased; line-height:1.45; font-size:15px;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:20px 20px 64px}
+
+  /* ---------- Header ---------- */
+  header.top{margin:8px 0 18px}
+  .eyebrow{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--primary);font-weight:600;margin-bottom:6px;
+  }
+  header.top h1{
+    font-family:var(--display);font-weight:700;letter-spacing:-.02em;
+    font-size:clamp(26px,4.5vw,40px);line-height:1.02;margin:0;color:var(--ink);
+  }
+  header.top h1 .yr{color:var(--primary)}
+  header.top p.sub{margin:8px 0 0;color:var(--ink-soft);max-width:60ch;font-size:14.5px}
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 6px}
+  .btn{
+    font-family:var(--body);font-weight:500;font-size:13.5px;cursor:pointer;
+    border:1px solid var(--line);background:var(--surface);color:var(--ink);
+    padding:8px 13px;border-radius:9px;display:inline-flex;align-items:center;gap:7px;
+    transition:border-color .12s,background .12s,transform .04s;
+  }
+  .btn:hover{border-color:var(--primary);background:var(--surface-3)}
+  .btn:active{transform:translateY(1px)}
+  .btn:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+  .btn .ic{width:15px;height:15px;stroke:var(--primary);stroke-width:1.8;fill:none;flex:none}
+  .btn.solid{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .btn.solid .ic{stroke:#fff}
+  .btn.solid:hover{background:var(--primary-dk);border-color:var(--primary-dk)}
+  .toolbar .spacer{flex:1 1 auto}
+
+  /* ---------- Legend ---------- */
+  .legend{display:flex;flex-wrap:wrap;gap:14px 18px;margin:14px 0 20px;padding:12px 15px;
+    background:var(--surface);border:1px solid var(--line);border-radius:11px}
+  .lg{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-soft)}
+  .swatch{width:13px;height:13px;border-radius:4px;flex:none;border:1px solid rgba(0,0,0,.08)}
+  .sw-let{background:var(--surface-2)}
+  .sw-nac{background:var(--nac-bg);border-color:var(--nac)}
+  .sw-est{background:var(--est-bg);border-color:var(--est)}
+  .sw-fac{background:var(--fac-bg);border-color:var(--fac)}
+  .sw-rec{background:var(--rec-bg);border-color:var(--rec)}
+  .sw-mile{background:var(--mile-bg);border-color:var(--mile-bd)}
+
+  /* ---------- Tabs ---------- */
+  .tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:2px solid var(--line);margin-bottom:0}
+  .tab{
+    font-family:var(--display);font-weight:600;font-size:14.5px;letter-spacing:-.01em;
+    padding:10px 15px;border:none;background:none;cursor:pointer;color:var(--muted);
+    border-bottom:3px solid transparent;margin-bottom:-2px;position:relative;
+    display:inline-flex;align-items:center;gap:8px;transition:color .12s;
+  }
+  .tab:hover{color:var(--ink-soft)}
+  .tab .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .tab.active{color:var(--ink)}
+  .tab.add{color:var(--primary);font-weight:600}
+  .tab:focus-visible{outline:2px solid var(--primary);outline-offset:-2px;border-radius:6px}
+
+  /* ---------- Panel ---------- */
+  .panel{background:var(--surface);border:1px solid var(--line);border-top:none;
+    border-radius:0 0 14px 14px;padding:20px;box-shadow:var(--shadow)}
+  .panel-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:4px}
+  .panel-head h2{font-family:var(--display);font-weight:700;font-size:20px;margin:0;letter-spacing:-.01em}
+  .panel-head .accent{width:12px;height:12px;border-radius:3px;flex:none;transform:translateY(1px)}
+  .panel-head .metaline{color:var(--muted);font-size:13px;font-family:var(--mono)}
+
+  .section-title{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;margin:22px 0 10px;display:flex;align-items:center;gap:10px}
+  .section-title::after{content:"";flex:1;height:1px;background:var(--line-2)}
+
+  /* ---------- Weekly grid editor ---------- */
+  .cfg-row{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-end;margin:2px 0 4px}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field label{font-size:12px;color:var(--ink-soft);font-weight:500}
+  .field input{font-family:var(--mono);font-size:15px;width:96px;padding:7px 9px;border:1px solid var(--line);
+    border-radius:8px;background:var(--surface-3);color:var(--ink)}
+  .field input:focus{outline:2px solid var(--primary);outline-offset:0;border-color:var(--primary)}
+  .hint{font-size:12px;color:var(--muted);max-width:52ch}
+
+  .grid-tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:11px;margin-top:4px}
+  table.grid{border-collapse:collapse;width:100%;min-width:520px}
+  table.grid th,table.grid td{padding:8px 10px;text-align:center;border-bottom:1px solid var(--line-2)}
+  table.grid thead th{background:var(--surface-2);font-family:var(--mono);font-size:11px;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+  table.grid tbody tr:last-child td{border-bottom:none}
+  table.grid td.turma-cell{text-align:left;font-weight:600;color:var(--ink);white-space:nowrap;
+    background:var(--surface-3);border-right:1px solid var(--line-2)}
+  table.grid thead th.turma-cell{text-align:left;background:var(--surface-2)}
+  .grade-in{font-family:var(--mono);font-size:14px;width:56px;padding:6px 4px;text-align:center;
+    border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}
+  .grade-in:focus{outline:2px solid var(--primary);outline-offset:0;border-color:var(--primary)}
+  .grade-in.zero{color:var(--muted);background:var(--surface-3)}
+
+  /* ---------- Summary cards ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:4px}
+  .card{border:1px solid var(--line);border-radius:12px;padding:14px 15px;background:var(--surface-3)}
+  .card h3{font-family:var(--display);font-size:15.5px;font-weight:600;margin:0 0 10px;letter-spacing:-.01em}
+  .card .bim{display:flex;justify-content:space-between;align-items:center;gap:10px;
+    font-size:13.5px;padding:5px 0;border-bottom:1px dashed var(--line-2)}
+  .card .bim:last-of-type{border-bottom:none}
+  .card .bim .lbl{color:var(--ink-soft)}
+  .card .bim .date{font-family:var(--mono);font-weight:600;color:var(--primary-dk)}
+  .card .bim .date.miss{color:var(--nac);font-weight:500;font-size:12px;font-family:var(--body)}
+  .card .tot{margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  .card .tot b{color:var(--ink);font-weight:600}
+
+  /* ---------- View toggle ---------- */
+  .view-toggle{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:10px}
+  .view-toggle button{font-family:var(--body);font-size:12.5px;padding:7px 12px;border:none;background:var(--surface);
+    color:var(--ink-soft);cursor:pointer}
+  .view-toggle button.on{background:var(--primary);color:#fff}
+  .view-toggle button:focus-visible{outline:2px solid var(--primary);outline-offset:-2px}
+
+  /* ---------- Projection table ---------- */
+  .proj-wrap{position:relative;max-height:620px;overflow:auto;border:1px solid var(--line);border-radius:12px}
+  table.proj{border-collapse:separate;border-spacing:0;width:100%;font-size:13.5px}
+  table.proj th,table.proj td{padding:6px 11px;white-space:nowrap;border-bottom:1px solid var(--line-2)}
+  table.proj thead th{position:sticky;top:0;z-index:3;background:var(--surface-2);
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-soft);font-weight:600;text-align:center;border-bottom:2px solid var(--line)}
+  table.proj thead th.c-data,table.proj thead th.c-dia{text-align:left}
+  .c-data{position:sticky;left:0;z-index:2;background:var(--surface);font-family:var(--mono);
+    font-size:12.5px;color:var(--ink-soft);border-right:1px solid var(--line-2)}
+  .c-dia{position:sticky;left:66px;z-index:2;background:var(--surface);color:var(--ink-soft);
+    font-size:12.5px;border-right:1px solid var(--line)}
+  thead .c-data{z-index:4}
+  thead .c-dia{z-index:4}
+  td.turno{text-align:center;font-family:var(--mono);font-weight:500}
+  td.turno .cum{color:var(--ink)}
+  td.blank{text-align:center;color:var(--line);font-family:var(--mono)}
+  tr.row-mon .c-data{border-top:2px solid var(--line)}
+  tr.row-mon td{border-top:2px solid var(--line)}
+
+  /* holiday / recess rows */
+  tr.special td{font-weight:500}
+  tr.special .c-data,tr.special .c-dia{background:inherit}
+  td.special-label{font-size:12.5px;letter-spacing:.01em}
+  td.special-label .badge{font-family:var(--mono);font-size:10px;font-weight:600;
+    padding:1px 7px;border-radius:20px;margin-right:9px;letter-spacing:.04em;text-transform:uppercase}
+  tr.t-nacional{background:var(--nac-bg)} tr.t-nacional td{color:var(--nac)}
+  tr.t-nacional .c-data,tr.t-nacional .c-dia{background:var(--nac-bg)}
+  tr.t-nacional .badge{background:var(--nac);color:#fff}
+  tr.t-estadual{background:var(--est-bg)} tr.t-estadual td{color:var(--est)}
+  tr.t-estadual .c-data,tr.t-estadual .c-dia{background:var(--est-bg)}
+  tr.t-estadual .badge{background:var(--est);color:#fff}
+  tr.t-facultativo{background:var(--fac-bg)} tr.t-facultativo td{color:var(--fac)}
+  tr.t-facultativo .c-data,tr.t-facultativo .c-dia{background:var(--fac-bg)}
+  tr.t-facultativo .badge{background:var(--fac);color:#fff}
+  tr.t-recesso{background:var(--rec-bg)} tr.t-recesso td{color:var(--rec)}
+  tr.t-recesso .c-data,tr.t-recesso .c-dia{background:var(--rec-bg)}
+  tr.t-recesso .badge{background:var(--rec);color:#fff}
+
+  /* milestone cell */
+  td.milestone{background:var(--mile-bg);box-shadow:inset 0 0 0 1px var(--mile-bd)}
+  td.milestone .cum{color:var(--primary-dk);font-weight:600}
+  .mile-tag{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:600;
+    background:var(--primary);color:#fff;padding:1px 5px;border-radius:5px;margin-left:6px;vertical-align:1px}
+
+  .empty-note{padding:26px;text-align:center;color:var(--muted);font-size:14px}
+
+  /* ---------- Modal ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(15,30,25,.42);display:none;align-items:flex-start;
+    justify-content:center;padding:44px 16px;z-index:50;overflow-y:auto}
+  .overlay.open{display:flex}
+  .modal{background:var(--surface);border-radius:16px;max-width:560px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);
+    border:1px solid var(--line);animation:pop .16s ease}
+  @keyframes pop{from{transform:translateY(8px) scale(.99);opacity:0}to{transform:none;opacity:1}}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line-2)}
+  .modal-head h3{font-family:var(--display);font-size:18px;font-weight:700;margin:0;letter-spacing:-.01em}
+  .x{border:none;background:none;cursor:pointer;font-size:22px;line-height:1;color:var(--muted);padding:4px 8px;border-radius:8px}
+  .x:hover{background:var(--surface-2);color:var(--ink)}
+  .modal-body{padding:18px 20px;max-height:64vh;overflow-y:auto}
+  .modal-foot{padding:14px 20px;border-top:1px solid var(--line-2);display:flex;justify-content:flex-end;gap:8px}
+
+  .list-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px dashed var(--line-2)}
+  .list-row:last-child{border-bottom:none}
+  .list-row input.name{flex:1;min-width:0;font-family:var(--body);font-size:14px;padding:7px 9px;
+    border:1px solid var(--line);border-radius:8px;background:var(--surface-3)}
+  .list-row input.date{font-family:var(--mono);font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-3)}
+  .list-row input.num{font-family:var(--mono);width:70px;font-size:13px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-3);text-align:center}
+  .list-row input.color{width:34px;height:34px;padding:0;border:1px solid var(--line);border-radius:8px;background:none;cursor:pointer}
+  .list-row select{font-family:var(--body);font-size:13px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-3)}
+  .list-row .del{border:none;background:none;color:var(--nac);cursor:pointer;font-size:18px;padding:2px 8px;border-radius:7px;flex:none}
+  .list-row .del:hover{background:var(--nac-bg)}
+  .tinytag{font-family:var(--mono);font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.03em;flex:none}
+  .tinytag.nacional{background:var(--nac);color:#fff}
+  .tinytag.estadual{background:var(--est);color:#fff}
+  .tinytag.facultativo{background:var(--fac);color:#fff}
+  .add-line{margin-top:12px}
+  .check{display:flex;align-items:center;gap:9px;margin:14px 0 4px;font-size:13.5px;color:var(--ink-soft)}
+  .check input{width:17px;height:17px;accent-color:var(--primary)}
+  .modal-body .grp{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;margin:16px 0 4px}
+  .modal-body .grp:first-child{margin-top:0}
+  .dates-2{display:flex;gap:16px;flex-wrap:wrap}
+
+  footer.credit{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:space-between}
+  footer.credit .mono{font-family:var(--mono)}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:640px){
+    .wrap{padding:14px 12px 48px}
+    .c-dia{position:static;left:auto}
+    .cards{grid-template-columns:1fr 1fr}
+    header.top p.sub{font-size:13.5px}
+  }
+  @media (max-width:440px){ .cards{grid-template-columns:1fr} }
+
+  /* ---------- Print ---------- */
+  @media print{
+    body{background:#fff}
+    .toolbar,.tabs .add,.view-toggle,.overlay,footer.credit .mono{display:none !important}
+    .panel{box-shadow:none;border:1px solid #ccc}
+    .proj-wrap{max-height:none;overflow:visible;border:none}
+    table.proj thead th{position:static}
+    .c-data,.c-dia{position:static}
+    tr.special,tr.milestone td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Planejamento docente · Estado do Acre</div>
+    <h1>Previsão de Aulas <span class="yr">2026</span></h1>
+    <p class="sub">Projeção do cronograma letivo por turma e disciplina. Descontando fins de semana, feriados nacionais e estaduais (AC) e o recesso escolar, calcula o acúmulo de aulas e o dia de fechamento de cada bimestre.</p>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn" onclick="openTurmas()"><svg class="ic" viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-8 0M3 20a7 7 0 0 1 18 0"/></svg>Turmas</button>
+    <button class="btn" onclick="openDisciplinas()"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/></svg>Disciplinas</button>
+    <button class="btn" onclick="openRecesso()"><svg class="ic" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 9h18M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Recesso</button>
+    <button class="btn" onclick="openFeriados()"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l2.4 6.9H22l-6 4.3 2.3 7-6.3-4.6L5.7 20l2.3-7-6-4.3h7.6z"/></svg>Feriados</button>
+    <span class="spacer"></span>
+    <button class="btn" onclick="doImport()"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>Importar</button>
+    <button class="btn" onclick="doExport()"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21V9m0 0l-4 4m4-4l4 4M4 3h16"/></svg>Exportar</button>
+    <button class="btn solid" onclick="window.print()"><svg class="ic" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>Imprimir / PDF</button>
+    <input type="file" id="fileIn" accept="application/json" style="display:none">
+  </div>
+
+  <div class="legend">
+    <span class="lg"><span class="swatch sw-let"></span>Dia letivo</span>
+    <span class="lg"><span class="swatch sw-nac"></span>Feriado nacional</span>
+    <span class="lg"><span class="swatch sw-est"></span>Feriado estadual (AC)</span>
+    <span class="lg"><span class="swatch sw-fac"></span>Ponto facultativo</span>
+    <span class="lg"><span class="swatch sw-rec"></span>Recesso escolar</span>
+    <span class="lg"><span class="swatch sw-mile"></span>Fecha bimestre</span>
+  </div>
+
+  <nav class="tabs" id="tabs"></nav>
+  <section class="panel" id="panel"></section>
+
+  <footer class="credit">
+    <span>Feito por <b>Paulo Roberto</b> + Claude</span>
+    <span class="mono" id="statFoot"></span>
+  </footer>
+</div>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+</div>
+
+<script>
+/* =================== Dados fixos =================== */
+const DIAS_AB = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const WEEK = [ {k:1,ab:'Seg'},{k:2,ab:'Ter'},{k:3,ab:'Qua'},{k:4,ab:'Qui'},{k:5,ab:'Sex'} ];
+const STORAGE_KEY = 'previsao_aulas_2026';
+const YEAR = 2026;
+
+const FERIADOS_2026 = [
+  {date:'2026-01-01',nome:'Confraternização Universal',tipo:'nacional'},
+  {date:'2026-01-20',nome:'Dia do Católico',tipo:'estadual'},
+  {date:'2026-01-23',nome:'Dia do Evangélico',tipo:'estadual'},
+  {date:'2026-02-16',nome:'Carnaval',tipo:'facultativo'},
+  {date:'2026-02-17',nome:'Carnaval',tipo:'facultativo'},
+  {date:'2026-02-18',nome:'Quarta-feira de Cinzas',tipo:'facultativo'},
+  {date:'2026-03-08',nome:'Dia Internacional da Mulher',tipo:'estadual'},
+  {date:'2026-04-03',nome:'Sexta-feira Santa (Paixão de Cristo)',tipo:'nacional'},
+  {date:'2026-04-21',nome:'Tiradentes',tipo:'nacional'},
+  {date:'2026-05-01',nome:'Dia do Trabalho',tipo:'nacional'},
+  {date:'2026-06-04',nome:'Corpus Christi',tipo:'facultativo'},
+  {date:'2026-06-15',nome:'Aniversário do Estado do Acre',tipo:'estadual'},
+  {date:'2026-08-06',nome:'Início da Revolução Acreana',tipo:'facultativo'},
+  {date:'2026-09-05',nome:'Dia da Amazônia',tipo:'estadual'},
+  {date:'2026-09-07',nome:'Independência do Brasil',tipo:'nacional'},
+  {date:'2026-10-12',nome:'Nossa Senhora Aparecida',tipo:'nacional'},
+  {date:'2026-10-28',nome:'Dia do Servidor Público',tipo:'facultativo'},
+  {date:'2026-11-02',nome:'Finados',tipo:'nacional'},
+  {date:'2026-11-15',nome:'Proclamação da República',tipo:'nacional'},
+  {date:'2026-11-17',nome:'Assinatura do Tratado de Petrópolis',tipo:'estadual'},
+  {date:'2026-11-20',nome:'Dia da Consciência Negra',tipo:'nacional'},
+  {date:'2026-12-24',nome:'Véspera de Natal',tipo:'facultativo'},
+  {date:'2026-12-25',nome:'Natal',tipo:'nacional'},
+  {date:'2026-12-31',nome:'Véspera de Ano Novo',tipo:'facultativo'},
+];
+const TIPO_LABEL = {nacional:'Feriado nacional',estadual:'Feriado estadual (AC)',facultativo:'Ponto facultativo'};
+const DISC_CORES = ['#0f766e','#6d28d9','#c2410c','#1d4ed8','#be123c','#047857','#7c2d12','#4338ca'];
+
+/* =================== Utilidades =================== */
+const pad = n => String(n).padStart(2,'0');
+const mkKey = (y,m,d) => `${y}-${pad(m+1)}-${pad(d)}`;
+const brDate = k => { const p=k.split('-'); return `${p[2]}/${p[1]}`; };
+const uid = () => 'id'+Math.random().toString(36).slice(2,9);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* =================== Estado =================== */
+let state = null;
+let showAll = true;  // mostrar todos os dias letivos vs só dias com aula
+
+function defaultState(){
+  const t1=uid(), t2=uid(), t3=uid();
+  const d1=uid(), d2=uid();
+  return {
+    recesso:{start:'2026-07-20', end:'2026-07-31'},
+    facultativoLetivo:false,
+    feriados: FERIADOS_2026.map(f=>({...f})),
+    turmas:[ {id:t1,nome:'1º Ano A'},{id:t2,nome:'2º Ano A'},{id:t3,nome:'3º Ano A'} ],
+    disciplinas:[
+      {id:d1,nome:'Língua Portuguesa',cor:'#0f766e',aulasPorBimestre:20,nBimestres:4,
+        grade:{[t1]:{1:2,3:2},[t2]:{2:2,4:2},[t3]:{1:2,5:2}}},
+      {id:d2,nome:'Espanhol',cor:'#6d28d9',aulasPorBimestre:16,nBimestres:4,
+        grade:{[t1]:{5:2},[t2]:{3:2},[t3]:{2:2}}},
+    ],
+    activeDisc:d1,
+  };
+}
+
+function normalize(){
+  // garante grade[turma] para cada disciplina/turma
+  state.disciplinas.forEach(d=>{
+    if(!d.grade) d.grade={};
+    if(!d.cor) d.cor=DISC_CORES[0];
+    if(d.aulasPorBimestre==null) d.aulasPorBimestre=20;
+    if(d.nBimestres==null) d.nBimestres=4;
+    state.turmas.forEach(t=>{ if(!d.grade[t.id]) d.grade[t.id]={}; });
+  });
+  if(!state.disciplinas.find(d=>d.id===state.activeDisc)){
+    state.activeDisc = state.disciplinas[0] ? state.disciplinas[0].id : null;
+  }
+}
+
+function save(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){/* sem persistência */}
+}
+function load(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(raw){ state=JSON.parse(raw); return; }
+  }catch(e){}
+  state=defaultState();
+}
+
+/* =================== Calendário e projeção =================== */
+function buildDays(){
+  const days=[]; const fer={};
+  state.feriados.forEach(f=>{ fer[f.date]=f; });
+  let dt=new Date(YEAR,0,1);
+  while(dt.getFullYear()===YEAR){
+    const dow=dt.getDay();
+    if(dow>=1 && dow<=5){
+      const k=mkKey(dt.getFullYear(),dt.getMonth(),dt.getDate());
+      let status='letivo', f=null;
+      const hit=fer[k];
+      if(hit){
+        if(hit.tipo==='facultativo' && state.facultativoLetivo){ status='letivo'; }
+        else { status='feriado'; f=hit; }
+      }
+      if(status==='letivo' && k>=state.recesso.start && k<=state.recesso.end){ status='recesso'; }
+      days.push({k,dow,status,fer:f, mon:(dow===1)});
+    }
+    dt.setDate(dt.getDate()+1);
+  }
+  return days;
+}
+
+function project(disc, days){
+  const proj={}, resumo={};
+  const meta=Number(disc.aulasPorBimestre)||0;
+  const nb=Number(disc.nBimestres)||4;
+  state.turmas.forEach(t=>{
+    proj[t.id]={};
+    const g=disc.grade[t.id]||{};
+    let acc=0,k=1; const closes={};
+    for(const d of days){
+      if(d.status!=='letivo') continue;
+      const add=Number(g[d.dow])||0;
+      if(add>0){
+        acc+=add;
+        const cell={cum:acc,add,closes:[]};
+        while(meta>0 && k<=nb && acc>=k*meta){ cell.closes.push(k); closes[k]=d.k; k++; }
+        proj[t.id][d.k]=cell;
+      }
+    }
+    resumo[t.id]={closes,total:acc,nb,meta};
+  });
+  return {proj,resumo,meta,nb};
+}
+
+/* =================== Render: abas + rodapé =================== */
+function renderTabs(){
+  const el=document.getElementById('tabs');
+  let h='';
+  state.disciplinas.forEach(d=>{
+    h+=`<button class="tab ${d.id===state.activeDisc?'active':''}" onclick="setDisc('${d.id}')">
+      <span class="dot" style="background:${d.cor}"></span>${esc(d.nome)}</button>`;
+  });
+  h+=`<button class="tab add" onclick="openDisciplinas()" title="Gerenciar disciplinas">+ disciplina</button>`;
+  el.innerHTML=h;
+}
+function renderFooterStat(days){
+  const let_=days.filter(d=>d.status==='letivo').length;
+  const fe=days.filter(d=>d.status==='feriado').length;
+  const re=days.filter(d=>d.status==='recesso').length;
+  document.getElementById('statFoot').textContent =
+    `${let_} dias letivos · ${fe} feriados · ${re} de recesso · ${state.turmas.length} turmas · ${state.disciplinas.length} disciplinas`;
+}
+
+function setDisc(id){ state.activeDisc=id; save(); renderTabs(); renderPanel(); }
+
+/* =================== Render: painel da disciplina =================== */
+function renderPanel(){
+  const disc=state.disciplinas.find(d=>d.id===state.activeDisc);
+  const panel=document.getElementById('panel');
+  const days=buildDays();
+  renderFooterStat(days);
+
+  if(!disc){
+    panel.innerHTML=`<div class="empty-note">Nenhuma disciplina. Clique em <b>Disciplinas</b> para adicionar.</div>`;
+    return;
+  }
+  if(state.turmas.length===0){
+    panel.innerHTML=`<div class="empty-note">Nenhuma turma. Clique em <b>Turmas</b> para adicionar.</div>`;
+    return;
+  }
+
+  // Editor da grade semanal
+  let grid=`<div class="grid-tbl-wrap"><table class="grid"><thead><tr>
+    <th class="turma-cell">Turma \\ Dia</th>`;
+  WEEK.forEach(w=>{ grid+=`<th>${w.ab}</th>`; });
+  grid+=`<th>Total/sem.</th></tr></thead><tbody>`;
+  state.turmas.forEach(t=>{
+    const g=disc.grade[t.id]||{};
+    let semana=0;
+    let cells='';
+    WEEK.forEach(w=>{
+      const v=Number(g[w.k])||0; semana+=v;
+      cells+=`<td><input class="grade-in ${v===0?'zero':''}" type="number" min="0" step="1" value="${v}"
+        data-t="${t.id}" data-d="${w.k}" oninput="onGrade(this)" aria-label="${esc(t.nome)} ${w.ab}"></td>`;
+    });
+    grid+=`<tr><td class="turma-cell">${esc(t.nome)}</td>${cells}
+      <td style="font-family:var(--mono);color:var(--muted)">${semana}</td></tr>`;
+  });
+  grid+=`</tbody></table></div>`;
+
+  const cfg=`<div class="cfg-row">
+    <div class="field"><label>Aulas por bimestre</label>
+      <input type="number" min="1" step="1" value="${disc.aulasPorBimestre}" oninput="onCfg('aulasPorBimestre',this.value)"></div>
+    <div class="field"><label>Nº de bimestres</label>
+      <input type="number" min="1" max="8" step="1" value="${disc.nBimestres}" oninput="onCfg('nBimestres',this.value)"></div>
+    <div class="hint">Informe quantas aulas compõem 1 bimestre desta disciplina. A tabela marca o dia em que cada turma atinge a meta e fecha o bimestre.</div>
+  </div>`;
+
+  panel.innerHTML=`
+    <div class="panel-head">
+      <span class="accent" style="background:${disc.cor}"></span>
+      <h2>${esc(disc.nome)}</h2>
+      <span class="metaline">grade semanal fixa · projeção 2026</span>
+    </div>
+    <div class="section-title">Grade semanal (aulas por dia)</div>
+    ${grid}
+    ${cfg}
+    <div id="results"></div>`;
+  renderResults();
+}
+
+function renderResults(){
+  const disc=state.disciplinas.find(d=>d.id===state.activeDisc);
+  const days=buildDays();
+  const {proj,resumo,meta,nb}=project(disc,days);
+  const box=document.getElementById('results');
+
+  // Cards resumo
+  let cards='<div class="cards">';
+  state.turmas.forEach(t=>{
+    const r=resumo[t.id];
+    let bims='';
+    for(let b=1;b<=nb;b++){
+      const dt=r.closes[b];
+      bims+=`<div class="bim"><span class="lbl">${b}º bimestre</span>`+
+        (dt?`<span class="date">${brDate(dt)}</span>`:`<span class="date miss">não fecha em ${YEAR}</span>`)+`</div>`;
+    }
+    cards+=`<div class="card"><h3>${esc(t.nome)}</h3>${bims}
+      <div class="tot">Total no ano: <b>${r.total}</b> aulas</div></div>`;
+  });
+  cards+='</div>';
+
+  // Tabela de projeção
+  let head=`<tr><th class="c-data">Data</th><th class="c-dia">Dia</th>`;
+  state.turmas.forEach(t=>{ head+=`<th>${esc(t.nome)}</th>`; });
+  head+=`</tr>`;
+
+  let rows='';
+  days.forEach(d=>{
+    if(d.status==='feriado'){
+      const tp=d.fer.tipo;
+      rows+=`<tr class="special t-${tp} ${d.mon?'row-mon':''}">
+        <td class="c-data">${brDate(d.k)}</td><td class="c-dia">${DIAS_AB[d.dow]}</td>
+        <td class="special-label" colspan="${state.turmas.length}">
+          <span class="badge">${tp==='nacional'?'Nac':tp==='estadual'?'AC':'Fac'}</span>${esc(d.fer.nome)}</td></tr>`;
+      return;
+    }
+    if(d.status==='recesso'){
+      rows+=`<tr class="special t-recesso ${d.mon?'row-mon':''}">
+        <td class="c-data">${brDate(d.k)}</td><td class="c-dia">${DIAS_AB[d.dow]}</td>
+        <td class="special-label" colspan="${state.turmas.length}"><span class="badge">Rec</span>Recesso escolar</td></tr>`;
+      return;
+    }
+    // letivo
+    let hasAny=false, cells='';
+    state.turmas.forEach(t=>{
+      const c=proj[t.id][d.k];
+      if(c){
+        hasAny=true;
+        const mile=c.closes.length>0;
+        const tag=c.closes.map(b=>`<span class="mile-tag">Fim ${b}º</span>`).join('');
+        cells+=`<td class="turno ${mile?'milestone':''}" title="+${c.add} aula(s) neste dia">
+          <span class="cum">${c.cum}</span>${tag}</td>`;
+      }else{
+        cells+=`<td class="blank">·</td>`;
+      }
+    });
+    if(!showAll && !hasAny) return;
+    rows+=`<tr class="row-let ${d.mon?'row-mon':''}">
+      <td class="c-data">${brDate(d.k)}</td><td class="c-dia">${DIAS_AB[d.dow]}</td>${cells}</tr>`;
+  });
+
+  const toggle=`<div class="view-toggle" role="group" aria-label="Filtro de dias">
+    <button class="${showAll?'on':''}" onclick="setShow(true)">Todos os dias</button>
+    <button class="${!showAll?'on':''}" onclick="setShow(false)">Só dias com aula</button>
+  </div>`;
+
+  box.innerHTML=`
+    <div class="section-title">Fechamento dos bimestres por turma</div>
+    ${cards}
+    <div class="section-title">Cronograma dia a dia · acúmulo de aulas</div>
+    ${toggle}
+    <div class="proj-wrap"><table class="proj"><thead>${head}</thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function setShow(v){ showAll=v; renderResults(); }
+
+/* =================== Handlers de edição inline =================== */
+function onGrade(inp){
+  const disc=state.disciplinas.find(d=>d.id===state.activeDisc);
+  const t=inp.dataset.t, dw=inp.dataset.d;
+  let v=parseInt(inp.value,10); if(isNaN(v)||v<0){v=0;}
+  if(!disc.grade[t]) disc.grade[t]={};
+  disc.grade[t][dw]=v;
+  inp.classList.toggle('zero', v===0);
+  save(); renderResults();
+  // atualiza total/semana da linha
+  const tr=inp.closest('tr'); if(tr){ let s=0; tr.querySelectorAll('.grade-in').forEach(i=>s+=parseInt(i.value,10)||0);
+    tr.lastElementChild.textContent=s; }
+}
+function onCfg(field,val){
+  const disc=state.disciplinas.find(d=>d.id===state.activeDisc);
+  let v=parseInt(val,10); if(isNaN(v)||v<1)v=1;
+  disc[field]=v; save(); renderResults();
+}
+
+/* =================== Modais =================== */
+function openModal(html){ document.getElementById('modal').innerHTML=html; document.getElementById('overlay').classList.add('open'); }
+function closeModal(){ document.getElementById('overlay').classList.remove('open'); renderTabs(); renderPanel(); }
+
+/* ---- Turmas ---- */
+function openTurmas(){
+  let rows='';
+  state.turmas.forEach(t=>{
+    rows+=`<div class="list-row">
+      <input class="name" value="${esc(t.nome)}" oninput="editTurma('${t.id}',this.value)">
+      <button class="del" title="Remover" onclick="delTurma('${t.id}')">×</button></div>`;
+  });
+  openModal(`
+    <div class="modal-head"><h3>Turmas</h3><button class="x" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="hint" style="margin-bottom:10px">As turmas viram colunas em todas as disciplinas.</div>
+      <div id="turmaList">${rows||'<div class="hint">Nenhuma turma ainda.</div>'}</div>
+      <div class="add-line"><button class="btn" onclick="addTurma()">+ Adicionar turma</button></div>
+    </div>
+    <div class="modal-foot"><button class="btn solid" onclick="closeModal()">Concluir</button></div>`);
+}
+function editTurma(id,v){ const t=state.turmas.find(x=>x.id===id); if(t){t.nome=v;save();} }
+function addTurma(){ state.turmas.push({id:uid(),nome:'Nova turma'}); normalize(); save(); openTurmas(); }
+function delTurma(id){
+  state.turmas=state.turmas.filter(t=>t.id!==id);
+  state.disciplinas.forEach(d=>{ if(d.grade) delete d.grade[id]; });
+  save(); openTurmas();
+}
+
+/* ---- Disciplinas ---- */
+function openDisciplinas(){
+  let rows='';
+  state.disciplinas.forEach(d=>{
+    rows+=`<div class="list-row">
+      <input class="color" type="color" value="${d.cor}" oninput="editDisc('${d.id}','cor',this.value)">
+      <input class="name" value="${esc(d.nome)}" oninput="editDisc('${d.id}','nome',this.value)">
+      <button class="del" title="Remover" onclick="delDisc('${d.id}')">×</button></div>`;
+  });
+  openModal(`
+    <div class="modal-head"><h3>Disciplinas</h3><button class="x" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="hint" style="margin-bottom:10px">Cada disciplina tem sua própria aba, grade semanal e meta de aulas por bimestre.</div>
+      <div id="discList">${rows||'<div class="hint">Nenhuma disciplina ainda.</div>'}</div>
+      <div class="add-line"><button class="btn" onclick="addDisc()">+ Adicionar disciplina</button></div>
+    </div>
+    <div class="modal-foot"><button class="btn solid" onclick="closeModal()">Concluir</button></div>`);
+}
+function editDisc(id,f,v){ const d=state.disciplinas.find(x=>x.id===id); if(d){d[f]=v;save();} }
+function addDisc(){
+  const cor=DISC_CORES[state.disciplinas.length % DISC_CORES.length];
+  const id=uid();
+  state.disciplinas.push({id,nome:'Nova disciplina',cor,aulasPorBimestre:20,nBimestres:4,grade:{}});
+  normalize(); state.activeDisc=id; save(); openDisciplinas();
+}
+function delDisc(id){
+  state.disciplinas=state.disciplinas.filter(d=>d.id!==id);
+  if(state.activeDisc===id) state.activeDisc = state.disciplinas[0]?state.disciplinas[0].id:null;
+  save(); openDisciplinas();
+}
+
+/* ---- Recesso ---- */
+function openRecesso(){
+  openModal(`
+    <div class="modal-head"><h3>Recesso escolar</h3><button class="x" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="hint" style="margin-bottom:14px">Dias dentro do intervalo não contam como letivos. Padrão adotado: <b>20 a 31 de julho de 2026</b> — ajuste se o seu calendário for diferente.</div>
+      <div class="dates-2">
+        <div class="field"><label>Início</label><input type="date" id="recStart" value="${state.recesso.start}" min="2026-01-01" max="2026-12-31" style="font-family:var(--mono)"></div>
+        <div class="field"><label>Fim</label><input type="date" id="recEnd" value="${state.recesso.end}" min="2026-01-01" max="2026-12-31" style="font-family:var(--mono)"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn solid" onclick="saveRecesso()">Salvar</button>
+    </div>`);
+}
+function saveRecesso(){
+  const s=document.getElementById('recStart').value, e=document.getElementById('recEnd').value;
+  if(s&&e){ state.recesso={start:s<e?s:e, end:s<e?e:s}; save(); }
+  closeModal();
+}
+
+/* ---- Feriados ---- */
+function openFeriados(){
+  const groups={nacional:[],estadual:[],facultativo:[]};
+  state.feriados.slice().sort((a,b)=>a.date<b.date?-1:1).forEach(f=>groups[f.tipo].push(f));
+  const block=(arr)=>arr.map(f=>`<div class="list-row">
+      <input class="date" type="date" value="${f.date}" onchange="editFerDate('${f.date}','${f.tipo}',this.value)">
+      <input class="name" value="${esc(f.nome)}" oninput="editFerNome('${f.date}','${f.tipo}',this.value)">
+      <span class="tinytag ${f.tipo}">${f.tipo==='nacional'?'Nac':f.tipo==='estadual'?'AC':'Fac'}</span>
+      <button class="del" title="Remover" onclick="delFer('${f.date}','${f.tipo}')">×</button></div>`).join('');
+  openModal(`
+    <div class="modal-head"><h3>Feriados e pontos facultativos · 2026</h3><button class="x" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <label class="check"><input type="checkbox" ${state.facultativoLetivo?'checked':''} onchange="toggleFac(this.checked)">
+        Contar pontos facultativos como dia letivo (Carnaval, Corpus Christi etc.)</label>
+      <div class="grp">Nacionais</div>${block(groups.nacional)}
+      <div class="grp">Estaduais (Acre)</div>${block(groups.estadual)}
+      <div class="grp">Pontos facultativos</div>${block(groups.facultativo)}
+      <div class="add-line"><button class="btn" onclick="addFer()">+ Adicionar data</button></div>
+    </div>
+    <div class="modal-foot"><button class="btn solid" onclick="closeModal()">Concluir</button></div>`);
+}
+function findFer(date,tipo){ return state.feriados.find(f=>f.date===date&&f.tipo===tipo); }
+function editFerDate(oldD,tipo,v){ const f=findFer(oldD,tipo); if(f&&v){f.date=v;save();openFeriados();} }
+function editFerNome(date,tipo,v){ const f=findFer(date,tipo); if(f){f.nome=v;save();} }
+function delFer(date,tipo){ state.feriados=state.feriados.filter(f=>!(f.date===date&&f.tipo===tipo)); save(); openFeriados(); }
+function addFer(){ state.feriados.push({date:'2026-01-01',nome:'Novo feriado',tipo:'estadual'}); save(); openFeriados(); }
+function toggleFac(v){ state.facultativoLetivo=v; save(); }
+
+/* =================== Import / Export =================== */
+function doExport(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='previsao-aulas-2026.json'; a.click();
+  URL.revokeObjectURL(a.href);
+}
+function doImport(){ document.getElementById('fileIn').click(); }
+document.getElementById('fileIn').addEventListener('change',function(ev){
+  const file=ev.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ state=JSON.parse(r.result); normalize(); save(); renderTabs(); renderPanel(); }
+    catch(e){ alert('Arquivo inválido.'); } };
+  r.readAsText(file); ev.target.value='';
+});
+
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+/* =================== Início =================== */
+load(); normalize(); renderTabs(); renderPanel();
+</script>
+</body>
+</html>
