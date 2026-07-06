@@ -236,6 +236,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--ce);min-h
 .pc-cal-grid-week{background:transparent;border:none;padding:0}
 .pc-cal-day{min-height:116px;border:1px solid #d8decd;border-radius:14px;padding:10px;background:#fffef8;color:#19324a;display:flex;flex-direction:column;gap:8px;text-align:left;box-shadow:0 2px 6px rgba(20,34,20,.04)}
 .pc-cal-day.other-month{background:#f1f1ea;color:#7d8490}
+.pc-cal-day-placeholder{background:transparent;border:none;box-shadow:none;pointer-events:none}
 .pc-cal-day.today{box-shadow:0 0 0 2px rgba(201,168,76,.32)}
 .pc-cal-day.compact{min-height:58px;padding:7px 6px;border-radius:10px;gap:4px}
 .pc-cal-day-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -366,6 +367,7 @@ body.modo-escuro .pc-cal-chip-btn.on{background:rgba(74,148,103,.22);color:#7fdd
 body.modo-escuro .pc-cal-grid{background:#202330;border-color:rgba(255,255,255,.08)}
 body.modo-escuro .pc-cal-day{box-shadow:none}
 body.modo-escuro .pc-cal-day:not(.has-events){background:#252533;color:#e8e8f0;border-color:rgba(255,255,255,.08)}
+body.modo-escuro .pc-cal-day-placeholder{background:transparent;border:none}
 body.modo-escuro .pc-cal-day.other-month{background:#232330;color:#8e95a4}
 body.modo-escuro .pc-cal-day-footer,body.modo-escuro .pc-cal-day-summary p,body.modo-escuro .pc-cal-agenda-head span,body.modo-escuro .pc-cal-agenda-source,body.modo-escuro .pc-cal-modal-sub,body.modo-escuro .pc-cal-week-section-top span,body.modo-escuro .pc-cal-modal-card p,body.modo-escuro .pc-cal-modal-card small{color:#aab3c2}
 body.modo-escuro .pc-cal-agenda-item{background:#252533}

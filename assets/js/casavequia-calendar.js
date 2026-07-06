@@ -509,15 +509,30 @@
 
   function getVisibleMonthDays(date) {
     var first = new Date(date.getFullYear(), date.getMonth(), 1);
-    var start = new Date(first);
-    start.setDate(first.getDate() - first.getDay());
-    var end = new Date(start);
-    end.setDate(start.getDate() + 41);
     var days = [];
-    eachDateInclusive(start, end, function (cursor) {
+    var last = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    eachDateInclusive(first, last, function (cursor) {
       days.push(new Date(cursor));
     });
     return days;
+  }
+
+  function getMonthGridCells(date) {
+    var monthDays = getVisibleMonthDays(date);
+    var firstDay = monthDays.length ? monthDays[0].getDay() : 0;
+    var trailing = monthDays.length ? (6 - monthDays[monthDays.length - 1].getDay()) : 0;
+    var cells = [];
+    var i;
+    for (i = 0; i < firstDay; i++) {
+      cells.push(null);
+    }
+    monthDays.forEach(function (day) {
+      cells.push(day);
+    });
+    for (i = 0; i < trailing; i++) {
+      cells.push(null);
+    }
+    return cells;
   }
 
   function getWeekDays(date) {
@@ -649,7 +664,7 @@
   }
 
   function renderMonthView(date) {
-    var monthDays = getVisibleMonthDays(date);
+    var monthCells = getMonthGridCells(date);
     var monthRange = getMonthRange(date);
     var events = getVisibleEventsBetween(monthRange.start, monthRange.end);
     var html = [];
@@ -658,11 +673,11 @@
       return '<div class="pc-cal-weekday">' + label + '</div>';
     }).join('') + '</div>');
     html.push('<div class="pc-cal-grid">');
-    monthDays.forEach(function (day) {
-      html.push(renderDayCell(day, {
+    monthCells.forEach(function (day) {
+      html.push(day ? renderDayCell(day, {
         month: date.getMonth(),
         compact: false
-      }));
+      }) : renderEmptyDayCell(false));
     });
     html.push('</div></div>');
     html.push(renderAgendaSection('Acontecimentos do mês', events, 'Nenhum evento encontrado para este mês no filtro atual.'));
@@ -713,11 +728,11 @@
         return '<span>' + label.slice(0, 1) + '</span>';
       }).join('') + '</div>');
       html.push('<div class="pc-cal-mini-grid">');
-      getVisibleMonthDays(date).forEach(function (day) {
-        html.push(renderDayCell(day, {
+      getMonthGridCells(date).forEach(function (day) {
+        html.push(day ? renderDayCell(day, {
           month: month,
           compact: true
-        }));
+        }) : renderEmptyDayCell(true));
       });
       html.push('</div></section>');
     }
@@ -767,6 +782,10 @@
       + (events.length && !options.compact ? '<div class="pc-cal-day-label">' + escapeHtml(shortTitle(events[0].title, 34)) + '</div>' : '<div class="pc-cal-day-label pc-cal-day-label-empty">' + (options.compact ? '' : '&nbsp;') + '</div>')
       + footer
       + '</button>';
+  }
+
+  function renderEmptyDayCell(compact) {
+    return '<div class="pc-cal-day pc-cal-day-placeholder' + (compact ? ' compact' : '') + '" aria-hidden="true"></div>';
   }
 
   function renderAgendaSection(title, events, emptyLabel, modalMode) {
