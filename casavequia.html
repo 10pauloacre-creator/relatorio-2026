@@ -7932,7 +7932,6 @@ function pcProjectionExtractCalendarSeed(){
   var calendar=window.CASAVEQUIA_CALENDAR_DATA||{};
   var scopes=calendar.scopes||{};
   var feriadosByKey={};
-  var notesByDate={};
   var recesso={start:'2026-07-20',end:'2026-07-31'};
   ['regular','third'].forEach(function(scopeKey){
     var scope=scopes[scopeKey];
@@ -7946,10 +7945,6 @@ function pcProjectionExtractCalendarSeed(){
       if(norm.indexOf('recesso escolar')>=0){
         recesso.start=dates[0];
         recesso.end=dates[dates.length-1];
-        dates.forEach(function(dateKey){
-          if(!notesByDate[dateKey])notesByDate[dateKey]=[];
-          if(notesByDate[dateKey].indexOf('Recesso escolar')<0)notesByDate[dateKey].push('Recesso escolar');
-        });
         return;
       }
       var holidayType=pcProjectionHolidayTypeFromTitle(title);
@@ -7957,17 +7952,12 @@ function pcProjectionExtractCalendarSeed(){
         if(holidayType){
           var holidayKey=dateKey+'|'+holidayType+'|'+title;
           if(!feriadosByKey[holidayKey])feriadosByKey[holidayKey]={date:dateKey,nome:title,tipo:holidayType};
-          return;
         }
-        if(!notesByDate[dateKey])notesByDate[dateKey]=[];
-        var label=scopeKey==='third'?'3ª Série: '+title:title;
-        if(notesByDate[dateKey].indexOf(label)<0)notesByDate[dateKey].push(label);
       });
     });
   });
   return {
     feriados:Object.keys(feriadosByKey).map(function(key){return feriadosByKey[key];}).sort(function(a,b){return a.date.localeCompare(b.date)||a.nome.localeCompare(b.nome);}),
-    notesByDate:notesByDate,
     recesso:recesso
   };
 }
@@ -8069,7 +8059,6 @@ function pcBuildProjectionSeed(){
     recesso:calendarSeed.recesso,
     facultativoLetivo:false,
     feriados:calendarSeed.feriados,
-    notesByDate:calendarSeed.notesByDate,
     turmas:turmas,
     disciplinas:['lp','tl','tc','ar'].filter(function(key){return !!disciplinasByGroup[key];}).map(function(key){return disciplinasByGroup[key];}),
     activeDisc:'lp'
