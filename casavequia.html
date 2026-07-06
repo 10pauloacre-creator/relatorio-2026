@@ -7809,11 +7809,15 @@ function pcBuildHeroLessonsHtml(sectionId){
   }).join('');
 }
 function pcBuildCounterHeroLessonsHtml(){
+  var seed=pcBuildProjectionSeed();
+  var counterMap=pcProjectionBuildCounterStateMap(seed);
   var grouped={};
   DISC.forEach(function(item){
+    var turmaId=PC_PROJECTION_TURMA_ID_MAP[item.t];
+    var synced=counterMap[item.g+'|'+turmaId]||{launched:item.feitas,total:item.tot};
     if(!grouped[item.g])grouped[item.g]={label:item.d,feitas:0,total:0};
-    grouped[item.g].feitas+=item.feitas;
-    grouped[item.g].total+=item.tot;
+    grouped[item.g].feitas+=synced.launched;
+    grouped[item.g].total+=synced.total;
   });
   return Object.keys(grouped).map(function(key){
     var item=grouped[key];
@@ -7821,7 +7825,13 @@ function pcBuildCounterHeroLessonsHtml(){
   }).join('');
 }
 function pcRefreshCounterHero(){
-  var totalFeitas=DISC.reduce(function(sum,item){return sum+item.feitas;},0);
+  var seed=pcBuildProjectionSeed();
+  var counterMap=pcProjectionBuildCounterStateMap(seed);
+  var totalFeitas=DISC.reduce(function(sum,item){
+    var turmaId=PC_PROJECTION_TURMA_ID_MAP[item.t];
+    var synced=counterMap[item.g+'|'+turmaId]||{launched:item.feitas};
+    return sum+synced.launched;
+  },0);
   var totalDisciplinas=DISC.length;
   var countEl=document.getElementById('pc-stat-count-sec-cont');
   var discEl=document.getElementById('pc-stat-last-sec-cont');
@@ -7833,12 +7843,20 @@ function pcRefreshCounterHero(){
   if(statusEl)statusEl.textContent='Painel pronto · '+totalFeitas+' aulas registradas no contador.';
 }
 function pcCopyCounterSummary(){
+  var seed=pcBuildProjectionSeed();
+  var counterMap=pcProjectionBuildCounterStateMap(seed);
   var linhas=['Pe. Carlos Casavequia - Contador de Aulas'];
-  var totalFeitas=DISC.reduce(function(sum,item){return sum+item.feitas;},0);
+  var totalFeitas=DISC.reduce(function(sum,item){
+    var turmaId=PC_PROJECTION_TURMA_ID_MAP[item.t];
+    var synced=counterMap[item.g+'|'+turmaId]||{launched:item.feitas};
+    return sum+synced.launched;
+  },0);
   linhas.push('Aulas lancadas: '+totalFeitas);
   linhas.push('Disciplinas ativas: '+DISC.length);
   DISC.forEach(function(item){
-    linhas.push('- '+item.t+' | '+item.d+': '+item.feitas+' de '+item.tot);
+    var turmaId=PC_PROJECTION_TURMA_ID_MAP[item.t];
+    var synced=counterMap[item.g+'|'+turmaId]||{launched:item.feitas,total:item.tot};
+    linhas.push('- '+item.t+' | '+item.d+': '+synced.launched+' de '+synced.total);
   });
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(linhas.join('\n')).catch(function(){});}
 }
@@ -8120,6 +8138,67 @@ function pcBuildProjectionSeed(){
     activeDisc:'lp'
   };
 }
+function pcProjectionBuildDays(seed){
+  var holidayMap={};
+  (seed.feriados||[]).forEach(function(item){
+    if(!holidayMap[item.date])holidayMap[item.date]=[];
+    holidayMap[item.date].push(item);
+  });
+  var days=[];
+  var cursor=new Date(2026,0,1,12,0,0);
+  while(cursor.getFullYear()===2026){
+    var key=cursor.toISOString().slice(0,10);
+    var dow=cursor.getDay();
+    var status='letivo';
+    var holidays=holidayMap[key]||[];
+    if(dow===0){
+      status='domingo';
+    }else if(seed.recesso&&seed.recesso.start&&key>=seed.recesso.start&&key<=seed.recesso.end){
+      status='recesso';
+    }else if(holidays.length){
+      var blocked=holidays.filter(function(item){return !(item.tipo==='facultativo'&&seed.facultativoLetivo);});
+      if(blocked.length)status='feriado';
+    }else if(dow===6){
+      status='sabado';
+    }
+    days.push({k:key,dow:dow,status:status,isProjectionDay:dow>=1&&dow<=5&&status==='letivo'});
+    cursor.setDate(cursor.getDate()+1);
+  }
+  return days;
+}
+function pcProjectionFormatDateKey(dateKey){
+  if(!dateKey)return '';
+  var parts=String(dateKey).split('-');
+  if(parts.length!==3)return dateKey;
+  return parts[2]+'/'+parts[1]+'/'+parts[0];
+}
+function pcProjectionBuildCounterStateMap(seed){
+  var map={};
+  var days=pcProjectionBuildDays(seed);
+  (seed.disciplinas||[]).forEach(function(disc){
+    var nBimestres=disc.nBimestres||4;
+    Object.keys(disc.grade||{}).forEach(function(turmaId){
+      var meta=parseInt((disc.metas||{})[turmaId],10)||20;
+      var launched=parseInt((disc.lancadas||{})[turmaId],10)||0;
+      var total=parseInt((disc.totais||{})[turmaId],10)||meta*nBimestres;
+      var acc=launched;
+      var target=Math.floor(launched/meta)+1;
+      var closes={};
+      days.forEach(function(day){
+        if(day.k<=seed.anchorDate||!day.isProjectionDay)return;
+        var add=parseInt((((disc.grade||{})[turmaId]||{})[day.dow]),10)||0;
+        if(add<=0)return;
+        acc+=add;
+        while(target<=nBimestres&&acc>=target*meta){
+          if(!closes[target])closes[target]=day.k;
+          target+=1;
+        }
+      });
+      map[disc.id+'|'+turmaId]={launched:launched,meta:meta,total:total,closes:closes,nBimestres:nBimestres};
+    });
+  });
+  return map;
+}
 function pcSyncProjectionSeed(){
   try{
     localStorage.setItem(PC_PROJECTION_SEED_KEY,JSON.stringify(pcBuildProjectionSeed()));
@@ -8128,14 +8207,26 @@ function pcSyncProjectionSeed(){
   }
 }
 function renderCont(){
+  var seed=pcBuildProjectionSeed();
+  var counterMap=pcProjectionBuildCounterStateMap(seed);
   DISC.forEach(d=>{
     const cnt=document.getElementById(CN[d.g]);if(!cnt)return;
-    const ba=getBim(d.feitas,d.bim),inB=(ba-1)*d.bim,fB=d.feitas-inB;
-    const pB=Math.min((fB/d.bim)*100,100),pT=Math.min((d.feitas/d.tot)*100,100);
-    const bims=calcBims(d),fc=FC[d.g],bc=BC[d.g];
-    const bH=bims.map(x=>`<div class="bi ${x.ok?'co':x.b===ba?'at':''}"><div class="bn">${x.b}º Bim</div><div class="bd2">${x.ok?'✔ Concluído':fmt(x.data)}</div></div>`).join('');
+    const turmaId=PC_PROJECTION_TURMA_ID_MAP[d.t];
+    const synced=counterMap[d.g+'|'+turmaId]||{launched:d.feitas,meta:d.bim,total:d.tot,closes:{},nBimestres:4};
+    const feitas=synced.launched;
+    const meta=synced.meta;
+    const total=synced.total;
+    const ba=getBim(feitas,meta),inB=(ba-1)*meta,fB=feitas-inB;
+    const pB=Math.min((fB/meta)*100,100),pT=Math.min((feitas/total)*100,100);
+    const fc=FC[d.g],bc=BC[d.g];
+    const bH=Array.from({length:synced.nBimestres||4},(_,index)=>{
+      const b=index+1;
+      const ok=feitas>=b*meta;
+      const label=ok?'✔ Concluído':(synced.closes[b]?pcProjectionFormatDateKey(synced.closes[b]):'Não fecha');
+      return `<div class="bi ${ok?'co':b===ba?'at':''}"><div class="bn">${b}º Bim</div><div class="bd2">${label}</div></div>`;
+    }).join('');
     const cc=document.createElement('div');cc.className='cc';
-    cc.innerHTML=`<div class="cch"><div><div class="cct">${d.t}</div><div class="ccm">${d.d} · ${d.sw} h/aula/sem</div></div><div class="ccb ${bc}">${ba}º Bimestre</div></div><div class="ccbody"><div class="pg"><div class="pl"><span class="plt">${ba}º Bimestre</span><span class="pln">${fB}/${d.bim} · faltam ${d.bim-fB}</span></div><div class="pbg"><div class="pf ${fc}" style="width:${pB}%"></div></div></div><div class="pg"><div class="pl"><span class="plt">Total do Ano</span><span class="pln">${d.feitas}/${d.tot} · faltam ${d.tot-d.feitas}</span></div><div class="pbg"><div class="pf ${fc} dm" style="width:${pT}%"></div></div></div><div style="font-size:.69rem;color:var(--cm);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin:13px 0 6px">Previsão de conclusão por bimestre</div><div class="brow">${bH}</div><div class="ae">* Projeções detalhadas agora consideram cronograma, calendário escolar, recessos e aulas já lançadas na página de Projeções de aulas.</div></div>`;
+    cc.innerHTML=`<div class="cch"><div><div class="cct">${d.t}</div><div class="ccm">${d.d} · ${d.sw} h/aula/sem</div></div><div class="ccb ${bc}">${ba}º Bimestre</div></div><div class="ccbody"><div class="pg"><div class="pl"><span class="plt">${ba}º Bimestre</span><span class="pln">${fB}/${meta} · faltam ${meta-fB}</span></div><div class="pbg"><div class="pf ${fc}" style="width:${pB}%"></div></div></div><div class="pg"><div class="pl"><span class="plt">Total do Ano</span><span class="pln">${feitas}/${total} · faltam ${total-feitas}</span></div><div class="pbg"><div class="pf ${fc} dm" style="width:${pT}%"></div></div></div><div style="font-size:.69rem;color:var(--cm);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin:13px 0 6px">Previsão de conclusão por bimestre</div><div class="brow">${bH}</div><div class="ae">* Projeções detalhadas agora consideram cronograma, calendário escolar, recessos e aulas já lançadas na página de Projeções de aulas.</div></div>`;
     cnt.appendChild(cc);
   });
 }
