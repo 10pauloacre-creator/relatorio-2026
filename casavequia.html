@@ -7880,7 +7880,7 @@ function pcInitSectionHeroes(){
 const BASE=new Date(2026,2,30);
 const DISC=[
   {g:'lp',t:'1ª Série',d:'Língua Portuguesa',sw:2,feitas:28,bim:20,tot:80},
-  {g:'lp',t:'2ª Série',d:'Língua Portuguesa',sw:4,feitas:47,bim:30,tot:120},
+  {g:'lp',t:'2ª Série',d:'Língua Portuguesa',sw:3,feitas:47,bim:30,tot:120},
   {g:'lp',t:'3ª Série',d:'Língua Portuguesa',sw:3,feitas:49,bim:30,tot:120},
   {g:'tl',t:'1ª Série',d:'Trilhas de Linguagens',sw:1,feitas:9,bim:10,tot:40},
   {g:'tl',t:'2ª Série',d:'Trilhas de Linguagens',sw:1,feitas:13,bim:10,tot:40},
@@ -8032,6 +8032,7 @@ function pcBuildProjectionSeed(){
         nome:item.d,
         cor:PC_PROJECTION_COLOR_MAP[item.g]||'#0f766e',
         nBimestres:4,
+        turmasAtivas:[],
         grade:{},
         metas:{},
         lancadas:{},
@@ -8039,6 +8040,7 @@ function pcBuildProjectionSeed(){
       };
     }
     var disc=disciplinasByGroup[item.g];
+    if(disc.turmasAtivas.indexOf(turmaId)<0)disc.turmasAtivas.push(turmaId);
     var grade=Object.assign({},(schedule[item.d]&&schedule[item.d][turmaId])||{});
     var weeklySum=Object.keys(grade).reduce(function(sum,key){return sum+(parseInt(grade[key],10)||0);},0);
     if(weeklySum!==item.sw){
