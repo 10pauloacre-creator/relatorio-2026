@@ -690,7 +690,6 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <button class="nb" onclick="aba('t3',this)">3ª Série</button><div class="sp"></div>
 <button class="nb" onclick="aba('t6',this)">6º Ano</button><div class="sp"></div>
 <button class="nb" onclick="aba('plano',this)">📚 Plano Anual</button><div class="sp"></div>
-    <button class="nb" onclick="aba('cron',this)">📅 Cronograma</button><div class="sp"></div>
 <button class="nb" onclick="aba('cal',this)">📆 Calendário</button><div class="sp"></div>
 <button class="nb" onclick="aba('cont',this)">📊 Contador</button>
 <div class="sp"></div>
@@ -6630,7 +6629,7 @@ document.getElementById('p6ano').classList.add('active');
 </div>
 </section>
 
-<section class="sec" id="sec-cron">
+<section class="sec" id="sec-cron" style="display:none!important" aria-hidden="true">
 <div class="th"><div class="tb gz">📅</div><div class="ti"><h2>Cronograma Semanal</h2><p>Grade em vigor desde 30/03/2026 · Trilhas divididas em Linguagens e C. Humanas</p></div></div>
 <div class="cron-intro"><strong>Grade atual.</strong> Hoje é destacado automaticamente. Avise quando houver mudanças.</div>
 <div class="cleg"><div class="cl2"><div class="ld d-lp"></div><span>Língua Portuguesa</span></div><div class="cl2"><div class="ld d-tl"></div><span>Trilhas de Linguagens</span></div><div class="cl2"><div class="ld d-tc"></div><span>Trilhas de C. Humanas</span></div><div class="cl2"><div class="ld d-ar"></div><span>Artes</span></div></div>
@@ -6681,6 +6680,22 @@ document.getElementById('p6ano').classList.add('active');
 
 <section class="sec" id="sec-cont">
 <div class="th"><div class="tb gz">📊</div><div class="ti"><h2>Contador de Aulas</h2><p>Progresso por disciplina · Trilhas divididas em Linguagens e C. Humanas · Metas proporcionais às h/aula</p></div></div>
+<div style="margin-bottom:22px">
+  <div class="th" style="margin-bottom:16px;padding-bottom:10px">
+    <div class="tb gz">📅</div>
+    <div class="ti"><h2>Cronograma Semanal</h2><p>Grade em vigor desde 30/03/2026 · Agora integrada à aba Contador</p></div>
+  </div>
+  <div class="cron-intro"><strong>Grade atual.</strong> Hoje é destacado automaticamente. Avise quando houver mudanças.</div>
+  <div class="cleg"><div class="cl2"><div class="ld d-lp"></div><span>Língua Portuguesa</span></div><div class="cl2"><div class="ld d-tl"></div><span>Trilhas de Linguagens</span></div><div class="cl2"><div class="ld d-tc"></div><span>Trilhas de C. Humanas</span></div><div class="cl2"><div class="ld d-ar"></div><span>Artes</span></div></div>
+  <div class="cg">
+  <div class="dc" id="card-seg-cont"><div class="dch c-se">☀️ Segunda-feira</div><div class="db"><div class="sl sl-lp"><div class="sh">07h00 – 09h00</div><div class="sd">Língua Portuguesa</div><div class="st2">1ª Série · 2 h/aula</div></div><div class="sl sl-lp"><div class="sh">09h00 – 11h15</div><div class="sd">Língua Portuguesa</div><div class="st2">2ª e 3ª Série (juntas) · 2h/aula cada</div></div></div></div>
+  <div class="dc" id="card-ter-cont"><div class="dch c-te">🌤 Terça-feira</div><div class="db"><div class="sl sl-lp"><div class="sh">13h00 – 14h00</div><div class="sd">Língua Portuguesa</div><div class="st2">3ª Série · 1 h/aula</div></div><div class="sl sl-tl"><div class="sh">14h00 – 15h00</div><div class="sd">Trilhas de Linguagens</div><div class="st2">3ª Série · 1 h/aula</div></div><div class="sl sl-tl"><div class="sh">15h00 – 16h15</div><div class="sd">Trilhas de Linguagens</div><div class="st2">2ª Série · 1 h/aula</div></div><div class="sl sl-lp"><div class="sh">15h15 – 17h15</div><div class="sd">Língua Portuguesa</div><div class="st2">2ª Série · 1 h/aula</div></div></div></div>
+  <div class="dc" id="card-qui-cont"><div class="dch c-qu">🎨 Quinta-feira</div><div class="db"><div class="sl sl-ar"><div class="sh">15h15 – 16h15</div><div class="sd">Artes</div><div class="st2">2ª Série · 1 h/aula</div></div><div class="sl sl-ar"><div class="sh">16h15 – 17h15</div><div class="sd">Artes</div><div class="st2">3ª Série · 1 h/aula</div></div></div></div>
+  <div class="dc" id="card-sex-cont"><div class="dch c-sx">🌅 Sexta-feira</div><div class="db"><div class="sl sl-ar"><div class="sh">07h00 – 08h00</div><div class="sd">Artes</div><div class="st2">6º Ano · 1 h/aula</div></div><div class="sl sl-tc"><div class="sh">13h00 – 14h00</div><div class="sd">Trilhas de C. Humanas</div><div class="st2">2ª Série · 1 h/aula</div></div><div class="sl sl-tc"><div class="sh">14h00 – 15h00</div><div class="sd">Trilhas de C. Humanas</div><div class="st2">1ª Série · 1 h/aula</div></div><div class="sl sl-tl"><div class="sh">15h15 – 16h15</div><div class="sd">Trilhas de Linguagens</div><div class="st2">1ª Série · 1 h/aula</div></div><div class="sl sl-tc"><div class="sh">16h15 – 17h15</div><div class="sd">Trilhas de C. Humanas</div><div class="st2">2ª Série · 1 h/aula</div></div><div class="sl sl-tc"><div class="sh">16h15 – 17h15</div><div class="sd">Trilhas de C. Humanas</div><div class="st2">3ª Série · 1 h/aula</div></div></div></div>
+  </div>
+  <div style="margin-top:20px;background:#fff;border-radius:var(--r);padding:17px 21px;box-shadow:var(--sc)"><div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cm);font-weight:700;margin-bottom:11px">H/aula por semana — resumo</div>
+  <div class="rcg"><div class="ri ri-v"><div class="rl">1ª Série</div><div class="rv">LP: <strong>2</strong> · T.Ling: <strong>1</strong> · T.CH: <strong>1</strong></div></div><div class="ri ri-a"><div class="rl">2ª Série</div><div class="rv">LP: <strong>3</strong> · T.Ling: <strong>1</strong> · T.CH: <strong>2</strong> · Arte: <strong>1</strong></div></div><div class="ri ri-o"><div class="rl">3ª Série</div><div class="rv">LP: <strong>3</strong> · T.Ling: <strong>1</strong> · T.CH: <strong>1</strong> · Arte: <strong>1</strong></div></div><div class="ri ri-l"><div class="rl">6º Ano</div><div class="rv">Arte: <strong>1</strong></div></div></div></div>
+</div>
 <div class="ci"><h3>📈 Como funciona</h3><p>Feitas = relatos diários. Datas = estimativas (sem feriados). Metas de T.Ling e T.C.H divididas proporcionalmente às h/aula semanais. Atualize a cada relato.</p><div class="ci-up">📅 Última atualização: 06/07/2026</div></div>
 <div class="cgt"><h3>Língua Portuguesa</h3><span class="bd bd-lp">LP</span></div><div class="ccards" id="cnt-lp"></div>
 <div class="cgt"><h3>Trilhas de Linguagens</h3><span class="bd bd-tl">T. LING.</span></div><div class="ccards" id="cnt-tl"></div>
