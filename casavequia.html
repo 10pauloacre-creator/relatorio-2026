@@ -7237,7 +7237,36 @@ function _atvAtualizarStat(atvId){
 
 function _atvFecharMenu(){
   var m=document.getElementById('atv-float-menu');
-  if(m){m.classList.remove('on');m.innerHTML='';}
+  if(m){
+    m.classList.remove('on');
+    m.removeAttribute('data-for');
+    m.removeAttribute('data-atv');
+    m.removeAttribute('data-n');
+    m.removeAttribute('data-turma');
+    m.innerHTML='';
+  }
+}
+
+function _atvBindMenu(){
+  var m=document.getElementById('atv-float-menu');
+  if(!m||m.dataset.bound==='1')return;
+  m.dataset.bound='1';
+  m.addEventListener('click',function(e){
+    e.stopPropagation();
+    var item=e.target.closest('.atv-mo');
+    if(!item)return;
+    var atvId=m.getAttribute('data-atv');
+    var n=parseInt(m.getAttribute('data-n'),10);
+    var turma=m.getAttribute('data-turma');
+    if(!atvId||!n)return;
+    if(item.getAttribute('data-action')==='perfil'){
+      abrirPerfil(turma,n);
+      _atvFecharMenu();
+      return;
+    }
+    var status=item.getAttribute('data-status');
+    if(status)atvRegistrar(atvId,n,status);
+  });
 }
 
 function _atvAbrirMenu(cell,atvId,n,turma){
@@ -7327,6 +7356,66 @@ function renderAtividades(){
 }
 
 /* ★ ANCORAGEM AUTOMÁTICA — monta REGISTROS e ATIVIDADES_BIMESTRE a partir de PRESENCA/ATIVIDADES ★ */
+function _atvAbrirMenu(cell,atvId,n,turma){
+  var m=document.getElementById('atv-float-menu');if(!m)return;
+  _atvBindMenu();
+  _atvFecharMenu();
+  var rect=cell.getBoundingClientRect();
+  var mH=170,mW=164;
+  var top=rect.bottom+4;
+  if(top+mH>window.innerHeight)top=Math.max(4,rect.top-mH-4);
+  var left=rect.right-mW;
+  if(left<6)left=6;
+  if(left+mW>window.innerWidth-6)left=window.innerWidth-mW-6;
+  m.style.top=top+'px';
+  m.style.left=left+'px';
+  m.setAttribute('data-for',atvId+'_'+n);
+  m.setAttribute('data-atv',atvId);
+  m.setAttribute('data-n',String(n));
+  m.setAttribute('data-turma',turma);
+  m.innerHTML=
+    '<div class="atv-mo verde" data-action="status" data-status="fz">Entregue</div>'
+    +'<div class="atv-mo verm" data-action="status" data-status="nf">Nao entregue</div>'
+    +'<div class="atv-mo ag-o" data-action="status" data-status="ag">Aguardando</div>'
+    +'<div class="atv-mo pfil" data-action="perfil">Ver perfil</div>';
+  m.classList.add('on');
+}
+
+function atvRegistrar(atvId,n,s){
+  _atvManual[atvId+'_'+n]=s;
+  _atvSalvar();
+  document.querySelectorAll('[data-atv="'+atvId+'"][data-n="'+n+'"]').forEach(function(cell){
+    _atvAtualizarCelula(cell,s);
+  });
+  _atvFecharMenu();
+  _atvAtualizarStat(atvId);
+}
+
+function renderAtividades(){
+  _atvBindMenu();
+  if(document.body&&!document.body.dataset.atvMenuCloseBound){
+    document.addEventListener('click',function(){_atvFecharMenu();});
+    document.body.dataset.atvMenuCloseBound='1';
+  }
+  document.querySelectorAll('.ipane[id^="a-t"]').forEach(function(pane){
+    var m=pane.id.match(/^a-(t[^-]+)-(.+)$/);
+    if(!m)return;
+    var turma=m[1],mmdd=m[2];
+    var atvId='atv-'+turma+'-'+mmdd;
+    var al=ALUNOS[turma]||[];if(!al.length)return;
+    var el=document.getElementById(atvId);
+    if(!el){
+      el=document.createElement('div');
+      el.id=atvId;
+      el.className='atv-grid';
+      pane.appendChild(el);
+    }
+    if(el.children.length>0)return;
+    var cfg=ATIVIDADES[atvId]||{turma:turma,fez:[],naoFez:[],parcial:false};
+    _atvCriarCelulas(el,atvId,turma,cfg);
+  });
+}
+
 var REGISTROS = {};
 var ATIVIDADES_BIMESTRE = {};
 var TURMAS = [
@@ -7709,8 +7798,9 @@ function pcRefreshAtividadesVisuals(){
     var cfg=ATIVIDADES[atvId]||{turma:m[1],fez:[],naoFez:[],parcial:false};
     (ALUNOS[m[1]]||[]).forEach(function(a){
       var s=pcResolveActivityStatus(atvId,a.n,cfg);
-      var cell=document.querySelector('[data-atv="'+atvId+'"][data-n="'+a.n+'"]');
-      if(cell)_atvAtualizarCelula(cell,s);
+      document.querySelectorAll('[data-atv="'+atvId+'"][data-n="'+a.n+'"]').forEach(function(cell){
+        _atvAtualizarCelula(cell,s);
+      });
     });
     _atvAtualizarStat(atvId);
   });
@@ -9000,8 +9090,9 @@ function _syncAplicarAtv(data) {
     if (idx < 0) return;
     var atvId = k.slice(0, idx);
     var n = parseInt(k.slice(idx + 1));
-    var cell = document.querySelector('[data-atv="'+atvId+'"][data-n="'+n+'"]');
-    if (cell) _atvAtualizarCelula(cell, data[k]);
+    document.querySelectorAll('[data-atv="'+atvId+'"][data-n="'+n+'"]').forEach(function(cell){
+      _atvAtualizarCelula(cell, data[k]);
+    });
     atvIds[atvId] = true;
   });
   localStorage.setItem('atv_manual', JSON.stringify(_atvManual));
