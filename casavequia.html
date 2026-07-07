@@ -7486,6 +7486,41 @@ function pcBindDailyInteractionOverrides(){
     var turma=m?m[1]:null;
     if(!turma)return;
 
+    if(e.target.closest('.atv-ic-p')){
+      var fm=document.getElementById('atv-float-menu');
+      var key=atvId+'_'+n;
+      var jaAberto=fm&&fm.classList.contains('on')&&fm.getAttribute('data-for')===key;
+      if(jaAberto){
+        _atvFecharMenu();
+        return;
+      }
+      _atvAbrirMenu(cell,atvId,n,turma);
+      return;
+    }
+
+    var cfg=ATIVIDADES[atvId]||{turma:turma,fez:[],naoFez:[],parcial:false};
+    var atual=pcResolveActivityStatus(atvId,n,cfg);
+    var prox=atual==='fz'?'nf':atual==='nf'?'ag':'fz';
+    atvRegistrar(atvId,n,prox);
+  },true);
+
+  document.addEventListener('dblclick',function(e){
+    var cell=e.target.closest('.atv-r[data-atv]');
+    if(!cell)return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(typeof e.stopImmediatePropagation==='function')e.stopImmediatePropagation();
+
+    var atvId=cell.getAttribute('data-atv');
+    var n=parseInt(cell.getAttribute('data-n'),10);
+    if(!atvId||!n)return;
+
+    var pane=cell.closest('.ipane[id^="a-"]');
+    if(!pane)return;
+    var m=pane.id.match(/^a-(t[^-]+)-(.+)$/);
+    var turma=m?m[1]:null;
+    if(!turma)return;
+
     var fm=document.getElementById('atv-float-menu');
     var key=atvId+'_'+n;
     var jaAberto=fm&&fm.classList.contains('on')&&fm.getAttribute('data-for')===key;
