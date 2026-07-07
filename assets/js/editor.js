@@ -8,6 +8,11 @@ var _undoStack = [];
 var _redoStack = [];
 var _elSelecionado = null;
 var _painel = null;
+var EDITOR_LAYOUT_KEY = 'ed_layout_snapshot_v4';
+var EDITOR_LAYOUT_SCOPE = 'casavequia:layout:shared-v1';
+var _editorRemoteSync = null;
+var _editorApplyingRemote = false;
+var _editorLastAppliedSignature = '';
 
 function initEditor() {
   configurarBtnEditar();
@@ -587,6 +592,130 @@ function limparAlteracoes() {
 
 // ─── TOOLBAR TEXTO ───────────────────────────────────────
 
+function _editorBuildAtual() {
+  var main = document.querySelector('.main');
+  return main && main.dataset ? (main.dataset.build || '') : '';
+}
+
+function _editorSnapshotSignature(payload) {
+  try { return JSON.stringify(payload || null); } catch (e) { return ''; }
+}
+
+function _editorLerSnapshot() {
+  try {
+    var raw = localStorage.getItem(EDITOR_LAYOUT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function _editorPersistirSnapshot(payload) {
+  if (!payload) return;
+  try {
+    localStorage.setItem(EDITOR_LAYOUT_KEY, JSON.stringify(payload));
+  } catch (e) {}
+}
+
+function _editorCriarPayload() {
+  var main = document.querySelector('.main');
+  if (!main) return null;
+  return {
+    build: _editorBuildAtual(),
+    updatedAt: new Date().toISOString(),
+    html: main.innerHTML
+  };
+}
+
+function _editorReidratarDepoisDoRestore() {
+  try { if (typeof initAlunos === 'function') initAlunos(); } catch (e) {}
+  try { if (typeof renderCasavequiaCalendar === 'function') renderCasavequiaCalendar(); } catch (e) {}
+  try { if (typeof pcInitSectionHeroes === 'function') pcInitSectionHeroes(); } catch (e) {}
+  try { if (typeof pcRefreshHeroStats === 'function') pcRefreshHeroStats(); } catch (e) {}
+  try { if (typeof pcRefreshCounterHero === 'function') pcRefreshCounterHero(); } catch (e) {}
+  try { if (typeof verificarAbasRelatos === 'function') verificarAbasRelatos(); } catch (e) {}
+}
+
+function _editorAplicarSnapshot(payload) {
+  var main = document.querySelector('.main');
+  if (!main || !payload || !payload.html) return false;
+  if (!payload.build || payload.build !== _editorBuildAtual()) return false;
+  var signature = _editorSnapshotSignature(payload);
+  if (signature && signature === _editorLastAppliedSignature) return true;
+  _editorApplyingRemote = true;
+  main.innerHTML = payload.html;
+  _editorPersistirSnapshot(payload);
+  _editorLastAppliedSignature = signature;
+  _editorApplyingRemote = false;
+  _editorReidratarDepoisDoRestore();
+  return true;
+}
+
+function _editorRestaurarSnapshot() {
+  var payload = _editorLerSnapshot();
+  if (!payload) return;
+  if (!_editorAplicarSnapshot(payload)) {
+    try { localStorage.removeItem(EDITOR_LAYOUT_KEY); } catch (e) {}
+  }
+}
+
+function _editorIniciarSyncRemoto() {
+  if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return;
+  _editorRemoteSync = window.RelatorioSupabaseSync.createScopeSync({
+    scope: EDITOR_LAYOUT_SCOPE,
+    schoolSlug: 'padre-carlos-casavequia',
+    classSlug: 'layout-relatorio',
+    source: 'editor-js',
+    debounceMs: 550,
+    getLocalPayload: function() {
+      return _editorCriarPayload();
+    },
+    onRemotePayload: function(payload, meta) {
+      if (!payload) return;
+      var local = _editorLerSnapshot();
+      var localStamp = Date.parse((local && local.updatedAt) || '') || 0;
+      var remoteStamp = Date.parse((payload && payload.updatedAt) || (meta && meta.updatedAt) || '') || 0;
+      if (localStamp && remoteStamp && localStamp > remoteStamp) {
+        if (_editorRemoteSync) _editorRemoteSync.schedulePush('keep-local-layout');
+        return;
+      }
+      if (modoEdicaoAtivo) {
+        _editorPersistirSnapshot(payload);
+        return;
+      }
+      if (!_editorAplicarSnapshot(payload)) {
+        _editorPersistirSnapshot(payload);
+      }
+    },
+    onStatus: function(status) {
+      if (status === 'erro') {
+        console.warn('[SupabaseSync] Layout visual permaneceu em modo local.');
+      }
+    }
+  });
+  _editorRemoteSync.start().then(function(ready) {
+    if (!ready) return;
+    window.setTimeout(function() {
+      if (_editorRemoteSync) _editorRemoteSync.schedulePush('layout-bootstrap');
+    }, 900);
+  });
+}
+
+function _salvarAlteracoes() {
+  var payload = _editorCriarPayload();
+  if (!payload) return;
+  _editorPersistirSnapshot(payload);
+  _editorLastAppliedSignature = _editorSnapshotSignature(payload);
+  if (!_editorApplyingRemote && _editorRemoteSync) {
+    _editorRemoteSync.schedulePush('layout-change');
+  }
+}
+
+function limparAlteracoes() {
+  ['ed_main_html','ed_main_html_v2','ed_main_html_v3',EDITOR_LAYOUT_KEY].forEach(function(k){ localStorage.removeItem(k); });
+  window.location.reload();
+}
+
 function configurarToolbarTexto() {
   var toolbar = document.getElementById('toolbar-texto');
   if (!toolbar) return;
@@ -656,6 +785,8 @@ function _rgbToHex(rgb) {
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
+  _editorRestaurarSnapshot();
+  _editorIniciarSyncRemoto();
   // Carrega contas Claude salvas (única coisa que persiste entre sessões)
   try {
     var contasSalvas = localStorage.getItem('cl_contas');

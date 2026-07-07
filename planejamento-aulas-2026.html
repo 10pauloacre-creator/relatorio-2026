@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="assets/js/supabase-report-sync.js"></script>
 <style>
   :root{
     --bg:#eff3ea;
@@ -992,6 +994,8 @@
 <script>
 const STORAGE_KEY = 'previsoes_aulas_2026_local';
 const SOURCE_KEY = 'casavequia_projection_seed_v1';
+const PLANNER_SCOPE = 'casavequia:planner-state:shared-v1';
+const PLANNER_SEED_SCOPE = 'casavequia:projection-seed:shared-v1';
 const START_YEAR = 2026;
 const PROJECTION_LIMIT_YEAR = 2027;
 const DIAS_AB = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
@@ -999,6 +1003,10 @@ const DISC_CORES = ['#187a63','#6d28d9','#1d4ed8','#c26a06','#be123c','#047857',
 const WEEK = [{k:1,ab:'Seg'},{k:2,ab:'Ter'},{k:3,ab:'Qua'},{k:4,ab:'Qui'},{k:5,ab:'Sex'}];
 const TIPO_LABEL = {nacional:'Feriado nacional',estadual:'Feriado estadual',facultativo:'Ponto facultativo'};
 let state = null;
+let plannerSeed = null;
+let plannerRemoteSync = null;
+let plannerSeedRemoteSync = null;
+let applyingPlannerRemote = false;
 
 const pad = n => String(n).padStart(2,'0');
 const mkKey = (y,m,d) => `${y}-${pad(m + 1)}-${pad(d)}`;
@@ -1013,6 +1021,13 @@ const brDateShort = k => {
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid = () => 'id' + Math.random().toString(36).slice(2,9);
 const normalizeText = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+const deepClone = value => {
+  try{
+    return JSON.parse(JSON.stringify(value == null ? null : value));
+  }catch(error){
+    return null;
+  }
+};
 
 function sumValues(obj){
   return Object.keys(obj || {}).reduce((sum,key)=>sum + (parseInt(obj[key],10) || 0), 0);
@@ -1072,6 +1087,87 @@ function defaultState(){
   };
 }
 
+function readLocalState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    return null;
+  }
+}
+
+function mergeNumberMaps(seedMap, localMap, mode){
+  const merged = Object.assign({}, seedMap || {});
+  Object.keys(localMap || {}).forEach(key=>{
+    const localValue = numberValue(localMap[key], numberValue(merged[key], 0));
+    if(mode === 'max'){
+      merged[key] = Math.max(numberValue(merged[key], 0), localValue);
+      return;
+    }
+    merged[key] = localValue;
+  });
+  return merged;
+}
+
+function mergeGradeMaps(seedGrade, localGrade){
+  const merged = {};
+  const turmaIds = Array.from(new Set([].concat(Object.keys(seedGrade || {}), Object.keys(localGrade || {}))));
+  turmaIds.forEach(turmaId=>{
+    merged[turmaId] = mergeNumberMaps((seedGrade || {})[turmaId], (localGrade || {})[turmaId], 'replace');
+  });
+  return merged;
+}
+
+function mergeProjectionState(seed, localState){
+  const fallback = deepClone(localState || seed || defaultState()) || defaultState();
+  if(!seed || !Array.isArray(seed.disciplinas) || !seed.disciplinas.length){
+    return fallback;
+  }
+
+  const merged = deepClone(seed) || defaultState();
+  const local = localState && typeof localState === 'object' ? localState : {};
+  const localTurmas = Array.isArray(local.turmas) ? local.turmas : [];
+  const localDiscs = Array.isArray(local.disciplinas) ? local.disciplinas : [];
+  const localByDisc = Object.fromEntries(localDiscs.filter(Boolean).map(disc=>[disc.id, disc]));
+
+  merged.notesByDate = deepClone(local.notesByDate || {}) || {};
+  merged.showOnlyActive = typeof local.showOnlyActive === 'boolean' ? local.showOnlyActive : !!merged.showOnlyActive;
+  merged.anchorDate = local.anchorDate || merged.anchorDate;
+  merged.facultativoLetivo = typeof local.facultativoLetivo === 'boolean' ? local.facultativoLetivo : !!merged.facultativoLetivo;
+  merged.userCalendarOverride = !!local.userCalendarOverride;
+  merged.updatedAt = local.updatedAt || merged.updatedAt || null;
+
+  if(merged.userCalendarOverride){
+    if(local.recesso && local.recesso.start && local.recesso.end) merged.recesso = deepClone(local.recesso);
+    if(Array.isArray(local.feriados)) merged.feriados = deepClone(local.feriados);
+  }
+
+  const extraTurmas = localTurmas.filter(turma=>turma && !merged.turmas.some(item=>item.id === turma.id));
+  merged.turmas = merged.turmas.concat(deepClone(extraTurmas) || []);
+
+  merged.disciplinas.forEach(disc=>{
+    const localDisc = localByDisc[disc.id];
+    if(!localDisc) return;
+    if(localDisc.nome) disc.nome = localDisc.nome;
+    if(localDisc.cor) disc.cor = localDisc.cor;
+    if(localDisc.nBimestres) disc.nBimestres = localDisc.nBimestres;
+    if(Array.isArray(localDisc.turmasAtivas) && localDisc.turmasAtivas.length) disc.turmasAtivas = localDisc.turmasAtivas.slice();
+    disc.grade = mergeGradeMaps(disc.grade, localDisc.grade);
+    disc.metas = mergeNumberMaps(disc.metas, localDisc.metas, 'replace');
+    disc.totais = mergeNumberMaps(disc.totais, localDisc.totais, 'replace');
+    disc.lancadas = mergeNumberMaps(disc.lancadas, localDisc.lancadas, 'max');
+  });
+
+  localDiscs.forEach(localDisc=>{
+    if(!localDisc || merged.disciplinas.some(item=>item.id === localDisc.id)) return;
+    merged.disciplinas.push(deepClone(localDisc));
+  });
+
+  const activeIds = merged.disciplinas.map(disc=>disc.id);
+  merged.activeDisc = activeIds.includes(local.activeDisc) ? local.activeDisc : (activeIds.includes(merged.activeDisc) ? merged.activeDisc : activeIds[0] || null);
+  return merged;
+}
+
 function normalizeState(){
   if(!state || typeof state !== 'object') state = defaultState();
   state.notesByDate = state.notesByDate || {};
@@ -1123,12 +1219,6 @@ function normalizeState(){
   }
 }
 
-function save(){
-  try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }catch(e){}
-}
-
 function readSeed(){
   try{
     const raw = localStorage.getItem(SOURCE_KEY);
@@ -1138,28 +1228,108 @@ function readSeed(){
   }
 }
 
-function load(){
-  let localState = null;
+function persistLocalState(){
   try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) localState = JSON.parse(raw);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }catch(e){}
-  const seed = readSeed();
-  if(seed && Array.isArray(seed.disciplinas) && seed.disciplinas.length){
-    state = seed;
-    if(localState){
-      state.showOnlyActive = !!localState.showOnlyActive;
-      if(localState.anchorDate) state.anchorDate = localState.anchorDate;
-      if(localState.activeDisc && seed.disciplinas.some(d=>d.id === localState.activeDisc)) state.activeDisc = localState.activeDisc;
-      if(typeof localState.facultativoLetivo === 'boolean') state.facultativoLetivo = localState.facultativoLetivo;
-    }
-  }else if(localState){
-    state = localState;
-  }else{
-    state = defaultState();
+}
+
+function save(reason){
+  if(!state || typeof state !== 'object') return;
+  state.updatedAt = new Date().toISOString();
+  persistLocalState();
+  if(!applyingPlannerRemote && plannerRemoteSync){
+    plannerRemoteSync.schedulePush(reason || 'planner-change');
   }
+}
+
+function applyMergedState(nextState, options){
+  const opts = options || {};
+  state = nextState || defaultState();
   normalizeState();
-  save();
+  if(!state.updatedAt && !opts.skipTouch){
+    state.updatedAt = new Date().toISOString();
+  }
+  persistLocalState();
+  if(!opts.skipRender){
+    render();
+  }
+}
+
+function load(){
+  plannerSeed = readSeed();
+  state = mergeProjectionState(plannerSeed, readLocalState());
+  normalizeState();
+  if(!state.updatedAt){
+    state.updatedAt = new Date().toISOString();
+  }
+  persistLocalState();
+}
+
+function applyRemotePlannerSeed(payload, meta){
+  if(!payload || !payload.seed) return;
+  plannerSeed = payload.seed;
+  try{
+    localStorage.setItem(SOURCE_KEY, JSON.stringify(payload.seed));
+  }catch(e){}
+  const currentLocal = readLocalState();
+  applyMergedState(mergeProjectionState(plannerSeed, currentLocal), {skipTouch:true});
+}
+
+function applyRemotePlannerState(payload, meta){
+  if(!payload || typeof payload !== 'object') return;
+  const localState = readLocalState();
+  const localStamp = Date.parse((localState && localState.updatedAt) || '') || 0;
+  const remoteStamp = Date.parse((payload && payload.updatedAt) || (meta && meta.updatedAt) || '') || 0;
+  if(localStamp && remoteStamp && localStamp > remoteStamp){
+    if(plannerRemoteSync) plannerRemoteSync.schedulePush('keep-local-planner');
+    return;
+  }
+  applyingPlannerRemote = true;
+  applyMergedState(mergeProjectionState(plannerSeed || readSeed(), payload), {skipTouch:true});
+  applyingPlannerRemote = false;
+}
+
+function initPlannerSync(){
+  if(!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return;
+
+  plannerSeedRemoteSync = window.RelatorioSupabaseSync.createScopeSync({
+    scope: PLANNER_SEED_SCOPE,
+    schoolSlug: 'padre-carlos-casavequia',
+    classSlug: 'projecoes-aulas',
+    source: 'planejamento-aulas-2026-seed',
+    readOnly: true,
+    onRemotePayload: function(payload, meta){
+      applyRemotePlannerSeed(payload, meta);
+    }
+  });
+
+  plannerRemoteSync = window.RelatorioSupabaseSync.createScopeSync({
+    scope: PLANNER_SCOPE,
+    schoolSlug: 'padre-carlos-casavequia',
+    classSlug: 'projecoes-aulas',
+    source: 'planejamento-aulas-2026',
+    debounceMs: 450,
+    getLocalPayload: function(){
+      return state;
+    },
+    onRemotePayload: function(payload, meta){
+      applyRemotePlannerState(payload, meta);
+    },
+    onStatus: function(status){
+      if(status === 'erro'){
+        console.warn('[SupabaseSync] Projeções de aulas permaneceu em modo local.');
+      }
+    }
+  });
+
+  plannerSeedRemoteSync.start();
+  plannerRemoteSync.start().then(ready=>{
+    if(!ready) return;
+    window.setTimeout(()=>{
+      if(plannerRemoteSync) plannerRemoteSync.schedulePush('planner-bootstrap');
+    }, 800);
+  });
 }
 
 function totalLancadas(){
@@ -1718,6 +1888,7 @@ function saveRecesso(){
   const end = document.getElementById('recEnd').value;
   if(start && end){
     state.recesso = start <= end ? {start:start, end:end} : {start:end, end:start};
+    state.userCalendarOverride = true;
     save();
   }
   closeModal();
@@ -1748,6 +1919,7 @@ function openFeriados(){
 
 function toggleFacultativo(value){
   state.facultativoLetivo = !!value;
+  state.userCalendarOverride = true;
   save();
   render();
 }
@@ -1760,6 +1932,7 @@ function editFerDate(oldDate, tipo, value){
   const item = findFer(oldDate, tipo);
   if(!item || !value) return;
   item.date = value;
+  state.userCalendarOverride = true;
   save();
   openFeriados();
 }
@@ -1768,17 +1941,20 @@ function editFerName(date, tipo, value){
   const item = findFer(date, tipo);
   if(!item) return;
   item.nome = value;
+  state.userCalendarOverride = true;
   save();
 }
 
 function delFer(date, tipo){
   state.feriados = state.feriados.filter(item=>!(item.date === date && item.tipo === tipo));
+  state.userCalendarOverride = true;
   save();
   openFeriados();
 }
 
 function addFer(){
   state.feriados.push({date:'2026-01-01', nome:'Novo feriado', tipo:'estadual'});
+  state.userCalendarOverride = true;
   save();
   openFeriados();
 }
@@ -1818,12 +1994,24 @@ document.addEventListener('keydown', event=>{
   if(event.key === 'Escape') closeModal();
 });
 
+window.addEventListener('storage', event=>{
+  if(event.key === SOURCE_KEY){
+    plannerSeed = readSeed();
+    applyMergedState(mergeProjectionState(plannerSeed, readLocalState()), {skipTouch:true});
+    return;
+  }
+  if(event.key === STORAGE_KEY && !applyingPlannerRemote){
+    applyMergedState(mergeProjectionState(plannerSeed || readSeed(), readLocalState()), {skipTouch:true});
+  }
+});
+
 if(window.top !== window.self){
   document.body.classList.add('embedded');
 }
 
 load();
 render();
+document.addEventListener('DOMContentLoaded', initPlannerSync);
 </script>
 </body>
 </html>

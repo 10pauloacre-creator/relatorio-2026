@@ -7375,8 +7375,10 @@ var PC_ALUNOS_SYNC_KEY='pc_alunos_sync_v1';
 var PC_ALUNOS_PAGES={t1:'casavequia-alunos-1serie.html',t2:'casavequia-alunos-2serie.html',t3:'casavequia-alunos-3serie.html',t6:'casavequia-alunos-6ano.html'};
 var PC_DAILY_LOCAL_TS_KEY='pc_daily_local_ts_v1';
 var PC_SUPABASE_DAILY_SCOPE='casavequia:daily:shared-v1';
+var PC_PROJECTION_STATE_KEY='previsoes_aulas_2026_local';
 var PC_PROJECTION_LOCAL_TS_KEY='casavequia_projection_seed_local_ts_v1';
 var PC_SUPABASE_PROJECTION_SCOPE='casavequia:projection-seed:shared-v1';
+var PC_SUPABASE_PLANNER_SCOPE='casavequia:planner-state:shared-v1';
 var PC_TURMA_LABELS={t1:'1ª Série',t2:'2ª Série',t3:'3ª Série',t6:'6º Ano'};
 var PC_DISCIPLINE_CONFIG={
   t1:[
@@ -7405,6 +7407,7 @@ var _pcRemoteDailySync=null;
 var _pcApplyingRemoteSync=false;
 var _pcProjectionSeedRemoteSync=null;
 var _pcApplyingProjectionSeedRemote=false;
+var _pcPlannerStateRemoteSync=null;
 
 function pcNormalizeText(v){
   return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
@@ -7827,7 +7830,7 @@ function pcBuildHeroLessonsHtml(sectionId){
   }).join('');
 }
 function pcBuildCounterHeroLessonsHtml(){
-  var seed=pcBuildProjectionSeed();
+  var seed=pcResolveProjectionRuntimeState();
   var counterMap=pcProjectionBuildCounterStateMap(seed);
   var grouped={};
   DISC.forEach(function(item){
@@ -7843,7 +7846,7 @@ function pcBuildCounterHeroLessonsHtml(){
   }).join('');
 }
 function pcRefreshCounterHero(){
-  var seed=pcBuildProjectionSeed();
+  var seed=pcResolveProjectionRuntimeState();
   var counterMap=pcProjectionBuildCounterStateMap(seed);
   var totalFeitas=DISC.reduce(function(sum,item){
     var turmaId=PC_PROJECTION_TURMA_ID_MAP[item.t];
@@ -7861,7 +7864,7 @@ function pcRefreshCounterHero(){
   if(statusEl)statusEl.textContent='Painel pronto · '+totalFeitas+' aulas registradas no contador.';
 }
 function pcCopyCounterSummary(){
-  var seed=pcBuildProjectionSeed();
+  var seed=pcResolveProjectionRuntimeState();
   var counterMap=pcProjectionBuildCounterStateMap(seed);
   var linhas=['Pe. Carlos Casavequia - Contador de Aulas'];
   var totalFeitas=DISC.reduce(function(sum,item){
@@ -8178,6 +8181,61 @@ function pcBuildProjectionSeed(){
     activeDisc:'lp'
   };
 }
+function pcProjectionClone(value){
+  try{return JSON.parse(JSON.stringify(value==null?null:value));}catch(e){return null;}
+}
+function pcMergeNumberMaps(baseMap,overrideMap,useMax){
+  var merged=Object.assign({},baseMap||{});
+  Object.keys(overrideMap||{}).forEach(function(key){
+    var baseValue=parseInt(merged[key],10)||0;
+    var nextValue=parseInt(overrideMap[key],10);
+    if(!Number.isFinite(nextValue))nextValue=baseValue;
+    merged[key]=useMax?Math.max(baseValue,nextValue):nextValue;
+  });
+  return merged;
+}
+function pcReadProjectionRuntimeState(){
+  try{
+    var raw=localStorage.getItem(PC_PROJECTION_STATE_KEY);
+    if(!raw)return null;
+    var parsed=JSON.parse(raw);
+    return parsed&&Array.isArray(parsed.disciplinas)&&parsed.disciplinas.length?parsed:null;
+  }catch(e){
+    return null;
+  }
+}
+function pcResolveProjectionRuntimeState(){
+  var seed=pcBuildProjectionSeed();
+  var stored=pcReadProjectionRuntimeState();
+  if(!stored)return seed;
+  var merged=pcProjectionClone(seed)||seed;
+  var storedByDisc={};
+  (stored.disciplinas||[]).forEach(function(disc){
+    if(disc&&disc.id)storedByDisc[disc.id]=disc;
+  });
+  merged.notesByDate=pcProjectionClone(stored.notesByDate||{})||{};
+  merged.showOnlyActive=!!stored.showOnlyActive;
+  merged.anchorDate=stored.anchorDate||merged.anchorDate;
+  merged.facultativoLetivo=typeof stored.facultativoLetivo==='boolean'?stored.facultativoLetivo:!!merged.facultativoLetivo;
+  if(stored.userCalendarOverride){
+    merged.userCalendarOverride=true;
+    if(stored.recesso&&stored.recesso.start&&stored.recesso.end)merged.recesso=pcProjectionClone(stored.recesso);
+    if(Array.isArray(stored.feriados))merged.feriados=pcProjectionClone(stored.feriados);
+  }
+  merged.disciplinas.forEach(function(disc){
+    var localDisc=storedByDisc[disc.id];
+    if(!localDisc)return;
+    if(localDisc.nome)disc.nome=localDisc.nome;
+    if(localDisc.cor)disc.cor=localDisc.cor;
+    if(localDisc.nBimestres)disc.nBimestres=localDisc.nBimestres;
+    if(Array.isArray(localDisc.turmasAtivas)&&localDisc.turmasAtivas.length)disc.turmasAtivas=localDisc.turmasAtivas.slice();
+    disc.grade=Object.assign({},disc.grade||{},pcProjectionClone(localDisc.grade||{})||{});
+    disc.metas=pcMergeNumberMaps(disc.metas,localDisc.metas,false);
+    disc.totais=pcMergeNumberMaps(disc.totais,localDisc.totais,false);
+    disc.lancadas=pcMergeNumberMaps(disc.lancadas,localDisc.lancadas,true);
+  });
+  return merged;
+}
 function pcProjectionBuildDays(seed){
   var holidayMap={};
   (seed.feriados||[]).forEach(function(item){
@@ -8261,6 +8319,8 @@ function pcApplyRemoteProjectionSeed(payload,meta){
     console.warn('[PC projection remote]',e.message);
   }
   _pcApplyingProjectionSeedRemote=false;
+  renderCont();
+  pcRefreshCounterHero();
 }
 function pcScheduleProjectionSeedRemote(reason){
   if(_pcApplyingProjectionSeedRemote||!_pcProjectionSeedRemoteSync)return;
@@ -8291,6 +8351,35 @@ function pcIniciarProjectionSeedSync(){
     window.setTimeout(function(){pcScheduleProjectionSeedRemote('bootstrap-seed');},900);
   });
 }
+function pcApplyRemotePlannerProjectionState(payload){
+  if(!payload||!Array.isArray(payload.disciplinas)||!payload.disciplinas.length)return;
+  try{
+    localStorage.setItem(PC_PROJECTION_STATE_KEY,JSON.stringify(payload));
+  }catch(e){
+    console.warn('[PC projection state]',e.message);
+  }
+  renderCont();
+  pcRefreshCounterHero();
+}
+function pcIniciarPlannerStateSync(){
+  if(!window.RelatorioSupabaseSync||!window.RelatorioSupabaseSync.isAvailable())return;
+  _pcPlannerStateRemoteSync=window.RelatorioSupabaseSync.createScopeSync({
+    scope:PC_SUPABASE_PLANNER_SCOPE,
+    schoolSlug:'padre-carlos-casavequia',
+    classSlug:'projecoes-aulas',
+    source:'casavequia-html',
+    readOnly:true,
+    onRemotePayload:function(payload){
+      pcApplyRemotePlannerProjectionState(payload);
+    },
+    onStatus:function(status){
+      if(status==='erro'){
+        console.warn('[SupabaseSync] Estado das projeções permaneceu em modo local.');
+      }
+    }
+  });
+  _pcPlannerStateRemoteSync.start();
+}
 function pcSyncProjectionSeed(reason){
   var payload=pcProjectionSeedLocalPayload();
   try{
@@ -8302,7 +8391,11 @@ function pcSyncProjectionSeed(reason){
   pcScheduleProjectionSeedRemote(reason||'projection-seed');
 }
 function renderCont(){
-  var seed=pcBuildProjectionSeed();
+  Object.keys(CN).forEach(function(key){
+    var container=document.getElementById(CN[key]);
+    if(container)container.innerHTML='';
+  });
+  var seed=pcResolveProjectionRuntimeState();
   var counterMap=pcProjectionBuildCounterStateMap(seed);
   DISC.forEach(d=>{
     const cnt=document.getElementById(CN[d.g]);if(!cnt)return;
@@ -8349,7 +8442,14 @@ function verificarAbasRelatos(){
   });
 }
 
-document.addEventListener('DOMContentLoaded',()=>{renderPresenca();renderAtividades();renderCont();pcSyncProjectionSeed('bootstrap-local');_sincronizarRegistros();verificarAbasRelatos();pcSyncAndBroadcast();pcInitSectionHeroes();pcIniciarSyncRemoto();pcIniciarProjectionSeedSync();});
+window.addEventListener('storage',function(event){
+  if(event.key===PC_PROJECTION_STATE_KEY){
+    renderCont();
+    pcRefreshCounterHero();
+  }
+});
+
+document.addEventListener('DOMContentLoaded',()=>{renderPresenca();renderAtividades();renderCont();pcSyncProjectionSeed('bootstrap-local');_sincronizarRegistros();verificarAbasRelatos();pcSyncAndBroadcast();pcInitSectionHeroes();pcIniciarSyncRemoto();pcIniciarProjectionSeedSync();pcIniciarPlannerStateSync();});
 
 /* ── PERFIL DO ALUNO ── */
 function abrirPerfil(turma,numAluno){
