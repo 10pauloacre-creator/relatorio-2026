@@ -6943,7 +6943,8 @@ document.getElementById('p6ano').classList.add('active');
 <footer>E.E. Rural Pe. Carlos Casavequia · Senador Guiomard – AC &nbsp;|&nbsp; Prof. Paulo Roberto Ramalho Magalhães &nbsp;|&nbsp; Ano Letivo 2026 &nbsp;|&nbsp; Assistência de IA</footer>
 
 <script>
-function aba(id,btn){document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));document.getElementById('sec-'+id).classList.add('on');btn.classList.add('on');if(id==='cal'&&typeof renderCasavequiaCalendar==='function'){renderCasavequiaCalendar();}}
+function aba(id,btn){var targetBtn=btn||Array.from(document.querySelectorAll('.nb')).find(function(item){return(item.getAttribute('onclick')||'').indexOf("aba('"+id+"'")>=0;});document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));document.getElementById('sec-'+id).classList.add('on');if(targetBtn)targetBtn.classList.add('on');if(id==='cal'&&typeof renderCasavequiaCalendar==='function'){renderCasavequiaCalendar();}}
+document.addEventListener('DOMContentLoaded',function(){aba('all');});
 function tog(h){const c=h.nextElementSibling,t=h.querySelector('.et'),o=c.classList.contains('on');c.classList.toggle('on',!o);t.classList.toggle('op',!o);}
 function itab(btn,pid){const ec=btn.closest('.ec2');ec.querySelectorAll('.itab').forEach(b=>b.classList.remove('on'));ec.querySelectorAll('.ipane').forEach(p=>p.classList.remove('on'));btn.classList.add('on');document.getElementById(pid).classList.add('on');if(pid.startsWith('p-')){renderPresenca();}if(pid.startsWith('a-')){renderAtividades();}}
 var _pcOrigTog=tog;
