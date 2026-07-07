@@ -8642,6 +8642,15 @@ function gerarChave(texto) {
   }
 }
 
+function gerarChaveItemPlano(item, titleEl) {
+  const pageId = item.closest('.page')?.id || 'page';
+  const discId = item.closest('.disc-panel')?.id || 'disc';
+  const bimId = item.closest('.bim-panel')?.id || 'bim';
+  const num = item.querySelector('.lesson-num')?.textContent.trim() || '0';
+  const title = (titleEl?.textContent || '').trim();
+  return gerarChave([pageId, discId, bimId, num, title].join('|'));
+}
+
 // Botões: Planejada | Aplicada | Pulada | SIMAED
 const BOTOES = [
   {cls:'pl', label:'📅 Planj.',  cor:'#6c3483'},
@@ -8713,7 +8722,8 @@ function initStatusButtons() {
     const old = item.querySelector('.lesson-actions');
     if (old) old.remove();
 
-    const key = gerarChave(titleEl.textContent);
+    const legacyKey = gerarChave(titleEl.textContent);
+    const key = gerarChaveItemPlano(item, titleEl);
     item.dataset.fbkey = key;
 
     // Cria div de botões sempre visíveis
@@ -8722,9 +8732,14 @@ function initStatusButtons() {
 
     BOTOES.forEach(({cls, label}) => {
       const btn = document.createElement('button');
+      btn.type = 'button';
       btn.className = 'btn-st ' + cls;
       btn.textContent = label;
-      btn.onclick = (e) => { e.stopPropagation(); toggleSt(btn, item, key, cls); };
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSt(btn, item, key, cls);
+      });
       div.appendChild(btn);
     });
 
@@ -8732,7 +8747,7 @@ function initStatusButtons() {
     item.appendChild(div);
 
     // Carregar do localStorage imediatamente
-    const salvo = carregarStatusLocal(key);
+    const salvo = Object.assign({}, carregarStatusLocal(legacyKey), carregarStatusLocal(key));
     BOTOES.forEach(({cls}) => {
       if (salvo[cls]) {
         const btn = item.querySelector('.btn-st.' + cls);
@@ -8746,15 +8761,15 @@ function initStatusButtons() {
   if (_db) {
     _db.collection('plano_status').onSnapshot(snap => {
       snap.forEach(doc => {
-        const item = document.querySelector(`[data-fbkey="${doc.id}"]`);
-        if (!item) return;
         const data = doc.data();
         localStorage.setItem('ps_' + doc.id, JSON.stringify(data));
-        BOTOES.forEach(({cls}) => {
-          if (data[cls] !== undefined) {
-            const btn = item.querySelector('.btn-st.' + cls);
-            if (btn) aplicarEstadoVisual(btn, item, cls, data[cls]);
-          }
+        document.querySelectorAll(`[data-fbkey="${doc.id}"]`).forEach(item => {
+          BOTOES.forEach(({cls}) => {
+            if (data[cls] !== undefined) {
+              const btn = item.querySelector('.btn-st.' + cls);
+              if (btn) aplicarEstadoVisual(btn, item, cls, data[cls]);
+            }
+          });
         });
       });
     }, ()=>{});
