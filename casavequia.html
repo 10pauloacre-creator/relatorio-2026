@@ -7126,12 +7126,22 @@ const PRESENCA={
 /* ── PRESENÇA MANUAL (overrides clicáveis) ── */
 var _presManual=JSON.parse(localStorage.getItem('pres_manual')||'{}');
 function _presManualSalvar(){
-  if(typeof pcMarkLocalSyncChange==='function')pcMarkLocalSyncChange();
-  localStorage.setItem('pres_manual',JSON.stringify(_presManual));
-  if(_db) _db.collection('app_data').doc('pres_manual').set(_presManual)
-    .catch(function(e){console.error('[SYNC pres]',e.code,e.message);});
-  if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
-  if(typeof pcRefreshAtividadesVisuals==='function')pcRefreshAtividadesVisuals();
+  try{
+    if(typeof pcMarkLocalSyncChange==='function')pcMarkLocalSyncChange();
+  }catch(e){console.warn('[PRES local ts]',e.message);}
+  try{
+    localStorage.setItem('pres_manual',JSON.stringify(_presManual));
+  }catch(e){console.warn('[PRES localStorage]',e.message);}
+  try{
+    if(_db) _db.collection('app_data').doc('pres_manual').set(_presManual)
+      .catch(function(e){console.error('[SYNC pres]',e.code,e.message);});
+  }catch(e){console.warn('[SYNC pres]',e.message);}
+  try{
+    if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
+  }catch(e){console.warn('[PRES sync geral]',e.message);}
+  try{
+    if(typeof pcRefreshAtividadesVisuals==='function')pcRefreshAtividadesVisuals();
+  }catch(e){console.warn('[PRES refresh atv]',e.message);}
 }
 var _presIcons={pr:'✓',fa:'✗',fj:'⚠'};
 var _presLabels={pr:'',fa:'<span class="atg tgf">F</span>',fj:'<span class="atg tgfj">FJ</span>'};
@@ -7196,11 +7206,19 @@ const ATIVIDADES={
 /* ── ATIVIDADES INTERATIVAS ── */
 var _atvManual=JSON.parse(localStorage.getItem('atv_manual')||'{}');
 function _atvSalvar(){
-  if(typeof pcMarkLocalSyncChange==='function')pcMarkLocalSyncChange();
-  localStorage.setItem('atv_manual',JSON.stringify(_atvManual));
-  if(_db) _db.collection('app_data').doc('atv_manual').set(_atvManual)
-    .catch(function(e){console.error('[SYNC atv]',e.code,e.message);});
-  if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
+  try{
+    if(typeof pcMarkLocalSyncChange==='function')pcMarkLocalSyncChange();
+  }catch(e){console.warn('[ATV local ts]',e.message);}
+  try{
+    localStorage.setItem('atv_manual',JSON.stringify(_atvManual));
+  }catch(e){console.warn('[ATV localStorage]',e.message);}
+  try{
+    if(_db) _db.collection('app_data').doc('atv_manual').set(_atvManual)
+      .catch(function(e){console.error('[SYNC atv]',e.code,e.message);});
+  }catch(e){console.warn('[SYNC atv]',e.message);}
+  try{
+    if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
+  }catch(e){console.warn('[ATV sync geral]',e.message);}
 }
 var _atvMenuAberto=null;
 
@@ -7387,12 +7405,12 @@ function _atvAbrirMenu(cell,atvId,n,turma){
 
 function atvRegistrar(atvId,n,s){
   _atvManual[atvId+'_'+n]=s;
-  _atvSalvar();
   document.querySelectorAll('[data-atv="'+atvId+'"][data-n="'+n+'"]').forEach(function(cell){
     _atvAtualizarCelula(cell,s);
   });
   _atvFecharMenu();
   _atvAtualizarStat(atvId);
+  _atvSalvar();
 }
 
 function renderAtividades(){
@@ -7786,8 +7804,9 @@ function pcRefreshPresencaVisuals(){
     al.forEach(function(a){
       var s=pcResolvePresenceStatus(id,a.n,cfg);
       if(s==='fa')fa+=1;else if(s==='fj')fj+=1;else pr+=1;
-      var row=document.querySelector('[data-pres="'+id+'"][data-n="'+a.n+'"]');
-      if(row)_presAplicarVisual(row,s);
+      document.querySelectorAll('[data-pres="'+id+'"][data-n="'+a.n+'"]').forEach(function(row){
+        _presAplicarVisual(row,s);
+      });
     });
     var stat=el.previousElementSibling;
     if(stat&&stat.classList.contains('pres-stat')){
@@ -7813,8 +7832,8 @@ function pcApplyRemoteSync(payload,meta){
   if(!payload||typeof payload!=='object')return;
   var localStamp=Date.parse(localStorage.getItem(PC_DAILY_LOCAL_TS_KEY)||'')||0;
   var remoteStamp=Date.parse((payload&&payload.localUpdatedAt)||(meta&&meta.updatedAt)||'')||0;
-  if(localStamp&&remoteStamp&&localStamp>remoteStamp){
-    pcScheduleRemoteSync('keep-local');
+  if(localStamp&&(!remoteStamp||localStamp>=remoteStamp)){
+    if(remoteStamp&&localStamp>remoteStamp)pcScheduleRemoteSync('keep-local');
     return;
   }
   _pcApplyingRemoteSync=true;
