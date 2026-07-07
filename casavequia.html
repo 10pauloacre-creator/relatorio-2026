@@ -7439,6 +7439,64 @@ function renderAtividades(){
   });
 }
 
+function pcBindDailyInteractionOverrides(){
+  if(!document.body||document.body.dataset.dailyInteractionOverridesBound==='1')return;
+  document.body.dataset.dailyInteractionOverridesBound='1';
+
+  document.addEventListener('click',function(e){
+    var row=e.target.closest('.ar2[data-pres]');
+    if(!row)return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(typeof e.stopImmediatePropagation==='function')e.stopImmediatePropagation();
+
+    var presId=row.getAttribute('data-pres');
+    var n=parseInt(row.getAttribute('data-n'),10);
+    var cfg=PRESENCA[presId];
+    if(!presId||!n||!cfg)return;
+
+    var baseStatus=cfg.faltaram.includes(n)?'fa':cfg.faltJ.includes(n)?'fj':'pr';
+    var cur=pcResolvePresenceStatus(presId,n,cfg);
+    var prox=_presProximoStatus(cur);
+
+    document.querySelectorAll('[data-pres="'+presId+'"][data-n="'+n+'"]').forEach(function(targetRow){
+      _presAplicarVisual(targetRow,prox);
+    });
+
+    if(prox===baseStatus)delete _presManual[presId+'_'+n];
+    else _presManual[presId+'_'+n]=prox;
+
+    _presManualSalvar();
+  },true);
+
+  document.addEventListener('click',function(e){
+    var cell=e.target.closest('.atv-r[data-atv]');
+    if(!cell)return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(typeof e.stopImmediatePropagation==='function')e.stopImmediatePropagation();
+
+    var atvId=cell.getAttribute('data-atv');
+    var n=parseInt(cell.getAttribute('data-n'),10);
+    if(!atvId||!n)return;
+
+    var pane=cell.closest('.ipane[id^="a-"]');
+    if(!pane)return;
+    var m=pane.id.match(/^a-(t[^-]+)-(.+)$/);
+    var turma=m?m[1]:null;
+    if(!turma)return;
+
+    var fm=document.getElementById('atv-float-menu');
+    var key=atvId+'_'+n;
+    var jaAberto=fm&&fm.classList.contains('on')&&fm.getAttribute('data-for')===key;
+    if(jaAberto){
+      _atvFecharMenu();
+      return;
+    }
+    _atvAbrirMenu(cell,atvId,n,turma);
+  },true);
+}
+
 var REGISTROS = {};
 var ATIVIDADES_BIMESTRE = {};
 var TURMAS = [
@@ -8563,7 +8621,7 @@ window.addEventListener('storage',function(event){
   }
 });
 
-document.addEventListener('DOMContentLoaded',()=>{renderPresenca();renderAtividades();renderCont();pcSyncProjectionSeed('bootstrap-local');_sincronizarRegistros();verificarAbasRelatos();pcSyncAndBroadcast();pcInitSectionHeroes();pcIniciarSyncRemoto();pcIniciarProjectionSeedSync();pcIniciarPlannerStateSync();});
+document.addEventListener('DOMContentLoaded',()=>{renderPresenca();renderAtividades();pcBindDailyInteractionOverrides();renderCont();pcSyncProjectionSeed('bootstrap-local');_sincronizarRegistros();verificarAbasRelatos();pcSyncAndBroadcast();pcInitSectionHeroes();pcIniciarSyncRemoto();pcIniciarProjectionSeedSync();pcIniciarPlannerStateSync();});
 
 /* ── PERFIL DO ALUNO ── */
 function abrirPerfil(turma,numAluno){
