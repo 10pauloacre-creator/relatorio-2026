@@ -1,4 +1,4 @@
-const CACHE = 'relatorio-2026-v16';
+const CACHE = 'relatorio-2026-v17';
 // ⚠️ HTMLs NÃO entram no pre-cache — conteúdo dinâmico nunca deve ser
 // servido estático. Apenas assets verdadeiramente estáticos são pré-cacheados.
 const ASSETS = [
