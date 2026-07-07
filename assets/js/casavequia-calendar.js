@@ -4,6 +4,8 @@
   var DATA = window.CASAVEQUIA_CALENDAR_DATA;
   var YEAR = 2026;
   var STORAGE_KEY = 'pc_calendar_overrides_v1';
+  var STORAGE_TS_KEY = 'pc_calendar_overrides_ts_v1';
+  var REMOTE_SCOPE = 'casavequia:calendar-overrides:shared-v1';
   var MONTH_NAMES = [
     'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
     'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
@@ -54,6 +56,8 @@
 
   var overrides = loadOverrides();
   var index = buildIndex();
+  var remoteSync = null;
+  var applyingRemote = false;
 
   function repairText(text) {
     var value = String(text || '');
@@ -412,11 +416,60 @@
     }
   }
 
-  function saveOverrides() {
+  function readOverridesTimestamp() {
+    try {
+      return window.localStorage.getItem(STORAGE_TS_KEY) || '';
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function persistOverrides(timestamp) {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
+      window.localStorage.setItem(STORAGE_TS_KEY, timestamp || new Date().toISOString());
     } catch (error) {
       /* noop */
+    }
+  }
+
+  function buildOverridePayload() {
+    return {
+      updatedAt: new Date().toISOString(),
+      overrides: overrides
+    };
+  }
+
+  function saveOverrides(reason) {
+    var payload = buildOverridePayload();
+    persistOverrides(payload.updatedAt);
+    if (!applyingRemote && remoteSync) {
+      remoteSync.schedulePush(reason || 'calendar-change');
+    }
+    return payload;
+  }
+
+  function applyRemoteOverrides(payload, meta) {
+    var nextOverrides = payload && payload.overrides;
+    var remoteStamp = Date.parse((payload && payload.updatedAt) || (meta && meta.updatedAt) || '') || 0;
+    var localStamp = Date.parse(readOverridesTimestamp()) || 0;
+    if (localStamp && remoteStamp && localStamp > remoteStamp) {
+      if (remoteSync) {
+        remoteSync.schedulePush('keep-local-calendar');
+      }
+      return;
+    }
+    if (!nextOverrides || typeof nextOverrides !== 'object') {
+      return;
+    }
+    applyingRemote = true;
+    overrides = nextOverrides;
+    persistOverrides((payload && payload.updatedAt) || (meta && meta.updatedAt) || new Date().toISOString());
+    rebuildIndex();
+    render();
+    applyingRemote = false;
+    if (typeof window.pcSyncProjectionSeed === 'function') {
+      window.pcSyncProjectionSeed('calendar-remote');
     }
   }
 
@@ -531,6 +584,12 @@
 
   function rebuildIndex() {
     index = buildIndex();
+  }
+
+  function getAllEvents() {
+    return index.allEvents.map(function (event) {
+      return cloneEvent(event, event.start);
+    });
   }
 
   function getEventsForIso(iso) {
@@ -1051,11 +1110,14 @@
       rangeText: start === end ? String(parseIso(start).getDate()) : (parseIso(start).getDate() + ' a ' + parseIso(end).getDate()),
       color: customColor
     };
-    saveOverrides();
+    saveOverrides('calendar-edit');
     rebuildIndex();
     state.editingEventId = null;
     state.cursor = clampDate(parseIso(start));
     render();
+    if (typeof window.pcSyncProjectionSeed === 'function') {
+      window.pcSyncProjectionSeed('calendar-edit');
+    }
     openDayModal(start, id);
   }
 
@@ -1068,10 +1130,13 @@
       return;
     }
     overrides[id] = Object.assign({}, overrides[id] || {}, { deleted: true });
-    saveOverrides();
+    saveOverrides('calendar-delete');
     rebuildIndex();
     state.editingEventId = null;
     render();
+    if (typeof window.pcSyncProjectionSeed === 'function') {
+      window.pcSyncProjectionSeed('calendar-delete');
+    }
     openDayModal(state.selectedDate || event.start, null);
   }
 
@@ -1083,15 +1148,51 @@
     });
   }
 
+  function initRemoteSync() {
+    if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) {
+      return;
+    }
+    remoteSync = window.RelatorioSupabaseSync.createScopeSync({
+      scope: REMOTE_SCOPE,
+      schoolSlug: 'padre-carlos-casavequia',
+      classSlug: 'calendario',
+      source: 'casavequia-calendar',
+      debounceMs: 450,
+      getLocalPayload: function () {
+        return buildOverridePayload();
+      },
+      onRemotePayload: function (payload, meta) {
+        applyRemoteOverrides(payload, meta);
+      },
+      onStatus: function (status) {
+        if (status === 'erro') {
+          console.warn('[SupabaseSync] Calendário permaneceu em modo local.');
+        }
+      }
+    });
+    remoteSync.start().then(function (ready) {
+      if (!ready) {
+        return;
+      }
+      window.setTimeout(function () {
+        if (remoteSync) {
+          remoteSync.schedulePush('calendar-bootstrap');
+        }
+      }, 700);
+    });
+  }
+
   function init() {
     if (!document.getElementById('sec-cal')) {
       return;
     }
     render();
     initKeyboardAndModal();
+    initRemoteSync();
   }
 
   window.renderCasavequiaCalendar = render;
+  window.pcCalendarGetAllEvents = getAllEvents;
   window.pcCalendarSetView = setView;
   window.pcCalendarSetFilter = setFilter;
   window.pcCalendarShift = shiftCursor;
