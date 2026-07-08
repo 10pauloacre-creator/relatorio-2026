@@ -655,12 +655,17 @@
     return calculateAutoWorkGrade(student, disciplineName, bim);
   }
 
+  function roundFinalGrade(value) {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) return null;
+    return Number((Math.round(Number(value) * 2) / 2).toFixed(1));
+  }
+
   function calculateDisciplineBimTotal(student, disciplineName, bim) {
     const dados = getDisciplineBimState(student, disciplineName, bim);
     const trabalhos = getEffectiveWorkGrade(student, disciplineName, bim);
     const prova = toNumber(dados.prova);
     if (trabalhos === null && prova === null) return null;
-    return Number(((trabalhos || 0) + (prova || 0)).toFixed(1));
+    return roundFinalGrade((trabalhos || 0) + (prova || 0));
   }
 
   function calculateDisciplineAverage(student, disciplineName) {
@@ -670,7 +675,7 @@
       return value !== null;
     });
     if (!totals.length) return null;
-    return Number((totals.reduce(function (sum, value) { return sum + value; }, 0) / totals.length).toFixed(1));
+    return roundFinalGrade(totals.reduce(function (sum, value) { return sum + value; }, 0) / totals.length);
   }
 
   function calculateAnnualAverage(student) {
