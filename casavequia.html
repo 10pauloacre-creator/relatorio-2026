@@ -8940,6 +8940,36 @@ function toggleSt(btn, item, key, cls) {
   if (ativo) _registrarUltimaModPlano(item, cls);
 }
 
+function pcResolverClasseBotaoPlano(btn) {
+  if (!btn) return '';
+  return btn.dataset.planCls
+    || (btn.classList.contains('pl') ? 'pl'
+      : btn.classList.contains('ap') ? 'ap'
+      : btn.classList.contains('pu') ? 'pu'
+      : btn.classList.contains('sm') ? 'sm'
+      : '');
+}
+
+function pcBindPlannerStatusOverrides() {
+  if (!document.body || document.body.dataset.plannerStatusOverridesBound === '1') return;
+  document.body.dataset.plannerStatusOverridesBound = '1';
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.plano-wrapper .btn-st');
+    if (!btn) return;
+    const item = btn.closest('.lesson-item');
+    if (!item) return;
+    const cls = pcResolverClasseBotaoPlano(btn);
+    if (!cls) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+    const titleEl = item.querySelector('.lesson-title');
+    const key = item.dataset.fbkey || gerarChaveItemPlano(item, titleEl);
+    item.dataset.fbkey = key;
+    toggleSt(btn, item, key, cls);
+  }, true);
+}
+
 function initStatusButtons() {
   document.querySelectorAll('.plano-wrapper .lesson-item').forEach(item => {
     const titleEl = item.querySelector('.lesson-title');
@@ -8961,6 +8991,7 @@ function initStatusButtons() {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'btn-st ' + cls;
+      btn.dataset.planCls = cls;
       btn.textContent = label;
       btn.addEventListener('click', function(e) {
         e.preventDefault();
@@ -9003,6 +9034,7 @@ function initStatusButtons() {
   }
 }
 document.addEventListener('DOMContentLoaded', function() {
+  pcBindPlannerStatusOverrides();
   initStatusButtons();
   // Restaura última modificação salva
   try {
