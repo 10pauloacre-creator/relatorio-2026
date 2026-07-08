@@ -142,6 +142,12 @@
       return;
     }
 
+    const exportBoletimButton = event.target.closest("[data-open-boletim-export]");
+    if (exportBoletimButton) {
+      openBoletimExport();
+      return;
+    }
+
     const resetAutoButton = event.target.closest("[data-reset-auto]");
     if (resetAutoButton) {
       clearWorkGradeOverride(
@@ -879,7 +885,10 @@
         + '<button class="ghost-btn discipline-btn" type="button" data-toggle-discipline-menu="profile">Disciplina: ' + escapeHtml(disciplineConfig.name) + "</button>"
         + '<div class="discipline-menu">' + buildDisciplineMenuHtml("profile", currentBoletimDiscipline) + "</div>"
       + "</div>"
+      + '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">'
       + '<span class="mini-chip">Boletim detalhado: ' + escapeHtml(disciplineConfig.shortLabel) + "</span>"
+      + '<button class="ghost-btn" type="button" data-open-boletim-export="1">Exportar</button>'
+      + "</div>"
       + "</div>"
       + DISCIPLINES.map(function (discipline) {
         const active = currentBoletimDiscipline === discipline.name;
@@ -939,6 +948,68 @@
         return '<span class="absence-chip"><strong>' + escapeHtml(date) + "</strong> · " + escapeHtml(metrics.porDia[date]) + " falta(s) em h/aula</span>";
       }).join("")
       + "</div>";
+  }
+
+  function openBoletimExport() {
+    if (!window.BoletimExport) {
+      window.alert("O exportador de PDF ainda nao foi carregado. Recarregue a pagina e tente novamente.");
+      return;
+    }
+    window.BoletimExport.open({
+      classOptions: [{ value: CLASS_NAME, label: CLASS_NAME }],
+      defaultClass: CLASS_NAME,
+      disciplineOptions: DISCIPLINES.map(function (discipline) {
+        return { value: discipline.name, label: discipline.name };
+      }),
+      defaultDiscipline: currentBoletimDiscipline,
+      bimesterOptions: BIMESTERS.map(function (bim) {
+        return { value: bim, label: bim + "o bimestre" };
+      }),
+      defaultBimesters: BIMESTERS.slice(),
+      buildPayload: function (selection) {
+        return buildBoletimExportPayload(selection);
+      }
+    });
+  }
+
+  function buildBoletimExportPayload(selection) {
+    var students = state.alunos
+      .filter(function (student) { return !student.transferido; })
+      .slice()
+      .sort(function (left, right) { return left.numero - right.numero; });
+    var disciplineName = selection.disciplineValue || currentBoletimDiscipline;
+    return {
+      schoolName: SCHOOL_NAME,
+      subtitle: PERIOD_LABEL + " - boletim exportado do painel de alunos",
+      classLabel: selection.classLabel || CLASS_NAME,
+      disciplineLabel: selection.disciplineLabel || disciplineName,
+      generatedAt: formatDate(new Date()) + " " + new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(new Date()),
+      fileName: "boletim-" + CLASS_NAME + "-" + disciplineName,
+      sections: selection.bimesters.map(function (bim) {
+        var totals = [];
+        var rows = students.map(function (student) {
+          var dados = getDisciplineBimState(student, disciplineName, bim);
+          var trabalhos = getEffectiveWorkGrade(student, disciplineName, bim);
+          var prova = toNumber(dados.prova);
+          var total = calculateDisciplineBimTotal(student, disciplineName, bim);
+          if (total !== null) totals.push(total);
+          return {
+            numero: student.numero,
+            nome: student.nome,
+            trabalhos: trabalhos === null ? "-" : formatNumber(trabalhos) + "/5",
+            prova: prova === null ? "-" : formatNumber(prova) + "/5",
+            total: total === null ? "-" : formatNumber(total) + "/10"
+          };
+        });
+        var average = totals.length ? roundFinalGrade(totals.reduce(function (sum, value) { return sum + value; }, 0) / totals.length) : null;
+        return {
+          title: bim + "o bimestre",
+          average: average === null ? "-" : formatNumber(average) + "/10",
+          note: "Lista exportada com " + rows.length + " aluno(s) ativos da turma.",
+          rows: rows
+        };
+      })
+    };
   }
 
   function renderObservationDetails(observacoes) {
