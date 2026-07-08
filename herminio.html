@@ -6340,6 +6340,7 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
   <div class="cgt"><h3>Língua Portuguesa</h3><span class="bd bd-lp">LP</span></div><div class="ccards" id="rh-cont-lp"></div>
   <div class="cgt"><h3>Inglês</h3><span class="bd" style="background:#e8f9ef;color:#1f7a52">ING</span></div><div class="ccards" id="rh-cont-ing"></div>
   <div class="cgt"><h3>Espanhol</h3><span class="bd" style="background:#f3e9fb;color:#7d3c98">ESP</span></div><div class="ccards" id="rh-cont-esp"></div>
+  <div class="cgt"><h3>Arte</h3><span class="bd bd-ar">ART</span></div><div class="ccards" id="rh-cont-art"></div>
 </section>
 
 
@@ -6537,7 +6538,10 @@ const DISC_RH = [
   { grupo:'ing', turmaId:'t23', turma:'2ª/3ª Série', disc:'Inglês',            semanais:0,    bimestreMeta:10, totalMeta:40 },
   { grupo:'esp', turmaId:'t89', turma:'8º/9º Ano',   disc:'Espanhol',          semanais:0,    bimestreMeta:10, totalMeta:40 },
   { grupo:'esp', turmaId:'t1',  turma:'1ª Série',    disc:'Espanhol',          semanais:2.25, bimestreMeta:10, totalMeta:40 },
-  { grupo:'esp', turmaId:'t23', turma:'2ª/3ª Série', disc:'Espanhol',          semanais:0,    bimestreMeta:10, totalMeta:40 }
+  { grupo:'esp', turmaId:'t23', turma:'2ª/3ª Série', disc:'Espanhol',          semanais:0,    bimestreMeta:10, totalMeta:40 },
+  { grupo:'art', turmaId:'t89', turma:'8º/9º Ano',   disc:'Arte',              semanais:0,    bimestreMeta:10, totalMeta:40 },
+  { grupo:'art', turmaId:'t1',  turma:'1ª Série',    disc:'Arte',              semanais:0,    bimestreMeta:10, totalMeta:40 },
+  { grupo:'art', turmaId:'t23', turma:'2ª/3ª Série', disc:'Arte',              semanais:0,    bimestreMeta:10, totalMeta:40 }
 ];
 
 const RH_SECOES_TURMA = {
@@ -6555,7 +6559,8 @@ const RH_TURMA_LABELS = {
 const RH_GRUPOS_CONT = {
   lp: { container: 'rh-cont-lp', badge: 'LP', badgeStyle: 'background:var(--vs);color:var(--vm)', bar: 'linear-gradient(90deg,var(--vm),var(--vc))' },
   ing:{ container: 'rh-cont-ing', badge: 'ING', badgeStyle: 'background:#e8f9ef;color:#1f7a52', bar: 'linear-gradient(90deg,#27ae60,#58d68d)' },
-  esp:{ container: 'rh-cont-esp', badge: 'ESP', badgeStyle: 'background:#f3e9fb;color:#7d3c98', bar: 'linear-gradient(90deg,#8e44ad,#c39bd3)' }
+  esp:{ container: 'rh-cont-esp', badge: 'ESP', badgeStyle: 'background:#f3e9fb;color:#7d3c98', bar: 'linear-gradient(90deg,#8e44ad,#c39bd3)' },
+  art:{ container: 'rh-cont-art', badge: 'ART', badgeStyle: 'background:var(--lav);color:var(--la)', bar: 'linear-gradient(90deg,var(--la),#e67e22)' }
 };
 
 const RH_LIVROS_DISCS = {
@@ -6627,6 +6632,7 @@ function normalizarDiscRH(txt) {
   if (/(Língua Portuguesa|LP)/i.test(txt)) return { grupo:'lp', disc:'Língua Portuguesa' };
   if (/(Língua Inglesa|Inglês|Ingles)/i.test(txt)) return { grupo:'ing', disc:'Inglês' };
   if (/(Língua Espanhola|Espanhol)/i.test(txt)) return { grupo:'esp', disc:'Espanhol' };
+  if (/\bArte(?:s)?\b/i.test(txt)) return { grupo:'art', disc:'Arte' };
   return null;
 }
 
