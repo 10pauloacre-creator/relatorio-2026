@@ -1132,7 +1132,8 @@ function mergeProjectionState(seed, localState){
 
   merged.notesByDate = deepClone(local.notesByDate || {}) || {};
   merged.showOnlyActive = typeof local.showOnlyActive === 'boolean' ? local.showOnlyActive : !!merged.showOnlyActive;
-  merged.anchorDate = local.anchorDate || merged.anchorDate;
+  merged.userAnchorOverride = !!local.userAnchorOverride;
+  merged.anchorDate = merged.userAnchorOverride && local.anchorDate ? local.anchorDate : merged.anchorDate;
   merged.facultativoLetivo = typeof local.facultativoLetivo === 'boolean' ? local.facultativoLetivo : !!merged.facultativoLetivo;
   merged.userCalendarOverride = !!local.userCalendarOverride;
   merged.updatedAt = local.updatedAt || merged.updatedAt || null;
@@ -1177,6 +1178,7 @@ function normalizeState(){
   state.recesso = state.recesso || {start:'2026-07-20', end:'2026-07-31'};
   if(!state.anchorDate) state.anchorDate = '2026-07-06';
   if(typeof state.showOnlyActive !== 'boolean') state.showOnlyActive = false;
+  if(typeof state.userAnchorOverride !== 'boolean') state.userAnchorOverride = false;
 
   const desiredOrder = {t1:1,t2:2,t3:3,t6:4};
   state.turmas.sort((a,b)=>{
@@ -1762,6 +1764,7 @@ function onTotal(discId, turmaId, value){
 function onAnchorDate(value){
   if(!value) return;
   state.anchorDate = value;
+  state.userAnchorOverride = true;
   save();
   render();
 }
