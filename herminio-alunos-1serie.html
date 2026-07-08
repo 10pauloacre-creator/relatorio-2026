@@ -8,6 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+<script defer src="assets/js/boletim-export.js"></script>
 <title>Alunos - 1a Serie - Raimundo Herminio de Melo</title>
 <style>
 :root{
@@ -1129,6 +1132,12 @@ document.addEventListener("click", function (event) {
     return;
   }
 
+  const exportBoletimButton = event.target.closest("[data-open-boletim-export]");
+  if (exportBoletimButton) {
+    openBoletimExport();
+    return;
+  }
+
   const boletimTabButton = event.target.closest("[data-boletim-tab]");
   if (boletimTabButton) {
     currentBoletimDiscipline = boletimTabButton.dataset.boletimTab || MAIN_DISCIPLINE;
@@ -1851,7 +1860,10 @@ function renderBoletimSection(student) {
       + '<button class="ghost-btn discipline-btn" type="button" data-toggle-discipline-menu="profile">Disciplina: ' + escapeHtml(disciplineConfig.name) + '</button>'
       + '<div class="discipline-menu">' + buildDisciplineMenuHtml("profile", currentBoletimDiscipline) + '</div>'
     + '</div>'
+    + '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">'
     + '<span class="mini-chip">Página detalhada: ' + escapeHtml(disciplineConfig.shortLabel) + '</span>'
+    + '<button class="ghost-btn" type="button" data-open-boletim-export="1">Exportar</button>'
+    + '</div>'
     + '</div>'
     + DISCIPLINES.map(function (discipline) {
       const active = currentBoletimDiscipline === discipline.name;
@@ -1871,6 +1883,65 @@ function renderBoletimSection(student) {
         + '</div>'
         + '</div>';
     }).join("");
+}
+
+function openBoletimExport() {
+  if (!window.BoletimExport) {
+    window.alert("O exportador de PDF ainda nao foi carregado. Recarregue a pagina e tente novamente.");
+    return;
+  }
+  window.BoletimExport.open({
+    classOptions: [{ value: CLASS_NAME, label: CLASS_NAME }],
+    defaultClass: CLASS_NAME,
+    disciplineOptions: DISCIPLINES.map(function (discipline) {
+      return { value: discipline.name, label: discipline.name };
+    }),
+    defaultDiscipline: currentBoletimDiscipline,
+    bimesterOptions: BIMESTERS.map(function (bim) {
+      return { value: bim, label: bim + "o bimestre" };
+    }),
+    defaultBimesters: BIMESTERS.slice(),
+    buildPayload: function (selection) {
+      return buildBoletimExportPayload(selection);
+    }
+  });
+}
+
+function buildBoletimExportPayload(selection) {
+  const disciplineName = selection.disciplineValue || currentBoletimDiscipline;
+  const students = state.alunos.slice().sort(function (left, right) { return left.numero - right.numero; });
+  return {
+    schoolName: SCHOOL_NAME,
+    subtitle: PERIOD_LABEL + " - boletim exportado do painel de alunos",
+    classLabel: selection.classLabel || CLASS_NAME,
+    disciplineLabel: selection.disciplineLabel || disciplineName,
+    generatedAt: formatDate(new Date()) + " " + new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(new Date()),
+    fileName: "boletim-" + CLASS_NAME + "-" + disciplineName,
+    sections: selection.bimesters.map(function (bim) {
+      const totals = [];
+      const rows = students.map(function (student) {
+        const dados = getDisciplineBimState(student, disciplineName, bim);
+        const trabalhos = getEffectiveWorkGrade(student, disciplineName, bim);
+        const prova = toNumber(dados.prova);
+        const total = trabalhos === null && prova === null ? null : roundFinalGrade((trabalhos || 0) + (prova || 0));
+        if (total !== null) totals.push(total);
+        return {
+          numero: student.numero,
+          nome: student.nome,
+          trabalhos: trabalhos === null ? "-" : formatNumber(trabalhos) + "/5",
+          prova: prova === null ? "-" : formatNumber(prova) + "/5",
+          total: total === null ? "-" : formatNumber(total) + "/10"
+        };
+      });
+      const average = totals.length ? roundFinalGrade(totals.reduce(function (sum, value) { return sum + value; }, 0) / totals.length) : null;
+      return {
+        title: bim + "o bimestre",
+        average: average === null ? "-" : formatNumber(average) + "/10",
+        note: "Lista exportada com " + rows.length + " aluno(s) da turma.",
+        rows: rows
+      };
+    })
+  };
 }
 
 function renderBimCard(student, bim, disciplineName) {

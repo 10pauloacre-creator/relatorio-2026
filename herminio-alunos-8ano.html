@@ -8,6 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+<script defer src="assets/js/boletim-export.js"></script>
 <title>Alunos - 8o Ano - Raimundo Herminio de Melo</title>
 <style>
 :root{
@@ -824,6 +827,7 @@ const STORAGE_KEY = "rh_alunos_8ano_2026_v1";
 const SCHOOL_NAME = "E.E. Raimundo Hermínio de Melo";
 const CLASS_NAME = "8º Ano";
 const PERIOD_LABEL = "Ano letivo de 2026";
+const EXPORT_DISCIPLINE_NAME = "Língua Portuguesa";
 const BIMESTERS = ["1", "2", "3", "4"];
 const GRADE_MAX = 5;
 
@@ -928,6 +932,12 @@ document.addEventListener("click", function (event) {
     const studentId = Number(copyStudentButton.dataset.copyStudentSummary);
     copyText(buildStudentSummary(getStudent(studentId)));
     setSaveStatus("Resumo do aluno copiado para o Codex.");
+    return;
+  }
+
+  const exportBoletimButton = event.target.closest("[data-open-boletim-export]");
+  if (exportBoletimButton) {
+    openBoletimExport();
     return;
   }
 
@@ -1409,6 +1419,7 @@ function renderProfile(studentId) {
       + '<div class="bim-grid">'
       + BIMESTERS.map(function (bim) { return renderBimCard(student, bim); }).join("")
       + '</div>'
+      + '<div class="report-tools" style="margin-top:14px"><button class="ghost-btn" type="button" data-open-boletim-export="1">Exportar</button></div>'
     + '</section>'
     + '<section class="section-block">'
       + '<h3>Faltas e dias em que o aluno faltou</h3>'
@@ -1475,6 +1486,59 @@ function renderTextArea(student, field, label, placeholder) {
     + '<label>' + escapeHtml(label) + '</label>'
     + '<textarea data-student="' + student.id + '" data-textfield="' + field + '" placeholder="' + escapeHtml(placeholder) + '">' + escapeHtml(student[field] || "") + "</textarea>"
     + "</div>";
+}
+
+function openBoletimExport() {
+  if (!window.BoletimExport) {
+    window.alert("O exportador de PDF ainda nao foi carregado. Recarregue a pagina e tente novamente.");
+    return;
+  }
+  window.BoletimExport.open({
+    classOptions: [{ value: CLASS_NAME, label: CLASS_NAME }],
+    defaultClass: CLASS_NAME,
+    disciplineOptions: [{ value: EXPORT_DISCIPLINE_NAME, label: EXPORT_DISCIPLINE_NAME }],
+    defaultDiscipline: EXPORT_DISCIPLINE_NAME,
+    bimesterOptions: BIMESTERS.map(function (bim) { return { value: bim, label: bim + "o bimestre" }; }),
+    defaultBimesters: BIMESTERS.slice(),
+    buildPayload: function (selection) {
+      return buildBoletimExportPayload(selection);
+    }
+  });
+}
+
+function buildBoletimExportPayload(selection) {
+  const students = state.alunos.filter(function (student) { return !student.transferido; }).slice().sort(function (left, right) { return left.numero - right.numero; });
+  return {
+    schoolName: SCHOOL_NAME,
+    subtitle: PERIOD_LABEL + " - boletim exportado do painel de alunos",
+    classLabel: selection.classLabel || CLASS_NAME,
+    disciplineLabel: selection.disciplineLabel || EXPORT_DISCIPLINE_NAME,
+    generatedAt: formatDate(new Date()) + " " + new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(new Date()),
+    fileName: "boletim-" + CLASS_NAME + "-" + EXPORT_DISCIPLINE_NAME,
+    sections: selection.bimesters.map(function (bim) {
+      const totals = [];
+      const rows = students.map(function (student) {
+        const trabalhos = toNumber(student.bimestres[bim].trabalhos);
+        const prova = toNumber(student.bimestres[bim].prova);
+        const total = calculateBimTotal(student, bim);
+        if (total !== null) totals.push(total);
+        return {
+          numero: student.numero,
+          nome: student.nome,
+          trabalhos: trabalhos === null ? "-" : formatNumber(trabalhos) + "/5",
+          prova: prova === null ? "-" : formatNumber(prova) + "/5",
+          total: total === null ? "-" : formatNumber(total) + "/10"
+        };
+      });
+      const average = totals.length ? roundFinalGrade(totals.reduce(function (sum, value) { return sum + value; }, 0) / totals.length) : null;
+      return {
+        title: bim + "o bimestre",
+        average: average === null ? "-" : formatNumber(average) + "/10",
+        note: "Lista exportada com " + rows.length + " aluno(s) ativos da turma.",
+        rows: rows
+      };
+    })
+  };
 }
 
 function openReport(studentId) {
