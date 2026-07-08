@@ -8285,6 +8285,25 @@ function pcProjectionEntryDateFromId(entryId){
   if(!match)return '';
   return '2026-'+match[1]+'-'+match[2];
 }
+function pcProjectionInferTurmaFromEntryId(entryId){
+  var match=String(entryId||'').match(/^(?:pl|p)-(t[^-]+)/i);
+  return match?match[1].toLowerCase():'';
+}
+function pcProjectionCollectPresenceEntries(){
+  var seen={};
+  return Array.from(document.querySelectorAll('.ipane[id^="p-"]')).map(function(pane){
+    var entryId=pane.id;
+    if(!entryId||seen[entryId])return null;
+    seen[entryId]=true;
+    var storageId='pl-'+entryId.slice(2);
+    var cfg=PRESENCA[storageId]||{};
+    return {
+      entryId:entryId,
+      turma:(cfg&&cfg.turma)||pcProjectionInferTurmaFromEntryId(entryId)||'',
+      parcial:!!(cfg&&cfg.parcial)
+    };
+  }).filter(Boolean);
+}
 function pcProjectionResolveGroupKey(turmaId,disciplineName){
   var normDiscipline=pcProjectionNormalizeText(disciplineName);
   var found=DISC.find(function(item){
@@ -8294,8 +8313,8 @@ function pcProjectionResolveGroupKey(turmaId,disciplineName){
 }
 function pcProjectionBuildLessonLog(){
   var recordsByGroup={};
-  Object.entries(PRESENCA).forEach(function(pair){
-    var entryId=pair[0],cfg=pair[1]||{};
+  pcProjectionCollectPresenceEntries().forEach(function(item){
+    var entryId=item.entryId,cfg=item||{};
     var turmaId=cfg.turma||'';
     if(!turmaId)return;
     var dateKey=pcProjectionEntryDateFromId(entryId);
@@ -8422,7 +8441,8 @@ function pcResolveProjectionRuntimeState(){
   });
   merged.notesByDate=pcProjectionClone(stored.notesByDate||{})||{};
   merged.showOnlyActive=!!stored.showOnlyActive;
-  merged.anchorDate=stored.anchorDate||merged.anchorDate;
+  merged.userAnchorOverride=!!stored.userAnchorOverride;
+  merged.anchorDate=merged.userAnchorOverride&&stored.anchorDate?stored.anchorDate:merged.anchorDate;
   merged.facultativoLetivo=typeof stored.facultativoLetivo==='boolean'?stored.facultativoLetivo:!!merged.facultativoLetivo;
   if(stored.userCalendarOverride){
     merged.userCalendarOverride=true;
