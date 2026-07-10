@@ -541,12 +541,15 @@ body.modo-edicao .main *:not(#painel-editor):not(#toolbar-texto):not(.ed-float-b
 .disc-tab.esp.active{background:var(--esp);color:#fff}
 .disc-tab.art{border-color:var(--art);color:var(--art)}
 .disc-tab.art.active{background:var(--art);color:#fff}
+.disc-tab.red{border-color:#1f7a4d;color:#1f7a4d}
+.disc-tab.red.active{background:#1f7a4d;color:#fff}
 .bim-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
 .bim-tab{padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.8rem;font-weight:600;background:#e2e8f0;color:#374151;transition:all .2s}
 .bim-tab.active.lp{background:var(--lp);color:#fff}
 .bim-tab.active.ing{background:var(--ing);color:#fff}
 .bim-tab.active.esp{background:var(--esp);color:#fff}
 .bim-tab.active.art{background:var(--art);color:#fff}
+.bim-tab.active.red{background:#1f7a4d;color:#fff}
 .bim-header{background:#fff;border-radius:8px 8px 0 0;padding:12px 16px;border-left:4px solid;margin-bottom:0;display:flex;align-items:center;gap:10px}
 .bim-header.lp{border-color:var(--lp)}
 .bim-header.ing{border-color:var(--ing)}
@@ -608,11 +611,14 @@ body.modo-escuro #rh-plan-clone-root .disc-tab.esp{color:#d8b4fe!important;borde
 body.modo-escuro #rh-plan-clone-root .disc-tab.esp.active{background:#6d28d9!important;color:#f8fafc!important;border-color:#8b5cf6!important}
 body.modo-escuro #rh-plan-clone-root .disc-tab.art{color:#fdba74!important;border-color:#f59e0b!important}
 body.modo-escuro #rh-plan-clone-root .disc-tab.art.active{background:#b45309!important;color:#f8fafc!important;border-color:#f59e0b!important}
+body.modo-escuro #rh-plan-clone-root .disc-tab.red{color:#86efac!important;border-color:#22c55e!important}
+body.modo-escuro #rh-plan-clone-root .disc-tab.red.active{background:#166534!important;color:#f8fafc!important;border-color:#22c55e!important}
 body.modo-escuro #rh-plan-clone-root .bim-tab{background:#1e293b!important;color:#cbd5e1!important}
 body.modo-escuro #rh-plan-clone-root .bim-tab.active.lp{background:#185b39!important;color:#f8fafc!important}
 body.modo-escuro #rh-plan-clone-root .bim-tab.active.ing{background:#1d4ed8!important;color:#f8fafc!important}
 body.modo-escuro #rh-plan-clone-root .bim-tab.active.esp{background:#6d28d9!important;color:#f8fafc!important}
 body.modo-escuro #rh-plan-clone-root .bim-tab.active.art{background:#b45309!important;color:#f8fafc!important}
+body.modo-escuro #rh-plan-clone-root .bim-tab.active.red{background:#166534!important;color:#f8fafc!important}
 body.modo-escuro #rh-plan-clone-root .bim-header{background:#111827!important}
 body.modo-escuro #rh-plan-clone-root .bim-header h3{color:#f8fafc!important}
 body.modo-escuro #rh-plan-clone-root .bim-header .badge{background:#1e293b!important;color:#cbd5e1!important}
@@ -7922,7 +7928,7 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
       <p>Planejamento organizado por disciplina e bimestre para a Escola Raimundo Hermínio de Melo.</p>
       <div class="plan-meta">
         <span class="plan-pill">Turma: 1ª Série</span>
-        <span class="plan-pill">Disciplinas: Língua Portuguesa, Língua Inglesa, Língua Espanhola e Arte</span>
+        <span class="plan-pill">Disciplinas: Língua Portuguesa, Língua Inglesa, Língua Espanhola, Arte e Redação</span>
         <span class="plan-pill">Organização: por bimestre</span>
       </div>
     </div>
@@ -7932,6 +7938,7 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
       <div class="disc-tab ing" onclick="rhPlanShowDisc('rh-d1ing1',this)">Língua Inglesa</div>
       <div class="disc-tab esp" onclick="rhPlanShowDisc('rh-d1esp1',this)">Língua Espanhola</div>
       <div class="disc-tab art" onclick="rhPlanShowDisc('rh-d1art1',this)">Arte</div>
+      <div class="disc-tab red" onclick="rhPlanShowDisc('rh-d1red1',this)">Redação</div>
     </div>
 
     <div class="disc-panel active" id="rh-d1lp1">
@@ -8249,6 +8256,75 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
         </div>
       </div>
     </div>
+
+    <div class="disc-panel" id="rh-d1red1">
+      <div class="bim-tabs">
+        <div class="bim-tab red active" onclick="rhPlanShowBim('rh-d1red1-b1',this)">1º Bimestre</div>
+        <div class="bim-tab red" onclick="rhPlanShowBim('rh-d1red1-b2',this)">2º Bimestre</div>
+        <div class="bim-tab red" onclick="rhPlanShowBim('rh-d1red1-b3',this)">3º Bimestre</div>
+        <div class="bim-tab red" onclick="rhPlanShowBim('rh-d1red1-b4',this)">4º Bimestre</div>
+      </div>
+
+      <div class="bim-panel active" id="rh-d1red1-b1">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Apresentação da disciplina de Redação e diagnóstico inicial de escrita</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">O que é texto dissertativo-argumentativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Diferenças entre narração, descrição e dissertação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Estrutura básica da redação do ENEM: introdução, desenvolvimento e conclusão</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Tema e recorte temático</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Tese: construção do ponto de vista</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Diferença entre opinião e argumento</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Construção de argumentos simples</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Introdução da redação: apresentação do tema, problema e tese</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Produção diagnóstica de introdução</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d1red1-b2">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">O parágrafo de desenvolvimento</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Tópico frasal, explicação e exemplo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Tipos de argumento: causa, consequência, exemplificação e autoridade</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Transformação de opiniões em argumentos convincentes</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Coesão textual: conectivos e articulação entre ideias</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Coerência textual: organização lógica do pensamento</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Problemas comuns na argumentação: repetição, fuga ao tema e generalização</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Conclusão da redação: retomada da tese e fechamento das ideias</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Proposta de intervenção: quem, o quê, como, para quê e detalhamento</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Produção e revisão de parágrafo argumentativo</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d1red1-b3">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Repertório sociocultural: conceito e importância na redação do ENEM</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Repertórios válidos e repertórios improdutivos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Como selecionar informações, dados, fatos e exemplos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Uso de repertório em parágrafos argumentativos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Introdução avançada: construção de aberturas claras e bem delimitadas</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Desenvolvimento avançado: aprofundamento argumentativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Progressão de ideias entre os parágrafos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Produção orientada de redação completa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Revisão coletiva e avaliação por pares</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Reescrita orientada da redação</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d1red1-b4">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">As cinco competências da redação do ENEM</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Como o corretor avalia a redação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Competência 1: norma-padrão e clareza linguística</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Competência 2: compreensão do tema e repertório sociocultural</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Competência 3: seleção e organização dos argumentos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Competência 4: coesão e articulação textual</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Competência 5: proposta de intervenção completa e respeitosa aos direitos humanos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Produção de redação em modelo ENEM</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Correção comentada, autoavaliação e reescrita final</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Culminância: portfólio de redações e reflexão sobre a evolução da escrita</div></div></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="plano-wrapper" style="margin-top:28px">
@@ -8257,7 +8333,7 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
       <p>Planejamento organizado por disciplina e bimestre para a Escola Raimundo Hermínio de Melo.</p>
       <div class="plan-meta">
         <span class="plan-pill">Turma: 2ª/3ª Série</span>
-        <span class="plan-pill">Disciplinas: Língua Portuguesa, Língua Inglesa e Língua Espanhola</span>
+        <span class="plan-pill">Disciplinas: Língua Portuguesa, Língua Inglesa, Língua Espanhola e Redação</span>
         <span class="plan-pill">Organização: por bimestre</span>
       </div>
     </div>
@@ -8266,6 +8342,7 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
       <div class="disc-tab lp active" onclick="rhPlanShowDisc('rh-d2lp1',this)">Língua Portuguesa</div>
       <div class="disc-tab ing" onclick="rhPlanShowDisc('rh-d2ing1',this)">Língua Inglesa</div>
       <div class="disc-tab esp" onclick="rhPlanShowDisc('rh-d2esp1',this)">Língua Espanhola</div>
+      <div class="disc-tab red" onclick="rhPlanShowDisc('rh-d2red1',this)">Redação</div>
     </div>
 
     <div class="disc-panel active" id="rh-d2lp1">
@@ -8551,6 +8628,75 @@ body.modo-escuro #rh-plan-clone-root .lesson-item.st-sm{background:#1f2937!impor
           <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Expressões de finalidade e perífrases de orientação</div></div></div>
           <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Morfologia do espanhol: substantivo, adjetivo, advérbio, apócope, ditos populares e frases feitas</div></div></div>
           <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Cidade, viagem, meios de transporte, estabelecimentos comerciais, redes sociais e uso do espanhol no mundo acadêmico e profissional</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disc-panel" id="rh-d2red1">
+      <div class="bim-tabs">
+        <div class="bim-tab red active" onclick="rhPlanShowBim('rh-d2red1-b1',this)">1º Bimestre</div>
+        <div class="bim-tab red" onclick="rhPlanShowBim('rh-d2red1-b2',this)">2º Bimestre</div>
+        <div class="bim-tab red" onclick="rhPlanShowBim('rh-d2red1-b3',this)">3º Bimestre</div>
+        <div class="bim-tab red" onclick="rhPlanShowBim('rh-d2red1-b4',this)">4º Bimestre</div>
+      </div>
+
+      <div class="bim-panel active" id="rh-d2red1-b1">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Diagnóstico de escrita em modelo ENEM</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Revisão da estrutura do texto dissertativo-argumentativo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Leitura e interpretação da proposta de redação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Tema, recorte temático e problematização</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Tese clara, crítica e bem delimitada</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Projeto de texto: planejamento antes da escrita</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Estratégias argumentativas: causa, consequência, comparação e exemplificação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Parágrafo de desenvolvimento com tópico frasal, explicação e repertório</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Coesão e coerência na construção dos parágrafos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Produção orientada de introdução e desenvolvimento</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d2red1-b2">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Repertório sociocultural produtivo</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Uso de dados, fatos, citações, obras, leis e acontecimentos históricos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Seleção de fontes confiáveis para fundamentar argumentos</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Introdução avançada: contextualização, problematização e tese</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Desenvolvimento avançado: progressão, aprofundamento e autoria</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Argumentos principais e argumentos secundários</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Contra-argumentação e refutação</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Coesão avançada: conectivos, retomadas e progressão temática</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Produção de redação completa orientada</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Revisão por pares e reescrita com foco na argumentação</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d2red1-b3">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Correção da redação pelas cinco competências do ENEM</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Competência 1: desvios gramaticais, pontuação e norma-padrão</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">Competência 2: repertório, tema e estrutura dissertativo-argumentativa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">Competência 3: autoria, seleção e organização das ideias</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">Competência 4: mecanismos linguísticos de coesão</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Competência 5: proposta de intervenção completa</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Propostas fracas, medianas e fortes de intervenção</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Redação completa em tempo controlado</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Correção comentada: erros, acertos e estratégias de melhoria</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Reescrita orientada com base nas competências do ENEM</div></div></div>
+        </div>
+      </div>
+
+      <div class="bim-panel" id="rh-d2red1-b4">
+        <div class="lesson-list">
+          <div class="lesson-item"><div class="lesson-num">01</div><div class="lesson-content"><div class="lesson-title">Estratégias de redação nota alta</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">02</div><div class="lesson-content"><div class="lesson-title">Comparação entre redações regulares e redações de alto desempenho</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">03</div><div class="lesson-content"><div class="lesson-title">O que o corretor valoriza na introdução</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">04</div><div class="lesson-content"><div class="lesson-title">O que o corretor valoriza no desenvolvimento</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">05</div><div class="lesson-content"><div class="lesson-title">O que o corretor valoriza na proposta de intervenção</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">06</div><div class="lesson-content"><div class="lesson-title">Simulado de redação em modelo ENEM</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">07</div><div class="lesson-content"><div class="lesson-title">Devolutiva formativa do simulado</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">08</div><div class="lesson-content"><div class="lesson-title">Autoavaliação e avaliação por pares</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">09</div><div class="lesson-content"><div class="lesson-title">Rotação por estações: introdução, argumentação, coesão e intervenção</div></div></div>
+          <div class="lesson-item"><div class="lesson-num">10</div><div class="lesson-content"><div class="lesson-title">Culminância: portfólio final, reescrita e análise da evolução individual</div></div></div>
         </div>
       </div>
     </div>
@@ -8911,8 +9057,8 @@ var _rhLivStatus = JSON.parse(localStorage.getItem('rh_liv_status') || '{}');
 var _rhLivUrls = JSON.parse(localStorage.getItem('rh_liv_urls') || '{}');
 const RH_SEQ_DISCS = {
   t89:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'}],
-  t1:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'}],
-  t23:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'}]
+  t1:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'},{id:'red',nm:'Redação',cor:'d-lp'}],
+  t23:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'},{id:'red',nm:'Redação',cor:'d-lp'}]
 };
 const RH_SEQ_ICS = {'':{ic:'🗂',lbl:'Não iniciado'},criando:{ic:'📝',lbl:'Criando'},concluido:{ic:'✅',lbl:'Concluído'}};
 var _rhSeqStatus = JSON.parse(localStorage.getItem('rh_seq_status') || '{}');
