@@ -27,6 +27,7 @@
   const GRADE_SEEDS = window.CASAVEQUIA_GRADE_SEEDS && window.CASAVEQUIA_GRADE_SEEDS[STORAGE_KEY]
     ? window.CASAVEQUIA_GRADE_SEEDS[STORAGE_KEY]
     : (config.gradeSeeds && typeof config.gradeSeeds === "object" ? config.gradeSeeds : null);
+  const GRADE_SEED_VERSION = GRADE_SEEDS ? "2026-07-10-em-1bim-v2" : "";
 
   const searchInput = document.getElementById("searchInput");
   const tableBody = document.getElementById("tableBody");
@@ -49,6 +50,7 @@
   let remoteSyncRetryCount = 0;
   let applyingRemotePanelState = false;
   let state = loadState();
+  persistGradeSeedMigrationIfNeeded();
 
   renderDisciplineMenus();
   renderAll();
@@ -380,6 +382,7 @@
   function buildDefaultState() {
     return {
       __syncUpdatedAt: "",
+      __gradeSeedVersion: GRADE_SEED_VERSION,
       escola: SCHOOL_NAME,
       turma: CLASS_NAME,
       periodo: PERIOD_LABEL,
@@ -463,6 +466,7 @@
 
       return {
         __syncUpdatedAt: parsed.__syncUpdatedAt || base.__syncUpdatedAt || "",
+        __gradeSeedVersion: parsed.__gradeSeedVersion || "",
         escola: parsed.escola || base.escola,
         turma: parsed.turma || base.turma,
         periodo: parsed.periodo || base.periodo,
@@ -474,6 +478,14 @@
     } catch (error) {
       return base;
     }
+  }
+
+  function persistGradeSeedMigrationIfNeeded() {
+    if (!GRADE_SEEDS || !GRADE_SEED_VERSION) return;
+    if (state.__gradeSeedVersion === GRADE_SEED_VERSION) return;
+    state.__gradeSeedVersion = GRADE_SEED_VERSION;
+    state.__syncUpdatedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
 
   function saveState(message) {
