@@ -1,4 +1,4 @@
-const CACHE = 'relatorio-2026-v19';
+const CACHE = 'relatorio-2026-v20';
 // ⚠️ HTMLs NÃO entram no pre-cache — conteúdo dinâmico nunca deve ser
 // servido estático. Apenas assets verdadeiramente estáticos são pré-cacheados.
 const ASSETS = [
@@ -11,6 +11,7 @@ const ASSETS = [
   '/relatorio-2026/icon-512.png',
   '/relatorio-2026/maskable-icon-512.png',
   '/relatorio-2026/assets/js/supabase-report-sync.js',
+  '/relatorio-2026/assets/js/casavequia-grade-seeds.js',
   '/relatorio-2026/assets/js/boletim-export.js',
   '/relatorio-2026/botãocasavequia.png',
   '/relatorio-2026/botãoherminio.png',

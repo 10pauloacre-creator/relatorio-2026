@@ -24,6 +24,9 @@
   const MAIN_DISCIPLINE = config.mainDiscipline || (DISCIPLINES[0] ? DISCIPLINES[0].name : "Linguagem");
   const DAILY_SCOPE = "casavequia:daily:shared-v1";
   const PANEL_SCOPE = "casavequia:panel:" + STORAGE_KEY;
+  const GRADE_SEEDS = window.CASAVEQUIA_GRADE_SEEDS && window.CASAVEQUIA_GRADE_SEEDS[STORAGE_KEY]
+    ? window.CASAVEQUIA_GRADE_SEEDS[STORAGE_KEY]
+    : (config.gradeSeeds && typeof config.gradeSeeds === "object" ? config.gradeSeeds : null);
 
   const searchInput = document.getElementById("searchInput");
   const tableBody = document.getElementById("tableBody");
@@ -314,6 +317,66 @@
     return boletim;
   }
 
+  function getStudentGradeSeed(studentId) {
+    if (!GRADE_SEEDS || typeof GRADE_SEEDS !== "object") return null;
+    return GRADE_SEEDS[String(studentId)] || GRADE_SEEDS[studentId] || null;
+  }
+
+  function isBlankNumericField(value) {
+    return value === "" || value === null || value === undefined;
+  }
+
+  function ensureStudentSeedBimState(student, disciplineName, bim) {
+    if (disciplineName === MAIN_DISCIPLINE) {
+      if (!student.bimestres[bim]) {
+        student.bimestres[bim] = buildEmptyBimesterState();
+      }
+      return student.bimestres[bim];
+    }
+
+    if (!student.boletim) {
+      student.boletim = buildDefaultBoletimState();
+    }
+    if (!student.boletim[disciplineName]) {
+      student.boletim[disciplineName] = buildEmptyDisciplineState();
+    }
+    if (!student.boletim[disciplineName].bimestres[bim]) {
+      student.boletim[disciplineName].bimestres[bim] = buildEmptyBimesterState();
+    }
+    return student.boletim[disciplineName].bimestres[bim];
+  }
+
+  function applySeedGradesToStudentState(student) {
+    const seed = getStudentGradeSeed(student.id);
+    if (!seed || typeof seed !== "object") return student;
+
+    Object.keys(seed).forEach(function (disciplineName) {
+      const disciplineSeed = seed[disciplineName];
+      const disciplineExists = disciplineName === MAIN_DISCIPLINE || DISCIPLINES.some(function (discipline) {
+        return discipline.name === disciplineName;
+      });
+      if (!disciplineSeed || typeof disciplineSeed !== "object" || !disciplineExists) return;
+
+      Object.keys(disciplineSeed).forEach(function (bim) {
+        const source = disciplineSeed[bim];
+        if (!source || typeof source !== "object") return;
+        const target = ensureStudentSeedBimState(student, disciplineName, bim);
+
+        if (source.trabalhos !== undefined && isBlankNumericField(target.trabalhos)) {
+          target.trabalhos = sanitizeFieldValue("trabalhos", source.trabalhos);
+        }
+        if (source.prova !== undefined && isBlankNumericField(target.prova)) {
+          target.prova = sanitizeFieldValue("prova", source.prova);
+        }
+        if (source.trabalhosRealizados !== undefined && (target.trabalhosRealizados === 0 || isBlankNumericField(target.trabalhosRealizados))) {
+          target.trabalhosRealizados = sanitizeFieldValue("trabalhosRealizados", source.trabalhosRealizados);
+        }
+      });
+    });
+
+    return student;
+  }
+
   function buildDefaultState() {
     return {
       __syncUpdatedAt: "",
@@ -321,7 +384,7 @@
       turma: CLASS_NAME,
       periodo: PERIOD_LABEL,
       alunos: (config.students || []).map(function (student) {
-        return {
+        return applySeedGradesToStudentState({
           id: student.id,
           numero: student.numero,
           nome: student.nome,
@@ -338,7 +401,7 @@
           destaques: "",
           necessidadesApoio: "",
           relatorioGeral: ""
-        };
+        });
       })
     };
   }
@@ -405,7 +468,7 @@
         periodo: parsed.periodo || base.periodo,
         alunos: base.alunos.map(function (student) {
           const saved = parsed.alunos.find(function (item) { return item.id === student.id; }) || {};
-          return mergeStudent(student, saved);
+          return applySeedGradesToStudentState(mergeStudent(student, saved));
         })
       };
     } catch (error) {
