@@ -785,7 +785,7 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <div class="sp"></div>
 <button id="btn-editar" class="nb" style="background:rgba(74,148,103,.2);color:#7fddaa;border:1px solid rgba(74,148,103,.4);border-radius:6px;margin:6px 4px">✏️ Editar</button>
 </div></nav>
-<main class="main" data-build="20260713">
+<main class="main" data-build="20260713-2">
 
 <section class="sec on" id="sec-all">
 <div class="th"><div class="tb">2026</div><div class="ti"><h2>Visão Geral — Todas as Turmas</h2><p>LP · Artes · Trilhas de Linguagens · Trilhas de C. Humanas</p></div></div>
@@ -7173,7 +7173,11 @@ const PRESENCA={
 
 /* ── PRESENÇA MANUAL (overrides clicáveis) ── */
 var _presManual=JSON.parse(localStorage.getItem('pres_manual')||'{}');
-function _presManualSalvar(){
+var _pcPresenceEffectsScheduled=0;
+var _pcPresencePersistTimer=0;
+var PC_PRESENCE_PERSIST_DEBOUNCE_MS=120;
+function pcFlushPresenceManualSave(){
+  _pcPresencePersistTimer=0;
   try{
     if(typeof pcMarkLocalSyncChange==='function')pcMarkLocalSyncChange();
   }catch(e){console.warn('[PRES local ts]',e.message);}
@@ -7184,12 +7188,12 @@ function _presManualSalvar(){
     if(_db) _db.collection('app_data').doc('pres_manual').set(_presManual)
       .catch(function(e){console.error('[SYNC pres]',e.code,e.message);});
   }catch(e){console.warn('[SYNC pres]',e.message);}
-  try{
-    if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
-  }catch(e){console.warn('[PRES sync geral]',e.message);}
-  try{
-    if(typeof pcRefreshAtividadesVisuals==='function')pcRefreshAtividadesVisuals();
-  }catch(e){console.warn('[PRES refresh atv]',e.message);}
+  pcSchedulePresenceSideEffects();
+}
+function _presManualSalvar(){
+  if(_pcPresencePersistTimer)window.clearTimeout(_pcPresencePersistTimer);
+  // Persiste fora do clique para a troca visual aparecer imediatamente.
+  _pcPresencePersistTimer=window.setTimeout(pcFlushPresenceManualSave,PC_PRESENCE_PERSIST_DEBOUNCE_MS);
 }
 var _presIcons={pr:'✓',fa:'✗',fj:'⚠'};
 var _presLabels={pr:'',fa:'<span class="atg tgf">F</span>',fj:'<span class="atg tgfj">FJ</span>'};
@@ -7200,6 +7204,41 @@ function _presAplicarVisual(row,s){
   var tg=row.querySelector('.atg');
   if(s==='pr'){if(tg)tg.remove();}
   else{if(!tg){tg=document.createElement('span');row.appendChild(tg);}tg.className='atg '+(s==='fa'?'tgf':'tgfj');tg.textContent=s==='fa'?'F':'FJ';}
+}
+function pcSchedulePresenceSideEffects(){
+  if(_pcPresenceEffectsScheduled)return;
+  var run=function(){
+    _pcPresenceEffectsScheduled=0;
+    try{
+      if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
+    }catch(e){console.warn('[PRES sync geral]',e.message);}
+    try{
+      if(typeof pcRefreshAtividadesVisuals==='function')pcRefreshAtividadesVisuals();
+    }catch(e){console.warn('[PRES refresh atv]',e.message);}
+  };
+  if(typeof window.requestAnimationFrame==='function'){
+    _pcPresenceEffectsScheduled=window.requestAnimationFrame(function(){
+      window.setTimeout(run,0);
+    });
+    return;
+  }
+  _pcPresenceEffectsScheduled=window.setTimeout(run,0);
+}
+function pcAtualizarResumoPresenca(presId){
+  var cfg=PRESENCA[presId];
+  var el=document.getElementById(presId);
+  if(!cfg||!el)return;
+  var stat=el.previousElementSibling;
+  if(!stat||!stat.classList.contains('pres-stat'))return;
+  var ativos=(ALUNOS[cfg.turma]||[]).filter(function(a){return !a.tr;});
+  var fa=0,fj=0,pr=0;
+  ativos.forEach(function(a){
+    var s=pcResolvePresenceStatus(presId,a.n,cfg);
+    if(s==='fa')fa+=1;
+    else if(s==='fj')fj+=1;
+    else pr+=1;
+  });
+  stat.innerHTML='<span>âœ“ Presentes: <strong>'+pr+'</strong></span><span>âœ— Faltas: <strong>'+fa+'</strong></span><span>âš  FJ: <strong>'+fj+'</strong></span><span>Total: <strong>'+ativos.length+'</strong></span>';
 }
 
 function renderPresenca(){
@@ -7235,6 +7274,7 @@ function renderPresenca(){
         _presAplicarVisual(row,prox);
         if(prox===baseStatus){delete _presManual[manKey];}
         else{_presManual[manKey]=prox;}
+        pcAtualizarResumoPresenca(id);
         _presManualSalvar();
       });
       el.appendChild(row);
@@ -7513,6 +7553,7 @@ function pcBindDailyInteractionOverrides(){
     if(prox===baseStatus)delete _presManual[presId+'_'+n];
     else _presManual[presId+'_'+n]=prox;
 
+    pcAtualizarResumoPresenca(presId);
     _presManualSalvar();
   },true);
 
