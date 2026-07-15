@@ -6920,6 +6920,10 @@ document.getElementById('p6ano').classList.add('active');
 
 <section class="sec" id="sec-livros">
 <div class="th"><div class="tb" style="background:linear-gradient(135deg,#c9a84c,#e8c86a)">📖</div><div class="ti"><h2>Livros Digitais</h2><p>Produção e acompanhamento dos livros digitais por disciplina e bimestre</p></div></div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:-8px 0 18px">
+  <div style="font-size:.77rem;color:var(--cm)">Abra o prompt base para iniciar a criação dos livros em HTML.</div>
+  <button type="button" onclick="abrirPromptLivros()" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border:none;border-radius:999px;background:linear-gradient(135deg,#c9a84c,#e8c86a);color:#43310e;font:700 .82rem 'DM Sans',sans-serif;cursor:pointer;box-shadow:0 10px 24px rgba(201,168,76,.18)">prompt</button>
+</div>
 
 <div class="liv-legend">
   <div class="liv-leg-item"><div class="liv-dot nd"></div>Não iniciado</div>
@@ -9197,6 +9201,217 @@ var _LIV_DISCS={
 };
 var _LIV_ICS={'':{ic:'📘',lbl:'Não iniciado'},'criando':{ic:'📕',lbl:'Criando'},'concluido':{ic:'📗',lbl:'Concluído'}};
 var _SEQ_ICS={'':{ic:'🗂',lbl:'Não iniciado'},'criando':{ic:'📝',lbl:'Criando'},'concluido':{ic:'✅',lbl:'Concluído'}};
+
+var PROMPT_LIVROS_TEXTO=`PROMPT PARA INICIO DO DESENVOLVIMENTO DO LIVRO HTML
+
+Agora atuando como desenvolvedor de conteúdo didático interativo para um livro digital em HTML.
+A partir dos temas que eu informar, desenvolva um conteúdo educacional completo, organizado e pronto para ser inserido em um livro HTML interativo.
+
+Use como base conhecimentos confiáveis disponíveis na web e conhecimentos pedagógicos atualizados. O conteúdo deve ser claro, aprofundado e adequado para leitura ativa, leitura compartilhada e estudo orientado em sala de aula.
+
+Regras gerais que você deve seguir estritamente:
+A regra primordial: Use estratégias profundas e apelativas para gerar dopamina ao alunos durante o estudo.
+1. Quando eu informar apenas um tema, desenvolva todo o conteúdo abaixo exclusivamente para esse tema.
+2. Quando eu informar dois ou mais temas, una os temas em uma sequência didática coerente, criando um único conteúdo integrado.
+3. A regra mais importante: Escreva textos teóricos extensos, para longas leituras entre os alunos, com conteúdo bem detalhados, explicativos e bem desenvolvidos, com linguagem acessível aos estudantes, mas sem perder profundidade.
+4. Inclua exemplos práticos ligados ao cotidiano dos alunos, à realidade escolar, à comunidade, às redes sociais, ao trabalho, à cultura local e a situações comuns do dia a dia.
+5. Evite respostas genéricas. Explique conceitos, causas, consequências, usos, relações e aplicações práticas.
+6. Organize o conteúdo com títulos, subtítulos, blocos de leitura, boxes explicativos, exemplos e atividades. Todo o conteúdo deve ser agradável ao olhos eu ao cérebro gerando dopamina.
+
+Estrutura obrigatória para cada tema ou conjunto de temas:
+
+I. Título principal da página
+Crie um título claro, atrativo e adequado ao conteúdo, com fontes bem maiores para ser fácil achar.
+
+II. Introdução
+Apresente o assunto de forma envolvente, explicando por que ele é importante para a vida dos estudantes e para a compreensão do mundo.
+
+III. Conteúdo teórico desenvolvido
+Produza um texto amplo, com explicações progressivas e bem conectadas.
+
+O texto deve conter:
+
+* Conceitos principais;
+* Explicações detalhadas;
+* Exemplos práticos;
+* Comparações com situações do cotidiano;
+* Relações com outros conhecimentos escolares;
+* Aplicações sociais, culturais, tecnológicas ou profissionais;
+* Linguagem adequada para estudantes do Ensino Fundamental ou Ensino Médio, conforme eu indicar.
+*Citação a qual área da bncc aquele assunto está abordando.
+* Atenção: Para disciplinas de língua estrangeiras, inclua a regra do duolingo para ver tradução de palavras estrangeiras, cada palavra ou frase em outra língua deverá obrigatoriamente ficar em cor destacada e negrito, ao clicar responde com um modal mostrando tradução e botão para ouvir a pronuncia,
+* No fim De cada conteúdo disponibilize um botão bem visível escrito “Concluí o estudo desse assunto”, Ao clicar nesse botão o assunto estudado deverá ficar dourado no sumário, assim o aluno poderá pelo sumário saber qual assunto já foi estudado. O botão dourado deve ter efeito 3d com reflexo de luz.
+
+IV. Seções interativas
+Crie seções em que o aluno possa interagir com o livro digital.
+
+Sempre inclua atividades como:
+
+* Cards clicáveis;
+* Jogo da memória;
+* Atividade de ligar conceitos;
+* Associação entre palavras e significados;
+* Complete a frase;
+* Verdadeiro ou falso interativo;
+* Arrastar e soltar;
+* Caça-palavras;
+* Quiz rápido;
+* Caixa de reflexão;
+* Botão para revelar resposta;
+* Botão “Saiba mais”;
+* Botão “Explique melhor”.
+
+Atenção: Para as disciplinas de línguas estrangeiras, inclua obrigatoriamente cessões praticas no mesmo estilo do duolingo.
+
+As interações devem ser possíveis de implementar em HTML, CSS e JavaScript.
+
+V. Espaços para imagens pesquisáveis
+
+Sempre inclua espaços reservados para imagens.
+
+Para cada imagem sugerida, crie:
+
+* Uma descrição clara da imagem;
+* Um espaço visual/linkável;
+* Um botão clicável com o texto “Pesquisar imagem”;
+* O botão deve abrir uma pesquisa no Google Imagens usando como termo a descrição da imagem sugerida.
+
+Exemplo de funcionamento esperado:
+
+Descrição da imagem: “pintura rupestre representando uma cena de caça na Pré-história”.
+
+Botão: “Pesquisar imagem”.
+
+Ao clicar, o usuário deve ser direcionado para uma busca no Google Imagens com essa descrição.
+
+VI. Atividade dissertativa
+Crie de 5 a 10 questões dissertativas interpretativas sobre o conteúdo.
+
+As perguntas devem:
+
+* Exigir reflexão;
+* Estimular interpretação;
+* Relacionar o conteúdo com situações práticas;
+* Evitar respostas de apenas uma palavra;
+* Ter linguagem clara;
+* Ser adequadas ao nível da turma.
+
+Em cada questão dissertativa, inclua um botão chamado “Explique melhor”. Ao clicar nesse botão, deve abrir um modal flutuante com uma explicação simples, didática e objetiva da pergunta, usando exemplos para ajudar o aluno a entender o que deve responder.
+
+Ao lado do botão explique melhor, crie um botão escrito “Veja no conteúdo”, ao clicar nesse botão a tela do celular mostrará automaticamente a parte do conteúdo que estudou sobre o que está sendo perguntado na questão.
+
+VII. Quiz de múltipla escolha
+Crie um quiz com 10 questões de múltipla escolha.
+
+Regras obrigatórias do quiz:
+
+* Cada questão deve ter enunciado longo, bem contextualizado e interpretativo;
+* Cada questão deve ter alternativas de A a E;
+* Cada questão deve ter apenas uma alternativa correta;
+* As respostas corretas devem variar entre A, B, C, D e E;
+* Em um único quiz, todas as letras devem aparecer como resposta correta pelo menos uma vez;
+* Evite padrões previsíveis de resposta;
+* A alternativa correta nunca deve ser sempre a mais longa;
+* A alternativa correta nunca deve ser sempre a mais curta;
+* As alternativas devem ter tamanhos semelhantes;
+* Todas as alternativas devem parecer plausíveis;
+* Evite alternativas óbvias ou absurdas;
+* Inclua feedback explicativo para cada resposta correta;
+* Quando possível, inclua feedback simples para respostas incorretas.
+* Não adicione um botão para tentar novamente. Apenas botão de salvar.
+* Após responder uma questão já deve mostrar se acertou ou não e sempre abaixo motrar um botão escrito “Entenda sua resposta” Ao clicar abre um modal mostrando porque a alternativa é certa e porque é errada.
+
+VIII. Modal “Explique melhor”
+Sempre que houver questões ou partes mais complexas, crie botões “Explique melhor”.
+
+O modal deve:
+
+* Abrir sobre a página;
+* Ter explicação simples;
+* Usar exemplos práticos;
+* Ter linguagem acessível;
+* Ter botão para fechar;
+* Não substituir a resposta do aluno, apenas orientar o raciocínio.
+
+IX. Código HTML
+Quando eu pedir o conteúdo em HTML, entregue o código completo contendo:
+
+* HTML estruturado;
+* CSS interno organizado;
+* JavaScript funcional;
+* Layout responsivo;
+* Botões interativos;
+* Modais funcionando;
+* Quiz funcional;
+* Espaços para imagens;
+* Links de pesquisa no Google Imagens;
+* Organização visual limpa e moderna;
+* Identidade visual de livro didático digital.
+
+X. Economia de tokens e continuidade
+Evite qualquer explicação desnecessária fora do conteúdo solicitado.
+Não responda com comentários como “claro”, “aqui está” ou explicações longas antes do material.
+Não interrompa o desenvolvimento antes de finalizar a estrutura principal.
+Priorize entregar o conteúdo completo, mesmo que precise ser objetivo em algumas partes.
+Se o conteúdo for muito grande, mantenha a estrutura essencial completa e reduza apenas repetições, nunca as partes obrigatórias.
+
+A partir deste comando, sempre que eu enviar um tema, desenvolva o conteúdo seguindo exatamente esta estrutura.`;
+
+function abrirPromptLivros(){
+  var modal=document.getElementById('prompt-livros-modal');
+  if(!modal){
+    modal=document.createElement('div');
+    modal.id='prompt-livros-modal';
+    modal.style='position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px';
+    modal.innerHTML=''
+      +'<div style="background:var(--cr);border-radius:18px;width:min(920px,100%);max-height:92vh;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.45);display:flex;flex-direction:column">'
+      +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--cl);background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(232,200,106,.08))">'
+      +'<div><div style="font-family:\\'Playfair Display\\',serif;font-size:1.1rem;font-weight:700;color:var(--vd)">Prompt para livros HTML</div><div style="font-size:.77rem;color:var(--cm);margin-top:3px">Texto base para iniciar o desenvolvimento do livro digital.</div></div>'
+      +'<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">'
+      +'<button id="prompt-livros-copy-btn" type="button" onclick="copiarPromptLivros()" style="padding:10px 16px;border:none;border-radius:999px;background:linear-gradient(135deg,#c9a84c,#e8c86a);color:#43310e;font:700 .8rem \\'DM Sans\\',sans-serif;cursor:pointer">copiar</button>'
+      +'<button type="button" onclick="fecharPromptLivros()" style="padding:10px 16px;border:none;border-radius:999px;background:var(--cl);color:var(--ce);font:700 .8rem \\'DM Sans\\',sans-serif;cursor:pointer">fechar</button>'
+      +'</div></div>'
+      +'<div style="padding:20px;overflow:auto"><textarea id="prompt-livros-texto" readonly style="width:100%;min-height:68vh;padding:16px 18px;border:1px solid var(--cl);border-radius:14px;background:#fff;color:var(--ce);font:400 .84rem/1.7 \\'DM Sans\\',sans-serif;resize:none;white-space:pre-wrap"></textarea></div>'
+      +'</div>';
+    document.body.appendChild(modal);
+    var area=document.getElementById('prompt-livros-texto');
+    if(area)area.value=PROMPT_LIVROS_TEXTO;
+    modal.addEventListener('click',function(e){if(e.target===modal)fecharPromptLivros();});
+  }
+  modal.style.display='flex';
+}
+
+function fecharPromptLivros(){
+  var modal=document.getElementById('prompt-livros-modal');
+  if(modal)modal.style.display='none';
+}
+
+function copiarPromptLivros(){
+  var area=document.getElementById('prompt-livros-texto');
+  var btn=document.getElementById('prompt-livros-copy-btn');
+  if(!area)return;
+  var texto=area.value||'';
+  function ok(){
+    if(!btn)return;
+    btn.textContent='copiado!';
+    clearTimeout(btn._copyTimer);
+    btn._copyTimer=setTimeout(function(){btn.textContent='copiar';},1600);
+  }
+  function fallback(){
+    area.focus();
+    area.select();
+    try{ if(document.execCommand('copy')) ok(); }catch(e){}
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(texto).then(ok).catch(fallback);
+    return;
+  }
+  fallback();
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')fecharPromptLivros();
+});
 
 function livTab(turma,btn){
   document.querySelectorAll('#sec-livros .liv-page').forEach(function(p){p.classList.remove('on');});
