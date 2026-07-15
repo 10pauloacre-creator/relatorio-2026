@@ -778,15 +778,13 @@ function _rgbToHex(rgb) {
 // salvo anteriormente pelo editor — impede sobrescrita do HTML do servidor.
 (function() {
   try {
-    ['ed_main_html', 'ed_main_html_v2', 'ed_main_html_v3'].forEach(function(k) {
+    ['ed_main_html', 'ed_main_html_v2', 'ed_main_html_v3', EDITOR_LAYOUT_KEY].forEach(function(k) {
       localStorage.removeItem(k);
     });
   } catch(e) {}
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
-  _editorRestaurarSnapshot();
-  _editorIniciarSyncRemoto();
   // Carrega contas Claude salvas (única coisa que persiste entre sessões)
   try {
     var contasSalvas = localStorage.getItem('cl_contas');
