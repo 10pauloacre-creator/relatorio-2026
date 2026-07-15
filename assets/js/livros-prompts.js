@@ -1,5 +1,6 @@
 (function(){
   var LIVROS_PROMPTS_URL='tmp/docs/prompt-capa-sumario-extract.txt';
+  var LIVROS_PROMPT_GERAL_URL='tmp/docs/prompt-geral-livros.txt';
   var LIVRO_PROMPT_BUTTON_STYLE='display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 10px;border-radius:7px;border:2px solid #d8b45b;background:rgba(201,168,76,.12);color:#7a5c10;font:700 .72rem "DM Sans",sans-serif;cursor:pointer';
   var LIVROS_PROMPTS_MAP={
     casavequia:{
@@ -58,6 +59,7 @@
   };
   var TURMA_LABELS={t1:'1ª Série',t2:'2ª Série',t3:'3ª Série',t89:'8º e 9º ano',t23:'2ª e 3ª série'};
   var _livrosPromptSectionsPromise=null;
+  var _livrosPromptGeralPromise=null;
 
   function formatarTurmaLabel(turma){
     return TURMA_LABELS[turma]||turma||'';
@@ -128,6 +130,21 @@
     return _livrosPromptSectionsPromise;
   }
 
+  function loadPromptGeral(){
+    if(!_livrosPromptGeralPromise){
+      _livrosPromptGeralPromise=fetch(LIVROS_PROMPT_GERAL_URL,{cache:'no-cache'})
+        .then(function(res){
+          if(!res.ok)throw new Error('HTTP '+res.status);
+          return res.text();
+        })
+        .catch(function(err){
+          console.error('[livros-prompt-geral]',err);
+          return '';
+        });
+    }
+    return _livrosPromptGeralPromise;
+  }
+
   function ensureModal(){
     var modal=document.getElementById('livro-prompt-modal');
     if(modal)return modal;
@@ -194,6 +211,28 @@
     if(modal)modal.style.display='none';
   }
 
+  function abrirPromptGeralLivros(){
+    setModalState('Prompt geral dos livros','Base para iniciar a criação dos livros em HTML.','Carregando prompt...');
+    loadPromptGeral().then(function(texto){
+      if(!texto)texto='Não foi possível carregar o prompt geral dos livros.';
+      setModalState('Prompt geral dos livros','Base para iniciar a criação dos livros em HTML.',texto);
+    });
+  }
+
+  function injetarBotaoPromptGeral(){
+    var sec=document.getElementById('sec-livros');
+    if(!sec||sec.querySelector('[data-livros-prompt-geral]'))return;
+    var th=sec.querySelector('.th');
+    if(!th)return;
+    var wrap=document.createElement('div');
+    wrap.setAttribute('data-livros-prompt-geral','1');
+    wrap.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:-8px 0 18px';
+    wrap.innerHTML=''
+      +'<div style="font-size:.77rem;color:var(--cm)">Abra o prompt geral para iniciar a criação dos livros em HTML.</div>'
+      +'<button type="button" onclick="abrirPromptGeralLivros()" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border:none;border-radius:999px;background:linear-gradient(135deg,#c9a84c,#e8c86a);color:#43310e;font:700 .82rem \'DM Sans\',sans-serif;cursor:pointer;box-shadow:0 10px 24px rgba(201,168,76,.18)">Prompt</button>';
+    th.insertAdjacentElement('afterend',wrap);
+  }
+
   function abrirLivroPromptLivro(escola,key,turma,disciplina,bimestre,evt){
     if(evt)evt.stopPropagation();
     var subtitulo=[formatarTurmaLabel(turma),disciplina,formatarBimestreLabel(bimestre)].filter(Boolean).join(' • ');
@@ -209,10 +248,12 @@
 
   window.LIVRO_PROMPT_BUTTON_STYLE=LIVRO_PROMPT_BUTTON_STYLE;
   window.abrirLivroPromptLivro=abrirLivroPromptLivro;
+  window.abrirPromptGeralLivros=abrirPromptGeralLivros;
   window.fecharLivroPromptModal=fecharLivroPromptModal;
   window.copiarLivroPromptModal=copiarLivroPromptModal;
 
   document.addEventListener('keydown',function(e){
     if(e.key==='Escape')fecharLivroPromptModal();
   });
+  document.addEventListener('DOMContentLoaded',injetarBotaoPromptGeral);
 })();
