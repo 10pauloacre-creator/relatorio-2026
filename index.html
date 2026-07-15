@@ -65,16 +65,6 @@ img {
   <img src="botãoherminio.png" alt="Raimundo Hermínio de Melo">
 </a>
 
-<script>
-if ('serviceWorker' in navigator) {
-  // Limpa todos os caches antigos imediatamente
-  caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      reg.update(); // força verificação de atualização do SW
-    }).catch(() => {});
-  });
-}
-</script>
+<script>(function(){if(!('serviceWorker' in navigator))return;window.addEventListener('load',function(){navigator.serviceWorker.getRegistrations().then(function(regs){return Promise.all(regs.map(function(reg){return reg.unregister();}));}).catch(function(){}).finally(function(){if(window.caches&&caches.keys){caches.keys().then(function(keys){return Promise.all(keys.map(function(key){return caches.delete(key);}));}).catch(function(){});}});});})();</script>
 </body>
 </html>
