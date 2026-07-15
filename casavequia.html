@@ -19,6 +19,7 @@
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js"></script>
+<script defer src="assets/js/livros-prompts.js"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--tl:#6c3483;--tlv:#e8daef;--tc:#0e7a6b;--tcv:#d1f2eb;--la:#c0570a;--lav:#fdebd0;--az:#1a5276;--og:#876020;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -6920,11 +6921,6 @@ document.getElementById('p6ano').classList.add('active');
 
 <section class="sec" id="sec-livros">
 <div class="th"><div class="tb" style="background:linear-gradient(135deg,#c9a84c,#e8c86a)">📖</div><div class="ti"><h2>Livros Digitais</h2><p>Produção e acompanhamento dos livros digitais por disciplina e bimestre</p></div></div>
-<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:-8px 0 18px">
-  <div style="font-size:.77rem;color:var(--cm)">Abra o prompt base para iniciar a criação dos livros em HTML.</div>
-  <button type="button" onclick="abrirPromptLivros()" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border:none;border-radius:999px;background:linear-gradient(135deg,#c9a84c,#e8c86a);color:#43310e;font:700 .82rem 'DM Sans',sans-serif;cursor:pointer;box-shadow:0 10px 24px rgba(201,168,76,.18)">prompt</button>
-</div>
-
 <div class="liv-legend">
   <div class="liv-leg-item"><div class="liv-dot nd"></div>Não iniciado</div>
   <div class="liv-leg-item"><div class="liv-dot cr"></div>Em criação</div>
@@ -9473,6 +9469,7 @@ function livRender(){
               +'<button class="liv-btn b-cri" onclick="livSetStatus(\''+key+'\',\'criando\',event)">📝 Criando</button>'
               +'<button class="liv-btn b-con" onclick="livSetStatus(\''+key+'\',\'concluido\',event)">✅ Concluído</button>'
               +'<button class="liv-btn b-ace"'+(!_livUrls[key]?' disabled':'')+' onclick="livAcessar(\''+key+'\',event)">🔗 Acessar</button>'
+              +'<button class="liv-btn" type="button" onclick="abrirLivroPromptLivro(\'casavequia\',\''+key+'\',\''+turma+'\',\''+disc.nm.replace(/'/g, "\\'")+'\',\''+bim+'\',event)" style="'+LIVRO_PROMPT_BUTTON_STYLE+'">Prompt</button>'
             +'</div>';
           card.addEventListener('click',function(e){
             if(e.target.closest('.liv-btn'))return;
