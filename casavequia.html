@@ -9366,12 +9366,12 @@ function abrirPromptLivros(){
     modal.innerHTML=''
       +'<div style="background:var(--cr);border-radius:18px;width:min(920px,100%);max-height:92vh;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.45);display:flex;flex-direction:column">'
       +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--cl);background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(232,200,106,.08))">'
-      +'<div><div style="font-family:\\'Playfair Display\\',serif;font-size:1.1rem;font-weight:700;color:var(--vd)">Prompt para livros HTML</div><div style="font-size:.77rem;color:var(--cm);margin-top:3px">Texto base para iniciar o desenvolvimento do livro digital.</div></div>'
+      +'<div><div style="font-family:\'Playfair Display\',serif;font-size:1.1rem;font-weight:700;color:var(--vd)">Prompt para livros HTML</div><div style="font-size:.77rem;color:var(--cm);margin-top:3px">Texto base para iniciar o desenvolvimento do livro digital.</div></div>'
       +'<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">'
-      +'<button id="prompt-livros-copy-btn" type="button" onclick="copiarPromptLivros()" style="padding:10px 16px;border:none;border-radius:999px;background:linear-gradient(135deg,#c9a84c,#e8c86a);color:#43310e;font:700 .8rem \\'DM Sans\\',sans-serif;cursor:pointer">copiar</button>'
-      +'<button type="button" onclick="fecharPromptLivros()" style="padding:10px 16px;border:none;border-radius:999px;background:var(--cl);color:var(--ce);font:700 .8rem \\'DM Sans\\',sans-serif;cursor:pointer">fechar</button>'
+      +'<button id="prompt-livros-copy-btn" type="button" onclick="copiarPromptLivros()" style="padding:10px 16px;border:none;border-radius:999px;background:linear-gradient(135deg,#c9a84c,#e8c86a);color:#43310e;font:700 .8rem \'DM Sans\',sans-serif;cursor:pointer">copiar</button>'
+      +'<button type="button" onclick="fecharPromptLivros()" style="padding:10px 16px;border:none;border-radius:999px;background:var(--cl);color:var(--ce);font:700 .8rem \'DM Sans\',sans-serif;cursor:pointer">fechar</button>'
       +'</div></div>'
-      +'<div style="padding:20px;overflow:auto"><textarea id="prompt-livros-texto" readonly style="width:100%;min-height:68vh;padding:16px 18px;border:1px solid var(--cl);border-radius:14px;background:#fff;color:var(--ce);font:400 .84rem/1.7 \\'DM Sans\\',sans-serif;resize:none;white-space:pre-wrap"></textarea></div>'
+      +'<div style="padding:20px;overflow:auto"><textarea id="prompt-livros-texto" readonly style="width:100%;min-height:68vh;padding:16px 18px;border:1px solid var(--cl);border-radius:14px;background:#fff;color:var(--ce);font:400 .84rem/1.7 \'DM Sans\',sans-serif;resize:none;white-space:pre-wrap"></textarea></div>'
       +'</div>';
     document.body.appendChild(modal);
     var area=document.getElementById('prompt-livros-texto');
