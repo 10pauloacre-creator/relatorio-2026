@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-07-16T20:54:26.843Z",
+  "latest": {
+    "appName": "Relatórios Diários",
+    "appId": "com.relatoriosdiarios.app",
+    "versionName": "1.0.0",
+    "versionCode": 1,
+    "channel": "debug",
+    "notes": [
+      "Primeira versao do APK com pagina publica de download e atualizacao."
+    ],
+    "fileName": "relatorios-diarios-v1.0.0.apk",
+    "sizeBytes": 9986276,
+    "sizeLabel": "9.52 MB",
+    "sha256": "2c25516261f0d1f3e9fc28a1ac9ac0d13096c752dc3cf950b288db6ec45efa04",
+    "releasedAt": "2026-07-16T20:54:26.843Z",
+    "releasedAtLabel": "16/07/2026, 15:54",
+    "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.0.apk",
+    "downloadPath": "./apk/relatorios-diarios-v1.0.0.apk"
+  }
+}

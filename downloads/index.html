@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Download do APK · Relatórios Diários</title>
+<meta name="theme-color" content="#0e2417">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="../icon-192.png">
+<style>
+:root{
+  --bg:#08140d;
+  --panel:#102319;
+  --panel-2:#173325;
+  --line:rgba(255,255,255,.1);
+  --text:#f4f8f4;
+  --muted:#a9b9ae;
+  --accent:#d8b35b;
+  --accent-2:#f2d37f;
+  --ok:#79d39b;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at top right, rgba(216,179,91,.14), transparent 26%),
+    linear-gradient(180deg, #0a1610, #08140d 38%, #07110b);
+  color:var(--text);
+  min-height:100vh;
+}
+.shell{
+  max-width:1080px;
+  margin:0 auto;
+  padding:32px 20px 56px;
+}
+.hero{
+  display:grid;
+  gap:24px;
+  grid-template-columns:1.3fr .9fr;
+  background:linear-gradient(135deg, rgba(16,35,25,.95), rgba(23,51,37,.92));
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:28px;
+  box-shadow:0 20px 60px rgba(0,0,0,.32);
+}
+.eyebrow{
+  display:inline-flex;
+  width:max-content;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(216,179,91,.12);
+  border:1px solid rgba(216,179,91,.22);
+  color:var(--accent-2);
+  font-size:.78rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:700;
+}
+h1{
+  margin:14px 0 10px;
+  font-size:clamp(2rem, 4vw, 3.2rem);
+  line-height:1.05;
+}
+.hero p,.side p,.empty,.steps li,.release-card li,.release-meta span,.meta-grid span{
+  color:var(--muted);
+}
+.hero p{
+  margin:0;
+  line-height:1.7;
+  max-width:58ch;
+}
+.hero-actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:22px;
+}
+.primary-btn,.ghost-btn,.release-top a{
+  text-decoration:none;
+  border-radius:999px;
+  padding:13px 18px;
+  font-weight:700;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.primary-btn{
+  background:linear-gradient(135deg, var(--accent), var(--accent-2));
+  color:#2d2208;
+}
+.primary-btn.disabled{
+  background:#314338;
+  color:#95aa9a;
+  cursor:not-allowed;
+}
+.ghost-btn{
+  border:1px solid var(--line);
+  color:var(--text);
+}
+.side{
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:22px;
+}
+.side h2,.notes h3,.section h2{
+  margin:0 0 14px;
+  font-size:1.05rem;
+}
+.meta-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.meta-grid div{
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+}
+.meta-grid strong,.release-top h3{
+  display:block;
+  margin-bottom:6px;
+}
+.hash{
+  font-family:Consolas,monospace;
+  font-size:.8rem;
+  word-break:break-all;
+}
+.section{
+  margin-top:28px;
+}
+.steps{
+  margin:0;
+  padding-left:18px;
+  line-height:1.8;
+}
+.release-grid{
+  display:grid;
+  gap:16px;
+}
+.release-card{
+  background:linear-gradient(180deg, rgba(16,35,25,.88), rgba(10,22,16,.96));
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:20px;
+}
+.release-top{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:flex-start;
+}
+.release-top p{
+  margin:4px 0 0;
+}
+.release-top a{
+  background:rgba(121,211,155,.12);
+  color:var(--ok);
+  border:1px solid rgba(121,211,155,.24);
+}
+.release-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:12px 0;
+}
+.release-card ul,.notes ul{
+  margin:0;
+  padding-left:18px;
+  line-height:1.7;
+}
+@media (max-width: 860px){
+  .hero{grid-template-columns:1fr}
+  .meta-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <span class="eyebrow">APK e Atualizações</span>
+        <h1>Relatórios Diários</h1>
+        <p>Baixe a versão mais recente do aplicativo Android, acompanhe o histórico de publicações e atualize instalando a nova versão por cima da anterior.</p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="./apk/relatorios-diarios-v1.0.0.apk">Baixar APK 1.0.0</a>
+          <a class="ghost-btn" href="../index.html">Voltar ao painel inicial</a>
+        </div>
+      </div>
+      <aside class="side">
+        <h2>Última versão publicada</h2>
+        
+      <div class="meta-grid">
+        <div><strong>Versão</strong><span>1.0.0</span></div>
+        <div><strong>Build</strong><span>1</span></div>
+        <div><strong>Canal</strong><span>debug</span></div>
+        <div><strong>Tamanho</strong><span>9.52 MB</span></div>
+        <div><strong>Publicado em</strong><span>16/07/2026, 15:54</span></div>
+        <div><strong>SHA-256</strong><span class="hash">2c25516261f0d1f3e9fc28a1ac9ac0d13096c752dc3cf950b288db6ec45efa04</span></div>
+      </div>
+      <div class="notes">
+        <h3>O que mudou</h3>
+        <ul><li>Primeira versao do APK com pagina publica de download e atualizacao.</li></ul>
+      </div>
+    
+      </aside>
+    </section>
+
+    <section class="section">
+      <h2>Como instalar ou atualizar</h2>
+      <ol class="steps">
+        <li>Baixe o APK mais recente nesta página.</li>
+        <li>No celular, permita instalação por fonte confiável se o Android solicitar.</li>
+        <li>Abra o arquivo APK e confirme a instalação.</li>
+        <li>Para atualizar, instale a nova versão por cima da versão anterior.</li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <h2>Histórico de versões</h2>
+      <div class="release-grid">
+        
+          <article class="release-card">
+            <div class="release-top">
+              <div>
+                <h3>1.0.0</h3>
+                <p>Build 1 · debug</p>
+              </div>
+              <a href="./apk/relatorios-diarios-v1.0.0.apk">Baixar</a>
+            </div>
+            <div class="release-meta">
+              <span>16/07/2026, 15:54</span>
+              <span>9.52 MB</span>
+            </div>
+            <ul><li>Primeira versao do APK com pagina publica de download e atualizacao.</li></ul>
+          </article>
+        
+      </div>
+    </section>
+  </main>
+</body>
+</html>

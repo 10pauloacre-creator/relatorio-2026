@@ -23,6 +23,7 @@ body {
   justify-content: center;
   gap: 32px;
   padding: 20px;
+  font-family: "Segoe UI", Tahoma, sans-serif;
 }
 
 a {
@@ -47,6 +48,18 @@ img {
   display: block;
 }
 
+.download-link {
+  width: min(100%, 360px);
+  padding: 16px 22px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #d5f2bc, #8bd16f);
+  color: #12311e;
+  text-decoration: none;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
 /* desktop: lado a lado */
 @media (min-width: 900px) {
   body { flex-direction: row; gap: 60px; padding: 24px; }
@@ -65,6 +78,6 @@ img {
   <img src="botãoherminio.png" alt="Raimundo Hermínio de Melo">
 </a>
 
-<script>(function(){if(!('serviceWorker' in navigator))return;window.addEventListener('load',function(){navigator.serviceWorker.getRegistrations().then(function(regs){return Promise.all(regs.map(function(reg){return reg.unregister();}));}).catch(function(){}).finally(function(){if(window.caches&&caches.keys){caches.keys().then(function(keys){return Promise.all(keys.map(function(key){return caches.delete(key);}));}).catch(function(){});}});});})();</script>
+<a class="download-link" href="downloads/index.html">Download e atualizaÃ§Ãµes do APK</a>
 </body>
 </html>
