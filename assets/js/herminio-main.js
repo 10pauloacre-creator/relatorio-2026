@@ -269,7 +269,8 @@ if ((id === 'sec-all' || id === 'sec-t89' || id === 'sec-t1' || id === 'sec-t23'
 if (id === 'sec-cont') renderContRH(); 
 if (id === 'sec-plano' && !window._rhPlanReady) { window._rhPlanReady = true; setTimeout(function(){ rhBuildPlanReplica(); }, 40); } 
 if (id === 'sec-livros' && !window._rhLivReady) { window._rhLivReady = true; setTimeout(function(){ rhLivRender(); }, 40); } 
-if (id === 'sec-sequencias' && !window._rhSeqReady) { window._rhSeqReady = true; setTimeout(function(){ rhSeqRender(); }, 40); }   rhUpdateHeroStats(id); }
+if (id === 'sec-sequencias' && !window._rhSeqReady) { window._rhSeqReady = true; setTimeout(function(){ rhSeqRender(); }, 40); } 
+if (id === 'sec-claude') rhClaudeRender();   rhUpdateHeroStats(id); }
 function tog(h) { 
 var p = h.parentElement; 
 var ec2 = p.querySelector('.ec2'); 
@@ -376,13 +377,6 @@ var cls = item.ok ? 'co' : (item.b === bimAtual ? 'at' : '');
 var rotulo = item.ok ? '&#10004; Concluído' : fmtDataRH(item.data);         return '<div class="bi ' + cls + '"><div class="bn">' + item.b + 'º Bim</div><div class="bd2">' + rotulo + '</div></div>';       }).join('') + '</div>';     }    
 var observacao = semanais       ? '<div class="ae">Estimativa calculada a partir dos relatos diários já lançados.</div>'       : '<div class="ae">Metas bimestrais e anuais definidas. Defina a carga semanal se quiser liberar a previsão automática de conclusão.</div>';      card.innerHTML =       '<div class="cch">'         + '<div><div class="cct">' + RH_TURMA_LABELS[base.turmaId] + '</div><div class="ccm">' + metaTxt + '</div></div>'         + '<div class="ccb" style="' + confGrupo.badgeStyle + '">' + badgeTxt + '</div>'       + '</div>'       + '<div class="ccbody">'         + '<div class="pg">'           + '<div class="pl"><span class="plt">' + (bimestre ? (bimAtual + 'º Bimestre') : 'Aulas lançadas') + '</span><span class="pln">' + fmtHoraAula(bimestre ? feitasBim : feitas) + (bimestre ? ' / ' + fmtHoraAula(bimestre) + ' · faltam ' + fmtHoraAula(faltamBim) : ' h/aula acumuladas') + '</span></div>'           + '<div class="pbg"><div class="pf" style="width:' + pctBim + '%;background:' + confGrupo.bar + '"></div></div>'         + '</div>'         + '<div class="pg">'           + '<div class="pl"><span class="plt">Total do ano</span><span class="pln">' + fmtHoraAula(feitas) + (total ? ' / ' + fmtHoraAula(total) + ' · faltam ' + fmtHoraAula(faltamAno) : ' h/aula registradas') + '</span></div>'           + '<div class="pbg"><div class="pf dm" style="width:' + pctAno + '%;background:' + confGrupo.bar + '"></div></div>'         + '</div>'         + previsaoHtml         + observacao       + '</div>';      container.appendChild(card);   }); }
 // ═══════════════════════════════════════════════════════ //  INIT // ═══════════════════════════════════════════════════════ 
-// ═══════════════════════════════════════════════════════ //  NAVEGAÇÃO — aba() atualizada para suportar novas seções // ═══════════════════════════════════════════════════════ // (sobrescreve a definição anterior)
-function aba(id, btn) {   document.querySelectorAll('.sec').forEach(function(s){ s.classList.remove('on'); });   document.querySelectorAll('.nb').forEach(function(b){ b.classList.remove('on'); }); 
-var sec = document.getElementById(id); 
-if (sec) sec.classList.add('on'); 
-if (btn) btn.classList.add('on'); 
-if (id === 'sec-cont') renderContRH(); 
-if (id === 'sec-claude') rhClaudeRender();   rhUpdateHeroStats(id); }
 // ═══════════════════════════════════════════════════════ //  LIVROS — troca de aba // ═══════════════════════════════════════════════════════
 var PROMPT_LIVROS_TEXTO='Prompt de livros temporariamente simplificado para manter a pagina interativa.';
 function abrirPromptLivros(){ 

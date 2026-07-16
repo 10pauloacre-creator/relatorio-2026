@@ -26,7 +26,11 @@
       "Bash(git revert *)",
       "Bash(node --input-type=module)",
       "Bash(node -e ' *)",
-      "WebFetch(domain:10pauloacre-creator.github.io)"
+      "WebFetch(domain:10pauloacre-creator.github.io)",
+      "Bash(grep -o \"herminio-alunos-8ano.html[^\\\\\"]*\\\\\"[^<]{0,80}\" /c/Downloads/relatorio-2026/herminio.html)",
+      "Bash(grep -o \"Artes[^<]\\\\{0,30\\\\}\" /c/Downloads/relatorio-2026/herminio.html)",
+      "Bash(grep -o \"8º Ano[^<]\\\\{0,200\\\\}\" /c/Downloads/relatorio-2026/herminio.html)",
+      "Bash(grep -o \"9º Ano[^<]\\\\{0,200\\\\}\" /c/Downloads/relatorio-2026/herminio.html)"
     ],
     "additionalDirectories": [
       "\\tmp"
