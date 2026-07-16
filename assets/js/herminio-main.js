@@ -657,3 +657,14 @@ if (!_rhPresencaCliques[paneId]) _rhPresencaCliques[paneId] = {};     _rhPresenc
 if (!_rhAtividadeCliques[paneId]) _rhAtividadeCliques[paneId] = {};   _rhAtividadeCliques[paneId][aluno] = proximo;   rhSalvarCliques('atividade');   rhRenderPaneAtividade(pane);   rhSincronizarResumoAlunos(); });
 if ('serviceWorker' in navigator) { 
 window.addEventListener('load', function() {     navigator.serviceWorker.register('sw.js').catch(function(){});   }); }
+function rhRemoverAbaJogos() {
+var secJogos = document.getElementById('sec-jogos');
+if (secJogos) secJogos.remove();
+var btnJogos = document.querySelector(".nb[onclick=\"aba('sec-jogos',this)\"]");
+if (btnJogos) {
+var sep = btnJogos.previousElementSibling;
+if (sep && sep.classList && sep.classList.contains('sp')) sep.remove();
+btnJogos.remove();
+}
+}
+document.addEventListener('DOMContentLoaded', rhRemoverAbaJogos);

@@ -37,7 +37,8 @@
       "Bash(python3 -)",
       "Bash(where python3 *)",
       "Bash(python3 -c \"print\\('hi'\\)\")",
-      "Bash(node --check /c/Downloads/relatorio-2026/_tmp_check.js)"
+      "Bash(node --check /c/Downloads/relatorio-2026/_tmp_check.js)",
+      "Bash(supabase --version)"
     ],
     "additionalDirectories": [
       "\\tmp"
