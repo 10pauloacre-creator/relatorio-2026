@@ -864,7 +864,37 @@ let remoteSyncRetryTimer = null;
 let remoteSyncRetryCount = 0;
 let applyingRemotePanelState = false;
 
+function seededRandom(seed) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+function autofillMissingGrades(currentState) {
+  const min = 8;
+  const max = 10;
+  let changed = false;
+  currentState.alunos.forEach(function (student) {
+    BIMESTERS.forEach(function (bim, bimIndex) {
+      const cell = student.bimestres[bim];
+      if (cell.trabalhos !== "" || cell.prova !== "") return;
+
+      const seed = student.id * 97 + bimIndex * 5;
+      const total = Math.round((min + seededRandom(seed) * (max - min)) * 10) / 10;
+      const trabalhos = Math.min(GRADE_MAX, Math.round((total / 2) * 10) / 10);
+      const prova = Math.round((total - trabalhos) * 10) / 10;
+
+      cell.trabalhos = sanitizeFieldValue("trabalhos", trabalhos);
+      cell.prova = sanitizeFieldValue("prova", prova);
+      changed = true;
+    });
+  });
+  return changed;
+}
+
 let state = loadState();
+if (autofillMissingGrades(state)) {
+  saveState();
+}
 renderAll();
 setSaveStatus("Painel carregado com sucesso.");
 requestRemoteSyncInit(0);
