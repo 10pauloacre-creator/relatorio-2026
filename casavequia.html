@@ -6979,7 +6979,9 @@ document.getElementById('p6ano').classList.add('active');
 
 <script>
 function aba(id,btn){var targetBtn=btn||Array.from(document.querySelectorAll('.nb')).find(function(item){return(item.getAttribute('onclick')||'').indexOf("aba('"+id+"'")>=0;});document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));document.getElementById('sec-'+id).classList.add('on');if(targetBtn)targetBtn.classList.add('on');if(id==='cal'&&typeof renderCasavequiaCalendar==='function'){renderCasavequiaCalendar();}}
-document.addEventListener('DOMContentLoaded',function(){aba('all');});
+function claudeAbrirPelaHash(){var hash=(location.hash||'').toLowerCase();if(hash!=='#claude'&&hash!=='#sec-claude')return;var btn=Array.from(document.querySelectorAll('.nb')).find(function(item){return(item.getAttribute('onclick')||'').indexOf("aba('claude'")>=0;});aba('claude',btn);}
+document.addEventListener('DOMContentLoaded',function(){aba('all');claudeAbrirPelaHash();});
+window.addEventListener('hashchange',claudeAbrirPelaHash);
 function tog(h){const c=h.nextElementSibling,t=h.querySelector('.et'),o=c.classList.contains('on');c.classList.toggle('on',!o);t.classList.toggle('op',!o);}
 function itab(btn,pid){const ec=btn.closest('.ec2');ec.querySelectorAll('.itab').forEach(b=>b.classList.remove('on'));ec.querySelectorAll('.ipane').forEach(p=>p.classList.remove('on'));btn.classList.add('on');document.getElementById(pid).classList.add('on');if(pid.startsWith('p-')){renderPresenca();}if(pid.startsWith('a-')){renderAtividades();}}
 var _pcOrigTog=tog;
@@ -9811,30 +9813,29 @@ document.addEventListener('visibilitychange', function() {
 });
 
 // ── Notification Triggers (agenda notificação com app fechado) ──
-async function _claudeAgendarNotifSistema(id, nome, timestampFim) {
+async function _claudeAgendarNotifSistema(id, nome, timestampFim, urlDestino) {
   if (!('serviceWorker' in navigator) || Notification.permission !== 'granted') return;
   try {
     var reg = await navigator.serviceWorker.ready;
-    // Cancela notificação agendada anterior para esta conta
     var existentes = await reg.getNotifications({ tag: 'cl-sched-' + id });
     existentes.forEach(function(n) { n.close(); });
-    // TimestampTrigger — agenda notificação sem precisar do app aberto
     if (typeof TimestampTrigger !== 'undefined') {
-      await reg.showNotification('Claude Liberado! ✅', {
-        body: 'Conta [' + nome + '] liberada! O limite do Claude expirou.',
+      await reg.showNotification('Conta claude disponivel', {
+        body: 'Conta claude disponivel, toque para verificar',
         icon: 'icon-192.png',
         badge: 'icon-192.png',
         tag: 'cl-sched-' + id,
         renotify: true,
         requireInteraction: true,
         vibrate: [300, 100, 300, 100, 300],
+        data: { id: id, nome: nome, url: urlDestino || (location.pathname + '#claude') },
         showTrigger: new TimestampTrigger(timestampFim)
       });
-      console.log('[Claude] Notificação agendada para ' + new Date(timestampFim).toLocaleTimeString('pt-BR'));
+      console.log('[Claude] Notificacao agendada para ' + new Date(timestampFim).toLocaleTimeString('pt-BR'));
       return true;
     }
   } catch(e) {
-    console.warn('[Claude] Notification Trigger não suportado:', e.message);
+    console.warn('[Claude] Notification Trigger nao suportado:', e.message);
   }
   return false;
 }
@@ -9845,11 +9846,15 @@ function claudeParar(id) {
   localStorage.removeItem('cl_notif_' + id);
   _claudeSyncFB(id, null);
   _claudeIDB_remover(id);
-  // Cancela notificação agendada
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready.then(function(reg) {
-      reg.getNotifications({ tag: 'cl-sched-' + id }).then(function(ns) {
-        ns.forEach(function(n) { n.close(); });
+      Promise.all([
+        reg.getNotifications({ tag: 'cl-sched-' + id }),
+        reg.getNotifications({ tag: 'claude-ready-' + id })
+      ]).then(function(listas) {
+        listas.forEach(function(ns) {
+          ns.forEach(function(n) { n.close(); });
+        });
       });
     });
   }
@@ -9880,11 +9885,19 @@ function claudeConfirmarHora() {
   var id = popup.dataset.id;
   var nome = popup.dataset.nome;
   var ts = fim.getTime();
+  var urlDestino = location.pathname + '#claude';
   localStorage.removeItem('cl_notif_' + id);
   localStorage.setItem('cl_fim_' + id, ts.toString());
   _claudeSyncFB(id, ts);
-  _claudeAgendarNotifSistema(id, nome, ts);
-  _claudeIDB_salvar(id, nome, ts); // para o SW verificar com app fechado
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(function() {
+      claudeAtualizarNotifBar();
+      _claudeAgendarNotifSistema(id, nome, ts, urlDestino);
+    });
+  } else {
+    _claudeAgendarNotifSistema(id, nome, ts, urlDestino);
+  }
+  _claudeIDB_salvar(id, nome, ts, urlDestino);
   popup.style.display = 'none';
   claudeRenderizar();
 }
@@ -10164,40 +10177,42 @@ function claudeTick() {
 }
 
 function claudeNotificar(nome) {
+  var urlDestino = location.pathname + '#claude';
   var opts = {
-    body: 'Conta [' + nome + '] liberada! O limite do Claude expirou.',
+    body: 'Conta claude disponivel, toque para verificar',
     icon: 'icon-192.png',
     badge: 'icon-192.png',
     tag: 'cl-' + nome,
     renotify: true,
     requireInteraction: true,
-    vibrate: [300, 100, 300, 100, 300]
+    vibrate: [300, 100, 300, 100, 300],
+    data: { nome: nome, url: urlDestino }
   };
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     navigator.serviceWorker.ready.then(function(reg) {
-      reg.showNotification('Claude Liberado! ✅', opts);
+      reg.showNotification('Conta claude disponivel', opts);
     }).catch(function() {
-      if (Notification.permission === 'granted') new Notification('Claude Liberado! ✅', opts);
+      if (Notification.permission === 'granted') new Notification('Conta claude disponivel', opts);
     });
   } else if (Notification.permission === 'granted') {
-    new Notification('Claude Liberado! ✅', opts);
+    new Notification('Conta claude disponivel', opts);
   }
   var _orig = document.title;
   var _count = 0;
   var _flash = setInterval(function() {
-    document.title = (_count % 2 === 0) ? '🔔 Claude Liberado!' : _orig;
+    document.title = (_count % 2 === 0) ? 'Claude disponivel' : _orig;
     _count++;
     if (_count > 10) { clearInterval(_flash); document.title = _orig; }
   }, 600);
 }
 
 function claudePedirPermissao() {
-  if (!('Notification' in window)) { alert('Seu navegador não suporta notificações.'); return; }
+  if (!('Notification' in window)) { alert('Seu navegador nao suporta notificacoes.'); return; }
   Notification.requestPermission().then(function(perm) {
     claudeAtualizarNotifBar();
     if (perm === 'granted') {
-      new Notification('Notificações ativadas ✅', {
-        body: 'Você será avisado quando uma conta Claude for liberada.',
+      new Notification('Notificacoes ativadas', {
+        body: 'Quando o cronometro zerar, voce sera avisado no celular.',
         icon: 'icon-192.png'
       });
     }
@@ -10205,8 +10220,6 @@ function claudePedirPermissao() {
 }
 
 function claudeAtualizarNotifBar() {
-  // Notificações desabilitadas no mobile
-  if (window.innerWidth <= 680 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) return;
   var bar = document.getElementById('cl-notif-bar');
   if (!bar) return;
   bar.style.display = ('Notification' in window && Notification.permission !== 'granted') ? 'flex' : 'none';
@@ -10243,7 +10256,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ── IndexedDB: sincroniza timers para o Service Worker ──
-function _claudeIDB_salvar(id, nome, fim) {
+function _claudeIDB_salvar(id, nome, fim, url) {
   var req = indexedDB.open('claude-timers', 1);
   req.onupgradeneeded = function(e) {
     e.target.result.createObjectStore('timers', { keyPath: 'id' });
@@ -10251,7 +10264,7 @@ function _claudeIDB_salvar(id, nome, fim) {
   req.onsuccess = function(e) {
     var db = e.target.result;
     var tx = db.transaction('timers', 'readwrite');
-    tx.objectStore('timers').put({ id: id, nome: nome, fim: fim, notificado: false });
+    tx.objectStore('timers').put({ id: id, nome: nome, fim: fim, notificado: false, url: url || (location.pathname + '#claude') });
   };
 }
 function _claudeIDB_remover(id) {
@@ -10281,7 +10294,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
-<script>(function(){if(!('serviceWorker' in navigator))return;window.addEventListener('load',function(){navigator.serviceWorker.getRegistrations().then(function(regs){return Promise.all(regs.map(function(reg){return reg.unregister();}));}).catch(function(){}).finally(function(){if(window.caches&&caches.keys){caches.keys().then(function(keys){return Promise.all(keys.map(function(key){return caches.delete(key);}));}).catch(function(){});}});});})();</script>
+
 </body>
 </html>
 

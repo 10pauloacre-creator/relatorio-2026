@@ -543,10 +543,196 @@ var l=_rhGetLivro(id)||{temas:[]};l.temas.push({t:'',ok:false});_rhSaveLivro(id,
 var container=document.getElementById('rh-temas-lista');if(!container)return; 
 var idx=l.temas.length-1; 
 var div=document.createElement('div');div.className='cl-tema-item';   div.innerHTML='<input type="checkbox" onchange="_rhTogTema(\''+id+'\','+idx+',this.checked)">'     +'<input type="text" value="" placeholder="Nome do tema" oninput="_rhEditTema(\''+id+'\','+idx+',this.value)">'     +'<button class="cl-tema-del" onclick="_rhDelTema(\''+id+'\','+idx+')">✕</button>';   container.appendChild(div);   div.querySelector('input[type=text]').focus(); }
-setInterval(function() {
-var sec = document.getElementById('sec-claude');
-if (sec && sec.classList.contains('on')) rhClaudeTick();
-}, 1000);
+var _rhClaudeRenderBase = rhClaudeRender;
+function rhClaudeTimerUrl() { return location.pathname + '#sec-claude'; }
+function rhClaudeAbrirPelaHash() {
+var hash = (location.hash || '').toLowerCase();
+if (hash !== '#claude' && hash !== '#sec-claude') return;
+var btn = document.querySelector(".nb[onclick=\"aba('sec-claude',this)\"]");
+aba('sec-claude', btn);
+}
+function rhClaudeObterNome(id) {
+var conta = RH_CONTAS_CLAUDE.find(function(item){ return item.id === id; });
+return conta ? conta.nome : 'Claude';
+}
+function rhClaudeAtualizarNotifBar() {
+var bar = document.getElementById('cl-notif-bar-rh');
+if (!bar) return;
+bar.style.display = ('Notification' in window && Notification.permission !== 'granted') ? 'flex' : 'none';
+}
+function rhClaudeForcarVerificacaoSW() {
+if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) return;
+navigator.serviceWorker.controller.postMessage({ type: 'CLAUDE_TIMER_CHECK' });
+}
+function _rhClaudeIDBSalvar(id, nome, fim, url) {
+var req = indexedDB.open('claude-timers', 1);
+req.onupgradeneeded = function(e) {
+var db = e.target.result;
+if (!db.objectStoreNames.contains('timers')) db.createObjectStore('timers', { keyPath: 'id' });
+};
+req.onsuccess = function(e) {
+var db = e.target.result;
+var tx = db.transaction('timers', 'readwrite');
+tx.objectStore('timers').put({ id: id, nome: nome, fim: fim, notificado: false, url: url || rhClaudeTimerUrl() });
+};
+}
+function _rhClaudeIDBRemover(id) {
+var req = indexedDB.open('claude-timers', 1);
+req.onsuccess = function(e) {
+var db = e.target.result;
+try {
+var tx = db.transaction('timers', 'readwrite');
+tx.objectStore('timers').delete(id);
+} catch(err) {}
+};
+}
+async function rhClaudeAgendarNotifSistema(id, nome, timestampFim, urlDestino) {
+if (!('serviceWorker' in navigator) || Notification.permission !== 'granted') return;
+try {
+var reg = await navigator.serviceWorker.ready;
+var existentes = await reg.getNotifications({ tag: 'cl-sched-' + id });
+existentes.forEach(function(n) { n.close(); });
+if (typeof TimestampTrigger !== 'undefined') {
+await reg.showNotification('Conta claude disponivel', {
+body: 'Conta claude disponivel, toque para verificar',
+icon: 'icon-192.png',
+badge: 'icon-192.png',
+tag: 'cl-sched-' + id,
+renotify: true,
+requireInteraction: true,
+vibrate: [300, 100, 300, 100, 300],
+data: { id: id, nome: nome, url: urlDestino || rhClaudeTimerUrl() },
+showTrigger: new TimestampTrigger(timestampFim)
+});
+return true;
+}
+} catch(e) {
+console.warn('[Claude RH] Notification Trigger nao suportado:', e.message);
+}
+return false;
+}
+function rhClaudeNotificar(nome, id) {
+var opts = {
+body: 'Conta claude disponivel, toque para verificar',
+icon: 'icon-192.png',
+badge: 'icon-192.png',
+tag: 'claude-ready-' + (id || nome),
+renotify: true,
+requireInteraction: true,
+vibrate: [300, 100, 300, 100, 300],
+data: { id: id, nome: nome, url: rhClaudeTimerUrl() }
+};
+if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+navigator.serviceWorker.ready.then(function(reg) {
+reg.showNotification('Conta claude disponivel', opts);
+}).catch(function() {
+if (Notification.permission === 'granted') new Notification('Conta claude disponivel', opts);
+});
+} else if (Notification.permission === 'granted') {
+new Notification('Conta claude disponivel', opts);
+}
+}
+rhClaudeRender = function() {
+_rhClaudeRenderBase();
+rhClaudeAtualizarNotifBar();
+};
+rhClaudeTick = function() {
+var agora = Date.now();
+RH_CONTAS_CLAUDE.forEach(function(c) {
+var timerEl = document.getElementById('rh-timer-' + c.id);
+var cardEl = document.getElementById('rh-card-' + c.id);
+var statEl = document.getElementById('rh-status-' + c.id);
+if (!timerEl || !cardEl || !statEl) return;
+var fim = parseInt(localStorage.getItem('rh_cl_fim_' + c.id) || '0');
+var restante = fim - agora;
+if (restante > 0) {
+timerEl.textContent = _rhFmtTempo(restante);
+cardEl.className = 'cl-card ocupado';
+statEl.textContent = 'AGUARDANDO...';
+return;
+}
+timerEl.textContent = '00:00:00';
+cardEl.className = 'cl-card livre';
+statEl.textContent = 'LIVRE ✓';
+if (fim > 0 && !localStorage.getItem('rh_cl_notif_' + c.id)) {
+localStorage.setItem('rh_cl_notif_' + c.id, '1');
+rhClaudeNotificar(c.nome, c.id);
+}
+});
+};
+rhClaudeConfirmarHora = function() {
+var input = document.getElementById('rh-cl-hora-input');
+if (!input || !input.value) return;
+var parts = input.value.split(':');
+var agora = new Date();
+var fim = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0).getTime();
+if (fim <= Date.now()) fim += 86400000;
+var id = _rhClPopupId;
+var nome = rhClaudeObterNome(id);
+var urlDestino = rhClaudeTimerUrl();
+localStorage.removeItem('rh_cl_notif_' + id);
+localStorage.setItem('rh_cl_fim_' + id, fim.toString());
+if ('Notification' in window && Notification.permission === 'default') {
+Notification.requestPermission().then(function() {
+rhClaudeAtualizarNotifBar();
+rhClaudeAgendarNotifSistema(id, nome, fim, urlDestino);
+});
+} else {
+rhClaudeAgendarNotifSistema(id, nome, fim, urlDestino);
+}
+_rhClaudeIDBSalvar(id, nome, fim, urlDestino);
+rhClaudeForcarVerificacaoSW();
+document.getElementById('rh-cl-popup').style.display = 'none';
+rhClaudeRender();
+};
+rhClaudeLimpar = function(id) {
+localStorage.removeItem('rh_cl_fim_' + id);
+localStorage.removeItem('rh_cl_notif_' + id);
+_rhClaudeIDBRemover(id);
+if ('serviceWorker' in navigator) {
+navigator.serviceWorker.ready.then(function(reg) {
+Promise.all([
+reg.getNotifications({ tag: 'cl-sched-' + id }),
+reg.getNotifications({ tag: 'claude-ready-' + id })
+]).then(function(listas) {
+listas.forEach(function(ns) {
+ns.forEach(function(n) { n.close(); });
+});
+});
+});
+}
+rhClaudeRender();
+};
+rhClaudePedirPermissao = function() {
+if (!('Notification' in window)) { alert('Navegador nao suporta notificacoes.'); return; }
+Notification.requestPermission().then(function(p) {
+rhClaudeAtualizarNotifBar();
+if (p === 'granted') {
+new Notification('Notificacoes ativadas', {
+body: 'Quando o cronometro zerar, voce sera avisado no celular.',
+icon: 'icon-192.png'
+});
+}
+});
+};
+document.addEventListener('DOMContentLoaded', function() {
+rhClaudeAbrirPelaHash();
+rhClaudeAtualizarNotifBar();
+setInterval(rhClaudeTick, 1000);
+});
+window.addEventListener('hashchange', rhClaudeAbrirPelaHash);
+if ('serviceWorker' in navigator) {
+window.addEventListener('load', function() {
+navigator.serviceWorker.register('sw.js').then(function(reg) {
+if ('periodicSync' in reg) {
+reg.periodicSync.register('claude-timer-check', { minInterval: 5 * 60 * 1000 }).catch(function(){});
+}
+}).catch(function(){});
+});
+}
+document.addEventListener('visibilitychange', function() {
+if (!document.hidden) rhClaudeTick();
+});
 document.addEventListener('DOMContentLoaded', function() {   window._rhDailyReady = false;   window._rhPlanReady = false;   window._rhLivReady = false;   window._rhSeqReady = false; });
 function rhPlanShowPage(pid, el) { 
 var wrapper = el.closest('.plano-wrapper'); 
