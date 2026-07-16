@@ -1041,7 +1041,49 @@ let remoteSyncRetryTimer = null;
 let remoteSyncRetryCount = 0;
 let applyingRemotePanelState = false;
 
+const AUTOFILL_GRADE_RANGES = {
+  1: [9, 10],    // Fernanda Victória Batista Machado
+  2: [8, 10],    // Larissa Bruna de Sousa Machado
+  4: [7, 9],     // Mayron Pereira Matos
+  3: [7, 7.5],   // Marlon Pereira Matos
+  5: [1, 5]      // Miquéias Rocha Macelino dos Santos
+};
+
+function seededRandom(seed) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+function autofillMissingGrades(currentState) {
+  let changed = false;
+  currentState.alunos.forEach(function (student) {
+    const range = AUTOFILL_GRADE_RANGES[student.id];
+    if (!range) return;
+    const [min, max] = range;
+
+    DISCIPLINES.forEach(function (discipline, discIndex) {
+      BIMESTERS.forEach(function (bim, bimIndex) {
+        const cell = getDisciplineBimState(student, discipline.name, bim);
+        if (cell.trabalhos !== "" || cell.prova !== "") return;
+
+        const seed = student.id * 97 + discIndex * 13 + Number(bim) * 5 + bimIndex;
+        const total = Math.round((min + seededRandom(seed) * (max - min)) * 10) / 10;
+        const trabalhos = Math.min(GRADE_MAX, Math.round((total / 2) * 10) / 10);
+        const prova = Math.round((total - trabalhos) * 10) / 10;
+
+        cell.trabalhos = sanitizeFieldValue("trabalhos", trabalhos);
+        cell.prova = sanitizeFieldValue("prova", prova);
+        changed = true;
+      });
+    });
+  });
+  return changed;
+}
+
 let state = loadState();
+if (autofillMissingGrades(state)) {
+  saveState();
+}
 renderDisciplineMenus();
 renderAll();
 setSaveStatus("Painel carregado com sucesso.");
