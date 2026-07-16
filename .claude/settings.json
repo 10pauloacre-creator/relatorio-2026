@@ -38,7 +38,8 @@
       "Bash(where python3 *)",
       "Bash(python3 -c \"print\\('hi'\\)\")",
       "Bash(node --check /c/Downloads/relatorio-2026/_tmp_check.js)",
-      "Bash(supabase --version)"
+      "Bash(supabase --version)",
+      "Bash(curl -s 'https://vgceathgwvtmjxbdpecr.supabase.co/rest/v1/boletim_normalizado?select=*&limit=5' -H 'apikey: sb_publishable_ba-g-ww4KwM2Wq0x2vsGVg_x_9pTqUQ' -H 'Authorization: Bearer sb_publishable_ba-g-ww4KwM2Wq0x2vsGVg_x_9pTqUQ')"
     ],
     "additionalDirectories": [
       "\\tmp"
