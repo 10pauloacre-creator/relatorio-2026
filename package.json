@@ -1,0 +1,22 @@
+{
+  "name": "relatorios-diarios-2026",
+  "private": true,
+  "version": "1.0.0",
+  "description": "App web e APK do projeto Relatorios Diarios 2026.",
+  "scripts": {
+    "build:web": "node scripts/build-web-release.js",
+    "android:add": "npm run build:web && npx cap add android",
+    "cap:copy": "npm run build:web && npx cap copy android",
+    "cap:sync": "npm run build:web && npx cap sync android",
+    "release:prepare": "node scripts/prepare-apk-release.js",
+    "apk:debug": "npm run cap:sync && node scripts/run-android-gradle.js :app:assembleDebug",
+    "apk:release": "npm run cap:sync && node scripts/run-android-gradle.js :app:assembleRelease",
+    "release:publish": "node scripts/publish-apk-release.js",
+    "release:debug": "npm run release:prepare && npm run apk:debug && npm run release:publish -- --apk android/app/build/outputs/apk/debug/app-debug.apk && npm run build:web"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^7.4.2",
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2"
+  }
+}

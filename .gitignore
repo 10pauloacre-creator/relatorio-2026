@@ -11,3 +11,18 @@ desktop.ini
 .vscode/
 *.swp
 *.swo
+
+# Node / build mobile
+node_modules/
+dist/
+
+# Android / Capacitor
+android/.gradle/
+android/.idea/
+android/app/build/
+android/build/
+android/local.properties
+android/capacitor.settings.gradle
+
+# Release metadata local
+release/app-version.json

@@ -1,0 +1,13 @@
+{
+  "appName": "Relatórios Diários",
+  "appId": "com.relatoriosdiarios.app",
+  "apkBaseName": "relatorios-diarios",
+  "downloadPagePath": "downloads/index.html",
+  "downloadPageUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/",
+  "downloadBaseUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/",
+  "defaultChannel": "debug",
+  "defaultReleaseNotes": "Atualização estrutural do aplicativo.",
+  "latestFile": "downloads/latest.json",
+  "releasesFile": "downloads/releases.json",
+  "workingVersionFile": "release/app-version.json"
+}

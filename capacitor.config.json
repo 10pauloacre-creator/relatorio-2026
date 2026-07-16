@@ -1,0 +1,6 @@
+{
+  "appId": "com.relatoriosdiarios.app",
+  "appName": "Relatórios Diários",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
