@@ -30,7 +30,14 @@
       "Bash(grep -o \"herminio-alunos-8ano.html[^\\\\\"]*\\\\\"[^<]{0,80}\" /c/Downloads/relatorio-2026/herminio.html)",
       "Bash(grep -o \"Artes[^<]\\\\{0,30\\\\}\" /c/Downloads/relatorio-2026/herminio.html)",
       "Bash(grep -o \"8º Ano[^<]\\\\{0,200\\\\}\" /c/Downloads/relatorio-2026/herminio.html)",
-      "Bash(grep -o \"9º Ano[^<]\\\\{0,200\\\\}\" /c/Downloads/relatorio-2026/herminio.html)"
+      "Bash(grep -o \"9º Ano[^<]\\\\{0,200\\\\}\" /c/Downloads/relatorio-2026/herminio.html)",
+      "Bash(grep -o \"8[ºo] [Aa]no[^<]\\\\{0,150\\\\}\" /c/Downloads/relatorio-2026/herminio.html)",
+      "Bash(grep -oE \"8. Ano[^<]{0,150}\" /c/Downloads/relatorio-2026/herminio.html)",
+      "Bash(grep -o \"8.Ano[^<]\\\\{0,150\\\\}\" /c/Downloads/relatorio-2026/herminio.html)",
+      "Bash(python3 -)",
+      "Bash(where python3 *)",
+      "Bash(python3 -c \"print\\('hi'\\)\")",
+      "Bash(node --check /c/Downloads/relatorio-2026/_tmp_check.js)"
     ],
     "additionalDirectories": [
       "\\tmp"
