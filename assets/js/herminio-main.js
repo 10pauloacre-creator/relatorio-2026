@@ -854,3 +854,218 @@ btnJogos.remove();
 }
 }
 document.addEventListener('DOMContentLoaded', rhRemoverAbaJogos);
+(function() {
+var RH_STORAGE_SYNC_SCOPE = 'herminio:storage:shared-v1';
+var RH_STORAGE_LOCAL_TS_KEY = 'rh_storage_sync_local_ts';
+var RH_STORAGE_SYNC_EXACT_KEYS = ['rh_liv_status', 'rh_liv_urls', 'rh_seq_status', 'rh_plan_last_update'];
+var RH_STORAGE_SYNC_PREFIXES = ['rh_livro_', 'rh_hist_', 'rh_seq_', 'rh_seq_hist_', 'rh_cl_fim_', 'rh_plan_'];
+var _rhRemoteStorageSync = null;
+var _rhAplicandoStorageRemoto = false;
+
+function rhStorageSyncStatus(status) {
+var el = document.getElementById('rh-cl-status');
+if (!el) return;
+var texto = '● Sincronizacao local';
+if (status === 'conectando') texto = '● Conectando online...';
+if (status === 'online') texto = '● Online em tempo real';
+if (status === 'salvando') texto = '● Salvando online...';
+if (status === 'salvo') texto = '● Online sincronizado';
+if (status === 'indisponivel') texto = '● Sync remoto indisponivel';
+if (status === 'erro') texto = '● Falha no sync remoto';
+el.textContent = texto;
+}
+
+function rhStorageSyncKey(key) {
+if (!key) return false;
+if (RH_STORAGE_SYNC_EXACT_KEYS.indexOf(key) >= 0) return true;
+return RH_STORAGE_SYNC_PREFIXES.some(function(prefix) {
+return key.indexOf(prefix) === 0;
+});
+}
+
+function rhStorageTouch(ts) {
+localStorage.setItem(RH_STORAGE_LOCAL_TS_KEY, ts || new Date().toISOString());
+}
+
+function rhStoragePayloadValues() {
+var values = {};
+for (var i = 0; i < localStorage.length; i += 1) {
+var key = localStorage.key(i);
+if (!rhStorageSyncKey(key)) continue;
+values[key] = localStorage.getItem(key);
+}
+return values;
+}
+
+function rhStoragePayload() {
+return {
+localUpdatedAt: localStorage.getItem(RH_STORAGE_LOCAL_TS_KEY) || new Date().toISOString(),
+values: rhStoragePayloadValues()
+};
+}
+
+function rhStorageHydrateGlobals() {
+try { _rhLivStatus = JSON.parse(localStorage.getItem('rh_liv_status') || '{}'); } catch (e) { _rhLivStatus = {}; }
+try { _rhLivUrls = JSON.parse(localStorage.getItem('rh_liv_urls') || '{}'); } catch (e) { _rhLivUrls = {}; }
+try { _rhSeqStatus = JSON.parse(localStorage.getItem('rh_seq_status') || '{}'); } catch (e) { _rhSeqStatus = {}; }
+}
+
+function rhStorageApplyRemote(payload, meta) {
+if (!payload || typeof payload !== 'object') return;
+var remoteStamp = Date.parse(payload.localUpdatedAt || (meta && meta.updatedAt) || '') || 0;
+var localStamp = Date.parse(localStorage.getItem(RH_STORAGE_LOCAL_TS_KEY) || '') || 0;
+if (localStamp && remoteStamp && localStamp > remoteStamp) {
+rhAgendarStorageSync('keep-local');
+return;
+}
+_rhAplicandoStorageRemoto = true;
+try {
+var values = payload.values && typeof payload.values === 'object' ? payload.values : {};
+var keysToRemove = [];
+for (var i = 0; i < localStorage.length; i += 1) {
+var localKey = localStorage.key(i);
+if (rhStorageSyncKey(localKey) && !Object.prototype.hasOwnProperty.call(values, localKey)) {
+keysToRemove.push(localKey);
+}
+}
+keysToRemove.forEach(function(key) {
+localStorage.removeItem(key);
+});
+Object.keys(values).forEach(function(key) {
+if (!rhStorageSyncKey(key)) return;
+if (values[key] == null) localStorage.removeItem(key);
+else localStorage.setItem(key, String(values[key]));
+});
+rhStorageTouch(payload.localUpdatedAt || (meta && meta.updatedAt) || new Date().toISOString());
+rhStorageHydrateGlobals();
+if (typeof rhLivRender === 'function') rhLivRender();
+if (typeof rhSeqRender === 'function') rhSeqRender();
+if (typeof rhClaudeRender === 'function') rhClaudeRender();
+if (typeof rhRefreshHeroStats === 'function') rhRefreshHeroStats();
+if (document.getElementById('rh-hist-modal') && typeof _rhReabrirLivroModal === 'function') _rhReabrirLivroModal();
+} finally {
+_rhAplicandoStorageRemoto = false;
+}
+}
+
+function rhAgendarStorageSync(reason) {
+if (_rhAplicandoStorageRemoto || !_rhRemoteStorageSync) return;
+rhStorageTouch();
+_rhRemoteStorageSync.schedulePush(reason || 'storage-change');
+}
+
+function rhSalvarStorageAgora(reason) {
+if (_rhAplicandoStorageRemoto || !_rhRemoteStorageSync) return Promise.resolve(false);
+rhStorageTouch();
+return _rhRemoteStorageSync.pushNow(reason || 'force');
+}
+
+function rhIniciarStorageSync() {
+if (_rhRemoteStorageSync) return true;
+if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return false;
+_rhRemoteStorageSync = window.RelatorioSupabaseSync.createScopeSync({
+scope: RH_STORAGE_SYNC_SCOPE,
+schoolSlug: 'raimundo-herminio-de-melo',
+classSlug: 'storage',
+source: 'herminio-storage',
+debounceMs: 450,
+getLocalPayload: function() {
+return rhStoragePayload();
+},
+onRemotePayload: function(payload, meta) {
+rhStorageApplyRemote(payload, meta);
+},
+onStatus: function(status) {
+rhStorageSyncStatus(status);
+}
+});
+_rhRemoteStorageSync.start().then(function(ready) {
+if (!ready) return;
+window.setTimeout(function() {
+rhAgendarStorageSync('bootstrap-storage');
+}, 700);
+});
+return true;
+}
+
+function rhGarantirSyncsOnline(tentativa) {
+if (window.RelatorioSupabaseSync && window.RelatorioSupabaseSync.isAvailable()) {
+if (!_rhRemoteDailySync && typeof rhIniciarSyncRemoto === 'function') rhIniciarSyncRemoto();
+rhIniciarStorageSync();
+return;
+}
+if ((tentativa || 0) >= 15) {
+rhStorageSyncStatus('indisponivel');
+return;
+}
+window.setTimeout(function() {
+rhGarantirSyncsOnline((tentativa || 0) + 1);
+}, 1200);
+}
+
+function rhWrapSyncFunction(name, after) {
+var original = window[name];
+if (typeof original !== 'function' || original.__rhSyncWrapped) return;
+var wrapped = function() {
+var result = original.apply(this, arguments);
+try {
+after.apply(this, arguments);
+} catch (error) {
+console.warn('[RH sync]', name, error && error.message ? error.message : error);
+}
+return result;
+};
+wrapped.__rhSyncWrapped = true;
+window[name] = wrapped;
+}
+
+function rhBindStorageSyncHooks() {
+rhWrapSyncFunction('_rhSaveLivro', function() { rhAgendarStorageSync('livro-local'); });
+rhWrapSyncFunction('_rhSaveHist', function() { rhAgendarStorageSync('hist-local'); });
+rhWrapSyncFunction('_rhSaveSequencia', function() { rhAgendarStorageSync('seq-local'); });
+rhWrapSyncFunction('_rhSaveSeqHist', function() { rhAgendarStorageSync('seq-hist-local'); });
+rhWrapSyncFunction('rhLivSalvarStatus', function() { rhAgendarStorageSync('liv-status'); });
+rhWrapSyncFunction('rhSeqSalvarStatus', function() { rhAgendarStorageSync('seq-status'); });
+rhWrapSyncFunction('rhLivRegistrarUrl', function() { rhAgendarStorageSync('liv-url'); });
+rhWrapSyncFunction('rhSalvarLivro', function() { rhSalvarStorageAgora('force'); });
+rhWrapSyncFunction('rhMarcarConcluido', function() { rhSalvarStorageAgora('force'); });
+rhWrapSyncFunction('rhSequenciaSalvar', function() { rhSalvarStorageAgora('force'); });
+rhWrapSyncFunction('rhSequenciaMarcarConcluida', function() { rhSalvarStorageAgora('force'); });
+rhWrapSyncFunction('_rhTogTema', function() { rhAgendarStorageSync('tema-toggle'); });
+rhWrapSyncFunction('_rhEditTema', function() { rhAgendarStorageSync('tema-edit'); });
+rhWrapSyncFunction('_rhDelTema', function() { rhAgendarStorageSync('tema-del'); });
+rhWrapSyncFunction('_rhAddTema', function() { rhAgendarStorageSync('tema-add'); });
+rhWrapSyncFunction('rhClaudeConfirmarHora', function() { rhSalvarStorageAgora('force'); });
+rhWrapSyncFunction('rhClaudeLimpar', function() { rhSalvarStorageAgora('force'); });
+}
+
+window.relatoriosForceOnlineRefresh = function() {
+rhGarantirSyncsOnline(0);
+var tarefas = [];
+if (_rhRemoteDailySync && typeof _rhRemoteDailySync.refresh === 'function') tarefas.push(_rhRemoteDailySync.refresh());
+if (_rhRemoteStorageSync && typeof _rhRemoteStorageSync.refresh === 'function') tarefas.push(_rhRemoteStorageSync.refresh());
+return Promise.allSettled(tarefas).then(function() {
+rhStorageHydrateGlobals();
+if (typeof rhRenderPresencaInterativa === 'function') rhRenderPresencaInterativa();
+if (typeof rhRenderAtividadeInterativa === 'function') rhRenderAtividadeInterativa();
+if (typeof rhSincronizarResumoAlunos === 'function') rhSincronizarResumoAlunos();
+if (typeof rhLivRender === 'function') rhLivRender();
+if (typeof rhSeqRender === 'function') rhSeqRender();
+if (typeof rhClaudeRender === 'function') rhClaudeRender();
+if (typeof rhRefreshHeroStats === 'function') rhRefreshHeroStats();
+return true;
+});
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+rhBindStorageSyncHooks();
+rhGarantirSyncsOnline(0);
+});
+
+window.addEventListener('online', function() {
+rhGarantirSyncsOnline(0);
+if (typeof window.relatoriosForceOnlineRefresh === 'function') {
+window.relatoriosForceOnlineRefresh();
+}
+});
+})();
