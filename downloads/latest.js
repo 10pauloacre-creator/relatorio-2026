@@ -1,18 +1,18 @@
 window.__RELATORIOS_APP_LATEST__ = {
   "appName": "Relatórios",
   "appId": "com.relatoriosdiarios.app",
-  "versionName": "1.0.5",
-  "versionCode": 7,
+  "versionName": "1.0.6",
+  "versionCode": 8,
   "channel": "debug",
   "notes": [
-    "Reajusta o icone do aplicativo e renomeia o app para Relatorios no Android."
+    "Permissão nativa de notificações Android na aba Claude, alerta automático ao zerar o cronômetro e integração nas duas escolas."
   ],
-  "fileName": "relatorios-diarios-v1.0.5.apk",
-  "sizeBytes": 10473120,
-  "sizeLabel": "9.99 MB",
-  "sha256": "a3591c59c04c655de458628c91d393a0abf9bea73863ba8c0c89eb98d32133a3",
-  "releasedAt": "2026-07-17T02:59:35.505Z",
-  "releasedAtLabel": "16/07/2026, 21:59",
-  "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.5.apk",
-  "downloadPath": "./apk/relatorios-diarios-v1.0.5.apk"
+  "fileName": "relatorios-diarios-v1.0.6.apk",
+  "sizeBytes": 10502326,
+  "sizeLabel": "10.02 MB",
+  "sha256": "742efd090c4c49a5dd0fcf81a4b01757ae721fe168beebb0185375d355d4eb60",
+  "releasedAt": "2026-07-17T03:12:57.203Z",
+  "releasedAtLabel": "16/07/2026, 22:12",
+  "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.6.apk",
+  "downloadPath": "./apk/relatorios-diarios-v1.0.6.apk"
 };

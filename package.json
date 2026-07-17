@@ -1,7 +1,7 @@
 {
   "name": "relatorios-diarios-2026",
   "private": true,
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "App web e APK do projeto Relatorios Diarios 2026.",
   "scripts": {
     "build:web": "node scripts/build-web-release.js",
@@ -19,5 +19,8 @@
     "@capacitor/android": "^7.4.2",
     "@capacitor/cli": "^7.4.2",
     "@capacitor/core": "^7.4.2"
+  },
+  "dependencies": {
+    "@capacitor/local-notifications": "^7.0.0"
   }
 }
