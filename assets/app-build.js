@@ -1,14 +1,14 @@
 window.__RELATORIOS_APP_BUILD__ = {
-  "appName": "Relatórios Diários",
+  "appName": "Relatórios",
   "appId": "com.relatoriosdiarios.app",
   "channel": "debug",
-  "versionName": "1.0.4",
-  "versionCode": 6,
+  "versionName": "1.0.5",
+  "versionCode": 7,
   "notes": [
     "Atualização estrutural do aplicativo."
   ],
   "downloadPageUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/",
   "latestJsonUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/latest.json",
   "latestScriptUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/latest.js",
-  "generatedAt": "2026-07-17T02:47:55.412Z"
+  "generatedAt": "2026-07-17T03:00:23.772Z"
 };
