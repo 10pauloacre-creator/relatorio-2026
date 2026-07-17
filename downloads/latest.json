@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-07-17T02:16:40.249Z",
+  "generatedAt": "2026-07-17T02:26:23.631Z",
   "latest": {
     "appName": "Relatórios Diários",
     "appId": "com.relatoriosdiarios.app",
-    "versionName": "1.0.2",
-    "versionCode": 4,
+    "versionName": "1.0.3",
+    "versionCode": 5,
     "channel": "debug",
     "notes": [
-      "Restaura o conteudo dos modais de prompt nos livros do relatorio diario."
+      "Remove o botao de atualizacao da tela inicial e passa a avisar novas versoes por modal automatico ao abrir o app."
     ],
-    "fileName": "relatorios-diarios-v1.0.2.apk",
-    "sizeBytes": 58557310,
-    "sizeLabel": "55.84 MB",
-    "sha256": "b7614a296b4fb419497e24a59a48109ca22ddd20b7064593303081b8211b7d26",
-    "releasedAt": "2026-07-17T02:16:40.249Z",
-    "releasedAtLabel": "16/07/2026, 21:16",
-    "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.2.apk",
-    "downloadPath": "./apk/relatorios-diarios-v1.0.2.apk"
+    "fileName": "relatorios-diarios-v1.0.3.apk",
+    "sizeBytes": 10126946,
+    "sizeLabel": "9.66 MB",
+    "sha256": "e87227094ed1da1393c4062732bab97e5f40f04b12236649420169a56328802e",
+    "releasedAt": "2026-07-17T02:26:23.631Z",
+    "releasedAtLabel": "16/07/2026, 21:26",
+    "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.3.apk",
+    "downloadPath": "./apk/relatorios-diarios-v1.0.3.apk"
   }
 }

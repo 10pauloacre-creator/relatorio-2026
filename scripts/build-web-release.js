@@ -88,10 +88,20 @@ function copyDir(sourceDir, targetDir) {
   for (const entry of fs.readdirSync(sourceDir, { withFileTypes: true })) {
     const source = path.join(sourceDir, entry.name);
     const target = path.join(targetDir, entry.name);
+    if (shouldSkipCopy(source)) continue;
     if (entry.isDirectory()) {
       copyDir(source, target);
       continue;
     }
     fs.copyFileSync(source, target);
   }
+}
+
+function shouldSkipCopy(sourcePath) {
+  const relativePath = path.relative(rootDir, sourcePath).replace(/\\/g, "/");
+  return (
+    relativePath === "downloads/apk" ||
+    relativePath.startsWith("downloads/apk/") ||
+    relativePath.endsWith(".apk")
+  );
 }
