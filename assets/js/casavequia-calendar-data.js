@@ -7,8 +7,8 @@
     "scopes":  {
                    "regular":  {
                                    "scope":  "regular",
-                                   "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
-                                   "sheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)",
+                                   "scopeLabel":  "Fundamental + 1ª e 2ª Série",
+                                   "sheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)",
                                    "monthlyTotals":  {
                                                          "2026-01":  {
                                                                          "label":  "Janeiro 2026",
@@ -62,7 +62,7 @@
                                    "events":  [
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Independência do Brasil (Feriado Nacional)",
                                                       "category":  "feriado",
                                                       "start":  "2026-09-07",
@@ -70,11 +70,11 @@
                                                       "rangeText":  "45907",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Dia da Amazônia (Feriado Estadual)",
                                                       "category":  "feriado",
                                                       "start":  "2026-09-05",
@@ -82,11 +82,11 @@
                                                       "rangeText":  "45540",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Independência do Brasil",
                                                       "category":  "feriado",
                                                       "start":  "2026-09-07",
@@ -94,11 +94,11 @@
                                                       "rangeText":  "46272",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Nossa Senhora de Aparecida",
                                                       "category":  "feriado",
                                                       "start":  "2026-10-12",
@@ -106,11 +106,11 @@
                                                       "rangeText":  "46307",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Dia do Servidor Público (DIA LETIVO)",
                                                       "category":  "feriado",
                                                       "start":  "2026-10-28",
@@ -118,11 +118,11 @@
                                                       "rangeText":  "45958",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Nossa Senhora Aparecida/ Dia da Criança (Feriado Nacional)",
                                                       "category":  "feriado",
                                                       "start":  "2026-10-12",
@@ -130,11 +130,11 @@
                                                       "rangeText":  "45942",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Dia do Servidor Público",
                                                       "category":  "feriado",
                                                       "start":  "2026-10-28",
@@ -142,11 +142,11 @@
                                                       "rangeText":  "46323",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Revolução Acreana - Feriado Estadual             (DIA LETIVO)",
                                                       "category":  "feriado",
                                                       "start":  "2026-08-06",
@@ -154,11 +154,11 @@
                                                       "rangeText":  "45875",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Férias dos Professores (5 dias)",
                                                       "category":  "ferias",
                                                       "start":  "2026-07-20",
@@ -166,11 +166,11 @@
                                                       "rangeText":  "20 a 24",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Recesso Escolar",
                                                       "category":  "marco",
                                                       "start":  "2026-07-20",
@@ -178,11 +178,11 @@
                                                       "rangeText":  "20 a 31",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Término do 1º Semestre",
                                                       "category":  "agenda",
                                                       "start":  "2026-07-17",
@@ -190,11 +190,11 @@
                                                       "rangeText":  "17",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Jornada Pedagógica para os Docentes",
                                                       "category":  "planejamento",
                                                       "start":  "2026-07-27",
@@ -202,11 +202,11 @@
                                                       "rangeText":  "27 a 30",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Início do 2º Semestre",
                                                       "category":  "agenda",
                                                       "start":  "2026-08-03",
@@ -214,11 +214,11 @@
                                                       "rangeText":  "3",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "46265",
                                                       "category":  "agenda",
                                                       "start":  "2026-08-30",
@@ -226,11 +226,11 @@
                                                       "rangeText":  "46264",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Planejamento Escolar",
                                                       "category":  "planejamento",
                                                       "start":  "2026-07-31",
@@ -238,11 +238,11 @@
                                                       "rangeText":  "31",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Finados (Dia dos Mortos)",
                                                       "category":  "feriado",
                                                       "start":  "2026-11-02",
@@ -250,11 +250,11 @@
                                                       "rangeText":  "46328",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Natal",
                                                       "category":  "feriado",
                                                       "start":  "2026-12-25",
@@ -262,11 +262,11 @@
                                                       "rangeText":  "46381",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Culminância de Projetos - Consciência Negra",
                                                       "category":  "feriado",
                                                       "start":  "2026-11-27",
@@ -274,11 +274,11 @@
                                                       "rangeText":  "27",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "12ª Mostra Acreana - Viver Ciência",
                                                       "category":  "evento",
                                                       "start":  "2026-11-25",
@@ -286,11 +286,11 @@
                                                       "rangeText":  "25 e 26",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Término do ano letivo de 2026",
                                                       "category":  "marco",
                                                       "start":  "2026-12-23",
@@ -298,11 +298,11 @@
                                                       "rangeText":  "23",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Aniversário do município de Rio Branco - Feriado facultativo",
                                                       "category":  "feriado",
                                                       "start":  "2026-12-28",
@@ -310,11 +310,11 @@
                                                       "rangeText":  "46019",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Natal (Feriado Nacional)",
                                                       "category":  "feriado",
                                                       "start":  "2026-12-25",
@@ -322,11 +322,11 @@
                                                       "rangeText":  "46016",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Véspera de Natal",
                                                       "category":  "feriado",
                                                       "start":  "2026-12-24",
@@ -334,11 +334,11 @@
                                                       "rangeText":  "24",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Avalia ACRE (2º e 5º Anos)",
                                                       "category":  "avaliacao",
                                                       "start":  "2026-11-23",
@@ -346,11 +346,11 @@
                                                       "rangeText":  "23 a 27",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Finados (Feriado Nacional)",
                                                       "category":  "feriado",
                                                       "start":  "2026-11-02",
@@ -358,11 +358,11 @@
                                                       "rangeText":  "45963",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Consciência Negra",
                                                       "category":  "feriado",
                                                       "start":  "2026-11-20",
@@ -370,11 +370,11 @@
                                                       "rangeText":  "46346",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Proclamação da República",
                                                       "category":  "feriado",
                                                       "start":  "2026-11-15",
@@ -382,11 +382,11 @@
                                                       "rangeText":  "46341",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Proclamação da República (Feriado Nacional)",
                                                       "category":  "feriado",
                                                       "start":  "2026-11-15",
@@ -394,11 +394,11 @@
                                                       "rangeText":  "45976",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Dia da Consciência Negra (Feriado Nacional)",
                                                       "category":  "feriado",
                                                       "start":  "2026-11-20",
@@ -406,11 +406,11 @@
                                                       "rangeText":  "45616",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Tratado de Petrópolis (Feriado Estadual - Lei nº 57/1965)",
                                                       "category":  "feriado",
                                                       "start":  "2026-11-17",
@@ -418,11 +418,11 @@
                                                       "rangeText":  "45613",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Avaliação Diagnóstica (3ª Fase)",
                                                       "category":  "avaliacao",
                                                       "start":  "2026-11-16",
@@ -430,11 +430,11 @@
                                                       "rangeText":  "16 a 19",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Férias dos Professores (10 dias)",
                                                       "category":  "ferias",
                                                       "start":  "2026-02-01",
@@ -442,11 +442,11 @@
                                                       "rangeText":  "1 a 10",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Carnaval (Terça-Feira)",
                                                       "category":  "agenda",
                                                       "start":  "2026-02-17",
@@ -454,11 +454,11 @@
                                                       "rangeText":  "46070",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Carnaval (Segunda-Feira)",
                                                       "category":  "agenda",
                                                       "start":  "2026-02-16",
@@ -466,11 +466,11 @@
                                                       "rangeText":  "46069",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Jornada Pedagógica para os Docentes",
                                                       "category":  "planejamento",
                                                       "start":  "2026-02-11",
@@ -478,11 +478,11 @@
                                                       "rangeText":  "11 a 13",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Início do Ano Letivo",
                                                       "category":  "marco",
                                                       "start":  "2026-02-23",
@@ -490,11 +490,11 @@
                                                       "rangeText":  "23",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Planejamento Escolar",
                                                       "category":  "planejamento",
                                                       "start":  "2026-02-19",
@@ -502,11 +502,11 @@
                                                       "rangeText":  "19 e 20",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Carnaval",
                                                       "category":  "agenda",
                                                       "start":  "2026-02-16",
@@ -514,11 +514,11 @@
                                                       "rangeText":  "16,17,18",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Férias dos Professores (30 dias)",
                                                       "category":  "ferias",
                                                       "start":  "2026-01-02",
@@ -526,11 +526,11 @@
                                                       "rangeText":  "2 a 31",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Renovação de Matrículas",
                                                       "category":  "agenda",
                                                       "start":  "2026-01-05",
@@ -538,11 +538,11 @@
                                                       "rangeText":  "5 a 9",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Solicitação on-line de matrícula e transferência interna (Etapas no mês de dezembro de 2025)",
                                                       "category":  "agenda",
                                                       "start":  "2026-01-08",
@@ -550,11 +550,11 @@
                                                       "rangeText":  "8 a 20",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Ano Novo",
                                                       "category":  "feriado",
                                                       "start":  "2026-01-01",
@@ -562,11 +562,11 @@
                                                       "rangeText":  "46023",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Envio das listas dos alunos encaminhados das escolas municipais e das escolas da rede estadual para as escolas estaduais",
                                                       "category":  "agenda",
                                                       "start":  "2026-01-12",
@@ -574,11 +574,11 @@
                                                       "rangeText":  "12 a 16",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Jornada Pedagógica para as Equipes Gestoras",
                                                       "category":  "planejamento",
                                                       "start":  "2026-01-26",
@@ -586,11 +586,11 @@
                                                       "rangeText":  "26 a 30",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Feriado Estadual (Lei nº 3.137/2016), comemoração do dia 20 adiada para o dia 22, nos termos da Lei nº 2.126/2009.",
                                                       "category":  "feriado",
                                                       "start":  "2026-01-22",
@@ -598,11 +598,11 @@
                                                       "rangeText":  "22 e 23",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Jornada Pedagógica para os Núcleos",
                                                       "category":  "planejamento",
                                                       "start":  "2026-01-12",
@@ -610,11 +610,11 @@
                                                       "rangeText":  "12 a 16",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Dia Internacional da Mulher",
                                                       "category":  "agenda",
                                                       "start":  "2026-03-08",
@@ -622,11 +622,11 @@
                                                       "rangeText":  "8",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Corpus Christi",
                                                       "category":  "feriado",
                                                       "start":  "2026-06-04",
@@ -634,11 +634,11 @@
                                                       "rangeText":  "4",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Corpus Christi",
                                                       "category":  "feriado",
                                                       "start":  "2026-06-04",
@@ -646,11 +646,11 @@
                                                       "rangeText":  "46177",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Dia do trabalho (Feriado Nacional)",
                                                       "category":  "feriado",
                                                       "start":  "2026-05-01",
@@ -658,11 +658,11 @@
                                                       "rangeText":  "45778",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Aniversário do Estado (Feriado Estadual - Lei nº 14/1964).",
                                                       "category":  "feriado",
                                                       "start":  "2026-06-15",
@@ -670,11 +670,11 @@
                                                       "rangeText":  "44727",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Jornada Pedagógica para as Equipes Gestoras",
                                                       "category":  "planejamento",
                                                       "start":  "2026-07-13",
@@ -682,11 +682,11 @@
                                                       "rangeText":  "13 a 17",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Jornada Pedagógica para os Núcleos",
                                                       "category":  "planejamento",
                                                       "start":  "2026-07-06",
@@ -694,11 +694,11 @@
                                                       "rangeText":  "6 a 10",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Avaliação Diagnóstica (2ª Fase)",
                                                       "category":  "avaliacao",
                                                       "start":  "2026-06-22",
@@ -706,11 +706,11 @@
                                                       "rangeText":  "22 a 26",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Dia do Trabalho",
                                                       "category":  "agenda",
                                                       "start":  "2026-05-01",
@@ -718,11 +718,11 @@
                                                       "rangeText":  "46143",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Sexta-Feira Santa",
                                                       "category":  "agenda",
                                                       "start":  "2026-04-03",
@@ -730,11 +730,11 @@
                                                       "rangeText":  "46115",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Avaliação Diagnóstica (1ª Fase)",
                                                       "category":  "avaliacao",
                                                       "start":  "2026-03-16",
@@ -742,11 +742,11 @@
                                                       "rangeText":  "16 a 20",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Semana Escolar de Combate à Violência Contra a Mulher - Lei 14.164",
                                                       "category":  "evento",
                                                       "start":  "2026-03-09",
@@ -754,11 +754,11 @@
                                                       "rangeText":  "9 a 13",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Tiradentes",
                                                       "category":  "feriado",
                                                       "start":  "2026-04-21",
@@ -766,11 +766,11 @@
                                                       "rangeText":  "46133",
                                                       "allDay":  true,
                                                       "sourceType":  "comment",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Feriado - Tiradentes",
                                                       "category":  "feriado",
                                                       "start":  "2026-04-21",
@@ -778,11 +778,11 @@
                                                       "rangeText":  "45768",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Seminário de Psicologia",
                                                       "category":  "evento",
                                                       "start":  "2026-04-08",
@@ -790,11 +790,11 @@
                                                       "rangeText":  "8 e 9",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   },
                                                   {
                                                       "scope":  "regular",
-                                                      "scopeLabel":  "Fundamental + 1Âª e 2Âª SÃ©rie",
+                                                      "scopeLabel":  "Fundamental + 1ª e 2ª Série",
                                                       "title":  "Sexta feira Santa",
                                                       "category":  "agenda",
                                                       "start":  "2026-04-03",
@@ -802,14 +802,14 @@
                                                       "rangeText":  "3",
                                                       "allDay":  true,
                                                       "sourceType":  "range",
-                                                      "sourceSheet":  "CalendÃ¡rio 2026 - Ensino Fundamental e MÃ©dio (1Âª e 2Âª SÃ©rie)"
+                                                      "sourceSheet":  "Calendário 2026 - Ensino Fundamental e Médio (1ª e 2ª Série)"
                                                   }
                                               ]
                                },
                    "third":  {
                                  "scope":  "third",
-                                 "scopeLabel":  "3Âª SÃ©rie",
-                                 "sheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie",
+                                 "scopeLabel":  "3ª Série",
+                                 "sheet":  "Calendário 2026 - 3ª Série",
                                  "monthlyTotals":  {
                                                        "2026-01":  {
                                                                        "label":  "Janeiro 2026",
@@ -863,7 +863,7 @@
                                  "events":  [
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Independência do Brasil (Feriado Nacional)",
                                                     "category":  "feriado",
                                                     "start":  "2026-09-07",
@@ -871,11 +871,11 @@
                                                     "rangeText":  "45907",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-09-15",
@@ -883,11 +883,11 @@
                                                     "rangeText":  "15",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Sábado Letivo substituído pelo dia 15/09 e 29/09",
                                                     "category":  "reposicao",
                                                     "start":  "2026-09-12",
@@ -895,11 +895,11 @@
                                                     "rangeText":  "12 e 26",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "educação física (manhã)",
                                                     "category":  "atividade",
                                                     "start":  "2026-08-11",
@@ -907,11 +907,11 @@
                                                     "rangeText":  "11 25",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Independência do Brasil",
                                                     "category":  "feriado",
                                                     "start":  "2026-09-07",
@@ -919,11 +919,11 @@
                                                     "rangeText":  "45907",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Dia da Amazônia (Feriado Estadual)",
                                                     "category":  "feriado",
                                                     "start":  "2026-09-05",
@@ -931,11 +931,11 @@
                                                     "rangeText":  "45540",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-09-29",
@@ -943,11 +943,11 @@
                                                     "rangeText":  "29",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Dia do Servidor Público",
                                                     "category":  "feriado",
                                                     "start":  "2026-10-28",
@@ -955,11 +955,11 @@
                                                     "rangeText":  "46323",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Nossa Senhora Aparecida/ Dia da Criança (Feriado Nacional)  - DIA LETIVO",
                                                     "category":  "feriado",
                                                     "start":  "2026-10-12",
@@ -967,11 +967,11 @@
                                                     "rangeText":  "45942",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Sábado Letivo substituido pelo contra-turno dia 13/10 e 27/10",
                                                     "category":  "reposicao",
                                                     "start":  "2026-10-10",
@@ -979,11 +979,11 @@
                                                     "rangeText":  "10 e 24",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "educação física (manhã)",
                                                     "category":  "atividade",
                                                     "start":  "2026-09-08",
@@ -991,11 +991,11 @@
                                                     "rangeText":  "8 e 22",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "avaliação 3º bimestre",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-09-28",
@@ -1003,11 +1003,11 @@
                                                     "rangeText":  "28 29 30",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Nossa Senhora de Aparecida",
                                                     "category":  "feriado",
                                                     "start":  "2026-10-12",
@@ -1015,11 +1015,11 @@
                                                     "rangeText":  "46307",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Sábado Letivo substituido pelo contra-turno dia 18/08 e 31/08",
                                                     "category":  "reposicao",
                                                     "start":  "2026-08-15",
@@ -1027,11 +1027,11 @@
                                                     "rangeText":  "15 e 29",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Férias dos Professores (5 dias)",
                                                     "category":  "ferias",
                                                     "start":  "2026-07-20",
@@ -1039,11 +1039,11 @@
                                                     "rangeText":  "20 a 24",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Jornada Pedagógica para os Docentes",
                                                     "category":  "planejamento",
                                                     "start":  "2026-07-27",
@@ -1051,11 +1051,11 @@
                                                     "rangeText":  "27 a 30",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Planejamento Escolar",
                                                     "category":  "planejamento",
                                                     "start":  "2026-07-31",
@@ -1063,11 +1063,11 @@
                                                     "rangeText":  "31",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "revisão",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-07-06",
@@ -1075,11 +1075,11 @@
                                                     "rangeText":  "6 a 10",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "recuperação do 1º semestre",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-07-13",
@@ -1087,11 +1087,11 @@
                                                     "rangeText":  "13 a 17 ",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Recesso Escolar",
                                                     "category":  "marco",
                                                     "start":  "2026-07-20",
@@ -1099,11 +1099,11 @@
                                                     "rangeText":  "20 a 31",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "educação física (manhã)",
                                                     "category":  "atividade",
                                                     "start":  "2026-07-07",
@@ -1111,11 +1111,11 @@
                                                     "rangeText":  "7",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Revolução Acreana - Feriado Estadual                   (DIA LETIVO)",
                                                     "category":  "feriado",
                                                     "start":  "2026-08-06",
@@ -1123,11 +1123,11 @@
                                                     "rangeText":  "45875",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-08-18",
@@ -1135,11 +1135,11 @@
                                                     "rangeText":  "18",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-08-31",
@@ -1147,11 +1147,11 @@
                                                     "rangeText":  "31",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "46265",
                                                     "category":  "agenda",
                                                     "start":  "2026-08-30",
@@ -1159,11 +1159,11 @@
                                                     "rangeText":  "46264",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Início do 2º Semestre",
                                                     "category":  "agenda",
                                                     "start":  "2026-08-03",
@@ -1171,11 +1171,11 @@
                                                     "rangeText":  "3",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "03º reunião de pais",
                                                     "category":  "reuniao",
                                                     "start":  "2026-08-07",
@@ -1183,11 +1183,11 @@
                                                     "rangeText":  "7",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-10-13",
@@ -1195,11 +1195,11 @@
                                                     "rangeText":  "13",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Proclamação da República (Feriado Nacional)",
                                                     "category":  "feriado",
                                                     "start":  "2026-11-15",
@@ -1207,11 +1207,11 @@
                                                     "rangeText":  "45976",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Avaliação Diagnóstica (3ª Fase)",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-11-16",
@@ -1219,11 +1219,11 @@
                                                     "rangeText":  "16 a 19",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Dia da Consciência Negra (Feriado Nacional)",
                                                     "category":  "feriado",
                                                     "start":  "2026-11-20",
@@ -1231,11 +1231,11 @@
                                                     "rangeText":  "45616",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-11-23",
@@ -1243,11 +1243,11 @@
                                                     "rangeText":  "23",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "05º reunião de pais culminância de Projetos - Conciência Negra",
                                                     "category":  "reuniao",
                                                     "start":  "2026-11-27",
@@ -1255,11 +1255,11 @@
                                                     "rangeText":  "27",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "sábado letivo",
                                                     "category":  "reposicao",
                                                     "start":  "2026-11-28",
@@ -1267,11 +1267,11 @@
                                                     "rangeText":  "28",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "12ª Mostra Acreana - Viver Ciência",
                                                     "category":  "evento",
                                                     "start":  "2026-11-25",
@@ -1279,11 +1279,11 @@
                                                     "rangeText":  "25 e 26",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Véspera de Natal",
                                                     "category":  "feriado",
                                                     "start":  "2026-12-24",
@@ -1291,11 +1291,11 @@
                                                     "rangeText":  "24",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Natal (Feriado Nacional)",
                                                     "category":  "feriado",
                                                     "start":  "2026-12-25",
@@ -1303,11 +1303,11 @@
                                                     "rangeText":  "46016",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Aniversário do município de Rio Branco - Feriado facultativo",
                                                     "category":  "feriado",
                                                     "start":  "2026-12-28",
@@ -1315,11 +1315,11 @@
                                                     "rangeText":  "28",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Término do ano letivo de 2026",
                                                     "category":  "marco",
                                                     "start":  "2026-11-28",
@@ -1327,11 +1327,11 @@
                                                     "rangeText":  "28",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "educação física (manhã)",
                                                     "category":  "atividade",
                                                     "start":  "2026-11-10",
@@ -1339,11 +1339,11 @@
                                                     "rangeText":  "10 24",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Natal",
                                                     "category":  "feriado",
                                                     "start":  "2026-12-25",
@@ -1351,11 +1351,11 @@
                                                     "rangeText":  "46381",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Sábado Letivo substituido pelo contra-turno dia 17/11",
                                                     "category":  "reposicao",
                                                     "start":  "2026-11-14",
@@ -1363,11 +1363,11 @@
                                                     "rangeText":  "14",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "avaliação do 3º bimestre",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-10-01",
@@ -1375,11 +1375,11 @@
                                                     "rangeText":  "1 2",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "educação fisica",
                                                     "category":  "atividade",
                                                     "start":  "2026-10-06",
@@ -1387,11 +1387,11 @@
                                                     "rangeText":  "6 13",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Finados (Dia dos Mortos)",
                                                     "category":  "feriado",
                                                     "start":  "2026-11-02",
@@ -1399,11 +1399,11 @@
                                                     "rangeText":  "46328",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "04º reunião de pais",
                                                     "category":  "reuniao",
                                                     "start":  "2026-10-16",
@@ -1411,11 +1411,11 @@
                                                     "rangeText":  "16",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-10-27",
@@ -1423,11 +1423,11 @@
                                                     "rangeText":  "27",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Dia do Servidor Público (DIA LETIVO)",
                                                     "category":  "feriado",
                                                     "start":  "2026-10-28",
@@ -1435,11 +1435,11 @@
                                                     "rangeText":  "45958",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Proclamação da República",
                                                     "category":  "feriado",
                                                     "start":  "2026-11-15",
@@ -1447,11 +1447,11 @@
                                                     "rangeText":  "46341",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "avaliação 04º bimestre e 2º semestre",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-11-09",
@@ -1459,11 +1459,11 @@
                                                     "rangeText":  "09 a 13",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "revisão",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-11-16",
@@ -1471,11 +1471,11 @@
                                                     "rangeText":  "16  a 23",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "recuperação 02º semestre",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-11-24",
@@ -1483,11 +1483,11 @@
                                                     "rangeText":  "24 a 28",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Consciência Negra",
                                                     "category":  "feriado",
                                                     "start":  "2026-11-20",
@@ -1495,11 +1495,11 @@
                                                     "rangeText":  "46346",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Finados (Feriado Nacional)",
                                                     "category":  "feriado",
                                                     "start":  "2026-11-02",
@@ -1507,11 +1507,11 @@
                                                     "rangeText":  "45963",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Tratado de Petrópolis (Feriado Estadual - Lei nº 57/1965)  (DIA LETIVO) contra-turno pré-enem",
                                                     "category":  "feriado",
                                                     "start":  "2026-11-17",
@@ -1519,11 +1519,11 @@
                                                     "rangeText":  "17",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Semana Escolar de Combate à Violência Contra a Mulher - Lei 14.164",
                                                     "category":  "evento",
                                                     "start":  "2026-03-09",
@@ -1531,11 +1531,11 @@
                                                     "rangeText":  "9 a 13",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "pré-enem sábado letivo substituido pelo contra-turno dias 24/03 e 30/03",
                                                     "category":  "reposicao",
                                                     "start":  "2026-03-14",
@@ -1543,11 +1543,11 @@
                                                     "rangeText":  "14 e 28",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno do pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-03-24",
@@ -1555,11 +1555,11 @@
                                                     "rangeText":  "24 e 30",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Carnaval",
                                                     "category":  "agenda",
                                                     "start":  "2026-02-16",
@@ -1567,11 +1567,11 @@
                                                     "rangeText":  "16,17,18",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Sábado Letivo",
                                                     "category":  "reposicao",
                                                     "start":  "2026-02-28",
@@ -1579,11 +1579,11 @@
                                                     "rangeText":  "46109",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Dia Internacional da Mulher",
                                                     "category":  "agenda",
                                                     "start":  "2026-03-08",
@@ -1591,11 +1591,11 @@
                                                     "rangeText":  "8",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Avaliação Diagnóstica (1ª Fase)",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-03-16",
@@ -1603,11 +1603,11 @@
                                                     "rangeText":  "16 a 20",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Sexta-Feira Santa",
                                                     "category":  "agenda",
                                                     "start":  "2026-04-03",
@@ -1615,11 +1615,11 @@
                                                     "rangeText":  "3",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Tiradentes",
                                                     "category":  "feriado",
                                                     "start":  "2026-04-21",
@@ -1627,11 +1627,11 @@
                                                     "rangeText":  "45768",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Sexta feira Santa",
                                                     "category":  "agenda",
                                                     "start":  "2026-04-03",
@@ -1639,11 +1639,11 @@
                                                     "rangeText":  "3",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "01º reunião de pais",
                                                     "category":  "reuniao",
                                                     "start":  "2026-03-27",
@@ -1651,11 +1651,11 @@
                                                     "rangeText":  "27",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "educação física (manhã)",
                                                     "category":  "atividade",
                                                     "start":  "2026-03-03",
@@ -1663,11 +1663,11 @@
                                                     "rangeText":  "3 17 31",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "projeto combate violência contra a mulher",
                                                     "category":  "evento",
                                                     "start":  "2026-03-13",
@@ -1675,11 +1675,11 @@
                                                     "rangeText":  "13",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Início do Ano Letivo",
                                                     "category":  "marco",
                                                     "start":  "2026-02-23",
@@ -1687,11 +1687,11 @@
                                                     "rangeText":  "23",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Renovação de Matrículas",
                                                     "category":  "agenda",
                                                     "start":  "2026-01-05",
@@ -1699,11 +1699,11 @@
                                                     "rangeText":  "5 a 9",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Envio das listas dos alunos encaminhados das escolas municipais e das escolas da rede estadual para as escolas estaduais",
                                                     "category":  "agenda",
                                                     "start":  "2026-01-12",
@@ -1711,11 +1711,11 @@
                                                     "rangeText":  "12 a 16",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Feriado Estadual (Lei nº 3.137/2016), comemoração do dia 20 adiada para o dia 22, nos termos da Lei nº 2.126/2009.",
                                                     "category":  "feriado",
                                                     "start":  "2026-01-22",
@@ -1723,11 +1723,11 @@
                                                     "rangeText":  "22 e 23",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Ano Novo",
                                                     "category":  "feriado",
                                                     "start":  "2026-01-01",
@@ -1735,11 +1735,11 @@
                                                     "rangeText":  "46023",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Ano Novo",
                                                     "category":  "feriado",
                                                     "start":  "2026-01-23",
@@ -1747,11 +1747,11 @@
                                                     "rangeText":  "23",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Solicitação on-line de matrícula e transferência interna (Etapas no mês de dezembro de 2025)",
                                                     "category":  "agenda",
                                                     "start":  "2026-01-08",
@@ -1759,11 +1759,11 @@
                                                     "rangeText":  "8 a 20",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Jornada Pedagógica para os Núcleos",
                                                     "category":  "planejamento",
                                                     "start":  "2026-01-12",
@@ -1771,11 +1771,11 @@
                                                     "rangeText":  "12 a 16",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Carnaval (Terça-Feira)",
                                                     "category":  "agenda",
                                                     "start":  "2026-02-17",
@@ -1783,11 +1783,11 @@
                                                     "rangeText":  "46070",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Jornada Pedagógica para os Docentes",
                                                     "category":  "planejamento",
                                                     "start":  "2026-02-02",
@@ -1795,11 +1795,11 @@
                                                     "rangeText":  "2 a 4",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Planejamento Escolar",
                                                     "category":  "planejamento",
                                                     "start":  "2026-02-05",
@@ -1807,11 +1807,11 @@
                                                     "rangeText":  "5 e 6",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Jornada Pedagógica para as Equipes Gestoras",
                                                     "category":  "planejamento",
                                                     "start":  "2026-01-22",
@@ -1819,11 +1819,11 @@
                                                     "rangeText":  "22 a 23",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Férias dos Professores (30 dias)",
                                                     "category":  "ferias",
                                                     "start":  "2026-01-02",
@@ -1831,11 +1831,11 @@
                                                     "rangeText":  "2 a 31",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Carnaval (Segunda-Feira)",
                                                     "category":  "agenda",
                                                     "start":  "2026-02-16",
@@ -1843,11 +1843,11 @@
                                                     "rangeText":  "46069",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Seminário de Psicologia",
                                                     "category":  "evento",
                                                     "start":  "2026-04-08",
@@ -1855,11 +1855,11 @@
                                                     "rangeText":  "8 e 9",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Avaliação Diagnóstica (2ª Fase)",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-06-22",
@@ -1867,11 +1867,11 @@
                                                     "rangeText":  "22 a 26",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "educação física (manhã)",
                                                     "category":  "atividade",
                                                     "start":  "2026-06-02",
@@ -1879,11 +1879,11 @@
                                                     "rangeText":  "2 23",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "inicio da avaliação do 02º bimestre",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-06-29",
@@ -1891,11 +1891,11 @@
                                                     "rangeText":  "29",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Corpus Christi",
                                                     "category":  "feriado",
                                                     "start":  "2026-06-04",
@@ -1903,11 +1903,11 @@
                                                     "rangeText":  "4",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Sábado Letivo substituido pelo contra-turno dia 16/06 e 30/06",
                                                     "category":  "reposicao",
                                                     "start":  "2026-06-13",
@@ -1915,11 +1915,11 @@
                                                     "rangeText":  "13 e 27",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Aniversário do Estado (Feriado Estadual - Lei nº 14/1964).",
                                                     "category":  "feriado",
                                                     "start":  "2026-06-15",
@@ -1927,11 +1927,11 @@
                                                     "rangeText":  "44727",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-06-30",
@@ -1939,11 +1939,11 @@
                                                     "rangeText":  "30",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-07-14",
@@ -1951,11 +1951,11 @@
                                                     "rangeText":  "14",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Término do 1º Semestre",
                                                     "category":  "agenda",
                                                     "start":  "2026-07-17",
@@ -1963,11 +1963,11 @@
                                                     "rangeText":  "17",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "avaliação 2º bimestre",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-07-01",
@@ -1975,11 +1975,11 @@
                                                     "rangeText":  "1,2,3,6",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Jornada Pedagógica para os Núcleos",
                                                     "category":  "planejamento",
                                                     "start":  "2026-07-06",
@@ -1987,11 +1987,11 @@
                                                     "rangeText":  "6 a 10",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Sábado Letivo substituido pelo dia 14/07",
                                                     "category":  "reposicao",
                                                     "start":  "2026-07-11",
@@ -1999,11 +1999,11 @@
                                                     "rangeText":  "11",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Jornada Pedagógica para as Equipes Gestoras",
                                                     "category":  "planejamento",
                                                     "start":  "2026-07-13",
@@ -2011,11 +2011,11 @@
                                                     "rangeText":  "13 a 17",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-06-16",
@@ -2023,11 +2023,11 @@
                                                     "rangeText":  "16",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Avaliação 1º bimestre",
                                                     "category":  "avaliacao",
                                                     "start":  "2026-04-23",
@@ -2035,11 +2035,11 @@
                                                     "rangeText":  "23 A 28 ",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra- turno pré-enem",
                                                     "category":  "atividade",
                                                     "start":  "2026-04-21",
@@ -2047,11 +2047,11 @@
                                                     "rangeText":  "21 e 27",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "educação física (manhã)",
                                                     "category":  "atividade",
                                                     "start":  "2026-04-14",
@@ -2059,11 +2059,11 @@
                                                     "rangeText":  " 14 28",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Sábado Letivo substituido pelo contra-turno dias 21/04 e 27/04",
                                                     "category":  "reposicao",
                                                     "start":  "2026-04-11",
@@ -2071,11 +2071,11 @@
                                                     "rangeText":  "11 e 25",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "antecipação do feriado do dia 21",
                                                     "category":  "feriado",
                                                     "start":  "2026-04-20",
@@ -2083,11 +2083,11 @@
                                                     "rangeText":  "20",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "FERIADO ( DIA LETIVO)",
                                                     "category":  "feriado",
                                                     "start":  "2026-04-21",
@@ -2095,11 +2095,11 @@
                                                     "rangeText":  "45768",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Dia do Trabalho",
                                                     "category":  "agenda",
                                                     "start":  "2026-05-01",
@@ -2107,11 +2107,11 @@
                                                     "rangeText":  "45778",
                                                     "allDay":  true,
                                                     "sourceType":  "comment",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "02º reunião de pais",
                                                     "category":  "reuniao",
                                                     "start":  "2026-05-08",
@@ -2119,11 +2119,11 @@
                                                     "rangeText":  "8",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-05-26",
@@ -2131,11 +2131,11 @@
                                                     "rangeText":  "26",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "educação física (manhã)",
                                                     "category":  "atividade",
                                                     "start":  "2026-05-05",
@@ -2143,11 +2143,11 @@
                                                     "rangeText":  "5 19",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Dia do trabalho (Feriado Nacional)",
                                                     "category":  "feriado",
                                                     "start":  "2026-05-01",
@@ -2155,11 +2155,11 @@
                                                     "rangeText":  "45778",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "Sábado Letivo substituido pelo contra-turno dia 02/06 e 16/06",
                                                     "category":  "reposicao",
                                                     "start":  "2026-05-09",
@@ -2167,11 +2167,11 @@
                                                     "rangeText":  "9 e 23",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 },
                                                 {
                                                     "scope":  "third",
-                                                    "scopeLabel":  "3Âª SÃ©rie",
+                                                    "scopeLabel":  "3ª Série",
                                                     "title":  "contra-turno pré-enem",
                                                     "category":  "reposicao",
                                                     "start":  "2026-05-12",
@@ -2179,7 +2179,7 @@
                                                     "rangeText":  "12",
                                                     "allDay":  true,
                                                     "sourceType":  "range",
-                                                    "sourceSheet":  "CalendÃ¡rio 2026 - 3Âª SÃ©rie"
+                                                    "sourceSheet":  "Calendário 2026 - 3ª Série"
                                                 }
                                             ]
                              }

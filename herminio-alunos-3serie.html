@@ -722,13 +722,13 @@ tbody tr:hover td{
 <body>
 <header class="hero">
   <div class="hero-inner">
-    <a class="crumbs" href="herminio.html">â† Voltar para o relatÃ³rio da escola</a>
-    <h1>Alunos da 3Âª SÃ©rie</h1>
-    <p>Painel acadÃªmico da E.E. Raimundo HermÃ­nio de Melo com notas editÃ¡veis por bimestre, contagem de trabalhos, faltas por hora/aula, observaÃ§Ãµes de comportamento e um modal pronto para o relatÃ³rio anual de cada aluno.</p>
+    <a class="crumbs" href="herminio.html">← Voltar para o relatório da escola</a>
+    <h1>Alunos da 3ª Série</h1>
+    <p>Painel acadêmico da E.E. Raimundo Hermínio de Melo com notas editáveis por bimestre, contagem de trabalhos, faltas por hora/aula, observações de comportamento e um modal pronto para o relatório anual de cada aluno.</p>
     <div class="hero-meta">
-      <span class="hero-chip">ðŸ« Raimundo HermÃ­nio de Melo</span>
-      <span class="hero-chip">ðŸ‘¥ Turma: 3Âª SÃ©rie</span>
-      <span class="hero-chip">ðŸ“Œ Escala sugerida: trabalhos 0-5, prova 0-5, total automÃ¡tico 0-10</span>
+      <span class="hero-chip">🏫 Raimundo Hermínio de Melo</span>
+      <span class="hero-chip">👥 Turma: 3ª Série</span>
+      <span class="hero-chip">📌 Escala sugerida: trabalhos 0-5, prova 0-5, total automático 0-10</span>
     </div>
   </div>
 </header>
@@ -739,29 +739,29 @@ tbody tr:hover td{
   <section class="info-panel">
     <div class="panel panel-main">
       <h2 class="panel-title">Como este painel foi refinado</h2>
-      <p>AlÃ©m da tabela pedida, a pÃ¡gina calcula a mÃ©dia anual parcial, soma quantos trabalhos cada aluno realizou ao longo dos 4 bimestres, consolida faltas por hora/aula quando houver registros e deixa um fluxo pronto para o Codex montar o relatÃ³rio anual de forma mais consistente.</p>
+      <p>Além da tabela pedida, a página calcula a média anual parcial, soma quantos trabalhos cada aluno realizou ao longo dos 4 bimestres, consolida faltas por hora/aula quando houver registros e deixa um fluxo pronto para o Codex montar o relatório anual de forma mais consistente.</p>
       <ul class="guide-list">
-        <li><strong>Clique no nome do aluno</strong> para ver faltas, dias ausentes, observaÃ§Ãµes de comportamento e acompanhamento pedagÃ³gico.</li>
-        <li><strong>Use os controles + e -</strong> para ajustar notas mais rÃ¡pido, ou digite diretamente os valores.</li>
-        <li><strong>Abra "RelatÃ³rio geral"</strong> no perfil para copiar um resumo completo do aluno e pedir ao Codex a anÃ¡lise anual.</li>
+        <li><strong>Clique no nome do aluno</strong> para ver faltas, dias ausentes, observações de comportamento e acompanhamento pedagógico.</li>
+        <li><strong>Use os controles + e -</strong> para ajustar notas mais rápido, ou digite diretamente os valores.</li>
+        <li><strong>Abra "Relatório geral"</strong> no perfil para copiar um resumo completo do aluno e pedir ao Codex a análise anual.</li>
       </ul>
     </div>
     <aside class="panel panel-side">
       <h2 class="panel-title">Status do painel</h2>
       <div class="status-box" id="saveStatusBox">
-        <strong>Salvamento local automÃ¡tico</strong>
-        <span id="saveStatusText">Aguardando alteraÃ§Ãµes.</span>
+        <strong>Salvamento local automático</strong>
+        <span id="saveStatusText">Aguardando alterações.</span>
       </div>
       <div class="status-box" style="margin-top:12px;background:rgba(42,110,147,.08);border-color:rgba(42,110,147,.15);color:var(--info)">
         <strong>Base inicial das faltas</strong>
-        A base da 3Âª SÃ©rie foi separada conforme a chamada oficial da secretaria. As faltas por hora/aula podem ser atualizadas neste painel assim que os registros dessa turma forem lanÃ§ados no relatÃ³rio principal.
+        A base da 3ª Série foi separada conforme a chamada oficial da secretaria. As faltas por hora/aula podem ser atualizadas neste painel assim que os registros dessa turma forem lançados no relatório principal.
       </div>
     </aside>
   </section>
 
   <section class="toolbar">
     <div class="toolbar-left">
-      <input class="search-input" id="searchInput" type="search" placeholder="Buscar aluno por nome ou nÃºmero">
+      <input class="search-input" id="searchInput" type="search" placeholder="Buscar aluno por nome ou número">
     </div>
     <div class="toolbar-right">
       <button class="ghost-btn" type="button" id="copyClassSummaryBtn">Copiar resumo da turma</button>
@@ -773,11 +773,11 @@ tbody tr:hover td{
     <div class="table-head">
       <div>
         <h2>Tabela geral da turma</h2>
-        <p>VisÃ£o resumida com as notas finais dos 4 bimestres. Os detalhes de trabalhos e prova continuam no perfil do aluno.</p>
+        <p>Visão resumida com as notas finais dos 4 bimestres. Os detalhes de trabalhos e prova continuam no perfil do aluno.</p>
       </div>
       <div class="status-box" style="max-width:340px;background:rgba(26,58,42,.05);border-color:rgba(26,58,42,.10);color:var(--muted)">
         <strong>Colunas da tabela</strong>
-        Notas abaixo de 7 ficam em vermelho com aviso de recuperaÃ§Ã£o. Clique no nome do aluno para abrir o perfil completo.
+        Notas abaixo de 7 ficam em vermelho com aviso de recuperação. Clique no nome do aluno para abrir o perfil completo.
       </div>
     </div>
     <div class="table-wrap">
@@ -785,10 +785,10 @@ tbody tr:hover td{
         <thead>
           <tr>
             <th>Aluno</th>
-            <th>1Âº Bimestre</th>
-            <th>2Âº Bimestre</th>
-            <th>3Âº Bimestre</th>
-            <th>4Âº Bimestre</th>
+            <th>1º Bimestre</th>
+            <th>2º Bimestre</th>
+            <th>3º Bimestre</th>
+            <th>4º Bimestre</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -804,7 +804,7 @@ tbody tr:hover td{
         <h2 class="modal-title" id="profileTitle"></h2>
         <div class="modal-subtitle" id="profileSubtitle"></div>
       </div>
-      <button class="close-btn" type="button" data-close-modal="profileModal">âœ•</button>
+      <button class="close-btn" type="button" data-close-modal="profileModal">✕</button>
     </div>
     <div class="modal-body" id="profileBody"></div>
   </div>
@@ -817,7 +817,7 @@ tbody tr:hover td{
         <h2 class="modal-title" id="reportTitle"></h2>
         <div class="modal-subtitle" id="reportSubtitle"></div>
       </div>
-      <button class="close-btn" type="button" data-close-modal="reportModal">âœ•</button>
+      <button class="close-btn" type="button" data-close-modal="reportModal">✕</button>
     </div>
     <div class="modal-body" id="reportBody"></div>
   </div>
@@ -825,10 +825,10 @@ tbody tr:hover td{
 
 <script>
 const STORAGE_KEY = "rh_alunos_3serie_2026_v1";
-const SCHOOL_NAME = "E.E. Raimundo HermÃ­nio de Melo";
-const CLASS_NAME = "3Âª SÃ©rie";
+const SCHOOL_NAME = "E.E. Raimundo Hermínio de Melo";
+const CLASS_NAME = "3ª Série";
 const PERIOD_LABEL = "Ano letivo de 2026";
-const EXPORT_DISCIPLINE_NAME = "LÃ­ngua Portuguesa";
+const EXPORT_DISCIPLINE_NAME = "Língua Portuguesa";
 const BIMESTERS = ["1", "2", "3", "4"];
 const GRADE_MAX = 5;
 
@@ -836,10 +836,10 @@ const STUDENTS = [
   { id: 1, numero: 1, nome: "Aquis Ferreira de Oliveira" },
   { id: 2, numero: 2, nome: "Diego da Silva Lima" },
   { id: 3, numero: 3, nome: "Erislene Tavares Ricardo" },
-  { id: 4, numero: 4, nome: "HeloÃ¡ do Nascimento Fernandes" },
+  { id: 4, numero: 4, nome: "Heloá do Nascimento Fernandes" },
   { id: 5, numero: 5, nome: "Mariana Soares da Silva" },
   { id: 6, numero: 6, nome: "Rafael da Silva Ramalho" },
-  { id: 7, numero: 7, nome: "VitÃ³ria de Souza Rodrigues" },
+  { id: 7, numero: 7, nome: "Vitória de Souza Rodrigues" },
   { id: 8, numero: 8, nome: "Yago de Oliveira Carneiro" }
 ];
 
@@ -891,7 +891,7 @@ window.addEventListener("pagehide", function () {
 });
 
 document.getElementById("resetDataBtn").addEventListener("click", function () {
-  const confirmar = window.confirm("Deseja restaurar o modelo original desta pÃ¡gina? Isso apaga as ediÃ§Ãµes salvas localmente.");
+  const confirmar = window.confirm("Deseja restaurar o modelo original desta página? Isso apaga as edições salvas localmente.");
   if (!confirmar) return;
   localStorage.removeItem(STORAGE_KEY);
   state = buildDefaultState();
@@ -950,7 +950,7 @@ document.addEventListener("click", function (event) {
     const studentId = Number(insertTemplateButton.dataset.insertReportTemplate);
     const student = getStudent(studentId);
     student.relatorioGeral = buildAnnualReportTemplate(student);
-    persistAndRefresh(studentId, "Modelo-base do relatÃ³rio inserido.");
+    persistAndRefresh(studentId, "Modelo-base do relatório inserido.");
   }
 });
 
@@ -1325,12 +1325,12 @@ function renderSummary() {
   const totalAtividadesAplicadas = getAppliedActivitiesCount();
 
   summaryGrid.innerHTML = [
-    summaryCard("Alunos cadastrados", String(state.alunos.length), "Base da 3Âª SÃ©rie"),
-    summaryCard("Faltas em h/aula", String(totalFaltas), "SomatÃ³rio da carga horÃ¡ria ausente"),
+    summaryCard("Alunos cadastrados", String(state.alunos.length), "Base da 3ª Série"),
+    summaryCard("Faltas em h/aula", String(totalFaltas), "Somatório da carga horária ausente"),
     summaryCard("Presencas em h/aula", String(totalPresencas), "Sincronizadas pelos relatos diarios"),
-    summaryCard("MÃ©dia parcial da turma", mediaTurma === null ? "â€”" : formatNumber(mediaTurma), mediaTurma === null ? "Preencha as notas para calcular" : "Com base nos bimestres jÃ¡ lanÃ§ados"),
+    summaryCard("Média parcial da turma", mediaTurma === null ? "—" : formatNumber(mediaTurma), mediaTurma === null ? "Preencha as notas para calcular" : "Com base nos bimestres já lançados"),
     summaryCard("Atividades aplicadas", String(totalAtividadesAplicadas), "Cada tema registrado conta como 1 atividade aplicada"),
-    summaryCard("RelatÃ³rios anuais", String(state.alunos.length), "Todos podem ser gerados automaticamente pelo sistema")
+    summaryCard("Relatórios anuais", String(state.alunos.length), "Todos podem ser gerados automaticamente pelo sistema")
   ].join("");
 }
 
@@ -1362,8 +1362,8 @@ function renderTable() {
       + '<span class="student-number">' + student.numero + "</span>"
       + '<button class="student-name-btn" type="button" data-open-profile="' + student.id + '"><span class="student-name">' + escapeHtml(student.nome) + "</span></button>"
       + '<div class="student-meta">'
-      + '<span class="mini-chip">MÃ©dia parcial: ' + (media === null ? "â€”" : formatNumber(media) + "/10") + "</span>"
-      + '<span class="mini-chip">FrequÃªncia: ' + formatNumber(calculateAttendance(student)) + "%</span>"
+      + '<span class="mini-chip">Média parcial: ' + (media === null ? "—" : formatNumber(media) + "/10") + "</span>"
+      + '<span class="mini-chip">Frequência: ' + formatNumber(calculateAttendance(student)) + "%</span>"
       + "</div>"
       + "</td>"
       + BIMESTERS.map(function (bim) {
@@ -1376,12 +1376,12 @@ function renderTable() {
 function renderBimGradeBadge(student, bim) {
   const total = calculateBimTotal(student, bim);
   if (total === null) {
-    return '<span class="grade-badge"><strong>â€”</strong><small>Sem nota</small></span>';
+    return '<span class="grade-badge"><strong>—</strong><small>Sem nota</small></span>';
   }
   const isRecovery = total < 7;
   return '<span class="grade-badge ' + (isRecovery ? 'recovery' : 'good') + '">'
-    + '<strong>' + (isRecovery ? 'âš ï¸ ' : 'âœ… ') + formatNumber(total) + '/10</strong>'
-    + '<small>' + (isRecovery ? 'RecuperaÃ§Ã£o' : 'Acima de 7') + '</small>'
+    + '<strong>' + (isRecovery ? '⚠️ ' : '✅ ') + formatNumber(total) + '/10</strong>'
+    + '<small>' + (isRecovery ? 'Recuperação' : 'Acima de 7') + '</small>'
     + '</span>';
 }
 
@@ -1408,18 +1408,18 @@ function renderProfile(studentId) {
   const media = calculateAnnualAverage(student);
 
   document.getElementById("profileTitle").textContent = student.numero + ". " + student.nome;
-  document.getElementById("profileSubtitle").textContent = SCHOOL_NAME + " Â· " + CLASS_NAME + " Â· " + PERIOD_LABEL;
+  document.getElementById("profileSubtitle").textContent = SCHOOL_NAME + " · " + CLASS_NAME + " · " + PERIOD_LABEL;
 
   document.getElementById("profileBody").innerHTML =
     '<section class="profile-stats">'
-      + profileMetric("Faltas em h/aula", String(absence.aulas), "Carga horÃ¡ria ausente consolidada")
+      + profileMetric("Faltas em h/aula", String(absence.aulas), "Carga horária ausente consolidada")
       + profileMetric("Presencas em h/aula", String(absence.presencas), "Presencas registradas nos relatos diarios")
       + profileMetric("Atividades feitas", String(calculateWorksTotal(student)), "Soma automatica registrada nos relatos")
-      + profileMetric("MÃ©dia anual parcial", media === null ? "â€”" : formatNumber(media) + "/10", media === null ? "Ainda sem notas lanÃ§adas" : "MÃ©dia dos bimestres preenchidos")
+      + profileMetric("Média anual parcial", media === null ? "—" : formatNumber(media) + "/10", media === null ? "Ainda sem notas lançadas" : "Média dos bimestres preenchidos")
     + '</section>'
     + '<section class="section-block">'
       + '<h3>Panorama por bimestre</h3>'
-      + '<p class="section-note">Aqui vocÃª pode ajustar as notas. A quantidade de atividades feitas em cada bimestre agora Ã© sincronizada automaticamente a partir dos cliques nos relatos diarios.</p>'
+      + '<p class="section-note">Aqui você pode ajustar as notas. A quantidade de atividades feitas em cada bimestre agora é sincronizada automaticamente a partir dos cliques nos relatos diarios.</p>'
       + '<div class="bim-grid">'
       + BIMESTERS.map(function (bim) { return renderBimCard(student, bim); }).join("")
       + '</div>'
@@ -1427,25 +1427,25 @@ function renderProfile(studentId) {
     + '</section>'
     + '<section class="section-block">'
       + '<h3>Faltas e dias em que o aluno faltou</h3>'
-      + '<p class="section-note">A contagem abaixo foi consolidada a partir das chamadas da prÃ³pria turma jÃ¡ presentes no relatÃ³rio. Cada hora/aula ausente equivale a 1 falta, e blocos de 2h15 contam como 2 faltas.</p>'
+      + '<p class="section-note">A contagem abaixo foi consolidada a partir das chamadas da própria turma já presentes no relatório. Cada hora/aula ausente equivale a 1 falta, e blocos de 2h15 contam como 2 faltas.</p>'
       + renderAbsenceDetails(absence)
     + '</section>'
     + '<section class="section-block">'
-      + '<h3>ObservaÃ§Ãµes de comportamento e acompanhamento</h3>'
+      + '<h3>Observações de comportamento e acompanhamento</h3>'
       + '<div class="text-grid">'
-        + renderTextArea(student, "observacoesComportamento", "ObservaÃ§Ãµes de comportamento", "Descreva postura, participaÃ§Ã£o, convivÃªncia, atenÃ§Ã£o, comportamento recorrente ou evoluÃ§Ã£o.")
-        + renderTextArea(student, "encaminhamentos", "Encaminhamentos pedagÃ³gicos", "Registre intervenÃ§Ãµes, conversas com responsÃ¡veis, reforÃ§o, pactos e prÃ³ximos passos.")
+        + renderTextArea(student, "observacoesComportamento", "Observações de comportamento", "Descreva postura, participação, convivência, atenção, comportamento recorrente ou evolução.")
+        + renderTextArea(student, "encaminhamentos", "Encaminhamentos pedagógicos", "Registre intervenções, conversas com responsáveis, reforço, pactos e próximos passos.")
       + '</div>'
     + '</section>'
     + '<section class="section-block">'
       + '<h3>Refinamentos importantes para o perfil</h3>'
       + '<div class="text-grid">'
-        + renderTextArea(student, "destaques", "Pontos fortes do aluno", "ParticipaÃ§Ã£o, produÃ§Ã£o, oralidade, escrita, responsabilidade, lideranÃ§a ou avanÃ§os observados.")
-        + renderTextArea(student, "necessidadesApoio", "Necessidades de apoio", "Dificuldades frequentes, lacunas de aprendizagem, frequÃªncia, motivaÃ§Ã£o e estratÃ©gias de apoio.")
+        + renderTextArea(student, "destaques", "Pontos fortes do aluno", "Participação, produção, oralidade, escrita, responsabilidade, liderança ou avanços observados.")
+        + renderTextArea(student, "necessidadesApoio", "Necessidades de apoio", "Dificuldades frequentes, lacunas de aprendizagem, frequência, motivação e estratégias de apoio.")
       + '</div>'
     + '</section>'
     + '<div class="report-tools">'
-      + '<button class="primary-btn" type="button" data-open-report="' + student.id + '">RelatÃ³rio geral</button>'
+      + '<button class="primary-btn" type="button" data-open-report="' + student.id + '">Relatório geral</button>'
       + '<button class="ghost-btn" type="button" data-copy-student-summary="' + student.id + '">Copiar resumo para o Codex</button>'
     + '</div>';
 }
@@ -1463,8 +1463,8 @@ function renderBimCard(student, bim) {
   const total = calculateBimTotal(student, bim);
   return '<article class="bim-card">'
     + '<div class="bim-card-head">'
-      + '<div class="bim-card-title">' + bim + "Âº Bimestre</div>"
-      + '<div class="bim-card-total">' + (total === null ? "â€”" : formatNumber(total) + "/10") + "</div>"
+      + '<div class="bim-card-title">' + bim + "º Bimestre</div>"
+      + '<div class="bim-card-total">' + (total === null ? "—" : formatNumber(total) + "/10") + "</div>"
     + '</div>'
     + '<div class="field-stack">'
       + '<div><label>Nota de trabalhos</label>' + renderStepper(student.id, bim, "trabalhos", dados.trabalhos) + '</div>'
@@ -1476,11 +1476,11 @@ function renderBimCard(student, bim) {
 
 function renderAbsenceDetails(absence) {
   if (!absence.dias.length) {
-    return '<div class="empty-state">Nenhuma falta registrada para este aluno nas chamadas lanÃ§adas atÃ© agora.</div>';
+    return '<div class="empty-state">Nenhuma falta registrada para este aluno nas chamadas lançadas até agora.</div>';
   }
   return '<div class="absence-chips">'
     + absence.dias.map(function (date) {
-      return '<span class="absence-chip"><strong>' + date + '</strong> Â· ' + absence.porDia[date] + ' falta(s) em h/aula</span>';
+      return '<span class="absence-chip"><strong>' + date + '</strong> · ' + absence.porDia[date] + ' falta(s) em h/aula</span>';
     }).join("")
     + '</div>';
 }
@@ -1555,16 +1555,16 @@ function renderReport(studentId) {
   const student = getStudent(studentId);
   if (!student) return;
   const generatedReport = buildAutoAnnualReport(student);
-  document.getElementById("reportTitle").textContent = "RelatÃ³rio geral - " + student.nome;
-  document.getElementById("reportSubtitle").textContent = SCHOOL_NAME + " Â· " + CLASS_NAME + " Â· relatÃ³rio anual do aluno";
+  document.getElementById("reportTitle").textContent = "Relatório geral - " + student.nome;
+  document.getElementById("reportSubtitle").textContent = SCHOOL_NAME + " · " + CLASS_NAME + " · relatório anual do aluno";
   document.getElementById("reportBody").innerHTML =
-    '<div class="report-alert">Este relatÃ³rio anual Ã© montado automaticamente com base nas notas, faltas, presencas, atividades feitas nos relatos diarios e observaÃ§Ãµes pedagÃ³gicas registradas no perfil do aluno.</div>'
+    '<div class="report-alert">Este relatório anual é montado automaticamente com base nas notas, faltas, presencas, atividades feitas nos relatos diarios e observações pedagógicas registradas no perfil do aluno.</div>'
     + '<div class="report-tools">'
       + '<button class="primary-btn" type="button" data-copy-student-summary="' + student.id + '">Copiar resumo completo para o Codex</button>'
     + '</div>'
     + '<p class="report-meta">Resumo estruturado do aluno:</p>'
     + '<div class="report-preview">' + escapeHtml(buildStudentSummary(student)) + '</div>'
-    + '<label class="summary-label" style="display:block;margin-bottom:6px">RelatÃ³rio anual gerado automaticamente</label>'
+    + '<label class="summary-label" style="display:block;margin-bottom:6px">Relatório anual gerado automaticamente</label>'
     + '<textarea class="report-area" readonly>' + escapeHtml(generatedReport) + "</textarea>";
 }
 
@@ -1643,23 +1643,23 @@ function calculateAttendance(student) {
 function defaultBehaviorText(studentId) {
   const absence = getStudentMetricsById(studentId);
   if (absence.dias.length >= 5) {
-    return "Acompanhar frequÃªncia com atenÃ§Ã£o: o aluno apresenta ausÃªncias recorrentes, o que pode impactar rendimento, participaÃ§Ã£o e continuidade das atividades.";
+    return "Acompanhar frequência com atenção: o aluno apresenta ausências recorrentes, o que pode impactar rendimento, participação e continuidade das atividades.";
   }
   if (absence.dias.length >= 2) {
-    return "Sem registro comportamental grave atÃ© o momento, mas vale observar participaÃ§Ã£o e devolutivas em razÃ£o de algumas ausÃªncias.";
+    return "Sem registro comportamental grave até o momento, mas vale observar participação e devolutivas em razão de algumas ausências.";
   }
-  return "Sem observaÃ§Ãµes comportamentais registradas atÃ© o momento.";
+  return "Sem observações comportamentais registradas até o momento.";
 }
 
 function defaultReferralText(studentId) {
   const absence = getStudentMetricsById(studentId);
   if (absence.dias.length >= 5) {
-    return "Priorizar conversa com o aluno e com os responsÃ¡veis sobre frequÃªncia, recuperar atividades pendentes e monitorar permanÃªncia em sala.";
+    return "Priorizar conversa com o aluno e com os responsáveis sobre frequência, recuperar atividades pendentes e monitorar permanência em sala.";
   }
   if (absence.dias.length >= 2) {
-    return "Manter acompanhamento de rotina, conferir devoluÃ§Ã£o das atividades e registrar possÃ­veis oscilaÃ§Ãµes de participaÃ§Ã£o.";
+    return "Manter acompanhamento de rotina, conferir devolução das atividades e registrar possíveis oscilações de participação.";
   }
-  return "Manter acompanhamento pedagÃ³gico regular e registrar novas evidÃªncias ao longo do ano.";
+  return "Manter acompanhamento pedagógico regular e registrar novas evidências ao longo do ano.";
 }
 
 function buildStudentSummary(student) {
@@ -1668,9 +1668,9 @@ function buildStudentSummary(student) {
   const bimLines = BIMESTERS.map(function (bim) {
     const dados = student.bimestres[bim];
     const total = calculateBimTotal(student, bim);
-    return bim + "Âº bimestre: trabalhos " + printableNumber(dados.trabalhos, "/5")
+    return bim + "º bimestre: trabalhos " + printableNumber(dados.trabalhos, "/5")
       + ", prova " + printableNumber(dados.prova, "/5")
-      + ", total " + (total === null ? "nÃ£o preenchido" : formatNumber(total) + "/10")
+      + ", total " + (total === null ? "não preenchido" : formatNumber(total) + "/10")
       + ", atividades feitas " + getBimesterWorksCount(student, bim) + ".";
   }).join("\n");
 
@@ -1682,8 +1682,8 @@ function buildStudentSummary(student) {
     "Escola: " + SCHOOL_NAME,
     "Turma: " + CLASS_NAME,
     "Aluno: " + student.numero + ". " + student.nome,
-    "MÃ©dia anual parcial: " + (media === null ? "nÃ£o calculada" : formatNumber(media) + "/10"),
-    "FrequÃªncia parcial: " + formatNumber(calculateAttendance(student)) + "% de presenÃ§a na carga horÃ¡ria registrada.",
+    "Média anual parcial: " + (media === null ? "não calculada" : formatNumber(media) + "/10"),
+    "Frequência parcial: " + formatNumber(calculateAttendance(student)) + "% de presença na carga horária registrada.",
     "Faltas em hora/aula: " + absence.aulas + ".",
     "Presencas em hora/aula: " + absence.presencas + ".",
     "Dias em que faltou: " + diasFalta,
@@ -1692,10 +1692,10 @@ function buildStudentSummary(student) {
     "Notas por bimestre:",
     bimLines,
     "",
-    "ObservaÃ§Ãµes de comportamento:",
-    student.observacoesComportamento || "Sem observaÃ§Ãµes registradas.",
+    "Observações de comportamento:",
+    student.observacoesComportamento || "Sem observações registradas.",
     "",
-    "Encaminhamentos pedagÃ³gicos:",
+    "Encaminhamentos pedagógicos:",
     student.encaminhamentos || "Sem encaminhamentos registrados.",
     "",
     "Pontos fortes:",
@@ -1704,24 +1704,24 @@ function buildStudentSummary(student) {
     "Necessidades de apoio:",
     student.necessidadesApoio || "Sem necessidades registradas.",
     "",
-    "RelatÃ³rio anual automÃ¡tico:",
+    "Relatório anual automático:",
     buildAutoAnnualReport(student)
   ].join("\n");
 }
 
 function buildClassSummary() {
   const medias = state.alunos.map(calculateAnnualAverage).filter(function (value) { return value !== null; });
-  const mediaTurma = medias.length ? formatNumber(medias.reduce(function (sum, value) { return sum + value; }, 0) / medias.length) + "/10" : "nÃ£o calculada";
+  const mediaTurma = medias.length ? formatNumber(medias.reduce(function (sum, value) { return sum + value; }, 0) / medias.length) + "/10" : "não calculada";
   return [
     "Resumo da turma - " + SCHOOL_NAME + " - " + CLASS_NAME,
-    "PerÃ­odo: " + PERIOD_LABEL,
+    "Período: " + PERIOD_LABEL,
     "Quantidade de alunos: " + state.alunos.length,
-    "MÃ©dia parcial da turma: " + mediaTurma,
+    "Média parcial da turma: " + mediaTurma,
     "",
     state.alunos.map(function (student) {
       const absence = getStudentMetrics(student);
       return student.numero + ". " + student.nome
-        + " | mÃ©dia parcial: " + (calculateAnnualAverage(student) === null ? "â€”" : formatNumber(calculateAnnualAverage(student)) + "/10")
+        + " | média parcial: " + (calculateAnnualAverage(student) === null ? "—" : formatNumber(calculateAnnualAverage(student)) + "/10")
         + " | atividades feitas: " + calculateWorksTotal(student)
         + " | faltas em h/aula: " + absence.aulas
         + " | presencas em h/aula: " + absence.presencas;
@@ -1744,7 +1744,7 @@ function buildAutoAnnualReport(student) {
   });
 
   return [
-    "RELATÃ“RIO ANUAL - " + student.nome,
+    "RELATÓRIO ANUAL - " + student.nome,
     "",
     buildPerformanceParagraph(student, media, works, filledBimesters, lowerBimesters, higherBimesters),
     "",
@@ -1758,46 +1758,46 @@ function buildAutoAnnualReport(student) {
 
 function buildPerformanceParagraph(student, media, works, filledBimesters, lowerBimesters, higherBimesters) {
   const intro = media === null
-    ? "O aluno ainda nÃ£o possui bimestres suficientes preenchidos para o cÃ¡lculo de uma mÃ©dia anual parcial."
-    : "O aluno apresenta mÃ©dia anual parcial de " + formatNumber(media) + "/10, com " + filledBimesters + " bimestre(s) jÃ¡ lanÃ§ado(s) no sistema.";
+    ? "O aluno ainda não possui bimestres suficientes preenchidos para o cálculo de uma média anual parcial."
+    : "O aluno apresenta média anual parcial de " + formatNumber(media) + "/10, com " + filledBimesters + " bimestre(s) já lançado(s) no sistema.";
 
   const progress = lowerBimesters.length
-    ? "HÃ¡ necessidade de recuperaÃ§Ã£o nos bimestres " + lowerBimesters.join(", ") + ", pois as notas ficaram abaixo de 7,0."
-    : (higherBimesters.length ? "Os bimestres jÃ¡ preenchidos permanecem com desempenho igual ou superior a 7,0." : "Ainda nÃ£o hÃ¡ notas bimestrais lanÃ§adas.");
+    ? "Há necessidade de recuperação nos bimestres " + lowerBimesters.join(", ") + ", pois as notas ficaram abaixo de 7,0."
+    : (higherBimesters.length ? "Os bimestres já preenchidos permanecem com desempenho igual ou superior a 7,0." : "Ainda não há notas bimestrais lançadas.");
 
-  return "1. Desempenho acadÃªmico: " + intro + " Ao todo, o aluno soma " + works + " trabalho(s) realizado(s) ao longo do ano. " + progress;
+  return "1. Desempenho acadêmico: " + intro + " Ao todo, o aluno soma " + works + " trabalho(s) realizado(s) ao longo do ano. " + progress;
 }
 
 function buildFrequencyParagraph(student, absence) {
   const attendance = formatNumber(calculateAttendance(student));
   const days = absence.dias.length
     ? absence.dias.map(function (date) { return date + " (" + absence.porDia[date] + " falta(s))"; }).join(", ")
-    : "sem registros de ausÃªncia atÃ© o momento";
-  return "2. FrequÃªncia: o aluno possui " + absence.aulas + " falta(s) em hora/aula, distribuÃ­das em " + absence.dias.length + " dia(s) de ausÃªncia, com frequÃªncia parcial de " + attendance + "%. Dias registrados: " + days + ".";
+    : "sem registros de ausência até o momento";
+  return "2. Frequência: o aluno possui " + absence.aulas + " falta(s) em hora/aula, distribuídas em " + absence.dias.length + " dia(s) de ausência, com frequência parcial de " + attendance + "%. Dias registrados: " + days + ".";
 }
 
 function buildBehaviorParagraph(student) {
-  const comportamento = (student.observacoesComportamento || "").trim() || "Sem observaÃ§Ãµes comportamentais registradas.";
-  const encaminhamentos = (student.encaminhamentos || "").trim() || "Sem encaminhamentos pedagÃ³gicos registrados.";
+  const comportamento = (student.observacoesComportamento || "").trim() || "Sem observações comportamentais registradas.";
+  const encaminhamentos = (student.encaminhamentos || "").trim() || "Sem encaminhamentos pedagógicos registrados.";
   const destaques = (student.destaques || "").trim();
   const apoio = (student.necessidadesApoio || "").trim();
-  return "3. Comportamento e participaÃ§Ã£o: " + comportamento + " Encaminhamentos atuais: " + encaminhamentos + (destaques ? " Pontos fortes observados: " + destaques + "." : "") + (apoio ? " Necessidades de apoio identificadas: " + apoio + "." : "");
+  return "3. Comportamento e participação: " + comportamento + " Encaminhamentos atuais: " + encaminhamentos + (destaques ? " Pontos fortes observados: " + destaques + "." : "") + (apoio ? " Necessidades de apoio identificadas: " + apoio + "." : "");
 }
 
 function buildRecommendationParagraph(student, media, absence, lowerBimesters) {
   const recomendacoes = [];
-  if (media !== null && media < 7) recomendacoes.push("reforÃ§ar o acompanhamento das aprendizagens e priorizar estratÃ©gias de recuperaÃ§Ã£o paralela");
-  if (absence.aulas >= 6) recomendacoes.push("monitorar a frequÃªncia com atenÃ§Ã£o e retomar conteÃºdos perdidos nas ausÃªncias");
-  if ((student.necessidadesApoio || "").trim()) recomendacoes.push("manter intervenÃ§Ãµes focadas nas necessidades pedagÃ³gicas jÃ¡ registradas");
-  if ((student.destaques || "").trim()) recomendacoes.push("valorizar os pontos fortes do aluno para sustentar seu avanÃ§o");
-  if (!recomendacoes.length) recomendacoes.push("manter o acompanhamento contÃ­nuo para consolidar o desempenho acadÃªmico e a participaÃ§Ã£o");
+  if (media !== null && media < 7) recomendacoes.push("reforçar o acompanhamento das aprendizagens e priorizar estratégias de recuperação paralela");
+  if (absence.aulas >= 6) recomendacoes.push("monitorar a frequência com atenção e retomar conteúdos perdidos nas ausências");
+  if ((student.necessidadesApoio || "").trim()) recomendacoes.push("manter intervenções focadas nas necessidades pedagógicas já registradas");
+  if ((student.destaques || "").trim()) recomendacoes.push("valorizar os pontos fortes do aluno para sustentar seu avanço");
+  if (!recomendacoes.length) recomendacoes.push("manter o acompanhamento contínuo para consolidar o desempenho acadêmico e a participação");
 
-  return "4. Encaminhamentos e recomendaÃ§Ãµes: recomenda-se " + recomendacoes.join("; ") + "." + (lowerBimesters.length ? " Os bimestres em recuperaÃ§Ã£o devem receber atenÃ§Ã£o prioritÃ¡ria: " + lowerBimesters.join(", ") + "." : "");
+  return "4. Encaminhamentos e recomendações: recomenda-se " + recomendacoes.join("; ") + "." + (lowerBimesters.length ? " Os bimestres em recuperação devem receber atenção prioritária: " + lowerBimesters.join(", ") + "." : "");
 }
 
 function setSaveStatus(message) {
   const agora = new Date();
-  saveStatusText.textContent = message + " Ãšltima atualizaÃ§Ã£o: " + agora.toLocaleDateString("pt-BR") + " Ã s " + agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + ".";
+  saveStatusText.textContent = message + " Última atualização: " + agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + ".";
 }
 
 function openModal(id) {
@@ -1849,7 +1849,7 @@ function formatInputValue(value) {
 
 function printableNumber(value, suffix) {
   const parsed = toNumber(value);
-  return parsed === null ? "nÃ£o preenchido" : formatNumber(parsed) + suffix;
+  return parsed === null ? "não preenchido" : formatNumber(parsed) + suffix;
 }
 
 function formatNumber(value) {

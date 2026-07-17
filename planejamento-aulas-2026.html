@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ProjeÃ§Ãµes de aulas 2026</title>
+<title>Projeções de aulas 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -930,9 +930,9 @@
   <section class="hero">
     <div class="hero-inner">
       <div>
-        <div class="eyebrow">ProjeÃ§Ãµes integradas Â· contador e calendÃ¡rio escolar</div>
-        <h1>ProjeÃ§Ãµes de aulas <span>2026</span></h1>
-        <p>Esta pÃ¡gina cruza as aulas jÃ¡ lanÃ§adas no relatÃ³rio, a carga semanal por turma e disciplina, os feriados oficiais e o recesso escolar para projetar automaticamente as prÃ³ximas aulas e as datas de encerramento de cada bimestre.</p>
+        <div class="eyebrow">Projeções integradas · contador e calendário escolar</div>
+        <h1>Projeções de aulas <span>2026</span></h1>
+        <p>Esta página cruza as aulas já lançadas no relatório, a carga semanal por turma e disciplina, os feriados oficiais e o recesso escolar para projetar automaticamente as próximas aulas e as datas de encerramento de cada bimestre.</p>
         <div class="hero-meta" id="hero-meta"></div>
       </div>
       <div class="hero-side" id="hero-stats"></div>
@@ -955,21 +955,21 @@
     <aside class="sidebar">
       <div class="panel-card sidebar-card">
         <h2>Leitura visual da tabela</h2>
-        <p>SÃ¡bado e domingo aparecem sempre na lista. O domingo fica em vermelho escuro para marcar o corte visual entre as semanas, enquanto os demais bloqueios recebem a cor do calendÃ¡rio oficial.</p>
+        <p>Sábado e domingo aparecem sempre na lista. O domingo fica em vermelho escuro para marcar o corte visual entre as semanas, enquanto os demais bloqueios recebem a cor do calendário oficial.</p>
         <div class="legend">
-          <div class="legend-item"><span class="swatch sw-let"></span><span>Dia Ãºtil com projeÃ§Ã£o normal</span></div>
+          <div class="legend-item"><span class="swatch sw-let"></span><span>Dia útil com projeção normal</span></div>
           <div class="legend-item"><span class="swatch sw-nac"></span><span>Feriado nacional</span></div>
           <div class="legend-item"><span class="swatch sw-est"></span><span>Feriado estadual</span></div>
           <div class="legend-item"><span class="swatch sw-fac"></span><span>Ponto facultativo</span></div>
           <div class="legend-item"><span class="swatch sw-rec"></span><span>Recesso escolar</span></div>
-          <div class="legend-item"><span class="swatch sw-sat"></span><span>SÃ¡bado visÃ­vel na sequÃªncia</span></div>
+          <div class="legend-item"><span class="swatch sw-sat"></span><span>Sábado visível na sequência</span></div>
           <div class="legend-item"><span class="swatch sw-sun"></span><span>Domingo como limitador semanal</span></div>
           <div class="legend-item"><span class="swatch sw-mile"></span><span>Dia que fecha bimestre</span></div>
         </div>
       </div>
       <div class="panel-card sidebar-card">
-        <h3>SincronizaÃ§Ã£o do relatÃ³rio</h3>
-        <p>A pÃ¡gina usa como base as aulas jÃ¡ contabilizadas no relatÃ³rio principal e projeta o restante do ano a partir dessa data-base.</p>
+        <h3>Sincronização do relatório</h3>
+        <p>A página usa como base as aulas já contabilizadas no relatório principal e projeta o restante do ano a partir dessa data-base.</p>
         <div class="sync-list" id="sync-list"></div>
       </div>
     </aside>
@@ -982,7 +982,7 @@
         </div>
       </div>
       <footer class="credit">
-        <span>Sincronizado com o relatÃ³rio escolar e com o calendÃ¡rio oficial de 2026.</span>
+        <span>Sincronizado com o relatório escolar e com o calendário oficial de 2026.</span>
         <span class="mono" id="statFoot"></span>
       </footer>
     </main>
@@ -1060,21 +1060,21 @@ function defaultState(){
   return {
     source:'local',
     generatedAt:new Date().toISOString(),
-    schoolName:'RelatÃ³rio escolar',
+    schoolName:'Relatório escolar',
     anchorDate:'2026-07-06',
     recesso:{start:'2026-07-20', end:'2026-07-31'},
     facultativoLetivo:false,
     feriados:[],
     notesByDate:{},
     turmas:[
-      {id:t1,nome:'1Âª SÃ©rie'},
-      {id:t2,nome:'2Âª SÃ©rie'},
-      {id:t3,nome:'3Âª SÃ©rie'}
+      {id:t1,nome:'1ª Série'},
+      {id:t2,nome:'2ª Série'},
+      {id:t3,nome:'3ª Série'}
     ],
     disciplinas:[
       {
         id:'lp',
-        nome:'LÃ­ngua Portuguesa',
+        nome:'Língua Portuguesa',
         cor:'#187a63',
         nBimestres:4,
         turmasAtivas:[t1,t2,t3],
@@ -1322,7 +1322,7 @@ function initPlannerSync(){
     },
     onStatus: function(status){
       if(status === 'erro'){
-        console.warn('[SupabaseSync] ProjeÃ§Ãµes de aulas permaneceu em modo local.');
+        console.warn('[SupabaseSync] Projeções de aulas permaneceu em modo local.');
       }
     }
   });
@@ -1488,25 +1488,25 @@ function futureProjectionForDiscipline(disc, days){
 }
 
 function renderHero(){
-  const generatedLabel = state.generatedAt ? new Date(state.generatedAt).toLocaleString('pt-BR') : 'sem horÃ¡rio';
-  const recessoLabel = state.recesso && state.recesso.start ? `${brDateShort(state.recesso.start)} a ${brDateShort(state.recesso.end)}` : 'nÃ£o definido';
+  const generatedLabel = state.generatedAt ? new Date(state.generatedAt).toLocaleString('pt-BR') : 'sem horário';
+  const recessoLabel = state.recesso && state.recesso.start ? `${brDateShort(state.recesso.start)} a ${brDateShort(state.recesso.end)}` : 'não definido';
   const activeDisc = state.disciplinas.find(d=>d.id === state.activeDisc);
   const meta = document.getElementById('hero-meta');
   meta.innerHTML = [
-    `<span class="hero-pill">Data-base das lanÃ§adas: <strong>${esc(brDate(state.anchorDate))}</strong></span>`,
+    `<span class="hero-pill">Data-base das lançadas: <strong>${esc(brDate(state.anchorDate))}</strong></span>`,
     `<span class="hero-pill">Recesso oficial: <strong>${esc(recessoLabel)}</strong></span>`,
     `<span class="hero-pill">Disciplinas sincronizadas: <strong>${state.disciplinas.length}</strong></span>`,
     `<span class="hero-pill">Aba ativa: <strong>${esc(activeDisc ? activeDisc.nome : 'nenhuma')}</strong></span>`
   ].join('');
   document.getElementById('hero-stats').innerHTML = [
-    {label:'Aulas jÃ¡ lanÃ§adas',value:totalLancadas(),copy:'Contagem importada do contador do relatÃ³rio.'},
-    {label:'Turmas acompanhadas',value:state.turmas.length,copy:'Linhas ativas na projeÃ§Ã£o semanal.'},
-    {label:'Bloqueios oficiais',value:countCalendarNotes(),copy:'Somente feriados e recesso entram no cÃ¡lculo.'},
-    {label:'Ãšltima sincronizaÃ§Ã£o',value:generatedLabel,copy:'Base gravada a partir da pÃ¡gina principal.'}
+    {label:'Aulas já lançadas',value:totalLancadas(),copy:'Contagem importada do contador do relatório.'},
+    {label:'Turmas acompanhadas',value:state.turmas.length,copy:'Linhas ativas na projeção semanal.'},
+    {label:'Bloqueios oficiais',value:countCalendarNotes(),copy:'Somente feriados e recesso entram no cálculo.'},
+    {label:'Última sincronização',value:generatedLabel,copy:'Base gravada a partir da página principal.'}
   ].map(item=>`<div class="hero-card"><small>${esc(item.label)}</small><strong>${esc(String(item.value))}</strong><span>${esc(item.copy)}</span></div>`).join('');
   document.getElementById('sync-list').innerHTML = [
-    {label:'Escola',value:state.schoolName || 'RelatÃ³rio escolar',copy:'Fonte principal dos lanÃ§amentos sincronizados.'},
-    {label:'AtÃ© a data',value:brDate(state.anchorDate),copy:'As prÃ³ximas linhas projetam o saldo apÃ³s esta referÃªncia.'},
+    {label:'Escola',value:state.schoolName || 'Relatório escolar',copy:'Fonte principal dos lançamentos sincronizados.'},
+    {label:'Até a data',value:brDate(state.anchorDate),copy:'As próximas linhas projetam o saldo após esta referência.'},
     {label:'Bloqueios oficiais',value:`${state.feriados.length} feriados`,copy:'Feriados e recesso considerados nas datas futuras.'}
   ].map(item=>`<div class="sync-chip"><small>${esc(item.label)}</small><strong>${esc(item.value)}</strong><span>${esc(item.copy)}</span></div>`).join('');
 }
@@ -1521,7 +1521,7 @@ function renderTabs(){
         <span class="tab-name"><span class="dot" style="background:${esc(disc.cor)}"></span>${esc(disc.nome)}</span>
         <strong>${launched}</strong>
       </div>
-      <div class="tab-meta">${activeTurmas.length} turmas Â· ${disc.nBimestres || 4} bimestres</div>
+      <div class="tab-meta">${activeTurmas.length} turmas · ${disc.nBimestres || 4} bimestres</div>
     </button>`;
   }).join('');
   tabs.innerHTML = html + `<button class="tab add" type="button" onclick="openDisciplinas()">+ disciplina</button>`;
@@ -1534,7 +1534,7 @@ function renderFooterStat(days, lastDate){
   const sundays = scoped.filter(day=>day.status === 'domingo').length;
   const recess = scoped.filter(day=>day.status === 'recesso').length;
   const projectionDays = scoped.filter(day=>day.isProjectionDay).length;
-  document.getElementById('statFoot').textContent = `${projectionDays} dias Ãºteis projetÃ¡veis Â· ${holidays} feriados Â· ${recess} dias de recesso Â· ${saturdays} sÃ¡bados Â· ${sundays} domingos`;
+  document.getElementById('statFoot').textContent = `${projectionDays} dias úteis projetáveis · ${holidays} feriados · ${recess} dias de recesso · ${saturdays} sábados · ${sundays} domingos`;
 }
 
 function setDisc(id){
@@ -1554,20 +1554,20 @@ function buildTurmaCard(turma, disc, fullInfo, futureInfo){
     let value = '';
     const target = bim * meta;
     if(launched >= target){
-      value = fullInfo.closes[bim] ? brDateShort(fullInfo.closes[bim]) : 'concluÃ­do';
+      value = fullInfo.closes[bim] ? brDateShort(fullInfo.closes[bim]) : 'concluído';
     }else{
-      value = futureInfo.closes[bim] ? brDateShort(futureInfo.closes[bim]) : 'nÃ£o fecha atÃ© 2027';
+      value = futureInfo.closes[bim] ? brDateShort(futureInfo.closes[bim]) : 'não fecha até 2027';
     }
-    lines += `<div class="statline"><span>${bim}Âº bimestre</span><span class="value ${value === 'nÃ£o fecha atÃ© 2027' ? 'miss' : ''}">${esc(value)}</span></div>`;
+    lines += `<div class="statline"><span>${bim}º bimestre</span><span class="value ${value === 'não fecha até 2027' ? 'miss' : ''}">${esc(value)}</span></div>`;
   }
   return `<article class="card">
     <h3>${esc(turma.nome)}</h3>
-    <div class="lead">${esc(disc.nome)} Â· ${weeklyForTurma(disc, turma.id)} h/aula por semana</div>
-    <div class="statline"><span>JÃ¡ lanÃ§adas</span><span class="value">${launched}</span></div>
-    <div class="statline"><span>Bimestre atual</span><span class="value">${currentBim}Âº Â· ${currentProgress}/${meta}</span></div>
+    <div class="lead">${esc(disc.nome)} · ${weeklyForTurma(disc, turma.id)} h/aula por semana</div>
+    <div class="statline"><span>Já lançadas</span><span class="value">${launched}</span></div>
+    <div class="statline"><span>Bimestre atual</span><span class="value">${currentBim}º · ${currentProgress}/${meta}</span></div>
     <div class="statline"><span>Total anual</span><span class="value">${launched}/${total}</span></div>
     ${lines}
-    <div class="summary-total"><strong>PrÃ³xima projeÃ§Ã£o Ãºtil:</strong> ${futureInfo.closes[currentBim] ? esc(brDate(futureInfo.closes[currentBim])) : 'sem fechamento restante atÃ© 2027'}.</div>
+    <div class="summary-total"><strong>Próxima projeção útil:</strong> ${futureInfo.closes[currentBim] ? esc(brDate(futureInfo.closes[currentBim])) : 'sem fechamento restante até 2027'}.</div>
   </article>`;
 }
 
@@ -1578,7 +1578,7 @@ function renderGrid(disc){
     ${WEEK.map(day=>`<th>${day.ab}</th>`).join('')}
     <th>Total/sem.</th>
     <th>Meta/bim.</th>
-    <th>LanÃ§adas</th>
+    <th>Lançadas</th>
     <th>Total ano</th>
   </tr></thead><tbody>`;
   activeTurmas.forEach(turma=>{
@@ -1599,14 +1599,14 @@ function renderGrid(disc){
 
 function dayNotePills(day){
   const pills = [];
-  if(day.k === state.anchorDate) pills.push(`<span class="note-pill sync">Saldo lanÃ§ado atÃ© ${esc(brDateShort(day.k))}</span>`);
+  if(day.k === state.anchorDate) pills.push(`<span class="note-pill sync">Saldo lançado até ${esc(brDateShort(day.k))}</span>`);
   day.holidays.forEach(item=>{
     pills.push(`<span class="note-pill ${esc(item.tipo)}">${esc(item.nome)}</span>`);
   });
-  if(day.status === 'sabado' && !day.holidays.length) pills.push(`<span class="note-pill sabado">SÃ¡bado visÃ­vel na linha do tempo</span>`);
-  if(day.status === 'domingo') pills.push(`<span class="note-pill domingo">Domingo Â· limitador da semana</span>`);
+  if(day.status === 'sabado' && !day.holidays.length) pills.push(`<span class="note-pill sabado">Sábado visível na linha do tempo</span>`);
+  if(day.status === 'domingo') pills.push(`<span class="note-pill domingo">Domingo · limitador da semana</span>`);
   if(day.status === 'recesso') pills.push(`<span class="note-pill recesso">Recesso escolar</span>`);
-  return pills.length ? pills.join('') : `<span class="note-pill">ProjeÃ§Ã£o regular</span>`;
+  return pills.length ? pills.join('') : `<span class="note-pill">Projeção regular</span>`;
 }
 
 function rowClass(day){
@@ -1629,7 +1629,7 @@ function renderProjectionTable(disc, days, futureProj, lastDate){
   const activeTurmas = turmasForDisc(disc);
   const visibleDays = days.filter(day=>shouldKeepRow(day, futureProj, lastDate));
   if(!visibleDays.length){
-    return `<div class="empty-note">Nenhuma data disponÃ­vel para esta projeÃ§Ã£o.</div>`;
+    return `<div class="empty-note">Nenhuma data disponível para esta projeção.</div>`;
   }
   let head = `<tr><th class="c-data">Data</th><th class="c-dia">Dia</th><th class="c-event">Evento / Status</th>`;
   activeTurmas.forEach(turma=>{ head += `<th>${esc(turma.nome)}</th>`; });
@@ -1640,13 +1640,13 @@ function renderProjectionTable(disc, days, futureProj, lastDate){
     activeTurmas.forEach(turma=>{
       const cell = ((futureProj.proj[turma.id] || {})[day.k]) || null;
       if(cell){
-        const tags = cell.closes.map(bim=>`<span class="mile-tag">fecha ${bim}Âº</span>`).join('');
+        const tags = cell.closes.map(bim=>`<span class="mile-tag">fecha ${bim}º</span>`).join('');
         const body = cell.sync
-          ? `<div class="turno-inner"><span class="cum">${cell.cum}</span><span class="delta">aulas jÃ¡ lanÃ§adas atÃ© esta data</span></div>`
+          ? `<div class="turno-inner"><span class="cum">${cell.cum}</span><span class="delta">aulas já lançadas até esta data</span></div>`
           : `<div class="turno-inner"><span class="cum">${cell.cum}</span><span class="delta">+${cell.add} aula(s) projetadas</span>${tags}</div>`;
         cells += `<td class="turno ${cell.sync ? 'sync' : ''} ${cell.closes.length ? 'milestone' : ''}">${body}</td>`;
       }else{
-        cells += `<td class="blank">â€”</td>`;
+        cells += `<td class="blank">—</td>`;
       }
     });
     rows += `<tr class="${rowClass(day)} ${day.mon ? 'row-mon' : ''}">
@@ -1658,7 +1658,7 @@ function renderProjectionTable(disc, days, futureProj, lastDate){
   });
   return `<div class="view-toggle" role="group" aria-label="Filtro de linhas">
     <button class="${!state.showOnlyActive ? 'on' : ''}" type="button" onclick="setShowOnlyActive(false)">Todas as datas</button>
-    <button class="${state.showOnlyActive ? 'on' : ''}" type="button" onclick="setShowOnlyActive(true)">SÃ³ datas com movimento</button>
+    <button class="${state.showOnlyActive ? 'on' : ''}" type="button" onclick="setShowOnlyActive(true)">Só datas com movimento</button>
   </div>
   <div class="proj-wrap"><table class="proj"><thead>${head}</thead><tbody>${rows}</tbody></table></div>`;
 }
@@ -1669,7 +1669,7 @@ function renderPanel(){
   const days = buildDays();
   if(!disc){
     renderFooterStat(days, state.anchorDate);
-    panel.innerHTML = `<div class="empty-note">Nenhuma disciplina disponÃ­vel. Use o botÃ£o de disciplinas para criar uma nova aba.</div>`;
+    panel.innerHTML = `<div class="empty-note">Nenhuma disciplina disponível. Use o botão de disciplinas para criar uma nova aba.</div>`;
     return;
   }
   const activeTurmas = turmasForDisc(disc);
@@ -1682,16 +1682,16 @@ function renderPanel(){
   panel.innerHTML = `<div class="discipline-panel">
     <div class="panel-hero">
       <div>
-        <div class="panel-kicker">Disciplina ativa Â· projeÃ§Ã£o dinÃ¢mica</div>
+        <div class="panel-kicker">Disciplina ativa · projeção dinâmica</div>
         <div class="panel-head">
           <span class="accent" style="background:${esc(disc.cor)}"></span>
           <h2>${esc(disc.nome)}</h2>
         </div>
-        <p class="panel-copy">As horas jÃ¡ lanÃ§adas no relatÃ³rio entram como saldo inicial. A partir de <strong>${esc(brDate(state.anchorDate))}</strong>, a tabela cruza o cronograma semanal com feriados, recesso e marcas do calendÃ¡rio escolar para estimar o restante do ano.</p>
+        <p class="panel-copy">As horas já lançadas no relatório entram como saldo inicial. A partir de <strong>${esc(brDate(state.anchorDate))}</strong>, a tabela cruza o cronograma semanal com feriados, recesso e marcas do calendário escolar para estimar o restante do ano.</p>
       </div>
       <div class="hero-kpis">
-        <div class="mini-card"><small>Aulas lanÃ§adas</small><strong>${launched}</strong><span>Soma desta disciplina em todas as turmas.</span></div>
-        <div class="mini-card"><small>Carga semanal</small><strong>${weeklyLoad} h/aula</strong><span>DistribuiÃ§Ã£o semanal usada nas prÃ³ximas projeÃ§Ãµes.</span></div>
+        <div class="mini-card"><small>Aulas lançadas</small><strong>${launched}</strong><span>Soma desta disciplina em todas as turmas.</span></div>
+        <div class="mini-card"><small>Carga semanal</small><strong>${weeklyLoad} h/aula</strong><span>Distribuição semanal usada nas próximas projeções.</span></div>
         <div class="mini-card"><small>Turmas ativas</small><strong>${activeTurmas.length}</strong><span>Linhas com metas e saldo individuais.</span></div>
         <div class="mini-card"><small>Base futura</small><strong>${esc(brDate(state.anchorDate))}</strong><span>Primeira linha sincronizada com o contador atual.</span></div>
       </div>
@@ -1700,18 +1700,18 @@ function renderPanel(){
     <div class="section-title">Fechamento dos bimestres por turma</div>
     <div class="cards">${activeTurmas.map(turma=>buildTurmaCard(turma, disc, full.resumo[turma.id], future.resumo[turma.id])).join('')}</div>
 
-    <div class="section-title">Grade semanal, metas e aulas jÃ¡ lanÃ§adas</div>
+    <div class="section-title">Grade semanal, metas e aulas já lançadas</div>
     ${renderGrid(disc)}
     <div class="cfg-row">
       <div class="field">
-        <label>Data-base das aulas lanÃ§adas</label>
+        <label>Data-base das aulas lançadas</label>
         <input type="date" min="2026-01-01" max="2027-12-31" value="${esc(state.anchorDate)}" onchange="onAnchorDate(this.value)">
       </div>
       <label class="check"><input type="checkbox" ${state.facultativoLetivo ? 'checked' : ''} onchange="toggleFacultativo(this.checked)">Contar pontos facultativos como dias letivos</label>
-      <div class="hint">Use esta data para dizer atÃ© onde o contador jÃ¡ foi lanÃ§ado. A tabela seguinte mantÃ©m sÃ¡bado e domingo na sequÃªncia para a leitura do ritmo semanal, deixando o domingo em vermelho escuro como limitador visual.</div>
+      <div class="hint">Use esta data para dizer até onde o contador já foi lançado. A tabela seguinte mantém sábado e domingo na sequência para a leitura do ritmo semanal, deixando o domingo em vermelho escuro como limitador visual.</div>
     </div>
 
-    <div class="section-title">Linha do tempo das prÃ³ximas aulas e dos fechamentos</div>
+    <div class="section-title">Linha do tempo das próximas aulas e dos fechamentos</div>
     ${renderProjectionTable(disc, days, future, lastDate)}
   </div>`;
 }
@@ -1784,11 +1784,11 @@ function closeModal(){
 function openTurmas(){
   const rows = state.turmas.map(turma=>`<div class="list-row">
     <input class="name" value="${esc(turma.nome)}" oninput="editTurma('${turma.id}',this.value)">
-    <button class="del" type="button" onclick="delTurma('${turma.id}')">Ã—</button>
+    <button class="del" type="button" onclick="delTurma('${turma.id}')">×</button>
   </div>`).join('');
-  openModal(`<div class="modal-head"><h3>Turmas</h3><button class="x" type="button" onclick="closeModal()">Ã—</button></div>
+  openModal(`<div class="modal-head"><h3>Turmas</h3><button class="x" type="button" onclick="closeModal()">×</button></div>
     <div class="modal-body">
-      <div class="hint">As turmas aparecem como linhas na grade semanal e tambÃ©m como colunas na projeÃ§Ã£o futura.</div>
+      <div class="hint">As turmas aparecem como linhas na grade semanal e também como colunas na projeção futura.</div>
       ${rows || '<div class="empty-note">Nenhuma turma cadastrada.</div>'}
       <div class="add-line"><button class="btn" type="button" onclick="addTurma()">+ Adicionar turma</button></div>
     </div>
@@ -1832,11 +1832,11 @@ function openDisciplinas(){
   const rows = state.disciplinas.map(disc=>`<div class="list-row">
     <input class="color" type="color" value="${esc(disc.cor)}" oninput="editDisc('${disc.id}','cor',this.value)">
     <input class="name" value="${esc(disc.nome)}" oninput="editDisc('${disc.id}','nome',this.value)">
-    <button class="del" type="button" onclick="delDisc('${disc.id}')">Ã—</button>
+    <button class="del" type="button" onclick="delDisc('${disc.id}')">×</button>
   </div>`).join('');
-  openModal(`<div class="modal-head"><h3>Disciplinas</h3><button class="x" type="button" onclick="closeModal()">Ã—</button></div>
+  openModal(`<div class="modal-head"><h3>Disciplinas</h3><button class="x" type="button" onclick="closeModal()">×</button></div>
     <div class="modal-body">
-      <div class="hint">Cada disciplina ganha sua prÃ³pria aba com metas, saldo lanÃ§ado e projeÃ§Ã£o futura por turma.</div>
+      <div class="hint">Cada disciplina ganha sua própria aba com metas, saldo lançado e projeção futura por turma.</div>
       ${rows || '<div class="empty-note">Nenhuma disciplina cadastrada.</div>'}
       <div class="add-line"><button class="btn" type="button" onclick="addDisc()">+ Adicionar disciplina</button></div>
     </div>
@@ -1874,9 +1874,9 @@ function delDisc(id){
 }
 
 function openRecesso(){
-  openModal(`<div class="modal-head"><h3>Recesso escolar</h3><button class="x" type="button" onclick="closeModal()">Ã—</button></div>
+  openModal(`<div class="modal-head"><h3>Recesso escolar</h3><button class="x" type="button" onclick="closeModal()">×</button></div>
     <div class="modal-body">
-      <div class="hint">As datas deste intervalo ficam bloqueadas na projeÃ§Ã£o, mesmo aparecendo na linha do tempo.</div>
+      <div class="hint">As datas deste intervalo ficam bloqueadas na projeção, mesmo aparecendo na linha do tempo.</div>
       <div class="list-row" style="border-bottom:none;padding-top:4px">
         <input class="date" type="date" id="recStart" min="2026-01-01" max="2027-12-31" value="${esc(state.recesso.start)}">
         <input class="date" type="date" id="recEnd" min="2026-01-01" max="2027-12-31" value="${esc(state.recesso.end)}">
@@ -1909,9 +1909,9 @@ function openFeriados(){
     <input class="date" type="date" value="${esc(item.date)}" onchange="editFerDate('${esc(item.date)}','${esc(item.tipo)}',this.value)">
     <input class="name" value="${esc(item.nome)}" oninput="editFerName('${esc(item.date)}','${esc(item.tipo)}',this.value)">
     <span class="tinytag ${esc(item.tipo)}">${esc(item.tipo)}</span>
-    <button class="del" type="button" onclick="delFer('${esc(item.date)}','${esc(item.tipo)}')">Ã—</button>
+    <button class="del" type="button" onclick="delFer('${esc(item.date)}','${esc(item.tipo)}')">×</button>
   </div>`).join('');
-  openModal(`<div class="modal-head"><h3>Feriados e pontos facultativos</h3><button class="x" type="button" onclick="closeModal()">Ã—</button></div>
+  openModal(`<div class="modal-head"><h3>Feriados e pontos facultativos</h3><button class="x" type="button" onclick="closeModal()">×</button></div>
     <div class="modal-body">
       <label class="check"><input type="checkbox" ${state.facultativoLetivo ? 'checked' : ''} onchange="toggleFacultativo(this.checked)">Contar pontos facultativos como dias letivos</label>
       <div class="grp">Feriados nacionais</div>${block(groups.nacional)}
@@ -1988,7 +1988,7 @@ document.getElementById('fileIn').addEventListener('change', function(event){
       save();
       render();
     }catch(e){
-      alert('Arquivo invÃ¡lido.');
+      alert('Arquivo inválido.');
     }
   };
   reader.readAsText(file);
