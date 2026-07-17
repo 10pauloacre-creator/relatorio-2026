@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-07-17T02:03:08.535Z",
+  "generatedAt": "2026-07-17T02:16:40.249Z",
   "latest": {
     "appName": "Relatórios Diários",
     "appId": "com.relatoriosdiarios.app",
-    "versionName": "1.0.1",
-    "versionCode": 3,
+    "versionName": "1.0.2",
+    "versionCode": 4,
     "channel": "debug",
     "notes": [
-      "Ajusta o layout mobile do plano de aula, calendario, listas e modais para telas verticais."
+      "Restaura o conteudo dos modais de prompt nos livros do relatorio diario."
     ],
-    "fileName": "relatorios-diarios-v1.0.1.apk",
-    "sizeBytes": 29469157,
-    "sizeLabel": "28.10 MB",
-    "sha256": "b14c0b1b4032969d3d36437e6ff3be543aff1169083324a2a56af8ab14a6cfda",
-    "releasedAt": "2026-07-17T02:03:08.535Z",
-    "releasedAtLabel": "16/07/2026, 21:03",
-    "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.1.apk",
-    "downloadPath": "./apk/relatorios-diarios-v1.0.1.apk"
+    "fileName": "relatorios-diarios-v1.0.2.apk",
+    "sizeBytes": 58557310,
+    "sizeLabel": "55.84 MB",
+    "sha256": "b7614a296b4fb419497e24a59a48109ca22ddd20b7064593303081b8211b7d26",
+    "releasedAt": "2026-07-17T02:16:40.249Z",
+    "releasedAtLabel": "16/07/2026, 21:16",
+    "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.2.apk",
+    "downloadPath": "./apk/relatorios-diarios-v1.0.2.apk"
   }
 }
