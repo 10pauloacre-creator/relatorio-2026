@@ -2,60 +2,15 @@
   var LIVROS_PROMPTS_URL='tmp/docs/prompt-capa-sumario-extract.txt';
   var LIVROS_PROMPT_GERAL_URL='tmp/docs/prompt-geral-livros.txt';
   var LIVRO_PROMPT_BUTTON_STYLE='display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 10px;border-radius:7px;border:2px solid #d8b45b;background:rgba(201,168,76,.12);color:#7a5c10;font:700 .72rem "DM Sans",sans-serif;cursor:pointer';
-  var LIVROS_PROMPTS_MAP={
-    casavequia:{
-      't1-lp-b3':['1ª SÉRIE – LÍNGUA PORTUGUESA – 3º BIMESTRE'],
-      't1-lp-b4':['1ª SÉRIE – LÍNGUA PORTUGUESA – 4º BIMESTRE'],
-      't1-tc-b3':['1ª SÉRIE – TRILHAS DE CIÊNCIAS HUMANAS – 3º BIMESTRE'],
-      't1-tc-b4':['1ª SÉRIE – TRILHAS DE CIÊNCIAS HUMANAS – 4º BIMESTRE'],
-      't1-tl-b3':['1ª SÉRIE – TRILHAS DE LINGUAGENS – 3º BIMESTRE'],
-      't1-tl-b4':['1ª SÉRIE – TRILHAS DE LINGUAGENS – 4º BIMESTRE'],
-      't2-lp-b1':['2ª E 3ª SÉRIE – LÍNGUA PORTUGUESA – 1º BIMESTRE'],
-      't2-lp-b3':['2ª SÉRIE – LÍNGUA PORTUGUESA – 3º BIMESTRE'],
-      't2-lp-b4':['2ª SÉRIE – LÍNGUA PORTUGUESA – 4º BIMESTRE'],
-      't2-tc-b3':['2ª SÉRIE – TRILHAS DE CIÊNCIAS HUMANAS – 3º BIMESTRE'],
-      't2-tc-b4':['2ª SÉRIE – TRILHAS DE CIÊNCIAS HUMANAS – 4º BIMESTRE'],
-      't2-tl-b3':['2ª SÉRIE – TRILHAS DE LINGUAGENS – 3º BIMESTRE'],
-      't2-tl-b4':['2ª SÉRIE – TRILHAS DE LINGUAGENS – 4º BIMESTRE'],
-      't2-ar-b3':['2ª SÉRIE – ARTES – 3º BIMESTRE'],
-      't2-ar-b4':['2ª SÉRIE – ARTES – 4º BIMESTRE'],
-      't3-lp-b1':['2ª E 3ª SÉRIE – LÍNGUA PORTUGUESA – 1º BIMESTRE'],
-      't3-lp-b4':['3ª SÉRIE – LÍNGUA PORTUGUESA – 4º BIMESTRE'],
-      't3-tc-b3':['3ª SÉRIE – TRILHAS DE CIÊNCIAS HUMANAS – 3º BIMESTRE'],
-      't3-tc-b4':['3ª SÉRIE – TRILHAS DE CIÊNCIAS HUMANAS – 4º BIMESTRE'],
-      't3-tl-b3':['3ª SÉRIE – TRILHAS DE LINGUAGENS – 3º BIMESTRE'],
-      't3-tl-b4':['3ª SÉRIE – TRILHAS DE LINGUAGENS – 4º BIMESTRE'],
-      't3-ar-b3':['3ª SÉRIE – ARTES – 3º BIMESTRE'],
-      't3-ar-b4':['3ª SÉRIE – ARTES – 4º BIMESTRE']
-    },
-    herminio:{
-      't89-lp-b2':['8º E 9º ANO – PORTUGUÊS – 2º BIMESTRE'],
-      't89-lp-b3':['8º E 9º ANO – PORTUGUÊS – 3º BIMESTRE'],
-      't89-lp-b4':['8º E 9º ANO – PORTUGUÊS – 4º BIMESTRE'],
-      't89-ing-b2':['8º E 9º ANO – INGLÊS – 2º BIMESTRE'],
-      't89-ing-b3':['8º E 9º ANO – INGLÊS – 3º BIMESTRE'],
-      't89-ing-b4':['8º E 9º ANO – INGLÊS – 4º BIMESTRE'],
-      't89-esp-b3':['8º E 9º ANO – ESPANHOL – 3º BIMESTRE'],
-      't89-esp-b4':['8º E 9º ANO – ESPANHOL – 4º BIMESTRE'],
-      't89-art-b1':['8º E 9º ANO – ARTES – 1º BIMESTRE'],
-      't89-art-b2':['8º E 9º ANO – ARTES – 2º BIMESTRE'],
-      't89-art-b3':['8º E 9º ANO – ARTES – 3º BIMESTRE'],
-      't89-art-b4':['8º E 9º ANO – ARTES – 4º BIMESTRE'],
-      't1-lp-b3':['1ª SÉRIE – LÍNGUA PORTUGUESA – 3º BIMESTRE'],
-      't1-lp-b4':['1ª SÉRIE – LÍNGUA PORTUGUESA – 4º BIMESTRE'],
-      't1-ing-b3':['1ª SÉRIE – LÍNGUA INGLESA – 3º BIMESTRE'],
-      't1-ing-b4':['1ª SÉRIE – LÍNGUA INGLESA – 4º BIMESTRE'],
-      't1-esp-b3':['1ª SÉRIE – LÍNGUA ESPANHOLA – 3º BIMESTRE'],
-      't1-esp-b4':['1ª SÉRIE – LÍNGUA ESPANHOLA – 4º BIMESTRE'],
-      't1-art-b2':['1ª SÉRIE – ARTES – 2º BIMESTRE'],
-      't1-art-b3':['1ª SÉRIE – ARTES – 3º BIMESTRE'],
-      't1-art-b4':['1ª SÉRIE – ARTES – 4º BIMESTRE'],
-      't23-lp-b1':['2ª E 3ª SÉRIE – LÍNGUA PORTUGUESA – 1º BIMESTRE'],
-      't23-lp-b3':['2ª SÉRIE – LÍNGUA PORTUGUESA – 3º BIMESTRE'],
-      't23-lp-b4':['2ª SÉRIE – LÍNGUA PORTUGUESA – 4º BIMESTRE','3ª SÉRIE – LÍNGUA PORTUGUESA – 4º BIMESTRE'],
-      't23-art-b3':['2ª SÉRIE – ARTES – 3º BIMESTRE','3ª SÉRIE – ARTES – 3º BIMESTRE'],
-      't23-art-b4':['2ª SÉRIE – ARTES – 4º BIMESTRE','3ª SÉRIE – ARTES – 4º BIMESTRE']
-    }
+  var DISCIPLINA_ALIASES={
+    lp:['PORTUGUES','LINGUA PORTUGUESA'],
+    tc:['TRILHAS DE CIENCIAS HUMANAS'],
+    tl:['TRILHAS DE LINGUAGENS'],
+    ar:['ARTES','ARTE'],
+    art:['ARTES','ARTE'],
+    ing:['INGLES','LINGUA INGLESA'],
+    esp:['ESPANHOL','LINGUA ESPANHOLA'],
+    red:['REDACAO']
   };
   var TURMA_LABELS={t1:'1ª Série',t2:'2ª Série',t3:'3ª Série',t89:'8º e 9º ano',t23:'2ª e 3ª série'};
   var _livrosPromptSectionsPromise=null;
@@ -76,15 +31,19 @@
 
   function canon(text){
     return String(text||'')
-      .replace(/LÍBGUA/gi,'LÍNGUA')
-      .replace(/\s*[–-]\s*/g,' – ')
+      .replace(/\u00C2/g,'')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[–—−]/g,'-')
+      .replace(/[º°]/g,'O')
+      .replace(/ª/g,'A')
       .replace(/\s+/g,' ')
+      .replace(/\s*-\s*/g,' - ')
       .trim()
       .toUpperCase();
   }
 
   function isHeading(text){
-    return /^(?:8º E 9º ANO|1ª SÉRIE|2ª SÉRIE|3ª SÉRIE|2ª E 3ª SÉRIE) – .+ – [1-4]º BIMESTRE$/i.test(canon(text));
+    return /^(?:8O E 9O ANO|1A SERIE|2A SERIE|3A SERIE|2A E 3A SERIE) - .+ - [1-4]O BIMESTRE$/i.test(canon(text));
   }
 
   function stripLineNumber(line){
@@ -94,6 +53,7 @@
 
   function parsePromptSections(raw){
     var sections={};
+    var order=[];
     var currentKey='';
     var currentLines=[];
     String(raw||'').split(/\r?\n/).forEach(function(line){
@@ -103,15 +63,21 @@
         return;
       }
       if(isHeading(clean)){
-        if(currentKey&&currentLines.length)sections[currentKey]=currentLines.join('\n').trim();
+        if(currentKey&&currentLines.length){
+          sections[currentKey]=currentLines.join('\n').trim();
+          order.push(currentKey);
+        }
         currentKey=canon(clean);
         currentLines=[clean];
         return;
       }
       if(currentKey)currentLines.push(clean);
     });
-    if(currentKey&&currentLines.length)sections[currentKey]=currentLines.join('\n').trim();
-    return sections;
+    if(currentKey&&currentLines.length){
+      sections[currentKey]=currentLines.join('\n').trim();
+      order.push(currentKey);
+    }
+    return {sections:sections,order:order};
   }
 
   function loadPromptSections(){
@@ -124,7 +90,7 @@
         .then(parsePromptSections)
         .catch(function(err){
           console.error('[livros-prompts]',err);
-          return {};
+          return {sections:{},order:[]};
         });
     }
     return _livrosPromptSectionsPromise;
@@ -177,11 +143,56 @@
     modal.style.display='flex';
   }
 
-  function montarPromptLivro(escola,key,sections){
-    var titles=((LIVROS_PROMPTS_MAP[escola]||{})[key]||[]);
-    if(!titles.length)return '';
-    var textos=titles.map(function(title){return sections[canon(title)]||'';}).filter(Boolean);
-    return textos.join('\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n').trim();
+  function getTurmaAliases(turma){
+    if(turma==='t89')return ['8O E 9O ANO'];
+    if(turma==='t1')return ['1A SERIE'];
+    if(turma==='t2')return ['2A SERIE'];
+    if(turma==='t3')return ['3A SERIE'];
+    if(turma==='t23')return ['2A E 3A SERIE','2A SERIE','3A SERIE'];
+    return [canon(formatarTurmaLabel(turma))].filter(Boolean);
+  }
+
+  function getDisciplinaAliases(key,disciplina){
+    var parts=String(key||'').split('-');
+    var discId=parts.length>1?parts[1]:'';
+    var aliases=(DISCIPLINA_ALIASES[discId]||[]).slice();
+    var canonDisc=canon(disciplina);
+    if(canonDisc)aliases.push(canonDisc);
+    return aliases.map(canon).filter(Boolean).filter(function(value,index,arr){
+      return arr.indexOf(value)===index;
+    });
+  }
+
+  function getBimestreAlias(bimestre){
+    var texto=String(bimestre||'').trim();
+    if(/^[1-4]$/.test(texto))return texto+'O BIMESTRE';
+    return canon(texto);
+  }
+
+  function sameOrContains(source,candidate){
+    return source===candidate||source.indexOf(candidate)>=0||candidate.indexOf(source)>=0;
+  }
+
+  function resolverPromptLivro(data,key,turma,disciplina,bimestre){
+    var sections=data.sections||{};
+    var order=data.order||[];
+    var turmaAliases=getTurmaAliases(turma);
+    var discAliases=getDisciplinaAliases(key,disciplina);
+    var bimestreAlias=getBimestreAlias(bimestre);
+    var encontrados=order.filter(function(sectionKey){
+      var parts=sectionKey.split(' - ');
+      if(parts.length<3)return false;
+      var turmaKey=parts[0];
+      var discKey=parts[1];
+      var bimKey=parts[parts.length-1];
+      var turmaOk=turmaAliases.some(function(alias){return sameOrContains(turmaKey,alias);});
+      var discOk=discAliases.some(function(alias){return sameOrContains(discKey,alias);});
+      var bimOk=sameOrContains(bimKey,bimestreAlias);
+      return turmaOk&&discOk&&bimOk&&sections[sectionKey];
+    }).map(function(sectionKey){
+      return sections[sectionKey];
+    });
+    return encontrados.join('\n\n========================================\n\n').trim();
   }
 
   function copiarLivroPromptModal(){
@@ -237,8 +248,8 @@
     if(evt)evt.stopPropagation();
     var subtitulo=[formatarTurmaLabel(turma),disciplina,formatarBimestreLabel(bimestre)].filter(Boolean).join(' • ');
     setModalState('Prompt do livro',subtitulo,'Carregando prompt...');
-    loadPromptSections().then(function(sections){
-      var texto=montarPromptLivro(escola,key,sections);
+    loadPromptSections().then(function(data){
+      var texto=resolverPromptLivro(data,key,turma,disciplina,bimestre);
       if(!texto){
         texto='Nenhum prompt mapeado para este livro no arquivo analisado.';
       }

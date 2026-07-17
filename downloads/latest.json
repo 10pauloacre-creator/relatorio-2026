@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-07-17T03:12:57.203Z",
+  "generatedAt": "2026-07-17T13:00:11.405Z",
   "latest": {
     "appName": "Relatórios",
     "appId": "com.relatoriosdiarios.app",
-    "versionName": "1.0.6",
-    "versionCode": 8,
+    "versionName": "1.0.7",
+    "versionCode": 9,
     "channel": "debug",
     "notes": [
-      "Permissão nativa de notificações Android na aba Claude, alerta automático ao zerar o cronômetro e integração nas duas escolas."
+      "Corrige o carregamento dos prompts nos modais dos livros digitais."
     ],
-    "fileName": "relatorios-diarios-v1.0.6.apk",
-    "sizeBytes": 10502326,
+    "fileName": "relatorios-diarios-v1.0.7.apk",
+    "sizeBytes": 10502825,
     "sizeLabel": "10.02 MB",
-    "sha256": "742efd090c4c49a5dd0fcf81a4b01757ae721fe168beebb0185375d355d4eb60",
-    "releasedAt": "2026-07-17T03:12:57.203Z",
-    "releasedAtLabel": "16/07/2026, 22:12",
-    "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.6.apk",
-    "downloadPath": "./apk/relatorios-diarios-v1.0.6.apk"
+    "sha256": "8365e775cfe281a7e274a62b3156e2f7552fb0850ac07c89c3496232952c1c8e",
+    "releasedAt": "2026-07-17T13:00:11.405Z",
+    "releasedAtLabel": "17/07/2026, 08:00",
+    "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.7.apk",
+    "downloadPath": "./apk/relatorios-diarios-v1.0.7.apk"
   }
 }
