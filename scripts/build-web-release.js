@@ -2,9 +2,11 @@
 
 const fs = require("fs");
 const path = require("path");
+const { readJson, writeAppBuildScript } = require("./release-utils");
 
 const rootDir = path.resolve(__dirname, "..");
 const distDir = path.join(rootDir, "dist");
+const releaseConfig = readJson(path.join(rootDir, "release-config.json"), {});
 
 const rootFileAllowlist = new Set([
   "apple-touch-icon.png",
@@ -42,6 +44,7 @@ const swCleanupSnippet =
 
 fs.rmSync(distDir, { recursive: true, force: true });
 fs.mkdirSync(distDir, { recursive: true });
+writeAppBuildScript(rootDir, releaseConfig);
 
 for (const entry of fs.readdirSync(rootDir, { withFileTypes: true })) {
   if (entry.name === "dist" || entry.name === "node_modules" || entry.name === "android") continue;
@@ -54,6 +57,11 @@ for (const entry of fs.readdirSync(rootDir, { withFileTypes: true })) {
   }
   if (!rootFileAllowlist.has(entry.name)) continue;
   fs.copyFileSync(source, target);
+}
+
+const promptDocsSource = path.join(rootDir, "tmp", "docs");
+if (fs.existsSync(promptDocsSource)) {
+  copyDir(promptDocsSource, path.join(distDir, "tmp", "docs"));
 }
 
 const manifestPath = path.join(distDir, "manifest.json");

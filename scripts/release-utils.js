@@ -17,6 +17,11 @@ function writeJson(filePath, value) {
   fs.writeFileSync(filePath, JSON.stringify(value, null, 2) + "\n", "utf8");
 }
 
+function writeText(filePath, value) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, String(value), "utf8");
+}
+
 function parseArgs(argv) {
   const args = {};
   for (let i = 0; i < argv.length; i += 1) {
@@ -84,6 +89,79 @@ function escapeHtml(value) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function readGradleBuildInfo(gradlePath) {
+  if (!fs.existsSync(gradlePath)) {
+    return { versionName: "1.0.0", versionCode: 1 };
+  }
+
+  const source = fs.readFileSync(gradlePath, "utf8");
+  const codeMatch = source.match(/versionCode\s+(\d+)/m);
+  const nameMatch = source.match(/versionName\s+"([^"]+)"/m);
+
+  return {
+    versionCode: codeMatch ? parseInt(codeMatch[1], 10) || 1 : 1,
+    versionName: nameMatch ? nameMatch[1] : "1.0.0"
+  };
+}
+
+function resolveBuildMeta(rootDir, config) {
+  const packageJson = readJson(path.join(rootDir, "package.json"), {});
+  const prepared = readJson(path.join(rootDir, config.workingVersionFile), null);
+  const gradleInfo = readGradleBuildInfo(path.join(rootDir, "android", "app", "build.gradle"));
+  const latestJsonUrl = new URL(path.basename(config.latestFile), config.downloadPageUrl).toString();
+  const latestScriptUrl = new URL(path.basename(config.latestScriptFile), config.downloadPageUrl).toString();
+
+  return {
+    appName: config.appName,
+    appId: config.appId,
+    channel: String(
+      (prepared && prepared.channel) ||
+        config.defaultChannel ||
+        "debug"
+    ),
+    versionName:
+      (prepared && prepared.versionName) ||
+      packageJson.version ||
+      gradleInfo.versionName ||
+      "1.0.0",
+    versionCode:
+      (prepared && prepared.versionCode) ||
+      gradleInfo.versionCode ||
+      1,
+    notes:
+      (prepared && Array.isArray(prepared.notes) && prepared.notes.length
+        ? prepared.notes
+        : normalizeNotes("", config.defaultReleaseNotes)),
+    downloadPageUrl: config.downloadPageUrl,
+    latestJsonUrl,
+    latestScriptUrl,
+    generatedAt: new Date().toISOString()
+  };
+}
+
+function renderAppBuildScript(buildMeta) {
+  return (
+    "window.__RELATORIOS_APP_BUILD__ = " +
+    JSON.stringify(buildMeta, null, 2) +
+    ";\n"
+  );
+}
+
+function renderLatestScript(latestEntry) {
+  return (
+    "window.__RELATORIOS_APP_LATEST__ = " +
+    JSON.stringify(latestEntry || null, null, 2) +
+    ";\n"
+  );
+}
+
+function writeAppBuildScript(rootDir, config) {
+  const buildMeta = resolveBuildMeta(rootDir, config);
+  const scriptPath = path.join(rootDir, config.appBuildScriptFile);
+  writeText(scriptPath, renderAppBuildScript(buildMeta));
+  return buildMeta;
 }
 
 function renderDownloadPage(config, latestEntry, releases) {
@@ -366,7 +444,13 @@ module.exports = {
   normalizeNotes,
   parseArgs,
   readJson,
+  readGradleBuildInfo,
   renderDownloadPage,
+  renderAppBuildScript,
+  renderLatestScript,
+  resolveBuildMeta,
   sha256File,
-  writeJson
+  writeAppBuildScript,
+  writeJson,
+  writeText
 };

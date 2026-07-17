@@ -31,7 +31,7 @@ writeLocalProperties(path.join(androidDir, "local.properties"), sdkHome);
 console.log(`Usando JAVA_HOME=${javaHome}`);
 console.log(`Usando ANDROID_SDK_ROOT=${sdkHome}`);
 
-const result = spawnSync("cmd.exe", ["/c", "gradlew.bat", "--no-daemon", "--max-workers=2", task], {
+const result = spawnSync("cmd.exe", ["/c", ".\\gradlew.bat", "--no-daemon", "--max-workers=1", task], {
   cwd: androidDir,
   stdio: "inherit",
   env: {

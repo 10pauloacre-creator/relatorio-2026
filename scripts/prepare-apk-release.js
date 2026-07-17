@@ -8,6 +8,7 @@ const {
   normalizeNotes,
   parseArgs,
   readJson,
+  writeAppBuildScript,
   writeJson
 } = require("./release-utils");
 
@@ -58,6 +59,8 @@ if (fs.existsSync(gradlePath)) {
     fs.writeFileSync(gradlePath, updated, "utf8");
   }
 }
+
+writeAppBuildScript(rootDir, config);
 
 console.log(
   `Release preparada: v${buildInfo.versionName} (code ${buildInfo.versionCode}) [${buildInfo.channel}]`

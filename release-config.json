@@ -5,6 +5,8 @@
   "downloadPagePath": "downloads/index.html",
   "downloadPageUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/",
   "downloadBaseUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/",
+  "latestScriptFile": "downloads/latest.js",
+  "appBuildScriptFile": "assets/app-build.js",
   "defaultChannel": "debug",
   "defaultReleaseNotes": "Atualização estrutural do aplicativo.",
   "latestFile": "downloads/latest.json",

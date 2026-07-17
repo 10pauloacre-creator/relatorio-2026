@@ -8,8 +8,10 @@ const {
   parseArgs,
   readJson,
   renderDownloadPage,
+  renderLatestScript,
   sha256File,
-  writeJson
+  writeJson,
+  writeText
 } = require("./release-utils");
 
 const rootDir = path.resolve(__dirname, "..");
@@ -81,6 +83,10 @@ writeJson(releasesFile, {
   generatedAt: releasedAt,
   releases: nextReleases
 });
+writeText(
+  path.join(rootDir, config.latestScriptFile),
+  renderLatestScript(entry)
+);
 
 const pageHtml = renderDownloadPage(config, entry, nextReleases);
 fs.writeFileSync(path.join(rootDir, config.downloadPagePath), pageHtml, "utf8");
