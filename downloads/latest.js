@@ -1,18 +1,18 @@
 window.__RELATORIOS_APP_LATEST__ = {
   "appName": "Relatórios Diários",
   "appId": "com.relatoriosdiarios.app",
-  "versionName": "1.0.3",
-  "versionCode": 5,
+  "versionName": "1.0.4",
+  "versionCode": 6,
   "channel": "debug",
   "notes": [
-    "Remove o botao de atualizacao da tela inicial e passa a avisar novas versoes por modal automatico ao abrir o app."
+    "Atualiza o icone do APK e o icone exibido nas notificacoes do celular para a identidade visual do app."
   ],
-  "fileName": "relatorios-diarios-v1.0.3.apk",
-  "sizeBytes": 10126946,
-  "sizeLabel": "9.66 MB",
-  "sha256": "e87227094ed1da1393c4062732bab97e5f40f04b12236649420169a56328802e",
-  "releasedAt": "2026-07-17T02:26:23.631Z",
-  "releasedAtLabel": "16/07/2026, 21:26",
-  "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.3.apk",
-  "downloadPath": "./apk/relatorios-diarios-v1.0.3.apk"
+  "fileName": "relatorios-diarios-v1.0.4.apk",
+  "sizeBytes": 10934532,
+  "sizeLabel": "10.43 MB",
+  "sha256": "ebd5870481cf7f47c04ac189c3018cf9d7489510f79b8eb831c9cd77c88f0ee8",
+  "releasedAt": "2026-07-17T02:36:32.242Z",
+  "releasedAtLabel": "16/07/2026, 21:36",
+  "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.4.apk",
+  "downloadPath": "./apk/relatorios-diarios-v1.0.4.apk"
 };
