@@ -1,0 +1,53 @@
+@font-face {
+  font-family: "DM Sans";
+  src:
+    local("Segoe UI"),
+    local("Arial"),
+    local("Helvetica Neue");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Playfair Display";
+  src:
+    local("Georgia"),
+    local("Times New Roman"),
+    local("Times");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DM Mono";
+  src:
+    local("Consolas"),
+    local("Courier New"),
+    local("Lucida Console");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src:
+    local("Segoe UI Semibold"),
+    local("Trebuchet MS"),
+    local("Arial");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  src:
+    local("Segoe UI"),
+    local("Arial"),
+    local("Helvetica Neue");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src:
+    local("Consolas"),
+    local("Courier New"),
+    local("Lucida Console");
+  font-display: swap;
+}
