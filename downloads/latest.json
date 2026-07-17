@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-07-17T13:00:11.405Z",
+  "generatedAt": "2026-07-17T13:42:39.459Z",
   "latest": {
     "appName": "Relatórios",
     "appId": "com.relatoriosdiarios.app",
-    "versionName": "1.0.7",
-    "versionCode": 9,
+    "versionName": "1.0.8",
+    "versionCode": 10,
     "channel": "debug",
     "notes": [
-      "Corrige o carregamento dos prompts nos modais dos livros digitais."
+      "Corrige os prompts dos livros, ativa sincronizacao online automatica entre PC e app e adiciona atualizacao por gesto no celular."
     ],
-    "fileName": "relatorios-diarios-v1.0.7.apk",
-    "sizeBytes": 10502825,
-    "sizeLabel": "10.02 MB",
-    "sha256": "8365e775cfe281a7e274a62b3156e2f7552fb0850ac07c89c3496232952c1c8e",
-    "releasedAt": "2026-07-17T13:00:11.405Z",
-    "releasedAtLabel": "17/07/2026, 08:00",
-    "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.7.apk",
-    "downloadPath": "./apk/relatorios-diarios-v1.0.7.apk"
+    "fileName": "relatorios-diarios-v1.0.8.apk",
+    "sizeBytes": 10512452,
+    "sizeLabel": "10.03 MB",
+    "sha256": "ec818ec6d55de1ad817fe49f2cce172317f374fe8da1ed1b16f19e9955dd5e76",
+    "releasedAt": "2026-07-17T13:42:39.459Z",
+    "releasedAtLabel": "17/07/2026, 08:42",
+    "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.8.apk",
+    "downloadPath": "./apk/relatorios-diarios-v1.0.8.apk"
   }
 }

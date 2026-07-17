@@ -16,6 +16,7 @@
     interceptDownloadLinks();
 
     if (isNativeApp()) {
+      setupNativePullRefresh();
       setTimeout(checkForUpdates, 700);
     }
   });
@@ -171,6 +172,131 @@
     return !!(window.RelatoriosAppBridge && typeof window.RelatoriosAppBridge.openInternalUrl === "function");
   }
 
+  function setupNativePullRefresh() {
+    if (window.__RELATORIOS_NATIVE_PULL_REFRESH__) return;
+    window.__RELATORIOS_NATIVE_PULL_REFRESH__ = true;
+
+    var indicator = document.createElement("div");
+    indicator.className = "rd-native-refresh";
+    indicator.innerHTML =
+      '<div class="rd-native-refresh-pill">' +
+      '  <div class="rd-native-refresh-title">Atualizacao online</div>' +
+      '  <div class="rd-native-refresh-copy">Puxe para baixo e segure por 2 segundos</div>' +
+      "</div>";
+    document.body.appendChild(indicator);
+
+    var startY = 0;
+    var armed = false;
+    var holdTimer = null;
+    var triggered = false;
+    var thresholdReached = false;
+
+    function getScrollTop() {
+      var root = document.scrollingElement || document.documentElement || document.body;
+      return Math.max(root ? root.scrollTop || 0 : 0, window.scrollY || 0);
+    }
+
+    function clearHoldTimer() {
+      if (!holdTimer) return;
+      window.clearTimeout(holdTimer);
+      holdTimer = null;
+    }
+
+    function setIndicatorState(state, title, copy) {
+      indicator.className = "rd-native-refresh is-" + state;
+      var titleEl = indicator.querySelector(".rd-native-refresh-title");
+      var copyEl = indicator.querySelector(".rd-native-refresh-copy");
+      if (titleEl) titleEl.textContent = title;
+      if (copyEl) copyEl.textContent = copy;
+    }
+
+    function resetIndicator() {
+      clearHoldTimer();
+      armed = false;
+      thresholdReached = false;
+      if (!triggered) {
+        setIndicatorState("idle", "Atualizacao online", "Puxe para baixo e segure por 2 segundos");
+      }
+    }
+
+    function triggerRefresh() {
+      triggered = true;
+      clearHoldTimer();
+      setIndicatorState("loading", "Atualizando...", "Buscando informacoes online");
+
+      var action = typeof window.relatoriosForceOnlineRefresh === "function"
+        ? window.relatoriosForceOnlineRefresh()
+        : Promise.resolve().then(function () { window.location.reload(); });
+
+      Promise.resolve(action)
+        .then(function () {
+          setIndicatorState("done", "Atualizado", "Dados online recarregados");
+        })
+        .catch(function () {
+          setIndicatorState("error", "Falha ao atualizar", "Tente novamente em instantes");
+        })
+        .finally(function () {
+          window.setTimeout(function () {
+            triggered = false;
+            resetIndicator();
+          }, 1400);
+        });
+    }
+
+    document.addEventListener("touchstart", function (event) {
+      if (triggered || getScrollTop() > 0) return;
+      var touch = event.touches && event.touches[0];
+      if (!touch) return;
+      startY = touch.clientY;
+      armed = true;
+      thresholdReached = false;
+      clearHoldTimer();
+      setIndicatorState("idle", "Atualizacao online", "Puxe para baixo e segure por 2 segundos");
+    }, { passive: true });
+
+    document.addEventListener("touchmove", function (event) {
+      if (!armed || triggered) return;
+      var touch = event.touches && event.touches[0];
+      if (!touch) return;
+      if (getScrollTop() > 0) {
+        resetIndicator();
+        return;
+      }
+
+      var delta = touch.clientY - startY;
+      if (delta < 0) {
+        resetIndicator();
+        return;
+      }
+
+      if (delta < 70) {
+        thresholdReached = false;
+        clearHoldTimer();
+        setIndicatorState("peek", "Continue puxando", "Segure quando a faixa estiver totalmente aberta");
+        return;
+      }
+
+      if (!thresholdReached) {
+        thresholdReached = true;
+        setIndicatorState("hold", "Segure por 2 segundos", "Mantendo a tela puxada para atualizar");
+      }
+
+      if (!holdTimer) {
+        holdTimer = window.setTimeout(triggerRefresh, 2000);
+      }
+    }, { passive: true });
+
+    document.addEventListener("touchend", function () {
+      if (triggered) return;
+      resetIndicator();
+    }, { passive: true });
+
+    document.addEventListener("touchcancel", function () {
+      if (triggered) return;
+      resetIndicator();
+    }, { passive: true });
+  }
+
   function isNewerRelease(latest, current) {
     var latestCode = parseInt(latest && latest.versionCode, 10);
     var currentCode = parseInt(current && current.versionCode, 10);
@@ -233,6 +359,15 @@
       ".rd-update-primary,.rd-update-secondary{border:none;border-radius:999px;padding:12px 18px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer}" +
       ".rd-update-primary{background:linear-gradient(135deg,#c9a84c,#e7cb7b);color:#392707}" +
       ".rd-update-secondary{background:#e9e3d5;color:#264635}" +
+      ".rd-native-refresh{position:fixed;left:50%;top:14px;transform:translate(-50%,-130%);z-index:9940;pointer-events:none;transition:transform .2s ease,opacity .2s ease;opacity:0}" +
+      ".rd-native-refresh .rd-native-refresh-pill{min-width:240px;max-width:90vw;background:rgba(17,39,28,.94);color:#fff;border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 46px rgba(0,0,0,.22);border-radius:18px;padding:12px 16px;text-align:center}" +
+      ".rd-native-refresh-title{font-size:.82rem;font-weight:700;letter-spacing:.03em}" +
+      ".rd-native-refresh-copy{margin-top:4px;font-size:.72rem;line-height:1.45;color:rgba(255,255,255,.78)}" +
+      ".rd-native-refresh.is-peek,.rd-native-refresh.is-hold,.rd-native-refresh.is-loading,.rd-native-refresh.is-done,.rd-native-refresh.is-error{transform:translate(-50%,0);opacity:1}" +
+      ".rd-native-refresh.is-hold .rd-native-refresh-pill{background:rgba(122,92,16,.96)}" +
+      ".rd-native-refresh.is-loading .rd-native-refresh-pill{background:rgba(34,87,61,.96)}" +
+      ".rd-native-refresh.is-done .rd-native-refresh-pill{background:rgba(31,106,58,.96)}" +
+      ".rd-native-refresh.is-error .rd-native-refresh-pill{background:rgba(151,47,34,.96)}" +
       "@media (max-width:640px){.rd-update-card{padding:22px 18px 18px}.rd-update-versions{grid-template-columns:1fr}.rd-update-actions>*{flex:1}}";
     document.head.appendChild(style);
   }
