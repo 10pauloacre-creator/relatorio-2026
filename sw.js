@@ -46,7 +46,7 @@ function saveClaudeTimer(timer) {
 function showClaudeReadyNotification(timer) {
   var destino = timer.url || './';
   return self.registration.showNotification('Conta Claude disponível', {
-    body: 'Conta claude disponivel, toque para verificar',
+    body: 'Conta Claude disponível, toque para verificar',
     icon: 'icon-512.png',
     badge: 'icon-192.png',
     tag: 'claude-ready-' + timer.id,
