@@ -1,13 +1,66 @@
 (function() {
+  var pendingConfigs = [];
+  var installedConfigs = {};
+  var retryHandle = 0;
+  var retryDeadline = 0;
+  var sessionPermissionPromptMap = {};
+
   function getCapacitor() {
-    return window.Capacitor || null;
+    return window.Capacitor || window.capacitor || null;
+  }
+
+  function isNativeRuntime(cap) {
+    if (!cap) return false;
+    if (typeof cap.isNativePlatform === 'function') {
+      return !!cap.isNativePlatform();
+    }
+    if (typeof cap.getPlatform === 'function') {
+      var platform = cap.getPlatform();
+      return !platform || platform !== 'web';
+    }
+    return true;
   }
 
   function getNativePlugin() {
     var cap = getCapacitor();
-    if (!cap || !cap.Plugins || !cap.Plugins.LocalNotifications) return null;
-    var platform = typeof cap.getPlatform === 'function' ? cap.getPlatform() : 'web';
-    return platform && platform !== 'web' ? cap.Plugins.LocalNotifications : null;
+    var plugin = cap && cap.Plugins && cap.Plugins.LocalNotifications;
+    if (!plugin) return null;
+    return isNativeRuntime(cap) ? plugin : null;
+  }
+
+  function flushPendingInstalls() {
+    retryHandle = 0;
+    if (!pendingConfigs.length) return;
+
+    var queued = pendingConfigs.slice();
+    pendingConfigs = [];
+
+    for (var i = 0; i < queued.length; i += 1) {
+      if (!installConfig(queued[i], false)) {
+        pendingConfigs.push(queued[i]);
+      }
+    }
+
+    if (pendingConfigs.length && Date.now() < retryDeadline) {
+      retryHandle = window.setTimeout(flushPendingInstalls, 350);
+    }
+  }
+
+  function queueInstall(cfg) {
+    if (!cfg || !cfg.key || installedConfigs[cfg.key]) return;
+    for (var i = 0; i < pendingConfigs.length; i += 1) {
+      if (pendingConfigs[i] && pendingConfigs[i].key === cfg.key) {
+        return;
+      }
+    }
+
+    pendingConfigs.push(cfg);
+    if (!retryDeadline || retryDeadline < Date.now()) {
+      retryDeadline = Date.now() + 20000;
+    }
+    if (!retryHandle) {
+      retryHandle = window.setTimeout(flushPendingInstalls, 350);
+    }
   }
 
   function hashNotificationId(text, base) {
@@ -28,6 +81,13 @@
     if (typeof window.alert === 'function') {
       window.alert(message);
     }
+  }
+
+  function safeConfirm(message) {
+    if (typeof window.confirm === 'function') {
+      return window.confirm(message);
+    }
+    return false;
   }
 
   function safeCall(name) {
@@ -69,9 +129,19 @@
     }).catch(function() {});
   }
 
-  window.installClaudeNativeNotifications = function(cfg) {
+  function installConfig(cfg, allowQueue) {
+    if (!cfg || !cfg.key) return false;
+    if (installedConfigs[cfg.key]) return true;
+
     var plugin = getNativePlugin();
-    if (!plugin) return false;
+    if (!plugin) {
+      if (allowQueue !== false) {
+        queueInstall(cfg);
+      }
+      return false;
+    }
+
+    installedConfigs[cfg.key] = true;
 
     var originals = {
       tick: window[cfg.tickName],
@@ -128,6 +198,27 @@
       if (el) el.textContent = message;
     }
 
+    function schedulePermissionPrompt() {
+      if (sessionPermissionPromptMap[cfg.key]) return;
+      sessionPermissionPromptMap[cfg.key] = true;
+
+      window.setTimeout(function() {
+        plugin.checkPermissions().then(function(perm) {
+          if (perm && perm.display === 'granted') return;
+
+          var accepted = safeConfirm(
+            'Deseja autorizar as notificacoes do Android para receber o aviso quando o contador do Claude zerar?'
+          );
+
+          if (!accepted) return;
+
+          if (typeof window[cfg.permissionName] === 'function') {
+            window[cfg.permissionName]();
+          }
+        }).catch(function() {});
+      }, 700);
+    }
+
     function openClaudeTab() {
       if (location.hash !== cfg.pageHash) {
         location.hash = cfg.pageHash;
@@ -145,7 +236,7 @@
           }
           perm = await plugin.requestPermissions();
           if (!perm || perm.display !== 'granted') {
-            safeAlert('Ative a permissão de notificações do Android para receber o aviso quando o cronômetro do Claude zerar.');
+            safeAlert('Ative a permissao de notificacoes do Android para receber o aviso quando o cronometro do Claude zerar.');
             await updateNotificationBar();
             return false;
           }
@@ -155,7 +246,7 @@
           try {
             var exact = await plugin.checkExactNotificationSetting();
             if (exact && exact.exact_alarm && exact.exact_alarm !== 'granted' && interactive && plugin.changeExactNotificationSetting) {
-              safeAlert('Para o aviso disparar no momento exato em que a conta Claude liberar, ative também os alarmes exatos do Android na próxima tela.');
+              safeAlert('Para o aviso disparar no momento exato em que a conta Claude liberar, ative tambem os alarmes exatos do Android na proxima tela.');
               await plugin.changeExactNotificationSetting();
             }
           } catch (error) {
@@ -228,6 +319,9 @@
         var enabled = !!perm && perm.display === 'granted';
         bar.style.display = enabled ? 'none' : 'flex';
         updateStatusText(enabled ? cfg.enabledStatusText : cfg.pendingStatusText);
+        if (!enabled && isNativeRuntime(getCapacitor())) {
+          schedulePermissionPrompt();
+        }
         return enabled;
       } catch (error) {
         console.warn('[Claude Native] Falha ao atualizar barra de notificacao:', error);
@@ -361,5 +455,15 @@
 
     updateNotificationBar();
     return true;
+  }
+
+  window.installClaudeNativeNotifications = function(cfg) {
+    return installConfig(cfg, true);
   };
+
+  document.addEventListener('DOMContentLoaded', flushPendingInstalls);
+  document.addEventListener('deviceready', flushPendingInstalls);
+  document.addEventListener('resume', flushPendingInstalls);
+  window.addEventListener('focus', flushPendingInstalls);
+  window.addEventListener('load', flushPendingInstalls);
 })();
