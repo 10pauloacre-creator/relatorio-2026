@@ -1,0 +1,413 @@
+/* Shared portrait/mobile containment fixes for school pages and planning views. */
+
+html,
+body {
+  max-width: 100%;
+}
+
+img,
+svg,
+canvas,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 820px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  body {
+    width: 100%;
+  }
+
+  .cab-i,
+  .main,
+  .wrap,
+  .nav-i {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .main,
+  .wrap,
+  .panel-card,
+  .sidebar,
+  .content,
+  .page,
+  .disc-panel,
+  .bim-panel,
+  .lesson-list,
+  .pc-cal-shell,
+  .pc-planner-shell,
+  .hero-inner,
+  .toolbar,
+  .shell,
+  .list-row,
+  .modal-body,
+  .modal-foot {
+    min-width: 0;
+  }
+
+  .th {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ti,
+  .cab-t,
+  .hero-copy,
+  .hero-card,
+  .rh-hero-copy,
+  .rh-hero-stat,
+  .pc-cal-title-wrap {
+    min-width: 0;
+  }
+
+  .ti h2,
+  .ti p,
+  .cab-t h1,
+  .cab-t .sub,
+  .cab-t .prof,
+  .hero h1,
+  .hero p,
+  .rh-hero-title,
+  .rh-hero-copy,
+  .pc-cal-title,
+  .pc-cal-meta,
+  #plano-ultima-mod,
+  .plan-pill {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .nav-i,
+  .main-tabs,
+  .disc-tabs,
+  .bim-tabs,
+  .liv-tabs {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nb,
+  .main-tab,
+  .disc-tab,
+  .bim-tab,
+  .liv-tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .content {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .plan-meta {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px;
+  }
+
+  #plano-ultima-mod,
+  .bim-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px;
+  }
+
+  .lesson-item {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr);
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .lesson-num {
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 44px;
+    margin: 0 !important;
+  }
+
+  .lesson-text,
+  .lesson-content {
+    min-width: 0;
+  }
+
+  .lesson-title,
+  .lesson-sub {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .rh-hero,
+  .hero,
+  .hero-inner {
+    grid-template-columns: 1fr !important;
+  }
+
+  .rh-hero-side,
+  .hero-side {
+    grid-template-columns: 1fr !important;
+  }
+
+  .toolbar {
+    gap: 8px;
+  }
+
+  .toolbar .spacer {
+    display: none;
+  }
+
+  .toolbar .btn,
+  .toolbar button,
+  .toolbar input,
+  .toolbar select {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sidebar {
+    position: static !important;
+    top: auto !important;
+  }
+
+  .view-toggle {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .view-toggle button {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .list-row {
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .list-row > * {
+    min-width: 0;
+    flex: 1 1 calc(50% - 10px);
+  }
+
+  .list-row input.name {
+    flex-basis: 100%;
+  }
+
+  .modal-body {
+    padding: 16px !important;
+  }
+
+  .modal-foot {
+    flex-direction: column;
+  }
+
+  .modal-foot > * {
+    width: 100%;
+  }
+
+  .pc-cal-shell {
+    padding: 14px !important;
+    overflow: hidden;
+  }
+
+  .pc-cal-toolbar-main {
+    grid-template-columns: 1fr !important;
+  }
+
+  .pc-cal-toolbar-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pc-cal-nav,
+  .pc-cal-switch,
+  .pc-cal-datepick {
+    width: 100% !important;
+    flex-wrap: wrap;
+  }
+
+  .pc-cal-datepick input {
+    width: 100% !important;
+  }
+
+  .pc-cal-weekdays,
+  .pc-cal-grid {
+    gap: 6px !important;
+  }
+
+  .pc-cal-grid {
+    padding: 6px !important;
+  }
+
+  .pc-cal-day {
+    min-height: 88px !important;
+    padding: 8px !important;
+  }
+
+  .pc-cal-day-label,
+  .pc-cal-day-footer,
+  .pc-cal-weekday {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .pc-cal-agenda-item {
+    grid-template-columns: 72px minmax(0, 1fr) !important;
+  }
+
+  .pc-cal-day-summary {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .pc-cal-week-sections,
+  .pc-cal-year-grid,
+  .pc-cal-edit-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .pc-cal-modal-inner {
+    width: min(100%, calc(100vw - 20px));
+    max-height: calc(100dvh - 20px);
+  }
+
+  .pc-cal-modal-top {
+    flex-wrap: wrap;
+    align-items: flex-start !important;
+    padding: 16px !important;
+  }
+
+  .pc-cal-modal-top h3,
+  .pc-cal-modal-date,
+  .pc-cal-modal-sub {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 560px) {
+  .cab-i {
+    padding-top: 22px !important;
+    padding-bottom: 18px !important;
+    gap: 14px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .escu {
+    width: 74px;
+    height: 74px;
+  }
+
+  .main {
+    padding-top: 22px !important;
+    padding-bottom: 42px !important;
+  }
+
+  .wrap {
+    padding-top: 18px !important;
+    padding-bottom: 52px !important;
+  }
+
+  .ti h2 {
+    font-size: 1.05rem !important;
+  }
+
+  .ti p,
+  .cab-t .sub,
+  .cab-t .prof {
+    font-size: 0.78rem !important;
+  }
+
+  .tb {
+    padding: 8px 14px !important;
+  }
+
+  .main-tab,
+  .disc-tab,
+  .bim-tab,
+  .liv-tab,
+  .nb {
+    font-size: 0.76rem !important;
+  }
+
+  .lesson-item {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .lesson-num {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px;
+    font-size: 0.78rem !important;
+  }
+
+  .lesson-title {
+    font-size: 0.87rem !important;
+  }
+
+  .lesson-sub {
+    font-size: 0.75rem !important;
+  }
+
+  .pc-cal-grid,
+  .pc-cal-weekdays {
+    gap: 4px !important;
+  }
+
+  .pc-cal-day {
+    min-height: 74px !important;
+    padding: 6px !important;
+  }
+
+  .pc-cal-day.compact {
+    min-height: 46px !important;
+  }
+
+  .pc-cal-day-number {
+    font-size: 0.9rem !important;
+  }
+
+  .pc-cal-day-label {
+    font-size: 0.68rem !important;
+  }
+
+  .pc-cal-agenda-item {
+    grid-template-columns: 1fr !important;
+  }
+
+  .pc-cal-agenda-range {
+    padding: 10px 12px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .pc-cal-modal-inner {
+    width: calc(100vw - 12px);
+    max-height: calc(100dvh - 12px);
+  }
+
+  .list-row > * {
+    flex-basis: 100%;
+  }
+}
