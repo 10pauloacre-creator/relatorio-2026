@@ -174,6 +174,20 @@
     if (window._rhLivUrls) window._rhLivUrls = sanitizeValue(window._rhLivUrls);
   }
 
+  function clearPendingHotfixGuard() {
+    try {
+      if (typeof window.__RELATORIOS_CLEAR_PENDING__ === "function") {
+        window.__RELATORIOS_CLEAR_PENDING__();
+        return;
+      }
+      document.documentElement.removeAttribute("data-hotfix-pending");
+      var styleNode = document.getElementById("relatorios-preload-fix");
+      if (styleNode && styleNode.parentNode) {
+        styleNode.parentNode.removeChild(styleNode);
+      }
+    } catch (error) {}
+  }
+
   function sanitizeValue(value) {
     if (typeof value === "string") {
       return decodeBrokenUtf8(value);
@@ -366,6 +380,7 @@
     }
     enforceKnownLabels();
     normalizeRenderedBookSections();
+    clearPendingHotfixGuard();
   }
 
   var observer = new MutationObserver(function (mutations) {
