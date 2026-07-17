@@ -595,7 +595,7 @@ existentes.forEach(function(n) { n.close(); });
 if (typeof TimestampTrigger !== 'undefined') {
 await reg.showNotification('Conta claude disponivel', {
 body: 'Conta claude disponivel, toque para verificar',
-icon: 'icon-192.png',
+icon: 'icon-512.png',
 badge: 'icon-192.png',
 tag: 'cl-sched-' + id,
 renotify: true,
@@ -614,7 +614,7 @@ return false;
 function rhClaudeNotificar(nome, id) {
 var opts = {
 body: 'Conta claude disponivel, toque para verificar',
-icon: 'icon-192.png',
+icon: 'icon-512.png',
 badge: 'icon-192.png',
 tag: 'claude-ready-' + (id || nome),
 renotify: true,
@@ -710,7 +710,7 @@ rhClaudeAtualizarNotifBar();
 if (p === 'granted') {
 new Notification('Notificacoes ativadas', {
 body: 'Quando o cronometro zerar, voce sera avisado no celular.',
-icon: 'icon-192.png'
+icon: 'icon-512.png'
 });
 }
 });
