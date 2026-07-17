@@ -19,7 +19,7 @@
 };
 
   function looksBroken(value) {
-    return /[\u00C3\u00C2\u00E2\u0192]/.test(String(value || ""));
+    return /[\u00C3\u00C2\u00C5\u00C6\u00E2\u0192]/.test(String(value || ""));
   }
 
   function cp1252BytesFromString(value) {
@@ -70,22 +70,59 @@
     return bytes;
   }
 
+  function repairCommonGlyphs(value) {
+    if (!value || typeof value !== "string") return value;
+
+    var replacements = [
+      ["ÃƒÂ°Ã…Â¸Ã…â€™Ã¢â€žÂ¢", "🌙"],
+      ["Ã°Å¸Å’â„¢", "🌙"],
+      ["ÃƒÂ¢Ã‹Å“Ã¢â€šÂ¬ÃƒÂ¯Ã‚Â¸Ã‚Â", "☀️"],
+      ["Ã¢Ëœâ‚¬Ã¯Â¸Â", "☀️"],
+      ["ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…ÂŠ", "📊"],
+      ["Ã°Å¸â€œÅŠ", "📊"],
+      ["ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â¡", "📚"],
+      ["Ã°Å¸â€œÅ¡", "📚"],
+      ["ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Â ", "📆"],
+      ["Ã°Å¸â€œâ€ ", "📆"],
+      ["ÃƒÂ°Ã…Â¸Ã¢â‚¬â€Ã¢â‚¬Å¡", "🗂"],
+      ["Ã°Å¸â€”â€š", "🗂"],
+      ["ÃƒÂ¢Ã‚ÂÃ‚Â±", "⏱"],
+      ["Ã¢ÂÂ±", "⏱"],
+      ["â†", "←"],
+      ["InÃƒÆ’Ã‚Â­cio", "Início"],
+      ["InÃƒÂ­cio", "Início"],
+      ["InÃ­cio", "Início"],
+      ["automÃƒÂ¡tico", "automático"],
+      ["automÃ¡tico", "automático"],
+      ["NotificaÃƒÂ§ÃƒÂµes", "Notificações"],
+      ["NotificaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes", "Notificações"],
+      ["HorÃƒÂ¡rio", "Horário"],
+      ["HorÃƒÆ’Ã‚Â¡rio", "Horário"]
+    ];
+
+    var next = value;
+    replacements.forEach(function (entry) {
+      next = next.split(entry[0]).join(entry[1]);
+    });
+    return next;
+  }
+
   function decodeBrokenUtf8(value) {
     if (!value || typeof value !== "string" || !looksBroken(value) || typeof TextDecoder === "undefined") {
-      return value;
+      return repairCommonGlyphs(value);
     }
 
-    var current = value;
-    for (var attempt = 0; attempt < 4; attempt += 1) {
+    var current = repairCommonGlyphs(value);
+    for (var attempt = 0; attempt < 6; attempt += 1) {
       if (!looksBroken(current)) break;
       var bytes = cp1252BytesFromString(current);
       if (!bytes) break;
       var next = new TextDecoder("utf-8").decode(new Uint8Array(bytes));
       if (!next || next === current || next.indexOf("\ufffd") !== -1) break;
-      current = next;
+      current = repairCommonGlyphs(next);
     }
 
-    return current;
+    return repairCommonGlyphs(current);
   }
 
   function sanitizeValue(value) {
@@ -153,6 +190,7 @@
       patchAttribute(root, "aria-label");
       patchAttribute(root, "alt");
       patchAttribute(root, "content");
+      patchAttribute(root, "value");
     }
 
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
@@ -173,8 +211,39 @@
         patchAttribute(element, "aria-label");
         patchAttribute(element, "alt");
         patchAttribute(element, "content");
+        patchAttribute(element, "value");
       });
     }
+  }
+
+  function forceText(selector, text, title) {
+    if (!selector) return;
+    document.querySelectorAll(selector).forEach(function (node) {
+      if (!node) return;
+      if ("value" in node && /^(INPUT|OPTION)$/i.test(node.tagName || "")) {
+        node.value = text;
+      } else {
+        node.textContent = text;
+      }
+      if (title) {
+        node.setAttribute("title", title);
+        node.setAttribute("aria-label", title);
+      }
+    });
+  }
+
+  function enforceKnownLabels() {
+    forceText('a[href="index.html"]', "← Início");
+    forceText('a.crumbs[href="casavequia.html"]', "← Voltar para Pe. Carlos Casavequia");
+    forceText('a.crumbs[href="herminio.html"]', "← Voltar para o relatório da escola");
+    forceText("#modo-claro-btn", "☀️", "Modo Claro");
+    forceText("#modo-escuro-btn", "🌙", "Modo Escuro");
+    forceText('button[onclick*="plano"]', "📚 Plano Anual");
+    forceText('button[onclick*="cont"]', "📊 Contador");
+    forceText('button[onclick*="claude"]', "⏱ Claude");
+    forceText('button[onclick*="livros"]', "📚 Livros");
+    forceText('button[onclick*="sequencias"]', "🗂 Sequências");
+    forceText('button[onclick*="cal"]', "📆 Calendário");
   }
 
   function run() {
@@ -183,6 +252,7 @@
     if (fixedTitle && fixedTitle !== document.title) {
       document.title = fixedTitle;
     }
+    enforceKnownLabels();
   }
 
   var observer = new MutationObserver(function (mutations) {
@@ -208,7 +278,7 @@
     childList: true,
     characterData: true,
     attributes: true,
-    attributeFilter: ["title", "placeholder", "aria-label", "alt", "content"]
+    attributeFilter: ["title", "placeholder", "aria-label", "alt", "content", "value"]
   });
 
   window.__RELATORIOS_MOJIBAKE_HOTFIX__ = {
@@ -224,4 +294,6 @@
   window.addEventListener("load", run, { once: true });
   window.setTimeout(run, 450);
   window.setTimeout(run, 1500);
+  window.setTimeout(run, 3200);
+  window.setTimeout(run, 6500);
 })();
