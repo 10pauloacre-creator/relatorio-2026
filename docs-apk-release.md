@@ -3,11 +3,11 @@
 ## O que foi configurado
 
 - Projeto Android com Capacitor em `android/`
-- Build web publicado a partir de `dist/`
+- Build do app publicado a partir de `dist/`
 - Pagina de download em `downloads/index.html`
 - Historico de releases em `downloads/latest.json` e `downloads/releases.json`
 - APK versionado em `downloads/apk/`
-- Deploy do GitHub Pages compilando `dist/` automaticamente
+- Deploy do GitHub Pages compilando `dist/` automaticamente com os APKs reinjetados em `dist/downloads/apk/`
 
 ## Fluxo principal para novas atualizacoes estruturais
 
@@ -44,6 +44,7 @@ git push origin main
 
 ```powershell
 npm.cmd install
+npm run build:pages
 npm run android:add
 npm run release:prepare -- --level patch --notes "Ajustes estruturais"
 npm run apk:debug
@@ -55,4 +56,5 @@ npm run build:web
 
 - O fluxo atual gera um APK `debug`, adequado para instalacao manual e atualizacao por cima da versao anterior.
 - O versionamento do Android e da pagina de downloads passa a ser controlado pelo release preparado em `release:prepare`.
-- O deploy do GitHub Pages agora publica apenas o site compilado em `dist/`, incluindo a pagina e os APKs copiados para `downloads/apk/`.
+- `npm run build:web` continua sem incluir `downloads/apk/`, para nao empacotar APKs dentro do app Android.
+- `npm run build:pages` recompila o site e recoloca `downloads/apk/` dentro de `dist/` antes do deploy no GitHub Pages.
