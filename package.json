@@ -1,7 +1,7 @@
 {
   "name": "relatorios-diarios-2026",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "App web e APK do projeto Relatorios Diarios 2026.",
   "scripts": {
     "build:web": "node scripts/build-web-release.js",
