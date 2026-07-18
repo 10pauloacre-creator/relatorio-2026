@@ -844,9 +844,9 @@ return btn;
 function rhConfigurarEditorPersistente() {
 window.__RELATORIOS_EDITOR_CONFIG__ = {
 schoolSlug: 'raimundo-herminio-de-melo',
-scope: 'report-layout:raimundo-herminio-de-melo',
+scope: 'report-layout-safe-v1:raimundo-herminio-de-melo',
 classSlug: 'layout-raimundo-herminio-de-melo',
-storageKey: 'ed_layout_snapshot_v5:raimundo-herminio-de-melo',
+storageKey: 'ed_layout_safe_v1:raimundo-herminio-de-melo',
 pagePath: 'herminio.html'
 };
 var main = document.querySelector('main.main');
