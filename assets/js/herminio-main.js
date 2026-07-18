@@ -808,6 +808,72 @@ var active = !!saved[def.cls];       rhPlanApplyState(btn, item, def.cls, active
 var current = {};         try { current = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}         current[def.cls] = !btn.classList.contains('on');         localStorage.setItem(key, JSON.stringify(current));         rhPlanApplyState(btn, item, def.cls, current[def.cls]);       
 if (current[def.cls]) rhPlanSaveLastUpdate(item, def.cls);       });       actions.appendChild(btn);     });     item.appendChild(actions);   }); }
 // ═══════════════════════════════════════════════════════ //  MODAL EDITAR — Novo Relato (R. Hermínio) // ═══════════════════════════════════════════════════════
+function rhGarantirToolbarEditor() {
+if (document.getElementById('toolbar-texto')) return;
+var toolbar = document.createElement('div');
+toolbar.id = 'toolbar-texto';
+toolbar.innerHTML = '<button class="tb-btn" data-cmd="bold" title="Negrito (Ctrl+B)"><strong>B</strong></button>'
+  + '<button class="tb-btn" data-cmd="italic" title="Italico (Ctrl+I)"><em>I</em></button>'
+  + '<button class="tb-btn" data-cmd="underline" title="Sublinhado (Ctrl+U)"><u>U</u></button>'
+  + '<div class="tb-sep"></div>'
+  + '<button class="tb-btn" data-cmd="insertUnorderedList" title="Lista">≡</button>'
+  + '<button class="tb-btn" data-cmd="insertOrderedList" title="Lista numerada">№</button>'
+  + '<div class="tb-sep"></div>'
+  + '<select class="tb-select" id="tb-tamanho" title="Tamanho"><option value="3">Normal</option><option value="1">Pequeno</option><option value="4">Grande</option><option value="5">Maior</option></select>'
+  + '<div class="tb-sep"></div>'
+  + '<input type="color" id="tb-cor-texto" value="#2b2b2b" title="Cor do texto" style="width:24px;height:24px;border:none;border-radius:4px;cursor:pointer;padding:0;background:transparent">'
+  + '<input type="color" id="tb-cor-fundo" value="#faf8f2" title="Destaque" style="width:24px;height:24px;border:none;border-radius:4px;cursor:pointer;padding:0;background:transparent">';
+document.body.appendChild(toolbar);
+}
+function rhGarantirCssEditor() {
+if (document.querySelector('link[data-rh-editor-css="1"]')) return;
+var link = document.createElement('link');
+link.rel = 'stylesheet';
+link.href = 'assets/css/editor.css?v=20260718a';
+link.setAttribute('data-rh-editor-css', '1');
+document.head.appendChild(link);
+}
+function rhPrepararBotaoEditor() {
+var btn = document.getElementById('btn-editar-rh') || document.getElementById('btn-editar');
+if (!btn) return null;
+btn.removeAttribute('onclick');
+btn.id = 'btn-editar';
+btn.type = 'button';
+return btn;
+}
+function rhConfigurarEditorPersistente() {
+window.__RELATORIOS_EDITOR_CONFIG__ = {
+schoolSlug: 'raimundo-herminio-de-melo',
+scope: 'report-layout:raimundo-herminio-de-melo',
+classSlug: 'layout-raimundo-herminio-de-melo',
+storageKey: 'ed_layout_snapshot_v5:raimundo-herminio-de-melo',
+pagePath: 'herminio.html'
+};
+var main = document.querySelector('main.main');
+if (main && !main.dataset.build) main.dataset.build = '20260718';
+}
+function rhGarantirEditorPersistente() {
+if (window._rhEditorBootstrapDone) return;
+var btn = rhPrepararBotaoEditor();
+if (!btn) return;
+window._rhEditorBootstrapDone = true;
+rhConfigurarEditorPersistente();
+rhGarantirCssEditor();
+rhGarantirToolbarEditor();
+if (typeof window.initEditor === 'function') {
+window.initEditor();
+return;
+}
+if (document.querySelector('script[data-rh-editor-loader="1"]')) return;
+var script = document.createElement('script');
+script.src = 'assets/js/editor.js?v=20260718a';
+script.async = false;
+script.setAttribute('data-rh-editor-loader', '1');
+script.onload = function() {
+if (typeof window.initEditor === 'function') window.initEditor();
+};
+document.body.appendChild(script);
+}
 function abrirModalRH() { 
 var m = document.getElementById('rh-modal-relato'); 
 if (m) { m.style.display = 'flex'; return; } 
@@ -854,6 +920,7 @@ btnJogos.remove();
 }
 }
 document.addEventListener('DOMContentLoaded', rhRemoverAbaJogos);
+document.addEventListener('DOMContentLoaded', rhGarantirEditorPersistente);
 (function() {
 var RH_STORAGE_SYNC_SCOPE = 'herminio:storage:shared-v1';
 var RH_STORAGE_LOCAL_TS_KEY = 'rh_storage_sync_local_ts';
