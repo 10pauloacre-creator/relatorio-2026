@@ -8,13 +8,17 @@ var _undoStack = [];
 var _redoStack = [];
 var _elSelecionado = null;
 var _painel = null;
-var EDITOR_LAYOUT_KEY = 'ed_layout_snapshot_v4';
-var EDITOR_LAYOUT_SCOPE = 'casavequia:layout:shared-v1';
 var _editorRemoteSync = null;
 var _editorApplyingRemote = false;
 var _editorLastAppliedSignature = '';
+var _editorInitialized = false;
+var _editorConfigCache = null;
 
 function initEditor() {
+  if (_editorInitialized) return;
+  _editorInitialized = true;
+  _editorRestaurarSnapshot();
+  _editorIniciarSyncRemoto();
   configurarBtnEditar();
   criarPainelEditor();
   configurarToolbarTexto();
@@ -22,8 +26,12 @@ function initEditor() {
 
 // ─── BOTÃO EDITAR / SAIR ────────────────────────────────
 
+function _editorGetToggleButton() {
+  return document.getElementById('btn-editar') || document.getElementById('btn-editar-rh');
+}
+
 function configurarBtnEditar() {
-  var btn = document.getElementById('btn-editar');
+  var btn = _editorGetToggleButton();
   if (!btn) return;
   btn.addEventListener('click', function() {
     if (modoEdicaoAtivo) sairModoEdicao();
@@ -34,7 +42,7 @@ function configurarBtnEditar() {
 function entrarModoEdicao() {
   modoEdicaoAtivo = true;
   document.body.classList.add('modo-edicao');
-  var btn = document.getElementById('btn-editar');
+  var btn = _editorGetToggleButton();
   if (btn) { btn.textContent = '✅ Salvar'; btn.style.cssText = 'background:#16a34a;color:white;border:none'; }
 
   var _eu = document.getElementById('ed-undo');    if (_eu) _eu.style.display = 'flex';
@@ -54,7 +62,7 @@ function entrarModoEdicao() {
 function sairModoEdicao() {
   modoEdicaoAtivo = false;
   document.body.classList.remove('modo-edicao');
-  var btn = document.getElementById('btn-editar');
+  var btn = _editorGetToggleButton();
   if (btn) { btn.textContent = '✏️ Editar'; btn.style.cssText = ''; }
 
   var _eu2 = document.getElementById('ed-undo');    if (_eu2) _eu2.style.display = 'none';
@@ -597,13 +605,40 @@ function _editorBuildAtual() {
   return main && main.dataset ? (main.dataset.build || '') : '';
 }
 
+function _editorResolveConfig() {
+  if (_editorConfigCache) return _editorConfigCache;
+
+  var pagePath = (window.location.pathname || '').split('/').pop() || 'index.html';
+  var normalizedPage = pagePath.toLowerCase();
+  var schoolSlug = 'padre-carlos-casavequia';
+
+  if (window.__RELATORIOS_EDITOR_CONFIG__ && typeof window.__RELATORIOS_EDITOR_CONFIG__ === 'object') {
+    _editorConfigCache = window.__RELATORIOS_EDITOR_CONFIG__;
+    return _editorConfigCache;
+  }
+
+  if (normalizedPage.indexOf('herminio') !== -1) {
+    schoolSlug = 'raimundo-herminio-de-melo';
+  }
+
+  var scopeSlug = normalizedPage.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'index-html';
+  _editorConfigCache = {
+    pagePath: pagePath,
+    schoolSlug: schoolSlug,
+    classSlug: 'layout-' + scopeSlug,
+    scope: 'report-layout:' + scopeSlug,
+    storageKey: 'ed_layout_snapshot_v5:' + scopeSlug
+  };
+  return _editorConfigCache;
+}
+
 function _editorSnapshotSignature(payload) {
   try { return JSON.stringify(payload || null); } catch (e) { return ''; }
 }
 
 function _editorLerSnapshot() {
   try {
-    var raw = localStorage.getItem(EDITOR_LAYOUT_KEY);
+    var raw = localStorage.getItem(_editorResolveConfig().storageKey);
     return raw ? JSON.parse(raw) : null;
   } catch (e) {
     return null;
@@ -613,14 +648,16 @@ function _editorLerSnapshot() {
 function _editorPersistirSnapshot(payload) {
   if (!payload) return;
   try {
-    localStorage.setItem(EDITOR_LAYOUT_KEY, JSON.stringify(payload));
+    localStorage.setItem(_editorResolveConfig().storageKey, JSON.stringify(payload));
   } catch (e) {}
 }
 
 function _editorCriarPayload() {
   var main = document.querySelector('.main');
+  var config = _editorResolveConfig();
   if (!main) return null;
   return {
+    pagePath: config.pagePath,
     build: _editorBuildAtual(),
     updatedAt: new Date().toISOString(),
     html: main.innerHTML
@@ -634,12 +671,26 @@ function _editorReidratarDepoisDoRestore() {
   try { if (typeof pcRefreshHeroStats === 'function') pcRefreshHeroStats(); } catch (e) {}
   try { if (typeof pcRefreshCounterHero === 'function') pcRefreshCounterHero(); } catch (e) {}
   try { if (typeof verificarAbasRelatos === 'function') verificarAbasRelatos(); } catch (e) {}
+  try { if (typeof rhRenderPresencaInterativa === 'function') rhRenderPresencaInterativa(); } catch (e) {}
+  try { if (typeof rhRenderAtividadeInterativa === 'function') rhRenderAtividadeInterativa(); } catch (e) {}
+  try { if (typeof rhSincronizarResumoAlunos === 'function') rhSincronizarResumoAlunos(); } catch (e) {}
+  try { if (typeof rhRefreshHeroStats === 'function') rhRefreshHeroStats(); } catch (e) {}
+  try { if (typeof rhLivRender === 'function') rhLivRender(); } catch (e) {}
+  try { if (typeof rhSeqRender === 'function') rhSeqRender(); } catch (e) {}
+  try { if (typeof rhClaudeRender === 'function') rhClaudeRender(); } catch (e) {}
+  try {
+    document.dispatchEvent(new CustomEvent('relatorios:editor-layout-restored', {
+      detail: _editorResolveConfig()
+    }));
+  } catch (e) {}
 }
 
 function _editorAplicarSnapshot(payload) {
   var main = document.querySelector('.main');
+  var currentBuild = _editorBuildAtual();
   if (!main || !payload || !payload.html) return false;
-  if (!payload.build || payload.build !== _editorBuildAtual()) return false;
+  if (payload.build && currentBuild && payload.build !== currentBuild) return false;
+  if (payload.pagePath && payload.pagePath !== _editorResolveConfig().pagePath) return false;
   var signature = _editorSnapshotSignature(payload);
   if (signature && signature === _editorLastAppliedSignature) return true;
   _editorApplyingRemote = true;
@@ -655,16 +706,18 @@ function _editorRestaurarSnapshot() {
   var payload = _editorLerSnapshot();
   if (!payload) return;
   if (!_editorAplicarSnapshot(payload)) {
-    try { localStorage.removeItem(EDITOR_LAYOUT_KEY); } catch (e) {}
+    try { localStorage.removeItem(_editorResolveConfig().storageKey); } catch (e) {}
   }
 }
 
 function _editorIniciarSyncRemoto() {
   if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return;
+  if (_editorRemoteSync) return;
+  var config = _editorResolveConfig();
   _editorRemoteSync = window.RelatorioSupabaseSync.createScopeSync({
-    scope: EDITOR_LAYOUT_SCOPE,
-    schoolSlug: 'padre-carlos-casavequia',
-    classSlug: 'layout-relatorio',
+    scope: config.scope,
+    schoolSlug: config.schoolSlug,
+    classSlug: config.classSlug,
     source: 'editor-js',
     debounceMs: 550,
     getLocalPayload: function() {
@@ -712,7 +765,8 @@ function _salvarAlteracoes() {
 }
 
 function limparAlteracoes() {
-  ['ed_main_html','ed_main_html_v2','ed_main_html_v3',EDITOR_LAYOUT_KEY].forEach(function(k){ localStorage.removeItem(k); });
+  ['ed_main_html', 'ed_main_html_v2', 'ed_main_html_v3', 'ed_layout_snapshot_v4', _editorResolveConfig().storageKey]
+    .forEach(function(k){ localStorage.removeItem(k); });
   window.location.reload();
 }
 
@@ -778,13 +832,16 @@ function _rgbToHex(rgb) {
 // salvo anteriormente pelo editor — impede sobrescrita do HTML do servidor.
 (function() {
   try {
-    ['ed_main_html', 'ed_main_html_v2', 'ed_main_html_v3', EDITOR_LAYOUT_KEY].forEach(function(k) {
+    ['ed_main_html', 'ed_main_html_v2', 'ed_main_html_v3', 'ed_layout_snapshot_v4'].forEach(function(k) {
       localStorage.removeItem(k);
     });
   } catch(e) {}
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
+  if (_editorGetToggleButton()) {
+    initEditor();
+  }
   // Carrega contas Claude salvas (única coisa que persiste entre sessões)
   try {
     var contasSalvas = localStorage.getItem('cl_contas');
