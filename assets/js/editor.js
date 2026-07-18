@@ -13,11 +13,13 @@ var _editorApplyingRemote = false;
 var _editorLastAppliedSignature = '';
 var _editorInitialized = false;
 var _editorConfigCache = null;
+var _editorRestoreBootstrapped = false;
 
 function initEditor() {
   if (_editorInitialized) return;
   _editorInitialized = true;
   _editorRestaurarSnapshot();
+  _editorBootstrapRestauracao();
   _editorIniciarSyncRemoto();
   configurarBtnEditar();
   criarPainelEditor();
@@ -710,6 +712,26 @@ function _editorRestaurarSnapshot() {
   }
 }
 
+function _editorRestaurarSnapshotAtrasado() {
+  if (modoEdicaoAtivo) return;
+  _editorRestaurarSnapshot();
+}
+
+function _editorBootstrapRestauracao() {
+  if (_editorRestoreBootstrapped) return;
+  _editorRestoreBootstrapped = true;
+
+  window.addEventListener('load', function() {
+    _editorRestaurarSnapshotAtrasado();
+    window.setTimeout(_editorRestaurarSnapshotAtrasado, 180);
+    window.setTimeout(_editorRestaurarSnapshotAtrasado, 900);
+  }, { once: true });
+
+  window.setTimeout(_editorRestaurarSnapshotAtrasado, 60);
+  window.setTimeout(_editorRestaurarSnapshotAtrasado, 420);
+  window.setTimeout(_editorRestaurarSnapshotAtrasado, 1400);
+}
+
 function _editorIniciarSyncRemoto() {
   if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return;
   if (_editorRemoteSync) return;
@@ -760,7 +782,16 @@ function _salvarAlteracoes() {
   _editorPersistirSnapshot(payload);
   _editorLastAppliedSignature = _editorSnapshotSignature(payload);
   if (!_editorApplyingRemote && _editorRemoteSync) {
-    _editorRemoteSync.schedulePush('layout-change');
+    try {
+      var maybePromise = _editorRemoteSync.pushNow('layout-change');
+      if (maybePromise && typeof maybePromise.catch === 'function') {
+        maybePromise.catch(function() {
+          _editorRemoteSync.schedulePush('layout-change');
+        });
+      }
+    } catch (e) {
+      _editorRemoteSync.schedulePush('layout-change');
+    }
   }
 }
 
