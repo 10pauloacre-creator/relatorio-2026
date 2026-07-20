@@ -15,6 +15,8 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
 
         if (bridge != null && bridge.getWebView() != null) {
+            bridge.getWebView().getSettings().setDefaultTextEncodingName("utf-8");
+            bridge.getWebView().getSettings().setTextZoom(100);
             bridge.getWebView().addJavascriptInterface(new RelatoriosAppBridge(), "RelatoriosAppBridge");
         }
     }

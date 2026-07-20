@@ -141,6 +141,8 @@ public class InternalBrowserActivity extends AppCompatActivity {
         settings.setSupportZoom(true);
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
+        settings.setDefaultTextEncodingName("utf-8");
+        settings.setTextZoom(100);
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override

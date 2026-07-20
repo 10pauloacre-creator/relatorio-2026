@@ -12,6 +12,12 @@ const defaultFiles = [
     .map((entry) => entry.name),
   "assets/app-build.js",
   "assets/js/casavequia-calendar-data.js",
+  "assets/js/contador.js",
+  "assets/js/cronograma.js",
+  "assets/js/data.js",
+  "assets/js/herminio-main.js",
+  "assets/js/livros-prompts.js",
+  "assets/js/plano.js",
   "downloads/index.html",
   "downloads/latest.json",
   "downloads/releases.json"

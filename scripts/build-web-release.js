@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { spawnSync } = require("child_process");
 const { readJson, writeAppBuildScript } = require("./release-utils");
 
 const rootDir = path.resolve(__dirname, "..");
@@ -43,6 +44,15 @@ const folderAllowlist = new Set(["assets", "downloads"]);
 
 const swCleanupSnippet =
   "<script>(function(){if(!('serviceWorker' in navigator))return;window.addEventListener('load',function(){navigator.serviceWorker.getRegistrations().then(function(regs){return Promise.all(regs.map(function(reg){return reg.unregister();}));}).catch(function(){}).finally(function(){if(window.caches&&caches.keys){caches.keys().then(function(keys){return Promise.all(keys.map(function(key){return caches.delete(key);}));}).catch(function(){});}});});})();</script>";
+
+const encodingFixResult = spawnSync(process.execPath, [path.join(__dirname, "fix-published-encoding.js")], {
+  cwd: rootDir,
+  stdio: "inherit"
+});
+
+if (typeof encodingFixResult.status === "number" && encodingFixResult.status !== 0) {
+  process.exit(encodingFixResult.status);
+}
 
 fs.rmSync(distDir, { recursive: true, force: true });
 fs.mkdirSync(distDir, { recursive: true });
