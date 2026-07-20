@@ -18,6 +18,7 @@ var _editorProtectedBaseline = {};
 var _editorProtectionWarningShown = false;
 var EDITOR_SAFE_HYBRID_KEY = 'RELATORIOS_SAFE_HYBRID_V1';
 var EDITOR_PROTECTED_SELECTORS = [
+  '#sec-claude',
   '.ea',
   '.ec2',
   '.ipane',
@@ -847,8 +848,13 @@ function _editorReidratarDepoisDoRestore() {
   try { if (typeof pcRefreshHeroStats === 'function') pcRefreshHeroStats(); } catch (e) {}
   try { if (typeof pcRefreshCounterHero === 'function') pcRefreshCounterHero(); } catch (e) {}
   try { if (typeof verificarAbasRelatos === 'function') verificarAbasRelatos(); } catch (e) {}
-  try { if (typeof rhRenderPresencaInterativa === 'function') rhRenderPresencaInterativa(); } catch (e) {}
-  try { if (typeof rhRenderAtividadeInterativa === 'function') rhRenderAtividadeInterativa(); } catch (e) {}
+  try {
+    if (typeof rhMarcarPanesInterativosDirty === 'function') {
+      rhMarcarPanesInterativosDirty('presenca');
+      rhMarcarPanesInterativosDirty('atividade');
+    }
+  } catch (e) {}
+  try { if (typeof rhRenderInterativosVisiveis === 'function') rhRenderInterativosVisiveis(true); } catch (e) {}
   try { if (typeof rhSincronizarResumoAlunos === 'function') rhSincronizarResumoAlunos(); } catch (e) {}
   try { if (typeof rhRefreshHeroStats === 'function') rhRefreshHeroStats(); } catch (e) {}
   try { if (typeof rhLivRender === 'function') rhLivRender(); } catch (e) {}

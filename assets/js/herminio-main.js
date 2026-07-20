@@ -206,7 +206,7 @@ function rhAplicarSyncRemoto(payload, meta) {
 if (!payload || typeof payload !== 'object') return; 
 var localStamp = Date.parse(localStorage.getItem(RH_DAILY_LOCAL_TS_KEY) || '') || 0; 
 var remoteStamp = Date.parse((payload && payload.localUpdatedAt) || (meta && meta.updatedAt) || '') || 0; 
-if (localStamp && remoteStamp && localStamp > remoteStamp) {     rhAgendarSyncRemoto('keep-local');     return;   }   _rhAplicandoSyncRemoto = true;    _rhPresencaCliques = payload.presencaCliques && typeof payload.presencaCliques === 'object'     ? payload.presencaCliques     : {};   _rhAtividadeCliques = payload.atividadeCliques && typeof payload.atividadeCliques === 'object'     ? payload.atividadeCliques     : {};    localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));   localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));   localStorage.setItem(RH_DAILY_LOCAL_TS_KEY, payload.localUpdatedAt || (meta && meta.updatedAt) || new Date().toISOString());   localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(payload.alunosSync || rhMontarResumoAlunosSync()));    rhRenderPresencaInterativa();   rhRenderAtividadeInterativa();   rhSincronizarResumoAlunos();    _rhAplicandoSyncRemoto = false; }
+if (localStamp && remoteStamp && localStamp > remoteStamp) {     rhAgendarSyncRemoto('keep-local');     return;   }   _rhAplicandoSyncRemoto = true;    _rhPresencaCliques = payload.presencaCliques && typeof payload.presencaCliques === 'object'     ? payload.presencaCliques     : {};   _rhAtividadeCliques = payload.atividadeCliques && typeof payload.atividadeCliques === 'object'     ? payload.atividadeCliques     : {};    localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));   localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));   localStorage.setItem(RH_DAILY_LOCAL_TS_KEY, payload.localUpdatedAt || (meta && meta.updatedAt) || new Date().toISOString());   localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(payload.alunosSync || rhMontarResumoAlunosSync()));    rhMarcarPanesInterativosDirty('presenca');   rhMarcarPanesInterativosDirty('atividade');   rhRenderInterativosVisiveis(false);   rhSincronizarResumoAlunos();    _rhAplicandoSyncRemoto = false; }
 function rhAgendarSyncRemoto(reason) { 
 if (_rhAplicandoSyncRemoto || !_rhRemoteDailySync) return;   _rhRemoteDailySync.schedulePush(reason || 'daily-change'); }
 function rhIniciarSyncRemoto() { 
@@ -247,8 +247,29 @@ var resumo = pane.querySelector('.atv-av');
 if (!resumo) {     resumo = document.createElement('div');     resumo.className = 'atv-av';     pane.insertBefore(resumo, pane.firstChild);   }   resumo.textContent = rhResumoMarcacao('atividade', pane, turmaId); 
 var host = pane.querySelector('[data-rh-mosaico="atividade"]'); 
 if (!host) {     host = document.createElement('div');     host.setAttribute('data-rh-mosaico', 'atividade');     pane.appendChild(host);   }   host.innerHTML = rhHtmlMosaico('atividade', pane, turmaId); }
-function rhRenderPresencaInterativa() {   document.querySelectorAll('.ipane[id^="p-"]').forEach(function(pane) {     rhRenderPanePresenca(pane);   }); }
-function rhRenderAtividadeInterativa() {   document.querySelectorAll('.ipane[id^="a-"]').forEach(function(pane) {     rhRenderPaneAtividade(pane);   }); }
+function rhPaneInterativoVisivel(pane) { 
+if (!pane) return false; 
+if (pane.classList && !pane.classList.contains('on')) return false; 
+var accordion = pane.closest('.ec2');   return !accordion || accordion.classList.contains('on'); }
+function rhMarcarPanesInterativosDirty(tipo) { 
+var seletor = tipo === 'presenca' ? '.ipane[id^="p-"]' : '.ipane[id^="a-"]';   document.querySelectorAll(seletor).forEach(function(pane) {     pane.setAttribute('data-rh-dirty', '1');   }); }
+function rhRenderPaneInterativo(tipo, pane, force) { 
+if (!pane) return; 
+var precisa = !!force || pane.getAttribute('data-rh-dirty') === '1'; 
+if (!precisa) {     precisa = tipo === 'presenca'       ? !pane.querySelector('[data-rh-mosaico="presenca"]')       : !pane.querySelector('[data-rh-mosaico="atividade"]');   } 
+if (!precisa) return; 
+if (tipo === 'presenca') rhRenderPanePresenca(pane);   else rhRenderPaneAtividade(pane);   pane.removeAttribute('data-rh-dirty'); }
+function rhRenderPresencaInterativa(options) { 
+var opts = options || {};   document.querySelectorAll('.ipane[id^="p-"]').forEach(function(pane) {     if (opts.visibleOnly && !rhPaneInterativoVisivel(pane)) return;     rhRenderPaneInterativo('presenca', pane, opts.force);   }); }
+function rhRenderAtividadeInterativa(options) { 
+var opts = options || {};   document.querySelectorAll('.ipane[id^="a-"]').forEach(function(pane) {     if (opts.visibleOnly && !rhPaneInterativoVisivel(pane)) return;     rhRenderPaneInterativo('atividade', pane, opts.force);   }); }
+function rhRenderInterativosVisiveis(force) {   rhRenderPresencaInterativa({ visibleOnly: true, force: !!force });   rhRenderAtividadeInterativa({ visibleOnly: true, force: !!force }); }
+function rhRenderPaneAtivo(container, force) { 
+if (!container) return; 
+var pane = container.querySelector('.ipane.on'); 
+if (!pane) return; 
+if (pane.id.indexOf('p-') === 0) {     rhRenderPaneInterativo('presenca', pane, force);     return;   } 
+if (pane.id.indexOf('a-') === 0) {     rhRenderPaneInterativo('atividade', pane, force);   } }
 function getMetasContRH(base) { 
 var semanais = base.semanais || 0; 
 var bimestre = base.bimestreMeta != null     ? base.bimestreMeta     : (semanais ? Math.round((semanais * 10 + Number.EPSILON) * 100) / 100 : 0); 
@@ -265,7 +286,7 @@ function aba(id, btn) {   document.querySelectorAll('.sec').forEach(function(s){
 var sec = document.getElementById(id); 
 if (sec) sec.classList.add('on'); 
 if (btn) btn.classList.add('on'); 
-if ((id === 'sec-all' || id === 'sec-t89' || id === 'sec-t1' || id === 'sec-t23') && !window._rhDailyReady) { window._rhDailyReady = true; setTimeout(function(){ renderPresencaRH(); renderAtividadesRH(); rhSincronizarResumoAlunos(); rhRefreshHeroStats(); }, 40); } 
+if ((id === 'sec-all' || id === 'sec-t89' || id === 'sec-t1' || id === 'sec-t23') && !window._rhDailyReady) { window._rhDailyReady = true; setTimeout(function(){ rhRenderInterativosVisiveis(false); rhSincronizarResumoAlunos(); rhRefreshHeroStats(); }, 40); } 
 if (id === 'sec-cont') renderContRH(); 
 if (id === 'sec-plano' && !window._rhPlanReady) { window._rhPlanReady = true; setTimeout(function(){ rhBuildPlanReplica(); }, 40); } 
 if (id === 'sec-livros' && !window._rhLivReady) { window._rhLivReady = true; setTimeout(function(){ rhLivRender(); }, 40); } 
@@ -277,13 +298,14 @@ var ec2 = p.querySelector('.ec2');
 var et = h.querySelector('.et'); 
 if (ec2) ec2.classList.toggle('on'); 
 if (et) et.classList.toggle('op'); 
+if (ec2 && ec2.classList.contains('on')) rhRenderPaneAtivo(ec2, false); 
 var sec = h.closest('.sec'); 
 if (sec) rhUpdateHeroStats(sec.id); }
 function itab(btn, pid) { 
 var parent = btn.closest('.ec2'); 
 if (!parent) return;   parent.querySelectorAll('.itab').forEach(function(b){ b.classList.remove('on'); });   parent.querySelectorAll('.ipane').forEach(function(p){ p.classList.remove('on'); });   btn.classList.add('on'); 
 var pane = document.getElementById(pid); 
-if (pane) pane.classList.add('on'); }
+if (pane) {     pane.classList.add('on');     rhRenderPaneAtivo(parent, false);   } }
 function rhHeroFormatLastDate(sectionId) { 
 var sec = document.getElementById(sectionId); 
 if (!sec) return '—'; 
@@ -879,21 +901,9 @@ var m = document.getElementById('rh-modal-relato');
 if (m) { m.style.display = 'flex'; return; } 
 // Cria modal simples na primeira vez
 var el = document.createElement('div');   el.id = 'rh-modal-relato';   el.style = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px';   el.innerHTML = '<div style="background:var(--cr);border-radius:16px;padding:28px;max-width:520px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.5);max-height:90vh;overflow-y:auto">'     + '<div style="font-family:\'Playfair Display\',serif;font-size:1.2rem;font-weight:700;color:var(--vd);margin-bottom:6px">✏️ Novo Relato — R. Hermínio de Melo</div>'     + '<div style="font-size:.8rem;color:var(--cm);margin-bottom:18px">Escreva o rascunho. Claude irá formatar o HTML.</div>'     + '<textarea id="rh-rascunho" rows="10" placeholder="Ex: Hoje, 20/05, 8º/9º Ano — LP, 2h. Conteúdo: figuras de linguagem..." style="width:100%;padding:12px;border:2px solid var(--cl);border-radius:10px;font-family:\'DM Sans\',sans-serif;font-size:.88rem;color:var(--ce);background:var(--cr);resize:vertical;margin-bottom:14px"></textarea>'     + '<div style="font-size:.78rem;color:var(--cm);background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:10px 14px;margin-bottom:16px">'     + '💡 Cole o rascunho no chat com Claude Code — ele irá gerar o HTML e injetar diretamente no arquivo.</div>'     + '<div style="display:flex;gap:10px">'     + '<button onclick="navigator.clipboard.writeText(document.getElementById(\'rh-rascunho\').value)" style="flex:1;background:var(--vm);color:#fff;border:none;border-radius:10px;padding:11px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:.88rem">📋 Copiar rascunho</button>'     + '<button onclick="document.getElementById(\'rh-modal-relato\').style.display=\'none\'" style="flex:1;background:var(--cl);color:var(--ce);border:none;border-radius:10px;padding:11px;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:.88rem">✕ Fechar</button>'     + '</div></div>';   document.body.appendChild(el);   el.addEventListener('click', function(e) { if (e.target === el) el.style.display = 'none'; }); } document.addEventListener('DOMContentLoaded', function() {   setTimeout(function(){   
-if (!window._rhDailyReady) {       window._rhDailyReady = true;       renderPresencaRH();       renderAtividadesRH();       rhSincronizarResumoAlunos();       rhRefreshHeroStats();     }   }, 80);   setTimeout(function(){   
+if (!window._rhDailyReady) {       window._rhDailyReady = true;       rhRenderInterativosVisiveis(false);       rhSincronizarResumoAlunos();       rhRefreshHeroStats();     }   }, 80);   setTimeout(function(){   
 if (!window._rhSyncReady) {       window._rhSyncReady = true;       rhIniciarSyncRemoto();     }   }, 900); });
 function rhFindActionable(target) {   return target && target.closest ? target.closest('button,a,[onclick],[data-rh-toggle],.nb,.eh,.itab,.rh-hero-pill,.rh-hero-btn,.rh-hero-link,.rh-mark-btn,.atv-r,.atv-mo,.main-tab,.disc-tab,.bim-tab,.btn-st,.liv-card,.liv-btn') : null; }
-document.addEventListener('click', function(e) { 
-if (!e || e.defaultPrevented || typeof document.elementsFromPoint !== 'function') return; 
-var direto = rhFindActionable(e.target); 
-if (direto) return; 
-var pilha = document.elementsFromPoint(e.clientX || 0, e.clientY || 0) || []; 
-var fallback = null;   for (var i = 0; i < pilha.length; i++) {   
-var candidato = rhFindActionable(pilha[i]);   
-if (!candidato) continue;   
-if (candidato === e.target) continue;   
-if (e.target && e.target.contains && e.target.contains(candidato)) continue;     fallback = candidato;     break;   } 
-if (!fallback) return;   e.preventDefault();   e.stopPropagation(); 
-if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();   fallback.click(); }, true);
 document.addEventListener('click', function(e) { 
 var btn = e.target.closest('[data-rh-toggle]'); 
 if (!btn) return; 
@@ -1073,13 +1083,22 @@ rhGarantirSyncsOnline((tentativa || 0) + 1);
 function rhWrapSyncFunction(name, after) {
 var original = window[name];
 if (typeof original !== 'function' || original.__rhSyncWrapped) return;
-var wrapped = function() {
-var result = original.apply(this, arguments);
+function runAfter(context, args) {
 try {
-after.apply(this, arguments);
+after.apply(context, args);
 } catch (error) {
 console.warn('[RH sync]', name, error && error.message ? error.message : error);
 }
+}
+var wrapped = function() {
+var args = arguments;
+var result = original.apply(this, arguments);
+if (result && typeof result.then === 'function') {
+return result.finally(function() {
+runAfter(this, args);
+}.bind(this));
+}
+runAfter(this, args);
 return result;
 };
 wrapped.__rhSyncWrapped = true;
@@ -1113,8 +1132,11 @@ if (_rhRemoteDailySync && typeof _rhRemoteDailySync.refresh === 'function') tare
 if (_rhRemoteStorageSync && typeof _rhRemoteStorageSync.refresh === 'function') tarefas.push(_rhRemoteStorageSync.refresh());
 return Promise.allSettled(tarefas).then(function() {
 rhStorageHydrateGlobals();
-if (typeof rhRenderPresencaInterativa === 'function') rhRenderPresencaInterativa();
-if (typeof rhRenderAtividadeInterativa === 'function') rhRenderAtividadeInterativa();
+if (typeof rhMarcarPanesInterativosDirty === 'function') {
+rhMarcarPanesInterativosDirty('presenca');
+rhMarcarPanesInterativosDirty('atividade');
+}
+if (typeof rhRenderInterativosVisiveis === 'function') rhRenderInterativosVisiveis(true);
 if (typeof rhSincronizarResumoAlunos === 'function') rhSincronizarResumoAlunos();
 if (typeof rhLivRender === 'function') rhLivRender();
 if (typeof rhSeqRender === 'function') rhSeqRender();

@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const rootDir = path.resolve(__dirname, "..");
-const version = "20260717h";
+const version = "20260720a";
 const files = [
   "index.html",
   "casavequia.html",

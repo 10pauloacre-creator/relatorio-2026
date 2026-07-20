@@ -12,7 +12,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
 <script defer src="assets/js/boletim-export.js"></script>
-<title>Alunos - 1a Serie - Raimundo Herminio de Melo</title> <style id="relatorios-preload-fix">html[data-hotfix-pending="1"] body{visibility:hidden}</style><script>document.documentElement.setAttribute("data-hotfix-pending","1");window.__RELATORIOS_CLEAR_PENDING__=function(){try{document.documentElement.removeAttribute("data-hotfix-pending");var s=document.getElementById("relatorios-preload-fix");if(s&&s.parentNode)s.parentNode.removeChild(s);}catch(e){}};window.setTimeout(window.__RELATORIOS_CLEAR_PENDING__,4000);</script><script defer src="downloads/latest.js?v=20260717h"></script>
+<title>Alunos - 1a Serie - Raimundo Herminio de Melo</title> <style id="relatorios-preload-fix">html[data-hotfix-pending="1"] body{visibility:hidden}</style><script>document.documentElement.setAttribute("data-hotfix-pending","1");window.__RELATORIOS_CLEAR_PENDING__=function(){try{document.documentElement.removeAttribute("data-hotfix-pending");var s=document.getElementById("relatorios-preload-fix");if(s&&s.parentNode)s.parentNode.removeChild(s);}catch(e){}};window.setTimeout(window.__RELATORIOS_CLEAR_PENDING__,4000);</script><script defer src="downloads/latest.js?v=20260720a"></script> 
 <style>
 :root{
   --vd:#1a3a2a;
@@ -972,12 +972,12 @@ const DISCIPLINES = [
 ];
 
 const STUDENTS = [
-  { id: 1, numero: 1, nome: "Fernanda Victória Batista Machado" },
-  { id: 2, numero: 2, nome: "Larissa Bruna de Sousa Machado" },
-  { id: 3, numero: 3, nome: "Marlon Pereira Matos" },
-  { id: 4, numero: 4, nome: "Mayron Pereira Matos" },
-  { id: 5, numero: 5, nome: "Miquéias Rocha Macelino dos Santos" }
-];
+    { id: 1, numero: 1, nome: "Fernanda Victória Batista Machado", externalId: "ID-1-FERNANDA-1-RHM2" },
+    { id: 2, numero: 2, nome: "Larissa Bruna de Sousa Machado", externalId: "ID-2-LARISSA-1-RHM2" },
+    { id: 3, numero: 3, nome: "Marlon Pereira Matos", externalId: "ID-3-MARLON-1-RHM2" },
+    { id: 4, numero: 4, nome: "Mayron Pereira Matos", externalId: "ID-4-MAYRON-1-RHM2" },
+    { id: 5, numero: 5, nome: "Miquéias Rocha Macelino dos Santos", externalId: "ID-5-MIQUEIAS-1-RHM2" }
+  ];
 
 const ABSENCE_RECORDS = [
   { codigo: "0525a", carga: 2, faltaram: [] },
@@ -1482,6 +1482,7 @@ function buildDefaultState() {
         id: student.id,
         numero: student.numero,
         nome: student.nome,
+        externalId: student.externalId || "",
         bimestres: {
           "1": buildEmptyBimesterState(),
           "2": buildEmptyBimesterState(),
@@ -1527,6 +1528,7 @@ function mergeStudent(baseStudent, savedStudent) {
     id: baseStudent.id,
     numero: baseStudent.numero,
     nome: baseStudent.nome,
+    externalId: baseStudent.externalId || "",
     observacoesComportamento: savedStudent.observacoesComportamento !== undefined ? savedStudent.observacoesComportamento : baseStudent.observacoesComportamento,
     encaminhamentos: savedStudent.encaminhamentos !== undefined ? savedStudent.encaminhamentos : baseStudent.encaminhamentos,
     destaques: savedStudent.destaques !== undefined ? savedStudent.destaques : baseStudent.destaques,
@@ -1840,6 +1842,10 @@ function openProfile(studentId) {
   openModal("profileModal");
 }
 
+function getStudentExternalId(student) {
+  return student && student.externalId ? student.externalId : "ID nao cadastrado";
+}
+
 function renderProfile(studentId) {
   const student = getStudent(studentId);
   if (!student) return;
@@ -1853,6 +1859,7 @@ function renderProfile(studentId) {
 
   document.getElementById("profileBody").innerHTML =
     '<section class="profile-stats">'
+      + profileMetric("ID do aluno", getStudentExternalId(student), student.externalId ? "Identificacao unica do cadastro" : "ID ainda nao localizado na lista enviada")
       + profileMetric("Faltas em h/aula", String(absence.aulas), "Carga horária ausente consolidada")
       + profileMetric("Presencas em h/aula", String(absence.presencas), "Presencas registradas nos relatos diarios")
       + profileMetric("Atividades em " + disciplineConfig.shortLabel, String(disciplineMetrics.atividadesFeitas || 0), disciplineConfig.automated ? "Contagem automática da disciplina ativa" : "Disciplina em modo manual")
