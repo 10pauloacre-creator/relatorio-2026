@@ -1,6 +1,42 @@
 {
-  "generatedAt": "2026-07-18T03:03:49.749Z",
+  "generatedAt": "2026-07-20T18:08:27.164Z",
   "releases": [
+    {
+      "appName": "Relatórios",
+      "appId": "com.relatoriosdiarios.app",
+      "versionName": "1.0.13",
+      "versionCode": 15,
+      "channel": "debug",
+      "notes": [
+        "Atualização estrutural do aplicativo."
+      ],
+      "fileName": "relatorios-diarios-v1.0.13.apk",
+      "sizeBytes": 13467467,
+      "sizeLabel": "12.84 MB",
+      "sha256": "ca234ed6d6adb3c72b76ae378f272888c37279607f60e5907fe3a060041ec6c5",
+      "releasedAt": "2026-07-20T18:08:27.164Z",
+      "releasedAtLabel": "20/07/2026, 13:08",
+      "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.13.apk",
+      "downloadPath": "./apk/relatorios-diarios-v1.0.13.apk"
+    },
+    {
+      "appName": "Relatórios",
+      "appId": "com.relatoriosdiarios.app",
+      "versionName": "1.0.12",
+      "versionCode": 14,
+      "channel": "debug",
+      "notes": [
+        "Atualização estrutural do aplicativo."
+      ],
+      "fileName": "relatorios-diarios-v1.0.12.apk",
+      "sizeBytes": 13467124,
+      "sizeLabel": "12.84 MB",
+      "sha256": "c5b0e199891d852d65ac3ef6642588dc1b264c1107b2bf580c131bfbfa042be9",
+      "releasedAt": "2026-07-18T17:58:21.577Z",
+      "releasedAtLabel": "18/07/2026, 12:58",
+      "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.12.apk",
+      "downloadPath": "./apk/relatorios-diarios-v1.0.12.apk"
+    },
     {
       "appName": "Relatórios",
       "appId": "com.relatoriosdiarios.app",

@@ -391,6 +391,7 @@
           id: student.id,
           numero: student.numero,
           nome: student.nome,
+          externalId: student.externalId || "",
           transferido: student.transferido === true,
           bimestres: {
             "1": buildEmptyBimesterState(),
@@ -414,6 +415,7 @@
       id: baseStudent.id,
       numero: baseStudent.numero,
       nome: baseStudent.nome,
+      externalId: baseStudent.externalId || "",
       transferido: baseStudent.transferido === true,
       observacoesComplementares: savedStudent.observacoesComplementares !== undefined ? savedStudent.observacoesComplementares : baseStudent.observacoesComplementares,
       encaminhamentos: savedStudent.encaminhamentos !== undefined ? savedStudent.encaminhamentos : baseStudent.encaminhamentos,
@@ -899,6 +901,10 @@
       + "</article>";
   }
 
+  function getStudentExternalId(student) {
+    return student && student.externalId ? student.externalId : "ID nao cadastrado";
+  }
+
   function openProfile(studentId) {
     currentProfileId = studentId;
     renderProfile(studentId);
@@ -918,6 +924,7 @@
 
     document.getElementById("profileBody").innerHTML =
       '<section class="profile-stats">'
+        + profileMetric("ID do aluno", getStudentExternalId(student), student.externalId ? "Identificacao unica do cadastro" : "ID ainda nao localizado na lista enviada")
         + profileMetric("Faltas em h/aula", String(metrics.faltas), "Carga horaria ausente consolidada")
         + profileMetric("Presencas em h/aula", String(metrics.presencas), "Presencas registradas nos relatos diarios")
         + profileMetric("Atividades em " + disciplineConfig.shortLabel, String(disciplineMetrics.atividadesFeitas || 0), disciplineConfig.automated ? "Contagem automatica da disciplina ativa" : "Disciplina em modo manual")

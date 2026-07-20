@@ -7,6 +7,8 @@
   var build = window.__RELATORIOS_APP_BUILD__ || null;
   var latestRelease = null;
   var modalElements = null;
+  var nativeBootstrapStarted = false;
+  var nativeUpdateButton = null;
 
   if (!build) return;
 
@@ -14,11 +16,7 @@
     injectStyles();
     modalElements = ensureModal();
     interceptDownloadLinks();
-
-    if (isNativeApp()) {
-      setupNativePullRefresh();
-      setTimeout(checkForUpdates, 700);
-    }
+    bootstrapNativeFeatures(0);
   });
 
   window.relatoriosAbrirPaginaDownload = function () {
@@ -35,6 +33,26 @@
         openModal();
       })
       .catch(function () {});
+  }
+
+  function bootstrapNativeFeatures(attempt) {
+    if (nativeBootstrapStarted && !attempt) return;
+    nativeBootstrapStarted = true;
+
+    ensureNativeUpdateButton();
+    updateNativeButtonVisibility();
+
+    if (isNativeApp()) {
+      setupNativePullRefresh();
+      window.setTimeout(checkForUpdates, 700);
+      return;
+    }
+
+    if ((attempt || 0) >= 20) return;
+
+    window.setTimeout(function () {
+      bootstrapNativeFeatures((attempt || 0) + 1);
+    }, 500);
   }
 
   function loadLatestReleaseScript() {
@@ -142,6 +160,25 @@
     window.location.href = url;
   }
 
+  function ensureNativeUpdateButton() {
+    if (nativeUpdateButton || !document.body) return;
+
+    nativeUpdateButton = document.createElement("button");
+    nativeUpdateButton.type = "button";
+    nativeUpdateButton.className = "rd-native-update-btn";
+    nativeUpdateButton.textContent = "Baixar atualizacao";
+    nativeUpdateButton.addEventListener("click", function () {
+      openDownloadPage();
+    });
+    document.body.appendChild(nativeUpdateButton);
+    updateNativeButtonVisibility();
+  }
+
+  function updateNativeButtonVisibility() {
+    if (!nativeUpdateButton) return;
+    nativeUpdateButton.style.display = isNativeApp() ? "inline-flex" : "none";
+  }
+
   function interceptDownloadLinks() {
     document.addEventListener("click", function (event) {
       var link = event.target.closest("a[href]");
@@ -169,7 +206,16 @@
   }
 
   function isNativeApp() {
-    return !!(window.RelatoriosAppBridge && typeof window.RelatoriosAppBridge.openInternalUrl === "function");
+    var bridge = window.RelatoriosAppBridge;
+    var capacitor = window.Capacitor || window.capacitor;
+    if (bridge && typeof bridge.openInternalUrl === "function") return true;
+    if (capacitor && typeof capacitor.isNativePlatform === "function") {
+      return !!capacitor.isNativePlatform();
+    }
+    if (capacitor && typeof capacitor.getPlatform === "function") {
+      return capacitor.getPlatform() !== "web";
+    }
+    return false;
   }
 
   function setupNativePullRefresh() {
@@ -368,6 +414,7 @@
       ".rd-native-refresh.is-loading .rd-native-refresh-pill{background:rgba(34,87,61,.96)}" +
       ".rd-native-refresh.is-done .rd-native-refresh-pill{background:rgba(31,106,58,.96)}" +
       ".rd-native-refresh.is-error .rd-native-refresh-pill{background:rgba(151,47,34,.96)}" +
+      ".rd-native-update-btn{position:fixed;right:16px;bottom:18px;z-index:9942;display:none;align-items:center;justify-content:center;border:none;border-radius:999px;padding:13px 18px;background:linear-gradient(135deg,#c9a84c,#e7cb7b);color:#392707;font:700 .82rem 'DM Sans',sans-serif;box-shadow:0 18px 36px rgba(0,0,0,.24);cursor:pointer}" +
       "@media (max-width:640px){.rd-update-card{padding:22px 18px 18px}.rd-update-versions{grid-template-columns:1fr}.rd-update-actions>*{flex:1}}";
     document.head.appendChild(style);
   }

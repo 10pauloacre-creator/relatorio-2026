@@ -12,7 +12,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
 <script defer src="assets/js/boletim-export.js"></script>
-<title>Alunos - 2a Serie - Raimundo Herminio de Melo</title> <style id="relatorios-preload-fix">html[data-hotfix-pending="1"] body{visibility:hidden}</style><script>document.documentElement.setAttribute("data-hotfix-pending","1");window.__RELATORIOS_CLEAR_PENDING__=function(){try{document.documentElement.removeAttribute("data-hotfix-pending");var s=document.getElementById("relatorios-preload-fix");if(s&&s.parentNode)s.parentNode.removeChild(s);}catch(e){}};window.setTimeout(window.__RELATORIOS_CLEAR_PENDING__,4000);</script><script defer src="downloads/latest.js?v=20260717h"></script>
+<title>Alunos - 2a Serie - Raimundo Herminio de Melo</title> <style id="relatorios-preload-fix">html[data-hotfix-pending="1"] body{visibility:hidden}</style><script>document.documentElement.setAttribute("data-hotfix-pending","1");window.__RELATORIOS_CLEAR_PENDING__=function(){try{document.documentElement.removeAttribute("data-hotfix-pending");var s=document.getElementById("relatorios-preload-fix");if(s&&s.parentNode)s.parentNode.removeChild(s);}catch(e){}};window.setTimeout(window.__RELATORIOS_CLEAR_PENDING__,4000);</script><script defer src="downloads/latest.js?v=20260720a"></script> 
 <style>
 :root{
   --vd:#1a3a2a;
@@ -833,19 +833,19 @@ const BIMESTERS = ["1", "2", "3", "4"];
 const GRADE_MAX = 5;
 
 const STUDENTS = [
-  { id: 1, numero: 1, nome: "Ana Vitória Simão de Oliveira" },
-  { id: 2, numero: 2, nome: "Átila Estevam Chaves Correa" },
-  { id: 3, numero: 3, nome: "Dayane Nunes de Sousa" },
-  { id: 4, numero: 4, nome: "Fernando Lima Altino" },
-  { id: 5, numero: 5, nome: "Geovana da Silva Conceição" },
-  { id: 6, numero: 6, nome: "Isvi Antony de Azevedo Damião" },
-  { id: 7, numero: 7, nome: "João Vítor Matos de Aguiar" },
-  { id: 8, numero: 8, nome: "Nely de Souza Bonfim" },
-  { id: 9, numero: 9, nome: "Pedro Henrique do Vino Silva" },
-  { id: 10, numero: 10, nome: "Rayely da Costa Lopes" },
-  { id: 11, numero: 11, nome: "Tamyres Soares dos Santos" },
-  { id: 12, numero: 12, nome: "Tiago Oliveira da Silva" }
-];
+    { id: 1, numero: 1, nome: "Ana Vitória Simão de Oliveira", externalId: "ID-1-ANA-2-RHM2" },
+    { id: 2, numero: 2, nome: "Átila Estevam Chaves Correa", externalId: "ID-2-ATILA-2-RHM2" },
+    { id: 3, numero: 3, nome: "Dayane Nunes de Sousa", externalId: "ID-3-DAYANE-2-RHM2" },
+    { id: 4, numero: 4, nome: "Fernando Lima Altino", externalId: "ID-4-FERNANDO-2-RHM2" },
+    { id: 5, numero: 5, nome: "Geovana da Silva Conceição", externalId: "ID-5-GEOVANA-2-RHM2" },
+    { id: 6, numero: 6, nome: "Isvi Antony de Azevedo Damião", externalId: "ID-6-ISVI-2-RHM2" },
+    { id: 7, numero: 7, nome: "João Vítor Matos de Aguiar", externalId: "ID-7-JOAO-2-RHM2" },
+    { id: 8, numero: 8, nome: "Nely de Souza Bonfim", externalId: "ID-8-NELY-2-RHM2" },
+    { id: 9, numero: 9, nome: "Pedro Henrique do Vino Silva", externalId: "ID-9-PEDRO-2-RHM2" },
+    { id: 10, numero: 10, nome: "Rayely da Costa Lopes", externalId: "ID-10-RAYELY-2-RHM2" },
+    { id: 11, numero: 11, nome: "Tamyres Soares dos Santos", externalId: "ID-11-TAMYRES-2-RHM2" },
+    { id: 12, numero: 12, nome: "Tiago Oliveira da Silva", externalId: "ID-12-TIAGO-2-RHM2" }
+  ];
 
 const ABSENCE_RECORDS = [];
 
@@ -1146,6 +1146,7 @@ function buildDefaultState() {
         id: student.id,
         numero: student.numero,
         nome: student.nome,
+        externalId: student.externalId || "",
         bimestres: {
           "1": { trabalhos: "", prova: "", trabalhosRealizados: 0 },
           "2": { trabalhos: "", prova: "", trabalhosRealizados: 0 },
@@ -1190,6 +1191,7 @@ function mergeStudent(baseStudent, savedStudent) {
     id: baseStudent.id,
     numero: baseStudent.numero,
     nome: baseStudent.nome,
+    externalId: baseStudent.externalId || "",
     observacoesComportamento: savedStudent.observacoesComportamento !== undefined ? savedStudent.observacoesComportamento : baseStudent.observacoesComportamento,
     encaminhamentos: savedStudent.encaminhamentos !== undefined ? savedStudent.encaminhamentos : baseStudent.encaminhamentos,
     destaques: savedStudent.destaques !== undefined ? savedStudent.destaques : baseStudent.destaques,
@@ -1405,6 +1407,10 @@ function openProfile(studentId) {
   openModal("profileModal");
 }
 
+function getStudentExternalId(student) {
+  return student && student.externalId ? student.externalId : "ID nao cadastrado";
+}
+
 function renderProfile(studentId) {
   const student = getStudent(studentId);
   if (!student) return;
@@ -1416,6 +1422,7 @@ function renderProfile(studentId) {
 
   document.getElementById("profileBody").innerHTML =
     '<section class="profile-stats">'
+      + profileMetric("ID do aluno", getStudentExternalId(student), student.externalId ? "Identificacao unica do cadastro" : "ID ainda nao localizado na lista enviada")
       + profileMetric("Faltas em h/aula", String(absence.aulas), "Carga horária ausente consolidada")
       + profileMetric("Presencas em h/aula", String(absence.presencas), "Presencas registradas nos relatos diarios")
       + profileMetric("Atividades feitas", String(calculateWorksTotal(student)), "Soma automatica registrada nos relatos")

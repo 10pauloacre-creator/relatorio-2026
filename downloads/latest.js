@@ -2,20 +2,20 @@
   var latest = {
   "appName": "Relatórios",
   "appId": "com.relatoriosdiarios.app",
-  "versionName": "1.0.11",
-  "versionCode": 13,
+  "versionName": "1.0.13",
+  "versionCode": 15,
   "channel": "debug",
   "notes": [
     "Atualização estrutural do aplicativo."
   ],
-  "fileName": "relatorios-diarios-v1.0.11.apk",
-  "sizeBytes": 13466931,
+  "fileName": "relatorios-diarios-v1.0.13.apk",
+  "sizeBytes": 13467467,
   "sizeLabel": "12.84 MB",
-  "sha256": "90810fcbc5df404b7eede41f956eaa5c7d9f105a25d57d53adf996c00c63376e",
-  "releasedAt": "2026-07-18T03:03:49.749Z",
-  "releasedAtLabel": "17/07/2026, 22:03",
-  "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.11.apk",
-  "downloadPath": "./apk/relatorios-diarios-v1.0.11.apk"
+  "sha256": "ca234ed6d6adb3c72b76ae378f272888c37279607f60e5907fe3a060041ec6c5",
+  "releasedAt": "2026-07-20T18:08:27.164Z",
+  "releasedAtLabel": "20/07/2026, 13:08",
+  "downloadUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.13.apk",
+  "downloadPath": "./apk/relatorios-diarios-v1.0.13.apk"
 };
 
   function looksBroken(value) {
@@ -371,9 +371,17 @@
     forceBookTabLabels();
   }
 
-  function run() {
+  var hasFullPatchRun = false;
+  var observer = null;
+  var observerStopTimer = 0;
+
+  function run(options) {
+    options = options || {};
     sanitizeKnownStorage();
-    patchNode(document);
+    if (options.full && !hasFullPatchRun) {
+      patchNode(document.body || document.documentElement || document);
+      hasFullPatchRun = true;
+    }
     var fixedTitle = decodeBrokenUtf8(document.title);
     if (fixedTitle && fixedTitle !== document.title) {
       document.title = fixedTitle;
@@ -383,45 +391,69 @@
     clearPendingHotfixGuard();
   }
 
-  var observer = new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-      if (mutation.type === "characterData") {
-        patchNode(mutation.target);
-        return;
-      }
+  function stopObserver() {
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
+    if (observerStopTimer) {
+      window.clearTimeout(observerStopTimer);
+      observerStopTimer = 0;
+    }
+  }
 
-      if (mutation.type === "attributes") {
-        patchAttribute(mutation.target, mutation.attributeName);
-        return;
-      }
+  function startObserver() {
+    if (observer || typeof MutationObserver === "undefined") return;
 
-      mutation.addedNodes.forEach(function (node) {
-        patchNode(node);
+    observer = new MutationObserver(function (mutations) {
+      var processed = 0;
+      mutations.forEach(function (mutation) {
+        if (mutation.type !== "childList" || !mutation.addedNodes || processed >= 12) return;
+
+        mutation.addedNodes.forEach(function (node) {
+          if (!node || processed >= 12 || node.nodeType === Node.TEXT_NODE) return;
+          patchNode(node);
+          processed += 1;
+        });
       });
-    });
-  });
 
-  observer.observe(document.documentElement || document, {
-    subtree: true,
-    childList: true,
-    characterData: true,
-    attributes: true,
-    attributeFilter: ["title", "placeholder", "aria-label", "alt", "content", "value"]
-  });
+      if (processed > 0) {
+        enforceKnownLabels();
+        normalizeRenderedBookSections();
+        clearPendingHotfixGuard();
+      }
+    });
+
+    observer.observe(document.body || document.documentElement || document, {
+      subtree: true,
+      childList: true
+    });
+
+    observerStopTimer = window.setTimeout(stopObserver, 5000);
+  }
 
   window.__RELATORIOS_MOJIBAKE_HOTFIX__ = {
-    run: run
+    run: function () {
+      run({ full: false });
+    }
   };
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", run, { once: true });
+    document.addEventListener("DOMContentLoaded", function () {
+      run({ full: true });
+      startObserver();
+    }, { once: true });
   } else {
-    run();
+    run({ full: true });
+    startObserver();
   }
 
-  window.addEventListener("load", run, { once: true });
-  window.setTimeout(run, 450);
-  window.setTimeout(run, 1500);
-  window.setTimeout(run, 3200);
-  window.setTimeout(run, 6500);
+  window.addEventListener("load", function () {
+    run({ full: false });
+  }, { once: true });
+  window.setTimeout(function () { run({ full: false }); }, 700);
+  window.setTimeout(function () {
+    run({ full: false });
+    stopObserver();
+  }, 2200);
 })();
