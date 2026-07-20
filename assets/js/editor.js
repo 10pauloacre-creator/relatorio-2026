@@ -14,9 +14,10 @@ var _editorLastAppliedSignature = '';
 var _editorInitialized = false;
 var _editorConfigCache = null;
 var _editorRestoreBootstrapped = false;
+var _editorSnapshotRestoreDone = false;
 var _editorProtectedBaseline = {};
 var _editorProtectionWarningShown = false;
-var EDITOR_SAFE_HYBRID_KEY = 'RELATORIOS_SAFE_HYBRID_V1';
+var EDITOR_SAFE_HYBRID_KEY = 'RELATORIOS_SAFE_HYBRID_V2';
 var EDITOR_PROTECTED_SELECTORS = [
   '#sec-claude',
   '.ea',
@@ -53,8 +54,8 @@ function initEditor() {
   if (_editorInitialized) return;
   _editorInitialized = true;
   _editorPrepararDomSeguro();
-  _editorRestaurarSnapshot();
-  _editorBootstrapRestauracao();
+  _editorLimparSnapshotsLegados();
+  _editorAgendarRestauracao();
   _editorIniciarSyncRemoto();
   configurarBtnEditar();
   criarPainelEditor();
@@ -801,8 +802,12 @@ function _editorResolveConfig() {
     pagePath: pagePath,
     schoolSlug: schoolSlug,
     classSlug: 'layout-' + scopeSlug,
-    scope: 'report-layout-safe-v1:' + scopeSlug,
-    storageKey: 'ed_layout_safe_v1:' + scopeSlug
+    scope: 'report-layout-safe-v2:' + scopeSlug,
+    storageKey: 'ed_layout_safe_v2:' + scopeSlug,
+    legacyStorageKeys: [
+      'ed_layout_safe_v1:' + scopeSlug,
+      'ed_layout_safe_v1'
+    ]
   };
   return _editorConfigCache;
 }
@@ -825,6 +830,18 @@ function _editorPersistirSnapshot(payload) {
   try {
     localStorage.setItem(_editorResolveConfig().storageKey, JSON.stringify(payload));
   } catch (e) {}
+}
+
+function _editorLimparSnapshotsLegados() {
+  var config = _editorResolveConfig();
+  var keys = []
+    .concat(config && config.legacyStorageKeys ? config.legacyStorageKeys : [])
+    .concat(['ed_main_html', 'ed_main_html_v2', 'ed_main_html_v3', 'ed_layout_snapshot_v4', 'ed_layout_snapshot_v5']);
+
+  keys.forEach(function(key) {
+    if (!key) return;
+    try { localStorage.removeItem(key); } catch (e) {}
+  });
 }
 
 function _editorCriarPayload() {
@@ -891,6 +908,8 @@ function _editorAplicarSnapshot(payload) {
 }
 
 function _editorRestaurarSnapshot() {
+  if (_editorSnapshotRestoreDone) return;
+  _editorSnapshotRestoreDone = true;
   var payload = _editorLerSnapshot();
   if (!payload) return;
   if (!_editorAplicarSnapshot(payload)) {
@@ -903,19 +922,24 @@ function _editorRestaurarSnapshotAtrasado() {
   _editorRestaurarSnapshot();
 }
 
-function _editorBootstrapRestauracao() {
+function _editorAgendarRestauracao() {
   if (_editorRestoreBootstrapped) return;
   _editorRestoreBootstrapped = true;
 
-  window.addEventListener('load', function() {
-    _editorRestaurarSnapshotAtrasado();
-    window.setTimeout(_editorRestaurarSnapshotAtrasado, 180);
-    window.setTimeout(_editorRestaurarSnapshotAtrasado, 900);
-  }, { once: true });
+  var runRestore = function() {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(function() {
+        _editorRestaurarSnapshotAtrasado();
+      }, { timeout: 400 });
+      return;
+    }
+    window.setTimeout(_editorRestaurarSnapshotAtrasado, 80);
+  };
 
-  window.setTimeout(_editorRestaurarSnapshotAtrasado, 60);
-  window.setTimeout(_editorRestaurarSnapshotAtrasado, 420);
-  window.setTimeout(_editorRestaurarSnapshotAtrasado, 1400);
+  runRestore();
+  if (document.readyState !== 'complete') {
+    window.addEventListener('load', runRestore, { once: true });
+  }
 }
 
 function _editorIniciarSyncRemoto() {
@@ -982,7 +1006,7 @@ function _salvarAlteracoes() {
 }
 
 function limparAlteracoes() {
-  ['ed_main_html', 'ed_main_html_v2', 'ed_main_html_v3', 'ed_layout_snapshot_v4', 'ed_layout_snapshot_v5', 'ed_layout_safe_v1', _editorResolveConfig().storageKey]
+  ['ed_main_html', 'ed_main_html_v2', 'ed_main_html_v3', 'ed_layout_snapshot_v4', 'ed_layout_snapshot_v5', 'ed_layout_safe_v1', 'ed_layout_safe_v2', _editorResolveConfig().storageKey]
     .forEach(function(k){ localStorage.removeItem(k); });
   window.location.reload();
 }
@@ -1049,7 +1073,7 @@ function _rgbToHex(rgb) {
 // salvo anteriormente pelo editor — impede sobrescrita do HTML do servidor.
 (function() {
   try {
-    ['ed_main_html', 'ed_main_html_v2', 'ed_main_html_v3', 'ed_layout_snapshot_v4', 'ed_layout_snapshot_v5'].forEach(function(k) {
+    ['ed_main_html', 'ed_main_html_v2', 'ed_main_html_v3', 'ed_layout_snapshot_v4', 'ed_layout_snapshot_v5', 'ed_layout_safe_v1'].forEach(function(k) {
       localStorage.removeItem(k);
     });
   } catch(e) {}
