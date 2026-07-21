@@ -10,5 +10,5 @@ window.__RELATORIOS_APP_BUILD__ = {
   "downloadPageUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/",
   "latestJsonUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/latest.json",
   "latestScriptUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/latest.js",
-  "generatedAt": "2026-07-21T12:44:25.946Z"
+  "generatedAt": "2026-07-21T14:05:14.150Z"
 };
