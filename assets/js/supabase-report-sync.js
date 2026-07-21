@@ -7,6 +7,7 @@ window.RELATORIO_SUPABASE_CONFIG = {
 window.RelatorioSupabaseSync = (function () {
   var config = window.RELATORIO_SUPABASE_CONFIG || {};
   var clientInstance = null;
+  var syncInstanceCounter = 0;
 
   function getClient() {
     if (clientInstance) return clientInstance;
@@ -49,6 +50,7 @@ window.RelatorioSupabaseSync = (function () {
     var client = getClient();
     var table = config.table || "report_sync_state";
     var scope = options.scope || "";
+    var channelTopic = options.channelTopic || ("report-sync:" + scope + ":" + (++syncInstanceCounter));
     var debounceMs = typeof options.debounceMs === "number" ? options.debounceMs : 450;
     var readOnly = !!options.readOnly;
     var getLocalPayload = typeof options.getLocalPayload === "function"
@@ -164,7 +166,7 @@ window.RelatorioSupabaseSync = (function () {
       if (!client || !scope || channel) return;
 
       channel = client
-        .channel("report-sync:" + scope)
+        .channel(channelTopic)
         .on("postgres_changes", {
           event: "*",
           schema: "public",
