@@ -157,6 +157,56 @@ function _editorSanitizarHtmlSeguro() {
   return clone.innerHTML;
 }
 
+function _editorExtrairSecoesEstruturais(root) {
+  if (!root || !root.children) return [];
+  return Array.prototype.slice.call(root.children).filter(function(el) {
+    return el && el.nodeType === 1 && el.classList && el.classList.contains('sec') && !!el.id;
+  }).map(function(el) {
+    return el.id;
+  });
+}
+
+function _editorSnapshotEstruturalValido(payloadHtml, protectedBaseline) {
+  var main = document.querySelector('.main');
+  if (!main || typeof payloadHtml !== 'string' || !payloadHtml.trim()) return false;
+
+  var holder = document.createElement('div');
+  holder.innerHTML = payloadHtml;
+
+  if (holder.querySelector('script, iframe, object, embed')) return false;
+
+  var expectedSections = _editorExtrairSecoesEstruturais(main);
+  var snapshotSections = _editorExtrairSecoesEstruturais(holder);
+
+  if (expectedSections.length) {
+    if (snapshotSections.length !== expectedSections.length) return false;
+    for (var i = 0; i < expectedSections.length; i += 1) {
+      if (snapshotSections[i] !== expectedSections[i]) return false;
+    }
+  }
+
+  var ids = Object.create(null);
+  var duplicateId = false;
+  holder.querySelectorAll('[id]').forEach(function(el) {
+    var id = (el.id || '').trim();
+    if (!id) return;
+    if (ids[id]) {
+      duplicateId = true;
+      return;
+    }
+    ids[id] = true;
+  });
+  if (duplicateId) return false;
+
+  var protectedKeys = Object.keys(protectedBaseline || {});
+  for (var j = 0; j < protectedKeys.length; j += 1) {
+    var key = protectedKeys[j];
+    if (!holder.querySelector('[data-ed-node="' + key + '"]')) return false;
+  }
+
+  return true;
+}
+
 function _editorRestaurarProtegidos(root, baseline) {
   var scope = root || document.querySelector('.main');
   var source = baseline || _editorProtectedBaseline;
@@ -847,14 +897,18 @@ function _editorLimparSnapshotsLegados() {
 function _editorCriarPayload() {
   var main = document.querySelector('.main');
   var config = _editorResolveConfig();
+  var html = '';
   if (!main) return null;
+  _editorPrepararDomSeguro(main, true);
+  html = _editorSanitizarHtmlSeguro();
+  if (!_editorSnapshotEstruturalValido(html, _editorProtectedBaseline)) return null;
   return {
     mode: 'hybrid-safe',
     safetyKey: EDITOR_SAFE_HYBRID_KEY,
     pagePath: config.pagePath,
     build: _editorBuildAtual(),
     updatedAt: new Date().toISOString(),
-    html: _editorSanitizarHtmlSeguro()
+    html: html
   };
 }
 
@@ -888,23 +942,36 @@ function _editorReidratarDepoisDoRestore() {
 function _editorAplicarSnapshot(payload) {
   var main = document.querySelector('.main');
   var currentBuild = _editorBuildAtual();
+  var previousHtml = '';
   if (!main || !payload || !payload.html) return false;
   _editorPrepararDomSeguro(main, true);
   var protectedAtual = Object.assign({}, _editorProtectedBaseline);
   if (payload.safetyKey && payload.safetyKey !== EDITOR_SAFE_HYBRID_KEY) return false;
   if (payload.build && currentBuild && payload.build !== currentBuild) return false;
   if (payload.pagePath && payload.pagePath !== _editorResolveConfig().pagePath) return false;
+  if (!_editorSnapshotEstruturalValido(payload.html, protectedAtual)) return false;
   var signature = _editorSnapshotSignature(payload);
   if (signature && signature === _editorLastAppliedSignature) return true;
+  previousHtml = main.innerHTML;
   _editorApplyingRemote = true;
-  main.innerHTML = payload.html;
-  _editorPrepararDomSeguro(main, false);
-  _editorRestaurarProtegidos(main, protectedAtual);
-  _editorPersistirSnapshot(payload);
-  _editorLastAppliedSignature = signature;
-  _editorApplyingRemote = false;
-  _editorReidratarDepoisDoRestore();
-  return true;
+  try {
+    main.innerHTML = payload.html;
+    _editorPrepararDomSeguro(main, false);
+    _editorRestaurarProtegidos(main, protectedAtual);
+    if (!_editorSnapshotEstruturalValido(main.innerHTML, protectedAtual)) {
+      main.innerHTML = previousHtml;
+      _editorPrepararDomSeguro(main, false);
+      _editorRestaurarProtegidos(main, protectedAtual);
+      _editorReidratarDepoisDoRestore();
+      return false;
+    }
+    _editorPersistirSnapshot(payload);
+    _editorLastAppliedSignature = signature;
+    _editorReidratarDepoisDoRestore();
+    return true;
+  } finally {
+    _editorApplyingRemote = false;
+  }
 }
 
 function _editorRestaurarSnapshot() {
@@ -969,7 +1036,7 @@ function _editorIniciarSyncRemoto() {
         return;
       }
       if (!_editorAplicarSnapshot(payload)) {
-        _editorPersistirSnapshot(payload);
+        console.warn('[Editor] Snapshot remoto ignorado por falha de validacao estrutural.');
       }
     },
     onStatus: function(status) {
