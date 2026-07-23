@@ -1147,7 +1147,18 @@ return true;
 });
 };
 
+function rhGarantirLivrosPromptScriptAtual() {
+if (window.__LIVROS_PROMPTS_VERSION__ === '20260723b') return;
+if (document.querySelector('script[data-rh-livros-prompts-latest="1"]')) return;
+var script = document.createElement('script');
+script.src = 'assets/js/livros-prompts.js?v=20260723b';
+script.async = false;
+script.setAttribute('data-rh-livros-prompts-latest', '1');
+document.body.appendChild(script);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+rhGarantirLivrosPromptScriptAtual();
 rhBindStorageSyncHooks();
 rhGarantirSyncsOnline(0);
 });
