@@ -6,6 +6,7 @@ firebase-config.js
 .DS_Store
 Thumbs.db
 desktop.ini
+.publish-tmp-*
 
 # Editor
 .vscode/
