@@ -7295,15 +7295,6 @@ function renderPresenca(){
       row.setAttribute('data-pres',id);
       row.setAttribute('data-n',a.n);
       row.innerHTML=`<span class="an">${a.n}</span><span class="ai3">${ic}</span><span class="anm">${a.nm}</span>${tg}`;
-      row.addEventListener('click',function(){
-        const cur=row.className.replace('ar2 ','').trim();
-        const prox=_presProximoStatus(cur);
-        _presAplicarVisual(row,prox);
-        if(prox===baseStatus){delete _presManual[manKey];}
-        else{_presManual[manKey]=prox;}
-        pcAtualizarResumoPresenca(id);
-        _presManualSalvar();
-      });
       el.appendChild(row);
     });
   });
@@ -7406,7 +7397,7 @@ function _atvBindMenu(){
   });
 }
 
-function _atvAbrirMenu(cell,atvId,n,turma){
+function _atvAbrirMenu_legado_removido(cell,atvId,n,turma){
   var m=document.getElementById('atv-float-menu');if(!m)return;
   _atvFecharMenu();
   var rect=cell.getBoundingClientRect();
@@ -7425,7 +7416,7 @@ function _atvAbrirMenu(cell,atvId,n,turma){
   m.classList.add('on');
 }
 
-function atvRegistrar(atvId,n,s){
+function atvRegistrar_legado_removido(atvId,n,s){
   _atvManual[atvId+'_'+n]=s;
   _atvSalvar();
   var cell=document.querySelector('[data-atv="'+atvId+'"][data-n="'+n+'"]');
@@ -7457,20 +7448,12 @@ function _atvCriarCelulas(el,atvId,turma,cfg){
     cell.innerHTML='<span class="aic">'+(_atvIcons[s]||'–')+'</span>'
       +'<span class="atv-nm">'+a.nm+'</span>'
       +'<span class="atv-ic-p">⋯</span>';
-    cell.addEventListener('click',function(e){
-      e.stopPropagation();
-      var fm=document.getElementById('atv-float-menu');
-      var jaAberto=fm&&fm.classList.contains('on')&&fm.getAttribute('data-for')===(atvId+'_'+a.n);
-      if(jaAberto){_atvFecharMenu();return;}
-      if(fm)fm.setAttribute('data-for',atvId+'_'+a.n);
-      _atvAbrirMenu(this,atvId,a.n,turma);
-    });
     el.appendChild(cell);
   });
   _atvAtualizarStat(atvId);
 }
 
-function renderAtividades(){
+function renderAtividades_legado_removido(){
   document.addEventListener('click',function(){_atvFecharMenu();});
   // Percorre TODOS os painéis de atividade de todos os diários
   document.querySelectorAll('.ipane[id^="a-t"]').forEach(function(pane){
@@ -8791,7 +8774,7 @@ window.addEventListener('storage',function(event){
   }
 });
 
-document.addEventListener('DOMContentLoaded',()=>{renderPresenca();renderAtividades();pcBindDailyInteractionOverrides();renderCont();pcSyncProjectionSeed('bootstrap-local');_sincronizarRegistros();verificarAbasRelatos();pcSyncAndBroadcast();pcInitSectionHeroes();pcIniciarSyncRemoto();pcIniciarProjectionSeedSync();pcIniciarPlannerStateSync();});
+document.addEventListener('DOMContentLoaded',()=>{pcBindDailyInteractionOverrides();renderPresenca();renderAtividades();renderCont();pcSyncProjectionSeed('bootstrap-local');_sincronizarRegistros();verificarAbasRelatos();pcSyncAndBroadcast();pcInitSectionHeroes();pcIniciarSyncRemoto();pcIniciarProjectionSeedSync();pcIniciarPlannerStateSync();});
 
 /* ── PERFIL DO ALUNO ── */
 function abrirPerfil(turma,numAluno){
