@@ -170,6 +170,36 @@
     if (changed) persist('core-projects-link'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
     return changed;
   }
+  function ensureFinanceProject() {
+    if (state.migrations.financeiroAppV1) return false;
+    var stamp = now();
+    var finance = coreProjectByName('Financeiro.app', 'project-financeiro-app');
+    var changed = false;
+    if (!finance) {
+      finance = {
+        id: 'project-financeiro-app',
+        name: 'Financeiro.app',
+        description: 'Aplicativo financeiro com IA para organizar receitas, despesas e o fluxo mensal.',
+        status: 'Desenvolvimento', type: 'App', url: 'https://github.com/10pauloacre-creator/Finan-as-app',
+        tools: [
+          { id: 'tool-financeiro-github', provider: 'GitHub', label: 'GitHub', url: 'https://github.com/10pauloacre-creator/Finan-as-app', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-financeiro-vercel', provider: 'Vercel', label: 'Vercel', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-financeiro-supabase', provider: 'Supabase', label: 'Supabase', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-financeiro-chatgpt', provider: 'ChatGPT', label: 'ChatGPT', url: 'https://chatgpt.com/', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-financeiro-claude', provider: 'Claude', label: 'Claude', url: 'https://claude.ai/', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-financeiro-gemini', provider: 'Gemini', label: 'Gemini', url: 'https://gemini.google.com/', createdAt: stamp, updatedAt: stamp }
+        ], relatedProjectIds: [], createdAt: stamp, updatedAt: stamp
+      };
+      state.projects.push(finance); changed = true;
+    }
+    if (!state.activities.some(function (activity) { return activity.id === 'activity-core-financeiro-app'; })) {
+      state.activities.push({ id: 'activity-core-financeiro-app', projectId: finance.id, title: 'Financeiro.app adicionado ao hub', details: 'Projeto em desenvolvimento com Next.js, Supabase, Vercel e recursos de IA.', occurredAt: stamp, source: 'Manual', externalUrl: finance.url, idempotencyKey: 'activity-core-financeiro-app', createdAt: stamp, updatedAt: stamp });
+      changed = true;
+    }
+    state.migrations.financeiroAppV1 = { addedAt: stamp, projectId: finance.id };
+    if (changed) persist('financeiro-app-add'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return changed;
+  }
   function statusClass(status) {
     return ({ 'Ideia': 'idea', 'Desenvolvimento': 'development', 'Operacional com ajustes': 'adjustments', 'Operacional final': 'final', 'Operacional efetivo': 'effective' })[status] || 'idea';
   }
@@ -696,7 +726,7 @@
   function handleFilter(event) { var filter = event.target.dataset.filter; if (!filter) return; currentFilters[filter] = event.target.value; render(); }
   function handleKeyboard(event) { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-action="goto-project"]')) { event.preventDefault(); window.location.href = 'projeto-detalhes.html?id=' + encodeURIComponent(event.target.dataset.id); } }
   function boot() {
-    loadCache(); ensureCoreProjects(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache(); ensureCoreProjects(); ensureFinanceProject(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
