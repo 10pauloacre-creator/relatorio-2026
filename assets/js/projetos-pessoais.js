@@ -115,6 +115,61 @@
   function getIdea(ideaId) { return active(state.ideas).find(function (idea) { return idea.id === ideaId; }) || null; }
   function getEvent(eventId) { return active(state.activities).find(function (event) { return event.id === eventId; }) || null; }
   function projectLabel(projectId) { var project = getProject(projectId); return project ? project.name : 'Projeto futuro'; }
+  function coreProjectByName(name, stableId) {
+    var normalizedName = String(name || '').trim().toLowerCase();
+    return active(state.projects).find(function (project) { return project.id === stableId || String(project.name || '').trim().toLowerCase() === normalizedName; }) || null;
+  }
+  function ensureCoreProjects() {
+    if (state.migrations.coreProjectsLinkedV1) return false;
+    var stamp = now();
+    var library = coreProjectByName('Biblioteca digital', 'project-biblioteca-digital');
+    var reports = coreProjectByName('Relatórios diários', 'project-relatorios-diarios');
+    var changed = false;
+    if (!library) {
+      library = {
+        id: 'project-biblioteca-digital',
+        name: 'Biblioteca digital',
+        description: 'Biblioteca digital medieval para organização e acesso aos livros e conteúdos pedagógicos.',
+        status: 'Desenvolvimento', type: 'Site', url: 'https://biblioteca-digital-medieval.vercel.app/',
+        tools: [
+          { id: 'tool-biblioteca-vercel', provider: 'Vercel', label: 'Vercel', url: 'https://biblioteca-digital-medieval.vercel.app/', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-biblioteca-supabase', provider: 'Supabase', label: 'Supabase', url: 'https://vgceathgwvtmjxbdpecr.supabase.co/', createdAt: stamp, updatedAt: stamp }
+        ], relatedProjectIds: [], createdAt: stamp, updatedAt: stamp
+      };
+      state.projects.push(library); changed = true;
+    }
+    if (!reports) {
+      reports = {
+        id: 'project-relatorios-diarios',
+        name: 'Relatórios diários',
+        description: 'Sistema de registros, relatórios e acompanhamento pedagógico das escolas.',
+        status: 'Desenvolvimento', type: 'Site', url: 'https://10pauloacre-creator.github.io/relatorio-2026/',
+        tools: [
+          { id: 'tool-relatorios-github', provider: 'GitHub', label: 'GitHub', url: 'https://github.com/10pauloacre-creator/relatorio-2026', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-relatorios-supabase', provider: 'Supabase', label: 'Supabase', url: 'https://vgceathgwvtmjxbdpecr.supabase.co/', createdAt: stamp, updatedAt: stamp }
+        ], relatedProjectIds: [], createdAt: stamp, updatedAt: stamp
+      };
+      state.projects.push(reports); changed = true;
+    }
+    [
+      { project: library, relatedId: reports.id },
+      { project: reports, relatedId: library.id }
+    ].forEach(function (connection) {
+      var ids = Array.isArray(connection.project.relatedProjectIds) ? connection.project.relatedProjectIds : [];
+      if (ids.indexOf(connection.relatedId) < 0) { connection.project.relatedProjectIds = ids.concat(connection.relatedId); connection.project.updatedAt = stamp; changed = true; }
+    });
+    [
+      { project: library, id: 'activity-core-biblioteca-relatorios', title: 'Projeto conectado a Relatórios diários', details: 'A Biblioteca digital foi vinculada ao sistema de Relatórios diários para concentrar evolução, integrações e ideias relacionadas.', externalUrl: reports.url },
+      { project: reports, id: 'activity-core-relatorios-biblioteca', title: 'Projeto conectado à Biblioteca digital', details: 'Relatórios diários foi vinculado à Biblioteca digital para acompanhar dependências e futuras automações entre os sistemas.', externalUrl: library.url }
+    ].forEach(function (entry) {
+      if (state.activities.some(function (activity) { return activity.id === entry.id; })) return;
+      state.activities.push({ id: entry.id, projectId: entry.project.id, title: entry.title, details: entry.details, occurredAt: stamp, source: 'Manual', externalUrl: entry.externalUrl, idempotencyKey: entry.id, createdAt: stamp, updatedAt: stamp });
+      changed = true;
+    });
+    state.migrations.coreProjectsLinkedV1 = { linkedAt: stamp, projectIds: [library.id, reports.id] };
+    if (changed) persist('core-projects-link'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return changed;
+  }
   function statusClass(status) {
     return ({ 'Ideia': 'idea', 'Desenvolvimento': 'development', 'Operacional com ajustes': 'adjustments', 'Operacional final': 'final', 'Operacional efetivo': 'effective' })[status] || 'idea';
   }
@@ -272,6 +327,13 @@
     var ready = remaining <= 0;
     return '<article class="pp-ai-card' + (ready ? ' is-ready' : '') + '" id="pp-ai-' + account.id + '"><div class="pp-ai-top"><div><p class="pp-ai-provider">' + escapeHtml(account.provider) + '</p><h3>' + escapeHtml(account.title) + '</h3></div>' + providerIcon(account.provider) + '</div><div class="pp-ai-state" data-ai-time="' + account.id + '">' + formatTimer(remaining) + '</div><div class="pp-ai-state-label" data-ai-label="' + account.id + '">' + (ready ? 'LIVRE ✓' : 'AGUARDANDO…') + '</div><div class="pp-ai-actions"><button class="pp-button" data-action="start-five" data-id="' + account.id + '">Iniciar 5h</button><button class="pp-button pp-secondary" data-action="set-timer" data-id="' + account.id + '">Definir hora</button>' + (!ready ? '<button class="pp-button pp-secondary" data-action="stop-timer" data-id="' + account.id + '">Parar</button>' : '') + '</div></article>';
   }
+  function relatedProjectsMarkup(project) {
+    var related = (Array.isArray(project.relatedProjectIds) ? project.relatedProjectIds : []).map(getProject).filter(Boolean);
+    if (!related.length) return '';
+    return '<section class="pp-panel"><h2>Projetos relacionados</h2><div class="pp-related-list">' + related.map(function (relatedProject) {
+      return '<a class="pp-related-project" href="projeto-detalhes.html?id=' + encodeURIComponent(relatedProject.id) + '">' + projectLogo(relatedProject, true) + '<span><strong>' + escapeHtml(relatedProject.name) + '</strong><small>' + escapeHtml(relatedProject.status) + '</small></span>' + uiIcon('external') + '</a>';
+    }).join('') + '</div></section>';
+  }
   function detailMarkup(project) {
     if (!project) return headerMarkup('Projeto não encontrado', 'Ele pode ter sido excluído ou o endereço está incorreto.', 'projetos-pessoais.html#projects') + '<main class="pp-shell"><div class="pp-empty"><strong>Projeto não encontrado</strong><a class="pp-button" href="projetos-pessoais.html#projects">Ver projetos</a></div></main>';
     var projectIdeas = active(state.ideas).filter(function (idea) { return idea.projectId === project.id; }).sort(function (a, b) { return toTime(b.updatedAt) - toTime(a.updatedAt); });
@@ -281,7 +343,7 @@
     return headerMarkup(project.name, 'Detalhes, ferramentas, histórico e ideias deste projeto.', 'projetos-pessoais.html#projects')
       + '<main class="pp-shell"><section class="pp-detail-top">' + projectLogo(project) + '<div><h1>' + escapeHtml(project.name) + '</h1><p>' + escapeHtml(project.description || 'Sem descrição.') + '</p><div class="pp-tags" style="margin-top:10px"><span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span><span class="pp-tag">' + escapeHtml(project.type || 'Outro') + '</span></div></div><div class="pp-detail-actions"><button class="pp-button pp-secondary" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + 'Editar</button><button class="pp-button pp-danger" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + 'Excluir</button></div></section>'
       + '<div class="pp-detail-grid"><div><section class="pp-panel"><div class="pp-panel-head"><h2>Linha do tempo</h2><button class="pp-button pp-small" data-action="new-event" data-project="' + project.id + '">' + uiIcon('plus') + 'Registrar</button></div>' + (events.length ? '<div class="pp-timeline">' + events.map(eventCard).join('') + '</div>' : emptyMarkup('Sem atualizações ainda', 'Registre um avanço, deploy, ajuste ou qualquer passo importante.')) + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ideias vinculadas</h2><a class="pp-button pp-small pp-secondary" href="projetos-pessoais.html#ideas">Ver todas</a></div>' + (projectIdeas.length ? projectIdeas.map(ideaMini).join('') : '<p class="pp-form-note">Ainda não há ideias vinculadas a este projeto.</p>') + '</section></div>'
-      + '<aside><section class="pp-panel"><h2>Links</h2><div style="height:12px"></div>' + links + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ferramentas</h2><button class="pp-button pp-small" data-action="edit-project" data-id="' + project.id + '">Gerenciar</button></div>' + (tools.length ? '<div class="pp-tool-list">' + tools.map(function (tool) { return '<button class="pp-tool-button" data-action="open-tool" data-project="' + project.id + '" data-tool="' + tool.id + '"><span>' + providerIcon(tool.provider) + '<span><strong>' + escapeHtml(tool.label || tool.provider) + '</strong><span>' + escapeHtml(tool.provider) + ' · acesso protegido</span></span></span><b>' + uiIcon('lock') + '</b></button>'; }).join('') + '</div>' : '<p class="pp-form-note">Adicione GitHub, Supabase, I.As ou outra ferramenta ao editar o projeto.</p>') + '</section></aside></div></main>';
+      + '<aside>' + relatedProjectsMarkup(project) + '<section class="pp-panel"><h2>Links</h2><div style="height:12px"></div>' + links + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ferramentas</h2><button class="pp-button pp-small" data-action="edit-project" data-id="' + project.id + '">Gerenciar</button></div>' + (tools.length ? '<div class="pp-tool-list">' + tools.map(function (tool) { return '<button class="pp-tool-button" data-action="open-tool" data-project="' + project.id + '" data-tool="' + tool.id + '"><span>' + providerIcon(tool.provider) + '<span><strong>' + escapeHtml(tool.label || tool.provider) + '</strong><span>' + escapeHtml(tool.provider) + ' · acesso protegido</span></span></span><b>' + uiIcon('lock') + '</b></button>'; }).join('') + '</div>' : '<p class="pp-form-note">Adicione GitHub, Supabase, I.As ou outra ferramenta ao editar o projeto.</p>') + '</section></aside></div></main>';
   }
   function eventCard(event) {
     var external = safeUrl(event.externalUrl) ? ' · <a target="_blank" rel="noopener noreferrer" href="' + escapeHtml(safeUrl(event.externalUrl)) + '">abrir referência</a>' : '';
@@ -634,7 +696,7 @@
   function handleFilter(event) { var filter = event.target.dataset.filter; if (!filter) return; currentFilters[filter] = event.target.value; render(); }
   function handleKeyboard(event) { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-action="goto-project"]')) { event.preventDefault(); window.location.href = 'projeto-detalhes.html?id=' + encodeURIComponent(event.target.dataset.id); } }
   function boot() {
-    loadCache(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache(); ensureCoreProjects(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
