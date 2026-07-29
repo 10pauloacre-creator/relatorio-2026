@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b1e12">
+<meta name="theme-color" content="#040303">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -37,7 +37,45 @@ a:hover {
   box-shadow: 0 28px 64px rgba(0,0,0,.6);
 }
 
-img {
+.projetos-pessoais {
+  position: relative;
+  width: 82vw;
+  height: 82vw;
+  max-width: 340px;
+  max-height: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  border: 1px solid #d6b242;
+  color: #fceb76;
+  text-decoration: none;
+  background: radial-gradient(circle at 50% 25%, rgba(252,235,118,.16), transparent 46%), linear-gradient(135deg,#040303,#12100e 54%,#272625);
+  box-shadow: inset 0 0 0 1px rgba(255,243,160,.12), 0 16px 38px rgba(0,0,0,.48);
+}
+
+.projetos-pessoais::after {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(255,243,160,.22);
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+.projetos-pessoais .pp-button-icon {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 18px rgba(0,0,0,.62));
+}
+
+.projetos-pessoais > :not(.pp-button-icon) { display: none; }
+
+a:not(.projetos-pessoais) > img {
   width: 82vw;
   height: 82vw;
   max-width: 340px;
@@ -47,8 +85,8 @@ img {
 }
 
 @media (min-width: 900px) {
-  body { flex-direction: row; gap: 60px; padding: 24px; }
-  img { width: 320px; height: 320px; max-width: none; max-height: none; }
+  body { flex-direction: row; flex-wrap: wrap; gap: 60px; padding: 24px; }
+  a:not(.projetos-pessoais) > img, .projetos-pessoais { width: 320px; height: 320px; max-width: none; max-height: none; }
   a:hover { transform: translateY(-8px) scale(1.05); }
 }
 </style>
@@ -61,6 +99,13 @@ img {
 
 <a class="h2" href="herminio.html">
   <img src="botao-herminio.png" alt="Raimundo Hermínio de Melo">
+</a>
+
+<a class="projetos-pessoais" href="projetos-pessoais.html" aria-label="Abrir Projetos pessoais">
+  <img class="pp-button-icon" src="botão_projetos.png" alt="">
+  <span class="pp-icon">✦</span>
+  <strong>Projetos<br>pessoais</strong>
+  <span>Ideias, projetos, ferramentas e I.As em um só lugar.</span>
 </a>
 
 <script defer src="assets/app-build.js?v=20260717a"></script>

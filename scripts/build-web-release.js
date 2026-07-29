@@ -11,6 +11,7 @@ const releaseConfig = readJson(path.join(rootDir, "release-config.json"), {});
 
 const rootFileAllowlist = new Set([
   "apple-touch-icon.png",
+  "botão_projetos.png",
   "botao-casavequia.png",
   "botao-herminio.png",
   "botãocasavequia.png",
@@ -37,6 +38,8 @@ const rootFileAllowlist = new Set([
   "manifest.json",
   "maskable-icon-512.png",
   "planejamento-aulas-2026.html",
+  "projetos-pessoais.html",
+  "projeto-detalhes.html",
   "sw.js"
 ]);
 
