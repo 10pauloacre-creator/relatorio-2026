@@ -199,6 +199,39 @@ body { background: radial-gradient(circle at 82% -8%, rgba(252, 235, 118, .12), 
 .pp-tool-modal-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; color: #fceb76; font-weight: 800; }
 .pp-tool-modal-brand .pp-provider-icon { width: 34px; height: 34px; flex-basis: 34px; border-radius: 9px; }
 
+/* Tema da área de trabalho: inspirado na interface escura do VS Code. */
+:root { --pp-ink: #f5f5f5; --pp-muted: #c5c5c5; --pp-bg: #1e1e1e; --pp-surface: #252526; --pp-line: #3e3e42; --pp-green: #0e639c; --pp-green-dark: #ffffff; --pp-green-soft: #2a2d2e; --pp-gold: #4fc1ff; --pp-red: #f48771; --pp-shadow: 0 8px 24px rgba(0,0,0,.3); }
+body, button, input, select, textarea { font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", sans-serif; }
+body { color: #f5f5f5; background: #1e1e1e; font-size: 14px; }
+.pp-hero { color: #f5f5f5; background: #181818; border-bottom: 1px solid #3e3e42; box-shadow: none; }
+.pp-hero h1, .pp-section-head h2, .pp-detail-top h1, .pp-panel h2, .pp-modal-header h2, .pp-empty strong { color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", sans-serif; font-weight: 400; letter-spacing: 0; }
+.pp-hero h1 { font-size: clamp(1.65rem, 3.5vw, 2.2rem); }.pp-kicker { color: #75beff; }.pp-hero p, .pp-vault-status span, .pp-section-head p, .pp-project-copy p, .pp-idea p, .pp-detail-top p, .pp-event p, .pp-form-note { color: #c5c5c5; }
+.pp-back { color: #cccccc; border: 1px solid #3e3e42; background: #252526; }.pp-back:hover { color: #ffffff; background: #2a2d2e; }
+.pp-vault-status { color: #f5f5f5; border-color: #3e3e42; background: #252526; }.pp-vault-status:hover { border-color: #007acc; background: #2a2d2e; }
+
+.pp-tabs { padding: 0; gap: 0; border: 0; border-bottom: 1px solid #3e3e42; border-radius: 0; background: transparent; box-shadow: none; }
+.pp-tab { min-height: 45px; padding: 12px 18px; border-radius: 0; color: #c5c5c5; font-size: .82rem; font-weight: 400; }.pp-tab:hover { color: #ffffff; background: #2a2d2e; }.pp-tab.is-active { color: #ffffff; border-bottom: 2px solid #007acc; background: #1e1e1e; box-shadow: none; }
+
+.pp-button { min-height: 32px; padding: 6px 11px; border: 1px solid #007acc; border-radius: 2px; color: #ffffff; background: #0e639c; box-shadow: none; font-weight: 400; }.pp-button:hover { color: #ffffff; background: #1177bb; box-shadow: none; transform: none; }
+.pp-button.pp-secondary { color: #ffffff; border-color: #3e3e42; background: #3a3d41; }.pp-button.pp-secondary:hover { background: #505357; }.pp-button.pp-danger { color: #ffffff; border-color: #be1100; background: #a1260d; }
+.pp-icon-button { width: 32px; height: 32px; border: 1px solid transparent; border-radius: 2px; color: #cccccc; background: transparent; }.pp-icon-button:hover, .pp-icon-button.is-active { color: #ffffff; border-color: #3e3e42; background: #3a3d41; }
+
+.pp-project-row, .pp-project-tile, .pp-idea, .pp-panel { border-color: #3e3e42; border-radius: 3px; background: #252526; box-shadow: none; }.pp-project-row:hover, .pp-project-tile:hover, .pp-project-tile:focus-within { border-color: #007acc; background: #2a2d2e; box-shadow: none; transform: none; }
+.pp-project-copy h3, .pp-idea h3 { color: #f5f5f5; font-weight: 600; }.pp-logo { color: #ffffff; border-radius: 4px; background: #0e639c; box-shadow: none; }.pp-badge { color: #d7eaff; background: #094771; }.pp-tag { color: #cccccc; background: #333333; border-radius: 2px; }
+.pp-tile-actions button { color: #ffffff; border: 1px solid #3e3e42; border-radius: 2px; background: #252526; }.pp-tile-actions button:hover { background: #0e639c; }
+.pp-empty { border-color: #3e3e42; border-radius: 3px; background: #252526; }.pp-empty strong { color: #f5f5f5; }
+
+.pp-field, .pp-filter-bar select { color: #f5f5f5; border-color: #3e3e42; border-radius: 2px; background: #3c3c3c; }.pp-field::placeholder { color: #a6a6a6; }.pp-field:focus, .pp-filter-bar select:focus { border-color: #007fd4; box-shadow: 0 0 0 1px #007fd4; }
+.pp-project-link { color: #4fc1ff; border-radius: 2px; background: #2a2d2e; }.pp-tool-button { color: #f5f5f5; border-color: #3e3e42; border-radius: 3px; background: #252526; }.pp-tool-button:hover { border-color: #007acc; background: #2a2d2e; }.pp-tool-button span, .pp-event time { color: #c5c5c5; }
+.pp-event { border-color: #3e3e42; }.pp-event::before { background: #007acc; box-shadow: none; }.pp-idea-mini { border-color: #3e3e42; }
+
+.pp-ai-card, .pp-ai-card.is-ready { color: #f5f5f5; border-color: #3e3e42; border-radius: 3px; background: #252526; }.pp-ai-card.is-ready { border-top: 2px solid #89d185; }.pp-ai-card .pp-secondary { color: #ffffff; border-color: #3e3e42; background: #3a3d41; }
+.pp-modal { background: rgba(0,0,0,.62); }.pp-modal-card { color: #f5f5f5; border-color: #3e3e42; border-radius: 4px; background: #252526; }.pp-modal-header, .pp-tools-editor { border-color: #3e3e42; }.pp-modal-close { color: #cccccc; background: transparent; }.pp-modal-close:hover { color: #ffffff; background: #3a3d41; }.pp-form-label { color: #cccccc; }.pp-form-note, .pp-tool-draft { color: #cccccc; border-color: #3e3e42; border-radius: 2px; background: #2a2d2e; }.pp-secret-hint { color: #d7eaff; border-color: #094771; border-radius: 2px; background: #063b5d; }.pp-tool-public-link a { color: #4fc1ff; }.pp-toast { color: #ffffff; border-color: #007acc; border-radius: 3px; background: #0e639c; }
+
+.pp-provider-icon { border-radius: 3px; background: #1e1e1e; }.pp-tool-modal-brand { color: #f5f5f5; }.pp-ui-icon { width: 16px; height: 16px; display: inline-block; vertical-align: -3px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }.pp-button .pp-ui-icon, .pp-tab .pp-ui-icon, .pp-back .pp-ui-icon { margin-right: 5px; }.pp-icon-button .pp-ui-icon { margin: 0; vertical-align: -3px; }
+.pp-vault-status strong .pp-ui-icon, .pp-project-link .pp-ui-icon { margin-right: 6px; }.pp-tool-button b .pp-ui-icon { color: #75beff; }.pp-status-idea, .pp-status-development, .pp-status-adjustments, .pp-status-final, .pp-status-effective { color: #d7eaff; background: #094771; }.pp-priority-urgent { color: #ffd7d1; background: #7a1f1f; }.pp-priority-high { color: #ffe5bf; background: #6b4519; }.pp-priority-medium { color: #fff1ba; background: #5c4f1c; }.pp-priority-low { color: #d7eaff; background: #094771; }.pp-priority-calm { color: #d6d6d6; background: #454545; }
+.pp-secret-hint .pp-ui-icon, .pp-tool-public-link .pp-ui-icon { margin-right: 6px; }
+
 @media (max-width: 760px) {
   .pp-shell { padding: 0 16px 42px; }.pp-hero-inner { min-height: 0; padding: 22px 16px; flex-direction: column; }.pp-vault-status { margin-top: 0; width: 100%; }.pp-section-head { align-items: stretch; flex-direction: column; }.pp-toolbar { justify-content: flex-start; }.pp-project-row { grid-template-columns: 48px minmax(0,1fr); gap: 11px; }.pp-project-row > .pp-project-meta { grid-column: 1 / -1; justify-content: space-between; }.pp-logo { width: 46px; height: 46px; border-radius: 12px; }.pp-filter-bar, .pp-form-grid, .pp-tool-add { grid-template-columns: 1fr; }.pp-ai-grid, .pp-detail-grid { grid-template-columns: 1fr; }.pp-detail-top { grid-template-columns: 58px minmax(0,1fr); gap: 11px; }.pp-detail-top .pp-logo { width: 58px; height: 58px; border-radius: 16px; font-size: 1.6rem; }.pp-detail-actions { grid-column: 1 / -1; justify-content: flex-start; }.pp-modal { align-items: flex-end; padding: 0; }.pp-modal-card { max-height: 92vh; border-radius: 20px 20px 0 0; }.pp-project-copy p { white-space: normal; }.pp-project-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }.pp-project-tile .pp-logo { width: 68px; height: 68px; border-radius: 19px; font-size: 1.75rem; }.pp-tile-actions { opacity: 1; }
 }

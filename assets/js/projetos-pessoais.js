@@ -79,6 +79,23 @@
     if (!asset) return '<span class="pp-provider-icon' + (extraClass ? ' ' + extraClass : '') + '" aria-hidden="true">✦</span>';
     return '<img class="pp-provider-icon' + (extraClass ? ' ' + extraClass : '') + '" src="' + asset + '" alt="' + escapeHtml(provider) + '" loading="lazy" referrerpolicy="no-referrer">';
   }
+  function uiIcon(name) {
+    var paths = {
+      back: '<path d="M14 4 6 12l8 8"/><path d="M7 12h11"/>',
+      project: '<path d="M3 5h6l2 2h10v12H3z"/><path d="M3 9h18"/>',
+      idea: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M8 14c-1.4-1.2-2-2.8-2-4.6a6 6 0 0 1 12 0c0 1.8-.6 3.4-2 4.6-.8.7-1 1.2-1 2H9c0-.8-.2-1.3-1-2Z"/>',
+      ai: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12h.01M16 12h.01M9 16c1.7 1 4.3 1 6 0"/>',
+      list: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>',
+      grid: '<rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/>',
+      plus: '<path d="M12 5v14M5 12h14"/>',
+      edit: '<path d="m4 20 4.2-1 10.4-10.4a2 2 0 0 0-2.8-2.8L5.4 16.2 4 20Z"/><path d="m13.8 7.8 2.8 2.8"/>',
+      trash: '<path d="M4 7h16M10 11v6M14 11v6M9 7l1-3h4l1 3M6 7l1 14h10l1-14"/>',
+      lock: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+      unlock: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M16 10V7a4 4 0 0 0-7.3-2.3"/>',
+      external: '<path d="M14 4h6v6"/><path d="m20 4-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/>'
+    };
+    return '<svg class="pp-ui-icon" viewBox="0 0 24 24" aria-hidden="true">' + (paths[name] || paths.project) + '</svg>';
+  }
   function safeUrl(value) {
     try {
       var url = new URL(String(value || ''), window.location.href);
@@ -188,16 +205,16 @@
 
   function headerMarkup(title, subtitle, back) {
     return '<header class="pp-hero"><div class="pp-hero-inner"><div>'
-      + (back ? '<a class="pp-back" href="' + back + '">← Voltar aos projetos</a>' : '<a class="pp-back" href="index.html">← Início</a>')
+      + (back ? '<a class="pp-back" href="' + back + '">' + uiIcon('back') + 'Voltar aos projetos</a>' : '<a class="pp-back" href="index.html">' + uiIcon('back') + 'Início</a>')
       + '<div class="pp-kicker">Organização pessoal</div><h1>' + escapeHtml(title) + '</h1><p>' + escapeHtml(subtitle) + '</p></div>'
-      + '<button type="button" class="pp-vault-status" data-action="vault-info" aria-label="Abrir opções do cofre"><strong>' + (isVaultUnlocked() ? '🔓 Cofre desbloqueado' : '🔒 Cofre protegido') + '</strong><span>' + (isVaultUnlocked() ? 'Acesso ativo por 15 minutos' : state.vault ? 'Senha necessária para as ferramentas' : 'Defina a senha no primeiro acesso') + '</span></button>'
+      + '<button type="button" class="pp-vault-status" data-action="vault-info" aria-label="Abrir opções do cofre"><strong>' + uiIcon(isVaultUnlocked() ? 'unlock' : 'lock') + (isVaultUnlocked() ? 'Cofre desbloqueado' : 'Cofre protegido') + '</strong><span>' + (isVaultUnlocked() ? 'Acesso ativo por 15 minutos' : state.vault ? 'Senha necessária para as ferramentas' : 'Defina a senha no primeiro acesso') + '</span></button>'
       + '</div></header>';
   }
   function workspaceMarkup() {
     var tab = currentTab();
     return headerMarkup('Projetos pessoais', 'Um lugar para lembrar do que está em andamento, das ideias e dos acessos importantes.')
       + '<main class="pp-shell"><nav class="pp-tabs" aria-label="Seções de projetos">'
-      + tabButton('projects', '🗂 Projetos', tab) + tabButton('ideas', '💡 Ideias', tab) + tabButton('ias', '✦ I.As', tab)
+      + tabButton('projects', uiIcon('project') + 'Projetos', tab) + tabButton('ideas', uiIcon('idea') + 'Ideias', tab) + tabButton('ias', uiIcon('ai') + 'I.As', tab)
       + '</nav>' + (tab === 'ideas' ? ideasMarkup() : tab === 'ias' ? aiMarkup() : projectsMarkup()) + '</main>';
   }
   function tabButton(value, label, current) { return '<button type="button" class="pp-tab' + (value === current ? ' is-active' : '') + '" data-action="tab" data-tab="' + value + '">' + label + '</button>'; }
@@ -206,23 +223,23 @@
     var projects = active(state.projects).sort(function (a, b) { return toTime(b.updatedAt) - toTime(a.updatedAt); });
     var body = projects.length ? (view === 'grid' ? projectGrid(projects) : projectList(projects)) : emptyMarkup('Nenhum projeto ainda', 'Crie o primeiro projeto e concentre aqui o que está sendo desenvolvido.');
     return '<section><div class="pp-section-head"><div><h2>Projetos</h2><p>Acompanhe seus projetos em um só lugar.</p></div><div class="pp-toolbar">'
-      + '<button class="pp-icon-button' + (view === 'list' ? ' is-active' : '') + '" title="Visualizar em lista" aria-label="Visualizar em lista" data-action="view" data-view="list">☷</button>'
-      + '<button class="pp-icon-button' + (view === 'grid' ? ' is-active' : '') + '" title="Visualizar em grade" aria-label="Visualizar em grade" data-action="view" data-view="grid">▦</button>'
-      + '<button class="pp-button" data-action="new-project">＋ Novo projeto</button></div></div>' + body + '</section>';
+      + '<button class="pp-icon-button' + (view === 'list' ? ' is-active' : '') + '" title="Visualizar em lista" aria-label="Visualizar em lista" data-action="view" data-view="list">' + uiIcon('list') + '</button>'
+      + '<button class="pp-icon-button' + (view === 'grid' ? ' is-active' : '') + '" title="Visualizar em grade" aria-label="Visualizar em grade" data-action="view" data-view="grid">' + uiIcon('grid') + '</button>'
+      + '<button class="pp-button" data-action="new-project">' + uiIcon('plus') + 'Novo projeto</button></div></div>' + body + '</section>';
   }
   function projectList(projects) {
     return '<div class="pp-project-list">' + projects.map(function (project) {
       return '<article class="pp-project-row" tabindex="0" role="link" data-action="goto-project" data-id="' + project.id + '">'
         + projectLogo(project) + '<div class="pp-project-copy"><h3>' + escapeHtml(project.name) + '</h3><p>' + escapeHtml(project.description || 'Sem descrição.') + '</p></div>'
         + '<div class="pp-project-meta"><span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span>'
-        + '<button class="pp-icon-button" aria-label="Editar ' + escapeHtml(project.name) + '" title="Editar" data-action="edit-project" data-id="' + project.id + '">✎</button>'
-        + '<button class="pp-icon-button" aria-label="Excluir ' + escapeHtml(project.name) + '" title="Excluir" data-action="delete-project" data-id="' + project.id + '">⌫</button></div></article>';
+        + '<button class="pp-icon-button" aria-label="Editar ' + escapeHtml(project.name) + '" title="Editar" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + '</button>'
+        + '<button class="pp-icon-button" aria-label="Excluir ' + escapeHtml(project.name) + '" title="Excluir" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + '</button></div></article>';
     }).join('') + '</div>';
   }
   function projectGrid(projects) {
     return '<div class="pp-project-grid">' + projects.map(function (project) {
       return '<article class="pp-project-tile" tabindex="0" role="link" aria-label="Abrir projeto ' + escapeHtml(project.name) + '" data-action="goto-project" data-id="' + project.id + '">'
-        + projectLogo(project) + '<div class="pp-tile-actions"><button aria-label="Editar" title="Editar" data-action="edit-project" data-id="' + project.id + '">✎</button><button aria-label="Excluir" title="Excluir" data-action="delete-project" data-id="' + project.id + '">⌫</button></div></article>';
+        + projectLogo(project) + '<div class="pp-tile-actions"><button aria-label="Editar" title="Editar" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + '</button><button aria-label="Excluir" title="Excluir" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + '</button></div></article>';
     }).join('') + '</div>';
   }
   function emptyMarkup(title, message) { return '<div class="pp-empty"><strong>' + escapeHtml(title) + '</strong><span>' + escapeHtml(message) + '</span></div>'; }
@@ -237,13 +254,13 @@
     });
     var projectOptions = '<option value="all">Todos os projetos</option><option value="future"' + (currentFilters.project === 'future' ? ' selected' : '') + '>Projeto futuro</option>'
       + active(state.projects).map(function (project) { return '<option value="' + project.id + '"' + (currentFilters.project === project.id ? ' selected' : '') + '>' + escapeHtml(project.name) + '</option>'; }).join('');
-    return '<section><div class="pp-section-head"><div><h2>Ideias</h2><p>Capture a ideia antes que ela se perca e conecte-a ao projeto certo.</p></div><div class="pp-toolbar"><button class="pp-button" data-action="new-idea">＋ Nova ideia</button></div></div>'
+    return '<section><div class="pp-section-head"><div><h2>Ideias</h2><p>Capture a ideia antes que ela se perca e conecte-a ao projeto certo.</p></div><div class="pp-toolbar"><button class="pp-button" data-action="new-idea">' + uiIcon('plus') + 'Nova ideia</button></div></div>'
       + '<div class="pp-filter-bar"><select data-filter="project" aria-label="Filtrar por projeto">' + projectOptions + '</select><select data-filter="status" aria-label="Filtrar por status"><option value="all">Todos os status</option>' + optionList(IDEA_STATUSES, currentFilters.status === 'all' ? '' : currentFilters.status) + '</select><select data-filter="priority" aria-label="Filtrar por prioridade"><option value="all">Todas as prioridades</option>' + optionList(PRIORITIES, currentFilters.priority === 'all' ? '' : currentFilters.priority) + '</select></div>'
       + (ideas.length ? '<div class="pp-ideas">' + ideas.map(ideaCard).join('') + '</div>' : emptyMarkup('Nenhuma ideia encontrada', 'Use o botão acima para criar uma ideia ou mude os filtros.')) + '</section>';
   }
   function ideaCard(idea) {
     var project = getProject(idea.projectId);
-    return '<article class="pp-idea"><div class="pp-idea-header"><div><h3>' + escapeHtml(idea.title) + '</h3></div><div class="pp-toolbar"><button class="pp-icon-button" title="Editar ideia" aria-label="Editar ideia" data-action="edit-idea" data-id="' + idea.id + '">✎</button><button class="pp-icon-button" title="Excluir ideia" aria-label="Excluir ideia" data-action="delete-idea" data-id="' + idea.id + '">⌫</button></div></div>'
+    return '<article class="pp-idea"><div class="pp-idea-header"><div><h3>' + escapeHtml(idea.title) + '</h3></div><div class="pp-toolbar"><button class="pp-icon-button" title="Editar ideia" aria-label="Editar ideia" data-action="edit-idea" data-id="' + idea.id + '">' + uiIcon('edit') + '</button><button class="pp-icon-button" title="Excluir ideia" aria-label="Excluir ideia" data-action="delete-idea" data-id="' + idea.id + '">' + uiIcon('trash') + '</button></div></div>'
       + '<p>' + escapeHtml(idea.description || 'Sem descrição detalhada.') + '</p><div class="pp-idea-foot"><div class="pp-tags"><span class="pp-tag pp-priority-' + priorityClass(idea.priority) + '">' + escapeHtml(idea.priority) + '</span><span class="pp-tag">' + escapeHtml(idea.status) + '</span><span class="pp-tag">' + (project ? projectLogo(project, true) + escapeHtml(project.name) : '◌ Projeto futuro') + '</span></div><span class="pp-tag">Editada ' + escapeHtml(formatDate(idea.updatedAt, false)) + '</span></div></article>';
   }
   function aiMarkup() {
@@ -260,18 +277,18 @@
     var projectIdeas = active(state.ideas).filter(function (idea) { return idea.projectId === project.id; }).sort(function (a, b) { return toTime(b.updatedAt) - toTime(a.updatedAt); });
     var events = active(state.activities).filter(function (event) { return event.projectId === project.id; }).sort(function (a, b) { return toTime(b.occurredAt) - toTime(a.occurredAt); });
     var tools = Array.isArray(project.tools) ? project.tools : [];
-    var links = safeUrl(project.url) ? '<div class="pp-project-links"><a class="pp-project-link" target="_blank" rel="noopener noreferrer" href="' + escapeHtml(safeUrl(project.url)) + '">↗ Abrir link principal</a></div>' : '<p class="pp-form-note">Nenhum link principal cadastrado.</p>';
+    var links = safeUrl(project.url) ? '<div class="pp-project-links"><a class="pp-project-link" target="_blank" rel="noopener noreferrer" href="' + escapeHtml(safeUrl(project.url)) + '">' + uiIcon('external') + 'Abrir link principal</a></div>' : '<p class="pp-form-note">Nenhum link principal cadastrado.</p>';
     return headerMarkup(project.name, 'Detalhes, ferramentas, histórico e ideias deste projeto.', 'projetos-pessoais.html#projects')
-      + '<main class="pp-shell"><section class="pp-detail-top">' + projectLogo(project) + '<div><h1>' + escapeHtml(project.name) + '</h1><p>' + escapeHtml(project.description || 'Sem descrição.') + '</p><div class="pp-tags" style="margin-top:10px"><span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span><span class="pp-tag">' + escapeHtml(project.type || 'Outro') + '</span></div></div><div class="pp-detail-actions"><button class="pp-button pp-secondary" data-action="edit-project" data-id="' + project.id + '">✎ Editar</button><button class="pp-button pp-danger" data-action="delete-project" data-id="' + project.id + '">Excluir</button></div></section>'
-      + '<div class="pp-detail-grid"><div><section class="pp-panel"><div class="pp-panel-head"><h2>Linha do tempo</h2><button class="pp-button pp-small" data-action="new-event" data-project="' + project.id + '">＋ Registrar</button></div>' + (events.length ? '<div class="pp-timeline">' + events.map(eventCard).join('') + '</div>' : emptyMarkup('Sem atualizações ainda', 'Registre um avanço, deploy, ajuste ou qualquer passo importante.')) + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ideias vinculadas</h2><a class="pp-button pp-small pp-secondary" href="projetos-pessoais.html#ideas">Ver todas</a></div>' + (projectIdeas.length ? projectIdeas.map(ideaMini).join('') : '<p class="pp-form-note">Ainda não há ideias vinculadas a este projeto.</p>') + '</section></div>'
-      + '<aside><section class="pp-panel"><h2>Links</h2><div style="height:12px"></div>' + links + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ferramentas</h2><button class="pp-button pp-small" data-action="edit-project" data-id="' + project.id + '">Gerenciar</button></div>' + (tools.length ? '<div class="pp-tool-list">' + tools.map(function (tool) { return '<button class="pp-tool-button" data-action="open-tool" data-project="' + project.id + '" data-tool="' + tool.id + '"><span>' + providerIcon(tool.provider) + '<span><strong>' + escapeHtml(tool.label || tool.provider) + '</strong><span>' + escapeHtml(tool.provider) + ' · acesso protegido</span></span></span><b>🔒</b></button>'; }).join('') + '</div>' : '<p class="pp-form-note">Adicione GitHub, Supabase, I.As ou outra ferramenta ao editar o projeto.</p>') + '</section></aside></div></main>';
+      + '<main class="pp-shell"><section class="pp-detail-top">' + projectLogo(project) + '<div><h1>' + escapeHtml(project.name) + '</h1><p>' + escapeHtml(project.description || 'Sem descrição.') + '</p><div class="pp-tags" style="margin-top:10px"><span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span><span class="pp-tag">' + escapeHtml(project.type || 'Outro') + '</span></div></div><div class="pp-detail-actions"><button class="pp-button pp-secondary" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + 'Editar</button><button class="pp-button pp-danger" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + 'Excluir</button></div></section>'
+      + '<div class="pp-detail-grid"><div><section class="pp-panel"><div class="pp-panel-head"><h2>Linha do tempo</h2><button class="pp-button pp-small" data-action="new-event" data-project="' + project.id + '">' + uiIcon('plus') + 'Registrar</button></div>' + (events.length ? '<div class="pp-timeline">' + events.map(eventCard).join('') + '</div>' : emptyMarkup('Sem atualizações ainda', 'Registre um avanço, deploy, ajuste ou qualquer passo importante.')) + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ideias vinculadas</h2><a class="pp-button pp-small pp-secondary" href="projetos-pessoais.html#ideas">Ver todas</a></div>' + (projectIdeas.length ? projectIdeas.map(ideaMini).join('') : '<p class="pp-form-note">Ainda não há ideias vinculadas a este projeto.</p>') + '</section></div>'
+      + '<aside><section class="pp-panel"><h2>Links</h2><div style="height:12px"></div>' + links + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ferramentas</h2><button class="pp-button pp-small" data-action="edit-project" data-id="' + project.id + '">Gerenciar</button></div>' + (tools.length ? '<div class="pp-tool-list">' + tools.map(function (tool) { return '<button class="pp-tool-button" data-action="open-tool" data-project="' + project.id + '" data-tool="' + tool.id + '"><span>' + providerIcon(tool.provider) + '<span><strong>' + escapeHtml(tool.label || tool.provider) + '</strong><span>' + escapeHtml(tool.provider) + ' · acesso protegido</span></span></span><b>' + uiIcon('lock') + '</b></button>'; }).join('') + '</div>' : '<p class="pp-form-note">Adicione GitHub, Supabase, I.As ou outra ferramenta ao editar o projeto.</p>') + '</section></aside></div></main>';
   }
   function eventCard(event) {
     var external = safeUrl(event.externalUrl) ? ' · <a target="_blank" rel="noopener noreferrer" href="' + escapeHtml(safeUrl(event.externalUrl)) + '">abrir referência</a>' : '';
-    return '<article class="pp-event"><div class="pp-event-top"><div><h3>' + escapeHtml(event.title) + '</h3><time>' + escapeHtml(formatDate(event.occurredAt)) + ' · ' + escapeHtml(event.source || 'Manual') + external + '</time></div><div class="pp-toolbar"><button class="pp-icon-button" title="Editar evento" aria-label="Editar evento" data-action="edit-event" data-id="' + event.id + '">✎</button><button class="pp-icon-button" title="Excluir evento" aria-label="Excluir evento" data-action="delete-event" data-id="' + event.id + '">⌫</button></div></div>' + (event.details ? '<p>' + escapeHtml(event.details) + '</p>' : '') + '</article>';
+    return '<article class="pp-event"><div class="pp-event-top"><div><h3>' + escapeHtml(event.title) + '</h3><time>' + escapeHtml(formatDate(event.occurredAt)) + ' · ' + escapeHtml(event.source || 'Manual') + external + '</time></div><div class="pp-toolbar"><button class="pp-icon-button" title="Editar evento" aria-label="Editar evento" data-action="edit-event" data-id="' + event.id + '">' + uiIcon('edit') + '</button><button class="pp-icon-button" title="Excluir evento" aria-label="Excluir evento" data-action="delete-event" data-id="' + event.id + '">' + uiIcon('trash') + '</button></div></div>' + (event.details ? '<p>' + escapeHtml(event.details) + '</p>' : '') + '</article>';
   }
   function ideaMini(idea) {
-    return '<div class="pp-idea-mini"><span class="pp-logo">💡</span><div><strong>' + escapeHtml(idea.title) + '</strong><span>' + escapeHtml(idea.priority) + ' · ' + escapeHtml(idea.status) + '</span></div></div>';
+    return '<div class="pp-idea-mini"><span class="pp-logo">' + uiIcon('idea') + '</span><div><strong>' + escapeHtml(idea.title) + '</strong><span>' + escapeHtml(idea.priority) + ' · ' + escapeHtml(idea.status) + '</span></div></div>';
   }
   function currentTab() {
     var hash = (window.location.hash || '').replace('#', '').toLowerCase();
@@ -491,6 +508,10 @@
       var key = projectId + ':' + toolId; var entry = vaultData.entries[key] || { login: '', password: '', keys: '', notes: '' };
       var publicUrl = safeUrl(tool.url);
       var modal = showModal(tool.label || tool.provider, 'Dados sensíveis deste acesso. O cofre fecha automaticamente após 15 minutos.', '<form id="pp-tool-form"><div class="pp-secret-hint">🔒 Estas informações são cifradas antes de serem salvas. Não copie chaves em locais públicos.</div>' + (publicUrl ? '<div class="pp-tool-public-link"><a target="_blank" rel="noopener noreferrer" href="' + escapeHtml(publicUrl) + '">↗ Abrir ' + escapeHtml(tool.label || tool.provider) + '</a></div>' : '') + '<div class="pp-form-grid" style="margin-top:14px"><label class="pp-form-label pp-full"><span>Logins / e-mails</span><textarea class="pp-field" name="login" placeholder="E-mails, usuários e observações de acesso">' + escapeHtml(entry.login) + '</textarea></label><label class="pp-form-label pp-full"><span>Senhas</span><textarea class="pp-field" name="password" placeholder="Senhas ou instruções de recuperação">' + escapeHtml(entry.password) + '</textarea></label><label class="pp-form-label pp-full"><span>APIs, chaves e códigos</span><textarea class="pp-field" name="keys" placeholder="Tokens, chaves, IDs, códigos ou comandos importantes">' + escapeHtml(entry.keys) + '</textarea></label><label class="pp-form-label pp-full"><span>Notas protegidas</span><textarea class="pp-field" name="notes" placeholder="Outras informações sensíveis">' + escapeHtml(entry.notes) + '</textarea></label></div><div class="pp-error" id="pp-tool-error"></div><div class="pp-modal-actions"><button type="button" class="pp-button pp-secondary" data-action="close-modal">Fechar</button><button class="pp-button" type="submit">Salvar no cofre</button></div></form>', { sensitive: true });
+      var secretHint = modal.querySelector('.pp-secret-hint');
+      if (secretHint) { secretHint.insertAdjacentHTML('afterbegin', uiIcon('lock')); Array.prototype.forEach.call(secretHint.childNodes, function (node) { if (node.nodeType === 3) node.textContent = node.textContent.replace(/^\s*🔒\s*/, ''); }); }
+      var publicLink = modal.querySelector('.pp-tool-public-link a');
+      if (publicLink) { publicLink.insertAdjacentHTML('afterbegin', uiIcon('external')); Array.prototype.forEach.call(publicLink.childNodes, function (node) { if (node.nodeType === 3) node.textContent = node.textContent.replace(/^\s*↗\s*/, ''); }); }
       modal.querySelector('#pp-tool-form').insertAdjacentHTML('afterbegin', '<div class="pp-tool-modal-brand">' + providerIcon(tool.provider) + '<span>' + escapeHtml(tool.label || tool.provider) + '</span></div>');
       modal.querySelector('#pp-tool-form').addEventListener('submit', function (event) {
         event.preventDefault(); var form = event.currentTarget; vaultData.entries[key] = { login: form.elements.login.value, password: form.elements.password.value, keys: form.elements.keys.value, notes: form.elements.notes.value, updatedAt: now() };
