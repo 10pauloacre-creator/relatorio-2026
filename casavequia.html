@@ -777,8 +777,6 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 <button class="nb" onclick="aba('cal',this)">📆 Calendário</button><div class="sp"></div>
 <button class="nb" onclick="aba('cont',this)">📊 Contador</button>
 <div class="sp"></div>
-<button class="nb" onclick="aba('claude',this)">⏱ Claude</button>
-<div class="sp"></div>
 <button class="nb" onclick="aba('livros',this)">📖 Livros</button>
 <div class="sp"></div>
 <button class="nb" onclick="aba('sequencias',this)">🗂 Sequências</button>
@@ -6900,31 +6898,6 @@ document.getElementById('p6ano').classList.add('active');
 <div class="cgt"><h3>Artes</h3><span class="bd bd-ar">ARTE</span></div><div class="ccards" id="cnt-ar"></div>
 </section>
 
-<section class="sec" id="sec-claude">
-<div class="th"><div class="tb gz">⏱</div><div class="ti"><h2>Controle de Tempo — Claude</h2><p>Gerenciamento das 6 contas · Espera de 5 horas · Notificações automáticas</p></div></div>
-<div id="cl-notif-bar" class="cl-notif-bar" style="display:none">
-  <span>🔔 Ative as notificações para ser avisado quando a conta liberar</span>
-  <button onclick="claudePedirPermissao()">Ativar Notificações</button>
-</div>
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-  <span id="cl-fb-status" style="font-size:.78rem;font-weight:600;color:#aaa">● Conectando ao Firestore…</span>
-  <button onclick="_claudeFBRetries=0;claudeListenFirebase()" style="font-size:.75rem;padding:5px 13px;border:1px solid var(--cl);background:transparent;color:var(--cm);border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif">🔄 Sincronizar agora</button>
-</div>
-<div class="cl-grid" id="claude-cards"></div>
-<!-- Popup Definir Hora -->
-<div id="cl-popup-hora" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
-  <div style="background:var(--cr);border-radius:14px;padding:28px;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.4)">
-    <div id="cl-popup-label" style="font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:var(--vd);margin-bottom:16px"></div>
-    <label style="font-size:.8rem;font-weight:600;color:var(--cm);display:block;margin-bottom:6px">Horário em que o limite expira:</label>
-    <input type="time" id="cl-hora-input" style="width:100%;padding:10px 14px;border:2px solid var(--cl);border-radius:8px;font-size:1.2rem;font-family:'DM Mono',monospace;color:var(--ce);background:var(--cr);margin-bottom:16px">
-    <div style="display:flex;gap:10px">
-      <button onclick="claudeConfirmarHora()" style="flex:1;background:var(--vm);color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">✅ Confirmar</button>
-      <button onclick="document.getElementById('cl-popup-hora').style.display='none'" style="flex:1;background:var(--cl);color:var(--ce);border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">✕ Cancelar</button>
-    </div>
-  </div>
-</div>
-</section>
-
 <section class="sec" id="sec-livros">
 <div class="th"><div class="tb" style="background:linear-gradient(135deg,#c9a84c,#e8c86a)">📖</div><div class="ti"><h2>Livros Digitais</h2><p>Produção e acompanhamento dos livros digitais por disciplina e bimestre</p></div></div>
 <div class="liv-legend">
@@ -10297,6 +10270,7 @@ if ('serviceWorker' in navigator) {
 
 <script defer src="assets/js/claude-native-notifications-core.js?v=20260717b"></script>
 <script defer src="assets/js/claude-native-notifications-casavequia.js?v=20260717a"></script>
+<script defer src="assets/js/legacy-claude-cleanup.js?v=20260729a"></script>
 <script defer src="assets/app-build.js?v=20260717b"></script>
 <script defer src="assets/js/app-update.js?v=20260717c"></script>
 </body>

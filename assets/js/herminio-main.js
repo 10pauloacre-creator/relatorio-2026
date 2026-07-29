@@ -930,6 +930,30 @@ if (sep && sep.classList && sep.classList.contains('sp')) sep.remove();
 btnJogos.remove();
 }
 }
+// A central de I.As substitui o controle Claude desta escola. Mantém os dados
+// antigos intactos, mas remove a aba e evita que timers legados continuem ativos.
+(function() {
+var _rhClaudeLegacyAccounts = typeof RH_CONTAS_CLAUDE !== 'undefined' ? RH_CONTAS_CLAUDE : [];
+if (_rhClaudeLegacyAccounts && _rhClaudeLegacyAccounts.length) _rhClaudeLegacyAccounts.length = 0;
+window.rhClaudeRender = function() {};
+window.rhClaudeTick = function() {};
+window.rhClaudeAbrirPelaHash = function() {};
+document.addEventListener('DOMContentLoaded', function() {
+  var section = document.getElementById('sec-claude');
+  if (section) section.remove();
+  document.querySelectorAll('.nb').forEach(function(button) {
+    var onclick = button.getAttribute('onclick') || '';
+    if (onclick.indexOf("'sec-claude'") < 0 && onclick.indexOf("'claude'") < 0) return;
+    var next = button.nextElementSibling;
+    var previous = button.previousElementSibling;
+    button.remove();
+    if (next && next.classList.contains('sp')) next.remove();
+    else if (previous && previous.classList.contains('sp')) previous.remove();
+  });
+  if ((location.hash || '').toLowerCase().indexOf('claude') >= 0 && history.replaceState) history.replaceState(null, '', location.pathname + location.search);
+});
+})();
+
 document.addEventListener('DOMContentLoaded', rhRemoverAbaJogos);
 document.addEventListener('DOMContentLoaded', rhGarantirEditorPersistente);
 (function() {
