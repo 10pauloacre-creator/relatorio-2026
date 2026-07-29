@@ -83,6 +83,10 @@
     var paths = {
       back: '<path d="M14 4 6 12l8 8"/><path d="M7 12h11"/>',
       project: '<path d="M3 5h6l2 2h10v12H3z"/><path d="M3 9h18"/>',
+      folder: '<path d="M3 6h6l2 2h10v10H3z"/><path d="M3 10h18"/>',
+      book: '<path d="M4 5.5A3.5 3.5 0 0 1 7.5 5H12v15H7.5A3.5 3.5 0 0 0 4 23V5.5Z"/><path d="M20 5.5A3.5 3.5 0 0 0 16.5 5H12v15h4.5A3.5 3.5 0 0 1 20 23V5.5Z"/>',
+      code: '<path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>',
+      map: '<path d="M12 4v16M12 8H7a3 3 0 0 0-3 3v2M12 15h5a3 3 0 0 1 3 3v2"/><circle cx="12" cy="4" r="2"/><circle cx="4" cy="14" r="2"/><circle cx="20" cy="21" r="2"/>',
       idea: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M8 14c-1.4-1.2-2-2.8-2-4.6a6 6 0 0 1 12 0c0 1.8-.6 3.4-2 4.6-.8.7-1 1.2-1 2H9c0-.8-.2-1.3-1-2Z"/>',
       ai: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12h.01M16 12h.01M9 16c1.7 1 4.3 1 6 0"/>',
       list: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>',
@@ -199,6 +203,75 @@
     state.migrations.financeiroAppV1 = { addedAt: stamp, projectId: finance.id };
     if (changed) persist('financeiro-app-add'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
     return changed;
+  }
+  function libraryDocumentationBlueprint() {
+    return {
+      title: 'Mapa do projeto Biblioteca Digital',
+      summary: 'Documentação do acervo medieval: estrutura, conteúdo publicado, pendências e regras de funcionamento encontradas na versão local v3.',
+      counters: { available: 8, pending: 36, series: 3, collections: 11 },
+      folders: [
+        {
+          id: 'visao-geral', icon: 'project', title: '01. Visão geral e objetivo',
+          description: 'Contexto para quem recebe o projeto pela primeira vez.',
+          children: [
+            { id: 'proposito', icon: 'project', title: 'Propósito e público', status: 'Concluído', details: ['Biblioteca digital com identidade medieval para disponibilizar livros e conteúdos pedagógicos da E.E. Rural Pe. Carlos Casavequia.', 'O fluxo principal é: escolher 1ª, 2ª ou 3ª série, abrir a disciplina e acessar o livro do bimestre quando ele estiver publicado.'] },
+            { id: 'estrutura-atual', icon: 'folder', title: 'Estrutura já montada', status: 'Concluído', details: ['Três séries estão disponíveis na tela inicial: 1ª, 2ª e 3ª séries.', 'O acervo está organizado por série, disciplina e bimestre, com caminhos relativos no formato ./livros/{serie}/{disciplina}/{bimestre}.html.', 'Há três arquivos locais de evolução: Biblioteca Digital Medieval.html, v2 e v3; a documentação usa o inventário da v3.'] },
+            { id: 'identidade', icon: 'project', title: 'Experiência e identidade visual', status: 'Concluído', details: ['Tema medieval com placa de entrada, livros de seleção de série, efeitos de pergaminho e mensagens de acervo.', 'Ativos existentes incluem imagens, GIF/vídeo de abertura, música de fundo, efeitos sonoros e imagens de livro verde/azul para disponibilidade.'] }
+          ]
+        },
+        {
+          id: 'acervo', icon: 'book', title: '02. Acervo por série',
+          description: '8 livros já disponíveis e 36 espaços de bimestre ainda pendentes.',
+          children: [
+            { id: 'acervo-1-serie', icon: 'book', title: '1ª série — 2 disponíveis / 10 pendentes', status: 'Em andamento', details: ['Disponíveis: 1º bimestre de Língua Portuguesa; 1º bimestre de Trilhas de Linguagens.', 'Pendentes em Língua Portuguesa: 2º, 3º e 4º bimestres.', 'Pendentes em Trilhas de Linguagens: 2º, 3º e 4º bimestres.', 'Pendentes em Trilhas de Ciências Humanas: 1º, 2º, 3º e 4º bimestres.'] },
+            { id: 'acervo-2-serie', icon: 'book', title: '2ª série — 4 disponíveis / 12 pendentes', status: 'Em andamento', details: ['Disponíveis: 1º bimestre de Língua Portuguesa, Trilhas de Linguagens, Trilhas de Ciências Humanas e Artes.', 'Pendentes em cada coleção: 2º, 3º e 4º bimestres.', 'Coleções existentes: Língua Portuguesa, Trilhas de Linguagens, Trilhas de Ciências Humanas e Artes.'] },
+            { id: 'acervo-3-serie', icon: 'book', title: '3ª série — 2 disponíveis / 14 pendentes', status: 'Em andamento', details: ['Disponíveis: 1º bimestre de Língua Portuguesa; 1º bimestre de Trilhas de Linguagens.', 'Pendentes em Língua Portuguesa e Trilhas de Linguagens: 2º, 3º e 4º bimestres.', 'Pendentes em Trilhas de Ciências Humanas e Artes: 1º, 2º, 3º e 4º bimestres.'] },
+            { id: 'inventario-total', icon: 'book', title: 'Inventário completo — 44 posições', status: 'Concluído', details: ['Total mapeado: 44 posições de livros (série × disciplina × bimestre).', 'Já publicados: 8 livros do 1º bimestre.', 'Ainda a produzir/publicar: 36 livros. A ordem recomendada é completar os demais bimestres das coleções que já têm o 1º livro disponível.'] }
+          ]
+        },
+        {
+          id: 'regras', icon: 'code', title: '03. Regras implementadas no código',
+          description: 'Comportamentos que devem ser preservados ao evoluir o acervo.',
+          children: [
+            { id: 'regra-disponibilidade', icon: 'code', title: 'Disponibilidade é verificada por arquivo', status: 'Concluído', details: ['Antes de abrir um livro, o sistema faz fetch com cache: no-store para o arquivo HTML do livro.', 'A posição é considerada disponível somente se a resposta for válida e o conteúdo tiver mais de 100 linhas; o resultado fica em memória no bookCache durante a sessão.', 'A interface troca automaticamente entre livro verde/Acessar e livro azul/Indisponível.'] },
+            { id: 'regra-abertura', icon: 'code', title: 'Abertura de livro e modal', status: 'Concluído', details: ['Livro disponível: mostra modal de abertura, toca efeitos e redireciona após aproximadamente 3,5 segundos.', 'Livro indisponível: abre modal “Pergaminho Selado” e não redireciona.', 'A tecla Escape e o retorno de página fecham o modal e restauram a rolagem.'] },
+            { id: 'regra-navegacao', icon: 'code', title: 'Navegação e estado local', status: 'Concluído', details: ['A série selecionada é guardada no localStorage pela chave bdm-current-serie.', 'A aplicação protege o botão Voltar com um aviso de saída para reduzir fechamentos acidentais.', 'A navegação mantém uma série visível por vez e inicia a primeira aba dessa série.'] },
+            { id: 'regra-pwa-audio', icon: 'code', title: 'PWA, áudio e ciclo de vida', status: 'Concluído', details: ['O service worker ./sw.js é registrado para suporte de PWA; o convite de instalação é voltado a dispositivos móveis e respeita a chave bdm_pwa_dismissed.', 'A música de fundo inicia após interação quando o navegador exige permissão; ela pausa/retoma em mudanças de visibilidade, foco e retorno à página.', 'Os sons distinguem seleção de série, livro disponível, indisponível e abertura.'] }
+          ]
+        },
+        {
+          id: 'ativos', icon: 'folder', title: '04. Ativos e publicação',
+          description: 'O que acompanha o HTML e como a versão chega ao público.',
+          children: [
+            { id: 'ativos-midia', icon: 'folder', title: 'Mídia existente', status: 'Concluído', details: ['Pasta assets/images: placa, livros da tela inicial, livros verde/azul e ícones de experiência.', 'Pasta assets/audio: música de fundo e efeitos de série, abertura, disponibilidade e indisponibilidade.', 'Pasta assets/gif: vídeo/animação de abertura do livro.'] },
+            { id: 'publicacao', icon: 'project', title: 'Publicação atual', status: 'Concluído', details: ['A versão consultada referencia https://biblioteca-digital-medieval.vercel.app para ativos publicados.', 'O projeto Biblioteca Digital está registrado no hub com ferramentas Vercel e Supabase; acessos sensíveis permanecem protegidos pelo cofre.'] }
+          ]
+        },
+        {
+          id: 'proximos-passos', icon: 'map', title: '05. Próximos passos recomendados',
+          description: 'Fila objetiva para continuar sem perder contexto.',
+          children: [
+            { id: 'prioridade-acervo', icon: 'book', title: 'Completar o acervo de maior continuidade', status: 'Prioridade alta', details: ['Criar os 2º, 3º e 4º bimestres das coleções que já possuem o 1º livro.', 'Depois, iniciar as coleções sem nenhum livro: Trilhas de Ciências Humanas da 1ª e 3ª séries; Artes da 3ª série.', 'Cada novo arquivo precisa respeitar a rota relativa, ter conteúdo real e manter mais de 100 linhas para ser reconhecido pela verificação atual.'] },
+            { id: 'qualidade-publicacao', icon: 'code', title: 'Checklist antes de publicar', status: 'Prioridade alta', details: ['Validar a rota do novo HTML no ambiente publicado.', 'Abrir pelo cartão para confirmar o estado verde, o modal, o redirecionamento e o conteúdo.', 'Testar no celular/PWA, inclusive instalação, áudio e retorno ao acervo.'] },
+            { id: 'automacao-futura', icon: 'map', title: 'Automação futura', status: 'Planejado', details: ['Conectar deploys do Vercel e alterações do repositório à linha do tempo deste projeto.', 'Trocar a regra de “mais de 100 linhas” por um manifesto de acervo com metadados de título, série, disciplina, bimestre e estado de publicação.'] }
+          ]
+        }
+      ]
+    };
+  }
+  function ensureLibraryDocumentation() {
+    if (state.migrations.bibliotecaDocumentationV1) return false;
+    var library = coreProjectByName('Biblioteca digital', 'project-biblioteca-digital');
+    if (!library) return false;
+    var stamp = now();
+    library.documentation = libraryDocumentationBlueprint();
+    library.updatedAt = stamp;
+    if (!state.activities.some(function (activity) { return activity.id === 'activity-biblioteca-documentation-map'; })) {
+      state.activities.push({ id: 'activity-biblioteca-documentation-map', projectId: library.id, title: 'Mapa de contexto da Biblioteca Digital criado', details: 'Documentação com acervo, pendências, regras de código, ativos e próximos passos foi organizada no projeto.', occurredAt: stamp, source: 'Manual', idempotencyKey: 'activity-biblioteca-documentation-map', createdAt: stamp, updatedAt: stamp });
+    }
+    state.migrations.bibliotecaDocumentationV1 = { addedAt: stamp, projectId: library.id };
+    persist('biblioteca-documentation-map');
+    return true;
   }
   function statusClass(status) {
     return ({ 'Ideia': 'idea', 'Desenvolvimento': 'development', 'Operacional com ajustes': 'adjustments', 'Operacional final': 'final', 'Operacional efetivo': 'effective' })[status] || 'idea';
@@ -364,6 +437,39 @@
       return '<a class="pp-related-project" href="projeto-detalhes.html?id=' + encodeURIComponent(relatedProject.id) + '">' + projectLogo(relatedProject, true) + '<span><strong>' + escapeHtml(relatedProject.name) + '</strong><small>' + escapeHtml(relatedProject.status) + '</small></span>' + uiIcon('external') + '</a>';
     }).join('') + '</div></section>';
   }
+  function libraryDocItem(project, itemId) {
+    var documentation = project && project.documentation;
+    if (!documentation || !Array.isArray(documentation.folders)) return null;
+    for (var index = 0; index < documentation.folders.length; index += 1) {
+      var found = (documentation.folders[index].children || []).find(function (item) { return item.id === itemId; });
+      if (found) return found;
+    }
+    return null;
+  }
+  function libraryDocumentationMarkup(project) {
+    var documentation = project && project.documentation;
+    if (!documentation || !Array.isArray(documentation.folders)) return '';
+    var counters = documentation.counters || {};
+    return '<section class="pp-library-docs"><div class="pp-library-docs-head"><div><p class="pp-doc-kicker">DOCUMENTAÇÃO DO PROJETO</p><h2>' + escapeHtml(documentation.title) + '</h2><p>' + escapeHtml(documentation.summary) + '</p></div><button class="pp-button" data-action="library-map" data-project="' + project.id + '">' + uiIcon('map') + 'Abrir mapa mental</button></div>'
+      + '<div class="pp-doc-stats"><span><b>' + Number(counters.available || 0) + '</b> livros disponíveis</span><span><b>' + Number(counters.pending || 0) + '</b> pendentes</span><span><b>' + Number(counters.series || 0) + '</b> séries</span><span><b>' + Number(counters.collections || 0) + '</b> coleções</span></div>'
+      + '<div class="pp-doc-folders">' + documentation.folders.map(function (folder, index) {
+        return '<details class="pp-doc-folder"' + (index === 0 ? ' open' : '') + '><summary><span class="pp-doc-folder-icon">' + uiIcon(folder.icon || 'folder') + '</span><span><strong>' + escapeHtml(folder.title) + '</strong><small>' + escapeHtml(folder.description) + '</small></span><span class="pp-doc-folder-count">' + (folder.children || []).length + '</span></summary><div class="pp-doc-children">' + (folder.children || []).map(function (item) {
+          return '<button class="pp-doc-item" data-action="library-doc" data-project="' + project.id + '" data-doc="' + escapeHtml(item.id) + '"><span class="pp-doc-item-icon">' + uiIcon(item.icon || 'project') + '</span><span><strong>' + escapeHtml(item.title) + '</strong><small>' + escapeHtml(item.status || 'Detalhes') + '</small></span>' + uiIcon('external') + '</button>';
+        }).join('') + '</div></details>';
+      }).join('') + '</div></section>';
+  }
+  function libraryDocModal(project, itemId) {
+    var item = libraryDocItem(project, itemId);
+    if (!item) return;
+    showModal(item.title, item.status || 'Documentação da Biblioteca Digital', '<div class="pp-doc-modal-copy"><div class="pp-doc-modal-icon">' + uiIcon(item.icon || 'project') + '</div>' + (item.details || []).map(function (detail) { return '<p>' + escapeHtml(detail) + '</p>'; }).join('') + '<div class="pp-modal-actions"><button type="button" class="pp-button pp-secondary" data-action="close-modal">Fechar</button></div></div>', { wide: true });
+  }
+  function libraryMindMapModal(project) {
+    var documentation = project && project.documentation;
+    if (!documentation) return;
+    showModal('Mapa mental — Biblioteca Digital', 'Clique em qualquer item para abrir a documentação detalhada.', '<div class="pp-mindmap"><div class="pp-mindmap-root">' + uiIcon('map') + '<strong>Biblioteca<br>Digital</strong><small>Acervo, regras e próximos passos</small></div><div class="pp-mindmap-branches">' + documentation.folders.map(function (folder) {
+      return '<section class="pp-mindmap-branch"><button class="pp-mindmap-folder" data-action="library-doc" data-project="' + project.id + '" data-doc="' + escapeHtml((folder.children || [])[0] ? folder.children[0].id : '') + '">' + uiIcon(folder.icon || 'folder') + '<span>' + escapeHtml(folder.title) + '</span></button><div class="pp-mindmap-items">' + (folder.children || []).map(function (item) { return '<button data-action="library-doc" data-project="' + project.id + '" data-doc="' + escapeHtml(item.id) + '">' + uiIcon(item.icon || 'project') + '<span>' + escapeHtml(item.title) + '</span></button>'; }).join('') + '</div></section>';
+    }).join('') + '</div></div>', { wide: true });
+  }
   function detailMarkup(project) {
     if (!project) return headerMarkup('Projeto não encontrado', 'Ele pode ter sido excluído ou o endereço está incorreto.', 'projetos-pessoais.html#projects') + '<main class="pp-shell"><div class="pp-empty"><strong>Projeto não encontrado</strong><a class="pp-button" href="projetos-pessoais.html#projects">Ver projetos</a></div></main>';
     var projectIdeas = active(state.ideas).filter(function (idea) { return idea.projectId === project.id; }).sort(function (a, b) { return toTime(b.updatedAt) - toTime(a.updatedAt); });
@@ -371,7 +477,7 @@
     var tools = Array.isArray(project.tools) ? project.tools : [];
     var links = safeUrl(project.url) ? '<div class="pp-project-links"><a class="pp-project-link" target="_blank" rel="noopener noreferrer" href="' + escapeHtml(safeUrl(project.url)) + '">' + uiIcon('external') + 'Abrir link principal</a></div>' : '<p class="pp-form-note">Nenhum link principal cadastrado.</p>';
     return headerMarkup(project.name, 'Detalhes, ferramentas, histórico e ideias deste projeto.', 'projetos-pessoais.html#projects')
-      + '<main class="pp-shell"><section class="pp-detail-top">' + projectLogo(project) + '<div><h1>' + escapeHtml(project.name) + '</h1><p>' + escapeHtml(project.description || 'Sem descrição.') + '</p><div class="pp-tags" style="margin-top:10px"><span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span><span class="pp-tag">' + escapeHtml(project.type || 'Outro') + '</span></div></div><div class="pp-detail-actions"><button class="pp-button pp-secondary" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + 'Editar</button><button class="pp-button pp-danger" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + 'Excluir</button></div></section>'
+      + '<main class="pp-shell"><section class="pp-detail-top">' + projectLogo(project) + '<div><h1>' + escapeHtml(project.name) + '</h1><p>' + escapeHtml(project.description || 'Sem descrição.') + '</p><div class="pp-tags" style="margin-top:10px"><span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span><span class="pp-tag">' + escapeHtml(project.type || 'Outro') + '</span></div></div><div class="pp-detail-actions"><button class="pp-button pp-secondary" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + 'Editar</button><button class="pp-button pp-danger" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + 'Excluir</button></div></section>' + libraryDocumentationMarkup(project)
       + '<div class="pp-detail-grid"><div><section class="pp-panel"><div class="pp-panel-head"><h2>Linha do tempo</h2><button class="pp-button pp-small" data-action="new-event" data-project="' + project.id + '">' + uiIcon('plus') + 'Registrar</button></div>' + (events.length ? '<div class="pp-timeline">' + events.map(eventCard).join('') + '</div>' : emptyMarkup('Sem atualizações ainda', 'Registre um avanço, deploy, ajuste ou qualquer passo importante.')) + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ideias vinculadas</h2><a class="pp-button pp-small pp-secondary" href="projetos-pessoais.html#ideas">Ver todas</a></div>' + (projectIdeas.length ? projectIdeas.map(ideaMini).join('') : '<p class="pp-form-note">Ainda não há ideias vinculadas a este projeto.</p>') + '</section></div>'
       + '<aside>' + relatedProjectsMarkup(project) + '<section class="pp-panel"><h2>Links</h2><div style="height:12px"></div>' + links + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ferramentas</h2><button class="pp-button pp-small" data-action="edit-project" data-id="' + project.id + '">Gerenciar</button></div>' + (tools.length ? '<div class="pp-tool-list">' + tools.map(function (tool) { return '<button class="pp-tool-button" data-action="open-tool" data-project="' + project.id + '" data-tool="' + tool.id + '"><span>' + providerIcon(tool.provider) + '<span><strong>' + escapeHtml(tool.label || tool.provider) + '</strong><span>' + escapeHtml(tool.provider) + ' · acesso protegido</span></span></span><b>' + uiIcon('lock') + '</b></button>'; }).join('') + '</div>' : '<p class="pp-form-note">Adicione GitHub, Supabase, I.As ou outra ferramenta ao editar o projeto.</p>') + '</section></aside></div></main>';
   }
@@ -716,6 +822,8 @@
     if (action === 'edit-event') { var activity = getEvent(target.dataset.id); if (activity) eventForm(activity.projectId, activity); return; }
     if (action === 'delete-event') { deleteEvent(target.dataset.id); return; }
     if (action === 'open-tool') { toolModal(target.dataset.project, target.dataset.tool); return; }
+    if (action === 'library-map') { libraryMindMapModal(getProject(target.dataset.project)); return; }
+    if (action === 'library-doc') { libraryDocModal(getProject(target.dataset.project), target.dataset.doc); return; }
     if (action === 'vault-info') { vaultInfo(); return; }
     if (action === 'lock-vault') { closeModal(); lockVault(); return; }
     if (action === 'reset-vault') { resetVault(); return; }
@@ -726,7 +834,7 @@
   function handleFilter(event) { var filter = event.target.dataset.filter; if (!filter) return; currentFilters[filter] = event.target.value; render(); }
   function handleKeyboard(event) { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-action="goto-project"]')) { event.preventDefault(); window.location.href = 'projeto-detalhes.html?id=' + encodeURIComponent(event.target.dataset.id); } }
   function boot() {
-    loadCache(); ensureCoreProjects(); ensureFinanceProject(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache(); ensureCoreProjects(); ensureFinanceProject(); ensureLibraryDocumentation(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
