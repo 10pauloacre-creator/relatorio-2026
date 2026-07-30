@@ -292,7 +292,7 @@
         id: 'project-rural-manager',
         name: 'Rural Manager',
         description: 'Projeto futuro de plataforma mobile-first para simulação econômica e futura administração pecuária, organizado a partir de um mapa de desenvolvimento completo.',
-        status: 'Ideia', type: 'App', url: '',
+        status: 'Ideia', type: 'App', url: '', logo: 'assets/icons/icone-rural-manager.png',
         tools: [
           { id: 'tool-rural-github', provider: 'GitHub', label: 'GitHub — repositório pendente', url: '', createdAt: stamp, updatedAt: stamp },
           { id: 'tool-rural-supabase', provider: 'Supabase', label: 'Supabase — a configurar', url: '', createdAt: stamp, updatedAt: stamp },
@@ -311,6 +311,15 @@
     state.migrations.ruralManagerV1 = { addedAt: stamp, projectId: rural.id, phases: RURAL_MANAGER_PHASES.length, tasks: RURAL_MANAGER_PHASES.reduce(function (total, phase) { return total + phase.tasks.length; }, 0) };
     if (changed) persist('rural-manager-add'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
     return changed;
+  }
+  function ensureRuralManagerIcon() {
+    if (state.migrations.ruralManagerIconV1) return false;
+    var rural = coreProjectByName('Rural Manager', 'project-rural-manager');
+    var stamp = now();
+    if (rural && !rural.logo) { rural.logo = 'assets/icons/icone-rural-manager.png'; rural.updatedAt = stamp; persist('rural-manager-icon'); }
+    state.migrations.ruralManagerIconV1 = { addedAt: stamp, projectId: rural ? rural.id : null };
+    if (!rural || rural.logo !== 'assets/icons/icone-rural-manager.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return Boolean(rural);
   }
   function libraryDocumentationBlueprint() {
     return {
@@ -1226,7 +1235,7 @@
   function handleFilter(event) { var filter = event.target.dataset.filter; if (!filter) return; currentFilters[filter] = event.target.value; render(); }
   function handleKeyboard(event) { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-action="goto-project"]')) { event.preventDefault(); window.location.href = 'projeto-detalhes.html?id=' + encodeURIComponent(event.target.dataset.id); } }
   function boot() {
-    loadCache(); ensureCoreProjects(); ensureFinanceProject(); ensureRuralManagerProject(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache(); ensureCoreProjects(); ensureFinanceProject(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
