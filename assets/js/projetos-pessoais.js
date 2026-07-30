@@ -29,6 +29,83 @@
     { id: 'claude-quinari', provider: 'Claude', title: 'quinari.ouvidoria@gmail.com' },
     { id: 'codex-pro', provider: 'Codex', title: 'Codex Pro' }
   ];
+  var RURAL_MANAGER_PHASES = [
+    { id: 'p1', title: 'Fundação técnica', summary: 'Criar uma base estável, tipada e verificável antes das funcionalidades.', tasks: [
+      ['Auditoria inicial do repositório', 'Mapear stack, rotas, componentes, banco, variáveis e riscos antes de começar.', 'Nenhuma. É o primeiro bloco.'],
+      ['Base Next.js e estrutura do projeto', 'Padronizar App Router, TypeScript estrito, aliases, layouts e módulos.', 'Auditoria inicial concluída.'],
+      ['Qualidade e automação local', 'Configurar lint, formatação, testes, hooks e comandos de validação.', 'Base do projeto estabilizada.']
+    ] },
+    { id: 'p2', title: 'UI/UX e navegação', summary: 'Construir a experiência mobile-first, componentes e formulários do produto.', tasks: [
+      ['Arquitetura de navegação', 'Criar shell mobile-first com barra inferior, header e rotas principais.', 'Fundação técnica pronta.'],
+      ['Design system e identidade visual', 'Definir tokens, componentes e padrões visuais consistentes.', 'Shell de navegação disponível.'],
+      ['Formulários, máscaras e validação', 'Padronizar entradas de moeda, peso, percentual, datas e números.', 'Design system pronto.'],
+      ['Onboarding e primeira configuração', 'Orientar cadastro, propriedade e parâmetros iniciais sem bloquear o usuário.', 'Autenticação pode ser integrada depois; prepare interfaces desacopladas.']
+    ] },
+    { id: 'p3', title: 'Dados, autenticação e segurança', summary: 'Preparar Supabase, schema, RLS e uma camada de dados testável.', tasks: [
+      ['Autenticação Supabase', 'Implementar cadastro, login, sessão, recuperação e proteção de rotas.', 'Projeto Supabase criado e variáveis públicas disponíveis.'],
+      ['Schema inicial do banco', 'Criar perfis, propriedades, membros, configurações e simulações versionadas.', 'Projeto Supabase acessível e autenticação definida.'],
+      ['RLS e autorização por propriedade', 'Impedir acesso cruzado entre usuários e preparar papéis de equipe.', 'Schema inicial aplicado.'],
+      ['Camada de serviços e repositórios', 'Isolar UI, Supabase, cache local e regras de domínio.', 'Schema e tipos disponíveis.']
+    ] },
+    { id: 'p4', title: 'Dashboard e contexto operacional', summary: 'Entregar a tela inicial, cotações e comunicação de estado.', tasks: [
+      ['Dashboard principal', 'Exibir panorama, CTA, indicadores e atividades recentes.', 'Navegação e repositórios disponíveis.'],
+      ['Card de mercado e cotações', 'Mostrar cotação com fonte, estado, categoria, data e fallback.', 'Tabela market_quotes e uma estratégia de fonte definida.'],
+      ['Conexão, sincronização e notificações', 'Comunicar online/offline, fila pendente e alertas úteis.', 'Shell e futura fila de sincronização; use contrato temporário se a fila ainda não existir.']
+    ] },
+    { id: 'p5', title: 'Entrada do simulador', summary: 'Construir todas as seções necessárias para modelar uma operação pecuária.', tasks: [
+      ['Shell da nova simulação', 'Formulário em acordeões, rascunho automático e totalizador fixo.', 'Formulários, navegação e entidades de simulação.'],
+      ['Operação e identificação do lote', 'Tipo de operação, categoria, propriedade e dados básicos.', 'Shell do simulador pronto.'],
+      ['Compra e custos de aquisição', 'Aceitar negociação por cabeça, kg, arroba ou lote e calcular equivalências.', 'Informações do lote e componentes monetários.'],
+      ['Desenvolvimento, GMD e perdas', 'Projetar peso, dias, ganho diário, mortalidade, descarte e quebra.', 'Lote e compra implementados.'],
+      ['Alimentação e suplementação', 'Cadastrar vários itens, consumo e custo por período.', 'Peso e duração disponíveis.'],
+      ['Terra, sanidade, mão de obra e custos fixos', 'Consolidar despesas operacionais e formas de rateio.', 'Duração e quantidade disponíveis.'],
+      ['Capital, juros e custos financeiros', 'Modelar capital próprio, financiamento e retorno pelo prazo.', 'Investimento e duração calculáveis.'],
+      ['Cenário de venda', 'Calcular receita por cabeça, kg vivo, arroba de carcaça ou lote.', 'Peso final e animais vendidos disponíveis.']
+    ] },
+    { id: 'p6', title: 'Motor de cálculo e regras', summary: 'Centralizar fórmulas, ponto de equilíbrio, risco e persistência versionada.', tasks: [
+      ['Motor de cálculo financeiro', 'Centralizar fórmulas em módulo puro, versionado e testado.', 'Schemas de entrada das seções definidos.'],
+      ['Ponto de equilíbrio', 'Calcular arroba mínima, compra máxima, GMD e peso necessários.', 'Motor principal validado.'],
+      ['Semáforo econômico e risco', 'Separar resultado financeiro de sensibilidade e risco.', 'ROI, ponto de equilíbrio e breakdown disponíveis.'],
+      ['Recálculo em tempo real e desempenho', 'Atualizar resultado por digitação sem travar ou perder foco.', 'Motor de cálculo puro disponível.'],
+      ['Persistência e versionamento da simulação', 'Salvar entradas, resultados e versão sem alterar cálculos antigos.', 'Repositórios, schema e motor de cálculo.']
+    ] },
+    { id: 'p7', title: 'Resultados e decisão', summary: 'Criar resumo auditável, cenários e comparação entre operações.', tasks: [
+      ['Tela de resultados', 'Apresentar resumo, custos, produção e explicação das fórmulas.', 'Motor de cálculo completo.'],
+      ['Cenários e análise de sensibilidade', 'Comparar pessimista, provável e otimista e testar variáveis.', 'Motor rápido e ponto de equilíbrio.'],
+      ['Comparador de simulações', 'Comparar até quatro cenários com critérios objetivos.', 'Histórico e resultados salvos.']
+    ] },
+    { id: 'p8', title: 'Histórico e configurações', summary: 'Permitir recuperar, organizar e parametrizar o trabalho diário.', tasks: [
+      ['Histórico de simulações', 'Busca, filtros, ordenação, paginação e cards de lotes.', 'Persistência de simulações.'],
+      ['Ações do histórico', 'Ver, editar, duplicar, arquivar, restaurar e excluir com segurança.', 'Lista do histórico e casos de uso.'],
+      ['Configurações padrão', 'Salvar parâmetros econômicos, produtivos, unidades e limites.', 'user_settings e formulários disponíveis.'],
+      ['Conta, propriedades e equipe', 'Gerenciar perfil, propriedades, sessões e membros.', 'Auth, farms, farm_members e RLS.']
+    ] },
+    { id: 'p9', title: 'PWA, offline e sincronização', summary: 'Garantir instalação e funcionamento confiável em leilões ou áreas sem sinal.', tasks: [
+      ['PWA instalável', 'Manifest, ícones, service worker, atualização e instalação.', 'Shell web estável e HTTPS no ambiente publicado.'],
+      ['Banco local IndexedDB', 'Persistir rascunhos, configurações, cotações e fila de operações.', 'Camada de repositórios e schemas de domínio.'],
+      ['Fila de sincronização e idempotência', 'Enviar alterações ao Supabase com retry, ordem e deduplicação.', 'IndexedDB, repositórios e endpoints/tabelas com versionamento.'],
+      ['Conflitos e consistência', 'Detectar alterações concorrentes e evitar last-write-wins silencioso.', 'Fila de sincronização operacional.']
+    ] },
+    { id: 'p10', title: 'Relatórios, testes e lançamento', summary: 'Validar, exportar e publicar o MVP com segurança.', tasks: [
+      ['Exportação PDF e planilha', 'Gerar relatórios consistentes a partir do snapshot salvo.', 'Tela de resultado e snapshot.'],
+      ['Compartilhamento seguro', 'Criar link controlado ou compartilhamento nativo sem tornar dados públicos.', 'Exportação e autenticação.'],
+      ['Testes do domínio financeiro', 'Criar suíte extensa para fórmulas, limites e regressões.', 'Motor de cálculo implementado.'],
+      ['Testes de interface e fluxo completo', 'Validar cadastro, simulação, offline, sync, histórico e exportação.', 'Fluxos principais implementados.'],
+      ['Segurança, desempenho e acessibilidade', 'Auditar RLS, bundle, consultas, cache e experiência em aparelhos modestos.', 'MVP funcional.'],
+      ['Deploy, ambientes e observabilidade', 'Configurar preview, produção, migrações, logs e rollback.', 'Checks e build estáveis.']
+    ] },
+    { id: 'p11', title: 'Evolução para administração pecuária', summary: 'Adicionar gestão real apenas depois de validar o simulador.', tasks: [
+      ['Lotes reais e projetado × realizado', 'Converter simulação em lote e acompanhar eventos e custos reais.', 'MVP validado por usuários.'],
+      ['Gestão individual do rebanho', 'Cadastro por brinco/RFID, histórico, pesagens e documentos.', 'Gestão de lotes estável e necessidade real confirmada.'],
+      ['Sanidade e reprodução', 'Protocolos, estoque de medicamentos, carência, matrizes e partos.', 'Animais/lotes reais e estoque básico.'],
+      ['Pastagens e estoque', 'Piquetes, ocupação, descanso, insumos, validade e reposição.', 'Lotes reais.'],
+      ['Financeiro, documentos e equipe', 'Fluxo de caixa, centros de custo, arquivos e permissões avançadas.', 'Operação real consolidada.']
+    ] },
+    { id: 'p12', title: 'Aplicativo Android', summary: 'Empacotar a plataforma somente quando o PWA estiver maduro.', tasks: [
+      ['Preparação para APK', 'Auditar APIs web, navegação, armazenamento e plugins antes do empacotamento.', 'PWA estável e testado em produção.'],
+      ['Empacotamento Android', 'Criar projeto nativo, assinatura, variantes e testes em aparelho.', 'Auditoria de prontidão concluída.']
+    ] }
+  ];
 
   var state = emptyState();
   var sync = null;
@@ -39,6 +116,7 @@
   var vaultExpiresAt = 0;
   var vaultTimeout = null;
   var currentFilters = { project: 'all', status: 'all', priority: 'all' };
+  var mindMapUi = { projectId: null, selectedId: null, initialized: false, scale: 1, x: 0, y: 0 };
 
   function now() { return new Date().toISOString(); }
   function id(prefix) { return (prefix || 'id') + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
@@ -134,7 +212,7 @@
         id: 'project-biblioteca-digital',
         name: 'Biblioteca digital',
         description: 'Biblioteca digital medieval para organização e acesso aos livros e conteúdos pedagógicos.',
-        status: 'Desenvolvimento', type: 'Site', url: 'https://biblioteca-digital-medieval.vercel.app/',
+        status: 'Desenvolvimento', type: 'Site', url: 'https://biblioteca-digital-medieval.vercel.app/', logo: 'assets/icons/icone-biblioteca-digital.png',
         tools: [
           { id: 'tool-biblioteca-vercel', provider: 'Vercel', label: 'Vercel', url: 'https://biblioteca-digital-medieval.vercel.app/', createdAt: stamp, updatedAt: stamp },
           { id: 'tool-biblioteca-supabase', provider: 'Supabase', label: 'Supabase', url: 'https://vgceathgwvtmjxbdpecr.supabase.co/', createdAt: stamp, updatedAt: stamp }
@@ -147,7 +225,7 @@
         id: 'project-relatorios-diarios',
         name: 'Relatórios diários',
         description: 'Sistema de registros, relatórios e acompanhamento pedagógico das escolas.',
-        status: 'Desenvolvimento', type: 'Site', url: 'https://10pauloacre-creator.github.io/relatorio-2026/',
+        status: 'Desenvolvimento', type: 'Site', url: 'https://10pauloacre-creator.github.io/relatorio-2026/', logo: 'iconv2.png',
         tools: [
           { id: 'tool-relatorios-github', provider: 'GitHub', label: 'GitHub', url: 'https://github.com/10pauloacre-creator/relatorio-2026', createdAt: stamp, updatedAt: stamp },
           { id: 'tool-relatorios-supabase', provider: 'Supabase', label: 'Supabase', url: 'https://vgceathgwvtmjxbdpecr.supabase.co/', createdAt: stamp, updatedAt: stamp }
@@ -174,6 +252,24 @@
     if (changed) persist('core-projects-link'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
     return changed;
   }
+  function ensureReportsProjectIcon() {
+    if (state.migrations.reportsProjectIconV1) return false;
+    var reports = coreProjectByName('Relatórios diários', 'project-relatorios-diarios');
+    var stamp = now();
+    if (reports && !reports.logo) { reports.logo = 'iconv2.png'; reports.updatedAt = stamp; persist('reports-project-icon'); }
+    state.migrations.reportsProjectIconV1 = { addedAt: stamp, projectId: reports ? reports.id : null };
+    if (!reports || reports.logo !== 'iconv2.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return Boolean(reports);
+  }
+  function ensureLibraryProjectIcon() {
+    if (state.migrations.libraryProjectIconV1) return false;
+    var library = coreProjectByName('Biblioteca digital', 'project-biblioteca-digital');
+    var stamp = now();
+    if (library && !library.logo) { library.logo = 'assets/icons/icone-biblioteca-digital.png'; library.updatedAt = stamp; persist('library-project-icon'); }
+    state.migrations.libraryProjectIconV1 = { addedAt: stamp, projectId: library ? library.id : null };
+    if (!library || library.logo !== 'assets/icons/icone-biblioteca-digital.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return Boolean(library);
+  }
   function ensureFinanceProject() {
     if (state.migrations.financeiroAppV1) return false;
     var stamp = now();
@@ -184,7 +280,7 @@
         id: 'project-financeiro-app',
         name: 'Financeiro.app',
         description: 'Aplicativo financeiro com IA para organizar receitas, despesas e o fluxo mensal.',
-        status: 'Desenvolvimento', type: 'App', url: 'https://github.com/10pauloacre-creator/Finan-as-app',
+        status: 'Desenvolvimento', type: 'App', url: 'https://github.com/10pauloacre-creator/Finan-as-app', logo: 'assets/icons/icone-financeiro-app.png',
         tools: [
           { id: 'tool-financeiro-github', provider: 'GitHub', label: 'GitHub', url: 'https://github.com/10pauloacre-creator/Finan-as-app', createdAt: stamp, updatedAt: stamp },
           { id: 'tool-financeiro-vercel', provider: 'Vercel', label: 'Vercel', url: '', createdAt: stamp, updatedAt: stamp },
@@ -203,6 +299,54 @@
     state.migrations.financeiroAppV1 = { addedAt: stamp, projectId: finance.id };
     if (changed) persist('financeiro-app-add'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
     return changed;
+  }
+  function ensureFinanceProjectIcon() {
+    if (state.migrations.financeiroAppIconV1) return false;
+    var finance = coreProjectByName('Financeiro.app', 'project-financeiro-app');
+    var stamp = now();
+    if (finance && !finance.logo) { finance.logo = 'assets/icons/icone-financeiro-app.png'; finance.updatedAt = stamp; persist('financeiro-app-icon'); }
+    state.migrations.financeiroAppIconV1 = { addedAt: stamp, projectId: finance ? finance.id : null };
+    if (!finance || finance.logo !== 'assets/icons/icone-financeiro-app.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return Boolean(finance);
+  }
+  function ensureRuralManagerProject() {
+    if (state.migrations.ruralManagerV1) return false;
+    var stamp = now();
+    var rural = coreProjectByName('Rural Manager', 'project-rural-manager');
+    var changed = false;
+    if (!rural) {
+      rural = {
+        id: 'project-rural-manager',
+        name: 'Rural Manager',
+        description: 'Projeto futuro de plataforma mobile-first para simulação econômica e futura administração pecuária, organizado a partir de um mapa de desenvolvimento completo.',
+        status: 'Ideia', type: 'App', url: '', logo: 'assets/icons/icone-rural-manager.png',
+        tools: [
+          { id: 'tool-rural-github', provider: 'GitHub', label: 'GitHub — repositório pendente', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-rural-supabase', provider: 'Supabase', label: 'Supabase — a configurar', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-rural-vercel', provider: 'Vercel', label: 'Vercel — hospedagem pendente', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-rural-codex', provider: 'Codex', label: 'Codex', url: 'https://chatgpt.com/', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-rural-claude', provider: 'Claude', label: 'Claude', url: 'https://claude.ai/', createdAt: stamp, updatedAt: stamp }
+        ], relatedProjectIds: [], createdAt: stamp, updatedAt: stamp
+      };
+      rural.mindMap = ruralManagerMindMapSeed(rural);
+      state.projects.push(rural); changed = true;
+    }
+    if (!state.activities.some(function (activity) { return activity.id === 'activity-rural-manager-added'; })) {
+      state.activities.push({ id: 'activity-rural-manager-added', projectId: rural.id, title: 'Rural Manager adicionado como projeto futuro', details: 'O mapa de desenvolvimento foi consolidado em 12 fases e 51 tarefas. GitHub, Supabase e Vercel ainda precisam de interligação e credenciais.', occurredAt: stamp, source: 'Mapa mental', idempotencyKey: 'activity-rural-manager-added', createdAt: stamp, updatedAt: stamp });
+      changed = true;
+    }
+    state.migrations.ruralManagerV1 = { addedAt: stamp, projectId: rural.id, phases: RURAL_MANAGER_PHASES.length, tasks: RURAL_MANAGER_PHASES.reduce(function (total, phase) { return total + phase.tasks.length; }, 0) };
+    if (changed) persist('rural-manager-add'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return changed;
+  }
+  function ensureRuralManagerIcon() {
+    if (state.migrations.ruralManagerIconV1) return false;
+    var rural = coreProjectByName('Rural Manager', 'project-rural-manager');
+    var stamp = now();
+    if (rural && !rural.logo) { rural.logo = 'assets/icons/icone-rural-manager.png'; rural.updatedAt = stamp; persist('rural-manager-icon'); }
+    state.migrations.ruralManagerIconV1 = { addedAt: stamp, projectId: rural ? rural.id : null };
+    if (!rural || rural.logo !== 'assets/icons/icone-rural-manager.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return Boolean(rural);
   }
   function libraryDocumentationBlueprint() {
     return {
@@ -273,6 +417,95 @@
     persist('biblioteca-documentation-map');
     return true;
   }
+  function createMindMap(project, nodes) {
+    var stamp = now();
+    var rootId = 'map-root-' + project.id;
+    return {
+      version: 1,
+      rootId: rootId,
+      createdAt: stamp,
+      updatedAt: stamp,
+      nodes: nodes && nodes.length ? nodes : [{ id: rootId, parentId: null, title: project.name, description: 'Nó central do mapa mental deste projeto.', kind: 'root', order: 0, createdAt: stamp, updatedAt: stamp }]
+    };
+  }
+  function libraryMindMapSeed(project) {
+    var stamp = now();
+    var root = 'map-root-' + project.id;
+    function node(key, parentId, title, kind, description, order) {
+      return { id: 'map-biblioteca-' + key, parentId: parentId, title: title, kind: kind, description: description, order: order || 0, createdAt: stamp, updatedAt: stamp };
+    }
+    var code = 'map-biblioteca-code';
+    var assets = 'map-biblioteca-assets';
+    var files = 'map-biblioteca-files';
+    var modules = 'map-biblioteca-modules';
+    var catalog = 'map-biblioteca-catalog';
+    var rules = 'map-biblioteca-rules';
+    return createMindMap(project, [
+      { id: root, parentId: null, title: 'Biblioteca Digital', description: 'Projeto central: acervo pedagógico digital, experiência medieval e publicação dos livros por série.', kind: 'root', order: 0, createdAt: stamp, updatedAt: stamp },
+      node('code', root, 'Código e arquitetura', 'folder', 'Estrutura principal consultada na versão local v3 da Biblioteca Digital.', 1),
+      node('files', code, 'Arquivos HTML', 'folder', 'Três versões locais documentam a evolução do projeto.', 1),
+      node('file-base', files, 'Biblioteca Digital Medieval.html', 'file', 'Versão base local do projeto; mantenha como referência histórica antes de consolidar versões.', 1),
+      node('file-v2', files, 'Biblioteca Digital Medieval v2.html', 'file', 'Evolução intermediária da interface e das interações da biblioteca.', 2),
+      node('file-v3', files, 'Biblioteca Digital Medieval v3.html', 'file', 'Versão consultada para este mapa. Reúne seleção de série, acervo, áudio, PWA e regras de abertura.', 3),
+      node('assets', code, 'assets/', 'folder', 'Recursos de imagem, áudio, animação e dados usados pela experiência.', 2),
+      node('img-data', assets, 'img-data.js', 'file', 'Dados visuais centralizados para capas, ícones e imagens relacionadas ao acervo.', 1),
+      node('audio', assets, 'audio/', 'folder', 'Arquivos confirmados: livro-abrindo, música de fundo, som de livro disponível, indisponível e seleção de série.', 2),
+      node('media', assets, 'gif + images', 'file', 'Animações de abertura e imagens de estado dos livros. Antes de publicar, confirme também as imagens referenciadas pelo HTML.', 3),
+      node('modules', code, 'Módulos JavaScript', 'folder', 'Funções encontradas no HTML v3 que sustentam a interação da biblioteca.', 3),
+      node('navigation', modules, 'Seleção e navegação', 'module', 'selectSerie() e goBack(). A série ativa usa a chave local bdm-current-serie e há proteção contra retorno acidental.', 1),
+      node('availability', modules, 'Disponibilidade', 'module', 'checkBook(), bookCache e updateAvailability(). A URL só conta como disponível se a resposta for válida e tiver mais de 100 linhas.', 2),
+      node('opening', modules, 'Abertura de livro', 'module', 'openBook() e closeModal(). O livro passa pela verificação, mostra feedback e só então é aberto.', 3),
+      node('sound', modules, 'Ciclo de áudio', 'module', 'startBgMusic(), toggleMute() e playSound(). A música e os efeitos respeitam interação, foco e visibilidade da página.', 4),
+      node('pwa', modules, 'PWA e instalação', 'module', 'Registro de ./sw.js e beforeinstallprompt. A preferência de fechar o convite usa bdm_pwa_dismissed.', 5),
+      node('catalog', root, 'Acervo por série', 'folder', 'Inventário atual: 44 posições, com 8 livros disponíveis e 36 pendentes.', 2),
+      node('first', catalog, '1ª série', 'collection', '2 disponíveis e 10 pendentes. Já há Língua Portuguesa e Trilhas de Linguagens do 1º bimestre.', 1),
+      node('second', catalog, '2ª série', 'collection', '4 disponíveis e 12 pendentes. Já há Língua Portuguesa, Trilhas, Ciências Humanas e Artes do 1º bimestre.', 2),
+      node('third', catalog, '3ª série', 'collection', '2 disponíveis e 14 pendentes. Já há Língua Portuguesa e Trilhas de Linguagens do 1º bimestre.', 3),
+      node('rules', root, 'Regras que precisam ser preservadas', 'folder', 'Checklist de comportamento para evoluir o projeto sem quebrar o fluxo atual.', 3),
+      node('availability-rule', rules, 'Validação antes de abrir', 'rule', 'Não liberar uma URL só por existir: mantenha a validação HTTP e o critério atual de conteúdo ou documente formalmente a troca.', 1),
+      node('route-rule', rules, 'Modal antes do redirecionamento', 'rule', 'A experiência deve dar retorno visual ao usuário antes de abrir um livro disponível ou informar que ele ainda não foi publicado.', 2),
+      node('state-rule', rules, 'Estado local identificado', 'rule', 'Use nomes com prefixo bdm_ para novas preferências locais e documente o propósito de cada chave.', 3),
+      node('publish', root, 'Publicação e próximos passos', 'folder', 'Rotas de livros são verificadas no ambiente publicado. A próxima prioridade é completar bimestres e validar cada rota no celular/PWA.', 4)
+    ]);
+  }
+  function ruralManagerMindMapSeed(project) {
+    var stamp = now();
+    var root = 'map-root-' + project.id;
+    function phaseDetails(phase) {
+      return phase.summary + '\n\nBlocos desta fase (' + phase.tasks.length + '):\n' + phase.tasks.map(function (task, index) {
+        return (index + 1) + '. ' + task[0] + ' — ' + task[1] + '\nDependência: ' + task[2];
+      }).join('\n\n');
+    }
+    var nodes = [{ id: root, parentId: null, title: 'Rural Manager', description: 'Projeto futuro: plataforma web mobile-first para simulação econômica e futura administração pecuária. O plano importado possui 12 fases e 51 tarefas, com prioridade para um MVP web/PWA antes do APK.', kind: 'root', order: 0, createdAt: stamp, updatedAt: stamp }, {
+      id: 'map-rural-integrations', parentId: root, title: 'Integrações e hospedagem', description: 'Pendente de interligação:\n• GitHub: criar ou vincular o repositório do projeto.\n• Supabase: criar projeto, configurar variáveis públicas, Auth, PostgreSQL, RLS e Storage privado.\n• Vercel: conectar o repositório, definir Preview e Produção, variáveis de ambiente, logs, rollback e HTTPS para PWA.\n• Codex e Claude: usar os prompts do plano de desenvolvimento por fase.\n\nNenhuma credencial foi incluída no mapa.', kind: 'folder', order: 1, createdAt: stamp, updatedAt: stamp }];
+    RURAL_MANAGER_PHASES.forEach(function (phase, index) {
+      nodes.push({ id: 'map-rural-' + phase.id, parentId: root, title: String(index + 1).padStart(2, '0') + '. ' + phase.title, description: phaseDetails(phase), kind: 'folder', order: index + 2, createdAt: stamp, updatedAt: stamp });
+    });
+    return createMindMap(project, nodes);
+  }
+  function ensureProjectMindMaps() {
+    var changed = false;
+    active(state.projects).forEach(function (project) {
+      if (project.mindMap && Array.isArray(project.mindMap.nodes) && project.mindMap.nodes.length) return;
+      project.mindMap = project.id === 'project-biblioteca-digital' ? libraryMindMapSeed(project) : project.id === 'project-rural-manager' ? ruralManagerMindMapSeed(project) : createMindMap(project);
+      project.updatedAt = now();
+      changed = true;
+    });
+    if (changed) persist('mindmaps-bootstrap');
+    return changed;
+  }
+  function getMindMap(project) {
+    if (!project) return null;
+    if (!project.mindMap || !Array.isArray(project.mindMap.nodes) || !project.mindMap.nodes.length) {
+      project.mindMap = project.id === 'project-biblioteca-digital' ? libraryMindMapSeed(project) : project.id === 'project-rural-manager' ? ruralManagerMindMapSeed(project) : createMindMap(project);
+      project.updatedAt = now(); persist('mindmap-create');
+    }
+    return project.mindMap;
+  }
+  function activeMindMapNodes(project) { var map = getMindMap(project); return map ? active(map.nodes) : []; }
+  function getMindMapNode(project, nodeId) { return activeMindMapNodes(project).find(function (node) { return node.id === nodeId; }) || null; }
+  function mindMapNodeLabel(kind) { return ({ root: 'Projeto', folder: 'Pasta', file: 'Arquivo', module: 'Módulo', collection: 'Acervo', rule: 'Regra', note: 'Anotação' })[kind] || 'Elemento'; }
+  function mindMapNodeIcon(kind) { return ({ root: 'map', folder: 'folder', file: 'project', module: 'code', collection: 'book', rule: 'lock', note: 'idea' })[kind] || 'project'; }
   function statusClass(status) {
     return ({ 'Ideia': 'idea', 'Desenvolvimento': 'development', 'Operacional com ajustes': 'adjustments', 'Operacional final': 'final', 'Operacional efetivo': 'effective' })[status] || 'idea';
   }
@@ -560,6 +793,99 @@
     viewport.addEventListener('pointerup', stopDragging); viewport.addEventListener('pointercancel', stopDragging);
     centerMap();
   }
+  function layoutMindMap(project) {
+    var map = getMindMap(project);
+    var nodes = activeMindMapNodes(project);
+    var byId = {}; var children = {}; var placed = {}; var leafIndex = 0; var positions = {};
+    nodes.forEach(function (node) { byId[node.id] = node; children[node.id] = []; });
+    nodes.forEach(function (node) { if (node.parentId && byId[node.parentId]) children[node.parentId].push(node); });
+    Object.keys(children).forEach(function (key) { children[key].sort(function (a, b) { return Number(a.order || 0) - Number(b.order || 0) || String(a.title).localeCompare(String(b.title), 'pt-BR'); }); });
+    var root = byId[map.rootId] || nodes.find(function (node) { return node.kind === 'root'; }) || nodes[0];
+    function place(node, depth) {
+      if (!node || placed[node.id]) return 70 + leafIndex++ * 112;
+      placed[node.id] = true;
+      var list = children[node.id] || [];
+      var y = list.length ? list.map(function (child) { return place(child, depth + 1); }).reduce(function (sum, value) { return sum + value; }, 0) / list.length : 70 + leafIndex++ * 112;
+      positions[node.id] = { x: 44 + depth * 318, y: y, depth: depth, node: node };
+      return y;
+    }
+    place(root, 0);
+    nodes.filter(function (node) { return !placed[node.id]; }).forEach(function (node) { place(node, 1); });
+    var maxDepth = Object.keys(positions).reduce(function (max, key) { return Math.max(max, positions[key].depth); }, 0);
+    return { map: map, nodes: nodes, children: children, positions: positions, width: Math.max(710, 44 + (maxDepth + 1) * 318), height: Math.max(430, 150 + Math.max(1, leafIndex) * 112) };
+  }
+  function mindMapDetailMarkup(node) {
+    if (!node) return '<span class="pp-map-detail-kicker">COMO USAR</span><h2>Mapa mental vivo</h2><p>Selecione um elemento para ler seus detalhes. Você pode criar ramos, editar títulos e descrições, trocar o elemento de lugar ou excluí-lo sem apagar os filhos.</p><ul><li>Arraste o espaço vazio para navegar.</li><li>Use o mouse, touchpad ou os controles para ajustar o zoom.</li><li>Use “Novo ramo” para registrar qualquer novo arquivo, módulo, ideia ou regra.</li></ul>';
+    return '<span class="pp-map-detail-kicker">' + escapeHtml(mindMapNodeLabel(node.kind).toUpperCase()) + '</span><div class="pp-map-detail-title"><span>' + uiIcon(mindMapNodeIcon(node.kind)) + '</span><h2>' + escapeHtml(node.title) + '</h2></div><p class="pp-map-detail-meta">Atualizado em ' + escapeHtml(formatDate(node.updatedAt)) + '</p><div class="pp-map-detail-copy">' + (node.description ? escapeHtml(node.description).split('\n').map(function (paragraph) { return '<p>' + paragraph + '</p>'; }).join('') : '<p>Sem detalhes registrados para este elemento.</p>') + '</div>';
+  }
+  function mindMapPageMarkup(project) {
+    var layout = layoutMindMap(project);
+    if (mindMapUi.projectId !== project.id) { mindMapUi = { projectId: project.id, selectedId: layout.map.rootId, initialized: false, scale: 1, x: 0, y: 0 }; }
+    if (!getMindMapNode(project, mindMapUi.selectedId)) mindMapUi.selectedId = layout.map.rootId;
+    var selected = getMindMapNode(project, mindMapUi.selectedId);
+    var nodeMarkup = layout.nodes.map(function (node) {
+      var position = layout.positions[node.id]; if (!position) return '';
+      return '<button type="button" class="pp-map-node pp-map-node-' + escapeHtml(node.kind) + (node.id === mindMapUi.selectedId ? ' is-selected' : '') + '" data-action="mindmap-select" data-node="' + escapeHtml(node.id) + '" style="--map-node-x:' + position.x + 'px;--map-node-y:' + position.y + 'px"><span class="pp-map-node-icon">' + uiIcon(mindMapNodeIcon(node.kind)) + '</span><span><strong>' + escapeHtml(node.title) + '</strong><small>' + escapeHtml(mindMapNodeLabel(node.kind)) + '</small></span></button>';
+    }).join('');
+    var lineMarkup = layout.nodes.filter(function (node) { return node.parentId && layout.positions[node.parentId] && layout.positions[node.id]; }).map(function (node) {
+      var from = layout.positions[node.parentId]; var to = layout.positions[node.id]; var startX = from.x + 246; var startY = from.y + 35; var endX = to.x; var endY = to.y + 35; var bend = Math.max(52, (endX - startX) * .46);
+      return '<path d="M ' + startX + ' ' + startY + ' C ' + (startX + bend) + ' ' + startY + ', ' + (endX - bend) + ' ' + endY + ', ' + endX + ' ' + endY + '"></path>';
+    }).join('');
+    var removeDisabled = !selected || selected.id === layout.map.rootId;
+    return headerMarkup('Mapa mental', project.name + ' — uma estrutura editável para organizar arquivos, módulos, regras e próximos passos.', 'projeto-detalhes.html?id=' + encodeURIComponent(project.id))
+      + '<main class="pp-shell pp-map-page"><section class="pp-map-page-head"><div class="pp-map-breadcrumb">' + projectLogo(project, true) + '<div><span>PROJETO</span><strong>' + escapeHtml(project.name) + '</strong></div></div><div class="pp-map-actions"><button class="pp-button" data-action="mindmap-add">' + uiIcon('plus') + 'Novo ramo</button><button class="pp-button pp-secondary" data-action="mindmap-edit"' + (selected ? '' : ' disabled') + '>' + uiIcon('edit') + 'Editar</button><button class="pp-button pp-danger" data-action="mindmap-delete"' + (removeDisabled ? ' disabled' : '') + '>' + uiIcon('trash') + 'Excluir</button></div></section><section class="pp-map-board"><div class="pp-map-toolbar"><div class="pp-map-toolbar-help">' + uiIcon('map') + '<span>Estrutura organizada automaticamente por ramificações</span></div><div class="pp-map-controls"><button type="button" class="pp-map-control" data-map-control="out" aria-label="Diminuir zoom">−</button><output data-map-zoom>100%</output><button type="button" class="pp-map-control" data-map-control="in" aria-label="Aumentar zoom">+</button><button type="button" class="pp-map-center" data-map-control="center">Centralizar</button></div></div><div class="pp-map-layout"><div class="pp-map-viewport" tabindex="0" data-map-width="' + layout.width + '" data-map-height="' + layout.height + '" aria-label="Mapa mental interativo. Arraste para navegar e use a rolagem para alterar o zoom."><div class="pp-map-stage" style="--map-stage-w:' + layout.width + 'px;--map-stage-h:' + layout.height + 'px"><svg class="pp-map-lines" viewBox="0 0 ' + layout.width + ' ' + layout.height + '" aria-hidden="true">' + lineMarkup + '</svg>' + nodeMarkup + '</div></div><aside class="pp-map-detail" data-map-detail>' + mindMapDetailMarkup(selected) + '</aside></div></section></main>';
+  }
+  function bindMindMapBoard() {
+    var viewport = APP && APP.querySelector('.pp-map-viewport');
+    var stage = APP && APP.querySelector('.pp-map-stage');
+    var zoomOutput = APP && APP.querySelector('[data-map-zoom]');
+    if (!viewport || !stage || !zoomOutput) return;
+    var mapWidth = Number(viewport.dataset.mapWidth || 900); var mapHeight = Number(viewport.dataset.mapHeight || 600);
+    function update() { stage.style.transform = 'translate(' + Math.round(mindMapUi.x) + 'px, ' + Math.round(mindMapUi.y) + 'px) scale(' + mindMapUi.scale.toFixed(3) + ')'; zoomOutput.textContent = Math.round(mindMapUi.scale * 100) + '%'; }
+    function center() { var rect = viewport.getBoundingClientRect(); var fit = Math.min((rect.width - 46) / mapWidth, (rect.height - 46) / mapHeight); mindMapUi.scale = Math.min(.95, Math.max(.22, fit)); mindMapUi.x = Math.max(18, (rect.width - mapWidth * mindMapUi.scale) / 2); mindMapUi.y = Math.max(18, (rect.height - mapHeight * mindMapUi.scale) / 2); mindMapUi.initialized = true; update(); }
+    function scale(next, clientX, clientY) { var old = mindMapUi.scale; var value = Math.max(.22, Math.min(1.7, next)); if (value === old) return; var rect = viewport.getBoundingClientRect(); var localX = typeof clientX === 'number' ? clientX - rect.left : rect.width / 2; var localY = typeof clientY === 'number' ? clientY - rect.top : rect.height / 2; var worldX = (localX - mindMapUi.x) / old; var worldY = (localY - mindMapUi.y) / old; mindMapUi.scale = value; mindMapUi.x = localX - worldX * value; mindMapUi.y = localY - worldY * value; update(); }
+    if (!mindMapUi.initialized) center(); else update();
+    APP.querySelectorAll('[data-map-control]').forEach(function (button) { button.addEventListener('click', function () { var action = button.dataset.mapControl; if (action === 'in') scale(mindMapUi.scale + .12); else if (action === 'out') scale(mindMapUi.scale - .12); else center(); }); });
+    viewport.addEventListener('wheel', function (event) { event.preventDefault(); scale(mindMapUi.scale * (event.deltaY < 0 ? 1.12 : .88), event.clientX, event.clientY); }, { passive: false });
+    var drag = null;
+    viewport.addEventListener('pointerdown', function (event) { if (event.target.closest('[data-action="mindmap-select"]')) return; drag = { id: event.pointerId, x: event.clientX, y: event.clientY, originX: mindMapUi.x, originY: mindMapUi.y }; viewport.classList.add('is-dragging'); if (viewport.setPointerCapture) viewport.setPointerCapture(event.pointerId); });
+    viewport.addEventListener('pointermove', function (event) { if (!drag || drag.id !== event.pointerId) return; mindMapUi.x = drag.originX + event.clientX - drag.x; mindMapUi.y = drag.originY + event.clientY - drag.y; update(); });
+    function stop(event) { if (!drag || (event && event.pointerId !== drag.id)) return; drag = null; viewport.classList.remove('is-dragging'); }
+    viewport.addEventListener('pointerup', stop); viewport.addEventListener('pointercancel', stop);
+  }
+  function mindMapDescendants(project, nodeId) {
+    var nodes = activeMindMapNodes(project); var result = {}; var changed = true; result[nodeId] = true;
+    while (changed) { changed = false; nodes.forEach(function (node) { if (node.parentId && result[node.parentId] && !result[node.id]) { result[node.id] = true; changed = true; } }); }
+    return result;
+  }
+  function mindMapNodeForm(project, node, initialParentId) {
+    var map = getMindMap(project); var root = getMindMapNode(project, map.rootId); var blocked = node ? mindMapDescendants(project, node.id) : {}; var parents = activeMindMapNodes(project).filter(function (candidate) { return !blocked[candidate.id]; });
+    var isRoot = node && node.id === map.rootId;
+    var selectedParent = node ? node.parentId : (initialParentId || (root && root.id));
+    var parentOptions = parents.map(function (candidate) { return '<option value="' + escapeHtml(candidate.id) + '"' + (candidate.id === selectedParent ? ' selected' : '') + '>' + escapeHtml(candidate.title) + '</option>'; }).join('');
+    var typeOptions = isRoot ? '<option value="root">Projeto</option>' : optionList(['folder', 'file', 'module', 'collection', 'rule', 'note'], node ? node.kind : 'note');
+    var locationOptions = isRoot ? '<option value="">Nó central</option>' : parentOptions;
+    var modal = showModal(node ? 'Editar elemento do mapa' : 'Novo ramo no mapa', node ? 'Você pode alterar o tipo, os detalhes e o local desta ramificação.' : 'Registre um arquivo, módulo, regra ou anotação e escolha onde ele ficará.', '<form id="pp-map-node-form"><div class="pp-form-grid"><label class="pp-form-label pp-full"><span>Título *</span><input class="pp-field" name="title" required maxlength="120" value="' + escapeHtml(node ? node.title : '') + '" placeholder="Ex.: Novo módulo de autenticação"></label><label class="pp-form-label"><span>Tipo</span><select class="pp-field" name="kind"' + (isRoot ? ' disabled' : '') + '>' + typeOptions + '</select></label><label class="pp-form-label"><span>Dentro de</span><select class="pp-field" name="parentId"' + (isRoot ? ' disabled' : '') + '>' + locationOptions + '</select></label><label class="pp-form-label pp-full"><span>Detalhes</span><textarea class="pp-field" name="description" maxlength="4000" placeholder="Explique a responsabilidade deste elemento, regras, caminhos ou próximos passos.">' + escapeHtml(node ? node.description : '') + '</textarea></label></div><div class="pp-error" id="pp-map-node-error"></div><div class="pp-modal-actions"><button type="button" class="pp-button pp-secondary" data-action="close-modal">Cancelar</button><button type="submit" class="pp-button">Salvar no mapa</button></div></form>', { wide: true });
+    var form = modal.querySelector('#pp-map-node-form');
+    form.addEventListener('submit', function (event) {
+      event.preventDefault(); var title = String(new FormData(form).get('title') || '').trim(); var error = modal.querySelector('#pp-map-node-error'); if (!title) { error.textContent = 'Informe um título para o elemento.'; return; }
+      var stamp = now(); var kind = isRoot ? 'root' : String(new FormData(form).get('kind') || 'note'); var parentId = isRoot ? null : String(new FormData(form).get('parentId') || map.rootId); var description = String(new FormData(form).get('description') || '').trim(); var item = node || { id: id('mapnode'), createdAt: stamp, order: map.nodes.length };
+      item.title = title; item.kind = kind; item.parentId = parentId; item.description = description; item.updatedAt = stamp;
+      if (!node) map.nodes.push(item);
+      map.updatedAt = stamp; project.updatedAt = stamp; mindMapUi.selectedId = item.id;
+      state.activities.push({ id: id('activity-map'), projectId: project.id, title: node ? 'Elemento do mapa mental atualizado' : 'Novo elemento adicionado ao mapa mental', details: title + (node ? ' foi atualizado.' : ' foi incluído em ' + project.name + '.'), occurredAt: stamp, source: 'Mapa mental', idempotencyKey: id('map-change'), createdAt: stamp, updatedAt: stamp });
+      persist(node ? 'mindmap-node-update' : 'mindmap-node-create'); closeModal(); render(); toast(node ? 'Elemento atualizado no mapa.' : 'Novo ramo adicionado ao mapa.');
+    });
+  }
+  function deleteMindMapNode(project, nodeId) {
+    var map = getMindMap(project); var node = getMindMapNode(project, nodeId); if (!node) return; if (node.id === map.rootId) { toast('O nó central do projeto não pode ser excluído.'); return; }
+    if (!window.confirm('Excluir “' + node.title + '”? Os elementos filhos serão mantidos e movidos para o nível acima.')) return;
+    var stamp = now(); var parentId = node.parentId || map.rootId;
+    map.nodes.forEach(function (item) { if (item.parentId === node.id && !item.deletedAt) { item.parentId = parentId; item.updatedAt = stamp; } });
+    node.deletedAt = stamp; node.updatedAt = stamp; map.updatedAt = stamp; project.updatedAt = stamp; mindMapUi.selectedId = parentId;
+    state.activities.push({ id: id('activity-map'), projectId: project.id, title: 'Elemento removido do mapa mental', details: node.title + ' foi removido; seus ramos foram preservados no nível acima.', occurredAt: stamp, source: 'Mapa mental', idempotencyKey: id('map-remove'), createdAt: stamp, updatedAt: stamp });
+    persist('mindmap-node-delete'); render(); toast('Elemento removido; os ramos filhos foram preservados.');
+  }
   function detailMarkup(project) {
     if (!project) return headerMarkup('Projeto não encontrado', 'Ele pode ter sido excluído ou o endereço está incorreto.', 'projetos-pessoais.html#projects') + '<main class="pp-shell"><div class="pp-empty"><strong>Projeto não encontrado</strong><a class="pp-button" href="projetos-pessoais.html#projects">Ver projetos</a></div></main>';
     var projectIdeas = active(state.ideas).filter(function (idea) { return idea.projectId === project.id; }).sort(function (a, b) { return toTime(b.updatedAt) - toTime(a.updatedAt); });
@@ -567,7 +893,7 @@
     var tools = Array.isArray(project.tools) ? project.tools : [];
     var links = safeUrl(project.url) ? '<div class="pp-project-links"><a class="pp-project-link" target="_blank" rel="noopener noreferrer" href="' + escapeHtml(safeUrl(project.url)) + '">' + uiIcon('external') + 'Abrir link principal</a></div>' : '<p class="pp-form-note">Nenhum link principal cadastrado.</p>';
     return headerMarkup(project.name, 'Detalhes, ferramentas, histórico e ideias deste projeto.', 'projetos-pessoais.html#projects')
-      + '<main class="pp-shell"><section class="pp-detail-top">' + projectLogo(project) + '<div><h1>' + escapeHtml(project.name) + '</h1><p>' + escapeHtml(project.description || 'Sem descrição.') + '</p><div class="pp-tags" style="margin-top:10px"><span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span><span class="pp-tag">' + escapeHtml(project.type || 'Outro') + '</span></div></div><div class="pp-detail-actions"><button class="pp-button pp-secondary" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + 'Editar</button><button class="pp-button pp-danger" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + 'Excluir</button></div></section>' + libraryDocumentationMarkup(project)
+      + '<main class="pp-shell"><section class="pp-detail-top">' + projectLogo(project) + '<div><h1>' + escapeHtml(project.name) + '</h1><p>' + escapeHtml(project.description || 'Sem descrição.') + '</p><div class="pp-tags" style="margin-top:10px"><span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span><span class="pp-tag">' + escapeHtml(project.type || 'Outro') + '</span></div></div><div class="pp-detail-actions"><button class="pp-button" data-action="open-mindmap" data-id="' + project.id + '">' + uiIcon('map') + 'Mapa mental</button><button class="pp-button pp-secondary" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + 'Editar</button><button class="pp-button pp-danger" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + 'Excluir</button></div></section>' + libraryDocumentationMarkup(project)
       + '<div class="pp-detail-grid"><div><section class="pp-panel"><div class="pp-panel-head"><h2>Linha do tempo</h2><button class="pp-button pp-small" data-action="new-event" data-project="' + project.id + '">' + uiIcon('plus') + 'Registrar</button></div>' + (events.length ? '<div class="pp-timeline">' + events.map(eventCard).join('') + '</div>' : emptyMarkup('Sem atualizações ainda', 'Registre um avanço, deploy, ajuste ou qualquer passo importante.')) + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ideias vinculadas</h2><a class="pp-button pp-small pp-secondary" href="projetos-pessoais.html#ideas">Ver todas</a></div>' + (projectIdeas.length ? projectIdeas.map(ideaMini).join('') : '<p class="pp-form-note">Ainda não há ideias vinculadas a este projeto.</p>') + '</section></div>'
       + '<aside>' + relatedProjectsMarkup(project) + '<section class="pp-panel"><h2>Links</h2><div style="height:12px"></div>' + links + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ferramentas</h2><button class="pp-button pp-small" data-action="edit-project" data-id="' + project.id + '">Gerenciar</button></div>' + (tools.length ? '<div class="pp-tool-list">' + tools.map(function (tool) { return '<button class="pp-tool-button" data-action="open-tool" data-project="' + project.id + '" data-tool="' + tool.id + '"><span>' + providerIcon(tool.provider) + '<span><strong>' + escapeHtml(tool.label || tool.provider) + '</strong><span>' + escapeHtml(tool.provider) + ' · acesso protegido</span></span></span><b>' + uiIcon('lock') + '</b></button>'; }).join('') + '</div>' : '<p class="pp-form-note">Adicione GitHub, Supabase, I.As ou outra ferramenta ao editar o projeto.</p>') + '</section></aside></div></main>';
   }
@@ -584,7 +910,15 @@
   }
   function render() {
     if (!APP) return;
-    if (PAGE === 'detail') {
+    if (PAGE === 'mindmap') {
+      var mapProjectId = new URLSearchParams(window.location.search).get('id');
+      var mapProject = getProject(mapProjectId);
+      APP.innerHTML = mapProject ? mindMapPageMarkup(mapProject) : detailMarkup(null);
+      document.title = mapProject ? 'Mapa mental · ' + mapProject.name : 'Mapa mental não encontrado';
+      if (mapProject) {
+        if (window.requestAnimationFrame) window.requestAnimationFrame(bindMindMapBoard); else bindMindMapBoard();
+      }
+    } else if (PAGE === 'detail') {
       var projectId = new URLSearchParams(window.location.search).get('id');
       APP.innerHTML = detailMarkup(getProject(projectId));
       document.title = getProject(projectId) ? getProject(projectId).name + ' · Projetos pessoais' : 'Projeto não encontrado';
@@ -912,7 +1246,11 @@
     if (action === 'edit-event') { var activity = getEvent(target.dataset.id); if (activity) eventForm(activity.projectId, activity); return; }
     if (action === 'delete-event') { deleteEvent(target.dataset.id); return; }
     if (action === 'open-tool') { toolModal(target.dataset.project, target.dataset.tool); return; }
-    if (action === 'library-map') { libraryMindMapModal(getProject(target.dataset.project)); return; }
+    if (action === 'open-mindmap' || action === 'library-map') { window.location.href = 'mapa-mental.html?id=' + encodeURIComponent(target.dataset.id || target.dataset.project); return; }
+    if (action === 'mindmap-select') { mindMapUi.selectedId = target.dataset.node; render(); return; }
+    if (action === 'mindmap-add') { var addProject = getProject(mindMapUi.projectId); if (addProject) mindMapNodeForm(addProject, null, mindMapUi.selectedId); return; }
+    if (action === 'mindmap-edit') { var editProject = getProject(mindMapUi.projectId); var selectedNode = editProject && getMindMapNode(editProject, mindMapUi.selectedId); if (editProject && selectedNode) mindMapNodeForm(editProject, selectedNode); return; }
+    if (action === 'mindmap-delete') { var deleteMapProject = getProject(mindMapUi.projectId); if (deleteMapProject) deleteMindMapNode(deleteMapProject, mindMapUi.selectedId); return; }
     if (action === 'library-doc') { libraryDocModal(getProject(target.dataset.project), target.dataset.doc); return; }
     if (action === 'vault-info') { vaultInfo(); return; }
     if (action === 'lock-vault') { closeModal(); lockVault(); return; }
@@ -924,7 +1262,7 @@
   function handleFilter(event) { var filter = event.target.dataset.filter; if (!filter) return; currentFilters[filter] = event.target.value; render(); }
   function handleKeyboard(event) { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-action="goto-project"]')) { event.preventDefault(); window.location.href = 'projeto-detalhes.html?id=' + encodeURIComponent(event.target.dataset.id); } }
   function boot() {
-    loadCache(); ensureCoreProjects(); ensureFinanceProject(); ensureLibraryDocumentation(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache(); ensureCoreProjects(); ensureReportsProjectIcon(); ensureLibraryProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
