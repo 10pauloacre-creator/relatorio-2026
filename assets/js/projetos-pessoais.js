@@ -1246,7 +1246,11 @@
     if (action === 'edit-event') { var activity = getEvent(target.dataset.id); if (activity) eventForm(activity.projectId, activity); return; }
     if (action === 'delete-event') { deleteEvent(target.dataset.id); return; }
     if (action === 'open-tool') { toolModal(target.dataset.project, target.dataset.tool); return; }
-    if (action === 'open-mindmap' || action === 'library-map') { window.location.href = 'mapa-mental.html?id=' + encodeURIComponent(target.dataset.id || target.dataset.project); return; }
+    if (action === 'open-mindmap' || action === 'library-map') {
+      var mindMapProjectId = target.dataset.id || target.dataset.project;
+      if (mindMapProjectId === 'project-rural-manager') { window.location.href = 'mapa-rural-manager.html'; return; }
+      window.location.href = 'mapa-mental.html?id=' + encodeURIComponent(mindMapProjectId); return;
+    }
     if (action === 'mindmap-select') { mindMapUi.selectedId = target.dataset.node; render(); return; }
     if (action === 'mindmap-add') { var addProject = getProject(mindMapUi.projectId); if (addProject) mindMapNodeForm(addProject, null, mindMapUi.selectedId); return; }
     if (action === 'mindmap-edit') { var editProject = getProject(mindMapUi.projectId); var selectedNode = editProject && getMindMapNode(editProject, mindMapUi.selectedId); if (editProject && selectedNode) mindMapNodeForm(editProject, selectedNode); return; }
