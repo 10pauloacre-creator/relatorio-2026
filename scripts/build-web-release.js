@@ -40,6 +40,7 @@ const rootFileAllowlist = new Set([
   "planejamento-aulas-2026.html",
   "projetos-pessoais.html",
   "projeto-detalhes.html",
+  "mapa-mental.html",
   "sw.js"
 ]);
 
