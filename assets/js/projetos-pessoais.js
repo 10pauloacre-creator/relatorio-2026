@@ -262,7 +262,7 @@
         id: 'project-financeiro-app',
         name: 'Financeiro.app',
         description: 'Aplicativo financeiro com IA para organizar receitas, despesas e o fluxo mensal.',
-        status: 'Desenvolvimento', type: 'App', url: 'https://github.com/10pauloacre-creator/Finan-as-app',
+        status: 'Desenvolvimento', type: 'App', url: 'https://github.com/10pauloacre-creator/Finan-as-app', logo: 'assets/icons/icone-financeiro-app.png',
         tools: [
           { id: 'tool-financeiro-github', provider: 'GitHub', label: 'GitHub', url: 'https://github.com/10pauloacre-creator/Finan-as-app', createdAt: stamp, updatedAt: stamp },
           { id: 'tool-financeiro-vercel', provider: 'Vercel', label: 'Vercel', url: '', createdAt: stamp, updatedAt: stamp },
@@ -281,6 +281,15 @@
     state.migrations.financeiroAppV1 = { addedAt: stamp, projectId: finance.id };
     if (changed) persist('financeiro-app-add'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
     return changed;
+  }
+  function ensureFinanceProjectIcon() {
+    if (state.migrations.financeiroAppIconV1) return false;
+    var finance = coreProjectByName('Financeiro.app', 'project-financeiro-app');
+    var stamp = now();
+    if (finance && !finance.logo) { finance.logo = 'assets/icons/icone-financeiro-app.png'; finance.updatedAt = stamp; persist('financeiro-app-icon'); }
+    state.migrations.financeiroAppIconV1 = { addedAt: stamp, projectId: finance ? finance.id : null };
+    if (!finance || finance.logo !== 'assets/icons/icone-financeiro-app.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return Boolean(finance);
   }
   function ensureRuralManagerProject() {
     if (state.migrations.ruralManagerV1) return false;
@@ -1235,7 +1244,7 @@
   function handleFilter(event) { var filter = event.target.dataset.filter; if (!filter) return; currentFilters[filter] = event.target.value; render(); }
   function handleKeyboard(event) { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-action="goto-project"]')) { event.preventDefault(); window.location.href = 'projeto-detalhes.html?id=' + encodeURIComponent(event.target.dataset.id); } }
   function boot() {
-    loadCache(); ensureCoreProjects(); ensureFinanceProject(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache(); ensureCoreProjects(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
