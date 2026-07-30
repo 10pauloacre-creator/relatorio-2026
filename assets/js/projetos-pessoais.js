@@ -463,12 +463,102 @@
     if (!item) return;
     showModal(item.title, item.status || 'Documentação da Biblioteca Digital', '<div class="pp-doc-modal-copy"><div class="pp-doc-modal-icon">' + uiIcon(item.icon || 'project') + '</div>' + (item.details || []).map(function (detail) { return '<p>' + escapeHtml(detail) + '</p>'; }).join('') + '<div class="pp-modal-actions"><button type="button" class="pp-button pp-secondary" data-action="close-modal">Fechar</button></div></div>', { wide: true });
   }
+  function libraryMapCatalog() {
+    var nodes = [
+      { id: 'root', label: 'Biblioteca Digital', meta: 'Visão geral do projeto', kind: 'root', x: 790, y: 520, w: 240, details: ['Projeto de biblioteca digital para as três séries do Ensino Médio.', 'O mapa foi montado a partir da estrutura local consultada da Biblioteca Digital.', 'Selecione uma ramificação para ver a responsabilidade de cada arquivo e módulo.'] },
+      { id: 'files', label: 'Arquivos raiz', meta: '3 versões HTML', kind: 'folder', x: 110, y: 108, w: 205, details: ['Pasta principal com três versões históricas da interface.', 'A versão v3 foi a referência usada para mapear módulos, regras e inventário.'] },
+      { id: 'file-base', label: 'Biblioteca Digital Medieval.html', meta: 'versão base', kind: 'file', x: 35, y: 250, w: 245, details: ['Arquivo HTML da primeira versão local identificada.', 'Serve como marco para comparar a evolução visual e funcional antes das revisões v2 e v3.'] },
+      { id: 'file-v2', label: 'Biblioteca Digital Medieval v2.html', meta: 'evolução da interface', kind: 'file', x: 35, y: 354, w: 245, details: ['Segunda versão local do arquivo principal.', 'Deve ser preservada como referência histórica antes de qualquer limpeza de versões antigas.'] },
+      { id: 'file-v3', label: 'Biblioteca Digital Medieval v3.html', meta: 'versão consultada', kind: 'file', x: 35, y: 458, w: 245, details: ['Arquivo usado para este levantamento de código.', 'Concentra a seleção de série, disponibilidade dos livros, modal de abertura, áudio, PWA e proteção de navegação.'] },
+      { id: 'assets', label: 'assets/', meta: 'imagens, mídia e dados', kind: 'folder', x: 110, y: 686, w: 205, details: ['Diretório de recursos da biblioteca.', 'Inclui dados de imagem, sons e animações usados pela experiência de navegação.'] },
+      { id: 'img-data', label: 'assets/img-data.js', meta: 'dados de imagens', kind: 'file', x: 35, y: 818, w: 245, details: ['Arquivo JavaScript de dados visuais localizado dentro de assets.', 'É o ponto natural para centralizar referências de capas, ícones e imagens por coleção.'] },
+      { id: 'audio', label: 'assets/audio/', meta: '5 arquivos de áudio', kind: 'folder', x: 35, y: 922, w: 245, details: ['Arquivos confirmados: livro-abrindo.mp3, musica-fundo.mp3, som-livro-disponivel.mp3, som-livro-indisponivel.mp3 e som-serie.mp3.', 'Os sons são acionados por playSound(), startBgMusic() e pelos estados de disponibilidade.'] },
+      { id: 'media', label: 'assets/gif + images', meta: 'animações e estados', kind: 'file', x: 315, y: 818, w: 250, details: ['Animações locais confirmadas: livro-abrindo.gif e livro-abrindo.webm.', 'Imagens locais confirmadas: livro-azul.png e livro-verde.png.', 'O HTML também referencia placa e imagens das séries; confirme que os arquivos publicados existem antes de um novo empacotamento.'] },
+      { id: 'interface', label: 'Módulos da interface', meta: 'funções e eventos', kind: 'folder', x: 455, y: 126, w: 225, details: ['Conjunto de funções que controla a navegação, consulta do acervo, modal, áudio e instalação PWA.', 'Os itens filhos descrevem o comportamento real identificado no HTML v3.'] },
+      { id: 'navigation', label: 'Seleção e navegação', meta: 'selectSerie · goBack', kind: 'module', x: 420, y: 270, w: 250, details: ['selectSerie() escolhe a série e persiste a opção atual em localStorage com a chave bdm-current-serie.', 'goBack() retorna ao início da experiência.', 'Um guard com history.pushState e popstate evita saídas acidentais pela navegação do navegador.'] },
+      { id: 'availability', label: 'Disponibilidade', meta: 'checkBook · bookCache', kind: 'module', x: 420, y: 378, w: 250, details: ['checkBook(url) consulta o arquivo com fetch usando cache: no-store.', 'A resposta só é considerada válida quando OK e com mais de 100 linhas.', 'bookCache mantém o resultado na memória; updateAvailability() atualiza os estados na interface.'] },
+      { id: 'book-modal', label: 'Abertura de livro', meta: 'openBook · closeModal', kind: 'module', x: 420, y: 486, w: 250, details: ['openBook() valida a disponibilidade antes de abrir o destino.', 'Quando disponível, mostra o modal de confirmação e redireciona após aproximadamente 3,5 segundos.', 'Quando indisponível, apresenta um retorno visual sem liberar uma rota quebrada. closeModal() fecha a camada.'] },
+      { id: 'audio-module', label: 'Ciclo de áudio', meta: 'startBgMusic · toggleMute', kind: 'module', x: 420, y: 594, w: 250, details: ['startBgMusic() inicia a trilha de fundo conforme a interação permitida pelo navegador.', 'toggleMute() controla a preferência de som e playSound() dispara os efeitos de interface.', 'Eventos de visibilidade, blur e focus preservam uma experiência menos invasiva.'] },
+      { id: 'pwa', label: 'PWA e instalação', meta: 'sw.js · beforeinstallprompt', kind: 'module', x: 420, y: 702, w: 250, details: ['O HTML registra ./sw.js para suporte de PWA.', 'beforeinstallprompt é usado para oferecer instalação em dispositivos compatíveis.', 'A dispensa do convite é lembrada em localStorage pela chave bdm_pwa_dismissed.'] },
+      { id: 'catalog', label: 'Acervo por série', meta: '44 posições mapeadas', kind: 'folder', x: 1180, y: 108, w: 225, details: ['A versão consultada organiza o acervo em 1ª, 2ª e 3ª séries.', 'Há 8 livros disponíveis, 36 pendentes, 3 séries e 11 coleções série-disciplina.'] },
+      { id: 'first-series', label: '1ª série', meta: '2 disponíveis · 10 pendentes', kind: 'collection', x: 1370, y: 248, w: 255, details: ['Disponíveis: Língua Portuguesa 1º e Trilhas de Linguagens 1º.', 'Pendentes: Língua Portuguesa 2º–4º; Trilhas 2º–4º; Todas as quatro posições de Tempo de Chegar.'] },
+      { id: 'second-series', label: '2ª série', meta: '4 disponíveis · 12 pendentes', kind: 'collection', x: 1370, y: 360, w: 255, details: ['Disponíveis: Língua Portuguesa 1º, Trilhas de Linguagens 1º, Tempo de Chegar 1º e Artes 1º.', 'Permanecem pendentes as posições 2º–4º dessas quatro coleções.'] },
+      { id: 'third-series', label: '3ª série', meta: '2 disponíveis · 14 pendentes', kind: 'collection', x: 1370, y: 472, w: 255, details: ['Disponíveis: Língua Portuguesa 1º e Trilhas de Linguagens 1º.', 'Pendentes: Língua Portuguesa e Trilhas 2º–4º; todas as posições de Tempo de Chegar e Artes.'] },
+      { id: 'rules', label: 'Regras do código', meta: 'comportamentos preservados', kind: 'folder', x: 1180, y: 678, w: 225, details: ['Regras que não devem ser quebradas em novas alterações sem revisão consciente.', 'Elas foram extraídas do comportamento da versão v3 e servem como checklist de manutenção.'] },
+      { id: 'rule-check', label: 'Regra de disponibilidade', meta: 'resposta válida > 100 linhas', kind: 'rule', x: 1370, y: 794, w: 255, details: ['Não trate a simples existência da URL como disponibilidade.', 'A regra atual exige resposta HTTP bem-sucedida e conteúdo com mais de 100 linhas; mantenha esse critério ou documente formalmente uma substituição.'] },
+      { id: 'rule-route', label: 'Regra de abertura', meta: 'modal antes do redirecionamento', kind: 'rule', x: 1370, y: 898, w: 255, details: ['A abertura de um livro passa primeiro pela verificação de disponibilidade.', 'O fluxo atual apresenta feedback e só então leva à rota externa; isso reduz links quebrados para o usuário.'] },
+      { id: 'rule-state', label: 'Regra de estado local', meta: 'série, PWA e preferências', kind: 'rule', x: 1370, y: 1002, w: 255, details: ['As chaves bdm-current-serie e bdm_pwa_dismissed preservam contexto da pessoa usuária.', 'Qualquer nova chave local deve ter prefixo bdm_ e uma finalidade documentada para evitar conflitos.'] },
+      { id: 'publication', label: 'Publicação e rotas', meta: 'Vercel · livros remotos', kind: 'folder', x: 820, y: 910, w: 225, details: ['A disponibilidade dos livros referencia rotas publicadas no domínio biblioteca-digital-medieval.vercel.app.', 'Antes de publicar, valide HTMLs, mídias, service worker e todas as rotas do acervo.'] }
+    ];
+    var lines = [[910, 595, 620, 230], [910, 595, 585, 725], [910, 595, 690, 250], [910, 595, 1290, 230], [910, 595, 1290, 800], [910, 595, 932, 910], [210, 210, 160, 250], [210, 210, 160, 354], [210, 210, 160, 458], [210, 785, 160, 818], [210, 785, 160, 922], [210, 785, 440, 818], [565, 230, 545, 270], [565, 230, 545, 378], [565, 230, 545, 486], [565, 230, 545, 594], [565, 230, 545, 702], [1292, 220, 1497, 248], [1292, 220, 1497, 360], [1292, 220, 1497, 472], [1292, 790, 1497, 794], [1292, 790, 1497, 898], [1292, 790, 1497, 1002]];
+    return { nodes: nodes, lines: lines };
+  }
   function libraryMindMapModal(project) {
-    var documentation = project && project.documentation;
-    if (!documentation) return;
-    showModal('Mapa mental — Biblioteca Digital', 'Clique em qualquer item para abrir a documentação detalhada.', '<div class="pp-mindmap"><div class="pp-mindmap-root">' + uiIcon('map') + '<strong>Biblioteca<br>Digital</strong><small>Acervo, regras e próximos passos</small></div><div class="pp-mindmap-branches">' + documentation.folders.map(function (folder) {
-      return '<section class="pp-mindmap-branch"><button class="pp-mindmap-folder" data-action="library-doc" data-project="' + project.id + '" data-doc="' + escapeHtml((folder.children || [])[0] ? folder.children[0].id : '') + '">' + uiIcon(folder.icon || 'folder') + '<span>' + escapeHtml(folder.title) + '</span></button><div class="pp-mindmap-items">' + (folder.children || []).map(function (item) { return '<button data-action="library-doc" data-project="' + project.id + '" data-doc="' + escapeHtml(item.id) + '">' + uiIcon(item.icon || 'project') + '<span>' + escapeHtml(item.title) + '</span></button>'; }).join('') + '</div></section>';
-    }).join('') + '</div></div>', { wide: true });
+    if (!project || !project.documentation) return;
+    var catalog = libraryMapCatalog();
+    var nodeMarkup = catalog.nodes.map(function (node) {
+      return '<button type="button" class="pp-mindmap-node pp-mindmap-node-' + escapeHtml(node.kind) + '" data-map-node="' + escapeHtml(node.id) + '" style="--map-x:' + Number(node.x) + 'px;--map-y:' + Number(node.y) + 'px;--map-w:' + Number(node.w || 220) + 'px" aria-pressed="false"><span>' + escapeHtml(node.label) + '</span><small>' + escapeHtml(node.meta) + '</small></button>';
+    }).join('');
+    var lineMarkup = catalog.lines.map(function (line) {
+      var curve = Math.abs(line[2] - line[0]) * 0.42;
+      var direction = line[2] >= line[0] ? 1 : -1;
+      return '<path d="M ' + line[0] + ' ' + line[1] + ' C ' + (line[0] + curve * direction) + ' ' + line[1] + ', ' + (line[2] - curve * direction) + ' ' + line[3] + ', ' + line[2] + ' ' + line[3] + '"></path>';
+    }).join('');
+    var modal = showModal('Mapa mental — Biblioteca Digital', 'Arraste o mapa, use a rolagem para aproximar ou diminuir e selecione um nó para ler os detalhes.', '<div class="pp-mindmap pp-mindmap-interactive"><div class="pp-mindmap-toolbar" aria-label="Controles do mapa"><div class="pp-mindmap-help">' + uiIcon('map') + '<span>Mapa baseado nos arquivos e módulos consultados</span></div><div class="pp-mindmap-controls"><button type="button" class="pp-mindmap-control" data-map-control="out" aria-label="Diminuir zoom">−</button><output class="pp-mindmap-zoom" data-map-zoom-label>70%</output><button type="button" class="pp-mindmap-control" data-map-control="in" aria-label="Aumentar zoom">+</button><button type="button" class="pp-mindmap-reset" data-map-control="reset">Centralizar</button></div></div><div class="pp-mindmap-layout"><div class="pp-mindmap-viewport" tabindex="0" aria-label="Mapa mental navegável. Use a rolagem para zoom e arraste para mover."><div class="pp-mindmap-stage"><svg class="pp-mindmap-lines" viewBox="0 0 1840 1180" aria-hidden="true">' + lineMarkup + '</svg>' + nodeMarkup + '</div></div><aside class="pp-mindmap-detail" data-map-detail aria-live="polite"><span class="pp-mindmap-detail-kicker">VISÃO GERAL</span><h3>Biblioteca Digital</h3><p>Selecione uma ramificação para ver o arquivo, módulo ou regra correspondente. Este painel mantém o mapa aberto enquanto você explora.</p><ul><li>Arraste na área do diagrama para navegar.</li><li>Use a roda do mouse, os botões ou os gestos do touchpad para controlar o zoom.</li><li>Os nomes representam a estrutura local e o HTML v3 consultados.</li></ul></aside></div></div>', { wide: true, map: true });
+    bindLibraryMindMap(modal, catalog);
+  }
+  function bindLibraryMindMap(modal, catalog) {
+    var viewport = modal.querySelector('.pp-mindmap-viewport');
+    var stage = modal.querySelector('.pp-mindmap-stage');
+    var zoomLabel = modal.querySelector('[data-map-zoom-label]');
+    var detail = modal.querySelector('[data-map-detail]');
+    if (!viewport || !stage || !zoomLabel || !detail) return;
+    var stateMap = { scale: 0.7, x: 0, y: 0, dragging: false, pointerId: null, startX: 0, startY: 0, originX: 0, originY: 0 };
+    var byId = {};
+    catalog.nodes.forEach(function (node) { byId[node.id] = node; });
+    function updateMap() {
+      stage.style.transform = 'translate(' + Math.round(stateMap.x) + 'px, ' + Math.round(stateMap.y) + 'px) scale(' + stateMap.scale.toFixed(3) + ')';
+      zoomLabel.textContent = Math.round(stateMap.scale * 100) + '%';
+    }
+    function centerMap() {
+      var rect = viewport.getBoundingClientRect();
+      stateMap.scale = Math.min(0.78, Math.max(0.44, (rect.width || 820) / 1840));
+      stateMap.x = ((rect.width || 820) - 1840 * stateMap.scale) / 2;
+      stateMap.y = Math.max(12, ((rect.height || 610) - 1180 * stateMap.scale) / 2);
+      updateMap();
+    }
+    function setScale(next, clientX, clientY) {
+      var oldScale = stateMap.scale;
+      var newScale = Math.max(0.34, Math.min(1.65, next));
+      if (newScale === oldScale) return;
+      var rect = viewport.getBoundingClientRect();
+      var localX = typeof clientX === 'number' ? clientX - rect.left : rect.width / 2;
+      var localY = typeof clientY === 'number' ? clientY - rect.top : rect.height / 2;
+      var worldX = (localX - stateMap.x) / oldScale;
+      var worldY = (localY - stateMap.y) / oldScale;
+      stateMap.scale = newScale;
+      stateMap.x = localX - worldX * newScale;
+      stateMap.y = localY - worldY * newScale;
+      updateMap();
+    }
+    function selectNode(id) {
+      var node = byId[id];
+      if (!node) return;
+      modal.querySelectorAll('[data-map-node]').forEach(function (button) { button.setAttribute('aria-pressed', button.dataset.mapNode === id ? 'true' : 'false'); });
+      detail.innerHTML = '<span class="pp-mindmap-detail-kicker">' + escapeHtml(node.kind === 'module' ? 'MÓDULO DE CÓDIGO' : node.kind === 'file' ? 'ARQUIVO' : node.kind === 'rule' ? 'REGRA PRESERVADA' : node.kind === 'collection' ? 'INVENTÁRIO DO ACERVO' : 'RAMIFICAÇÃO') + '</span><h3>' + escapeHtml(node.label) + '</h3><p class="pp-mindmap-detail-meta">' + escapeHtml(node.meta) + '</p><div class="pp-mindmap-detail-copy">' + (node.details || []).map(function (item) { return '<p>' + escapeHtml(item) + '</p>'; }).join('') + '</div>';
+    }
+    modal.querySelectorAll('[data-map-node]').forEach(function (button) { button.addEventListener('click', function () { selectNode(button.dataset.mapNode); }); });
+    modal.querySelectorAll('[data-map-control]').forEach(function (button) { button.addEventListener('click', function () { var control = button.dataset.mapControl; if (control === 'in') setScale(stateMap.scale + 0.12); else if (control === 'out') setScale(stateMap.scale - 0.12); else centerMap(); }); });
+    viewport.addEventListener('wheel', function (event) { event.preventDefault(); setScale(stateMap.scale * (event.deltaY < 0 ? 1.12 : 0.88), event.clientX, event.clientY); }, { passive: false });
+    viewport.addEventListener('pointerdown', function (event) {
+      if (event.target.closest('[data-map-node]')) return;
+      stateMap.dragging = true; stateMap.pointerId = event.pointerId; stateMap.startX = event.clientX; stateMap.startY = event.clientY; stateMap.originX = stateMap.x; stateMap.originY = stateMap.y;
+      viewport.classList.add('is-dragging'); if (viewport.setPointerCapture) viewport.setPointerCapture(event.pointerId);
+    });
+    viewport.addEventListener('pointermove', function (event) { if (!stateMap.dragging || event.pointerId !== stateMap.pointerId) return; stateMap.x = stateMap.originX + event.clientX - stateMap.startX; stateMap.y = stateMap.originY + event.clientY - stateMap.startY; updateMap(); });
+    function stopDragging(event) { if (event && stateMap.pointerId !== null && event.pointerId !== stateMap.pointerId) return; stateMap.dragging = false; stateMap.pointerId = null; viewport.classList.remove('is-dragging'); }
+    viewport.addEventListener('pointerup', stopDragging); viewport.addEventListener('pointercancel', stopDragging);
+    centerMap();
   }
   function detailMarkup(project) {
     if (!project) return headerMarkup('Projeto não encontrado', 'Ele pode ter sido excluído ou o endereço está incorreto.', 'projetos-pessoais.html#projects') + '<main class="pp-shell"><div class="pp-empty"><strong>Projeto não encontrado</strong><a class="pp-button" href="projetos-pessoais.html#projects">Ver projetos</a></div></main>';
@@ -509,7 +599,7 @@
     var modal = document.createElement('div');
     modal.className = 'pp-modal';
     if (options && options.sensitive) modal.dataset.sensitive = 'true';
-    modal.innerHTML = '<div class="pp-modal-card' + (options && options.wide ? ' pp-modal-wide' : '') + '" role="dialog" aria-modal="true" aria-label="' + escapeHtml(title) + '"><div class="pp-modal-header"><div><h2>' + escapeHtml(title) + '</h2>' + (description ? '<p>' + escapeHtml(description) + '</p>' : '') + '</div><button class="pp-modal-close" data-action="close-modal" aria-label="Fechar">×</button></div><div class="pp-modal-body">' + content + '</div></div>';
+    modal.innerHTML = '<div class="pp-modal-card' + (options && options.wide ? ' pp-modal-wide' : '') + (options && options.map ? ' pp-modal-map' : '') + '" role="dialog" aria-modal="true" aria-label="' + escapeHtml(title) + '"><div class="pp-modal-header"><div><h2>' + escapeHtml(title) + '</h2>' + (description ? '<p>' + escapeHtml(description) + '</p>' : '') + '</div><button class="pp-modal-close" data-action="close-modal" aria-label="Fechar">×</button></div><div class="pp-modal-body">' + content + '</div></div>';
     modal.addEventListener('click', function (event) { if (event.target === modal) closeModal(); });
     document.body.appendChild(modal);
     var focusable = modal.querySelector('input,select,textarea,button');
