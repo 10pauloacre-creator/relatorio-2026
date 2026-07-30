@@ -29,6 +29,83 @@
     { id: 'claude-quinari', provider: 'Claude', title: 'quinari.ouvidoria@gmail.com' },
     { id: 'codex-pro', provider: 'Codex', title: 'Codex Pro' }
   ];
+  var RURAL_MANAGER_PHASES = [
+    { id: 'p1', title: 'Fundação técnica', summary: 'Criar uma base estável, tipada e verificável antes das funcionalidades.', tasks: [
+      ['Auditoria inicial do repositório', 'Mapear stack, rotas, componentes, banco, variáveis e riscos antes de começar.', 'Nenhuma. É o primeiro bloco.'],
+      ['Base Next.js e estrutura do projeto', 'Padronizar App Router, TypeScript estrito, aliases, layouts e módulos.', 'Auditoria inicial concluída.'],
+      ['Qualidade e automação local', 'Configurar lint, formatação, testes, hooks e comandos de validação.', 'Base do projeto estabilizada.']
+    ] },
+    { id: 'p2', title: 'UI/UX e navegação', summary: 'Construir a experiência mobile-first, componentes e formulários do produto.', tasks: [
+      ['Arquitetura de navegação', 'Criar shell mobile-first com barra inferior, header e rotas principais.', 'Fundação técnica pronta.'],
+      ['Design system e identidade visual', 'Definir tokens, componentes e padrões visuais consistentes.', 'Shell de navegação disponível.'],
+      ['Formulários, máscaras e validação', 'Padronizar entradas de moeda, peso, percentual, datas e números.', 'Design system pronto.'],
+      ['Onboarding e primeira configuração', 'Orientar cadastro, propriedade e parâmetros iniciais sem bloquear o usuário.', 'Autenticação pode ser integrada depois; prepare interfaces desacopladas.']
+    ] },
+    { id: 'p3', title: 'Dados, autenticação e segurança', summary: 'Preparar Supabase, schema, RLS e uma camada de dados testável.', tasks: [
+      ['Autenticação Supabase', 'Implementar cadastro, login, sessão, recuperação e proteção de rotas.', 'Projeto Supabase criado e variáveis públicas disponíveis.'],
+      ['Schema inicial do banco', 'Criar perfis, propriedades, membros, configurações e simulações versionadas.', 'Projeto Supabase acessível e autenticação definida.'],
+      ['RLS e autorização por propriedade', 'Impedir acesso cruzado entre usuários e preparar papéis de equipe.', 'Schema inicial aplicado.'],
+      ['Camada de serviços e repositórios', 'Isolar UI, Supabase, cache local e regras de domínio.', 'Schema e tipos disponíveis.']
+    ] },
+    { id: 'p4', title: 'Dashboard e contexto operacional', summary: 'Entregar a tela inicial, cotações e comunicação de estado.', tasks: [
+      ['Dashboard principal', 'Exibir panorama, CTA, indicadores e atividades recentes.', 'Navegação e repositórios disponíveis.'],
+      ['Card de mercado e cotações', 'Mostrar cotação com fonte, estado, categoria, data e fallback.', 'Tabela market_quotes e uma estratégia de fonte definida.'],
+      ['Conexão, sincronização e notificações', 'Comunicar online/offline, fila pendente e alertas úteis.', 'Shell e futura fila de sincronização; use contrato temporário se a fila ainda não existir.']
+    ] },
+    { id: 'p5', title: 'Entrada do simulador', summary: 'Construir todas as seções necessárias para modelar uma operação pecuária.', tasks: [
+      ['Shell da nova simulação', 'Formulário em acordeões, rascunho automático e totalizador fixo.', 'Formulários, navegação e entidades de simulação.'],
+      ['Operação e identificação do lote', 'Tipo de operação, categoria, propriedade e dados básicos.', 'Shell do simulador pronto.'],
+      ['Compra e custos de aquisição', 'Aceitar negociação por cabeça, kg, arroba ou lote e calcular equivalências.', 'Informações do lote e componentes monetários.'],
+      ['Desenvolvimento, GMD e perdas', 'Projetar peso, dias, ganho diário, mortalidade, descarte e quebra.', 'Lote e compra implementados.'],
+      ['Alimentação e suplementação', 'Cadastrar vários itens, consumo e custo por período.', 'Peso e duração disponíveis.'],
+      ['Terra, sanidade, mão de obra e custos fixos', 'Consolidar despesas operacionais e formas de rateio.', 'Duração e quantidade disponíveis.'],
+      ['Capital, juros e custos financeiros', 'Modelar capital próprio, financiamento e retorno pelo prazo.', 'Investimento e duração calculáveis.'],
+      ['Cenário de venda', 'Calcular receita por cabeça, kg vivo, arroba de carcaça ou lote.', 'Peso final e animais vendidos disponíveis.']
+    ] },
+    { id: 'p6', title: 'Motor de cálculo e regras', summary: 'Centralizar fórmulas, ponto de equilíbrio, risco e persistência versionada.', tasks: [
+      ['Motor de cálculo financeiro', 'Centralizar fórmulas em módulo puro, versionado e testado.', 'Schemas de entrada das seções definidos.'],
+      ['Ponto de equilíbrio', 'Calcular arroba mínima, compra máxima, GMD e peso necessários.', 'Motor principal validado.'],
+      ['Semáforo econômico e risco', 'Separar resultado financeiro de sensibilidade e risco.', 'ROI, ponto de equilíbrio e breakdown disponíveis.'],
+      ['Recálculo em tempo real e desempenho', 'Atualizar resultado por digitação sem travar ou perder foco.', 'Motor de cálculo puro disponível.'],
+      ['Persistência e versionamento da simulação', 'Salvar entradas, resultados e versão sem alterar cálculos antigos.', 'Repositórios, schema e motor de cálculo.']
+    ] },
+    { id: 'p7', title: 'Resultados e decisão', summary: 'Criar resumo auditável, cenários e comparação entre operações.', tasks: [
+      ['Tela de resultados', 'Apresentar resumo, custos, produção e explicação das fórmulas.', 'Motor de cálculo completo.'],
+      ['Cenários e análise de sensibilidade', 'Comparar pessimista, provável e otimista e testar variáveis.', 'Motor rápido e ponto de equilíbrio.'],
+      ['Comparador de simulações', 'Comparar até quatro cenários com critérios objetivos.', 'Histórico e resultados salvos.']
+    ] },
+    { id: 'p8', title: 'Histórico e configurações', summary: 'Permitir recuperar, organizar e parametrizar o trabalho diário.', tasks: [
+      ['Histórico de simulações', 'Busca, filtros, ordenação, paginação e cards de lotes.', 'Persistência de simulações.'],
+      ['Ações do histórico', 'Ver, editar, duplicar, arquivar, restaurar e excluir com segurança.', 'Lista do histórico e casos de uso.'],
+      ['Configurações padrão', 'Salvar parâmetros econômicos, produtivos, unidades e limites.', 'user_settings e formulários disponíveis.'],
+      ['Conta, propriedades e equipe', 'Gerenciar perfil, propriedades, sessões e membros.', 'Auth, farms, farm_members e RLS.']
+    ] },
+    { id: 'p9', title: 'PWA, offline e sincronização', summary: 'Garantir instalação e funcionamento confiável em leilões ou áreas sem sinal.', tasks: [
+      ['PWA instalável', 'Manifest, ícones, service worker, atualização e instalação.', 'Shell web estável e HTTPS no ambiente publicado.'],
+      ['Banco local IndexedDB', 'Persistir rascunhos, configurações, cotações e fila de operações.', 'Camada de repositórios e schemas de domínio.'],
+      ['Fila de sincronização e idempotência', 'Enviar alterações ao Supabase com retry, ordem e deduplicação.', 'IndexedDB, repositórios e endpoints/tabelas com versionamento.'],
+      ['Conflitos e consistência', 'Detectar alterações concorrentes e evitar last-write-wins silencioso.', 'Fila de sincronização operacional.']
+    ] },
+    { id: 'p10', title: 'Relatórios, testes e lançamento', summary: 'Validar, exportar e publicar o MVP com segurança.', tasks: [
+      ['Exportação PDF e planilha', 'Gerar relatórios consistentes a partir do snapshot salvo.', 'Tela de resultado e snapshot.'],
+      ['Compartilhamento seguro', 'Criar link controlado ou compartilhamento nativo sem tornar dados públicos.', 'Exportação e autenticação.'],
+      ['Testes do domínio financeiro', 'Criar suíte extensa para fórmulas, limites e regressões.', 'Motor de cálculo implementado.'],
+      ['Testes de interface e fluxo completo', 'Validar cadastro, simulação, offline, sync, histórico e exportação.', 'Fluxos principais implementados.'],
+      ['Segurança, desempenho e acessibilidade', 'Auditar RLS, bundle, consultas, cache e experiência em aparelhos modestos.', 'MVP funcional.'],
+      ['Deploy, ambientes e observabilidade', 'Configurar preview, produção, migrações, logs e rollback.', 'Checks e build estáveis.']
+    ] },
+    { id: 'p11', title: 'Evolução para administração pecuária', summary: 'Adicionar gestão real apenas depois de validar o simulador.', tasks: [
+      ['Lotes reais e projetado × realizado', 'Converter simulação em lote e acompanhar eventos e custos reais.', 'MVP validado por usuários.'],
+      ['Gestão individual do rebanho', 'Cadastro por brinco/RFID, histórico, pesagens e documentos.', 'Gestão de lotes estável e necessidade real confirmada.'],
+      ['Sanidade e reprodução', 'Protocolos, estoque de medicamentos, carência, matrizes e partos.', 'Animais/lotes reais e estoque básico.'],
+      ['Pastagens e estoque', 'Piquetes, ocupação, descanso, insumos, validade e reposição.', 'Lotes reais.'],
+      ['Financeiro, documentos e equipe', 'Fluxo de caixa, centros de custo, arquivos e permissões avançadas.', 'Operação real consolidada.']
+    ] },
+    { id: 'p12', title: 'Aplicativo Android', summary: 'Empacotar a plataforma somente quando o PWA estiver maduro.', tasks: [
+      ['Preparação para APK', 'Auditar APIs web, navegação, armazenamento e plugins antes do empacotamento.', 'PWA estável e testado em produção.'],
+      ['Empacotamento Android', 'Criar projeto nativo, assinatura, variantes e testes em aparelho.', 'Auditoria de prontidão concluída.']
+    ] }
+  ];
 
   var state = emptyState();
   var sync = null;
@@ -205,6 +282,36 @@
     if (changed) persist('financeiro-app-add'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
     return changed;
   }
+  function ensureRuralManagerProject() {
+    if (state.migrations.ruralManagerV1) return false;
+    var stamp = now();
+    var rural = coreProjectByName('Rural Manager', 'project-rural-manager');
+    var changed = false;
+    if (!rural) {
+      rural = {
+        id: 'project-rural-manager',
+        name: 'Rural Manager',
+        description: 'Projeto futuro de plataforma mobile-first para simulação econômica e futura administração pecuária, organizado a partir de um mapa de desenvolvimento completo.',
+        status: 'Ideia', type: 'App', url: '',
+        tools: [
+          { id: 'tool-rural-github', provider: 'GitHub', label: 'GitHub — repositório pendente', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-rural-supabase', provider: 'Supabase', label: 'Supabase — a configurar', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-rural-vercel', provider: 'Vercel', label: 'Vercel — hospedagem pendente', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-rural-codex', provider: 'Codex', label: 'Codex', url: 'https://chatgpt.com/', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-rural-claude', provider: 'Claude', label: 'Claude', url: 'https://claude.ai/', createdAt: stamp, updatedAt: stamp }
+        ], relatedProjectIds: [], createdAt: stamp, updatedAt: stamp
+      };
+      rural.mindMap = ruralManagerMindMapSeed(rural);
+      state.projects.push(rural); changed = true;
+    }
+    if (!state.activities.some(function (activity) { return activity.id === 'activity-rural-manager-added'; })) {
+      state.activities.push({ id: 'activity-rural-manager-added', projectId: rural.id, title: 'Rural Manager adicionado como projeto futuro', details: 'O mapa de desenvolvimento foi consolidado em 12 fases e 51 tarefas. GitHub, Supabase e Vercel ainda precisam de interligação e credenciais.', occurredAt: stamp, source: 'Mapa mental', idempotencyKey: 'activity-rural-manager-added', createdAt: stamp, updatedAt: stamp });
+      changed = true;
+    }
+    state.migrations.ruralManagerV1 = { addedAt: stamp, projectId: rural.id, phases: RURAL_MANAGER_PHASES.length, tasks: RURAL_MANAGER_PHASES.reduce(function (total, phase) { return total + phase.tasks.length; }, 0) };
+    if (changed) persist('rural-manager-add'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return changed;
+  }
   function libraryDocumentationBlueprint() {
     return {
       title: 'Mapa do projeto Biblioteca Digital',
@@ -325,11 +432,26 @@
       node('publish', root, 'Publicação e próximos passos', 'folder', 'Rotas de livros são verificadas no ambiente publicado. A próxima prioridade é completar bimestres e validar cada rota no celular/PWA.', 4)
     ]);
   }
+  function ruralManagerMindMapSeed(project) {
+    var stamp = now();
+    var root = 'map-root-' + project.id;
+    function phaseDetails(phase) {
+      return phase.summary + '\n\nBlocos desta fase (' + phase.tasks.length + '):\n' + phase.tasks.map(function (task, index) {
+        return (index + 1) + '. ' + task[0] + ' — ' + task[1] + '\nDependência: ' + task[2];
+      }).join('\n\n');
+    }
+    var nodes = [{ id: root, parentId: null, title: 'Rural Manager', description: 'Projeto futuro: plataforma web mobile-first para simulação econômica e futura administração pecuária. O plano importado possui 12 fases e 51 tarefas, com prioridade para um MVP web/PWA antes do APK.', kind: 'root', order: 0, createdAt: stamp, updatedAt: stamp }, {
+      id: 'map-rural-integrations', parentId: root, title: 'Integrações e hospedagem', description: 'Pendente de interligação:\n• GitHub: criar ou vincular o repositório do projeto.\n• Supabase: criar projeto, configurar variáveis públicas, Auth, PostgreSQL, RLS e Storage privado.\n• Vercel: conectar o repositório, definir Preview e Produção, variáveis de ambiente, logs, rollback e HTTPS para PWA.\n• Codex e Claude: usar os prompts do plano de desenvolvimento por fase.\n\nNenhuma credencial foi incluída no mapa.', kind: 'folder', order: 1, createdAt: stamp, updatedAt: stamp }];
+    RURAL_MANAGER_PHASES.forEach(function (phase, index) {
+      nodes.push({ id: 'map-rural-' + phase.id, parentId: root, title: String(index + 1).padStart(2, '0') + '. ' + phase.title, description: phaseDetails(phase), kind: 'folder', order: index + 2, createdAt: stamp, updatedAt: stamp });
+    });
+    return createMindMap(project, nodes);
+  }
   function ensureProjectMindMaps() {
     var changed = false;
     active(state.projects).forEach(function (project) {
       if (project.mindMap && Array.isArray(project.mindMap.nodes) && project.mindMap.nodes.length) return;
-      project.mindMap = project.id === 'project-biblioteca-digital' ? libraryMindMapSeed(project) : createMindMap(project);
+      project.mindMap = project.id === 'project-biblioteca-digital' ? libraryMindMapSeed(project) : project.id === 'project-rural-manager' ? ruralManagerMindMapSeed(project) : createMindMap(project);
       project.updatedAt = now();
       changed = true;
     });
@@ -339,7 +461,7 @@
   function getMindMap(project) {
     if (!project) return null;
     if (!project.mindMap || !Array.isArray(project.mindMap.nodes) || !project.mindMap.nodes.length) {
-      project.mindMap = project.id === 'project-biblioteca-digital' ? libraryMindMapSeed(project) : createMindMap(project);
+      project.mindMap = project.id === 'project-biblioteca-digital' ? libraryMindMapSeed(project) : project.id === 'project-rural-manager' ? ruralManagerMindMapSeed(project) : createMindMap(project);
       project.updatedAt = now(); persist('mindmap-create');
     }
     return project.mindMap;
@@ -1104,7 +1226,7 @@
   function handleFilter(event) { var filter = event.target.dataset.filter; if (!filter) return; currentFilters[filter] = event.target.value; render(); }
   function handleKeyboard(event) { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-action="goto-project"]')) { event.preventDefault(); window.location.href = 'projeto-detalhes.html?id=' + encodeURIComponent(event.target.dataset.id); } }
   function boot() {
-    loadCache(); ensureCoreProjects(); ensureFinanceProject(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache(); ensureCoreProjects(); ensureFinanceProject(); ensureRuralManagerProject(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
