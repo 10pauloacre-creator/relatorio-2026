@@ -225,7 +225,7 @@
         id: 'project-relatorios-diarios',
         name: 'Relatórios diários',
         description: 'Sistema de registros, relatórios e acompanhamento pedagógico das escolas.',
-        status: 'Desenvolvimento', type: 'Site', url: 'https://10pauloacre-creator.github.io/relatorio-2026/',
+        status: 'Desenvolvimento', type: 'Site', url: 'https://10pauloacre-creator.github.io/relatorio-2026/', logo: 'iconv2.png',
         tools: [
           { id: 'tool-relatorios-github', provider: 'GitHub', label: 'GitHub', url: 'https://github.com/10pauloacre-creator/relatorio-2026', createdAt: stamp, updatedAt: stamp },
           { id: 'tool-relatorios-supabase', provider: 'Supabase', label: 'Supabase', url: 'https://vgceathgwvtmjxbdpecr.supabase.co/', createdAt: stamp, updatedAt: stamp }
@@ -251,6 +251,15 @@
     state.migrations.coreProjectsLinkedV1 = { linkedAt: stamp, projectIds: [library.id, reports.id] };
     if (changed) persist('core-projects-link'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
     return changed;
+  }
+  function ensureReportsProjectIcon() {
+    if (state.migrations.reportsProjectIconV1) return false;
+    var reports = coreProjectByName('Relatórios diários', 'project-relatorios-diarios');
+    var stamp = now();
+    if (reports && !reports.logo) { reports.logo = 'iconv2.png'; reports.updatedAt = stamp; persist('reports-project-icon'); }
+    state.migrations.reportsProjectIconV1 = { addedAt: stamp, projectId: reports ? reports.id : null };
+    if (!reports || reports.logo !== 'iconv2.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return Boolean(reports);
   }
   function ensureFinanceProject() {
     if (state.migrations.financeiroAppV1) return false;
@@ -1244,7 +1253,7 @@
   function handleFilter(event) { var filter = event.target.dataset.filter; if (!filter) return; currentFilters[filter] = event.target.value; render(); }
   function handleKeyboard(event) { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-action="goto-project"]')) { event.preventDefault(); window.location.href = 'projeto-detalhes.html?id=' + encodeURIComponent(event.target.dataset.id); } }
   function boot() {
-    loadCache(); ensureCoreProjects(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache(); ensureCoreProjects(); ensureReportsProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
