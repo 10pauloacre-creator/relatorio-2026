@@ -212,7 +212,7 @@
         id: 'project-biblioteca-digital',
         name: 'Biblioteca digital',
         description: 'Biblioteca digital medieval para organização e acesso aos livros e conteúdos pedagógicos.',
-        status: 'Desenvolvimento', type: 'Site', url: 'https://biblioteca-digital-medieval.vercel.app/',
+        status: 'Desenvolvimento', type: 'Site', url: 'https://biblioteca-digital-medieval.vercel.app/', logo: 'assets/icons/icone-biblioteca-digital.png',
         tools: [
           { id: 'tool-biblioteca-vercel', provider: 'Vercel', label: 'Vercel', url: 'https://biblioteca-digital-medieval.vercel.app/', createdAt: stamp, updatedAt: stamp },
           { id: 'tool-biblioteca-supabase', provider: 'Supabase', label: 'Supabase', url: 'https://vgceathgwvtmjxbdpecr.supabase.co/', createdAt: stamp, updatedAt: stamp }
@@ -260,6 +260,15 @@
     state.migrations.reportsProjectIconV1 = { addedAt: stamp, projectId: reports ? reports.id : null };
     if (!reports || reports.logo !== 'iconv2.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
     return Boolean(reports);
+  }
+  function ensureLibraryProjectIcon() {
+    if (state.migrations.libraryProjectIconV1) return false;
+    var library = coreProjectByName('Biblioteca digital', 'project-biblioteca-digital');
+    var stamp = now();
+    if (library && !library.logo) { library.logo = 'assets/icons/icone-biblioteca-digital.png'; library.updatedAt = stamp; persist('library-project-icon'); }
+    state.migrations.libraryProjectIconV1 = { addedAt: stamp, projectId: library ? library.id : null };
+    if (!library || library.logo !== 'assets/icons/icone-biblioteca-digital.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return Boolean(library);
   }
   function ensureFinanceProject() {
     if (state.migrations.financeiroAppV1) return false;
@@ -1253,7 +1262,7 @@
   function handleFilter(event) { var filter = event.target.dataset.filter; if (!filter) return; currentFilters[filter] = event.target.value; render(); }
   function handleKeyboard(event) { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-action="goto-project"]')) { event.preventDefault(); window.location.href = 'projeto-detalhes.html?id=' + encodeURIComponent(event.target.dataset.id); } }
   function boot() {
-    loadCache(); ensureCoreProjects(); ensureReportsProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache(); ensureCoreProjects(); ensureReportsProjectIcon(); ensureLibraryProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
