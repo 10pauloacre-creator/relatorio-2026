@@ -39,7 +39,18 @@
       "Bash(python3 -c \"print\\('hi'\\)\")",
       "Bash(node --check /c/Downloads/relatorio-2026/_tmp_check.js)",
       "Bash(supabase --version)",
-      "Bash(curl -s 'https://vgceathgwvtmjxbdpecr.supabase.co/rest/v1/boletim_normalizado?select=*&limit=5' -H 'apikey: sb_publishable_ba-g-ww4KwM2Wq0x2vsGVg_x_9pTqUQ' -H 'Authorization: Bearer sb_publishable_ba-g-ww4KwM2Wq0x2vsGVg_x_9pTqUQ')"
+      "Bash(curl -s 'https://vgceathgwvtmjxbdpecr.supabase.co/rest/v1/boletim_normalizado?select=*&limit=5' -H 'apikey: sb_publishable_ba-g-ww4KwM2Wq0x2vsGVg_x_9pTqUQ' -H 'Authorization: Bearer sb_publishable_ba-g-ww4KwM2Wq0x2vsGVg_x_9pTqUQ')",
+      "Read(//c/Program Files/Google/Chrome/Application/**)",
+      "Read(//c/Program Files \\\\\\(x86\\\\\\)/Microsoft/Edge/Application/**)",
+      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe.js\")",
+      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe2.js\")",
+      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe3.js\")",
+      "Bash(node --check assets/js/editor.js)",
+      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe4.js\")",
+      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe5.js\")",
+      "Bash(awk -F: '$1>770 && $1<10300')",
+      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe6.js\")",
+      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe.js\" \"file:///C:/Downloads/relatorio-2026/herminio.html\")"
     ],
     "additionalDirectories": [
       "\\tmp"
