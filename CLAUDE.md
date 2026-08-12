@@ -280,6 +280,10 @@ Quando o professor envia o rascunho **diretamente no chat**, Claude:
 | Erro UTF-8 ao publicar | `decodeURIComponent(escape(atob(...)))` quebrava com caracteres portugueses | Substituído por `new TextDecoder('utf-8').decode(Uint8Array.from(...))` |
 | **Relatos somem após reload** | SW cache `v7` nunca atualizado + `index.html` pré-cacheado. Browsers serviam HTML desatualizado do cache | Bumped cache para `v8`, removido `index.html` e URL raiz da lista ASSETS no `sw.js` |
 | Relato `r-t3-0410b` sem aba Presença | Aba 👥 esquecida na criação | Adicionadas aba e div `pl-t3-0410b` |
+| **Casavequia trava ao abrir (só rola, não clica)** | `pcRefreshPresencaVisuals`/`pcRefreshAtividadesVisuals` faziam um `document.querySelectorAll` por aluno de cada relato: ~4.600 varreduras de um DOM de 57 mil elementos (~260 milhões de visitas a nós) a cada sync do Supabase | `pcIndexarCelulas()`/`pcIndexarStats()` indexam `[data-pres]`/`[data-atv]`/`[data-stat]` numa única varredura; as funções passaram a consultar o índice |
+| **Casavequia trava ao abrir (2ª causa)** | `editor.js`: `_editorIsProtectedElement` testava 30 seletores (matches + closest) por elemento em 57 mil nós, e `_editorCapturarBaselineProtegido` serializava `outerHTML` de raízes protegidas aninhadas (`.ea > .ec2 > .ipane`) — custo quadrático a cada `pushNow` | Seletor único combinado `EDITOR_PROTECTED_SELECTOR`; marcação apenas das raízes protegidas mais externas; `_editorIndexarNodes()` no lugar dos `querySelector` por chave |
+
+> **Regra de ouro após esses bugs:** nunca colocar `document.querySelector(All)` dentro de laço que percorre alunos/relatos. Indexe o DOM uma vez e consulte o índice. O DOM da Casavequia tem ~57 mil elementos.
 
 ---
 

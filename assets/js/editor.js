@@ -49,6 +49,11 @@ var EDITOR_PROTECTED_SELECTORS = [
   '[data-rh-mosaico]',
   '[id^="rh-cont-"]'
 ];
+// Testar os 30 seletores um a um (matches + closest) em cada elemento custava
+// ~30 subidas na árvore por nó. Num DOM de ~57 mil elementos isso travava a
+// thread principal. Um único seletor combinado resolve em uma passagem.
+var EDITOR_PROTECTED_SELECTOR = EDITOR_PROTECTED_SELECTORS.join(',');
+var _editorNodeIdSeq = 0;
 
 function initEditor() {
   if (_editorInitialized) return;
@@ -66,20 +71,30 @@ function _editorEnsureNodeIds(root) {
   var scope = root || document.querySelector('.main');
   if (!scope) return;
   if (!scope.getAttribute('data-ed-node')) scope.setAttribute('data-ed-node', 'main-root');
-  var count = 0;
-  scope.querySelectorAll('*').forEach(function(el) {
-    if (!el.getAttribute('data-ed-node')) {
-      count += 1;
-      el.setAttribute('data-ed-node', 'ed-node-' + count + '-' + el.tagName.toLowerCase());
-    }
+  // O contador é global e crescente: reiniciá-lo a cada chamada gerava
+  // data-ed-node duplicados quando novos elementos entravam no DOM.
+  // O :not() deixa o motor de seletores pular quem já tem id, em vez de
+  // fazer 57 mil getAttribute em JS a cada chamada.
+  scope.querySelectorAll(':not([data-ed-node])').forEach(function(el) {
+    _editorNodeIdSeq += 1;
+    el.setAttribute('data-ed-node', 'ed-node-' + _editorNodeIdSeq + '-' + el.tagName.toLowerCase());
   });
 }
 
-function _editorIsProtectedElement(el) {
-  if (!el || el.nodeType !== 1) return false;
-  return EDITOR_PROTECTED_SELECTORS.some(function(selector) {
-    return el.matches(selector) || !!el.closest(selector);
+function _editorIndexarNodes(root) {
+  var idx = {};
+  if (!root) return idx;
+  root.querySelectorAll('[data-ed-node]').forEach(function(el) {
+    var key = el.getAttribute('data-ed-node');
+    if (key && !idx[key]) idx[key] = el;
   });
+  return idx;
+}
+
+function _editorIsProtectedElement(el) {
+  if (!el || el.nodeType !== 1 || !el.closest) return false;
+  // closest() já testa o próprio elemento antes de subir pelos ancestrais.
+  return !!el.closest(EDITOR_PROTECTED_SELECTOR);
 }
 
 function _editorCanMutate(el) {
@@ -104,11 +119,22 @@ function _editorAvisarProtecao() {
 function _editorMarcarAreasProtegidas(root) {
   var scope = root || document.querySelector('.main');
   if (!scope) return;
-  if (_editorIsProtectedElement(scope)) scope.setAttribute('data-ed-protected', '1');
-  else scope.removeAttribute('data-ed-protected');
-  scope.querySelectorAll('*').forEach(function(el) {
-    if (_editorIsProtectedElement(el)) el.setAttribute('data-ed-protected', '1');
-    else el.removeAttribute('data-ed-protected');
+  scope.querySelectorAll('[data-ed-protected]').forEach(function(el) {
+    el.removeAttribute('data-ed-protected');
+  });
+  scope.removeAttribute('data-ed-protected');
+  if (_editorIsProtectedElement(scope)) {
+    scope.setAttribute('data-ed-protected', '1');
+    return;
+  }
+  // Marca só as raízes protegidas mais externas. Tudo abaixo delas já está
+  // coberto: quem está dentro de uma raiz é barrado por _editorIsProtectedElement,
+  // e quem contém uma raiz encontra a própria raiz marcada. Marcar os aninhados
+  // (.ea > .ec2 > .ipane ...) fazia o baseline serializar a mesma subárvore
+  // várias vezes — custo quadrático que travava a página.
+  scope.querySelectorAll(EDITOR_PROTECTED_SELECTOR).forEach(function(el) {
+    if (el.parentElement && el.parentElement.closest(EDITOR_PROTECTED_SELECTOR)) return;
+    el.setAttribute('data-ed-protected', '1');
   });
 }
 
@@ -146,8 +172,9 @@ function _editorSanitizarHtmlSeguro() {
     el.classList.remove('ed-hover');
     el.classList.remove('ed-selecionado');
   });
+  var cloneNodes = _editorIndexarNodes(clone);
   Object.keys(_editorProtectedBaseline).forEach(function(key) {
-    var alvo = clone.querySelector('[data-ed-node="' + key + '"]');
+    var alvo = cloneNodes[key];
     if (!alvo) return;
     var holder = document.createElement('div');
     holder.innerHTML = _editorProtectedBaseline[key];
@@ -199,9 +226,9 @@ function _editorSnapshotEstruturalValido(payloadHtml, protectedBaseline) {
   if (duplicateId) return false;
 
   var protectedKeys = Object.keys(protectedBaseline || {});
+  var holderNodes = _editorIndexarNodes(holder);
   for (var j = 0; j < protectedKeys.length; j += 1) {
-    var key = protectedKeys[j];
-    if (!holder.querySelector('[data-ed-node="' + key + '"]')) return false;
+    if (!holderNodes[protectedKeys[j]]) return false;
   }
 
   return true;
@@ -211,8 +238,9 @@ function _editorRestaurarProtegidos(root, baseline) {
   var scope = root || document.querySelector('.main');
   var source = baseline || _editorProtectedBaseline;
   if (!scope || !source) return;
+  var scopeNodes = _editorIndexarNodes(scope);
   Object.keys(source).forEach(function(key) {
-    var alvo = scope.querySelector('[data-ed-node="' + key + '"]');
+    var alvo = scopeNodes[key];
     if (!alvo) return;
     var holder = document.createElement('div');
     holder.innerHTML = source[key];

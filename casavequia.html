@@ -7358,11 +7358,11 @@ function _atvAtualizarCelula(cell,s){
   cell.querySelector('.aic').textContent=_atvIcons[s]||'–';
 }
 
-function _atvAtualizarStat(atvId){
+function _atvAtualizarStat(atvId,statEl){
   var m2=atvId.match(/^atv-(t[^-]+)/);var turma=m2?m2[1]:null;if(!turma)return;
   var al=ALUNOS[turma]||[];
   var cfg=ATIVIDADES[atvId]||{fez:[],naoFez:[],parcial:false};
-  var st=document.querySelector('[data-stat="'+atvId+'"]');if(!st)return;
+  var st=statEl||document.querySelector('[data-stat="'+atvId+'"]');if(!st)return;
   var fz=0,nf=0,ag=0;
   al.forEach(function(a){if(a.tr)return;var s=_atvStatus(atvId,a.n,cfg);if(s==='fz')fz++;else if(s==='nf')nf++;else ag++;});
   st.innerHTML='<span>✓ Entregaram: <strong>'+fz+'</strong></span><span>✗ Não entregaram: <strong>'+nf+'</strong></span><span>⏳ Aguardando: <strong>'+ag+'</strong></span>';
@@ -7992,7 +7992,29 @@ function pcBuildRemoteSyncPayload(){
     alunosSync:pcBuildSyncPayload()
   };
 }
+// Indexa numa única varredura todas as células marcadas com o atributo pedido,
+// agrupadas por "valorDoAtributo_numeroDoAluno".
+// Sem este índice, cada aluno de cada relato dispararia um querySelectorAll no
+// documento inteiro (~57 mil elementos): 200+ relatos x ~25 alunos = centenas de
+// milhões de visitas a nós, travando a thread principal por minutos.
+function pcIndexarCelulas(attr){
+  var idx={};
+  document.querySelectorAll('['+attr+'][data-n]').forEach(function(el){
+    var k=el.getAttribute(attr)+'_'+el.getAttribute('data-n');
+    if(!idx[k])idx[k]=[];
+    idx[k].push(el);
+  });
+  return idx;
+}
+function pcIndexarStats(){
+  var idx={};
+  document.querySelectorAll('[data-stat]').forEach(function(el){
+    idx[el.getAttribute('data-stat')]=el;
+  });
+  return idx;
+}
 function pcRefreshPresencaVisuals(){
+  var celulas=pcIndexarCelulas('data-pres');
   Object.entries(PRESENCA).forEach(function(pair){
     var id=pair[0],cfg=pair[1];
     var el=document.getElementById(id);if(!el)return;
@@ -8001,7 +8023,7 @@ function pcRefreshPresencaVisuals(){
     al.forEach(function(a){
       var s=pcResolvePresenceStatus(id,a.n,cfg);
       if(s==='fa')fa+=1;else if(s==='fj')fj+=1;else pr+=1;
-      document.querySelectorAll('[data-pres="'+id+'"][data-n="'+a.n+'"]').forEach(function(row){
+      (celulas[id+'_'+a.n]||[]).forEach(function(row){
         _presAplicarVisual(row,s);
       });
     });
@@ -8012,17 +8034,19 @@ function pcRefreshPresencaVisuals(){
   });
 }
 function pcRefreshAtividadesVisuals(){
+  var celulas=pcIndexarCelulas('data-atv');
+  var stats=pcIndexarStats();
   document.querySelectorAll('.ipane[id^="a-t"]').forEach(function(pane){
     var m=pane.id.match(/^a-(t[^-]+)-(.+)$/);if(!m)return;
     var atvId='atv-'+m[1]+'-'+m[2];
     var cfg=ATIVIDADES[atvId]||{turma:m[1],fez:[],naoFez:[],parcial:false};
     (ALUNOS[m[1]]||[]).forEach(function(a){
       var s=pcResolveActivityStatus(atvId,a.n,cfg);
-      document.querySelectorAll('[data-atv="'+atvId+'"][data-n="'+a.n+'"]').forEach(function(cell){
+      (celulas[atvId+'_'+a.n]||[]).forEach(function(cell){
         _atvAtualizarCelula(cell,s);
       });
     });
-    _atvAtualizarStat(atvId);
+    _atvAtualizarStat(atvId,stats[atvId]);
   });
 }
 function pcApplyRemoteSync(payload,meta){
@@ -9568,19 +9592,21 @@ document.addEventListener('DOMContentLoaded',seqRender);
 function _syncAplicarAtv(data) {
   if (!data) return;
   var atvIds = {};
+  var celulas = pcIndexarCelulas('data-atv');
   Object.keys(data).forEach(function(k) {
     _atvManual[k] = data[k];
     var idx = k.lastIndexOf('_');
     if (idx < 0) return;
     var atvId = k.slice(0, idx);
     var n = parseInt(k.slice(idx + 1));
-    document.querySelectorAll('[data-atv="'+atvId+'"][data-n="'+n+'"]').forEach(function(cell){
+    (celulas[atvId + '_' + n] || []).forEach(function(cell){
       _atvAtualizarCelula(cell, data[k]);
     });
     atvIds[atvId] = true;
   });
   localStorage.setItem('atv_manual', JSON.stringify(_atvManual));
-  Object.keys(atvIds).forEach(function(atvId){ _atvAtualizarStat(atvId); });
+  var stats = pcIndexarStats();
+  Object.keys(atvIds).forEach(function(atvId){ _atvAtualizarStat(atvId, stats[atvId]); });
   if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
 }
 
@@ -9684,7 +9710,7 @@ function iniciarSyncUniversal() {
 </script>
 <script src="assets/js/casavequia-calendar-data.js"></script>
 <script src="assets/js/casavequia-calendar.js"></script>
-<script src="assets/js/editor.js?v=20260721a"></script>
+<script src="assets/js/editor.js?v=20260812a"></script>
 <script src="assets/js/alunos.js"></script>
 <script src="assets/js/livros-prompts.js?v=20260723b"></script>
 <script>
