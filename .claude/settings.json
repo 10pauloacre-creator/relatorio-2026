@@ -50,10 +50,24 @@
       "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe5.js\")",
       "Bash(awk -F: '$1>770 && $1<10300')",
       "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe6.js\")",
-      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe.js\" \"file:///C:/Downloads/relatorio-2026/herminio.html\")"
+      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe.js\" \"file:///C:/Downloads/relatorio-2026/herminio.html\")",
+      "Bash(ls /c/Downloads/ | head -50)",
+      "Read(//c/Downloads//**)",
+      "Bash(ls -la \"/c/Downloads/Biblioteca Digital/\" 2>/dev/null | head -40)",
+      "Read(//c/Downloads/Biblioteca Digital//**)",
+      "Bash(git log *)",
+      "Bash(awk 'NR>=880 && NR<=890 {print NR\": \"substr\\($0,1,600\\)}' casavequia.html)",
+      "Bash(awk 'NR==10246 {print substr\\($0,1,800\\)}' casavequia.html)",
+      "Bash(awk 'NR>=9830 && NR<=9845 {print NR\": \"substr\\($0,1,300\\)}' casavequia.html)",
+      "Bash(grep -rl -i \"iniciar aula\\\\|infra..o registrada\\\\|aula pausada\" /c/Downloads --include=*.html --include=*.js --exclude-dir=node_modules 2>/dev/null | head -20)",
+      "Read(//c/Downloads/**)",
+      "Bash(grep -rl -i \"iniciarAula\\\\|startClass\\\\|aula_ativa\\\\|aulaSession\\\\|sessaoAula\" /c/Downloads --include=*.html --include=*.js --exclude-dir=node_modules 2>/dev/null | head -20; echo \"=== git repos in Downloads ===\"; find /c/Downloads -maxdepth 3 -name \".git\" -type d 2>/dev/null | head -20)",
+      "mcp__plugin_claude-mem_mcp-search__search"
     ],
     "additionalDirectories": [
-      "\\tmp"
+      "\\tmp",
+      "C:\\Users\\PAULO ROBERTO\\biblioteca-digital-medieval-1\\sql",
+      "C:\\Users\\PAULO ROBERTO\\biblioteca-digital-medieval-1\\assets\\js"
     ]
   }
 }
