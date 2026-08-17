@@ -81,10 +81,10 @@ if (!refResumo) return;
 var turmaId = refResumo[1];
 var grupo = refResumo[2];
 var infoDisc = { grupo: grupo, disc: (
-grupo === 'lp' ? 'LÃ­ngua Portuguesa' :
-grupo === 'ing' ? 'InglÃªs' :
+grupo === 'lp' ? 'Língua Portuguesa' :
+grupo === 'ing' ? 'Inglês' :
 grupo === 'esp' ? 'Espanhol' :
-grupo === 'art' ? 'Arte' : 'RedaÃ§Ã£o'
+grupo === 'art' ? 'Arte' : 'Redação'
 ) };
 var data = parseDataCardRH(card);
 if (!data) return;
