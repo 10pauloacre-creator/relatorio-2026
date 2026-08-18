@@ -726,6 +726,36 @@ body.modo-escuro .pum-det{color:#8ab8a0}
 .pc-hero-title{margin:0;font-family:'Playfair Display',serif;font-size:1.8rem;line-height:1.1}
 .pc-hero-copy{margin:11px 0 0;color:rgba(255,255,255,.86);font-size:.92rem;line-height:1.72;max-width:760px}
 .pc-hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.pc-diary-modal{position:fixed;inset:0;background:rgba(7,17,12,.72);z-index:12000;display:none;align-items:center;justify-content:center;padding:20px}
+.pc-diary-modal.on{display:flex}
+.pc-diary-modal-inner{width:min(1180px,100%);max-height:92vh;background:var(--cr);border-radius:24px;box-shadow:0 28px 80px rgba(0,0,0,.34);display:flex;flex-direction:column;overflow:hidden}
+.pc-diary-modal-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 22px 18px;border-bottom:1px solid var(--cl);background:linear-gradient(135deg,rgba(26,58,42,.98),rgba(39,86,63,.94) 56%,rgba(74,148,103,.9));color:#fff}
+.pc-diary-modal-top h3{font-family:'Playfair Display',serif;font-size:1.2rem;line-height:1.15}
+.pc-diary-modal-top p{margin-top:6px;font-size:.8rem;line-height:1.6;color:rgba(255,255,255,.78)}
+.pc-diary-modal-top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.pc-diary-action-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 16px;border:none;border-radius:999px;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:transform .15s ease,opacity .15s ease,filter .15s ease}
+.pc-diary-action-btn:hover{transform:translateY(-1px)}
+.pc-diary-action-btn.primary{background:linear-gradient(135deg,#c9a84c,#ecd48b);color:#43310e}
+.pc-diary-action-btn.ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.18)}
+.pc-diary-action-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.pc-diary-modal-body{display:grid;grid-template-columns:minmax(280px,340px) minmax(0,1fr);min-height:0;flex:1}
+.pc-diary-sidebar{padding:18px;border-right:1px solid var(--cl);background:#f6f4ee;overflow:auto}
+.pc-diary-sidebar-block+.pc-diary-sidebar-block{margin-top:18px}
+.pc-diary-sidebar-label{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--cm);margin-bottom:10px}
+.pc-diary-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.pc-diary-choice{display:flex;align-items:center;justify-content:center;padding:11px 14px;border-radius:14px;border:1px solid rgba(26,58,42,.12);background:#fff;color:var(--vd);font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;transition:transform .14s ease,background .14s ease,border-color .14s ease,box-shadow .14s ease;text-align:center}
+.pc-diary-choice:hover{transform:translateY(-1px);border-color:rgba(26,58,42,.25);box-shadow:0 8px 18px rgba(26,58,42,.08)}
+.pc-diary-choice.on{background:linear-gradient(135deg,#1a3a2a,#2d6147);border-color:#1a3a2a;color:#fff}
+.pc-diary-empty{font-size:.8rem;line-height:1.6;color:var(--cm);background:#fff;border:1px dashed rgba(26,58,42,.18);border-radius:16px;padding:14px 15px}
+.pc-diary-viewer{display:flex;flex-direction:column;min-height:0;background:#fff}
+.pc-diary-meta{padding:18px 20px 0}
+.pc-diary-meta-card{border:1px solid rgba(26,58,42,.12);background:#f8faf7;border-radius:16px;padding:14px 16px}
+.pc-diary-meta-card strong{display:block;font-family:'Playfair Display',serif;font-size:1rem;color:var(--vd)}
+.pc-diary-meta-card span{display:block;margin-top:6px;font-size:.8rem;line-height:1.6;color:var(--cm)}
+.pc-diary-frame-wrap{padding:18px 20px 20px;flex:1;min-height:0}
+.pc-diary-frame{width:100%;height:100%;min-height:520px;border:1px solid rgba(26,58,42,.12);border-radius:18px;background:#fff}
+@media(max-width:980px){.pc-diary-modal-body{grid-template-columns:1fr}.pc-diary-sidebar{border-right:none;border-bottom:1px solid var(--cl)}.pc-diary-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
+@media(max-width:720px){.pc-diary-modal{padding:10px}.pc-diary-modal-top{padding:18px 16px 16px;flex-direction:column}.pc-diary-modal-top-actions{width:100%;justify-content:stretch}.pc-diary-action-btn{flex:1}.pc-diary-sidebar,.pc-diary-meta,.pc-diary-frame-wrap{padding-left:14px;padding-right:14px}.pc-diary-frame{min-height:360px}}
 .pc-hero-btn,.pc-hero-link,.pc-hero-pill{border:none;border-radius:999px;padding:11px 16px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .15s ease,box-shadow .15s ease}
 .pc-hero-btn:hover,.pc-hero-link:hover,.pc-hero-pill:hover{transform:translateY(-1px)}
 .pc-hero-btn.primary{background:linear-gradient(135deg,#c9a84c,#e3bf62);color:#4b3810;box-shadow:0 10px 24px rgba(201,168,76,.18)}
@@ -8247,9 +8277,528 @@ function pcDecorateSectionHero(sectionId,cfg){
     +'<button class="pc-hero-btn ghost" type="button" onclick="pcHeroToggleSection(\''+sectionId+'\',false)">Fechar todos</button>'
     +'<button class="pc-hero-btn ghost" type="button" onclick="pcHeroScrollLatest(\''+sectionId+'\')">Ir para o mais recente</button>'
     +'<button class="pc-hero-btn soft" type="button" onclick="pcCopySectionSummary(\''+sectionId+'\')">Copiar resumo da aba</button>'
+    +'<button class="pc-hero-btn ghost" type="button" onclick="pcOpenDiaryReportModal(\''+sectionId+'\')">Relatório diários</button>'
     +(cfg.page?'<a class="pc-hero-link" href="'+cfg.page+'">Abrir pagina de alunos</a>':'')
     +'</div>';
   sec.insertAdjacentHTML('afterbegin','<div class="pc-hero"><div class="pc-hero-main"><div class="pc-hero-kicker">'+cfg.kicker+'</div><h2 class="pc-hero-title">'+cfg.title+'</h2><p class="pc-hero-copy">'+cfg.copy+'</p>'+actions+(quick?'<div class="pc-hero-quicktabs">'+quick+'</div>':'')+'<div class="pc-hero-status" id="pc-hero-status-'+sectionId+'">'+cfg.status+'</div></div><div class="pc-hero-side"><div class="pc-hero-stat"><span class="pc-hero-stat-label">Lancamentos</span><strong class="pc-hero-stat-value" id="pc-stat-count-'+sectionId+'">--</strong><span class="pc-hero-stat-meta">Total de registros desta aba.</span></div><div class="pc-hero-stat"><span class="pc-hero-stat-label">Ultimo registro</span><strong class="pc-hero-stat-value" id="pc-stat-last-'+sectionId+'">--</strong><span class="pc-hero-stat-meta">Data do relato mais recente.</span></div><div class="pc-hero-stat pc-hero-stat-lessons"><span class="pc-hero-stat-label">Contagem de aulas</span><div class="pc-hero-lessons" id="pc-stat-lessons-'+sectionId+'">'+pcBuildHeroLessonsHtml(sectionId)+'</div><span class="pc-hero-stat-meta">Aulas registradas por materia em relacao ao total anual.</span></div></div></div>');
+}
+var PC_DIARY_SECTION_LABELS={'sec-all':'Geral','sec-t1':'1ª Série','sec-t2':'2ª Série','sec-t3':'3ª Série','sec-t6':'6º Ano'};
+var PC_DIARY_DISC_ORDER=['Língua Portuguesa','Trilhas de Linguagens','Trilhas de C. Humanas','Artes'];
+var PC_DIARY_MODAL_STATE={sectionId:'',disciplina:'',mode:'',pdfUrl:'',fileName:''};
+var PC_DIARY_MONTH_INDEX={jan:0,fev:1,mar:2,abr:3,mai:4,jun:5,jul:6,ago:7,set:8,out:9,nov:10,dez:11};
+
+function pcDiaryNormalizeDisciplina(value){
+  var clean=String(value||'').replace(/\([^)]*\)/g,' ').replace(/\s+/g,' ').trim();
+  var norm=pcNormalizeText(clean);
+  if(norm==='lp'||norm==='l p'||norm.indexOf('lingua portuguesa')>=0)return' Língua Portuguesa'.trim();
+  if(norm.indexOf('trilhas de linguagens')>=0||norm.indexOf('t ling')>=0||norm.indexOf('tling')>=0)return'Trilhas de Linguagens';
+  if(norm.indexOf('trilhas de c humanas')>=0||norm.indexOf('trilhas de ciencias humanas')>=0||norm.indexOf('t c h')>=0||norm.indexOf('tch')>=0)return'Trilhas de C. Humanas';
+  if(norm.indexOf('arte')===0||norm.indexOf('artes')===0)return'Artes';
+  return clean||'Disciplina';
+}
+function pcDiaryResolveHoursFromRange(value){
+  var match=String(value||'').match(/(\d{1,2}):(\d{2}).*?(\d{1,2}):(\d{2})/);
+  if(!match)return 1;
+  var start=(parseInt(match[1],10)*60)+parseInt(match[2],10);
+  var end=(parseInt(match[3],10)*60)+parseInt(match[4],10);
+  if(end<=start)return 1;
+  return Math.max(1,Math.round((end-start)/60));
+}
+function pcDiaryFormatShortDate(dateObj){
+  return ('0'+dateObj.getDate()).slice(-2)+'/'+('0'+(dateObj.getMonth()+1)).slice(-2);
+}
+function pcDiaryResolveBimester(dateObj){
+  var month=dateObj.getMonth()+1;
+  if(month<=4)return 1;
+  if(month<=6)return 2;
+  if(month<=9)return 3;
+  return 4;
+}
+function pcDiaryParseCardDate(card){
+  if(!card)return null;
+  var dayText=((card.querySelector('.edb .d')||{}).textContent||'').trim();
+  var monthText=((card.querySelector('.edb .my')||{}).textContent||'').trim();
+  var day=parseInt(dayText,10);
+  var monthBits=pcNormalizeText(monthText).split(' ');
+  var monthKey=(monthBits[0]||'').slice(0,3);
+  var year=parseInt(monthBits[1],10);
+  var monthIndex=PC_DIARY_MONTH_INDEX[monthKey];
+  if(!day||isNaN(year)||monthIndex==null)return null;
+  return new Date(year,monthIndex,day,12,0,0,0);
+}
+function pcDiaryExtractLinesFromContent(ct){
+  var lines=[];var current='';
+  Array.from(ct.childNodes||[]).forEach(function(node){
+    if(node.nodeName==='BR'){
+      if(current.trim())lines.push(current.trim());
+      current='';
+      return;
+    }
+    current+=String(node.textContent||'');
+  });
+  if(current.trim())lines.push(current.trim());
+  return lines.map(function(line){return line.replace(/\s+/g,' ').trim();}).filter(Boolean);
+}
+function pcDiaryCollectRecords(){
+  var today=new Date();today.setHours(23,59,59,999);
+  var records=[];
+  document.querySelectorAll('#sec-all .ea').forEach(function(card){
+    var dateObj=pcDiaryParseCardDate(card);
+    if(!dateObj||dateObj>today)return;
+    var dateKey=dateObj.toISOString().slice(0,10);
+    var lines=[];
+    card.querySelectorAll('.ct').forEach(function(ct){
+      lines=lines.concat(pcDiaryExtractLinesFromContent(ct));
+    });
+    lines.forEach(function(line){
+      var match=line.match(/^(1ª Série|2ª Série|3ª Série|6º Ano)\s*\(([^)]+)\)\s*[—-]\s*([^:]+):/i);
+      if(!match)return;
+      var turmaLabel=match[1];
+      var turmaId=PC_PROJECTION_TURMA_ID_MAP[turmaLabel];
+      if(!turmaId)return;
+      records.push({
+        dateKey:dateKey,
+        dateLabel:pcDiaryFormatShortDate(dateObj),
+        turmaId:turmaId,
+        turmaLabel:turmaLabel,
+        disciplina:pcDiaryNormalizeDisciplina(match[3]),
+        hours:pcDiaryResolveHoursFromRange(match[2]),
+        bimestre:pcDiaryResolveBimester(dateObj)
+      });
+    });
+  });
+  return records;
+}
+function pcDiarySortDisciplinas(values){
+  return values.slice().sort(function(a,b){
+    var ai=PC_DIARY_DISC_ORDER.indexOf(a),bi=PC_DIARY_DISC_ORDER.indexOf(b);
+    if(ai===-1&&bi===-1)return a.localeCompare(b,'pt-BR');
+    if(ai===-1)return 1;
+    if(bi===-1)return-1;
+    return ai-bi;
+  });
+}
+function pcDiaryGetSectionRecords(sectionId){
+  var records=pcDiaryCollectRecords();
+  if(sectionId==='sec-all')return records;
+  var turmaMap={'sec-t1':'t1','sec-t2':'t2','sec-t3':'t3','sec-t6':'t6'};
+  return records.filter(function(item){return item.turmaId===turmaMap[sectionId];});
+}
+function pcDiaryGetDisciplinas(sectionId){
+  var seen={};
+  pcDiaryGetSectionRecords(sectionId).forEach(function(item){seen[item.disciplina]=true;});
+  return pcDiarySortDisciplinas(Object.keys(seen));
+}
+function pcDiaryBuildDateSummary(records){
+  var grouped={};
+  records.forEach(function(item){
+    grouped[item.dateKey]=grouped[item.dateKey]||{dateLabel:item.dateLabel,hours:0};
+    grouped[item.dateKey].hours+=Math.max(1,item.hours||1);
+  });
+  return Object.keys(grouped).sort().map(function(dateKey){
+    var data=grouped[dateKey],tokens=[];
+    for(var i=1;i<=data.hours;i++)tokens.push(data.dateLabel+' ('+i+')');
+    return tokens.join(' - ');
+  });
+}
+function pcDiaryBuildReport(sectionId,disciplina,mode){
+  var sectionLabel=PC_DIARY_SECTION_LABELS[sectionId]||'Turma';
+  var records=pcDiaryGetSectionRecords(sectionId).filter(function(item){return item.disciplina===disciplina;});
+  var groups=[];
+  if(mode==='total'){
+    [1,2,3,4].forEach(function(bim){
+      var subset=records.filter(function(item){return item.bimestre===bim;});
+      groups.push({title:bim+'º Bimestre',lines:pcDiaryBuildDateSummary(subset),count:subset.length});
+    });
+  }else{
+    var bimSel=parseInt(mode,10)||1;
+    var bimRecords=records.filter(function(item){return item.bimestre===bimSel;});
+    groups.push({title:bimSel+'º Bimestre',lines:pcDiaryBuildDateSummary(bimRecords),count:bimRecords.length});
+  }
+  var bodyGroups=groups.filter(function(group){return group.lines.length;});
+  if(!bodyGroups.length)bodyGroups=[{title:mode==='total'?'Total':'Sem registros',lines:['Nenhuma aula lançada até 18/08/2026 para este recorte.'],count:0}];
+  return{
+    title:sectionLabel+' > '+disciplina+' - '+(mode==='total'?'Total':(parseInt(mode,10)||1)+'º Bimestre'),
+    subtitle:sectionId==='sec-all'?'Aulas lançadas até 18/08/2026, agrupadas por disciplina.':'Aulas lançadas da turma até 18/08/2026.',
+    sectionLabel:sectionLabel,
+    disciplina:disciplina,
+    groups:bodyGroups
+  };
+}
+function pcDiaryPdfHex(text){
+  var value=String(text==null?'':text),hex='FEFF';
+  for(var i=0;i<value.length;i++){
+    var code=value.charCodeAt(i).toString(16).toUpperCase();
+    hex+=('0000'+code).slice(-4);
+  }
+  return'<'+hex+'>';
+}
+function pcDiaryWrapText(text,maxChars){
+  var words=String(text||'').split(/\s+/).filter(Boolean),lines=[],current='';
+  if(!words.length)return[''];
+  words.forEach(function(word){
+    var next=current?current+' '+word:word;
+    if(next.length>maxChars&&current){lines.push(current);current=word;return;}
+    current=next;
+  });
+  if(current)lines.push(current);
+  return lines;
+}
+function pcDiaryCreatePdfBlob(report){
+  var pageWidth=595,pageHeight=842,margin=42,maxWidthChars=92;
+  var pages=[],page=null,y=0;
+  function newPage(){page=[];pages.push(page);y=pageHeight-margin;}
+  function addLine(text,size,bold,indent){
+    indent=indent||0;
+    if(!page)newPage();
+    var maxChars=Math.max(18,Math.floor(maxWidthChars-((indent||0)/4)));
+    pcDiaryWrapText(text,maxChars).forEach(function(line){
+      if(y<margin+24)newPage();
+      page.push('BT /'+(bold?'F2':'F1')+' '+size+' Tf 1 0 0 1 '+(margin+indent)+' '+y+' Tm '+pcDiaryPdfHex(line)+' Tj ET');
+      y-=size+5;
+    });
+  }
+  addLine(report.title,18,true,0);
+  addLine(report.subtitle,10,false,0);
+  y-=4;
+  report.groups.forEach(function(group){
+    addLine(group.title,14,true,0);
+    if(group.lines.length){
+      group.lines.forEach(function(line){addLine('Data: '+line,11,false,10);});
+    }else{
+      addLine('Nenhuma aula lançada.',11,false,10);
+    }
+    y-=4;
+  });
+  if(!pages.length)newPage();
+  var objects=['','<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids __KIDS__ /Count __COUNT__ >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>'];
+  var kids=[];
+  pages.forEach(function(commands,index){
+    var pageObj=5+(index*2),contentObj=pageObj+1,stream=commands.join('\n');
+    kids.push(pageObj+' 0 R');
+    objects[pageObj]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+pageWidth+' '+pageHeight+'] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents '+contentObj+' 0 R >>';
+    objects[contentObj]='<< /Length '+(new TextEncoder().encode(stream).length)+' >>\nstream\n'+stream+'\nendstream';
+  });
+  objects[2]=objects[2].replace('__KIDS__','['+kids.join(' ')+']').replace('__COUNT__',String(pages.length));
+  var pdf='%PDF-1.4\n',offsets=[0];
+  for(var i=1;i<objects.length;i++){
+    offsets[i]=pdf.length;
+    pdf+=i+' 0 obj\n'+objects[i]+'\nendobj\n';
+  }
+  var xrefStart=pdf.length;
+  pdf+='xref\n0 '+objects.length+'\n0000000000 65535 f \n';
+  for(var j=1;j<objects.length;j++)pdf+=('0000000000'+offsets[j]).slice(-10)+' 00000 n \n';
+  pdf+='trailer\n<< /Size '+objects.length+' /Root 1 0 R >>\nstartxref\n'+xrefStart+'\n%%EOF';
+  return new Blob([pdf],{type:'application/pdf'});
+}
+function pcDiaryEnsureModal(){
+  var modal=document.getElementById('pc-diary-modal');
+  if(modal)return modal;
+  modal=document.createElement('div');
+  modal.id='pc-diary-modal';
+  modal.className='pc-diary-modal';
+  modal.innerHTML='<div class="pc-diary-modal-inner"><div class="pc-diary-modal-top"><div><h3 id="pc-diary-modal-title">Relatório diários</h3><p id="pc-diary-modal-subtitle">Selecione a disciplina e o bimestre para abrir o PDF.</p></div><div class="pc-diary-modal-top-actions"><button class="pc-diary-action-btn primary" id="pc-diary-download-btn" type="button" onclick="pcDiaryDownloadCurrentPdf()" disabled>Baixar</button><button class="pc-diary-action-btn ghost" type="button" onclick="pcCloseDiaryReportModal()">Fechar</button></div></div><div class="pc-diary-modal-body"><div class="pc-diary-sidebar"><div class="pc-diary-sidebar-block"><div class="pc-diary-sidebar-label">Disciplinas</div><div class="pc-diary-grid" id="pc-diary-discipline-grid"></div></div><div class="pc-diary-sidebar-block"><div class="pc-diary-sidebar-label">Relatórios</div><div class="pc-diary-grid" id="pc-diary-range-grid"></div></div></div><div class="pc-diary-viewer"><div class="pc-diary-meta"><div class="pc-diary-meta-card"><strong id="pc-diary-meta-title">Selecione um relatório</strong><span id="pc-diary-meta-copy">O PDF será mostrado aqui com as datas lançadas de 1h em 1h/aula.</span></div></div><div class="pc-diary-frame-wrap"><iframe id="pc-diary-frame" class="pc-diary-frame" title="Pré-visualização do relatório diário"></iframe></div></div></div></div>';
+  modal.addEventListener('click',function(e){if(e.target===modal)pcCloseDiaryReportModal();});
+  document.body.appendChild(modal);
+  return modal;
+}
+function pcDiaryRevokePdfUrl(){
+  if(PC_DIARY_MODAL_STATE.pdfUrl){URL.revokeObjectURL(PC_DIARY_MODAL_STATE.pdfUrl);PC_DIARY_MODAL_STATE.pdfUrl='';}
+}
+function pcDiaryRenderDisciplinas(sectionId){
+  var grid=document.getElementById('pc-diary-discipline-grid');if(!grid)return;
+  var disciplinas=pcDiaryGetDisciplinas(sectionId);
+  if(!disciplinas.length){grid.innerHTML='<div class="pc-diary-empty">Nenhuma disciplina com aulas lançadas foi encontrada nesta aba.</div>';return;}
+  grid.innerHTML=disciplinas.map(function(item){
+    var active=PC_DIARY_MODAL_STATE.disciplina===item?' on':'';
+    return'<button class="pc-diary-choice'+active+'" type="button" onclick="pcDiarySelectDisciplina('+JSON.stringify(item)+')">'+item+'</button>';
+  }).join('');
+}
+function pcDiaryRenderRanges(){
+  var grid=document.getElementById('pc-diary-range-grid');if(!grid)return;
+  if(!PC_DIARY_MODAL_STATE.disciplina){grid.innerHTML='<div class="pc-diary-empty">Escolha uma disciplina para liberar os botões de bimestre e o relatório total.</div>';return;}
+  var buttons=['1','2','3','4','total'].map(function(value){
+    var label=value==='total'?'Total':value+'º Bimestre';
+    var active=PC_DIARY_MODAL_STATE.mode===value?' on':'';
+    return'<button class="pc-diary-choice'+active+'" type="button" onclick="pcDiaryOpenPdf('+JSON.stringify(value)+')">'+label+'</button>';
+  }).join('');
+  grid.innerHTML=buttons;
+}
+function pcDiaryUpdateMeta(title,copy){
+  var titleEl=document.getElementById('pc-diary-meta-title');
+  var copyEl=document.getElementById('pc-diary-meta-copy');
+  if(titleEl)titleEl.textContent=title||'Selecione um relatório';
+  if(copyEl)copyEl.textContent=copy||'O PDF será mostrado aqui com as datas lançadas de 1h em 1h/aula.';
+}
+function pcDiarySetDownloadState(enabled,fileName){
+  var btn=document.getElementById('pc-diary-download-btn');
+  if(btn){btn.disabled=!enabled;btn.setAttribute('data-file',fileName||'');}
+}
+function pcOpenDiaryReportModal(sectionId){
+  pcDiaryEnsureModal();
+  pcDiaryRevokePdfUrl();
+  PC_DIARY_MODAL_STATE.sectionId=sectionId;
+  PC_DIARY_MODAL_STATE.disciplina='';
+  PC_DIARY_MODAL_STATE.mode='';
+  PC_DIARY_MODAL_STATE.fileName='';
+  document.getElementById('pc-diary-modal').classList.add('on');
+  var sectionLabel=PC_DIARY_SECTION_LABELS[sectionId]||'Turma';
+  var titleEl=document.getElementById('pc-diary-modal-title');
+  var subEl=document.getElementById('pc-diary-modal-subtitle');
+  if(titleEl)titleEl.textContent='Relatório diários — '+sectionLabel;
+  if(subEl)subEl.textContent=sectionId==='sec-all'?'Selecione a disciplina para listar todas as aulas lançadas até 18/08/2026.':'Selecione a disciplina e o bimestre para gerar o PDF rápido da turma.';
+  pcDiaryRenderDisciplinas(sectionId);
+  pcDiaryRenderRanges();
+  pcDiaryUpdateMeta('Selecione um relatório','O PDF será mostrado aqui com as datas lançadas de 1h em 1h/aula.');
+  var frame=document.getElementById('pc-diary-frame');
+  if(frame)frame.removeAttribute('src');
+  pcDiarySetDownloadState(false,'');
+}
+function pcCloseDiaryReportModal(){
+  var modal=document.getElementById('pc-diary-modal');
+  if(modal)modal.classList.remove('on');
+  pcDiaryRevokePdfUrl();
+}
+function pcDiarySelectDisciplina(disciplina){
+  PC_DIARY_MODAL_STATE.disciplina=disciplina;
+  PC_DIARY_MODAL_STATE.mode='';
+  pcDiaryRenderDisciplinas(PC_DIARY_MODAL_STATE.sectionId);
+  pcDiaryRenderRanges();
+  pcDiaryUpdateMeta(disciplina,'Escolha o bimestre ou o total para abrir e baixar o PDF.');
+  var frame=document.getElementById('pc-diary-frame');
+  if(frame)frame.removeAttribute('src');
+  pcDiarySetDownloadState(false,'');
+}
+function pcDiarySanitizeFileName(value){
+  return String(value||'relatorio').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase();
+}
+function pcDiaryOpenPdf(mode){
+  if(!PC_DIARY_MODAL_STATE.sectionId||!PC_DIARY_MODAL_STATE.disciplina)return;
+  PC_DIARY_MODAL_STATE.mode=mode;
+  pcDiaryRenderRanges();
+  var report=pcDiaryBuildReport(PC_DIARY_MODAL_STATE.sectionId,PC_DIARY_MODAL_STATE.disciplina,mode);
+  var blob=pcDiaryCreatePdfBlob(report);
+  pcDiaryRevokePdfUrl();
+  var url=URL.createObjectURL(blob);
+  PC_DIARY_MODAL_STATE.pdfUrl=url;
+  PC_DIARY_MODAL_STATE.fileName=pcDiarySanitizeFileName(report.title)+'-2026-08-18.pdf';
+  var frame=document.getElementById('pc-diary-frame');
+  if(frame)frame.src=url;
+  pcDiaryUpdateMeta(report.title,report.subtitle);
+  pcDiarySetDownloadState(true,PC_DIARY_MODAL_STATE.fileName);
+}
+function pcDiaryDownloadCurrentPdf(){
+  if(!PC_DIARY_MODAL_STATE.pdfUrl)return;
+  var link=document.createElement('a');
+  link.href=PC_DIARY_MODAL_STATE.pdfUrl;
+  link.download=PC_DIARY_MODAL_STATE.fileName||'relatorio-diario-2026-08-18.pdf';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+PC_DIARY_SECTION_LABELS={'sec-all':'Geral','sec-t1':'1ª Série','sec-t2':'2ª Série','sec-t3':'3ª Série','sec-t6':'6º Ano'};
+PC_DIARY_DISC_ORDER=['Língua Portuguesa','Trilhas de Linguagens','Trilhas de C. Humanas','Artes'];
+var PC_DIARY_REPORT_CUTOFF=new Date(2026,7,18,23,59,59,999);
+var PC_DIARY_REPORT_DATE_LABEL='18/08/2026';
+var PC_DIARY_REPORT_FILE_DATE='2026-08-18';
+function pcDiaryNormalizeTurmaLabel(value){
+  var clean=String(value||'').replace(/\s+/g,' ').trim();
+  if(/^\s*1/.test(clean))return'1ª Série';
+  if(/^\s*2/.test(clean))return'2ª Série';
+  if(/^\s*3/.test(clean))return'3ª Série';
+  if(/^\s*6/.test(clean))return'6º Ano';
+  return clean;
+}
+function pcDiaryNormalizeDisciplina(value){
+  var clean=String(value||'').replace(/\([^)]*\)/g,' ').replace(/\s+/g,' ').trim();
+  var norm=pcNormalizeText(clean);
+  var rawLower=clean.toLowerCase();
+  if(norm==='lp'||norm==='l p'||norm.indexOf('lingua portuguesa')>=0||norm.indexOf('portuguesa')>=0||/\bl\.?\s*p\.?\b/i.test(clean))return'Língua Portuguesa';
+  if(norm.indexOf('trilhas de linguagens')>=0||norm.indexOf('t ling')>=0||norm.indexOf('tling')>=0||rawLower.indexOf('linguagens')>=0||/t\.?\s*ling/i.test(clean))return'Trilhas de Linguagens';
+  if(norm.indexOf('trilhas de c humanas')>=0||norm.indexOf('trilhas de ciencias humanas')>=0||norm.indexOf('t c h')>=0||norm.indexOf('tch')>=0||rawLower.indexOf('humanas')>=0||/t\.?\s*c\.?\s*h/i.test(clean))return'Trilhas de C. Humanas';
+  if(norm.indexOf('arte')===0||norm.indexOf('artes')===0)return'Artes';
+  return clean||'Disciplina';
+}
+function pcDiaryCollectRecords(){
+  var today=new Date(PC_DIARY_REPORT_CUTOFF.getTime());
+  var records=[];
+  document.querySelectorAll('#sec-all .ea').forEach(function(card){
+    var dateObj=pcDiaryParseCardDate(card);
+    if(!dateObj||dateObj>today)return;
+    var dateKey=dateObj.toISOString().slice(0,10);
+    var lines=[];
+    card.querySelectorAll('.ct').forEach(function(ct){
+      lines=lines.concat(pcDiaryExtractLinesFromContent(ct));
+    });
+    lines.forEach(function(line){
+      var match=line.match(/^(.+?)\s*\(([^)]+)\)\s*[\u2013\u2014-]\s*([^:]+):/i);
+      if(!match)return;
+      var turmaLabel=pcDiaryNormalizeTurmaLabel(match[1]);
+      var turmaId=PC_PROJECTION_TURMA_ID_MAP[turmaLabel];
+      if(!turmaId)return;
+      records.push({
+        dateKey:dateKey,
+        dateLabel:pcDiaryFormatShortDate(dateObj),
+        turmaId:turmaId,
+        turmaLabel:turmaLabel,
+        disciplina:pcDiaryNormalizeDisciplina(match[3]),
+        hours:pcDiaryResolveHoursFromRange(match[2]),
+        bimestre:pcDiaryResolveBimester(dateObj)
+      });
+    });
+  });
+  return records;
+}
+function pcDiaryBuildReport(sectionId,disciplina,mode){
+  var sectionLabel=PC_DIARY_SECTION_LABELS[sectionId]||'Turma';
+  var records=pcDiaryGetSectionRecords(sectionId).filter(function(item){return item.disciplina===disciplina;});
+  var groups=[];
+  if(mode==='total'){
+    [1,2,3,4].forEach(function(bim){
+      var subset=records.filter(function(item){return item.bimestre===bim;});
+      groups.push({title:bim+'º Bimestre',lines:pcDiaryBuildDateSummary(subset),count:subset.length});
+    });
+  }else{
+    var bimSel=parseInt(mode,10)||1;
+    var bimRecords=records.filter(function(item){return item.bimestre===bimSel;});
+    groups.push({title:bimSel+'º Bimestre',lines:pcDiaryBuildDateSummary(bimRecords),count:bimRecords.length});
+  }
+  var bodyGroups=groups.filter(function(group){return group.lines.length;});
+  if(!bodyGroups.length)bodyGroups=[{title:mode==='total'?'Total':'Sem registros',lines:['Nenhuma aula lançada até '+PC_DIARY_REPORT_DATE_LABEL+' para este recorte.'],count:0}];
+  return{
+    title:sectionLabel+' > '+disciplina+' - '+(mode==='total'?'Total':(parseInt(mode,10)||1)+'º Bimestre'),
+    subtitle:sectionId==='sec-all'?'Aulas lançadas até '+PC_DIARY_REPORT_DATE_LABEL+', agrupadas por disciplina.':'Aulas lançadas da turma até '+PC_DIARY_REPORT_DATE_LABEL+'.',
+    sectionLabel:sectionLabel,
+    disciplina:disciplina,
+    groups:bodyGroups
+  };
+}
+function pcDiaryCreatePdfBlob(report){
+  var pageWidth=595,pageHeight=842,margin=42,maxWidthChars=92;
+  var pages=[],page=null,y=0;
+  function newPage(){page=[];pages.push(page);y=pageHeight-margin;}
+  function addLine(text,size,bold,indent){
+    indent=indent||0;
+    if(!page)newPage();
+    var maxChars=Math.max(18,Math.floor(maxWidthChars-((indent||0)/4)));
+    pcDiaryWrapText(text,maxChars).forEach(function(line){
+      if(y<margin+24)newPage();
+      page.push('BT /'+(bold?'F2':'F1')+' '+size+' Tf 1 0 0 1 '+(margin+indent)+' '+y+' Tm '+pcDiaryPdfHex(line)+' Tj ET');
+      y-=size+5;
+    });
+  }
+  addLine(report.title,18,true,0);
+  addLine(report.subtitle,10,false,0);
+  y-=4;
+  report.groups.forEach(function(group){
+    addLine(group.title,14,true,0);
+    if(group.lines.length){
+      group.lines.forEach(function(line){addLine('Data: '+line,11,false,10);});
+    }else{
+      addLine('Nenhuma aula lançada.',11,false,10);
+    }
+    y-=4;
+  });
+  if(!pages.length)newPage();
+  var objects=['','<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids __KIDS__ /Count __COUNT__ >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>'];
+  var kids=[];
+  pages.forEach(function(commands,index){
+    var pageObj=5+(index*2),contentObj=pageObj+1,stream=commands.join('\n');
+    kids.push(pageObj+' 0 R');
+    objects[pageObj]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+pageWidth+' '+pageHeight+'] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents '+contentObj+' 0 R >>';
+    objects[contentObj]='<< /Length '+(new TextEncoder().encode(stream).length)+' >>\nstream\n'+stream+'\nendstream';
+  });
+  objects[2]=objects[2].replace('__KIDS__','['+kids.join(' ')+']').replace('__COUNT__',String(pages.length));
+  var pdf='%PDF-1.4\n',offsets=[0];
+  for(var i=1;i<objects.length;i++){
+    offsets[i]=pdf.length;
+    pdf+=i+' 0 obj\n'+objects[i]+'\nendobj\n';
+  }
+  var xrefStart=pdf.length;
+  pdf+='xref\n0 '+objects.length+'\n0000000000 65535 f \n';
+  for(var j=1;j<objects.length;j++)pdf+=('0000000000'+offsets[j]).slice(-10)+' 00000 n \n';
+  pdf+='trailer\n<< /Size '+objects.length+' /Root 1 0 R >>\nstartxref\n'+xrefStart+'\n%%EOF';
+  return new Blob([pdf],{type:'application/pdf'});
+}
+function pcDiaryEnsureModal(){
+  var modal=document.getElementById('pc-diary-modal');
+  if(modal)return modal;
+  modal=document.createElement('div');
+  modal.id='pc-diary-modal';
+  modal.className='pc-diary-modal';
+  modal.innerHTML='<div class="pc-diary-modal-inner"><div class="pc-diary-modal-top"><div><h3 id="pc-diary-modal-title">Relat&oacute;rio di&aacute;rios</h3><p id="pc-diary-modal-subtitle">Selecione a disciplina e o bimestre para abrir o PDF.</p></div><div class="pc-diary-modal-top-actions"><button class="pc-diary-action-btn primary" id="pc-diary-download-btn" type="button" onclick="pcDiaryDownloadCurrentPdf()" disabled>Baixar</button><button class="pc-diary-action-btn ghost" type="button" onclick="pcCloseDiaryReportModal()">Fechar</button></div></div><div class="pc-diary-modal-body"><div class="pc-diary-sidebar"><div class="pc-diary-sidebar-block"><div class="pc-diary-sidebar-label">Disciplinas</div><div class="pc-diary-grid" id="pc-diary-discipline-grid"></div></div><div class="pc-diary-sidebar-block"><div class="pc-diary-sidebar-label">Relat&oacute;rios</div><div class="pc-diary-grid" id="pc-diary-range-grid"></div></div></div><div class="pc-diary-viewer"><div class="pc-diary-meta"><div class="pc-diary-meta-card"><strong id="pc-diary-meta-title">Selecione um relat&oacute;rio</strong><span id="pc-diary-meta-copy">O PDF ser&aacute; mostrado aqui com as datas lan&ccedil;adas de 1h em 1h/aula.</span></div></div><div class="pc-diary-frame-wrap"><iframe id="pc-diary-frame" class="pc-diary-frame" title="Pr&eacute;-visualiza&ccedil;&atilde;o do relat&oacute;rio di&aacute;rio"></iframe></div></div></div></div>';
+  modal.addEventListener('click',function(e){if(e.target===modal)pcCloseDiaryReportModal();});
+  document.body.appendChild(modal);
+  return modal;
+}
+function pcDiaryRenderDisciplinas(sectionId){
+  var grid=document.getElementById('pc-diary-discipline-grid');if(!grid)return;
+  var disciplinas=pcDiaryGetDisciplinas(sectionId);
+  if(!disciplinas.length){grid.innerHTML='<div class="pc-diary-empty">Nenhuma disciplina com aulas lan&ccedil;adas foi encontrada nesta aba.</div>';return;}
+  grid.innerHTML=disciplinas.map(function(item){
+    var active=PC_DIARY_MODAL_STATE.disciplina===item?' on':'';
+    return'<button class="pc-diary-choice'+active+'" type="button" onclick="pcDiarySelectDisciplina('+JSON.stringify(item)+')">'+item+'</button>';
+  }).join('');
+}
+function pcDiaryRenderRanges(){
+  var grid=document.getElementById('pc-diary-range-grid');if(!grid)return;
+  if(!PC_DIARY_MODAL_STATE.disciplina){grid.innerHTML='<div class="pc-diary-empty">Escolha uma disciplina para liberar os bot&otilde;es de bimestre e o relat&oacute;rio total.</div>';return;}
+  var buttons=['1','2','3','4','total'].map(function(value){
+    var label=value==='total'?'Total':value+'&ordm; Bimestre';
+    var active=PC_DIARY_MODAL_STATE.mode===value?' on':'';
+    return'<button class="pc-diary-choice'+active+'" type="button" onclick="pcDiaryOpenPdf('+JSON.stringify(value)+')">'+label+'</button>';
+  }).join('');
+  grid.innerHTML=buttons;
+}
+function pcDiaryUpdateMeta(title,copy){
+  var titleEl=document.getElementById('pc-diary-meta-title');
+  var copyEl=document.getElementById('pc-diary-meta-copy');
+  if(titleEl)titleEl.textContent=title||'Selecione um relatório';
+  if(copyEl)copyEl.textContent=copy||'O PDF será mostrado aqui com as datas lançadas de 1h em 1h/aula.';
+}
+function pcOpenDiaryReportModal(sectionId){
+  pcDiaryEnsureModal();
+  pcDiaryRevokePdfUrl();
+  PC_DIARY_MODAL_STATE.sectionId=sectionId;
+  PC_DIARY_MODAL_STATE.disciplina='';
+  PC_DIARY_MODAL_STATE.mode='';
+  PC_DIARY_MODAL_STATE.fileName='';
+  document.getElementById('pc-diary-modal').classList.add('on');
+  var sectionLabel=PC_DIARY_SECTION_LABELS[sectionId]||'Turma';
+  var titleEl=document.getElementById('pc-diary-modal-title');
+  var subEl=document.getElementById('pc-diary-modal-subtitle');
+  if(titleEl)titleEl.textContent='Relatório diários - '+sectionLabel;
+  if(subEl)subEl.textContent=sectionId==='sec-all'?'Selecione a disciplina para listar todas as aulas lançadas até '+PC_DIARY_REPORT_DATE_LABEL+'.':'Selecione a disciplina e o bimestre para gerar o PDF rápido da turma.';
+  pcDiaryRenderDisciplinas(sectionId);
+  pcDiaryRenderRanges();
+  pcDiaryUpdateMeta('Selecione um relatório','O PDF será mostrado aqui com as datas lançadas de 1h em 1h/aula.');
+  var frame=document.getElementById('pc-diary-frame');
+  if(frame)frame.removeAttribute('src');
+  pcDiarySetDownloadState(false,'');
+}
+function pcDiaryOpenPdf(mode){
+  if(!PC_DIARY_MODAL_STATE.sectionId||!PC_DIARY_MODAL_STATE.disciplina)return;
+  PC_DIARY_MODAL_STATE.mode=mode;
+  pcDiaryRenderRanges();
+  var report=pcDiaryBuildReport(PC_DIARY_MODAL_STATE.sectionId,PC_DIARY_MODAL_STATE.disciplina,mode);
+  var blob=pcDiaryCreatePdfBlob(report);
+  pcDiaryRevokePdfUrl();
+  var url=URL.createObjectURL(blob);
+  PC_DIARY_MODAL_STATE.pdfUrl=url;
+  PC_DIARY_MODAL_STATE.fileName=pcDiarySanitizeFileName(report.title)+'-'+PC_DIARY_REPORT_FILE_DATE+'.pdf';
+  var frame=document.getElementById('pc-diary-frame');
+  if(frame)frame.src=url;
+  pcDiaryUpdateMeta(report.title,report.subtitle);
+  pcDiarySetDownloadState(true,PC_DIARY_MODAL_STATE.fileName);
+}
+function pcDiaryDownloadCurrentPdf(){
+  if(!PC_DIARY_MODAL_STATE.pdfUrl)return;
+  var link=document.createElement('a');
+  link.href=PC_DIARY_MODAL_STATE.pdfUrl;
+  link.download=PC_DIARY_MODAL_STATE.fileName||('relatorio-diario-'+PC_DIARY_REPORT_FILE_DATE+'.pdf');
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 }
 function pcRefreshHeroStats(){
   ['sec-all','sec-t1','sec-t2','sec-t3','sec-t6'].forEach(function(id){
