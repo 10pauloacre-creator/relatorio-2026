@@ -1615,6 +1615,20 @@ function rhEnsureDiaryButtons() {
   });
 }
 
+function rhRepairMalformedCards() {
+  var sec = document.getElementById('sec-t89');
+  if (!sec) return;
+  sec.querySelectorAll('.ea').forEach(function(card) {
+    var header = card.firstElementChild;
+    if (!header || !header.classList || !header.classList.contains('eh')) return;
+    var hasBrokenHeader = !header.querySelector('.edb');
+    if (!hasBrokenHeader) return;
+    var nestedCard = header.querySelector('.ea');
+    if (!nestedCard) return;
+    card.replaceWith(nestedCard);
+  });
+}
+
 (function() {
   if (typeof aba === 'function' && !aba.__rhDiaryWrapped) {
     var rhAbaOriginal = aba;
@@ -1629,6 +1643,7 @@ function rhEnsureDiaryButtons() {
 
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() {
+    rhRepairMalformedCards();
     rhEnsureDiaryButtons();
     rhDiaryEnsureModal();
   }, 120);
