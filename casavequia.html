@@ -8752,20 +8752,32 @@ function pcDiaryRenderDisciplinas(sectionId){
   var grid=document.getElementById('pc-diary-discipline-grid');if(!grid)return;
   var disciplinas=pcDiaryGetDisciplinas(sectionId);
   if(!disciplinas.length){grid.innerHTML='<div class="pc-diary-empty">Nenhuma disciplina com aulas lan&ccedil;adas foi encontrada nesta aba.</div>';return;}
-  grid.innerHTML=disciplinas.map(function(item){
-    var active=PC_DIARY_MODAL_STATE.disciplina===item?' on':'';
-    return'<button class="pc-diary-choice'+active+'" type="button" onclick="pcDiarySelectDisciplina('+JSON.stringify(item)+')">'+item+'</button>';
-  }).join('');
+  grid.innerHTML='';
+  disciplinas.forEach(function(item){
+    var button=document.createElement('button');
+    button.type='button';
+    button.className='pc-diary-choice'+(PC_DIARY_MODAL_STATE.disciplina===item?' on':'');
+    button.textContent=item;
+    button.addEventListener('click',function(){
+      pcDiarySelectDisciplina(item);
+    });
+    grid.appendChild(button);
+  });
 }
 function pcDiaryRenderRanges(){
   var grid=document.getElementById('pc-diary-range-grid');if(!grid)return;
   if(!PC_DIARY_MODAL_STATE.disciplina){grid.innerHTML='<div class="pc-diary-empty">Escolha uma disciplina para liberar os bot&otilde;es de bimestre e o relat&oacute;rio total.</div>';return;}
-  var buttons=['1','2','3','4','total'].map(function(value){
-    var label=value==='total'?'Total':value+'&ordm; Bimestre';
-    var active=PC_DIARY_MODAL_STATE.mode===value?' on':'';
-    return'<button class="pc-diary-choice'+active+'" type="button" onclick="pcDiaryOpenPdf('+JSON.stringify(value)+')">'+label+'</button>';
-  }).join('');
-  grid.innerHTML=buttons;
+  grid.innerHTML='';
+  ['1','2','3','4','total'].forEach(function(value){
+    var button=document.createElement('button');
+    button.type='button';
+    button.className='pc-diary-choice'+(PC_DIARY_MODAL_STATE.mode===value?' on':'');
+    button.textContent=value==='total'?'Total':value+'º Bimestre';
+    button.addEventListener('click',function(){
+      pcDiaryOpenPdf(value);
+    });
+    grid.appendChild(button);
+  });
 }
 function pcDiaryUpdateMeta(title,copy){
   var titleEl=document.getElementById('pc-diary-meta-title');
