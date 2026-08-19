@@ -1618,15 +1618,25 @@ function rhEnsureDiaryButtons() {
 function rhRepairMalformedCards() {
   var sec = document.getElementById('sec-t89');
   if (!sec) return;
-  sec.querySelectorAll('.ea').forEach(function(card) {
-    var header = card.firstElementChild;
-    if (!header || !header.classList || !header.classList.contains('eh')) return;
-    var hasBrokenHeader = !header.querySelector('.edb');
-    if (!hasBrokenHeader) return;
-    var nestedCard = header.querySelector('.ea');
-    if (!nestedCard) return;
-    card.replaceWith(nestedCard);
-  });
+  var html = sec.innerHTML;
+  var repairedHtml = html;
+  var malformedPattern = /<div class="ea">\s*<div class="eh" onclick="tog\(this\)">\s*<div class="ea">\s*<div class="eh" onclick="tog\(this\)">/g;
+  repairedHtml = repairedHtml.replace(malformedPattern, '<div class="ea">   <div class="eh" onclick="tog(this)">');
+  if (repairedHtml !== html) sec.innerHTML = repairedHtml;
+  var repaired = true;
+  while (repaired) {
+    repaired = false;
+    Array.from(sec.querySelectorAll('.ea')).forEach(function(card) {
+      if (repaired) return;
+      var header = card.firstElementChild;
+      if (!header || !header.classList || !header.classList.contains('eh')) return;
+      var firstInner = header.firstElementChild;
+      var nestedCard = firstInner && firstInner.classList && firstInner.classList.contains('ea') ? firstInner : null;
+      if (!nestedCard) return;
+      card.replaceWith(nestedCard);
+      repaired = true;
+    });
+  }
 }
 
 (function() {
