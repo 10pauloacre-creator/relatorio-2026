@@ -8829,6 +8829,259 @@ function pcDiaryDownloadCurrentPdf(){
   link.click();
   link.remove();
 }
+var PC_DIARY_PLANNER_PANEL_MAP={
+  t6:{'Artes':'arte'},
+  t1:{'L\xedngua Portuguesa':'d1lp1','Trilhas de Linguagens':'d1lgg1','Trilhas de C. Humanas':'d1chs1'},
+  t2:{'L\xedngua Portuguesa':'d2lp','Trilhas de Linguagens':'d2lgg','Trilhas de C. Humanas':'d2chs','Artes':'d2arte'},
+  t3:{'L\xedngua Portuguesa':'d3lp','Trilhas de Linguagens':'d3lgg','Trilhas de C. Humanas':'d3chs','Artes':'d3arte'}
+};
+var PC_DIARY_PLANNER_THEME_CACHE={};
+function pcDiaryEscapeHtml(value){
+  return String(value==null?'':value)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+function pcDiaryUniqueList(items){
+  var seen={};
+  return (items||[]).filter(function(item){
+    var key=String(item||'').trim();
+    if(!key||seen[key])return false;
+    seen[key]=true;
+    return true;
+  });
+}
+function pcDiaryCollectRecords(){
+  var today=new Date(PC_DIARY_REPORT_CUTOFF.getTime());
+  var records=[];
+  document.querySelectorAll('#sec-all .ea').forEach(function(card){
+    var dateObj=pcDiaryParseCardDate(card);
+    if(!dateObj||dateObj>today)return;
+    var dateKey=dateObj.toISOString().slice(0,10);
+    var lines=[];
+    card.querySelectorAll('.ct').forEach(function(ct){
+      lines=lines.concat(pcDiaryExtractLinesFromContent(ct));
+    });
+    lines.forEach(function(line){
+      var match=line.match(/^(.+?)\s*\(([^)]+)\)\s*[\u2013\u2014-]\s*([^:]+):\s*(.*)$/i);
+      if(!match)return;
+      var turmaLabel=pcDiaryNormalizeTurmaLabel(match[1]);
+      var turmaId=PC_PROJECTION_TURMA_ID_MAP[turmaLabel];
+      if(!turmaId)return;
+      records.push({
+        dateKey:dateKey,
+        dateLabel:pcDiaryFormatShortDate(dateObj),
+        turmaId:turmaId,
+        turmaLabel:turmaLabel,
+        disciplina:pcDiaryNormalizeDisciplina(match[3]),
+        hours:pcDiaryResolveHoursFromRange(match[2]),
+        bimestre:pcDiaryResolveBimester(dateObj),
+        detail:String(match[4]||'').replace(/\s+/g,' ').trim()
+      });
+    });
+  });
+  return records;
+}
+function pcDiaryGetPlannerThemeMap(turmaId,disciplina,bimestre){
+  var cacheKey=[turmaId,disciplina,bimestre].join('|');
+  if(PC_DIARY_PLANNER_THEME_CACHE[cacheKey])return PC_DIARY_PLANNER_THEME_CACHE[cacheKey];
+  var panelRoot=((PC_DIARY_PLANNER_PANEL_MAP[turmaId]||{})[disciplina]||'');
+  var panel=panelRoot?document.getElementById(panelRoot+'_b'+bimestre):null;
+  var map={};
+  if(panel){
+    panel.querySelectorAll('.lesson-item').forEach(function(item){
+      var num=parseInt(((item.querySelector('.lesson-num')||{}).textContent||'').trim(),10);
+      var title=((item.querySelector('.lesson-title')||{}).textContent||'').replace(/\s+/g,' ').trim();
+      if(num&&title)map[num]=title;
+    });
+  }
+  PC_DIARY_PLANNER_THEME_CACHE[cacheKey]=map;
+  return map;
+}
+function pcDiaryParseThemeNumbers(detail){
+  var source=String(detail||'');
+  var match=source.match(/Tem(?:a|as)?\s+([0-9,\seE]+)(?:\s*[\-:\u2013\u2014]|$)/i)
+    || source.match(/T[o\u00f3]pico(?:s)?\s+([0-9,\seE]+)(?:\s*[\-:\u2013\u2014]|$)/i);
+  if(!match)return [];
+  var seen={};
+  return match[1].replace(/\s+e\s+/gi,',').split(/[,\s]+/).map(function(token){
+    return parseInt(token,10);
+  }).filter(function(num){
+    if(!num||seen[num])return false;
+    seen[num]=true;
+    return true;
+  });
+}
+function pcDiaryStripThemePrefix(detail){
+  return String(detail||'')
+    .replace(/^\s*Tem(?:a|as)?\s+[0-9,\seE]+(?:\s*[\-:\u2013\u2014]\s*)?/i,'')
+    .replace(/^\s*T[o\u00f3]pico(?:s)?\s+[0-9,\seE]+(?:\s*[\-:\u2013\u2014]\s*)?/i,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function pcDiaryResolveContentItems(record){
+  var detail=String((record||{}).detail||'').replace(/\s+/g,' ').trim();
+  var themeNumbers=pcDiaryParseThemeNumbers(detail);
+  var themeMap=pcDiaryGetPlannerThemeMap(record.turmaId,record.disciplina,record.bimestre);
+  var items=[];
+  themeNumbers.forEach(function(themeNumber){
+    var plannedTitle=themeMap[themeNumber];
+    if(plannedTitle){
+      items.push('Tema '+themeNumber+' - '+plannedTitle);
+      return;
+    }
+    var fallbackTitle=pcDiaryStripThemePrefix(detail);
+    if(fallbackTitle)items.push('Tema '+themeNumber+' - '+fallbackTitle);
+  });
+  if(!items.length){
+    var plainDetail=pcDiaryStripThemePrefix(detail)||detail;
+    if(plainDetail)items.push(plainDetail);
+  }
+  if(!items.length)items.push('Conteudo nao detalhado.');
+  return pcDiaryUniqueList(items);
+}
+function pcDiaryBuildDateRows(records){
+  var grouped={};
+  records.forEach(function(item){
+    var row=grouped[item.dateKey];
+    if(!row){
+      row=grouped[item.dateKey]={dateKey:item.dateKey,dateLabel:item.dateLabel,hours:0,contentItems:[]};
+    }
+    row.hours+=Math.max(1,item.hours||1);
+    row.contentItems=row.contentItems.concat(pcDiaryResolveContentItems(item));
+  });
+  return Object.keys(grouped).sort().map(function(dateKey){
+    var row=grouped[dateKey];
+    row.contentItems=pcDiaryUniqueList(row.contentItems);
+    row.contentHeadline=row.contentItems[0]||'Conteudo nao detalhado.';
+    row.contentMeta=row.contentItems.length>1
+      ? row.contentItems.length+' temas vinculados a esta data.'
+      : '1 tema vinculado a esta data.';
+    return row;
+  });
+}
+function pcDiaryBuildReport(sectionId,disciplina,mode){
+  var sectionLabel=PC_DIARY_SECTION_LABELS[sectionId]||'Turma';
+  var records=pcDiaryGetSectionRecords(sectionId).filter(function(item){return item.disciplina===disciplina;});
+  var groups=[];
+  if(mode==='total'){
+    [1,2,3,4].forEach(function(bim){
+      var subset=records.filter(function(item){return item.bimestre===bim;});
+      groups.push({title:bim+'\u00ba Bimestre',rows:pcDiaryBuildDateRows(subset),count:subset.length});
+    });
+  }else{
+    var bimSel=parseInt(mode,10)||1;
+    var bimRecords=records.filter(function(item){return item.bimestre===bimSel;});
+    groups.push({title:bimSel+'\u00ba Bimestre',rows:pcDiaryBuildDateRows(bimRecords),count:bimRecords.length});
+  }
+  return{
+    title:sectionLabel+' > '+disciplina+' - '+(mode==='total'?'Total':(parseInt(mode,10)||1)+'\u00ba Bimestre'),
+    subtitle:sectionId==='sec-all'
+      ? 'Aulas lancadas ate '+PC_DIARY_REPORT_DATE_LABEL+', com os temas organizados por data.'
+      : 'Aulas lancadas da turma ate '+PC_DIARY_REPORT_DATE_LABEL+', com os temas organizados por data.',
+    sectionLabel:sectionLabel,
+    disciplina:disciplina,
+    groups:groups
+  };
+}
+function pcDiaryCreatePdfBlob(report){
+  var html=[];
+  html.push('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">');
+  html.push('<title>'+pcDiaryEscapeHtml(report.title)+'</title>');
+  html.push('<style>');
+  html.push(':root{color-scheme:light;--surface:#fffdf8;--line:#d8d3c5;--text:#153a2a;--muted:#667085;--gold:#e4c466;--gold-2:#f6dd92;--shadow:0 18px 45px rgba(21,58,42,.12)}');
+  html.push('*{box-sizing:border-box}body{margin:0;padding:32px 24px 56px;background:linear-gradient(180deg,#fbf7ef,#f1ebdf);color:var(--text);font:16px/1.5 "DM Sans",Arial,sans-serif}strong,h1,h2,h3{color:#113121}h1,h2,h3,p{margin:0}');
+  html.push('.sheet{max-width:1120px;margin:0 auto;background:var(--surface);border:1px solid rgba(37,87,63,.10);border-radius:28px;box-shadow:var(--shadow);overflow:hidden}.hero{padding:34px 34px 28px;background:linear-gradient(135deg,#143725,#2a6549 58%,#5b9871);color:#fff;position:relative;overflow:hidden}.hero:before,.hero:after{content:"";position:absolute;border-radius:999px;pointer-events:none}.hero:before{width:250px;height:250px;top:-90px;right:-70px;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 70%)}.hero:after{width:220px;height:220px;left:-70px;bottom:-110px;background:radial-gradient(circle,rgba(228,196,102,.22),transparent 72%)}');
+  html.push('.hero-inner{position:relative;z-index:1}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#f8e9b4}.hero h1{margin-top:14px;font:700 clamp(28px,4vw,42px)/1.08 "Playfair Display",Georgia,serif;color:#fff}.hero p{margin-top:12px;max-width:760px;font-size:15px;line-height:1.7;color:rgba(255,255,255,.82)}');
+  html.push('.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:20px 34px 8px;background:rgba(20,55,37,.03)}.meta-card{padding:16px 18px;border:1px solid rgba(37,87,63,.12);border-radius:18px;background:rgba(255,255,255,.92)}.meta-card span{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#68737d;margin-bottom:8px}.meta-card strong{display:block;font:700 20px/1.2 "Playfair Display",Georgia,serif}');
+  html.push('.body{padding:20px 34px 36px}.hint{margin-bottom:18px;padding:14px 16px;border-radius:16px;background:#fff8e6;border:1px solid rgba(228,196,102,.42);font-size:14px;color:#6f5a18}.group{margin-top:18px}.group-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}.group-title{display:inline-flex;align-items:center;gap:10px;padding:11px 18px;border-radius:18px 18px 18px 8px;background:linear-gradient(135deg,#173b60,#244e7e);color:#fff;font:700 24px/1.1 "DM Sans",Arial,sans-serif}.group-title .icon{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#143725;font-size:18px}.group-count{padding:8px 12px;border-radius:999px;background:#eef6f1;border:1px solid rgba(37,87,63,.12);font-size:13px;font-weight:700;color:#214a36}');
+  html.push('.table{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#fff}.thead,.summary{display:grid;grid-template-columns:140px 140px minmax(0,1fr) 38px;align-items:center;gap:0}.thead{background:linear-gradient(135deg,#fde8a6,#f8d978);font-size:14px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#113121}.thead span{padding:16px 18px;border-right:1px solid rgba(17,49,33,.14)}.thead span:last-child{border-right:none}.row{border-top:1px solid var(--line)}.row:first-child{border-top:none}.row[open]{background:#fcfaf5}.summary{list-style:none;cursor:pointer;min-height:82px}.summary::-webkit-details-marker{display:none}.summary span{padding:18px}.summary .date{font:700 24px/1 "DM Sans",Arial,sans-serif;color:#163523}.summary .hours{font:700 26px/1 "Playfair Display",Georgia,serif;color:#244e7e}.summary .content-main{display:block;font-size:16px;font-weight:700;color:#173927}.summary .content-meta{display:block;margin-top:6px;font-size:13px;color:var(--muted)}.summary .chev{display:flex;align-items:center;justify-content:center;font-size:20px;color:#244e7e;transition:transform .18s ease}.row[open] .summary .chev{transform:rotate(180deg)}');
+  html.push('.detail{padding:0 18px 18px 18px}.detail-card{margin-left:280px;border:1px solid rgba(36,78,126,.14);border-radius:16px;background:linear-gradient(180deg,#f8fbff,#ffffff);padding:16px 18px}.detail-card h3{font-size:14px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#244e7e;margin-bottom:12px}.detail-card ol{margin:0;padding-left:20px;display:grid;gap:10px}.detail-card li{color:#173927;line-height:1.65}.empty{padding:22px 18px;color:var(--muted);font-size:15px}');
+  html.push('@media (max-width:760px){body{padding:14px 10px 24px}.sheet{border-radius:22px}.hero,.body{padding-left:18px;padding-right:18px}.meta{padding:16px 18px 2px}.thead{display:none}.summary{grid-template-columns:minmax(0,1fr) 34px;gap:8px;padding:16px 16px 12px}.summary span{padding:0}.summary .date,.summary .hours{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#214a36}.summary .date:before{content:"Data:";font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#6f7d75}.summary .hours:before{content:"Aulas:";font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#6f7d75}.summary .content{grid-column:1/2}.summary .chev{grid-column:2/3;grid-row:1/4;align-self:center}.detail{padding:0 14px 14px}.detail-card{margin-left:0}}');
+  html.push('@media print{body{padding:0;background:#fff}.sheet{border:none;box-shadow:none}.hint{display:none}.row{break-inside:avoid-page}.row .detail{display:block!important}.row{background:#fff!important}.summary{cursor:default}.summary .chev{display:none}}');
+  html.push('</style></head><body><div class="sheet"><header class="hero"><div class="hero-inner"><div class="eyebrow">Relatorios diarios</div><h1>'+pcDiaryEscapeHtml(report.title)+'</h1><p>'+pcDiaryEscapeHtml(report.subtitle)+'</p></div></header>');
+  html.push('<section class="meta"><article class="meta-card"><span>Escola</span><strong>Padre Carlos Casavequia</strong></article><article class="meta-card"><span>Turma</span><strong>'+pcDiaryEscapeHtml(report.sectionLabel)+'</strong></article><article class="meta-card"><span>Disciplina</span><strong>'+pcDiaryEscapeHtml(report.disciplina)+'</strong></article><article class="meta-card"><span>Atualizado at&eacute;</span><strong>'+pcDiaryEscapeHtml(PC_DIARY_REPORT_DATE_LABEL)+'</strong></article></section>');
+  html.push('<main class="body"><div class="hint">Na coluna <strong>Conte&uacute;do</strong>, clique na linha para expandir e ver a lista completa dos temas vinculados a cada dia. O bot&atilde;o <strong>Baixar</strong> abre a impress&atilde;o para salvar em PDF.</div>');
+  report.groups.forEach(function(group){
+    html.push('<section class="group"><div class="group-head"><div class="group-title"><span class="icon">&#128197;</span><span>'+pcDiaryEscapeHtml(group.title)+'</span></div><div class="group-count">'+group.count+' lan&ccedil;amentos</div></div><div class="table"><div class="thead"><span>Data</span><span>N&ordm; Aulas</span><span>Conte&uacute;do</span><span></span></div>');
+    if(group.rows.length){
+      group.rows.forEach(function(row){
+        html.push('<details class="row"><summary class="summary"><span class="date">'+pcDiaryEscapeHtml(row.dateLabel)+'</span><span class="hours">'+pcDiaryEscapeHtml(String(row.hours))+'</span><span class="content"><span class="content-main">'+pcDiaryEscapeHtml(row.contentHeadline)+'</span><span class="content-meta">'+pcDiaryEscapeHtml(row.contentMeta)+'</span></span><span class="chev">&#9662;</span></summary><div class="detail"><div class="detail-card"><h3>Conte&uacute;dos do dia</h3><ol>');
+        row.contentItems.forEach(function(item){
+          html.push('<li>'+pcDiaryEscapeHtml(item)+'</li>');
+        });
+        html.push('</ol></div></div></details>');
+      });
+    }else{
+      html.push('<div class="empty">Nenhuma aula lancada neste recorte.</div>');
+    }
+    html.push('</div></section>');
+  });
+  html.push('</main></div><script>window.addEventListener("beforeprint",function(){document.querySelectorAll("details").forEach(function(el){el.open=true;});});<\/script></body></html>');
+  return new Blob(html,{type:'text/html;charset=utf-8'});
+}
+function pcDiaryUpdateMeta(title,copy){
+  var titleEl=document.getElementById('pc-diary-meta-title');
+  var copyEl=document.getElementById('pc-diary-meta-copy');
+  if(titleEl)titleEl.textContent=title||'Selecione um relat\xF3rio';
+  if(copyEl)copyEl.textContent=copy||'O relat\xF3rio ser\xE1 mostrado aqui com a coluna Conte\xFAdo e expans\xE3o por temas.';
+}
+function pcOpenDiaryReportModal(sectionId){
+  pcDiaryEnsureModal();
+  pcDiaryRevokePdfUrl();
+  PC_DIARY_MODAL_STATE.sectionId=sectionId;
+  PC_DIARY_MODAL_STATE.disciplina='';
+  PC_DIARY_MODAL_STATE.mode='';
+  PC_DIARY_MODAL_STATE.fileName='';
+  document.getElementById('pc-diary-modal').classList.add('on');
+  var sectionLabel=PC_DIARY_SECTION_LABELS[sectionId]||'Turma';
+  var titleEl=document.getElementById('pc-diary-modal-title');
+  var subEl=document.getElementById('pc-diary-modal-subtitle');
+  if(titleEl)titleEl.textContent='Relat\xF3rios di\xE1rios - '+sectionLabel;
+  if(subEl)subEl.textContent=sectionId==='sec-all'
+    ? 'Selecione a disciplina para listar as aulas lancadas at\xE9 '+PC_DIARY_REPORT_DATE_LABEL+'.'
+    : 'Selecione a disciplina e o bimestre para abrir o relat\xF3rio organizado da turma.';
+  pcDiaryRenderDisciplinas(sectionId);
+  pcDiaryRenderRanges();
+  pcDiaryUpdateMeta('Selecione um relat\xF3rio','O relat\xF3rio ser\xE1 mostrado aqui com os conte\xFAdos organizados por data.');
+  var frame=document.getElementById('pc-diary-frame');
+  if(frame)frame.removeAttribute('src');
+  pcDiarySetDownloadState(false,'');
+}
+function pcDiaryOpenPdf(mode){
+  if(!PC_DIARY_MODAL_STATE.sectionId||!PC_DIARY_MODAL_STATE.disciplina)return;
+  PC_DIARY_MODAL_STATE.mode=mode;
+  pcDiaryRenderRanges();
+  var report=pcDiaryBuildReport(PC_DIARY_MODAL_STATE.sectionId,PC_DIARY_MODAL_STATE.disciplina,mode);
+  var blob=pcDiaryCreatePdfBlob(report);
+  pcDiaryRevokePdfUrl();
+  var url=URL.createObjectURL(blob);
+  PC_DIARY_MODAL_STATE.pdfUrl=url;
+  PC_DIARY_MODAL_STATE.fileName=pcDiarySanitizeFileName(report.title)+'-'+PC_DIARY_REPORT_FILE_DATE+'.html';
+  var frame=document.getElementById('pc-diary-frame');
+  if(frame)frame.src=url;
+  pcDiaryUpdateMeta(report.title,'Clique numa linha para expandir os temas. Use Baixar para imprimir ou salvar em PDF.');
+  pcDiarySetDownloadState(true,PC_DIARY_MODAL_STATE.fileName);
+}
+function pcDiaryDownloadCurrentPdf(){
+  if(!PC_DIARY_MODAL_STATE.pdfUrl)return;
+  var frame=document.getElementById('pc-diary-frame');
+  try{
+    if(frame&&frame.contentWindow){
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+      return;
+    }
+  }catch(err){}
+  var link=document.createElement('a');
+  link.href=PC_DIARY_MODAL_STATE.pdfUrl;
+  link.download=PC_DIARY_MODAL_STATE.fileName||('relatorio-diario-'+PC_DIARY_REPORT_FILE_DATE+'.html');
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
 function pcRefreshHeroStats(){
   ['sec-all','sec-t1','sec-t2','sec-t3','sec-t6'].forEach(function(id){
     var sec=document.getElementById(id);if(!sec)return;
