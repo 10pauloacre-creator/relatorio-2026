@@ -8281,7 +8281,9 @@ function pcCopyCounterSummary(){
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(linhas.join('\n')).catch(function(){});}
 }
 function pcDecorateSectionHero(sectionId,cfg){
-  var sec=document.getElementById(sectionId);if(!sec||sec.querySelector('.pc-hero'))return;
+  var sec=document.getElementById(sectionId);if(!sec)return;
+  var existingHero=sec.querySelector('.pc-hero');
+  if(existingHero)existingHero.remove();
   sec.classList.add('pc-sec-enhanced');
   sec.setAttribute('data-hero-title',cfg.title);
   var quick=(cfg.quick||[]).map(function(item){
