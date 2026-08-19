@@ -1602,6 +1602,13 @@ function rhDiaryDownloadCurrentPdf() {
   link.remove();
 }
 
+function rhBindDiaryButton(button, sectionId) {
+  if (!button) return;
+  button.setAttribute('data-rh-diary-btn', '1');
+  button.setAttribute('data-rh-diary-section', sectionId);
+  button.onclick = function() { rhOpenDiaryReportModal(sectionId); };
+}
+
 function rhEnsureDiaryButtons() {
   ['sec-all', 'sec-t89', 'sec-t1', 'sec-t23'].forEach(function(sectionId) {
     var sec = document.getElementById(sectionId);
@@ -1616,13 +1623,17 @@ function rhEnsureDiaryButtons() {
       if (status) heroMain.insertBefore(actions, status);
       else heroMain.appendChild(actions);
     }
-    if (!actions || actions.querySelector('[data-rh-diary-btn="1"]')) return;
+    if (!actions) return;
+    var existingButton = actions.querySelector('[data-rh-diary-btn="1"]');
+    if (existingButton) {
+      rhBindDiaryButton(existingButton, sectionId);
+      return;
+    }
     var button = document.createElement('button');
     button.type = 'button';
     button.className = 'rh-hero-btn ghost';
-    button.setAttribute('data-rh-diary-btn', '1');
     button.textContent = 'Relat\u00f3rios Di\u00e1rios';
-    button.onclick = function() { rhOpenDiaryReportModal(sectionId); };
+    rhBindDiaryButton(button, sectionId);
     actions.appendChild(button);
   });
 }
@@ -1669,6 +1680,15 @@ document.addEventListener('DOMContentLoaded', function() {
     rhEnsureDiaryButtons();
     rhDiaryEnsureModal();
   }, 120);
+});
+
+document.addEventListener('click', function(e) {
+  var button = e.target && e.target.closest ? e.target.closest('[data-rh-diary-btn="1"]') : null;
+  if (!button) return;
+  var sectionId = button.getAttribute('data-rh-diary-section');
+  if (!sectionId) return;
+  e.preventDefault();
+  rhOpenDiaryReportModal(sectionId);
 });
 
 document.addEventListener('DOMContentLoaded', rhRemoverAbaJogos);
