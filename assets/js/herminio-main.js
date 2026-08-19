@@ -1287,6 +1287,15 @@ function rhDiaryPdfText(text) {
     .replace(/\)/g, '\\)') + ')';
 }
 
+function rhDiaryEscapeHtml(text) {
+  return String(text == null ? '' : text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function rhDiaryWrapText(text, maxChars) {
   var words = rhDiaryPlainText(text || '').split(/\s+/).filter(Boolean);
   var lines = [];
@@ -1306,112 +1315,104 @@ function rhDiaryWrapText(text, maxChars) {
 }
 
 function rhDiaryCreatePdfBlob(report) {
-  var pageWidth = 595;
-  var pageHeight = 842;
-  var margin = 42;
-  var maxWidthChars = 92;
-  var pages = [];
-  var page = null;
-  var y = 0;
-  function newPage() {
-    page = [];
-    pages.push(page);
-    y = pageHeight - margin;
-  }
-  function addLine(text, size, bold, indent) {
-    indent = indent || 0;
-    if (!page) newPage();
-    var maxChars = Math.max(18, Math.floor(maxWidthChars - ((indent || 0) / 4)));
-    rhDiaryWrapText(text, maxChars).forEach(function(line) {
-      if (y < margin + 24) newPage();
-      page.push('0 0 0 rg');
-      page.push('BT /' + (bold ? 'F2' : 'F1') + ' ' + size + ' Tf 1 0 0 1 ' + (margin + indent) + ' ' + y + ' Tm ' + rhDiaryPdfText(line) + ' Tj ET');
-      y -= size + 5;
-    });
-  }
-  function addTable(group) {
-    var tableX = margin;
-    var colDate = 180;
-    var colHours = 110;
-    var rowHeight = 24;
-    var tableWidth = pageWidth - (margin * 2);
-    function ensureRoom(rowsNeeded) {
-      if (!page) newPage();
-      if (y - (rowsNeeded * rowHeight) < margin + 20) newPage();
-    }
-    ensureRoom(2);
-    page.push('0.94 0.96 0.95 rg');
-    page.push(tableX + ' ' + (y - rowHeight) + ' ' + tableWidth + ' ' + rowHeight + ' re f');
-    page.push('0.78 0.82 0.79 RG 1 w');
-    page.push(tableX + ' ' + (y - rowHeight) + ' ' + tableWidth + ' ' + rowHeight + ' re S');
-    page.push((tableX + colDate) + ' ' + (y - rowHeight) + ' m ' + (tableX + colDate) + ' ' + y + ' l S');
-    page.push((tableX + colDate + colHours) + ' ' + (y - rowHeight) + ' m ' + (tableX + colDate + colHours) + ' ' + y + ' l S');
-    page.push('0.08 0.12 0.10 rg');
-    page.push('BT /F2 10 Tf 1 0 0 1 ' + (tableX + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText('Data') + ' Tj ET');
-    page.push('BT /F2 10 Tf 1 0 0 1 ' + (tableX + colDate + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText('H/Aula') + ' Tj ET');
-    page.push('BT /F2 10 Tf 1 0 0 1 ' + (tableX + colDate + colHours + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText('Observacao') + ' Tj ET');
-    y -= rowHeight;
+  var sectionLabel = RH_DIARY_SECTION_LABELS[RH_DIARY_MODAL_STATE.sectionId] || 'Geral';
+  var disciplina = RH_DIARY_MODAL_STATE.disciplina || 'Disciplina';
+  var periodo = RH_DIARY_MODAL_STATE.mode === 'total'
+    ? 'Total'
+    : ((parseInt(RH_DIARY_MODAL_STATE.mode, 10) || 1) + '\u00ba Bimestre');
+  var generatedAt = rhDiaryTodayLabel();
+  var groupsHtml = report.groups.map(function(group, index) {
+    var rowsHtml = group.rows.length
+      ? group.rows.map(function(row) {
+          return '<tr><td>' + rhDiaryEscapeHtml(row.dateLabel) + '</td><td>' + rhDiaryEscapeHtml(String(row.hours)) + '</td><td>' + rhDiaryEscapeHtml(row.hours === 1 ? '1 aula no dia' : row.hours + ' aulas no dia') + '</td></tr>';
+        }).join('')
+      : '<tr><td colspan="3" class="empty-row">' + rhDiaryEscapeHtml(group.emptyMessage || 'Nenhuma aula lan\u00e7ada para este recorte.') + '</td></tr>';
+    return ''
+      + '<section class="bimester-block">'
+      +   '<div class="bimester-badge"><span class="bimester-icon">&#128197;</span><span>' + rhDiaryEscapeHtml(group.title) + '</span></div>'
+      +   '<div class="table-shell">'
+      +     '<table class="report-table">'
+      +       '<thead><tr><th>Data</th><th>N\u00ba Aulas</th><th>Observa\u00e7\u00e3o</th></tr></thead>'
+      +       '<tbody>' + rowsHtml + '</tbody>'
+      +     '</table>'
+      +   '</div>'
+      + '</section>';
+  }).join('');
 
-    if (!group.rows.length) {
-      ensureRoom(1);
-      page.push('0.78 0.82 0.79 RG 1 w');
-      page.push(tableX + ' ' + (y - rowHeight) + ' ' + tableWidth + ' ' + rowHeight + ' re S');
-      page.push('0.08 0.12 0.10 rg');
-      page.push('BT /F1 10 Tf 1 0 0 1 ' + (tableX + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText(group.emptyMessage || 'Nenhuma aula lancada.') + ' Tj ET');
-      y -= rowHeight + 8;
-      return;
-    }
-
-    group.rows.forEach(function(row) {
-      ensureRoom(1);
-      page.push('0.78 0.82 0.79 RG 1 w');
-      page.push(tableX + ' ' + (y - rowHeight) + ' ' + tableWidth + ' ' + rowHeight + ' re S');
-      page.push((tableX + colDate) + ' ' + (y - rowHeight) + ' m ' + (tableX + colDate) + ' ' + y + ' l S');
-      page.push((tableX + colDate + colHours) + ' ' + (y - rowHeight) + ' m ' + (tableX + colDate + colHours) + ' ' + y + ' l S');
-      page.push('0.12 0.14 0.13 rg');
-      page.push('BT /F1 10 Tf 1 0 0 1 ' + (tableX + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText(row.dateLabel) + ' Tj ET');
-      page.push('BT /F1 10 Tf 1 0 0 1 ' + (tableX + colDate + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText(String(row.hours)) + ' Tj ET');
-      page.push('BT /F1 10 Tf 1 0 0 1 ' + (tableX + colDate + colHours + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText(row.hours === 1 ? '1 aula no dia' : row.hours + ' aulas no dia') + ' Tj ET');
-      y -= rowHeight;
-    });
-    y -= 10;
-  }
-  addLine(report.title, 18, true, 0);
-  addLine(report.subtitle, 10, false, 0);
-  y -= 4;
-  report.groups.forEach(function(group) {
-    addLine(group.title, 14, true, 0);
-    addTable(group);
-  });
-  if (!pages.length) newPage();
-  var objects = [
-    '',
-    '<< /Type /Catalog /Pages 2 0 R >>',
-    '<< /Type /Pages /Kids __KIDS__ /Count __COUNT__ >>',
-    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
-    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>'
-  ];
-  var kids = [];
-  pages.forEach(function(commands, index) {
-    var pageObj = 5 + (index * 2);
-    var contentObj = pageObj + 1;
-    var stream = commands.join('\n');
-    kids.push(pageObj + ' 0 R');
-    objects[pageObj] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pageWidth + ' ' + pageHeight + '] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ' + contentObj + ' 0 R >>';
-    objects[contentObj] = '<< /Length ' + (new TextEncoder().encode(stream).length) + ' >>\nstream\n' + stream + '\nendstream';
-  });
-  objects[2] = objects[2].replace('__KIDS__', '[' + kids.join(' ') + ']').replace('__COUNT__', String(pages.length));
-  var pdf = '%PDF-1.4\n';
-  var offsets = [0];
-  for (var i = 1; i < objects.length; i += 1) {
-    offsets[i] = pdf.length;
-    pdf += i + ' 0 obj\n' + objects[i] + '\nendobj\n';
-  }
-  var xrefStart = pdf.length;
-  pdf += 'xref\n0 ' + objects.length + '\n0000000000 65535 f \n';
-  for (var j = 1; j < objects.length; j += 1) pdf += ('0000000000' + offsets[j]).slice(-10) + ' 00000 n \n';
-  pdf += 'trailer\n<< /Size ' + objects.length + ' /Root 1 0 R >>\nstartxref\n' + xrefStart + '\n%%EOF';
-  return new Blob([pdf], { type: 'application/pdf' });
+  var html = '<!doctype html>'
+    + '<html lang="pt-BR"><head><meta charset="utf-8">'
+    + '<meta name="viewport" content="width=device-width, initial-scale=1">'
+    + '<title>' + rhDiaryEscapeHtml(report.title) + '</title>'
+    + '<style>'
+    + '@page{size:A4;margin:12mm;}'
+    + '*{box-sizing:border-box;}'
+    + 'html,body{margin:0;padding:0;background:#eef2f8;color:#17304f;font-family:"Segoe UI",Tahoma,Arial,sans-serif;}'
+    + 'body{padding:18px;}'
+    + '.sheet{width:100%;max-width:980px;margin:0 auto;background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%);border-radius:34px;overflow:hidden;box-shadow:0 24px 80px rgba(10,28,54,.18);border:1px solid rgba(15,49,89,.08);}'
+    + '.top-band{height:22px;background:linear-gradient(90deg,#0d2e55 0 86%,#f0b73f 86% 93%,#0d2e55 93% 100%);}'
+    + '.hero{padding:28px 34px 24px;position:relative;background:radial-gradient(circle at top right,rgba(240,183,63,.16),transparent 24%),linear-gradient(180deg,#ffffff 0%,#f7fbff 100%);}'
+    + '.hero-grid{display:grid;grid-template-columns:152px minmax(0,1fr);gap:24px;align-items:center;}'
+    + '.crest{width:152px;height:152px;border-radius:28px;background:linear-gradient(180deg,#123968,#0a2747);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 4px #f0b73f,0 18px 32px rgba(10,39,71,.18);color:#f8fbff;font-size:66px;}'
+    + '.school-kicker{font-size:18px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#173b68;}'
+    + '.school-name{margin-top:6px;font-size:34px;line-height:1.06;font-weight:900;letter-spacing:-.02em;color:#123968;text-transform:uppercase;}'
+    + '.hero-divider{margin:18px 0 18px;height:2px;background:linear-gradient(90deg,#f0b73f,rgba(240,183,63,.08));}'
+    + '.meta-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid rgba(18,57,104,.08);border-bottom:1px solid rgba(18,57,104,.08);}'
+    + '.meta-item{padding:14px 16px;display:flex;align-items:center;gap:12px;border-right:1px solid rgba(18,57,104,.08);}'
+    + '.meta-item:last-child{border-right:none;}'
+    + '.meta-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#123968;color:#fff;font-size:18px;flex-shrink:0;}'
+    + '.meta-label{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#395272;}'
+    + '.meta-value{margin-top:4px;font-size:17px;font-weight:800;line-height:1.22;color:#122f51;}'
+    + '.section-title{padding:18px 34px 10px;border-top:6px solid #113862;text-align:center;}'
+    + '.section-title h2{margin:0;font-size:24px;line-height:1.1;font-weight:900;letter-spacing:.01em;text-transform:uppercase;color:#123968;}'
+    + '.section-title p{margin:10px auto 0;max-width:760px;font-size:15px;line-height:1.65;color:#2c3f59;}'
+    + '.content{padding:10px 34px 24px;}'
+    + '.bimester-block{page-break-inside:avoid;margin-top:18px;}'
+    + '.bimester-badge{display:inline-flex;align-items:center;gap:12px;min-height:54px;padding:0 22px;border-radius:20px 20px 0 0;background:linear-gradient(180deg,#163b67,#0f2d50);color:#fff;font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.02em;box-shadow:0 12px 24px rgba(13,46,85,.14);}'
+    + '.bimester-icon{width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#f0b73f;color:#123968;font-size:18px;box-shadow:0 0 0 4px rgba(240,183,63,.22);}'
+    + '.table-shell{border:1px solid rgba(18,57,104,.18);border-radius:0 20px 20px 20px;overflow:hidden;background:#fff;box-shadow:0 16px 32px rgba(17,56,98,.08);}'
+    + '.report-table{width:100%;border-collapse:separate;border-spacing:0;font-size:16px;color:#17304f;}'
+    + '.report-table th,.report-table td{padding:14px 16px;border-right:1px solid rgba(18,57,104,.18);border-bottom:1px solid rgba(18,57,104,.18);text-align:center;}'
+    + '.report-table th:last-child,.report-table td:last-child{border-right:none;}'
+    + '.report-table tr:last-child td{border-bottom:none;}'
+    + '.report-table thead th{background:linear-gradient(180deg,#ffe39d,#ffd36a);font-size:16px;font-weight:900;text-transform:uppercase;color:#15345c;}'
+    + '.report-table tbody td{background:#ffffff;font-weight:700;}'
+    + '.report-table tbody td:nth-child(2){background:#f4f8ff;}'
+    + '.report-table tbody td:nth-child(3){font-weight:600;color:#26425f;}'
+    + '.empty-row{text-align:left !important;font-weight:700;color:#48607b !important;background:#fbfdff !important;}'
+    + '.footer{margin-top:22px;padding:18px 34px 20px;background:linear-gradient(180deg,#123968,#0b2747);color:#f4d07a;display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:14px;font-style:italic;}'
+    + '.footer strong{font-style:normal;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#ffffff;}'
+    + '.screen-hint{margin:0 34px 12px;padding:10px 14px;border-radius:14px;background:#edf4ff;color:#274261;font-size:13px;line-height:1.5;}'
+    + '@media print{body{padding:0;background:#fff;}.sheet{box-shadow:none;border:none;border-radius:0;max-width:none;}.screen-hint{display:none;}.content{padding-bottom:8px;}.footer{margin-top:12px;}}'
+    + '@media (max-width:860px){body{padding:8px;}.sheet{border-radius:22px;}.hero,.section-title,.content,.footer{padding-left:18px;padding-right:18px;}.hero-grid{grid-template-columns:1fr;}.crest{width:110px;height:110px;font-size:46px;}.meta-grid{grid-template-columns:1fr 1fr;}.school-name{font-size:28px;}}'
+    + '</style></head><body>'
+    + '<div class="sheet">'
+    +   '<div class="top-band"></div>'
+    +   '<header class="hero">'
+    +     '<div class="hero-grid">'
+    +       '<div class="crest">&#128218;</div>'
+    +       '<div>'
+    +         '<div class="school-kicker">Escola Estadual</div>'
+    +         '<div class="school-name">Raimundo Hermínio de Melo</div>'
+    +         '<div class="hero-divider"></div>'
+    +         '<div class="meta-grid">'
+    +           '<div class="meta-item"><div class="meta-icon">&#128100;</div><div><div class="meta-label">Professor</div><div class="meta-value">Paulo Roberto Ramalho Magalhães</div></div></div>'
+    +           '<div class="meta-item"><div class="meta-icon">&#128214;</div><div><div class="meta-label">Disciplina</div><div class="meta-value">' + rhDiaryEscapeHtml(disciplina) + '</div></div></div>'
+    +           '<div class="meta-item"><div class="meta-icon">&#127891;</div><div><div class="meta-label">Ano</div><div class="meta-value">' + rhDiaryEscapeHtml(sectionLabel) + '</div></div></div>'
+    +           '<div class="meta-item"><div class="meta-icon">&#128197;</div><div><div class="meta-label">Ano letivo</div><div class="meta-value">2026</div></div></div>'
+    +         '</div>'
+    +       '</div>'
+    +     '</div>'
+    +   '</header>'
+    +   '<section class="section-title">'
+    +     '<h2>Contagem Diária de Aulas</h2>'
+    +     '<p>' + rhDiaryEscapeHtml(report.subtitle) + ' Recorte selecionado: ' + rhDiaryEscapeHtml(periodo) + '.</p>'
+    +   '</section>'
+    +   '<div class="screen-hint">Use o botão <strong>Baixar</strong> da janela principal para abrir a impressão e salvar este relatório em PDF.</div>'
+    +   '<main class="content">' + groupsHtml + '</main>'
+    +   '<footer class="footer"><div>Gerado em ' + rhDiaryEscapeHtml(generatedAt) + ' · Sistema de relatórios diários</div><strong>Compromisso com a Educação</strong></footer>'
+    + '</div>'
+    + '</body></html>';
+  return new Blob([html], { type: 'text/html' });
 }
 
 function rhDiarySanitizeFileName(value) {
@@ -1468,7 +1469,7 @@ function rhDiaryEnsureModal() {
   modal = document.createElement('div');
   modal.id = 'rh-diary-modal';
   modal.className = 'rh-diary-modal';
-  modal.innerHTML = '<div class="rh-diary-modal-inner"><div class="rh-diary-modal-top"><div><h3 id="rh-diary-modal-title">Relat\u00f3rios di\u00e1rios</h3><p id="rh-diary-modal-subtitle">Selecione a disciplina e o bimestre para abrir o PDF.</p></div><div class="rh-diary-modal-top-actions"><button class="rh-diary-action-btn primary" id="rh-diary-download-btn" type="button" onclick="rhDiaryDownloadCurrentPdf()" disabled>Baixar</button><button class="rh-diary-action-btn ghost" type="button" onclick="rhCloseDiaryReportModal()">Fechar</button></div></div><div class="rh-diary-modal-body"><div class="rh-diary-sidebar"><div class="rh-diary-sidebar-block"><div class="rh-diary-sidebar-label">Disciplinas</div><div class="rh-diary-grid" id="rh-diary-discipline-grid"></div></div><div class="rh-diary-sidebar-block"><div class="rh-diary-sidebar-label">Relat\u00f3rios</div><div class="rh-diary-grid" id="rh-diary-range-grid"></div></div></div><div class="rh-diary-viewer"><div class="rh-diary-meta"><div class="rh-diary-meta-card"><strong id="rh-diary-meta-title">Selecione um relat\u00f3rio</strong><span id="rh-diary-meta-copy">O PDF usa as mesmas aulas registradas no projeto, agrupadas por data e total de h/aula.</span></div></div><div class="rh-diary-frame-wrap"><iframe id="rh-diary-frame" class="rh-diary-frame" title="Pr\u00e9-visualiza\u00e7\u00e3o do relat\u00f3rio di\u00e1rio"></iframe></div></div></div></div>';
+  modal.innerHTML = '<div class="rh-diary-modal-inner"><div class="rh-diary-modal-top"><div><h3 id="rh-diary-modal-title">Relat\u00f3rios di\u00e1rios</h3><p id="rh-diary-modal-subtitle">Selecione a disciplina e o bimestre para abrir a visualiza??o.</p></div><div class="rh-diary-modal-top-actions"><button class="rh-diary-action-btn primary" id="rh-diary-download-btn" type="button" onclick="rhDiaryDownloadCurrentPdf()" disabled>Baixar</button><button class="rh-diary-action-btn ghost" type="button" onclick="rhCloseDiaryReportModal()">Fechar</button></div></div><div class="rh-diary-modal-body"><div class="rh-diary-sidebar"><div class="rh-diary-sidebar-block"><div class="rh-diary-sidebar-label">Disciplinas</div><div class="rh-diary-grid" id="rh-diary-discipline-grid"></div></div><div class="rh-diary-sidebar-block"><div class="rh-diary-sidebar-label">Relat\u00f3rios</div><div class="rh-diary-grid" id="rh-diary-range-grid"></div></div></div><div class="rh-diary-viewer"><div class="rh-diary-meta"><div class="rh-diary-meta-card"><strong id="rh-diary-meta-title">Selecione um relat\u00f3rio</strong><span id="rh-diary-meta-copy">A visualiza??o usa as mesmas aulas registradas no projeto, agrupadas por data e total de h/aula.</span></div></div><div class="rh-diary-frame-wrap"><iframe id="rh-diary-frame" class="rh-diary-frame" title="Pr\u00e9-visualiza\u00e7\u00e3o do relat\u00f3rio di\u00e1rio"></iframe></div></div></div></div>';
   modal.addEventListener('click', function(e) {
     if (e.target === modal) rhCloseDiaryReportModal();
   });
@@ -1486,7 +1487,7 @@ function rhDiaryUpdateMeta(title, copy) {
   var titleEl = document.getElementById('rh-diary-meta-title');
   var copyEl = document.getElementById('rh-diary-meta-copy');
   if (titleEl) titleEl.textContent = title || 'Selecione um relat\u00f3rio';
-  if (copyEl) copyEl.textContent = copy || 'O PDF usa as mesmas aulas registradas no projeto, agrupadas por data e total de h/aula.';
+  if (copyEl) copyEl.textContent = copy || 'A visualiza??o usa as mesmas aulas registradas no projeto, agrupadas por data e total de h/aula.';
 }
 
 function rhDiarySetDownloadState(enabled, fileName) {
@@ -1554,7 +1555,7 @@ function rhOpenDiaryReportModal(sectionId) {
     : 'Selecione a disciplina e o bimestre para gerar o PDF r\u00e1pido da turma.';
   rhDiaryRenderDisciplinas(sectionId);
   rhDiaryRenderRanges();
-  rhDiaryUpdateMeta('Selecione um relat\u00f3rio', 'O PDF usa as mesmas aulas registradas no projeto, agrupadas por data e total de h/aula.');
+  rhDiaryUpdateMeta('Selecione um relat\u00f3rio', 'A visualiza??o usa as mesmas aulas registradas no projeto, agrupadas por data e total de h/aula.');
   var frame = document.getElementById('rh-diary-frame');
   if (frame) frame.removeAttribute('src');
   rhDiarySetDownloadState(false, '');
@@ -1571,7 +1572,7 @@ function rhDiarySelectDisciplina(disciplina) {
   RH_DIARY_MODAL_STATE.mode = '';
   rhDiaryRenderDisciplinas(RH_DIARY_MODAL_STATE.sectionId);
   rhDiaryRenderRanges();
-  rhDiaryUpdateMeta(disciplina, 'Escolha o bimestre ou o total para abrir e baixar o PDF.');
+  rhDiaryUpdateMeta(disciplina, 'Escolha o bimestre ou o total para abrir a visualiza??o e baixar em PDF.');
   var frame = document.getElementById('rh-diary-frame');
   if (frame) frame.removeAttribute('src');
   rhDiarySetDownloadState(false, '');
@@ -1585,7 +1586,7 @@ function rhDiaryOpenPdf(mode) {
   var blob = rhDiaryCreatePdfBlob(report);
   rhDiaryRevokePdfUrl();
   RH_DIARY_MODAL_STATE.pdfUrl = URL.createObjectURL(blob);
-  RH_DIARY_MODAL_STATE.fileName = rhDiarySanitizeFileName(report.title) + '-' + rhDiaryTodayFileLabel() + '.pdf';
+  RH_DIARY_MODAL_STATE.fileName = rhDiarySanitizeFileName(report.title) + '-' + rhDiaryTodayFileLabel() + '.html';
   var frame = document.getElementById('rh-diary-frame');
   if (frame) frame.src = RH_DIARY_MODAL_STATE.pdfUrl;
   rhDiaryUpdateMeta(report.title, report.subtitle);
@@ -1594,15 +1595,21 @@ function rhDiaryOpenPdf(mode) {
 
 function rhDiaryDownloadCurrentPdf() {
   if (!RH_DIARY_MODAL_STATE.pdfUrl) return;
+  var frame = document.getElementById('rh-diary-frame');
+  try {
+    if (frame && frame.contentWindow && typeof frame.contentWindow.print === 'function') {
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+      return;
+    }
+  } catch (err) {}
   var link = document.createElement('a');
   link.href = RH_DIARY_MODAL_STATE.pdfUrl;
-  link.download = RH_DIARY_MODAL_STATE.fileName || ('relatorio-diario-' + rhDiaryTodayFileLabel() + '.pdf');
+  link.download = RH_DIARY_MODAL_STATE.fileName || ('relatorio-diario-' + rhDiaryTodayFileLabel() + '.html');
   document.body.appendChild(link);
   link.click();
   link.remove();
-}
-
-function rhBindDiaryButton(button, sectionId) {
+}function rhBindDiaryButton(button, sectionId) {
   if (!button) return;
   button.setAttribute('data-rh-diary-btn', '1');
   button.setAttribute('data-rh-diary-section', sectionId);
@@ -1931,3 +1938,4 @@ window.relatoriosForceOnlineRefresh();
 }
 });
 })();
+
