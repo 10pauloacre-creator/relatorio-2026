@@ -1316,6 +1316,7 @@ function rhDiaryCreatePdfBlob(report) {
     var maxChars = Math.max(18, Math.floor(maxWidthChars - ((indent || 0) / 4)));
     rhDiaryWrapText(text, maxChars).forEach(function(line) {
       if (y < margin + 24) newPage();
+      page.push('0 0 0 rg');
       page.push('BT /' + (bold ? 'F2' : 'F1') + ' ' + size + ' Tf 1 0 0 1 ' + (margin + indent) + ' ' + y + ' Tm ' + rhDiaryPdfText(line) + ' Tj ET');
       y -= size + 5;
     });
@@ -1337,6 +1338,7 @@ function rhDiaryCreatePdfBlob(report) {
     page.push(tableX + ' ' + (y - rowHeight) + ' ' + tableWidth + ' ' + rowHeight + ' re S');
     page.push((tableX + colDate) + ' ' + (y - rowHeight) + ' m ' + (tableX + colDate) + ' ' + y + ' l S');
     page.push((tableX + colDate + colHours) + ' ' + (y - rowHeight) + ' m ' + (tableX + colDate + colHours) + ' ' + y + ' l S');
+    page.push('0.08 0.12 0.10 rg');
     page.push('BT /F2 10 Tf 1 0 0 1 ' + (tableX + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText('Data') + ' Tj ET');
     page.push('BT /F2 10 Tf 1 0 0 1 ' + (tableX + colDate + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText('H/Aula') + ' Tj ET');
     page.push('BT /F2 10 Tf 1 0 0 1 ' + (tableX + colDate + colHours + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText('Observacao') + ' Tj ET');
@@ -1346,6 +1348,7 @@ function rhDiaryCreatePdfBlob(report) {
       ensureRoom(1);
       page.push('0.78 0.82 0.79 RG 1 w');
       page.push(tableX + ' ' + (y - rowHeight) + ' ' + tableWidth + ' ' + rowHeight + ' re S');
+      page.push('0.08 0.12 0.10 rg');
       page.push('BT /F1 10 Tf 1 0 0 1 ' + (tableX + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText(group.emptyMessage || 'Nenhuma aula lancada.') + ' Tj ET');
       y -= rowHeight + 8;
       return;
@@ -1357,6 +1360,7 @@ function rhDiaryCreatePdfBlob(report) {
       page.push(tableX + ' ' + (y - rowHeight) + ' ' + tableWidth + ' ' + rowHeight + ' re S');
       page.push((tableX + colDate) + ' ' + (y - rowHeight) + ' m ' + (tableX + colDate) + ' ' + y + ' l S');
       page.push((tableX + colDate + colHours) + ' ' + (y - rowHeight) + ' m ' + (tableX + colDate + colHours) + ' ' + y + ' l S');
+      page.push('0.12 0.14 0.13 rg');
       page.push('BT /F1 10 Tf 1 0 0 1 ' + (tableX + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText(row.dateLabel) + ' Tj ET');
       page.push('BT /F1 10 Tf 1 0 0 1 ' + (tableX + colDate + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText(String(row.hours)) + ' Tj ET');
       page.push('BT /F1 10 Tf 1 0 0 1 ' + (tableX + colDate + colHours + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText(row.hours === 1 ? '1 aula no dia' : row.hours + ' aulas no dia') + ' Tj ET');
@@ -1441,7 +1445,7 @@ function rhDiaryEnsureStyles() {
     '.rh-diary-meta{padding:18px 20px 0}' +
     '.rh-diary-meta-card{border:1px solid rgba(26,58,42,.12);background:#f8faf7;border-radius:16px;padding:14px 16px}' +
     '.rh-diary-meta-card strong{display:block;font-family:"Playfair Display",serif;font-size:1rem;color:var(--vd)}' +
-    '.rh-diary-meta-card span{display:block;margin-top:6px;font-size:.8rem;line-height:1.6;color:var(--cm)}' +
+    '.rh-diary-meta-card span{display:block;margin-top:6px;font-size:.8rem;line-height:1.6;color:#566157}' +
     '.rh-diary-frame-wrap{padding:18px 20px 20px;flex:1;min-height:0}' +
     '.rh-diary-frame{width:100%;height:100%;min-height:520px;border:1px solid rgba(26,58,42,.12);border-radius:18px;background:#fff}' +
     '@media(max-width:980px){.rh-diary-modal-body{grid-template-columns:1fr}.rh-diary-sidebar{border-right:none;border-bottom:1px solid var(--cl)}.rh-diary-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}' +
