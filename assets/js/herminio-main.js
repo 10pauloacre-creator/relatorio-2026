@@ -134,7 +134,7 @@ var infoDisc = normalizarDiscRH(titulo.textContent);
 if (!infoDisc) return;
 var turmaId = turmaIdForcada || RH_SECOES_TURMA[(card.closest('.sec') || {}).id];
 if (!turmaId) return;
-var horas = rhHorasOficiaisCard(card, parseHorasRH(titulo.textContent));
+var horas = rhHorasOficiaisCard(card, Math.floor(parseHorasRH(titulo.textContent) || 0));
 var chave = turmaId + '_' + infoDisc.disc;   mapa[chave] = (mapa[chave] || 0) + horas;
 var data = parseDataCardRH(card);
 if (data) {
@@ -173,7 +173,7 @@ if (ultimaDataTurma[turmaId] && data <= ultimaDataTurma[turmaId]) return;
 var dataKey = rhDataChaveIso(data);
 var detalhadoKey = turmaId + '|' + infoDisc.disc + '|' + dataKey;
 if (datasDetalhadas[detalhadoKey]) return;
-var horas = rhHorasOficiaisCard(card, parseHorasRH(textoTitulo));
+var horas = rhHorasOficiaisCard(card, Math.floor(parseHorasRH(textoTitulo) || 0));
 if (!horas) return;
 var chave = turmaId + '_' + infoDisc.disc;
 mapa[chave] = (mapa[chave] || 0) + horas;
@@ -1084,6 +1084,456 @@ document.addEventListener('DOMContentLoaded', function() {
   if ((location.hash || '').toLowerCase().indexOf('claude') >= 0 && history.replaceState) history.replaceState(null, '', location.pathname + location.search);
 });
 })();
+
+var RH_DIARY_SECTION_LABELS = {
+  'sec-all': 'Geral',
+  'sec-t89': '8\u00ba/9\u00ba Ano',
+  'sec-t1': '1\u00aa S\u00e9rie',
+  'sec-t23': '2\u00aa/3\u00aa S\u00e9rie'
+};
+var RH_DIARY_DISC_ORDER = ['L\u00edngua Portuguesa', 'Ingl\u00eas', 'Espanhol', 'Arte', 'Reda\u00e7\u00e3o'];
+var RH_DIARY_MODAL_STATE = { sectionId: '', disciplina: '', mode: '', pdfUrl: '', fileName: '' };
+
+function rhDiaryTodayCutoff() {
+  var now = new Date();
+  now.setHours(23, 59, 59, 999);
+  return now;
+}
+
+function rhDiaryTodayLabel() {
+  return fmtDataRH(new Date());
+}
+
+function rhDiaryTodayFileLabel() {
+  var today = new Date();
+  var mes = String(today.getMonth() + 1).padStart(2, '0');
+  var dia = String(today.getDate()).padStart(2, '0');
+  return today.getFullYear() + '-' + mes + '-' + dia;
+}
+
+function rhDiaryResolveBimester(dateObj) {
+  var month = dateObj.getMonth() + 1;
+  if (month <= 4) return 1;
+  if (month <= 6) return 2;
+  if (month <= 9) return 3;
+  return 4;
+}
+
+function rhDiaryFormatShortDate(dateObj) {
+  return String(dateObj.getDate()).padStart(2, '0') + '/' + String(dateObj.getMonth() + 1).padStart(2, '0');
+}
+
+function rhDiarySortDisciplinas(values) {
+  return values.slice().sort(function(a, b) {
+    var ai = RH_DIARY_DISC_ORDER.indexOf(a);
+    var bi = RH_DIARY_DISC_ORDER.indexOf(b);
+    if (ai === -1 && bi === -1) return a.localeCompare(b, 'pt-BR');
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+}
+
+function rhDiaryCollectRecords() {
+  var cutoff = rhDiaryTodayCutoff();
+  var records = [];
+  var seenRelatos = {};
+  ['sec-t89', 'sec-t1', 'sec-t23'].forEach(function(sectionId) {
+    var sec = document.getElementById(sectionId);
+    var turmaId = RH_SECOES_TURMA[sectionId];
+    if (!sec || !turmaId) return;
+    sec.querySelectorAll('.ea').forEach(function(card) {
+      if (!rhCardContaNoPainel(card)) return;
+      var relatoId = rhRelatoIdCard(card);
+      if (relatoId && seenRelatos[relatoId]) return;
+      var titulo = card.querySelector('.em .ed');
+      var infoDisc = normalizarDiscRH(titulo ? titulo.textContent : '');
+      var dateObj = parseDataCardRH(card);
+      if (!infoDisc || !dateObj || dateObj > cutoff) return;
+      var hours = Math.max(1, Math.round(rhHorasOficiaisCard(card, parseHorasRH(titulo ? titulo.textContent : '')) || 1));
+      records.push({
+        dateKey: rhDataChaveIso(dateObj),
+        dateLabel: rhDiaryFormatShortDate(dateObj),
+        turmaId: turmaId,
+        turmaLabel: RH_TURMA_LABELS[turmaId] || RH_DIARY_SECTION_LABELS[sectionId] || turmaId,
+        disciplina: infoDisc.disc,
+        hours: hours,
+        bimestre: rhDiaryResolveBimester(dateObj)
+      });
+      if (relatoId) seenRelatos[relatoId] = true;
+    });
+  });
+  return records;
+}
+
+function rhDiaryGetSectionRecords(sectionId) {
+  var records = rhDiaryCollectRecords();
+  if (sectionId === 'sec-all') return records;
+  var turmaId = RH_SECOES_TURMA[sectionId];
+  return records.filter(function(item) { return item.turmaId === turmaId; });
+}
+
+function rhDiaryGetDisciplinas(sectionId) {
+  var seen = {};
+  rhDiaryGetSectionRecords(sectionId).forEach(function(item) { seen[item.disciplina] = true; });
+  return rhDiarySortDisciplinas(Object.keys(seen));
+}
+
+function rhDiaryBuildDateSummary(records) {
+  var grouped = {};
+  records.forEach(function(item) {
+    if (!grouped[item.dateKey]) grouped[item.dateKey] = { dateLabel: item.dateLabel, hours: 0 };
+    grouped[item.dateKey].hours += Math.max(1, item.hours || 1);
+  });
+  return Object.keys(grouped).sort().map(function(dateKey) {
+    var data = grouped[dateKey];
+    var tokens = [];
+    for (var i = 1; i <= data.hours; i += 1) tokens.push(data.dateLabel + ' (' + i + ')');
+    return tokens.join(' - ');
+  });
+}
+
+function rhDiaryBuildReport(sectionId, disciplina, mode) {
+  var todayLabel = rhDiaryTodayLabel();
+  var sectionLabel = RH_DIARY_SECTION_LABELS[sectionId] || 'Turma';
+  var records = rhDiaryGetSectionRecords(sectionId).filter(function(item) { return item.disciplina === disciplina; });
+  var groups = [];
+  if (mode === 'total') {
+    [1, 2, 3, 4].forEach(function(bim) {
+      var subset = records.filter(function(item) { return item.bimestre === bim; });
+      groups.push({ title: bim + '\u00ba Bimestre', lines: rhDiaryBuildDateSummary(subset), count: subset.length });
+    });
+  } else {
+    var bimSel = parseInt(mode, 10) || 1;
+    var bimRecords = records.filter(function(item) { return item.bimestre === bimSel; });
+    groups.push({ title: bimSel + '\u00ba Bimestre', lines: rhDiaryBuildDateSummary(bimRecords), count: bimRecords.length });
+  }
+  var bodyGroups = groups.filter(function(group) { return group.lines.length; });
+  if (!bodyGroups.length) {
+    bodyGroups = [{
+      title: mode === 'total' ? 'Total' : 'Sem registros',
+      lines: ['Nenhuma aula lan\u00e7ada at\u00e9 ' + todayLabel + ' para este recorte.'],
+      count: 0
+    }];
+  }
+  return {
+    title: sectionLabel + ' > ' + disciplina + ' - ' + (mode === 'total' ? 'Total' : ((parseInt(mode, 10) || 1) + '\u00ba Bimestre')),
+    subtitle: sectionId === 'sec-all'
+      ? 'Aulas lan\u00e7adas at\u00e9 ' + todayLabel + ', agrupadas por bimestre.'
+      : 'Aulas lan\u00e7adas da turma at\u00e9 ' + todayLabel + '.',
+    groups: bodyGroups
+  };
+}
+
+function rhDiaryPdfHex(text) {
+  var value = String(text == null ? '' : text);
+  var hex = 'FEFF';
+  for (var i = 0; i < value.length; i += 1) {
+    var code = value.charCodeAt(i).toString(16).toUpperCase();
+    hex += ('0000' + code).slice(-4);
+  }
+  return '<' + hex + '>';
+}
+
+function rhDiaryWrapText(text, maxChars) {
+  var words = String(text || '').split(/\s+/).filter(Boolean);
+  var lines = [];
+  var current = '';
+  if (!words.length) return [''];
+  words.forEach(function(word) {
+    var next = current ? current + ' ' + word : word;
+    if (next.length > maxChars && current) {
+      lines.push(current);
+      current = word;
+      return;
+    }
+    current = next;
+  });
+  if (current) lines.push(current);
+  return lines;
+}
+
+function rhDiaryCreatePdfBlob(report) {
+  var pageWidth = 595;
+  var pageHeight = 842;
+  var margin = 42;
+  var maxWidthChars = 92;
+  var pages = [];
+  var page = null;
+  var y = 0;
+  function newPage() {
+    page = [];
+    pages.push(page);
+    y = pageHeight - margin;
+  }
+  function addLine(text, size, bold, indent) {
+    indent = indent || 0;
+    if (!page) newPage();
+    var maxChars = Math.max(18, Math.floor(maxWidthChars - ((indent || 0) / 4)));
+    rhDiaryWrapText(text, maxChars).forEach(function(line) {
+      if (y < margin + 24) newPage();
+      page.push('BT /' + (bold ? 'F2' : 'F1') + ' ' + size + ' Tf 1 0 0 1 ' + (margin + indent) + ' ' + y + ' Tm ' + rhDiaryPdfHex(line) + ' Tj ET');
+      y -= size + 5;
+    });
+  }
+  addLine(report.title, 18, true, 0);
+  addLine(report.subtitle, 10, false, 0);
+  y -= 4;
+  report.groups.forEach(function(group) {
+    addLine(group.title, 14, true, 0);
+    if (group.lines.length) group.lines.forEach(function(line) { addLine('Data: ' + line, 11, false, 10); });
+    else addLine('Nenhuma aula lan\u00e7ada.', 11, false, 10);
+    y -= 4;
+  });
+  if (!pages.length) newPage();
+  var objects = [
+    '',
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids __KIDS__ /Count __COUNT__ >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>'
+  ];
+  var kids = [];
+  pages.forEach(function(commands, index) {
+    var pageObj = 5 + (index * 2);
+    var contentObj = pageObj + 1;
+    var stream = commands.join('\n');
+    kids.push(pageObj + ' 0 R');
+    objects[pageObj] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pageWidth + ' ' + pageHeight + '] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ' + contentObj + ' 0 R >>';
+    objects[contentObj] = '<< /Length ' + (new TextEncoder().encode(stream).length) + ' >>\nstream\n' + stream + '\nendstream';
+  });
+  objects[2] = objects[2].replace('__KIDS__', '[' + kids.join(' ') + ']').replace('__COUNT__', String(pages.length));
+  var pdf = '%PDF-1.4\n';
+  var offsets = [0];
+  for (var i = 1; i < objects.length; i += 1) {
+    offsets[i] = pdf.length;
+    pdf += i + ' 0 obj\n' + objects[i] + '\nendobj\n';
+  }
+  var xrefStart = pdf.length;
+  pdf += 'xref\n0 ' + objects.length + '\n0000000000 65535 f \n';
+  for (var j = 1; j < objects.length; j += 1) pdf += ('0000000000' + offsets[j]).slice(-10) + ' 00000 n \n';
+  pdf += 'trailer\n<< /Size ' + objects.length + ' /Root 1 0 R >>\nstartxref\n' + xrefStart + '\n%%EOF';
+  return new Blob([pdf], { type: 'application/pdf' });
+}
+
+function rhDiarySanitizeFileName(value) {
+  return String(value || 'relatorio')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase();
+}
+
+function rhDiaryEnsureStyles() {
+  if (document.getElementById('rh-diary-style')) return;
+  var style = document.createElement('style');
+  style.id = 'rh-diary-style';
+  style.textContent =
+    '.rh-diary-modal{position:fixed;inset:0;background:rgba(7,17,12,.72);z-index:12000;display:none;align-items:center;justify-content:center;padding:20px}' +
+    '.rh-diary-modal.on{display:flex}' +
+    '.rh-diary-modal-inner{width:min(1180px,100%);max-height:92vh;background:var(--cr);border-radius:24px;box-shadow:0 28px 80px rgba(0,0,0,.34);display:flex;flex-direction:column;overflow:hidden}' +
+    '.rh-diary-modal-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 22px 18px;border-bottom:1px solid var(--cl);background:linear-gradient(135deg,rgba(26,58,42,.98),rgba(39,86,63,.94) 56%,rgba(74,148,103,.9));color:#fff}' +
+    '.rh-diary-modal-top h3{font-family:"Playfair Display",serif;font-size:1.2rem;line-height:1.15}' +
+    '.rh-diary-modal-top p{margin-top:6px;font-size:.8rem;line-height:1.6;color:rgba(255,255,255,.78)}' +
+    '.rh-diary-modal-top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}' +
+    '.rh-diary-action-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 16px;border:none;border-radius:999px;font-family:"DM Sans",sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:transform .15s ease,opacity .15s ease,filter .15s ease}' +
+    '.rh-diary-action-btn:hover{transform:translateY(-1px)}' +
+    '.rh-diary-action-btn.primary{background:linear-gradient(135deg,#c9a84c,#ecd48b);color:#43310e}' +
+    '.rh-diary-action-btn.ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.18)}' +
+    '.rh-diary-action-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}' +
+    '.rh-diary-modal-body{display:grid;grid-template-columns:minmax(280px,340px) minmax(0,1fr);min-height:0;flex:1}' +
+    '.rh-diary-sidebar{padding:18px;border-right:1px solid var(--cl);background:#f6f4ee;overflow:auto}' +
+    '.rh-diary-sidebar-block+.rh-diary-sidebar-block{margin-top:18px}' +
+    '.rh-diary-sidebar-label{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--cm);margin-bottom:10px}' +
+    '.rh-diary-grid{display:grid;grid-template-columns:1fr;gap:10px}' +
+    '.rh-diary-choice{display:flex;align-items:center;justify-content:center;padding:11px 14px;border-radius:14px;border:1px solid rgba(26,58,42,.12);background:#fff;color:var(--vd);font-family:"DM Sans",sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;transition:transform .14s ease,background .14s ease,border-color .14s ease,box-shadow .14s ease;text-align:center}' +
+    '.rh-diary-choice:hover{transform:translateY(-1px);border-color:rgba(26,58,42,.25);box-shadow:0 8px 18px rgba(26,58,42,.08)}' +
+    '.rh-diary-choice.on{background:linear-gradient(135deg,#1a3a2a,#2d6147);border-color:#1a3a2a;color:#fff}' +
+    '.rh-diary-empty{font-size:.8rem;line-height:1.6;color:var(--cm);background:#fff;border:1px dashed rgba(26,58,42,.18);border-radius:16px;padding:14px 15px}' +
+    '.rh-diary-viewer{display:flex;flex-direction:column;min-height:0;background:#fff}' +
+    '.rh-diary-meta{padding:18px 20px 0}' +
+    '.rh-diary-meta-card{border:1px solid rgba(26,58,42,.12);background:#f8faf7;border-radius:16px;padding:14px 16px}' +
+    '.rh-diary-meta-card strong{display:block;font-family:"Playfair Display",serif;font-size:1rem;color:var(--vd)}' +
+    '.rh-diary-meta-card span{display:block;margin-top:6px;font-size:.8rem;line-height:1.6;color:var(--cm)}' +
+    '.rh-diary-frame-wrap{padding:18px 20px 20px;flex:1;min-height:0}' +
+    '.rh-diary-frame{width:100%;height:100%;min-height:520px;border:1px solid rgba(26,58,42,.12);border-radius:18px;background:#fff}' +
+    '@media(max-width:980px){.rh-diary-modal-body{grid-template-columns:1fr}.rh-diary-sidebar{border-right:none;border-bottom:1px solid var(--cl)}.rh-diary-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}' +
+    '@media(max-width:720px){.rh-diary-modal{padding:10px}.rh-diary-modal-top{padding:18px 16px 16px;flex-direction:column}.rh-diary-modal-top-actions{width:100%;justify-content:stretch}.rh-diary-action-btn{flex:1}.rh-diary-sidebar,.rh-diary-meta,.rh-diary-frame-wrap{padding-left:14px;padding-right:14px}.rh-diary-frame{min-height:360px}}';
+  document.head.appendChild(style);
+}
+
+function rhDiaryEnsureModal() {
+  rhDiaryEnsureStyles();
+  var modal = document.getElementById('rh-diary-modal');
+  if (modal) return modal;
+  modal = document.createElement('div');
+  modal.id = 'rh-diary-modal';
+  modal.className = 'rh-diary-modal';
+  modal.innerHTML = '<div class="rh-diary-modal-inner"><div class="rh-diary-modal-top"><div><h3 id="rh-diary-modal-title">Relat\u00f3rio di\u00e1rios</h3><p id="rh-diary-modal-subtitle">Selecione a disciplina e o bimestre para abrir o PDF.</p></div><div class="rh-diary-modal-top-actions"><button class="rh-diary-action-btn primary" id="rh-diary-download-btn" type="button" onclick="rhDiaryDownloadCurrentPdf()" disabled>Baixar</button><button class="rh-diary-action-btn ghost" type="button" onclick="rhCloseDiaryReportModal()">Fechar</button></div></div><div class="rh-diary-modal-body"><div class="rh-diary-sidebar"><div class="rh-diary-sidebar-block"><div class="rh-diary-sidebar-label">Disciplinas</div><div class="rh-diary-grid" id="rh-diary-discipline-grid"></div></div><div class="rh-diary-sidebar-block"><div class="rh-diary-sidebar-label">Relat\u00f3rios</div><div class="rh-diary-grid" id="rh-diary-range-grid"></div></div></div><div class="rh-diary-viewer"><div class="rh-diary-meta"><div class="rh-diary-meta-card"><strong id="rh-diary-meta-title">Selecione um relat\u00f3rio</strong><span id="rh-diary-meta-copy">O PDF ser\u00e1 mostrado aqui com as datas lan\u00e7adas de 1h em 1h/aula.</span></div></div><div class="rh-diary-frame-wrap"><iframe id="rh-diary-frame" class="rh-diary-frame" title="Pr\u00e9-visualiza\u00e7\u00e3o do relat\u00f3rio di\u00e1rio"></iframe></div></div></div></div>';
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) rhCloseDiaryReportModal();
+  });
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function rhDiaryRevokePdfUrl() {
+  if (!RH_DIARY_MODAL_STATE.pdfUrl) return;
+  URL.revokeObjectURL(RH_DIARY_MODAL_STATE.pdfUrl);
+  RH_DIARY_MODAL_STATE.pdfUrl = '';
+}
+
+function rhDiaryUpdateMeta(title, copy) {
+  var titleEl = document.getElementById('rh-diary-meta-title');
+  var copyEl = document.getElementById('rh-diary-meta-copy');
+  if (titleEl) titleEl.textContent = title || 'Selecione um relat\u00f3rio';
+  if (copyEl) copyEl.textContent = copy || 'O PDF ser\u00e1 mostrado aqui com as datas lan\u00e7adas de 1h em 1h/aula.';
+}
+
+function rhDiarySetDownloadState(enabled, fileName) {
+  var btn = document.getElementById('rh-diary-download-btn');
+  if (!btn) return;
+  btn.disabled = !enabled;
+  btn.setAttribute('data-file', fileName || '');
+}
+
+function rhDiaryRenderDisciplinas(sectionId) {
+  var grid = document.getElementById('rh-diary-discipline-grid');
+  if (!grid) return;
+  var disciplinas = rhDiaryGetDisciplinas(sectionId);
+  if (!disciplinas.length) {
+    grid.innerHTML = '<div class="rh-diary-empty">Nenhuma disciplina com aulas lan\u00e7adas foi encontrada nesta aba.</div>';
+    return;
+  }
+  grid.innerHTML = disciplinas.map(function(item) {
+    var active = RH_DIARY_MODAL_STATE.disciplina === item ? ' on' : '';
+    return '<button class="rh-diary-choice' + active + '" type="button" onclick="rhDiarySelectDisciplina(' + JSON.stringify(item) + ')">' + item + '</button>';
+  }).join('');
+}
+
+function rhDiaryRenderRanges() {
+  var grid = document.getElementById('rh-diary-range-grid');
+  if (!grid) return;
+  if (!RH_DIARY_MODAL_STATE.disciplina) {
+    grid.innerHTML = '<div class="rh-diary-empty">Escolha uma disciplina para liberar os bot\u00f5es de bimestre e o relat\u00f3rio total.</div>';
+    return;
+  }
+  grid.innerHTML = ['1', '2', '3', '4', 'total'].map(function(value) {
+    var label = value === 'total' ? 'Total' : value + '\u00ba Bimestre';
+    var active = RH_DIARY_MODAL_STATE.mode === value ? ' on' : '';
+    return '<button class="rh-diary-choice' + active + '" type="button" onclick="rhDiaryOpenPdf(' + JSON.stringify(value) + ')">' + label + '</button>';
+  }).join('');
+}
+
+function rhOpenDiaryReportModal(sectionId) {
+  rhDiaryEnsureModal();
+  rhDiaryRevokePdfUrl();
+  RH_DIARY_MODAL_STATE.sectionId = sectionId;
+  RH_DIARY_MODAL_STATE.disciplina = '';
+  RH_DIARY_MODAL_STATE.mode = '';
+  RH_DIARY_MODAL_STATE.fileName = '';
+  document.getElementById('rh-diary-modal').classList.add('on');
+  var sectionLabel = RH_DIARY_SECTION_LABELS[sectionId] || 'Turma';
+  var titleEl = document.getElementById('rh-diary-modal-title');
+  var subEl = document.getElementById('rh-diary-modal-subtitle');
+  if (titleEl) titleEl.textContent = 'Relat\u00f3rio di\u00e1rios - ' + sectionLabel;
+  if (subEl) subEl.textContent = sectionId === 'sec-all'
+    ? 'Selecione a disciplina para listar todas as aulas lan\u00e7adas at\u00e9 ' + rhDiaryTodayLabel() + '.'
+    : 'Selecione a disciplina e o bimestre para gerar o PDF r\u00e1pido da turma.';
+  rhDiaryRenderDisciplinas(sectionId);
+  rhDiaryRenderRanges();
+  rhDiaryUpdateMeta('Selecione um relat\u00f3rio', 'O PDF ser\u00e1 mostrado aqui com as datas lan\u00e7adas de 1h em 1h/aula.');
+  var frame = document.getElementById('rh-diary-frame');
+  if (frame) frame.removeAttribute('src');
+  rhDiarySetDownloadState(false, '');
+}
+
+function rhCloseDiaryReportModal() {
+  var modal = document.getElementById('rh-diary-modal');
+  if (modal) modal.classList.remove('on');
+  rhDiaryRevokePdfUrl();
+}
+
+function rhDiarySelectDisciplina(disciplina) {
+  RH_DIARY_MODAL_STATE.disciplina = disciplina;
+  RH_DIARY_MODAL_STATE.mode = '';
+  rhDiaryRenderDisciplinas(RH_DIARY_MODAL_STATE.sectionId);
+  rhDiaryRenderRanges();
+  rhDiaryUpdateMeta(disciplina, 'Escolha o bimestre ou o total para abrir e baixar o PDF.');
+  var frame = document.getElementById('rh-diary-frame');
+  if (frame) frame.removeAttribute('src');
+  rhDiarySetDownloadState(false, '');
+}
+
+function rhDiaryOpenPdf(mode) {
+  if (!RH_DIARY_MODAL_STATE.sectionId || !RH_DIARY_MODAL_STATE.disciplina) return;
+  RH_DIARY_MODAL_STATE.mode = mode;
+  rhDiaryRenderRanges();
+  var report = rhDiaryBuildReport(RH_DIARY_MODAL_STATE.sectionId, RH_DIARY_MODAL_STATE.disciplina, mode);
+  var blob = rhDiaryCreatePdfBlob(report);
+  rhDiaryRevokePdfUrl();
+  RH_DIARY_MODAL_STATE.pdfUrl = URL.createObjectURL(blob);
+  RH_DIARY_MODAL_STATE.fileName = rhDiarySanitizeFileName(report.title) + '-' + rhDiaryTodayFileLabel() + '.pdf';
+  var frame = document.getElementById('rh-diary-frame');
+  if (frame) frame.src = RH_DIARY_MODAL_STATE.pdfUrl;
+  rhDiaryUpdateMeta(report.title, report.subtitle);
+  rhDiarySetDownloadState(true, RH_DIARY_MODAL_STATE.fileName);
+}
+
+function rhDiaryDownloadCurrentPdf() {
+  if (!RH_DIARY_MODAL_STATE.pdfUrl) return;
+  var link = document.createElement('a');
+  link.href = RH_DIARY_MODAL_STATE.pdfUrl;
+  link.download = RH_DIARY_MODAL_STATE.fileName || ('relatorio-diario-' + rhDiaryTodayFileLabel() + '.pdf');
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+function rhEnsureDiaryButtons() {
+  ['sec-all', 'sec-t89', 'sec-t1', 'sec-t23'].forEach(function(sectionId) {
+    var sec = document.getElementById(sectionId);
+    if (!sec) return;
+    var heroMain = sec.querySelector('.rh-hero-main');
+    if (!heroMain && !sec.querySelector('.rh-hero')) return;
+    var actions = sec.querySelector('.rh-hero-actions');
+    if (!actions && heroMain) {
+      actions = document.createElement('div');
+      actions.className = 'rh-hero-actions';
+      var status = sec.querySelector('.rh-hero-status');
+      if (status) heroMain.insertBefore(actions, status);
+      else heroMain.appendChild(actions);
+    }
+    if (!actions || actions.querySelector('[data-rh-diary-btn="1"]')) return;
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'rh-hero-btn ghost';
+    button.setAttribute('data-rh-diary-btn', '1');
+    button.textContent = 'Relat\u00f3rios Di\u00e1rios';
+    button.onclick = function() { rhOpenDiaryReportModal(sectionId); };
+    actions.appendChild(button);
+  });
+}
+
+(function() {
+  if (typeof aba === 'function' && !aba.__rhDiaryWrapped) {
+    var rhAbaOriginal = aba;
+    var wrappedAba = function(id, btn) {
+      rhAbaOriginal(id, btn);
+      if (id === 'sec-all' || id === 'sec-t89' || id === 'sec-t1' || id === 'sec-t23') rhEnsureDiaryButtons();
+    };
+    wrappedAba.__rhDiaryWrapped = true;
+    aba = wrappedAba;
+  }
+})();
+
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    rhEnsureDiaryButtons();
+    rhDiaryEnsureModal();
+  }, 120);
+});
 
 document.addEventListener('DOMContentLoaded', rhRemoverAbaJogos);
 document.addEventListener('DOMContentLoaded', rhGarantirEditorPersistente);
