@@ -27,6 +27,78 @@ var m = txt.match(/(\d+)h(?:(\d{2}))?/i);
 if (!m) return 0; 
 var h = parseInt(m[1], 10); 
 var min = m[2] ? parseInt(m[2], 10) : 0;   return h + (min / 60); }
+const RH_HORAS_OFICIAIS_POR_RELATO = {
+  'r-g1-0430art': 0,
+  'r-g1-0504art': 0,
+  'r-g1-0505art': 0,
+  'r-g1-0506art': 0,
+  'r-g1-0507art': 0,
+  'r-g1-0508art': 0,
+  'r-g1-0511art': 0,
+  'r-g1-0512art': 0,
+  'r-g1-0513red': 0,
+  'r-g1-0515red': 0,
+  'r-g1-0518red': 0,
+  'r-g1-0519red': 0,
+  'r-g1-0520red': 0,
+  'r-g1-0521red': 0,
+  'r-g1-0522red': 0,
+  'r-t1-0605a': 2,
+  'r-t1-0605b': 2,
+  'r-t1-0605c': 2,
+  'r-t1-0605d': 3,
+  'r-t1-0608a-sec': 0,
+  'r-t1-0608b-sec': 0,
+  'r-t1-0609a': 0,
+  'r-t1-0609b-sec': 0,
+  'r-t1-0610a': 2,
+  'r-t1-0610b': 3,
+  'r-t1-0617a': 2,
+  'r-t1-0617b': 3,
+  'r-t1-0617c': 2,
+  'r-t1-0617d': 2,
+  'r-t1-0620a': 2,
+  'r-t1-0620b': 3,
+  'r-t1-0622a': 2,
+  'r-t1-0622b': 2,
+  'r-t1-0629a': 2,
+  'r-t1-0629b': 0,
+  'r-t1-0630a': 2,
+  'r-t1-0630b': 3,
+  'r-t1-0701a': 2,
+  'r-t1-0701b': 3,
+  'r-t1-0717a': 2,
+  'r-t1-0717b': 3,
+  'r-t1-0721a': 2,
+  'r-t1-0721b': 3,
+  'r-t1-0514red': 0,
+  'r-t1-0527a': 0,
+  'r-t1-0527b': 0,
+  'r-t1-0812a': 2,
+  'r-t1-0812b': 3,
+  'r-g1-0523red': 4
+};
+function rhHorasOficiaisRelatoId(relatoId, fallbackHoras) {
+if (!relatoId) return fallbackHoras;
+if (Object.prototype.hasOwnProperty.call(RH_HORAS_OFICIAIS_POR_RELATO, relatoId)) return RH_HORAS_OFICIAIS_POR_RELATO[relatoId];
+return fallbackHoras;
+}
+function rhHorasOficiaisCard(card, fallbackHoras) {
+if (!card) return fallbackHoras;
+var relato = card.querySelector('.ipane[id^="r-"]');
+return rhHorasOficiaisRelatoId(relato ? relato.id : '', fallbackHoras);
+}
+function rhRelatoIdCard(card) {
+if (!card) return '';
+var relato = card.querySelector('.ipane[id^="r-"]');
+return relato ? relato.id : '';
+}
+function rhCardContaNoPainel(card) {
+if (!card) return false;
+var titulo = card.querySelector('.em .ed');
+if (!titulo) return true;
+return rhHorasOficiaisCard(card, Math.floor(parseHorasRH(titulo.textContent) || 0)) > 0;
+}
 function normalizarDiscRH(txt) { 
 if (!txt) return null; 
 if (/(Língua Portuguesa|LP)/i.test(txt)) return { grupo:'lp', disc:'Língua Portuguesa' }; 
@@ -51,23 +123,32 @@ function coletarAulasLancadasRH() {
 var mapa = {}; 
 var ultimaData = null;
 var datasDetalhadas = {};
-var ultimaDataTurma = {};    Object.keys(RH_SECOES_TURMA).forEach(function(secId) {   
-var sec = document.getElementById(secId);   
-if (!sec) return;   
-var turmaId = RH_SECOES_TURMA[secId];     sec.querySelectorAll('.ea').forEach(function(card) {     
-var titulo = card.querySelector('.em .ed');     
-if (!titulo) return;     
-var infoDisc = normalizarDiscRH(titulo.textContent);     
-if (!infoDisc) return;     
-var horas = parseHorasRH(titulo.textContent);     
-var chave = turmaId + '_' + infoDisc.disc;       mapa[chave] = (mapa[chave] || 0) + horas;     
-var data = parseDataCardRH(card);     
+var ultimaDataTurma = {};
+var paneContabilizado = {};
+function rhSomarCard(card, turmaIdForcada) {
+var titulo = card.querySelector('.em .ed');
+if (!titulo) return;
+var relatoId = rhRelatoIdCard(card);
+if (relatoId && paneContabilizado[relatoId]) return;
+var infoDisc = normalizarDiscRH(titulo.textContent);
+if (!infoDisc) return;
+var turmaId = turmaIdForcada || RH_SECOES_TURMA[(card.closest('.sec') || {}).id];
+if (!turmaId) return;
+var horas = rhHorasOficiaisCard(card, parseHorasRH(titulo.textContent));
+var chave = turmaId + '_' + infoDisc.disc;   mapa[chave] = (mapa[chave] || 0) + horas;
+var data = parseDataCardRH(card);
 if (data) {
 var dataKey = rhDataChaveIso(data);
 datasDetalhadas[turmaId + '|' + infoDisc.disc + '|' + dataKey] = true;
 if (!ultimaDataTurma[turmaId] || data > ultimaDataTurma[turmaId]) ultimaDataTurma[turmaId] = data;
 if (!ultimaData || data > ultimaData) ultimaData = data;
-}     });   });
+}
+if (relatoId) paneContabilizado[relatoId] = true;
+}
+   Object.keys(RH_SECOES_TURMA).forEach(function(secId) {   
+var sec = document.getElementById(secId);   
+if (!sec) return;   
+var turmaId = RH_SECOES_TURMA[secId];     sec.querySelectorAll('.ea').forEach(function(card) { rhSomarCard(card, turmaId); });   });
 var secAll = document.getElementById('sec-all');
 if (secAll) {     secAll.querySelectorAll('.ea').forEach(function(card) {
 var titulo = card.querySelector('.em .ed');
@@ -92,13 +173,21 @@ if (ultimaDataTurma[turmaId] && data <= ultimaDataTurma[turmaId]) return;
 var dataKey = rhDataChaveIso(data);
 var detalhadoKey = turmaId + '|' + infoDisc.disc + '|' + dataKey;
 if (datasDetalhadas[detalhadoKey]) return;
-var horas = parseHorasRH(textoTitulo);
+var horas = rhHorasOficiaisCard(card, parseHorasRH(textoTitulo));
 if (!horas) return;
 var chave = turmaId + '_' + infoDisc.disc;
 mapa[chave] = (mapa[chave] || 0) + horas;
 datasDetalhadas[detalhadoKey] = true;
 if (!ultimaData || data > ultimaData) ultimaData = data;
-});   }    return { mapa: mapa, ultimaData: ultimaData }; }
+var relatoResumoId = rhRelatoIdCard(card);
+if (relatoResumoId) paneContabilizado[relatoResumoId] = true;
+});   }
+document.querySelectorAll('.ea').forEach(function(card) {
+var relatoId = rhRelatoIdCard(card);
+if (!relatoId || paneContabilizado[relatoId]) return;
+if (!/^r-(t1|g1)-/.test(relatoId)) return;
+rhSomarCard(card, 't1');
+});    return { mapa: mapa, ultimaData: ultimaData }; }
 function getBimAtualRH(feitas, bimestre) { 
 if (!bimestre) return 1;   for (var b = 1; b <= 4; b++) {   
 if (feitas < b * bimestre) return b;   }   return 4; }
@@ -196,7 +285,7 @@ if (!pane) return 1;
 var card = pane.closest('.ea'); 
 if (!card) return 1; 
 var titulo = card.querySelector('.em .ed'); 
-if (!titulo) return 1;   return Math.max(1, Math.floor(parseHorasRH(titulo.textContent) || 0)); }
+if (!titulo) return 1;   return Math.max(0, rhHorasOficiaisCard(card, Math.floor(parseHorasRH(titulo.textContent) || 0))); }
 function rhRelatoRelacionadoPane(pane) { 
 if (!pane || !pane.id) return null; 
 var relatoId = pane.id.replace(/^[pa]-/, 'r-');   return document.getElementById(relatoId); }
@@ -359,7 +448,7 @@ if (!dia || !mesAno) return 'Sem data';   return dia.textContent.trim() + ' ' + 
 function rhUpdateHeroStats(sectionId) { 
 var sec = document.getElementById(sectionId); 
 if (!sec) return; 
-var cards = sec.querySelectorAll('.ea'); 
+var cards = Array.from(sec.querySelectorAll('.ea')).filter(rhCardContaNoPainel); 
 var abertos = sec.querySelectorAll('.ea .ec2.on'); 
 var countEl = document.getElementById('rh-stat-count-' + sectionId); 
 var lastEl = document.getElementById('rh-stat-last-' + sectionId); 
@@ -387,7 +476,7 @@ function rhHeroBuildSummary(sectionId) {
 var sec = document.getElementById(sectionId); 
 if (!sec) return ''; 
 var titulo = sec.querySelector('.rh-hero-title'); 
-var cards = Array.from(sec.querySelectorAll('.ea')); 
+var cards = Array.from(sec.querySelectorAll('.ea')).filter(rhCardContaNoPainel); 
 var linhas = [     (titulo ? titulo.textContent.trim() : sectionId),     'Lançamentos: ' + cards.length,     'Último registro: ' + rhHeroFormatLastDate(sectionId),     'Relatos abertos: ' + sec.querySelectorAll('.ea .ec2.on').length,     ''   ];   cards.slice(0, 5).forEach(function(card, index) {   
 var nome = card.querySelector('.em .ed');   
 var info = card.querySelector('.em .ec');     linhas.push((index + 1) + '. ' + (nome ? nome.textContent.trim() : 'Registro sem título'));   
