@@ -76,6 +76,14 @@ const RH_HORAS_OFICIAIS_POR_RELATO = {
   'r-t1-0527b': 0,
   'r-t1-0812a': 2,
   'r-t1-0812b': 3,
+  'r-t89-0710a': 2,
+  'r-t89-0710b': 3,
+  'r-t89-0713a': 2,
+  'r-t89-0713b': 3,
+  'r-t89-0805c': 2,
+  'r-t89-0805d': 3,
+  'r-t89-0817c': 2,
+  'r-t89-0817d': 3,
   'r-g1-0523red': 4
 };
 function rhHorasOficiaisRelatoId(relatoId, fallbackHoras) {
