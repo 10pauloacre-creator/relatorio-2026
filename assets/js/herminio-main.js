@@ -1004,7 +1004,7 @@ legacyStorageKeys: ['ed_layout_safe_v1:raimundo-herminio-de-melo', 'ed_layout_sa
 pagePath: 'herminio.html'
 };
 var main = document.querySelector('main.main');
-if (main && !main.dataset.build) main.dataset.build = '20260718';
+if (main && !main.dataset.build) main.dataset.build = '20260819c';
 }
 function rhGarantirEditorPersistente() {
 if (window._rhEditorBootstrapDone) return;
@@ -1111,14 +1111,6 @@ function rhDiaryTodayFileLabel() {
   return today.getFullYear() + '-' + mes + '-' + dia;
 }
 
-function rhDiaryResolveBimester(dateObj) {
-  var month = dateObj.getMonth() + 1;
-  if (month <= 4) return 1;
-  if (month <= 6) return 2;
-  if (month <= 9) return 3;
-  return 4;
-}
-
 function rhDiaryFormatShortDate(dateObj) {
   return String(dateObj.getDate()).padStart(2, '0') + '/' + String(dateObj.getMonth() + 1).padStart(2, '0');
 }
@@ -1157,8 +1149,9 @@ function rhDiaryCollectRecords() {
         turmaId: turmaId,
         turmaLabel: RH_TURMA_LABELS[turmaId] || RH_DIARY_SECTION_LABELS[sectionId] || turmaId,
         disciplina: infoDisc.disc,
+        grupo: infoDisc.grupo,
         hours: hours,
-        bimestre: rhDiaryResolveBimester(dateObj)
+        ordemDom: records.length
       });
       if (relatoId) seenRelatos[relatoId] = true;
     });
@@ -1190,19 +1183,62 @@ function rhDiaryBuildDateSummary(records) {
   });
 }
 
+function rhDiaryDistributeByBimester(records) {
+  var distributed = { 1: [], 2: [], 3: [], 4: [] };
+  if (!records.length) return distributed;
+  var sample = records[0];
+  var meta = rhMetaBimestrePorDisciplina(sample.turmaId, sample.grupo, sample.disciplina);
+  var sorted = records.slice().sort(function(a, b) {
+    if (a.dateKey === b.dateKey) return (a.ordemDom || 0) - (b.ordemDom || 0);
+    return a.dateKey.localeCompare(b.dateKey);
+  });
+  if (!meta) {
+    sorted.forEach(function(item) {
+      var mes = parseInt(String(item.dateKey || '').slice(5, 7), 10);
+      var bim = mes <= 4 ? 1 : (mes <= 6 ? 2 : (mes <= 9 ? 3 : 4));
+      distributed[bim].push(item);
+    });
+    return distributed;
+  }
+  var acumulado = 0;
+  sorted.forEach(function(item) {
+    var restantes = Math.max(1, item.hours || 1);
+    while (restantes > 0) {
+      var bimAtual = Math.min(4, Math.floor(acumulado / meta) + 1);
+      var usadoNoBimestre = acumulado % meta;
+      var capacidade = bimAtual < 4 ? Math.max(1, meta - usadoNoBimestre) : restantes;
+      var bloco = Math.min(restantes, capacidade);
+      distributed[bimAtual].push({
+        dateKey: item.dateKey,
+        dateLabel: item.dateLabel,
+        turmaId: item.turmaId,
+        turmaLabel: item.turmaLabel,
+        disciplina: item.disciplina,
+        grupo: item.grupo,
+        hours: bloco,
+        ordemDom: item.ordemDom
+      });
+      acumulado += bloco;
+      restantes -= bloco;
+    }
+  });
+  return distributed;
+}
+
 function rhDiaryBuildReport(sectionId, disciplina, mode) {
   var todayLabel = rhDiaryTodayLabel();
   var sectionLabel = RH_DIARY_SECTION_LABELS[sectionId] || 'Turma';
   var records = rhDiaryGetSectionRecords(sectionId).filter(function(item) { return item.disciplina === disciplina; });
+  var distributed = rhDiaryDistributeByBimester(records);
   var groups = [];
   if (mode === 'total') {
     [1, 2, 3, 4].forEach(function(bim) {
-      var subset = records.filter(function(item) { return item.bimestre === bim; });
+      var subset = distributed[bim] || [];
       groups.push({ title: bim + '\u00ba Bimestre', rows: rhDiaryBuildDateSummary(subset), count: subset.length });
     });
   } else {
     var bimSel = parseInt(mode, 10) || 1;
-    var bimRecords = records.filter(function(item) { return item.bimestre === bimSel; });
+    var bimRecords = distributed[bimSel] || [];
     groups.push({ title: bimSel + '\u00ba Bimestre', rows: rhDiaryBuildDateSummary(bimRecords), count: bimRecords.length });
   }
   var bodyGroups = groups.filter(function(group) { return group.rows.length; });
@@ -1217,8 +1253,8 @@ function rhDiaryBuildReport(sectionId, disciplina, mode) {
   return {
     title: sectionLabel + ' > ' + disciplina + ' - ' + (mode === 'total' ? 'Total' : ((parseInt(mode, 10) || 1) + '\u00ba Bimestre')),
     subtitle: sectionId === 'sec-all'
-      ? 'Aulas lan\u00e7adas at\u00e9 ' + todayLabel + ', agrupadas por bimestre.'
-      : 'Aulas lan\u00e7adas da turma at\u00e9 ' + todayLabel + '.',
+      ? 'Aulas lan\u00e7adas at\u00e9 ' + todayLabel + ', agrupadas pela carga bimestral da disciplina.'
+      : 'Aulas lan\u00e7adas da turma at\u00e9 ' + todayLabel + ', agrupadas pela carga bimestral da disciplina.',
     groups: bodyGroups
   };
 }
