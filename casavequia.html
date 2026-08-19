@@ -8860,7 +8860,9 @@ const DISC=[
   {g:'tc',t:'1ª Série',d:'Trilhas de C. Humanas',sw:1,feitas:12,bim:10,tot:40},
   {g:'tc',t:'2ª Série',d:'Trilhas de C. Humanas',sw:2,feitas:25,bim:20,tot:80},
   {g:'tc',t:'3ª Série',d:'Trilhas de C. Humanas',sw:1,feitas:12,bim:10,tot:40},
-  {g:'ar',t:'6º Ano',  d:'Artes',sw:1,feitas:25,bim:10,tot:40},
+  // As seis h/aula abaixo antecedem os relatos digitais desta turma e devem
+  // permanecer somadas ao contador automático.
+  {g:'ar',t:'6º Ano',  d:'Artes',sw:1,feitas:25,legacyCredit:6,bim:10,tot:40},
   {g:'ar',t:'2ª Série',d:'Artes',sw:1,feitas:9,bim:10,tot:40},
   {g:'ar',t:'3ª Série',d:'Artes',sw:1,feitas:9,bim:10,tot:40}
 ];
@@ -9036,6 +9038,87 @@ function pcProjectionResolveGroupKey(turmaId,disciplineName){
   });
   return found?found.g:'';
 }
+function pcProjectionRecordTitle(entryId){
+  var pane=document.getElementById(entryId);
+  var card=pane?pane.closest('.ea'):null;
+  var title=card&&card.querySelector('.em .ed')?card.querySelector('.em .ed').textContent:'';
+  return String(title||'').replace(/\s+/g,' ').trim();
+}
+function pcProjectionSearchText(value){
+  return ' '+pcProjectionNormalizeText(value).replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim()+' ';
+}
+function pcProjectionDisciplineTerms(turmaId,disciplineName){
+  var config=pcFindDisciplineConfigByName(turmaId,disciplineName)||{};
+  var extra={
+    'Língua Portuguesa':['Língua Portuguesa','L.P.','LP','Português'],
+    'Trilhas de Linguagens':['Trilhas de Linguagens','Trilhas Linguagens','T. Linguagens','T.Ling.','T Ling'],
+    'Trilhas de C. Humanas':['Trilhas de C. Humanas','Trilhas C.H.','Trilhas CH','T.C.H.','T. C. Humanas','TCH'],
+    'Artes':['Artes','Arte']
+  };
+  return [disciplineName].concat(config.aliases||[]).concat(extra[disciplineName]||[]).filter(function(term,index,list){
+    return term&&list.indexOf(term)===index;
+  });
+}
+function pcProjectionIndexOfTerm(searchText,terms){
+  var first=-1;
+  terms.forEach(function(term){
+    var normalized=pcProjectionSearchText(term).trim();
+    if(!normalized)return;
+    var index=searchText.indexOf(' '+normalized+' ');
+    if(index>=0&&(first<0||index<first))first=index;
+  });
+  return first;
+}
+function pcProjectionExplicitHoursForTerms(title,terms){
+  var text=String(title||'');
+  for(var i=0;i<terms.length;i+=1){
+    var escaped=String(terms[i]).replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s*');
+    var match=new RegExp(escaped+'\\s*\\(\\s*(\\d+)\\s*h(?:\\/aula)?\\s*\\)','i').exec(text);
+    if(match)return Math.max(0,parseInt(match[1],10)||0);
+  }
+  return 0;
+}
+function pcProjectionResolveRecordAllocations(turmaId,entryId,totalHours){
+  var directCode=String(entryId||'').match(/(tch|tc|tl|lp|ar)(?:[ab])?$/i);
+  if(directCode){
+    var directNames={lp:'Língua Portuguesa',tl:'Trilhas de Linguagens',tc:'Trilhas de C. Humanas',tch:'Trilhas de C. Humanas',ar:'Artes'};
+    var directGroup=pcProjectionResolveGroupKey(turmaId,directNames[directCode[1].toLowerCase()]);
+    return directGroup?[{groupKey:directGroup,hours:totalHours}]:[];
+  }
+
+  var title=pcProjectionRecordTitle(entryId);
+  var searchText=pcProjectionSearchText(title);
+  var matches=pcGetDisciplineNames(turmaId).map(function(name){
+    var terms=pcProjectionDisciplineTerms(turmaId,name);
+    return {name:name,terms:terms,index:pcProjectionIndexOfTerm(searchText,terms)};
+  }).filter(function(item){return item.index>=0;}).sort(function(a,b){return a.index-b.index;});
+  if(!matches.length){
+    var fallback=pcProjectionResolveGroupKey(turmaId,pcResolveDisciplineName(turmaId,entryId));
+    return fallback?[{groupKey:fallback,hours:totalHours}]:[];
+  }
+  if(matches.length===1){
+    var single=pcProjectionResolveGroupKey(turmaId,matches[0].name);
+    return single?[{groupKey:single,hours:totalHours}]:[];
+  }
+
+  var explicitTotal=0;
+  matches.forEach(function(item){
+    item.hours=pcProjectionExplicitHoursForTerms(title,item.terms);
+    explicitTotal+=item.hours;
+  });
+  var remaining=Math.max(0,totalHours-Math.min(totalHours,explicitTotal));
+  var withoutHours=matches.filter(function(item){return !item.hours;});
+  var targets=withoutHours.length?withoutHours:matches;
+  targets.forEach(function(item,index){
+    var slotsLeft=targets.length-index;
+    var share=Math.floor(remaining/slotsLeft);
+    item.hours=(item.hours||0)+share;
+    remaining-=share;
+  });
+  return matches.map(function(item){
+    return {groupKey:pcProjectionResolveGroupKey(turmaId,item.name),hours:item.hours||0};
+  }).filter(function(item){return item.groupKey&&item.hours>0;});
+}
 function pcProjectionBuildLessonLog(){
   var recordsByGroup={};
   pcProjectionCollectPresenceEntries().forEach(function(item){
@@ -9045,12 +9128,14 @@ function pcProjectionBuildLessonLog(){
     var dateKey=pcProjectionEntryDateFromId(entryId);
     if(!dateKey)return;
     var disciplineName=pcResolveDisciplineName(turmaId,entryId);
-    var groupKey=pcProjectionResolveGroupKey(turmaId,disciplineName);
     var hours=pcResolveEntryLoad(entryId,cfg,disciplineName);
-    if(!groupKey||!hours)return;
-    if(!recordsByGroup[groupKey])recordsByGroup[groupKey]={};
-    if(!recordsByGroup[groupKey][turmaId])recordsByGroup[groupKey][turmaId]=[];
-    recordsByGroup[groupKey][turmaId].push({date:dateKey,hours:hours,source:'relato',entryId:entryId});
+    if(!hours)return;
+    pcProjectionResolveRecordAllocations(turmaId,entryId,hours).forEach(function(allocation){
+      var groupKey=allocation.groupKey;
+      if(!recordsByGroup[groupKey])recordsByGroup[groupKey]={};
+      if(!recordsByGroup[groupKey][turmaId])recordsByGroup[groupKey][turmaId]=[];
+      recordsByGroup[groupKey][turmaId].push({date:dateKey,hours:allocation.hours,source:'relato',entryId:entryId});
+    });
   });
   Object.keys(recordsByGroup).forEach(function(groupKey){
     Object.keys(recordsByGroup[groupKey]).forEach(function(turmaId){
@@ -9115,7 +9200,9 @@ function pcBuildProjectionSeed(){
     var totalRegistrado=registros.reduce(function(sum,entry){return sum+(parseInt(entry.hours,10)||0);},0);
     disc.grade[turmaId]=grade;
     disc.metas[turmaId]=item.bim;
-    disc.lancadas[turmaId]=Math.max(item.feitas,totalRegistrado);
+    // Relatos digitais são a fonte de verdade. O crédito só cobre aulas
+    // anteriores à digitalização, sem impedir que novos lançamentos apareçam.
+    disc.lancadas[turmaId]=totalRegistrado+(parseInt(item.legacyCredit,10)||0);
     disc.registros[turmaId]=registros;
     disc.totais[turmaId]=item.tot;
   });
@@ -9142,6 +9229,35 @@ function pcMergeNumberMaps(baseMap,overrideMap,useMax){
     var nextValue=parseInt(overrideMap[key],10);
     if(!Number.isFinite(nextValue))nextValue=baseValue;
     merged[key]=useMax?Math.max(baseValue,nextValue):nextValue;
+  });
+  return merged;
+}
+function pcMergeProjectionLaunchedMaps(automaticMap,localDisc){
+  var merged=Object.assign({},automaticMap||{});
+  var manual=(localDisc&&localDisc.lancadasManuais)||{};
+  Object.keys(manual).forEach(function(turmaId){
+    if(manual[turmaId])merged[turmaId]=parseInt(((localDisc.lancadas||{})[turmaId]),10)||0;
+  });
+  return merged;
+}
+function pcMergeProjectionManualNumbers(automaticMap,localDisc,manualKey,valueKey){
+  var merged=Object.assign({},automaticMap||{});
+  var manual=(localDisc&&localDisc[manualKey])||{};
+  Object.keys(manual).forEach(function(turmaId){
+    var value=parseInt(((localDisc||{})[valueKey]||{})[turmaId],10);
+    if(manual[turmaId]&&Number.isFinite(value))merged[turmaId]=value;
+  });
+  return merged;
+}
+function pcMergeProjectionGrades(automaticGrade,localDisc){
+  var merged=pcProjectionClone(automaticGrade)||{};
+  var manual=(localDisc&&localDisc.gradeManuais)||{};
+  Object.keys(manual).forEach(function(turmaId){
+    Object.keys(manual[turmaId]||{}).forEach(function(day){
+      if(!manual[turmaId][day])return;
+      if(!merged[turmaId])merged[turmaId]={};
+      merged[turmaId][day]=parseInt((((localDisc||{}).grade||{})[turmaId]||{})[day],10)||0;
+    });
   });
   return merged;
 }
@@ -9181,10 +9297,10 @@ function pcResolveProjectionRuntimeState(){
     if(localDisc.cor)disc.cor=localDisc.cor;
     if(localDisc.nBimestres)disc.nBimestres=localDisc.nBimestres;
     if(Array.isArray(localDisc.turmasAtivas)&&localDisc.turmasAtivas.length)disc.turmasAtivas=localDisc.turmasAtivas.slice();
-    disc.grade=Object.assign({},disc.grade||{},pcProjectionClone(localDisc.grade||{})||{});
-    disc.metas=pcMergeNumberMaps(disc.metas,localDisc.metas,false);
-    disc.totais=pcMergeNumberMaps(disc.totais,localDisc.totais,false);
-    disc.lancadas=pcMergeNumberMaps(disc.lancadas,localDisc.lancadas,true);
+    disc.grade=pcMergeProjectionGrades(disc.grade,localDisc);
+    disc.metas=pcMergeProjectionManualNumbers(disc.metas,localDisc,'metasManuais','metas');
+    disc.totais=pcMergeProjectionManualNumbers(disc.totais,localDisc,'totaisManuais','totais');
+    disc.lancadas=pcMergeProjectionLaunchedMaps(disc.lancadas,localDisc);
   });
   return merged;
 }
@@ -9234,6 +9350,7 @@ function pcProjectionBuildCounterStateMap(seed){
       var acc=launched;
       var target=Math.floor(launched/meta)+1;
       var closes={};
+      var yearEnd=launched>=total?seed.anchorDate:'';
       days.forEach(function(day){
         if(day.k<=seed.anchorDate||!day.isProjectionDay)return;
         var add=parseInt((((disc.grade||{})[turmaId]||{})[day.dow]),10)||0;
@@ -9243,8 +9360,9 @@ function pcProjectionBuildCounterStateMap(seed){
           if(!closes[target])closes[target]=day.k;
           target+=1;
         }
+        if(!yearEnd&&acc>=total)yearEnd=day.k;
       });
-      map[disc.id+'|'+turmaId]={launched:launched,meta:meta,total:total,closes:closes,nBimestres:nBimestres};
+      map[disc.id+'|'+turmaId]={launched:launched,meta:meta,total:total,closes:closes,yearEnd:yearEnd,nBimestres:nBimestres};
     });
   });
   return map;
@@ -9352,7 +9470,7 @@ function renderCont(){
   DISC.forEach(d=>{
     const cnt=document.getElementById(CN[d.g]);if(!cnt)return;
     const turmaId=PC_PROJECTION_TURMA_ID_MAP[d.t];
-    const synced=counterMap[d.g+'|'+turmaId]||{launched:d.feitas,meta:d.bim,total:d.tot,closes:{},nBimestres:4};
+    const synced=counterMap[d.g+'|'+turmaId]||{launched:d.feitas,meta:d.bim,total:d.tot,closes:{},yearEnd:'',nBimestres:4};
     const feitas=synced.launched;
     const meta=synced.meta;
     const total=synced.total;
@@ -9365,8 +9483,9 @@ function renderCont(){
       const label=ok?'✔ Concluído':(synced.closes[b]?pcProjectionFormatDateKey(synced.closes[b]):'Não fecha até 2027');
       return `<div class="bi ${ok?'co':b===ba?'at':''}"><div class="bn">${b}º Bim</div><div class="bd2">${label}</div></div>`;
     }).join('');
+    const encerramento=feitas>=total?'Concluído':(synced.yearEnd?pcProjectionFormatDateKey(synced.yearEnd):'Sem conclusão até 2027');
     const cc=document.createElement('div');cc.className='cc';
-    cc.innerHTML=`<div class="cch"><div><div class="cct">${d.t}</div><div class="ccm">${d.d} · ${d.sw} h/aula/sem</div></div><div class="ccb ${bc}">${ba}º Bimestre</div></div><div class="ccbody"><div class="pg"><div class="pl"><span class="plt">${ba}º Bimestre</span><span class="pln">${fB}/${meta} · faltam ${meta-fB}</span></div><div class="pbg"><div class="pf ${fc}" style="width:${pB}%"></div></div></div><div class="pg"><div class="pl"><span class="plt">Total do Ano</span><span class="pln">${feitas}/${total} · faltam ${total-feitas}</span></div><div class="pbg"><div class="pf ${fc} dm" style="width:${pT}%"></div></div></div><div style="font-size:.69rem;color:var(--cm);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin:13px 0 6px">Previsão de conclusão por bimestre</div><div class="brow">${bH}</div><div class="ae">* Projeções detalhadas agora consideram cronograma, calendário escolar, recessos e aulas já lançadas na página de Projeções de aulas.</div></div>`;
+    cc.innerHTML=`<div class="cch"><div><div class="cct">${d.t}</div><div class="ccm">${d.d} · ${d.sw} h/aula/sem</div></div><div class="ccb ${bc}">${ba}º Bimestre</div></div><div class="ccbody"><div class="pg"><div class="pl"><span class="plt">${ba}º Bimestre</span><span class="pln">${fB}/${meta} · faltam ${meta-fB}</span></div><div class="pbg"><div class="pf ${fc}" style="width:${pB}%"></div></div></div><div class="pg"><div class="pl"><span class="plt">Total do Ano</span><span class="pln">${feitas}/${total} · faltam ${total-feitas}</span></div><div class="pbg"><div class="pf ${fc} dm" style="width:${pT}%"></div></div></div><div style="font-size:.69rem;color:var(--cm);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin:13px 0 6px">Previsão de conclusão por bimestre</div><div class="brow">${bH}</div><div class="ae"><strong>Encerramento anual previsto:</strong> ${encerramento}.<br>* Projeções consideram cronograma, calendário escolar, recessos e aulas já lançadas.</div></div>`;
     cnt.appendChild(cc);
   });
 }

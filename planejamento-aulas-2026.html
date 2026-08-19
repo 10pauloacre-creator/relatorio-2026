@@ -545,6 +545,13 @@
     color:var(--ink);
   }
   .done-in{background:#eef8f3;border-color:rgba(24,122,99,.18)}
+  .done-cell{display:flex;align-items:center;justify-content:center;gap:4px}
+  .done-reset{
+    width:24px;height:24px;padding:0;border:1px solid rgba(24,122,99,.2);
+    border-radius:8px;background:#fff;color:var(--primary);cursor:pointer;
+    font-size:.9rem;line-height:1;
+  }
+  .done-reset:hover{background:#e2f3eb}
   .meta-in{background:#fff6e8;border-color:rgba(194,106,6,.18)}
   .total-in{
     background:#f4f5f9;
@@ -1110,6 +1117,40 @@ function mergeNumberMaps(seedMap, localMap, mode){
   return merged;
 }
 
+function mergeLaunchedMaps(automaticMap, localDisc){
+  const merged = Object.assign({}, automaticMap || {});
+  const manual = (localDisc && localDisc.lancadasManuais) || {};
+  Object.keys(manual).forEach(turmaId=>{
+    if(manual[turmaId]) merged[turmaId] = Math.max(0, numberValue((localDisc.lancadas || {})[turmaId], 0));
+  });
+  return merged;
+}
+
+function mergeManualNumberMaps(automaticMap, localDisc, manualKey, valueKey){
+  const merged = Object.assign({}, automaticMap || {});
+  const manual = (localDisc && localDisc[manualKey]) || {};
+  Object.keys(manual).forEach(turmaId=>{
+    const value = numberValue(((localDisc || {})[valueKey] || {})[turmaId], NaN);
+    if(manual[turmaId] && Number.isFinite(value)) merged[turmaId] = value;
+  });
+  return merged;
+}
+
+function mergeManualGradeMaps(automaticGrade, localDisc){
+  const merged = deepClone(automaticGrade || {}) || {};
+  const manual = (localDisc && localDisc.gradeManuais) || {};
+  Object.keys(manual).forEach(turmaId=>{
+    Object.keys(manual[turmaId] || {}).forEach(dow=>{
+      const value = numberValue((((localDisc || {}).grade || {})[turmaId] || {})[dow], NaN);
+      if(manual[turmaId][dow] && Number.isFinite(value)){
+        merged[turmaId] = merged[turmaId] || {};
+        merged[turmaId][dow] = value;
+      }
+    });
+  });
+  return merged;
+}
+
 function mergeGradeMaps(seedGrade, localGrade){
   const merged = {};
   const turmaIds = Array.from(new Set([].concat(Object.keys(seedGrade || {}), Object.keys(localGrade || {}))));
@@ -1154,10 +1195,14 @@ function mergeProjectionState(seed, localState){
     if(localDisc.cor) disc.cor = localDisc.cor;
     if(localDisc.nBimestres) disc.nBimestres = localDisc.nBimestres;
     if(Array.isArray(localDisc.turmasAtivas) && localDisc.turmasAtivas.length) disc.turmasAtivas = localDisc.turmasAtivas.slice();
-    disc.grade = mergeGradeMaps(disc.grade, localDisc.grade);
-    disc.metas = mergeNumberMaps(disc.metas, localDisc.metas, 'replace');
-    disc.totais = mergeNumberMaps(disc.totais, localDisc.totais, 'replace');
-    disc.lancadas = mergeNumberMaps(disc.lancadas, localDisc.lancadas, 'max');
+    disc.grade = mergeManualGradeMaps(disc.grade, localDisc);
+    disc.metas = mergeManualNumberMaps(disc.metas, localDisc, 'metasManuais', 'metas');
+    disc.totais = mergeManualNumberMaps(disc.totais, localDisc, 'totaisManuais', 'totais');
+    disc.lancadas = mergeLaunchedMaps(disc.lancadas, localDisc);
+    disc.lancadasManuais = deepClone(localDisc.lancadasManuais || {}) || {};
+    disc.gradeManuais = deepClone(localDisc.gradeManuais || {}) || {};
+    disc.metasManuais = deepClone(localDisc.metasManuais || {}) || {};
+    disc.totaisManuais = deepClone(localDisc.totaisManuais || {}) || {};
   });
 
   localDiscs.forEach(localDisc=>{
@@ -1196,6 +1241,10 @@ function normalizeState(){
     disc.grade = disc.grade || {};
     disc.metas = disc.metas || {};
     disc.lancadas = disc.lancadas || {};
+    disc.lancadasManuais = disc.lancadasManuais || {};
+    disc.gradeManuais = disc.gradeManuais || {};
+    disc.metasManuais = disc.metasManuais || {};
+    disc.totaisManuais = disc.totaisManuais || {};
     disc.totais = disc.totais || {};
     const inferredTurmas = Array.from(new Set([
       ...Object.keys(disc.grade),
@@ -1421,6 +1470,7 @@ function fullProjectionForDiscipline(disc, days){
     const meta = metaForTurma(disc, turma.id);
     const total = totalForTurma(disc, turma.id);
     const closes = {};
+    let yearEnd = '';
     let acc = 0;
     let target = 1;
     proj[turma.id] = {};
@@ -1438,9 +1488,10 @@ function fullProjectionForDiscipline(disc, days){
         closes[target] = day.k;
         target += 1;
       }
+      if(!yearEnd && acc >= total) yearEnd = day.k;
       proj[turma.id][day.k] = cell;
     });
-    resumo[turma.id] = {closes, total:acc, meta};
+    resumo[turma.id] = {closes, total:acc, meta, yearEnd};
   });
   return {proj, resumo};
 }
@@ -1454,6 +1505,7 @@ function futureProjectionForDiscipline(disc, days){
     const launched = launchedForTurma(disc, turma.id);
     const total = totalForTurma(disc, turma.id);
     const closes = {};
+    let yearEnd = launched >= total ? anchor : '';
     let acc = launched;
     let target = Math.floor(launched / meta) + 1;
     proj[turma.id] = {};
@@ -1472,6 +1524,7 @@ function futureProjectionForDiscipline(disc, days){
         closes[target] = day.k;
         target += 1;
       }
+      if(!yearEnd && acc >= total) yearEnd = day.k;
       proj[turma.id][day.k] = cell;
     });
     resumo[turma.id] = {
@@ -1479,6 +1532,7 @@ function futureProjectionForDiscipline(disc, days){
       launched,
       meta,
       total:totalForTurma(disc, turma.id),
+      yearEnd,
       currentBim:Math.min(disc.nBimestres || 4, Math.floor(launched / meta) + 1),
       completedBims:Math.min(disc.nBimestres || 4, Math.floor(launched / meta))
     };
@@ -1486,10 +1540,27 @@ function futureProjectionForDiscipline(disc, days){
   return {proj, resumo};
 }
 
+function projectedAcademicYearEnd(){
+  const days = buildDays();
+  let latest = state.anchorDate;
+  let hasPending = false;
+  state.disciplinas.forEach(disc=>{
+    const future = futureProjectionForDiscipline(disc, days);
+    Object.keys(future.resumo || {}).forEach(turmaId=>{
+      const info = future.resumo[turmaId];
+      if(!info || info.launched >= info.total) return;
+      hasPending = true;
+      if(info.yearEnd && info.yearEnd > latest) latest = info.yearEnd;
+    });
+  });
+  return hasPending ? latest : state.anchorDate;
+}
+
 function renderHero(){
   const generatedLabel = state.generatedAt ? new Date(state.generatedAt).toLocaleString('pt-BR') : 'sem horário';
   const recessoLabel = state.recesso && state.recesso.start ? `${brDateShort(state.recesso.start)} a ${brDateShort(state.recesso.end)}` : 'não definido';
   const activeDisc = state.disciplinas.find(d=>d.id === state.activeDisc);
+  const academicYearEnd = projectedAcademicYearEnd();
   const meta = document.getElementById('hero-meta');
   meta.innerHTML = [
     `<span class="hero-pill">Data-base das lançadas: <strong>${esc(brDate(state.anchorDate))}</strong></span>`,
@@ -1500,6 +1571,7 @@ function renderHero(){
   document.getElementById('hero-stats').innerHTML = [
     {label:'Aulas já lançadas',value:totalLancadas(),copy:'Contagem importada do contador do relatório.'},
     {label:'Turmas acompanhadas',value:state.turmas.length,copy:'Linhas ativas na projeção semanal.'},
+    {label:'Conclusão anual estimada',value:brDateShort(academicYearEnd),copy:'Último encerramento previsto entre as turmas.'},
     {label:'Bloqueios oficiais',value:countCalendarNotes(),copy:'Somente feriados e recesso entram no cálculo.'},
     {label:'Última sincronização',value:generatedLabel,copy:'Base gravada a partir da página principal.'}
   ].map(item=>`<div class="hero-card"><small>${esc(item.label)}</small><strong>${esc(String(item.value))}</strong><span>${esc(item.copy)}</span></div>`).join('');
@@ -1548,6 +1620,9 @@ function buildTurmaCard(turma, disc, fullInfo, futureInfo){
   const total = futureInfo.total;
   const currentBim = Math.min(disc.nBimestres || 4, Math.floor(launched / meta) + 1);
   const currentProgress = launched - (Math.floor(launched / meta) * meta);
+  const annualEnd = launched >= total
+    ? 'concluído'
+    : (futureInfo.yearEnd ? brDateShort(futureInfo.yearEnd) : 'não fecha até 2027');
   let lines = '';
   for(let bim = 1; bim <= (disc.nBimestres || 4); bim += 1){
     let value = '';
@@ -1566,6 +1641,7 @@ function buildTurmaCard(turma, disc, fullInfo, futureInfo){
     <div class="statline"><span>Bimestre atual</span><span class="value">${currentBim}º · ${currentProgress}/${meta}</span></div>
     <div class="statline"><span>Total anual</span><span class="value">${launched}/${total}</span></div>
     ${lines}
+    <div class="summary-total"><strong>Encerramento anual previsto:</strong> ${esc(annualEnd)}.</div>
     <div class="summary-total"><strong>Próxima projeção útil:</strong> ${futureInfo.closes[currentBim] ? esc(brDate(futureInfo.closes[currentBim])) : 'sem fechamento restante até 2027'}.</div>
   </article>`;
 }
@@ -1589,7 +1665,8 @@ function renderGrid(disc){
     });
     html += `<td class="week-sum">${weeklyForTurma(disc, turma.id)}</td>`;
     html += `<td><input class="meta-in" type="number" min="1" step="1" value="${metaForTurma(disc, turma.id)}" oninput="onMeta('${disc.id}','${turma.id}',this.value)"></td>`;
-    html += `<td><input class="done-in" type="number" min="0" step="1" value="${launchedForTurma(disc, turma.id)}" oninput="onLaunched('${disc.id}','${turma.id}',this.value)"></td>`;
+    const manual = !!((disc.lancadasManuais || {})[turma.id]);
+    html += `<td><div class="done-cell"><input class="done-in" type="number" min="0" step="1" value="${launchedForTurma(disc, turma.id)}" oninput="onLaunched('${disc.id}','${turma.id}',this.value)">${manual ? `<button class="done-reset" type="button" title="Voltar ao valor calculado pelos relatos" onclick="resetLaunched('${disc.id}','${turma.id}')">↺</button>` : ''}</div></td>`;
     html += `<td><input class="total-in" type="number" min="0" step="1" value="${totalForTurma(disc, turma.id)}" oninput="onTotal('${disc.id}','${turma.id}',this.value)"></td></tr>`;
   });
   html += `</tbody></table></div>`;
@@ -1734,6 +1811,9 @@ function onGrade(discId, turmaId, dow, value){
   if(!disc.grade[turmaId]) disc.grade[turmaId] = {};
   const parsed = Math.max(0, numberValue(value, 0));
   disc.grade[turmaId][dow] = parsed;
+  disc.gradeManuais = disc.gradeManuais || {};
+  disc.gradeManuais[turmaId] = disc.gradeManuais[turmaId] || {};
+  disc.gradeManuais[turmaId][dow] = true;
   save();
   renderPanel();
 }
@@ -1742,6 +1822,8 @@ function onMeta(discId, turmaId, value){
   const disc = state.disciplinas.find(item=>item.id === discId);
   if(!disc) return;
   disc.metas[turmaId] = Math.max(1, numberValue(value, 1));
+  disc.metasManuais = disc.metasManuais || {};
+  disc.metasManuais[turmaId] = true;
   save();
   renderPanel();
 }
@@ -1750,7 +1832,19 @@ function onLaunched(discId, turmaId, value){
   const disc = state.disciplinas.find(item=>item.id === discId);
   if(!disc) return;
   disc.lancadas[turmaId] = Math.max(0, numberValue(value, 0));
+  disc.lancadasManuais = disc.lancadasManuais || {};
+  disc.lancadasManuais[turmaId] = true;
   save();
+  render();
+}
+
+function resetLaunched(discId, turmaId){
+  const disc = state.disciplinas.find(item=>item.id === discId);
+  if(!disc) return;
+  delete (disc.lancadasManuais || {})[turmaId];
+  state = mergeProjectionState(plannerSeed || readSeed(), state);
+  normalizeState();
+  save('restore-automatic-launches');
   render();
 }
 
@@ -1758,6 +1852,8 @@ function onTotal(discId, turmaId, value){
   const disc = state.disciplinas.find(item=>item.id === discId);
   if(!disc) return;
   disc.totais[turmaId] = Math.max(0, numberValue(value, 0));
+  disc.totaisManuais = disc.totaisManuais || {};
+  disc.totaisManuais[turmaId] = true;
   save();
   renderPanel();
 }
