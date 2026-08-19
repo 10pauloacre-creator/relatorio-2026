@@ -1059,40 +1059,70 @@ function uniquePush(list, value){
   if(value && list.indexOf(value) < 0) list.push(value);
 }
 
-function defaultState(){
-  const t1 = uid();
-  const t2 = uid();
-  const t3 = uid();
+function schoolFallbackState(){
   return {
-    source:'local',
+    // Esta base impede que a tela fique zerada quando aberta diretamente,
+    // antes da sincronização com a página Contador estar disponível.
+    source:'casavequia-fallback',
     generatedAt:new Date().toISOString(),
-    schoolName:'Relatório escolar',
-    anchorDate:'2026-07-06',
+    schoolName:'E.E. Rural Pe. Carlos Casavequia',
+    anchorDate:'2026-08-18',
     recesso:{start:'2026-07-20', end:'2026-07-31'},
     facultativoLetivo:false,
-    feriados:[],
+    feriados:[
+      {date:'2026-09-07',nome:'Independência do Brasil',tipo:'nacional'},
+      {date:'2026-10-12',nome:'Nossa Senhora Aparecida',tipo:'nacional'},
+      {date:'2026-10-28',nome:'Dia do Servidor Público',tipo:'facultativo'},
+      {date:'2026-11-02',nome:'Finados',tipo:'nacional'},
+      {date:'2026-11-15',nome:'Proclamação da República',tipo:'nacional'},
+      {date:'2026-11-20',nome:'Consciência Negra',tipo:'nacional'},
+      {date:'2026-12-25',nome:'Natal',tipo:'nacional'}
+    ],
     notesByDate:{},
     turmas:[
-      {id:t1,nome:'1ª Série'},
-      {id:t2,nome:'2ª Série'},
-      {id:t3,nome:'3ª Série'}
+      {id:'t1',nome:'1ª Série'},
+      {id:'t2',nome:'2ª Série'},
+      {id:'t3',nome:'3ª Série'},
+      {id:'t6',nome:'6º Ano'}
     ],
     disciplinas:[
       {
         id:'lp',
         nome:'Língua Portuguesa',
-        cor:'#187a63',
+        cor:'#0f766e',
         nBimestres:4,
-        turmasAtivas:[t1,t2,t3],
-        grade:{[t1]:{1:2},[t2]:{1:2,2:2},[t3]:{1:2,2:1}},
-        metas:{[t1]:20,[t2]:30,[t3]:30},
-        lancadas:{[t1]:0,[t2]:0,[t3]:0},
-        totais:{[t1]:80,[t2]:120,[t3]:120}
+        turmasAtivas:['t1','t2','t3'],
+        grade:{t1:{1:2},t2:{1:2,2:1},t3:{1:2,2:1}},
+        metas:{t1:20,t2:30,t3:30},
+        lancadas:{t1:38,t2:63,t3:68},
+        totais:{t1:80,t2:120,t3:120}
+      },
+      {
+        id:'tl',nome:'Trilhas de Linguagens',cor:'#6d28d9',nBimestres:4,
+        turmasAtivas:['t1','t2','t3'],
+        grade:{t1:{5:1},t2:{2:1},t3:{2:1}},
+        metas:{t1:10,t2:10,t3:10},lancadas:{t1:13,t2:18,t3:16},totais:{t1:40,t2:40,t3:40}
+      },
+      {
+        id:'tc',nome:'Trilhas de C. Humanas',cor:'#1d4ed8',nBimestres:4,
+        turmasAtivas:['t1','t2','t3'],
+        grade:{t1:{5:1},t2:{5:2},t3:{5:1}},
+        metas:{t1:10,t2:20,t3:10},lancadas:{t1:12,t2:25,t3:12},totais:{t1:40,t2:80,t3:40}
+      },
+      {
+        id:'ar',nome:'Artes',cor:'#c26a06',nBimestres:4,
+        turmasAtivas:['t6','t2','t3'],
+        grade:{t6:{5:1},t2:{4:1},t3:{4:1}},
+        metas:{t6:10,t2:10,t3:10},lancadas:{t6:25,t2:9,t3:9},totais:{t6:40,t2:40,t3:40}
       }
     ],
     activeDisc:'lp',
     showOnlyActive:false
   };
+}
+
+function defaultState(){
+  return schoolFallbackState();
 }
 
 function readLocalState(){
@@ -1271,13 +1301,38 @@ function normalizeState(){
   }
 }
 
-function readSeed(){
+function isUsableCounterSeed(candidate){
+  if(!candidate || !Array.isArray(candidate.turmas) || !Array.isArray(candidate.disciplinas)) return false;
+  const hasCoreTurmas = ['t1','t2','t3','t6'].every(id=>candidate.turmas.some(turma=>turma && turma.id === id));
+  const weekly = candidate.disciplinas.reduce((sum,disc)=>sum + Object.keys(disc.grade || {}).reduce((gradeSum,turmaId)=>gradeSum + sumValues((disc.grade || {})[turmaId]), 0), 0);
+  const launched = candidate.disciplinas.reduce((sum,disc)=>sum + sumValues(disc.lancadas || {}), 0);
+  return hasCoreTurmas && candidate.disciplinas.length >= 4 && weekly > 0 && launched > 0;
+}
+
+function readSeedFromOpener(){
   try{
-    const raw = localStorage.getItem(SOURCE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if(!window.opener || typeof window.opener.pcBuildProjectionSeed !== 'function') return null;
+    const openerSeed = window.opener.pcBuildProjectionSeed();
+    if(!isUsableCounterSeed(openerSeed)) return null;
+    localStorage.setItem(SOURCE_KEY, JSON.stringify(openerSeed));
+    return openerSeed;
   }catch(e){
     return null;
   }
+}
+
+function readSeed(){
+  try{
+    const raw = localStorage.getItem(SOURCE_KEY);
+    const stored = raw ? JSON.parse(raw) : null;
+    if(isUsableCounterSeed(stored)) return stored;
+  }catch(e){}
+  return readSeedFromOpener() || schoolFallbackState();
+}
+
+function readUsableLocalState(){
+  const local = readLocalState();
+  return isUsableCounterSeed(local) ? local : null;
 }
 
 function persistLocalState(){
@@ -1310,7 +1365,7 @@ function applyMergedState(nextState, options){
 
 function load(){
   plannerSeed = readSeed();
-  state = mergeProjectionState(plannerSeed, readLocalState());
+  state = mergeProjectionState(plannerSeed, readUsableLocalState());
   normalizeState();
   if(!state.updatedAt){
     state.updatedAt = new Date().toISOString();
@@ -1324,7 +1379,7 @@ function applyRemotePlannerSeed(payload, meta){
   try{
     localStorage.setItem(SOURCE_KEY, JSON.stringify(payload.seed));
   }catch(e){}
-  const currentLocal = readLocalState();
+  const currentLocal = readUsableLocalState();
   applyMergedState(mergeProjectionState(plannerSeed, currentLocal), {skipTouch:true});
 }
 
@@ -2097,11 +2152,11 @@ document.addEventListener('keydown', event=>{
 window.addEventListener('storage', event=>{
   if(event.key === SOURCE_KEY){
     plannerSeed = readSeed();
-    applyMergedState(mergeProjectionState(plannerSeed, readLocalState()), {skipTouch:true});
+    applyMergedState(mergeProjectionState(plannerSeed, readUsableLocalState()), {skipTouch:true});
     return;
   }
   if(event.key === STORAGE_KEY && !applyingPlannerRemote){
-    applyMergedState(mergeProjectionState(plannerSeed || readSeed(), readLocalState()), {skipTouch:true});
+    applyMergedState(mergeProjectionState(plannerSeed || readSeed(), readUsableLocalState()), {skipTouch:true});
   }
 });
 
