@@ -1186,10 +1186,7 @@ function rhDiaryBuildDateSummary(records) {
     grouped[item.dateKey].hours += Math.max(1, item.hours || 1);
   });
   return Object.keys(grouped).sort().map(function(dateKey) {
-    var data = grouped[dateKey];
-    var tokens = [];
-    for (var i = 1; i <= data.hours; i += 1) tokens.push(data.dateLabel + ' (' + i + ')');
-    return tokens.join(' - ');
+    return grouped[dateKey];
   });
 }
 
@@ -1201,18 +1198,19 @@ function rhDiaryBuildReport(sectionId, disciplina, mode) {
   if (mode === 'total') {
     [1, 2, 3, 4].forEach(function(bim) {
       var subset = records.filter(function(item) { return item.bimestre === bim; });
-      groups.push({ title: bim + '\u00ba Bimestre', lines: rhDiaryBuildDateSummary(subset), count: subset.length });
+      groups.push({ title: bim + '\u00ba Bimestre', rows: rhDiaryBuildDateSummary(subset), count: subset.length });
     });
   } else {
     var bimSel = parseInt(mode, 10) || 1;
     var bimRecords = records.filter(function(item) { return item.bimestre === bimSel; });
-    groups.push({ title: bimSel + '\u00ba Bimestre', lines: rhDiaryBuildDateSummary(bimRecords), count: bimRecords.length });
+    groups.push({ title: bimSel + '\u00ba Bimestre', rows: rhDiaryBuildDateSummary(bimRecords), count: bimRecords.length });
   }
-  var bodyGroups = groups.filter(function(group) { return group.lines.length; });
+  var bodyGroups = groups.filter(function(group) { return group.rows.length; });
   if (!bodyGroups.length) {
     bodyGroups = [{
       title: mode === 'total' ? 'Total' : 'Sem registros',
-      lines: ['Nenhuma aula lan\u00e7ada at\u00e9 ' + todayLabel + ' para este recorte.'],
+      rows: [],
+      emptyMessage: 'Nenhuma aula lan\u00e7ada at\u00e9 ' + todayLabel + ' para este recorte.',
       count: 0
     }];
   }
@@ -1225,18 +1223,28 @@ function rhDiaryBuildReport(sectionId, disciplina, mode) {
   };
 }
 
-function rhDiaryPdfHex(text) {
-  var value = String(text == null ? '' : text);
-  var hex = 'FEFF';
-  for (var i = 0; i < value.length; i += 1) {
-    var code = value.charCodeAt(i).toString(16).toUpperCase();
-    hex += ('0000' + code).slice(-4);
-  }
-  return '<' + hex + '>';
+function rhDiaryPlainText(text) {
+  return String(text == null ? '' : text)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\u00ba/g, 'o')
+    .replace(/\u00aa/g, 'a')
+    .replace(/\u2013|\u2014/g, '-')
+    .replace(/\u2018|\u2019/g, "'")
+    .replace(/\u201c|\u201d/g, '"')
+    .replace(/\u2026/g, '...')
+    .replace(/[^\x20-\x7E]/g, ' ');
+}
+
+function rhDiaryPdfText(text) {
+  return '(' + rhDiaryPlainText(text)
+    .replace(/\\/g, '\\\\')
+    .replace(/\(/g, '\\(')
+    .replace(/\)/g, '\\)') + ')';
 }
 
 function rhDiaryWrapText(text, maxChars) {
-  var words = String(text || '').split(/\s+/).filter(Boolean);
+  var words = rhDiaryPlainText(text || '').split(/\s+/).filter(Boolean);
   var lines = [];
   var current = '';
   if (!words.length) return [''];
@@ -1272,18 +1280,60 @@ function rhDiaryCreatePdfBlob(report) {
     var maxChars = Math.max(18, Math.floor(maxWidthChars - ((indent || 0) / 4)));
     rhDiaryWrapText(text, maxChars).forEach(function(line) {
       if (y < margin + 24) newPage();
-      page.push('BT /' + (bold ? 'F2' : 'F1') + ' ' + size + ' Tf 1 0 0 1 ' + (margin + indent) + ' ' + y + ' Tm ' + rhDiaryPdfHex(line) + ' Tj ET');
+      page.push('BT /' + (bold ? 'F2' : 'F1') + ' ' + size + ' Tf 1 0 0 1 ' + (margin + indent) + ' ' + y + ' Tm ' + rhDiaryPdfText(line) + ' Tj ET');
       y -= size + 5;
     });
+  }
+  function addTable(group) {
+    var tableX = margin;
+    var colDate = 180;
+    var colHours = 110;
+    var rowHeight = 24;
+    var tableWidth = pageWidth - (margin * 2);
+    function ensureRoom(rowsNeeded) {
+      if (!page) newPage();
+      if (y - (rowsNeeded * rowHeight) < margin + 20) newPage();
+    }
+    ensureRoom(2);
+    page.push('0.94 0.96 0.95 rg');
+    page.push(tableX + ' ' + (y - rowHeight) + ' ' + tableWidth + ' ' + rowHeight + ' re f');
+    page.push('0.78 0.82 0.79 RG 1 w');
+    page.push(tableX + ' ' + (y - rowHeight) + ' ' + tableWidth + ' ' + rowHeight + ' re S');
+    page.push((tableX + colDate) + ' ' + (y - rowHeight) + ' m ' + (tableX + colDate) + ' ' + y + ' l S');
+    page.push((tableX + colDate + colHours) + ' ' + (y - rowHeight) + ' m ' + (tableX + colDate + colHours) + ' ' + y + ' l S');
+    page.push('BT /F2 10 Tf 1 0 0 1 ' + (tableX + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText('Data') + ' Tj ET');
+    page.push('BT /F2 10 Tf 1 0 0 1 ' + (tableX + colDate + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText('H/Aula') + ' Tj ET');
+    page.push('BT /F2 10 Tf 1 0 0 1 ' + (tableX + colDate + colHours + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText('Observacao') + ' Tj ET');
+    y -= rowHeight;
+
+    if (!group.rows.length) {
+      ensureRoom(1);
+      page.push('0.78 0.82 0.79 RG 1 w');
+      page.push(tableX + ' ' + (y - rowHeight) + ' ' + tableWidth + ' ' + rowHeight + ' re S');
+      page.push('BT /F1 10 Tf 1 0 0 1 ' + (tableX + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText(group.emptyMessage || 'Nenhuma aula lancada.') + ' Tj ET');
+      y -= rowHeight + 8;
+      return;
+    }
+
+    group.rows.forEach(function(row) {
+      ensureRoom(1);
+      page.push('0.78 0.82 0.79 RG 1 w');
+      page.push(tableX + ' ' + (y - rowHeight) + ' ' + tableWidth + ' ' + rowHeight + ' re S');
+      page.push((tableX + colDate) + ' ' + (y - rowHeight) + ' m ' + (tableX + colDate) + ' ' + y + ' l S');
+      page.push((tableX + colDate + colHours) + ' ' + (y - rowHeight) + ' m ' + (tableX + colDate + colHours) + ' ' + y + ' l S');
+      page.push('BT /F1 10 Tf 1 0 0 1 ' + (tableX + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText(row.dateLabel) + ' Tj ET');
+      page.push('BT /F1 10 Tf 1 0 0 1 ' + (tableX + colDate + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText(String(row.hours)) + ' Tj ET');
+      page.push('BT /F1 10 Tf 1 0 0 1 ' + (tableX + colDate + colHours + 10) + ' ' + (y - 16) + ' Tm ' + rhDiaryPdfText(row.hours === 1 ? '1 aula no dia' : row.hours + ' aulas no dia') + ' Tj ET');
+      y -= rowHeight;
+    });
+    y -= 10;
   }
   addLine(report.title, 18, true, 0);
   addLine(report.subtitle, 10, false, 0);
   y -= 4;
   report.groups.forEach(function(group) {
     addLine(group.title, 14, true, 0);
-    if (group.lines.length) group.lines.forEach(function(line) { addLine('Data: ' + line, 11, false, 10); });
-    else addLine('Nenhuma aula lan\u00e7ada.', 11, false, 10);
-    y -= 4;
+    addTable(group);
   });
   if (!pages.length) newPage();
   var objects = [
@@ -1370,7 +1420,7 @@ function rhDiaryEnsureModal() {
   modal = document.createElement('div');
   modal.id = 'rh-diary-modal';
   modal.className = 'rh-diary-modal';
-  modal.innerHTML = '<div class="rh-diary-modal-inner"><div class="rh-diary-modal-top"><div><h3 id="rh-diary-modal-title">Relat\u00f3rio di\u00e1rios</h3><p id="rh-diary-modal-subtitle">Selecione a disciplina e o bimestre para abrir o PDF.</p></div><div class="rh-diary-modal-top-actions"><button class="rh-diary-action-btn primary" id="rh-diary-download-btn" type="button" onclick="rhDiaryDownloadCurrentPdf()" disabled>Baixar</button><button class="rh-diary-action-btn ghost" type="button" onclick="rhCloseDiaryReportModal()">Fechar</button></div></div><div class="rh-diary-modal-body"><div class="rh-diary-sidebar"><div class="rh-diary-sidebar-block"><div class="rh-diary-sidebar-label">Disciplinas</div><div class="rh-diary-grid" id="rh-diary-discipline-grid"></div></div><div class="rh-diary-sidebar-block"><div class="rh-diary-sidebar-label">Relat\u00f3rios</div><div class="rh-diary-grid" id="rh-diary-range-grid"></div></div></div><div class="rh-diary-viewer"><div class="rh-diary-meta"><div class="rh-diary-meta-card"><strong id="rh-diary-meta-title">Selecione um relat\u00f3rio</strong><span id="rh-diary-meta-copy">O PDF ser\u00e1 mostrado aqui com as datas lan\u00e7adas de 1h em 1h/aula.</span></div></div><div class="rh-diary-frame-wrap"><iframe id="rh-diary-frame" class="rh-diary-frame" title="Pr\u00e9-visualiza\u00e7\u00e3o do relat\u00f3rio di\u00e1rio"></iframe></div></div></div></div>';
+  modal.innerHTML = '<div class="rh-diary-modal-inner"><div class="rh-diary-modal-top"><div><h3 id="rh-diary-modal-title">Relat\u00f3rios di\u00e1rios</h3><p id="rh-diary-modal-subtitle">Selecione a disciplina e o bimestre para abrir o PDF.</p></div><div class="rh-diary-modal-top-actions"><button class="rh-diary-action-btn primary" id="rh-diary-download-btn" type="button" onclick="rhDiaryDownloadCurrentPdf()" disabled>Baixar</button><button class="rh-diary-action-btn ghost" type="button" onclick="rhCloseDiaryReportModal()">Fechar</button></div></div><div class="rh-diary-modal-body"><div class="rh-diary-sidebar"><div class="rh-diary-sidebar-block"><div class="rh-diary-sidebar-label">Disciplinas</div><div class="rh-diary-grid" id="rh-diary-discipline-grid"></div></div><div class="rh-diary-sidebar-block"><div class="rh-diary-sidebar-label">Relat\u00f3rios</div><div class="rh-diary-grid" id="rh-diary-range-grid"></div></div></div><div class="rh-diary-viewer"><div class="rh-diary-meta"><div class="rh-diary-meta-card"><strong id="rh-diary-meta-title">Selecione um relat\u00f3rio</strong><span id="rh-diary-meta-copy">O PDF usa as mesmas aulas registradas no projeto, agrupadas por data e total de h/aula.</span></div></div><div class="rh-diary-frame-wrap"><iframe id="rh-diary-frame" class="rh-diary-frame" title="Pr\u00e9-visualiza\u00e7\u00e3o do relat\u00f3rio di\u00e1rio"></iframe></div></div></div></div>';
   modal.addEventListener('click', function(e) {
     if (e.target === modal) rhCloseDiaryReportModal();
   });
@@ -1388,7 +1438,7 @@ function rhDiaryUpdateMeta(title, copy) {
   var titleEl = document.getElementById('rh-diary-meta-title');
   var copyEl = document.getElementById('rh-diary-meta-copy');
   if (titleEl) titleEl.textContent = title || 'Selecione um relat\u00f3rio';
-  if (copyEl) copyEl.textContent = copy || 'O PDF ser\u00e1 mostrado aqui com as datas lan\u00e7adas de 1h em 1h/aula.';
+  if (copyEl) copyEl.textContent = copy || 'O PDF usa as mesmas aulas registradas no projeto, agrupadas por data e total de h/aula.';
 }
 
 function rhDiarySetDownloadState(enabled, fileName) {
@@ -1450,13 +1500,13 @@ function rhOpenDiaryReportModal(sectionId) {
   var sectionLabel = RH_DIARY_SECTION_LABELS[sectionId] || 'Turma';
   var titleEl = document.getElementById('rh-diary-modal-title');
   var subEl = document.getElementById('rh-diary-modal-subtitle');
-  if (titleEl) titleEl.textContent = 'Relat\u00f3rio di\u00e1rios - ' + sectionLabel;
+  if (titleEl) titleEl.textContent = 'Relat\u00f3rios di\u00e1rios - ' + sectionLabel;
   if (subEl) subEl.textContent = sectionId === 'sec-all'
     ? 'Selecione a disciplina para listar todas as aulas lan\u00e7adas at\u00e9 ' + rhDiaryTodayLabel() + '.'
     : 'Selecione a disciplina e o bimestre para gerar o PDF r\u00e1pido da turma.';
   rhDiaryRenderDisciplinas(sectionId);
   rhDiaryRenderRanges();
-  rhDiaryUpdateMeta('Selecione um relat\u00f3rio', 'O PDF ser\u00e1 mostrado aqui com as datas lan\u00e7adas de 1h em 1h/aula.');
+  rhDiaryUpdateMeta('Selecione um relat\u00f3rio', 'O PDF usa as mesmas aulas registradas no projeto, agrupadas por data e total de h/aula.');
   var frame = document.getElementById('rh-diary-frame');
   if (frame) frame.removeAttribute('src');
   rhDiarySetDownloadState(false, '');
