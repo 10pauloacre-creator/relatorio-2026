@@ -1406,10 +1406,17 @@ function rhDiaryRenderDisciplinas(sectionId) {
     grid.innerHTML = '<div class="rh-diary-empty">Nenhuma disciplina com aulas lan\u00e7adas foi encontrada nesta aba.</div>';
     return;
   }
-  grid.innerHTML = disciplinas.map(function(item) {
-    var active = RH_DIARY_MODAL_STATE.disciplina === item ? ' on' : '';
-    return '<button class="rh-diary-choice' + active + '" type="button" onclick="rhDiarySelectDisciplina(' + JSON.stringify(item) + ')">' + item + '</button>';
-  }).join('');
+  grid.innerHTML = '';
+  disciplinas.forEach(function(item) {
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'rh-diary-choice' + (RH_DIARY_MODAL_STATE.disciplina === item ? ' on' : '');
+    button.textContent = item;
+    button.addEventListener('click', function() {
+      rhDiarySelectDisciplina(item);
+    });
+    grid.appendChild(button);
+  });
 }
 
 function rhDiaryRenderRanges() {
@@ -1419,11 +1426,17 @@ function rhDiaryRenderRanges() {
     grid.innerHTML = '<div class="rh-diary-empty">Escolha uma disciplina para liberar os bot\u00f5es de bimestre e o relat\u00f3rio total.</div>';
     return;
   }
-  grid.innerHTML = ['1', '2', '3', '4', 'total'].map(function(value) {
-    var label = value === 'total' ? 'Total' : value + '\u00ba Bimestre';
-    var active = RH_DIARY_MODAL_STATE.mode === value ? ' on' : '';
-    return '<button class="rh-diary-choice' + active + '" type="button" onclick="rhDiaryOpenPdf(' + JSON.stringify(value) + ')">' + label + '</button>';
-  }).join('');
+  grid.innerHTML = '';
+  ['1', '2', '3', '4', 'total'].forEach(function(value) {
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'rh-diary-choice' + (RH_DIARY_MODAL_STATE.mode === value ? ' on' : '');
+    button.textContent = value === 'total' ? 'Total' : value + '\u00ba Bimestre';
+    button.addEventListener('click', function() {
+      rhDiaryOpenPdf(value);
+    });
+    grid.appendChild(button);
+  });
 }
 
 function rhOpenDiaryReportModal(sectionId) {
