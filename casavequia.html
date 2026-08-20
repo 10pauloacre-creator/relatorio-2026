@@ -8886,9 +8886,88 @@ function pcDiaryUniqueList(items){
     return true;
   });
 }
+function pcDiaryResolveStartMinutes(value){
+  var match=String(value||'').match(/(\d{1,2})[:h](\d{2})/i);
+  if(!match)return 0;
+  return (parseInt(match[1],10)*60)+parseInt(match[2],10);
+}
+function pcDiaryFallbackBimesterConfig(turmaId,disciplina){
+  var found=DISC.find(function(item){
+    return PC_PROJECTION_TURMA_ID_MAP[item.t]===turmaId
+      && pcDiaryNormalizeDisciplina(item.d)===disciplina;
+  });
+  return {
+    meta:found?(parseInt(found.bim,10)||0):0,
+    total:found?(parseInt(found.tot,10)||0):0,
+    launched:0,
+    nBimestres:4
+  };
+}
+function pcDiaryBuildBimesterConfigMap(){
+  var seed=null;
+  try{
+    seed=pcResolveProjectionRuntimeState();
+  }catch(err){
+    try{seed=pcBuildProjectionSeed();}catch(innerErr){seed=null;}
+  }
+  var map={};
+  ((seed&&seed.disciplinas)||[]).forEach(function(disc){
+    var nBimestres=parseInt(disc.nBimestres,10)||4;
+    Object.keys((disc&&disc.metas)||{}).forEach(function(turmaId){
+      var key=turmaId+'|'+pcDiaryNormalizeDisciplina(disc.nome||'');
+      map[key]={
+        meta:parseInt((disc.metas||{})[turmaId],10)||0,
+        total:parseInt((disc.totais||{})[turmaId],10)||0,
+        launched:parseInt((disc.lancadas||{})[turmaId],10)||0,
+        nBimestres:nBimestres
+      };
+    });
+  });
+  return map;
+}
+function pcDiaryAssignBimestersByLoad(records){
+  var configMap=pcDiaryBuildBimesterConfigMap();
+  var grouped={};
+  (records||[]).forEach(function(record){
+    var key=record.turmaId+'|'+record.disciplina;
+    if(!grouped[key])grouped[key]=[];
+    grouped[key].push(record);
+  });
+  var allocated=[];
+  Object.keys(grouped).forEach(function(key){
+    var list=grouped[key].slice().sort(function(a,b){
+      return a.dateKey.localeCompare(b.dateKey)
+        || ((a.startMinutes||0)-(b.startMinutes||0))
+        || ((a.sortOrder||0)-(b.sortOrder||0));
+    });
+    var parts=key.split('|');
+    var config=configMap[key]||pcDiaryFallbackBimesterConfig(parts[0],parts[1]);
+    var meta=parseInt(config.meta,10)||0;
+    var nBimestres=Math.max(1,parseInt(config.nBimestres,10)||4);
+    var loggedHours=list.reduce(function(sum,item){
+      return sum+Math.max(1,parseInt(item.hours,10)||1);
+    },0);
+    var carriedHours=Math.max(0,(parseInt(config.launched,10)||0)-loggedHours);
+    var progress=carriedHours;
+    list.forEach(function(record){
+      var remaining=Math.max(1,parseInt(record.hours,10)||1);
+      while(remaining>0){
+        var bim=meta>0?(Math.floor(progress/meta)+1):1;
+        if(bim>nBimestres)bim=nBimestres;
+        var room=meta>0?Math.max(0,(bim*meta)-progress):remaining;
+        if(room<=0)room=remaining;
+        var slice=Math.min(remaining,room);
+        allocated.push(Object.assign({},record,{hours:slice,bimestre:bim}));
+        progress+=slice;
+        remaining-=slice;
+      }
+    });
+  });
+  return allocated;
+}
 function pcDiaryCollectRecords(){
   var today=new Date(PC_DIARY_REPORT_CUTOFF.getTime());
-  var records=[];
+  var records=[],sortOrder=0;
   document.querySelectorAll('#sec-all .ea').forEach(function(card){
     var dateObj=pcDiaryParseCardDate(card);
     if(!dateObj||dateObj>today)return;
@@ -8910,12 +8989,13 @@ function pcDiaryCollectRecords(){
         turmaLabel:turmaLabel,
         disciplina:pcDiaryNormalizeDisciplina(match[3]),
         hours:pcDiaryResolveHoursFromRange(match[2]),
-        bimestre:pcDiaryResolveBimester(dateObj),
+        startMinutes:pcDiaryResolveStartMinutes(match[2]),
+        sortOrder:sortOrder++,
         detail:String(match[4]||'').replace(/\s+/g,' ').trim()
       });
     });
   });
-  return records;
+  return pcDiaryAssignBimestersByLoad(records);
 }
 function pcDiaryGetPlannerThemeMap(turmaId,disciplina,bimestre){
   var cacheKey=[turmaId,disciplina,bimestre].join('|');
@@ -9132,28 +9212,29 @@ function pcDiaryBuildReport(sectionId,disciplina,mode){
   if(mode==='total'){
     [1,2,3,4].forEach(function(bim){
       var subset=records.filter(function(item){return item.bimestre===bim;});
-      groups.push({title:bim+'\u00ba Bimestre',rows:pcDiaryBuildDateSummary(subset),count:subset.length});
+      groups.push({
+        title:bim+'\u00ba Bimestre',
+        rows:pcDiaryBuildDateSummary(subset),
+        emptyMessage:'Nenhuma aula vinculada a este bimestre pela carga acumulada da disciplina.',
+        count:subset.reduce(function(sum,item){return sum+(parseInt(item.hours,10)||0);},0)
+      });
     });
   }else{
     var bimSel=parseInt(mode,10)||1;
     var bimRecords=records.filter(function(item){return item.bimestre===bimSel;});
-    groups.push({title:bimSel+'\u00ba Bimestre',rows:pcDiaryBuildDateSummary(bimRecords),count:bimRecords.length});
-  }
-  var bodyGroups=groups.filter(function(group){return group.rows.length;});
-  if(!bodyGroups.length){
-    bodyGroups=[{
-      title:mode==='total'?'Total':'Sem registros',
-      rows:[],
-      emptyMessage:'Nenhuma aula lan\u00e7ada at\u00e9 '+PC_DIARY_REPORT_DATE_LABEL+' para este recorte.',
-      count:0
-    }];
+    groups.push({
+      title:bimSel+'\u00ba Bimestre',
+      rows:pcDiaryBuildDateSummary(bimRecords),
+      emptyMessage:'Nenhuma aula vinculada a este bimestre pela carga acumulada da disciplina.',
+      count:bimRecords.reduce(function(sum,item){return sum+(parseInt(item.hours,10)||0);},0)
+    });
   }
   return{
     title:sectionLabel+' > '+disciplina+' - '+(mode==='total'?'Total':((parseInt(mode,10)||1)+'\u00ba Bimestre')),
     subtitle:sectionId==='sec-all'
       ? 'Aulas lan\u00e7adas at\u00e9 '+PC_DIARY_REPORT_DATE_LABEL+', agrupadas pela carga bimestral da disciplina.'
       : 'Aulas lan\u00e7adas da turma at\u00e9 '+PC_DIARY_REPORT_DATE_LABEL+', agrupadas pela carga bimestral da disciplina.',
-    groups:bodyGroups
+    groups:groups
   };
 }
 function pcDiaryPlainText(text){
