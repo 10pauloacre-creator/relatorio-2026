@@ -9200,18 +9200,30 @@ function pcDiaryDownloadCurrentPdf(){
   link.remove();
 }
 function pcDiaryBuildDateSummary(records){
-  var rows=[];
+  var grouped={};
   records.slice().sort(function(a,b){
     return a.dateKey.localeCompare(b.dateKey)
       || ((a.startMinutes||0)-(b.startMinutes||0))
       || ((a.sortOrder||0)-(b.sortOrder||0));
   }).forEach(function(item){
     var hours=Math.max(1,parseInt(item.hours,10)||1);
-    for(var index=0;index<hours;index+=1){
-      rows.push({dateLabel:item.dateLabel,hours:1});
+    var key=item.dateKey||item.dateLabel||'';
+    if(!grouped[key]){
+      grouped[key]={
+        dateKey:item.dateKey||'',
+        dateLabel:item.dateLabel||'',
+        hours:0
+      };
     }
+    grouped[key].hours+=hours;
   });
-  return rows;
+  return Object.keys(grouped).sort(function(a,b){
+    var dateA=(grouped[a]&&grouped[a].dateKey)||a;
+    var dateB=(grouped[b]&&grouped[b].dateKey)||b;
+    return dateA.localeCompare(dateB);
+  }).map(function(key){
+    return grouped[key];
+  });
 }
 function pcDiaryBuildReport(sectionId,disciplina,mode){
   var sectionLabel=PC_DIARY_SECTION_LABELS[sectionId]||'Turma';
