@@ -47,7 +47,7 @@
         line-height:1;
         letter-spacing:.06em;
         opacity:.82;
-        text-transform:capitalize;
+        text-transform:uppercase;
         white-space:nowrap;
       }
       @media (max-width:680px){
