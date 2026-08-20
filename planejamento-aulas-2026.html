@@ -1094,7 +1094,7 @@ function schoolFallbackState(){
         turmasAtivas:['t1','t2','t3'],
         grade:{t1:{1:2},t2:{1:2,2:1},t3:{1:2,2:1}},
         metas:{t1:20,t2:30,t3:30},
-        lancadas:{t1:38,t2:63,t3:68},
+        lancadas:{t1:38,t2:63,t3:70},
         totais:{t1:80,t2:120,t3:120}
       },
       {
@@ -1263,6 +1263,25 @@ function normalizeState(){
     return oa - ob || String(a.nome).localeCompare(String(b.nome));
   });
 
+  // Versões anteriores do planejador gravaram novas IDs para turmas que já
+  // existiam (por exemplo, outra "3ª Série"). Ao abrir o estado compartilhado,
+  // essas cópias sem aulas passavam a ser as turmas ativas. Convertemos cada
+  // alias pelo nome para a ID oficial e removemos a duplicata antes dos cálculos.
+  const officialIds = new Set(['t1','t2','t3','t6']);
+  const officialByName = {};
+  state.turmas.forEach(turma=>{
+    if(turma && officialIds.has(turma.id)) officialByName[normalizeText(turma.nome)] = turma.id;
+  });
+  const turmaAliases = {};
+  state.turmas.forEach(turma=>{
+    if(!turma || officialIds.has(turma.id)) return;
+    const officialId = officialByName[normalizeText(turma.nome)];
+    if(officialId) turmaAliases[turma.id] = officialId;
+  });
+  if(Object.keys(turmaAliases).length){
+    state.turmas = state.turmas.filter(turma=>!turmaAliases[turma.id]);
+  }
+
   state.disciplinas.forEach((disc, index)=>{
     if(!disc.id) disc.id = uid();
     if(!disc.nome) disc.nome = 'Nova disciplina';
@@ -1276,6 +1295,14 @@ function normalizeState(){
     disc.metasManuais = disc.metasManuais || {};
     disc.totaisManuais = disc.totaisManuais || {};
     disc.totais = disc.totais || {};
+    Object.keys(turmaAliases).forEach(aliasId=>{
+      const officialId = turmaAliases[aliasId];
+      ['grade','metas','lancadas','lancadasManuais','gradeManuais','metasManuais','totaisManuais','totais'].forEach(key=>{
+        const values = disc[key] || {};
+        if(values[officialId] == null && values[aliasId] != null) values[officialId] = values[aliasId];
+        delete values[aliasId];
+      });
+    });
     const inferredTurmas = Array.from(new Set([
       ...Object.keys(disc.grade),
       ...Object.keys(disc.metas),
@@ -1283,7 +1310,7 @@ function normalizeState(){
       ...Object.keys(disc.totais)
     ])).filter(id=>state.turmas.some(t=>t.id === id));
     disc.turmasAtivas = Array.isArray(disc.turmasAtivas) && disc.turmasAtivas.length
-      ? disc.turmasAtivas.filter(id=>state.turmas.some(t=>t.id === id))
+      ? Array.from(new Set(disc.turmasAtivas.map(id=>turmaAliases[id] || id))).filter(id=>state.turmas.some(t=>t.id === id))
       : inferredTurmas;
     state.turmas.forEach(t=>{
       if(!disc.grade[t.id]) disc.grade[t.id] = {};
@@ -1307,6 +1334,15 @@ function isUsableCounterSeed(candidate){
   const weekly = candidate.disciplinas.reduce((sum,disc)=>sum + Object.keys(disc.grade || {}).reduce((gradeSum,turmaId)=>gradeSum + sumValues((disc.grade || {})[turmaId]), 0), 0);
   const launched = candidate.disciplinas.reduce((sum,disc)=>sum + sumValues(disc.lancadas || {}), 0);
   return hasCoreTurmas && candidate.disciplinas.length >= 4 && weekly > 0 && launched > 0;
+}
+
+function isUsablePlannerState(candidate){
+  if(!isUsableCounterSeed(candidate)) return false;
+  const portuguese = candidate.disciplinas.find(disc=>disc && disc.id === 'lp');
+  // A página da Casavequia sempre projeta as três séries de Português.
+  // Sem essa grade, trata-se de um estado legado incompleto e não deve
+  // substituir os dados sincronizados a partir do Contador.
+  return !!portuguese && ['t1','t2','t3'].every(turmaId=>sumValues((portuguese.grade || {})[turmaId]) > 0);
 }
 
 function readSeedFromOpener(){
@@ -1384,7 +1420,7 @@ function applyRemotePlannerSeed(payload, meta){
 }
 
 function applyRemotePlannerState(payload, meta){
-  if(!payload || typeof payload !== 'object') return;
+  if(!isUsablePlannerState(payload)) return;
   const localState = readLocalState();
   const localStamp = Date.parse((localState && localState.updatedAt) || '') || 0;
   const remoteStamp = Date.parse((payload && payload.updatedAt) || (meta && meta.updatedAt) || '') || 0;
