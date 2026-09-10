@@ -45,7 +45,7 @@ const rootFileAllowlist = new Set([
   "sw.js"
 ]);
 
-const folderAllowlist = new Set(["assets", "downloads"]);
+const folderAllowlist = new Set(["assets", "downloads", "livros"]);
 
 const swCleanupSnippet =
   "<script>(function(){if(!('serviceWorker' in navigator))return;window.addEventListener('load',function(){navigator.serviceWorker.getRegistrations().then(function(regs){return Promise.all(regs.map(function(reg){return reg.unregister();}));}).catch(function(){}).finally(function(){if(window.caches&&caches.keys){caches.keys().then(function(keys){return Promise.all(keys.map(function(key){return caches.delete(key);}));}).catch(function(){});}});});})();</script>";
