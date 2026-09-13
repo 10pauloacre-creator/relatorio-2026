@@ -115,7 +115,7 @@
   var vaultData = null;
   var vaultExpiresAt = 0;
   var vaultTimeout = null;
-  var currentFilters = { project: 'all', status: 'all', priority: 'all' };
+  var currentFilters = { project: 'all', status: 'all', priority: 'all', favorite: false };
   var mindMapUi = { projectId: null, selectedId: null, initialized: false, scale: 1, x: 0, y: 0 };
 
   function now() { return new Date().toISOString(); }
@@ -638,21 +638,50 @@
     var ideas = active(state.ideas).filter(function (idea) {
       return (currentFilters.project === 'all' || (currentFilters.project === 'future' ? !idea.projectId : idea.projectId === currentFilters.project))
         && (currentFilters.status === 'all' || idea.status === currentFilters.status)
-        && (currentFilters.priority === 'all' || idea.priority === currentFilters.priority);
+        && (currentFilters.priority === 'all' || idea.priority === currentFilters.priority)
+        && (!currentFilters.favorite || idea.favorite);
     }).sort(function (a, b) {
+      var favoriteDiff = (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0);
+      if (favoriteDiff) return favoriteDiff;
       var priority = PRIORITIES.indexOf(a.priority) - PRIORITIES.indexOf(b.priority);
       return priority || toTime(b.updatedAt) - toTime(a.updatedAt);
     });
     var projectOptions = '<option value="all">Todos os projetos</option><option value="future"' + (currentFilters.project === 'future' ? ' selected' : '') + '>Projeto futuro</option>'
       + active(state.projects).map(function (project) { return '<option value="' + project.id + '"' + (currentFilters.project === project.id ? ' selected' : '') + '>' + escapeHtml(project.name) + '</option>'; }).join('');
+    var groupBySection = currentFilters.project !== 'all' && currentFilters.project !== 'future';
+    var body;
+    if (!ideas.length) {
+      body = emptyMarkup('Nenhuma ideia encontrada', 'Use o botão acima para criar uma ideia ou mude os filtros.');
+    } else if (groupBySection) {
+      var groups = {}; var order = [];
+      ideas.forEach(function (idea) {
+        var key = (idea.section || '').trim() || 'Sem seção';
+        if (!groups[key]) { groups[key] = []; order.push(key); }
+        groups[key].push(idea);
+      });
+      order.sort(function (a, b) { if (a === 'Sem seção') return 1; if (b === 'Sem seção') return -1; return a.localeCompare(b); });
+      body = order.map(function (key) { return '<div class="pp-idea-section-group"><h3 class="pp-idea-section-title">' + escapeHtml(key) + '</h3><div class="pp-ideas">' + groups[key].map(ideaCard).join('') + '</div></div>'; }).join('');
+    } else {
+      body = '<div class="pp-ideas">' + ideas.map(ideaCard).join('') + '</div>';
+    }
     return '<section><div class="pp-section-head"><div><h2>Ideias</h2><p>Capture a ideia antes que ela se perca e conecte-a ao projeto certo.</p></div><div class="pp-toolbar"><button class="pp-button" data-action="new-idea">' + uiIcon('plus') + 'Nova ideia</button></div></div>'
-      + '<div class="pp-filter-bar"><select data-filter="project" aria-label="Filtrar por projeto">' + projectOptions + '</select><select data-filter="status" aria-label="Filtrar por status"><option value="all">Todos os status</option>' + optionList(IDEA_STATUSES, currentFilters.status === 'all' ? '' : currentFilters.status) + '</select><select data-filter="priority" aria-label="Filtrar por prioridade"><option value="all">Todas as prioridades</option>' + optionList(PRIORITIES, currentFilters.priority === 'all' ? '' : currentFilters.priority) + '</select></div>'
-      + (ideas.length ? '<div class="pp-ideas">' + ideas.map(ideaCard).join('') + '</div>' : emptyMarkup('Nenhuma ideia encontrada', 'Use o botão acima para criar uma ideia ou mude os filtros.')) + '</section>';
+      + '<div class="pp-filter-bar"><select data-filter="project" aria-label="Filtrar por projeto">' + projectOptions + '</select><select data-filter="status" aria-label="Filtrar por status"><option value="all">Todos os status</option>' + optionList(IDEA_STATUSES, currentFilters.status === 'all' ? '' : currentFilters.status) + '</select><select data-filter="priority" aria-label="Filtrar por prioridade"><option value="all">Todas as prioridades</option>' + optionList(PRIORITIES, currentFilters.priority === 'all' ? '' : currentFilters.priority) + '</select><label class="pp-favorite-filter"><input type="checkbox" data-filter="favorite"' + (currentFilters.favorite ? ' checked' : '') + '> ★ Só favoritas</label></div>'
+      + body + '</section>';
   }
   function ideaCard(idea) {
     var project = getProject(idea.projectId);
-    return '<article class="pp-idea"><div class="pp-idea-header"><div><h3>' + escapeHtml(idea.title) + '</h3></div><div class="pp-toolbar"><button class="pp-icon-button" title="Editar ideia" aria-label="Editar ideia" data-action="edit-idea" data-id="' + idea.id + '">' + uiIcon('edit') + '</button><button class="pp-icon-button" title="Excluir ideia" aria-label="Excluir ideia" data-action="delete-idea" data-id="' + idea.id + '">' + uiIcon('trash') + '</button></div></div>'
-      + '<p>' + escapeHtml(idea.description || 'Sem descrição detalhada.') + '</p><div class="pp-idea-foot"><div class="pp-tags"><span class="pp-tag pp-priority-' + priorityClass(idea.priority) + '">' + escapeHtml(idea.priority) + '</span><span class="pp-tag">' + escapeHtml(idea.status) + '</span><span class="pp-tag">' + (project ? projectLogo(project, true) + escapeHtml(project.name) : '◌ Projeto futuro') + '</span></div><span class="pp-tag">Editada ' + escapeHtml(formatDate(idea.updatedAt, false)) + '</span></div></article>';
+    var stats = checklistStats(idea.checklist);
+    var due = formatDueDate(idea.dueDate);
+    var labels = Array.isArray(idea.labels) ? idea.labels : [];
+    return '<article class="pp-idea' + (idea.favorite ? ' is-favorite' : '') + '"><div class="pp-idea-header"><div class="pp-idea-top-row">' + (idea.favorite ? '<span class="pp-idea-star" aria-hidden="true">★</span>' : '') + '<h3>' + escapeHtml(idea.title) + '</h3>' + (idea.section ? '<span class="pp-idea-section">' + escapeHtml(idea.section) + '</span>' : '') + '</div><div class="pp-toolbar"><button class="pp-icon-button" title="Editar ideia" aria-label="Editar ideia" data-action="edit-idea" data-id="' + idea.id + '">' + uiIcon('edit') + '</button><button class="pp-icon-button" title="Excluir ideia" aria-label="Excluir ideia" data-action="delete-idea" data-id="' + idea.id + '">' + uiIcon('trash') + '</button></div></div>'
+      + '<p>' + escapeHtml(idea.description || 'Sem descrição detalhada.') + '</p>'
+      + (stats.total ? '<div class="pp-checklist-progress"><div class="pp-checklist-progress-bar"><span style="width:' + Math.round(stats.done / stats.total * 100) + '%"></span></div><small>' + stats.done + '/' + stats.total + '</small></div>' : '')
+      + (labels.length ? '<div class="pp-tags">' + labels.map(function (label) { return '<span class="pp-tag pp-label-chip">#' + escapeHtml(label) + '</span>'; }).join('') + '</div>' : '')
+      + '<div class="pp-idea-foot"><div class="pp-tags"><span class="pp-tag pp-priority-' + priorityClass(idea.priority) + '">' + escapeHtml(idea.priority) + '</span><span class="pp-tag">' + escapeHtml(idea.status) + '</span><span class="pp-tag">' + (project ? projectLogo(project, true) + escapeHtml(project.name) : '◌ Projeto futuro') + '</span>'
+      + (due ? '<span class="pp-tag' + (due.overdue ? ' pp-tag-overdue' : '') + '">Prazo: ' + due.label + '</span>' : '')
+      + (idea.prompt ? '<span class="pp-tag" title="Tem prompt de IA salvo">Prompt</span>' : '')
+      + (idea.attachments && idea.attachments.length ? '<span class="pp-tag">Anexos: ' + idea.attachments.length + '</span>' : '')
+      + '</div><span class="pp-tag">Editada ' + escapeHtml(formatDate(idea.updatedAt, false)) + '</span></div></article>';
   }
   function aiMarkup() {
     return '<section><div class="pp-section-head"><div><h2>I.As</h2><p>Controle o tempo de espera das contas e receba um aviso quando elas estiverem livres.</p></div></div><div class="pp-ai-grid">' + AI_ACCOUNTS.map(aiCard).join('') + '</div></section>';
@@ -894,7 +923,7 @@
     var links = safeUrl(project.url) ? '<div class="pp-project-links"><a class="pp-project-link" target="_blank" rel="noopener noreferrer" href="' + escapeHtml(safeUrl(project.url)) + '">' + uiIcon('external') + 'Abrir link principal</a></div>' : '<p class="pp-form-note">Nenhum link principal cadastrado.</p>';
     return headerMarkup(project.name, 'Detalhes, ferramentas, histórico e ideias deste projeto.', 'projetos-pessoais.html#projects')
       + '<main class="pp-shell"><section class="pp-detail-top">' + projectLogo(project) + '<div><h1>' + escapeHtml(project.name) + '</h1><p>' + escapeHtml(project.description || 'Sem descrição.') + '</p><div class="pp-tags" style="margin-top:10px"><span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span><span class="pp-tag">' + escapeHtml(project.type || 'Outro') + '</span></div></div><div class="pp-detail-actions"><button class="pp-button" data-action="open-mindmap" data-id="' + project.id + '">' + uiIcon('map') + 'Mapa mental</button><button class="pp-button pp-secondary" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + 'Editar</button><button class="pp-button pp-danger" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + 'Excluir</button></div></section>' + libraryDocumentationMarkup(project)
-      + '<div class="pp-detail-grid"><div><section class="pp-panel"><div class="pp-panel-head"><h2>Linha do tempo</h2><button class="pp-button pp-small" data-action="new-event" data-project="' + project.id + '">' + uiIcon('plus') + 'Registrar</button></div>' + (events.length ? '<div class="pp-timeline">' + events.map(eventCard).join('') + '</div>' : emptyMarkup('Sem atualizações ainda', 'Registre um avanço, deploy, ajuste ou qualquer passo importante.')) + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ideias vinculadas</h2><a class="pp-button pp-small pp-secondary" href="projetos-pessoais.html#ideas">Ver todas</a></div>' + (projectIdeas.length ? projectIdeas.map(ideaMini).join('') : '<p class="pp-form-note">Ainda não há ideias vinculadas a este projeto.</p>') + '</section></div>'
+      + '<div class="pp-detail-grid"><div><section class="pp-panel"><div class="pp-panel-head"><h2>Linha do tempo</h2><button class="pp-button pp-small" data-action="new-event" data-project="' + project.id + '">' + uiIcon('plus') + 'Registrar</button></div>' + (events.length ? '<div class="pp-timeline">' + events.map(eventCard).join('') + '</div>' : emptyMarkup('Sem atualizações ainda', 'Registre um avanço, deploy, ajuste ou qualquer passo importante.')) + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ideias vinculadas</h2><a class="pp-button pp-small pp-secondary" href="projetos-pessoais.html#ideas">Ver todas</a></div>' + (projectIdeas.length ? projectIdeas.map(ideaMini).join('') : '<p class="pp-form-note">Ainda não há ideias vinculadas a este projeto.</p>') + '</section>' + projectChecklistMarkup(project) + '</div>'
       + '<aside>' + relatedProjectsMarkup(project) + '<section class="pp-panel"><h2>Links</h2><div style="height:12px"></div>' + links + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ferramentas</h2><button class="pp-button pp-small" data-action="edit-project" data-id="' + project.id + '">Gerenciar</button></div>' + (tools.length ? '<div class="pp-tool-list">' + tools.map(function (tool) { return '<button class="pp-tool-button" data-action="open-tool" data-project="' + project.id + '" data-tool="' + tool.id + '"><span>' + providerIcon(tool.provider) + '<span><strong>' + escapeHtml(tool.label || tool.provider) + '</strong><span>' + escapeHtml(tool.provider) + ' · acesso protegido</span></span></span><b>' + uiIcon('lock') + '</b></button>'; }).join('') + '</div>' : '<p class="pp-form-note">Adicione GitHub, Supabase, I.As ou outra ferramenta ao editar o projeto.</p>') + '</section></aside></div></main>';
   }
   function eventCard(event) {
@@ -902,7 +931,8 @@
     return '<article class="pp-event"><div class="pp-event-top"><div><h3>' + escapeHtml(event.title) + '</h3><time>' + escapeHtml(formatDate(event.occurredAt)) + ' · ' + escapeHtml(event.source || 'Manual') + external + '</time></div><div class="pp-toolbar"><button class="pp-icon-button" title="Editar evento" aria-label="Editar evento" data-action="edit-event" data-id="' + event.id + '">' + uiIcon('edit') + '</button><button class="pp-icon-button" title="Excluir evento" aria-label="Excluir evento" data-action="delete-event" data-id="' + event.id + '">' + uiIcon('trash') + '</button></div></div>' + (event.details ? '<p>' + escapeHtml(event.details) + '</p>' : '') + '</article>';
   }
   function ideaMini(idea) {
-    return '<div class="pp-idea-mini"><span class="pp-logo">' + uiIcon('idea') + '</span><div><strong>' + escapeHtml(idea.title) + '</strong><span>' + escapeHtml(idea.priority) + ' · ' + escapeHtml(idea.status) + '</span></div></div>';
+    var stats = checklistStats(idea.checklist);
+    return '<div class="pp-idea-mini"><span class="pp-logo">' + (idea.favorite ? '★' : uiIcon('idea')) + '</span><div><strong>' + escapeHtml(idea.title) + '</strong><span>' + escapeHtml(idea.priority) + ' · ' + escapeHtml(idea.status) + (stats.total ? ' · ' + stats.done + '/' + stats.total : '') + '</span></div></div>';
   }
   function currentTab() {
     var hash = (window.location.hash || '').replace('#', '').toLowerCase();
@@ -1013,17 +1043,196 @@
     if (PAGE === 'detail') window.location.href = 'projetos-pessoais.html#projects'; else { render(); toast('Projeto excluído.'); }
   }
 
+  function newChecklistItem(text) { var stamp = now(); return { id: id('chk'), text: text, done: false, children: [], createdAt: stamp, updatedAt: stamp }; }
+  function checklistStats(items) {
+    var total = 0, done = 0;
+    (items || []).forEach(function (item) {
+      total += 1; if (item.done) done += 1;
+      (item.children || []).forEach(function (child) { total += 1; if (child.done) done += 1; });
+    });
+    return { total: total, done: done };
+  }
+  function findChecklistItem(items, itemId) {
+    for (var index = 0; index < (items || []).length; index += 1) {
+      if (items[index].id === itemId) return { item: items[index], list: items, index: index };
+      var child = findChecklistItem(items[index].children || [], itemId);
+      if (child) return child;
+    }
+    return null;
+  }
+  function checklistItemsMarkup(items, actionPrefix, ownerAttr, depth) {
+    if (!items || !items.length) return '<p class="pp-form-note">Nenhum item ainda.</p>';
+    return '<ul class="' + (depth ? 'pp-checklist-children' : 'pp-checklist-list') + '">' + items.map(function (item) {
+      var childMarkup = !depth && item.children && item.children.length ? checklistItemsMarkup(item.children, actionPrefix, ownerAttr, 1) : '';
+      return '<li class="pp-checklist-item' + (item.done ? ' is-done' : '') + '">'
+        + '<button type="button" class="pp-checklist-toggle" aria-label="Concluir item" data-action="' + actionPrefix + '-toggle"' + ownerAttr + ' data-item="' + item.id + '"></button>'
+        + '<span class="pp-checklist-text">' + escapeHtml(item.text) + '</span>'
+        + '<span class="pp-checklist-actions">'
+        + (!depth ? '<button type="button" class="pp-icon-button pp-tiny" title="Adicionar subitem" aria-label="Adicionar subitem" data-action="' + actionPrefix + '-add-sub"' + ownerAttr + ' data-item="' + item.id + '">' + uiIcon('plus') + '</button>' : '')
+        + '<button type="button" class="pp-icon-button pp-tiny" title="Editar item" aria-label="Editar item" data-action="' + actionPrefix + '-edit"' + ownerAttr + ' data-item="' + item.id + '">' + uiIcon('edit') + '</button>'
+        + '<button type="button" class="pp-icon-button pp-tiny" title="Remover item" aria-label="Remover item" data-action="' + actionPrefix + '-delete"' + ownerAttr + ' data-item="' + item.id + '">' + uiIcon('trash') + '</button>'
+        + '</span>' + childMarkup + '</li>';
+    }).join('') + '</ul>';
+  }
+  function projectChecklistMarkup(project) {
+    var items = Array.isArray(project.checklist) ? project.checklist : [];
+    var stats = checklistStats(items);
+    return '<section class="pp-panel"><div class="pp-panel-head"><h2>Checklist do projeto</h2>' + (stats.total ? '<span class="pp-tag">' + stats.done + '/' + stats.total + '</span>' : '') + '</div>'
+      + (stats.total ? '<div class="pp-checklist-progress"><div class="pp-checklist-progress-bar"><span style="width:' + Math.round(stats.done / stats.total * 100) + '%"></span></div></div>' : '')
+      + '<div class="pp-quick-add-row"><input class="pp-field pp-quick-add-input" id="pp-project-checklist-input" placeholder="Adicionar passo do projeto..."><button type="button" class="pp-button pp-small" data-action="checklist-add" data-project="' + project.id + '">' + uiIcon('plus') + 'Adicionar</button></div>'
+      + checklistItemsMarkup(items, 'checklist', ' data-project="' + project.id + '"', 0) + '</section>';
+  }
+  function formatDueDate(value) {
+    if (!value) return null;
+    var date = new Date(value + 'T00:00:00');
+    if (isNaN(date.getTime())) return null;
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var diffDays = Math.round((date - today) / 86400000);
+    var label = diffDays === 0 ? 'Hoje' : diffDays === 1 ? 'Amanhã' : diffDays === -1 ? 'Ontem' : date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+    return { label: label, overdue: diffDays < 0 };
+  }
+  function uniqueIdeaSections() {
+    var seen = {}; var list = [];
+    active(state.ideas).forEach(function (item) {
+      var section = (item.section || '').trim();
+      if (section && !seen[section]) { seen[section] = true; list.push(section); }
+    });
+    return list;
+  }
+  function labelChipsMarkup(list) {
+    return (list && list.length) ? list.map(function (label) { return '<span class="pp-tool-draft pp-label-chip">#' + escapeHtml(label) + '<button type="button" aria-label="Remover etiqueta ' + escapeHtml(label) + '" data-action="idea-label-remove" data-label="' + escapeHtml(label) + '">×</button></span>'; }).join('') : '<span class="pp-form-note">Nenhuma etiqueta ainda.</span>';
+  }
+  function attachmentsMarkup(list) {
+    if (!list || !list.length) return '<p class="pp-form-note">Nenhum anexo ainda.</p>';
+    return '<div class="pp-attachments">' + list.map(function (attachment) {
+      var isImage = attachment.kind === 'image';
+      return '<div class="pp-attachment-item">' + (isImage ? '<img class="pp-attachment-thumb" src="' + attachment.dataUrl + '" alt="">' : '<span class="pp-attachment-icon">' + uiIcon('folder') + '</span>')
+        + '<a class="pp-attachment-name" href="' + attachment.dataUrl + '" target="_blank" rel="noopener noreferrer" download="' + escapeHtml(attachment.name) + '">' + escapeHtml(attachment.name) + '</a>'
+        + '<button type="button" class="pp-icon-button pp-tiny" title="Remover anexo" aria-label="Remover anexo" data-action="idea-attachment-remove" data-id="' + attachment.id + '">' + uiIcon('trash') + '</button></div>';
+    }).join('') + '</div>';
+  }
+  function readAttachment(file) {
+    var isImage = file.type && file.type.indexOf('image/') === 0;
+    var maxSize = isImage ? 8 * 1024 * 1024 : 5 * 1024 * 1024;
+    if (file.size > maxSize) { toast('"' + file.name + '" é muito grande (máx. ' + (isImage ? '8' : '5') + ' MB).'); return Promise.resolve(null); }
+    if (isImage) {
+      return compressImage(file).then(function (dataUrl) {
+        return { id: id('att'), name: file.name, kind: 'image', mime: 'image/webp', size: dataUrl.length, dataUrl: dataUrl, createdAt: now() };
+      }).catch(function (message) { toast(message || 'Não foi possível preparar "' + file.name + '".'); return null; });
+    }
+    return new Promise(function (resolve) {
+      var reader = new FileReader();
+      reader.onerror = function () { toast('Não foi possível ler "' + file.name + '".'); resolve(null); };
+      reader.onload = function () { resolve({ id: id('att'), name: file.name, kind: 'file', mime: file.type || 'application/octet-stream', size: file.size, dataUrl: reader.result, createdAt: now() }); };
+      reader.readAsDataURL(file);
+    });
+  }
+  function favoriteMarkupInline(isActive) {
+    return '<button type="button" id="pp-idea-favorite-host" class="pp-star-toggle' + (isActive ? ' is-active' : '') + '" data-action="idea-favorite-toggle" aria-pressed="' + (isActive ? 'true' : 'false') + '">' + (isActive ? '★' : '☆') + ' Favorita</button>';
+  }
   function ideaForm(idea) {
     idea = idea || { status: 'Para o futuro', priority: 'Média', projectId: null };
+    var checklistDraft = clone(idea.checklist || []);
+    var labelsDraft = clone(idea.labels || []);
+    var attachmentsDraft = clone(idea.attachments || []);
+    var favoriteDraft = !!idea.favorite;
     var projectOptions = '<option value="">Projeto futuro</option>' + active(state.projects).map(function (project) { return '<option value="' + project.id + '"' + (idea.projectId === project.id ? ' selected' : '') + '>' + escapeHtml(project.name) + '</option>'; }).join('');
-    var modal = showModal(idea.id ? 'Editar ideia' : 'Nova ideia', 'A data de criação e a última edição são registradas automaticamente.', '<form id="pp-idea-form"><div class="pp-form-grid"><label class="pp-form-label pp-full"><span>Título *</span><input class="pp-field" required maxlength="160" name="title" value="' + escapeHtml(idea.title || '') + '" placeholder="Descreva a ideia em poucas palavras"></label><label class="pp-form-label pp-full"><span>Descrição detalhada</span><textarea class="pp-field" name="description" maxlength="3000" placeholder="Registre os detalhes para não esquecer.">' + escapeHtml(idea.description || '') + '</textarea></label><label class="pp-form-label"><span>Projeto</span><select class="pp-field" name="projectId">' + projectOptions + '</select></label><label class="pp-form-label"><span>Status</span><select class="pp-field" name="status">' + optionList(IDEA_STATUSES, idea.status) + '</select></label><label class="pp-form-label"><span>Prioridade</span><select class="pp-field" name="priority">' + optionList(PRIORITIES, idea.priority) + '</select></label></div><div class="pp-error" id="pp-form-error"></div><div class="pp-modal-actions"><button type="button" class="pp-button pp-secondary" data-action="close-modal">Cancelar</button><button class="pp-button" type="submit">Salvar ideia</button></div></form>');
+    var sectionOptions = uniqueIdeaSections().map(function (section) { return '<option value="' + escapeHtml(section) + '"></option>'; }).join('');
+    var modal = showModal(idea.id ? 'Editar ideia' : 'Nova ideia', 'A data de criação e a última edição são registradas automaticamente.',
+      '<form id="pp-idea-form">'
+      + '<div class="pp-form-grid">'
+      + '<label class="pp-form-label pp-full"><span>Título *</span><input class="pp-field" required maxlength="160" name="title" value="' + escapeHtml(idea.title || '') + '" placeholder="Descreva a ideia em poucas palavras"></label>'
+      + '<label class="pp-form-label pp-full"><span>Descrição detalhada</span><textarea class="pp-field" name="description" maxlength="3000" placeholder="Registre os detalhes para não esquecer.">' + escapeHtml(idea.description || '') + '</textarea></label>'
+      + '<label class="pp-form-label"><span>Projeto</span><select class="pp-field" name="projectId">' + projectOptions + '</select></label>'
+      + '<label class="pp-form-label"><span>Seção</span><input class="pp-field" name="section" list="pp-section-options" maxlength="60" value="' + escapeHtml(idea.section || '') + '" placeholder="Ex.: Backlog, Em teste..."><datalist id="pp-section-options">' + sectionOptions + '</datalist></label>'
+      + '<label class="pp-form-label"><span>Status</span><select class="pp-field" name="status">' + optionList(IDEA_STATUSES, idea.status) + '</select></label>'
+      + '<label class="pp-form-label"><span>Prioridade</span><select class="pp-field" name="priority">' + optionList(PRIORITIES, idea.priority) + '</select></label>'
+      + '<label class="pp-form-label"><span>Prazo</span><div class="pp-duedate-row"><input class="pp-field" type="date" name="dueDate" id="pp-idea-duedate" value="' + escapeHtml(idea.dueDate || '') + '"><div class="pp-duedate-quick"><button type="button" data-action="idea-due-quick" data-days="0">Hoje</button><button type="button" data-action="idea-due-quick" data-days="1">Amanhã</button><button type="button" data-action="idea-due-quick" data-days="7">Em 7 dias</button><button type="button" data-action="idea-due-quick" data-days="clear">Sem prazo</button></div></div></label>'
+      + '<label class="pp-form-label"><span>Destaque</span><div>' + favoriteMarkupInline(favoriteDraft) + '</div></label>'
+      + '</div>'
+      + '<div class="pp-form-section"><h3>Etiquetas</h3><p class="pp-form-section-hint">Palavras-chave para agrupar ideias parecidas entre projetos, como no Todoist.</p><div class="pp-quick-add-row"><input class="pp-field pp-quick-add-input" id="pp-label-input" maxlength="24" placeholder="Ex.: urgente, design, IA..."><button type="button" class="pp-button pp-small" data-action="idea-label-add">' + uiIcon('plus') + 'Adicionar</button></div><div id="pp-label-drafts" class="pp-tags"></div></div>'
+      + '<div class="pp-form-section"><h3>Prompt para IA</h3><p class="pp-form-section-hint">Cole aqui um prompt pronto para executar esta ideia depois em uma IA (Claude, ChatGPT, Gemini...).</p><textarea class="pp-field" name="prompt" maxlength="6000" placeholder="Ex.: Crie um roteiro de aula sobre...">' + escapeHtml(idea.prompt || '') + '</textarea><div class="pp-prompt-actions"><button type="button" class="pp-button pp-small pp-secondary" data-action="idea-prompt-copy">Copiar prompt</button></div></div>'
+      + '<div class="pp-form-section"><h3>Checklist e subtarefas</h3><p class="pp-form-section-hint">Divida a ideia em passos. Cada passo pode ter subitens, como as sublistas do Todoist.</p><div class="pp-quick-add-row"><input class="pp-field pp-quick-add-input" id="pp-checklist-input" maxlength="160" placeholder="Adicionar item..."><button type="button" class="pp-button pp-small" data-action="idea-chk-add">' + uiIcon('plus') + 'Adicionar</button></div><div id="pp-checklist-list"></div></div>'
+      + '<div class="pp-form-section"><h3>Anexos</h3><p class="pp-form-section-hint">Adicione imagens ou documentos de referência para esta ideia.</p><input class="pp-field" type="file" id="pp-attachment-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip" multiple><div id="pp-attachments-list" style="margin-top:10px"></div></div>'
+      + '<div class="pp-error" id="pp-form-error"></div>'
+      + '<div class="pp-modal-actions"><button type="button" class="pp-button pp-secondary" data-action="close-modal">Cancelar</button><button class="pp-button" type="submit">Salvar ideia</button></div>'
+      + '</form>', { wide: true });
     var form = modal.querySelector('#pp-idea-form');
+    function renderChecklist() { modal.querySelector('#pp-checklist-list').innerHTML = checklistItemsMarkup(checklistDraft, 'idea-chk', '', 0); }
+    function renderLabels() { modal.querySelector('#pp-label-drafts').innerHTML = labelChipsMarkup(labelsDraft); }
+    function renderAttachments() { modal.querySelector('#pp-attachments-list').innerHTML = attachmentsMarkup(attachmentsDraft); }
+    function renderFavorite() { var host = modal.querySelector('#pp-idea-favorite-host'); if (host) host.outerHTML = favoriteMarkupInline(favoriteDraft); }
+    renderChecklist(); renderLabels(); renderAttachments();
+    modal.addEventListener('click', function (event) {
+      var target = event.target.closest('[data-action]'); if (!target) return;
+      var action = target.dataset.action;
+      if (action === 'idea-favorite-toggle') { favoriteDraft = !favoriteDraft; renderFavorite(); return; }
+      if (action === 'idea-due-quick') {
+        var field = modal.querySelector('#pp-idea-duedate');
+        if (target.dataset.days === 'clear') { field.value = ''; return; }
+        var futureDate = new Date(); futureDate.setDate(futureDate.getDate() + Number(target.dataset.days || 0));
+        field.value = futureDate.toISOString().slice(0, 10);
+        return;
+      }
+      if (action === 'idea-label-add') {
+        var labelInput = modal.querySelector('#pp-label-input'); var labelValue = labelInput.value.trim();
+        if (!labelValue) return;
+        if (labelsDraft.indexOf(labelValue) < 0) labelsDraft.push(labelValue);
+        labelInput.value = ''; renderLabels(); labelInput.focus();
+        return;
+      }
+      if (action === 'idea-label-remove') { labelsDraft = labelsDraft.filter(function (label) { return label !== target.dataset.label; }); renderLabels(); return; }
+      if (action === 'idea-prompt-copy') {
+        var promptField = form.elements.prompt;
+        if (!promptField.value.trim()) { toast('Escreva um prompt antes de copiar.'); return; }
+        if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(promptField.value).then(function () { toast('Prompt copiado.'); }).catch(function () { toast('Não foi possível copiar o prompt.'); }); }
+        return;
+      }
+      if (action === 'idea-chk-add') {
+        var checklistInput = modal.querySelector('#pp-checklist-input'); var itemText = checklistInput.value.trim();
+        if (!itemText) return;
+        checklistDraft.push(newChecklistItem(itemText)); checklistInput.value = ''; renderChecklist(); checklistInput.focus();
+        return;
+      }
+      if (action === 'idea-chk-toggle') { var toggled = findChecklistItem(checklistDraft, target.dataset.item); if (toggled) { toggled.item.done = !toggled.item.done; toggled.item.updatedAt = now(); renderChecklist(); } return; }
+      if (action === 'idea-chk-add-sub') {
+        var parentFound = findChecklistItem(checklistDraft, target.dataset.item); if (!parentFound) return;
+        var subText = window.prompt('Nome da subtarefa:'); if (subText == null || !subText.trim()) return;
+        parentFound.item.children = parentFound.item.children || []; parentFound.item.children.push(newChecklistItem(subText.trim())); renderChecklist();
+        return;
+      }
+      if (action === 'idea-chk-edit') {
+        var editFound = findChecklistItem(checklistDraft, target.dataset.item); if (!editFound) return;
+        var newText = window.prompt('Editar item:', editFound.item.text); if (newText == null || !newText.trim()) return;
+        editFound.item.text = newText.trim(); editFound.item.updatedAt = now(); renderChecklist();
+        return;
+      }
+      if (action === 'idea-chk-delete') {
+        var deleteFound = findChecklistItem(checklistDraft, target.dataset.item); if (!deleteFound) return;
+        if (!window.confirm('Remover este item?')) return;
+        deleteFound.list.splice(deleteFound.index, 1); renderChecklist();
+        return;
+      }
+      if (action === 'idea-attachment-remove') { attachmentsDraft = attachmentsDraft.filter(function (attachment) { return attachment.id !== target.dataset.id; }); renderAttachments(); return; }
+    });
+    modal.querySelector('#pp-attachment-input').addEventListener('change', function (event) {
+      var files = Array.prototype.slice.call(event.target.files || []);
+      event.target.value = '';
+      if (!files.length) return;
+      Promise.all(files.map(readAttachment)).then(function (results) {
+        results.filter(Boolean).forEach(function (attachment) { attachmentsDraft.push(attachment); });
+        renderAttachments();
+      });
+    });
     form.addEventListener('submit', function (event) {
       event.preventDefault(); var title = form.elements.title.value.trim(); var error = modal.querySelector('#pp-form-error');
       if (!title) { error.textContent = 'Informe o título da ideia.'; return; }
       var stamp = now(); var record = idea.id ? state.ideas.find(function (item) { return item.id === idea.id; }) : null;
       if (!record) { record = { id: id('idea'), createdAt: stamp }; state.ideas.push(record); }
-      record.title = title; record.description = form.elements.description.value.trim(); record.projectId = form.elements.projectId.value || null; record.status = form.elements.status.value; record.priority = form.elements.priority.value; record.updatedAt = stamp;
+      record.title = title; record.description = form.elements.description.value.trim(); record.projectId = form.elements.projectId.value || null;
+      record.status = form.elements.status.value; record.priority = form.elements.priority.value; record.section = form.elements.section.value.trim();
+      record.dueDate = form.elements.dueDate.value || null; record.favorite = favoriteDraft; record.labels = labelsDraft; record.prompt = form.elements.prompt.value.trim();
+      record.checklist = checklistDraft; record.attachments = attachmentsDraft; record.updatedAt = stamp;
       persist('idea-save'); closeModal(); render(); toast('Ideia salva.');
     });
   }
@@ -1242,6 +1451,41 @@
     if (action === 'new-idea') { ideaForm(null); return; }
     if (action === 'edit-idea') { ideaForm(getIdea(target.dataset.id)); return; }
     if (action === 'delete-idea') { deleteIdea(target.dataset.id); return; }
+    if (action === 'checklist-add') {
+      var addChkProject = getProject(target.dataset.project); if (!addChkProject) return;
+      var addChkInput = document.getElementById('pp-project-checklist-input'); var addChkText = addChkInput ? addChkInput.value.trim() : '';
+      if (!addChkText) return;
+      addChkProject.checklist = Array.isArray(addChkProject.checklist) ? addChkProject.checklist : [];
+      addChkProject.checklist.push(newChecklistItem(addChkText)); addChkProject.updatedAt = now();
+      persist('project-checklist-add'); render(); return;
+    }
+    if (action === 'checklist-toggle') {
+      var toggleChkProject = getProject(target.dataset.project); if (!toggleChkProject) return;
+      var toggleChkFound = findChecklistItem(toggleChkProject.checklist || [], target.dataset.item); if (!toggleChkFound) return;
+      toggleChkFound.item.done = !toggleChkFound.item.done; toggleChkFound.item.updatedAt = now(); toggleChkProject.updatedAt = now();
+      persist('project-checklist-toggle'); render(); return;
+    }
+    if (action === 'checklist-add-sub') {
+      var subChkProject = getProject(target.dataset.project); if (!subChkProject) return;
+      var subChkParent = findChecklistItem(subChkProject.checklist || [], target.dataset.item); if (!subChkParent) return;
+      var subChkText = window.prompt('Nome da subtarefa:'); if (subChkText == null || !subChkText.trim()) return;
+      subChkParent.item.children = subChkParent.item.children || []; subChkParent.item.children.push(newChecklistItem(subChkText.trim()));
+      subChkProject.updatedAt = now(); persist('project-checklist-add-sub'); render(); return;
+    }
+    if (action === 'checklist-edit') {
+      var editChkProject = getProject(target.dataset.project); if (!editChkProject) return;
+      var editChkFound = findChecklistItem(editChkProject.checklist || [], target.dataset.item); if (!editChkFound) return;
+      var editChkText = window.prompt('Editar item:', editChkFound.item.text); if (editChkText == null || !editChkText.trim()) return;
+      editChkFound.item.text = editChkText.trim(); editChkFound.item.updatedAt = now(); editChkProject.updatedAt = now();
+      persist('project-checklist-edit'); render(); return;
+    }
+    if (action === 'checklist-delete') {
+      var delChkProject = getProject(target.dataset.project); if (!delChkProject) return;
+      var delChkFound = findChecklistItem(delChkProject.checklist || [], target.dataset.item); if (!delChkFound) return;
+      if (!window.confirm('Remover este item do checklist?')) return;
+      delChkFound.list.splice(delChkFound.index, 1); delChkProject.updatedAt = now();
+      persist('project-checklist-delete'); render(); return;
+    }
     if (action === 'new-event') { eventForm(target.dataset.project, null); return; }
     if (action === 'edit-event') { var activity = getEvent(target.dataset.id); if (activity) eventForm(activity.projectId, activity); return; }
     if (action === 'delete-event') { deleteEvent(target.dataset.id); return; }
@@ -1263,8 +1507,19 @@
     if (action === 'set-timer') { timerForm(target.dataset.id); return; }
     if (action === 'stop-timer') { stopTimer(target.dataset.id); return; }
   }
-  function handleFilter(event) { var filter = event.target.dataset.filter; if (!filter) return; currentFilters[filter] = event.target.value; render(); }
-  function handleKeyboard(event) { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-action="goto-project"]')) { event.preventDefault(); window.location.href = 'projeto-detalhes.html?id=' + encodeURIComponent(event.target.dataset.id); } }
+  function handleFilter(event) {
+    var filter = event.target.dataset.filter; if (!filter) return;
+    currentFilters[filter] = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+    render();
+  }
+  function handleKeyboard(event) {
+    if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-action="goto-project"]')) { event.preventDefault(); window.location.href = 'projeto-detalhes.html?id=' + encodeURIComponent(event.target.dataset.id); return; }
+    if (event.key === 'Enter' && event.target.classList && event.target.classList.contains('pp-quick-add-input')) {
+      event.preventDefault();
+      var row = event.target.closest('.pp-quick-add-row'); var button = row && row.querySelector('button');
+      if (button) button.click();
+    }
+  }
   function boot() {
     loadCache(); ensureCoreProjects(); ensureReportsProjectIcon(); ensureLibraryProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
