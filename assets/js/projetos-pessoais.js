@@ -117,6 +117,7 @@
   var vaultExpiresAt = 0;
   var vaultTimeout = null;
   var currentFilters = { project: 'all', status: 'all', priority: 'all', favorite: false };
+  var expandedIdeaChecklists = {};
   var mindMapUi = { projectId: null, selectedId: null, initialized: false, scale: 1, x: 0, y: 0 };
 
   function now() { return new Date().toISOString(); }
@@ -672,12 +673,18 @@
   }
   function ideaCard(idea) {
     var project = getProject(idea.projectId);
-    var stats = checklistStats(idea.checklist);
+    var items = Array.isArray(idea.checklist) ? idea.checklist : [];
+    var stats = checklistStats(items);
     var due = formatDueDate(idea.dueDate);
     var labels = Array.isArray(idea.labels) ? idea.labels : [];
+    var expanded = !!expandedIdeaChecklists[idea.id];
     return '<article class="pp-idea' + (idea.favorite ? ' is-favorite' : '') + '"><div class="pp-idea-header"><div class="pp-idea-top-row">' + (idea.favorite ? '<span class="pp-idea-star" aria-hidden="true">★</span>' : '') + '<h3>' + escapeHtml(idea.title) + '</h3>' + (idea.section ? '<span class="pp-idea-section">' + escapeHtml(idea.section) + '</span>' : '') + '</div><div class="pp-toolbar"><button class="pp-icon-button" title="Editar ideia" aria-label="Editar ideia" data-action="edit-idea" data-id="' + idea.id + '">' + uiIcon('edit') + '</button><button class="pp-icon-button" title="Excluir ideia" aria-label="Excluir ideia" data-action="delete-idea" data-id="' + idea.id + '">' + uiIcon('trash') + '</button></div></div>'
       + '<p>' + escapeHtml(idea.description || 'Sem descrição detalhada.') + '</p>'
       + (stats.total ? '<div class="pp-checklist-progress"><div class="pp-checklist-progress-bar"><span style="width:' + Math.round(stats.done / stats.total * 100) + '%"></span></div><small>' + stats.done + '/' + stats.total + '</small></div>' : '')
+      + '<button type="button" class="pp-idea-checklist-toggle" data-action="idea-checklist-expand" data-id="' + idea.id + '" aria-expanded="' + (expanded ? 'true' : 'false') + '">' + (expanded ? '▾' : '▸') + ' Checklist' + (stats.total ? ' · ' + stats.done + '/' + stats.total : '') + '</button>'
+      + (expanded ? '<div class="pp-idea-inline-checklist">'
+        + '<div class="pp-quick-add-row"><input class="pp-field pp-quick-add-input" id="pp-idea-checklist-input-' + idea.id + '" placeholder="Adicionar item..."><button type="button" class="pp-button pp-small" data-action="idea-checklist-add" data-idea="' + idea.id + '">' + uiIcon('plus') + 'Adicionar</button></div>'
+        + checklistItemsMarkup(items, 'idea-checklist', ' data-idea="' + idea.id + '"', 0) + '</div>' : '')
       + (labels.length ? '<div class="pp-tags">' + labels.map(function (label) { return '<span class="pp-tag pp-label-chip">#' + escapeHtml(label) + '</span>'; }).join('') + '</div>' : '')
       + '<div class="pp-idea-foot"><div class="pp-tags"><span class="pp-tag pp-priority-' + priorityClass(idea.priority) + '">' + escapeHtml(idea.priority) + '</span><span class="pp-tag">' + escapeHtml(idea.status) + '</span><span class="pp-tag">' + (project ? projectLogo(project, true) + escapeHtml(project.name) : '◌ Projeto futuro') + '</span>'
       + (due ? '<span class="pp-tag' + (due.overdue ? ' pp-tag-overdue' : '') + '">Prazo: ' + due.label + '</span>' : '')
@@ -1067,13 +1074,14 @@
     return '<ul class="' + (depth ? 'pp-checklist-children' : 'pp-checklist-list') + '">' + items.map(function (item) {
       var childMarkup = !depth && item.children && item.children.length ? checklistItemsMarkup(item.children, actionPrefix, ownerAttr, 1) : '';
       return '<li class="pp-checklist-item' + (item.done ? ' is-done' : '') + '">'
+        + '<div class="pp-checklist-row">'
         + '<button type="button" class="pp-checklist-toggle" aria-label="Concluir item" data-action="' + actionPrefix + '-toggle"' + ownerAttr + ' data-item="' + item.id + '"></button>'
         + '<span class="pp-checklist-text">' + escapeHtml(item.text) + '</span>'
         + '<span class="pp-checklist-actions">'
         + (!depth ? '<button type="button" class="pp-icon-button pp-tiny" title="Adicionar subitem" aria-label="Adicionar subitem" data-action="' + actionPrefix + '-add-sub"' + ownerAttr + ' data-item="' + item.id + '">' + uiIcon('plus') + '</button>' : '')
         + '<button type="button" class="pp-icon-button pp-tiny" title="Editar item" aria-label="Editar item" data-action="' + actionPrefix + '-edit"' + ownerAttr + ' data-item="' + item.id + '">' + uiIcon('edit') + '</button>'
         + '<button type="button" class="pp-icon-button pp-tiny" title="Remover item" aria-label="Remover item" data-action="' + actionPrefix + '-delete"' + ownerAttr + ' data-item="' + item.id + '">' + uiIcon('trash') + '</button>'
-        + '</span>' + childMarkup + '</li>';
+        + '</span></div>' + childMarkup + '</li>';
     }).join('') + '</ul>';
   }
   function projectChecklistMarkup(project) {
@@ -1487,6 +1495,42 @@
       if (!window.confirm('Remover este item do checklist?')) return;
       delChkFound.list.splice(delChkFound.index, 1); delChkProject.updatedAt = now();
       persist('project-checklist-delete'); render(); return;
+    }
+    if (action === 'idea-checklist-expand') { expandedIdeaChecklists[target.dataset.id] = !expandedIdeaChecklists[target.dataset.id]; render(); return; }
+    if (action === 'idea-checklist-add') {
+      var addChkIdea = getIdea(target.dataset.idea); if (!addChkIdea) return;
+      var addChkIdeaInput = document.getElementById('pp-idea-checklist-input-' + target.dataset.idea); var addChkIdeaText = addChkIdeaInput ? addChkIdeaInput.value.trim() : '';
+      if (!addChkIdeaText) return;
+      addChkIdea.checklist = Array.isArray(addChkIdea.checklist) ? addChkIdea.checklist : [];
+      addChkIdea.checklist.push(newChecklistItem(addChkIdeaText)); addChkIdea.updatedAt = now();
+      persist('idea-checklist-add'); render(); return;
+    }
+    if (action === 'idea-checklist-toggle') {
+      var toggleChkIdea = getIdea(target.dataset.idea); if (!toggleChkIdea) return;
+      var toggleChkIdeaFound = findChecklistItem(toggleChkIdea.checklist || [], target.dataset.item); if (!toggleChkIdeaFound) return;
+      toggleChkIdeaFound.item.done = !toggleChkIdeaFound.item.done; toggleChkIdeaFound.item.updatedAt = now(); toggleChkIdea.updatedAt = now();
+      persist('idea-checklist-toggle'); render(); return;
+    }
+    if (action === 'idea-checklist-add-sub') {
+      var subChkIdea = getIdea(target.dataset.idea); if (!subChkIdea) return;
+      var subChkIdeaParent = findChecklistItem(subChkIdea.checklist || [], target.dataset.item); if (!subChkIdeaParent) return;
+      var subChkIdeaText = window.prompt('Nome da subtarefa:'); if (subChkIdeaText == null || !subChkIdeaText.trim()) return;
+      subChkIdeaParent.item.children = subChkIdeaParent.item.children || []; subChkIdeaParent.item.children.push(newChecklistItem(subChkIdeaText.trim()));
+      subChkIdea.updatedAt = now(); persist('idea-checklist-add-sub'); render(); return;
+    }
+    if (action === 'idea-checklist-edit') {
+      var editChkIdea = getIdea(target.dataset.idea); if (!editChkIdea) return;
+      var editChkIdeaFound = findChecklistItem(editChkIdea.checklist || [], target.dataset.item); if (!editChkIdeaFound) return;
+      var editChkIdeaText = window.prompt('Editar item:', editChkIdeaFound.item.text); if (editChkIdeaText == null || !editChkIdeaText.trim()) return;
+      editChkIdeaFound.item.text = editChkIdeaText.trim(); editChkIdeaFound.item.updatedAt = now(); editChkIdea.updatedAt = now();
+      persist('idea-checklist-edit'); render(); return;
+    }
+    if (action === 'idea-checklist-delete') {
+      var delChkIdea = getIdea(target.dataset.idea); if (!delChkIdea) return;
+      var delChkIdeaFound = findChecklistItem(delChkIdea.checklist || [], target.dataset.item); if (!delChkIdeaFound) return;
+      if (!window.confirm('Remover este item?')) return;
+      delChkIdeaFound.list.splice(delChkIdeaFound.index, 1); delChkIdea.updatedAt = now();
+      persist('idea-checklist-delete'); render(); return;
     }
     if (action === 'new-event') { eventForm(target.dataset.project, null); return; }
     if (action === 'edit-event') { var activity = getEvent(target.dataset.id); if (activity) eventForm(activity.projectId, activity); return; }
