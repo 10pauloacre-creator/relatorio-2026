@@ -269,16 +269,17 @@ body { color: #f5f5f5; background: #1e1e1e; font-size: 14px; }
 .pp-prompt-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
 .pp-checklist-list, .pp-checklist-children { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
 .pp-checklist-children { margin: 5px 0 3px 25px; padding-left: 12px; border-left: 1px dashed #3e3e42; }
-.pp-checklist-item { display: flex; align-items: center; gap: 9px; padding: 6px 7px; border-radius: 2px; }
-.pp-checklist-item:hover { background: #2a2d2e; }
+.pp-checklist-item { display: block; }
+.pp-checklist-row { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 6px 7px; border-radius: 2px; }
+.pp-checklist-row:hover { background: #2a2d2e; }
 .pp-checklist-toggle { position: relative; width: 18px; height: 18px; flex: 0 0 18px; padding: 0; border: 1.5px solid #6b6b6b; border-radius: 50%; background: transparent; }
 .pp-checklist-toggle:hover { border-color: #007acc; }
-.pp-checklist-item.is-done .pp-checklist-toggle { border-color: #89d185; background: #89d185; }
-.pp-checklist-item.is-done .pp-checklist-toggle::after { content: "\2713"; position: absolute; inset: 0; display: grid; place-items: center; color: #1e1e1e; font-size: .62rem; font-weight: 900; }
-.pp-checklist-text { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: .82rem; }
-.pp-checklist-item.is-done .pp-checklist-text { color: #808080; text-decoration: line-through; }
+.pp-checklist-item.is-done > .pp-checklist-row .pp-checklist-toggle { border-color: #89d185; background: #89d185; }
+.pp-checklist-item.is-done > .pp-checklist-row .pp-checklist-toggle::after { content: "\2713"; position: absolute; inset: 0; display: grid; place-items: center; color: #1e1e1e; font-size: .62rem; font-weight: 900; }
+.pp-checklist-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; font-size: .82rem; }
+.pp-checklist-item.is-done > .pp-checklist-row .pp-checklist-text { color: #808080; text-decoration: line-through; }
 .pp-checklist-actions { display: flex; align-items: center; gap: 2px; flex: 0 0 auto; opacity: .5; }
-.pp-checklist-item:hover .pp-checklist-actions { opacity: 1; }
+.pp-checklist-row:hover .pp-checklist-actions { opacity: 1; }
 .pp-icon-button.pp-tiny { width: 26px; height: 26px; }
 .pp-icon-button.pp-tiny .pp-ui-icon { width: 13px; height: 13px; }
 .pp-checklist-progress { display: flex; align-items: center; gap: 9px; margin: 2px 0 12px; }
@@ -291,6 +292,9 @@ body { color: #f5f5f5; background: #1e1e1e; font-size: 14px; }
 .pp-attachment-icon { width: 36px; height: 36px; flex: 0 0 36px; display: grid; place-items: center; border-radius: 2px; color: #75beff; background: #094771; }
 .pp-attachment-name { flex: 1; min-width: 0; overflow: hidden; color: #4fc1ff; text-overflow: ellipsis; white-space: nowrap; font-size: .78rem; text-decoration: none; }
 .pp-attachment-name:hover { text-decoration: underline; }
+.pp-idea-checklist-toggle { display: inline-flex; align-items: center; gap: 5px; margin: 2px 0 6px; padding: 3px 0; border: 0; background: transparent; color: #a6a6a6; font-size: .74rem; font-weight: 600; }
+.pp-idea-checklist-toggle:hover { color: #4fc1ff; }
+.pp-idea-inline-checklist { margin: 2px 0 12px; padding: 10px; border: 1px solid #3e3e42; border-radius: 2px; background: #202020; }
 
 @media (max-width: 760px) {
   .pp-shell { padding: 0 16px 42px; }.pp-hero-inner { min-height: 0; padding: 22px 16px; flex-direction: column; }.pp-vault-status { margin-top: 0; width: 100%; }.pp-section-head { align-items: stretch; flex-direction: column; }.pp-toolbar { justify-content: flex-start; }.pp-project-row { grid-template-columns: 48px minmax(0,1fr); gap: 11px; }.pp-project-row > .pp-project-meta { grid-column: 1 / -1; justify-content: space-between; }.pp-logo { width: 46px; height: 46px; border-radius: 12px; }.pp-filter-bar, .pp-form-grid, .pp-tool-add { grid-template-columns: 1fr; }.pp-ai-grid, .pp-detail-grid { grid-template-columns: 1fr; }.pp-detail-top { grid-template-columns: 58px minmax(0,1fr); gap: 11px; }.pp-detail-top .pp-logo { width: 58px; height: 58px; border-radius: 16px; font-size: 1.6rem; }.pp-detail-actions { grid-column: 1 / -1; justify-content: flex-start; }.pp-modal { align-items: flex-end; padding: 0; }.pp-modal-card { max-height: 92vh; border-radius: 20px 20px 0 0; }.pp-project-copy p { white-space: normal; }.pp-project-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }.pp-project-tile .pp-logo { width: 68px; height: 68px; border-radius: 19px; font-size: 1.75rem; }.pp-tile-actions { opacity: 1; }
