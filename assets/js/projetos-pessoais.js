@@ -14,6 +14,7 @@
     messagingSenderId: '457657450375',
     appId: '1:457657450375:web:15b1335aed2ba9939bdd22'
   };
+  var SEED_TIMESTAMP = '2020-01-01T00:00:00.000Z';
   var PROJECT_STATUSES = [
     'Ideia',
     'Desenvolvimento',
@@ -203,7 +204,7 @@
   }
   function ensureCoreProjects() {
     if (state.migrations.coreProjectsLinkedV1) return false;
-    var stamp = now();
+    var stamp = SEED_TIMESTAMP;
     var library = coreProjectByName('Biblioteca digital', 'project-biblioteca-digital');
     var reports = coreProjectByName('Relatórios diários', 'project-relatorios-diarios');
     var changed = false;
@@ -255,7 +256,7 @@
   function ensureReportsProjectIcon() {
     if (state.migrations.reportsProjectIconV1) return false;
     var reports = coreProjectByName('Relatórios diários', 'project-relatorios-diarios');
-    var stamp = now();
+    var stamp = SEED_TIMESTAMP;
     if (reports && !reports.logo) { reports.logo = 'iconv2.png'; reports.updatedAt = stamp; persist('reports-project-icon'); }
     state.migrations.reportsProjectIconV1 = { addedAt: stamp, projectId: reports ? reports.id : null };
     if (!reports || reports.logo !== 'iconv2.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
@@ -264,7 +265,7 @@
   function ensureLibraryProjectIcon() {
     if (state.migrations.libraryProjectIconV1) return false;
     var library = coreProjectByName('Biblioteca digital', 'project-biblioteca-digital');
-    var stamp = now();
+    var stamp = SEED_TIMESTAMP;
     if (library && !library.logo) { library.logo = 'assets/icons/icone-biblioteca-digital.png'; library.updatedAt = stamp; persist('library-project-icon'); }
     state.migrations.libraryProjectIconV1 = { addedAt: stamp, projectId: library ? library.id : null };
     if (!library || library.logo !== 'assets/icons/icone-biblioteca-digital.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
@@ -272,7 +273,7 @@
   }
   function ensureFinanceProject() {
     if (state.migrations.financeiroAppV1) return false;
-    var stamp = now();
+    var stamp = SEED_TIMESTAMP;
     var finance = coreProjectByName('Financeiro.app', 'project-financeiro-app');
     var changed = false;
     if (!finance) {
@@ -303,7 +304,7 @@
   function ensureFinanceProjectIcon() {
     if (state.migrations.financeiroAppIconV1) return false;
     var finance = coreProjectByName('Financeiro.app', 'project-financeiro-app');
-    var stamp = now();
+    var stamp = SEED_TIMESTAMP;
     if (finance && !finance.logo) { finance.logo = 'assets/icons/icone-financeiro-app.png'; finance.updatedAt = stamp; persist('financeiro-app-icon'); }
     state.migrations.financeiroAppIconV1 = { addedAt: stamp, projectId: finance ? finance.id : null };
     if (!finance || finance.logo !== 'assets/icons/icone-financeiro-app.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
@@ -311,7 +312,7 @@
   }
   function ensureRuralManagerProject() {
     if (state.migrations.ruralManagerV1) return false;
-    var stamp = now();
+    var stamp = SEED_TIMESTAMP;
     var rural = coreProjectByName('Rural Manager', 'project-rural-manager');
     var changed = false;
     if (!rural) {
@@ -342,7 +343,7 @@
   function ensureRuralManagerIcon() {
     if (state.migrations.ruralManagerIconV1) return false;
     var rural = coreProjectByName('Rural Manager', 'project-rural-manager');
-    var stamp = now();
+    var stamp = SEED_TIMESTAMP;
     if (rural && !rural.logo) { rural.logo = 'assets/icons/icone-rural-manager.png'; rural.updatedAt = stamp; persist('rural-manager-icon'); }
     state.migrations.ruralManagerIconV1 = { addedAt: stamp, projectId: rural ? rural.id : null };
     if (!rural || rural.logo !== 'assets/icons/icone-rural-manager.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
@@ -407,7 +408,7 @@
     if (state.migrations.bibliotecaDocumentationV1) return false;
     var library = coreProjectByName('Biblioteca digital', 'project-biblioteca-digital');
     if (!library) return false;
-    var stamp = now();
+    var stamp = SEED_TIMESTAMP;
     library.documentation = libraryDocumentationBlueprint();
     library.updatedAt = stamp;
     if (!state.activities.some(function (activity) { return activity.id === 'activity-biblioteca-documentation-map'; })) {
@@ -487,8 +488,9 @@
     var changed = false;
     active(state.projects).forEach(function (project) {
       if (project.mindMap && Array.isArray(project.mindMap.nodes) && project.mindMap.nodes.length) return;
+      var isSeedProject = project.id === 'project-biblioteca-digital' || project.id === 'project-rural-manager';
       project.mindMap = project.id === 'project-biblioteca-digital' ? libraryMindMapSeed(project) : project.id === 'project-rural-manager' ? ruralManagerMindMapSeed(project) : createMindMap(project);
-      project.updatedAt = now();
+      project.updatedAt = isSeedProject ? SEED_TIMESTAMP : now();
       changed = true;
     });
     if (changed) persist('mindmaps-bootstrap');
