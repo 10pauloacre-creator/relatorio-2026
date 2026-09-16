@@ -344,10 +344,13 @@ O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-
 | Tabela | Conteúdo |
 |---|---|
 | `relatorio_turmas` / `relatorio_aluno_vinculo` | painel do Relatório → aluno da Biblioteca (mesma escola, grupo e série; vínculo refeito por gatilho) |
-| `relatorio_bimestres` | início e fim de cada bimestre por escola (use `relatorio_bimestre_da_data`) |
+| `relatorio_metas_bimestrais` | h/aula por bimestre, total do ano e crédito anterior de cada turma/disciplina (enviados pela página) |
+| `relatorio_bimestres_por_carga` (view) | início, fim, horas e situação de cada bimestre, **medidos pela soma de aulas** |
 | `relatorio_turmas_diarias` | turma do diário (`t1`, `t23`, `t89`…) → painéis |
 | `relatorio_aulas` | uma linha por aula; `atividade_vale_ponto` é decisão do professor |
 | `relatorio_lancamentos` | presença e atividade de cada aluno em cada aula |
 | `relatorio_ocorrencias` | observações `.oi` com data, horário e aluno; `gravidade*` é decisão do professor |
+
+**Bimestre = soma de aulas, NUNCA calendário** (decisão do professor). Com meta de 10 h/aula, o 1º bimestre termina na 10ª, o 2º na 20ª… O bimestre de cada aula (`b`) vem da mesma distribuição do contador: `pcDiaryAssignBimestersByLoad` na Casavequia (chave do relato `p-<código>`) e `rhColetarMapaBimestresPanes` na Hermínio. A aula que cruza o limite fica no bimestre em que começou. "Aguardando" fica fora do cálculo de nota até ser marcado como fez ou não fez.
 
 **Publicação:** `assets/js/relatorio-lancamentos.js` + `pcMontarRetratoLancamentos()` (casavequia.html) e `rhMontarRetratoLancamentos()` (herminio-main.js) enviam o retrato completo para `relatorio_publicar_lancamentos` a cada mudança (debounce de 4s, só envia quando algo mudou). O montador reaproveita as regras de exibição (`_atvStatus`, `pcResolvePresenceStatus`, `rhGetEstadoAtual`). **Se mudar uma dessas regras, o retrato muda junto.** Se o retrato vier menor que 80% do que já está publicado, nada é marcado como removido.

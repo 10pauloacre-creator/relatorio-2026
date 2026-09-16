@@ -405,7 +405,35 @@ function rhMontarRetratoLancamentos() {
       resolverNumero: null
     }).forEach(function (item) { if (item.d) retrato.ocorrencias.push(item); });
   });
-  retrato.aulas = Object.keys(aulas).sort().map(function (k) { return aulas[k]; });
+  // Bimestre pela soma de h/aula, com o mesmo mapa do contador
+  // (rhColetarMapaBimestresPanes: meta por disciplina, acumulado por turma).
+  // Aula sem aba de atividade: bimestre da última aula da mesma turma e
+  // disciplina até aquela data.
+  var mapaBim = rhColetarMapaBimestresPanes();
+  var lista = Object.keys(aulas).sort().map(function (k) { return aulas[k]; });
+  var linhaDoTempo = {};
+  lista.forEach(function (aula) {
+    var bim = parseInt(mapaBim['a-' + aula.c], 10);
+    if (bim) {
+      aula.b = bim;
+      (linhaDoTempo[aula.t + '|' + aula.disc] = linhaDoTempo[aula.t + '|' + aula.disc] || []).push([aula.d, bim]);
+    }
+  });
+  Object.keys(linhaDoTempo).forEach(function (k) {
+    linhaDoTempo[k].sort(function (a, b) { return a[0].localeCompare(b[0]) || a[1] - b[1]; });
+  });
+  lista.forEach(function (aula) {
+    aula.hd = aula.carga;
+    if (aula.b) return;
+    var itens = linhaDoTempo[aula.t + '|' + aula.disc] || [];
+    var bim = itens.length ? itens[0][1] : 1;
+    for (var i = 0; i < itens.length && itens[i][0] <= aula.d; i++) bim = itens[i][1];
+    aula.b = bim;
+  });
+  retrato.aulas = lista;
+  retrato.metas = DISC_RH.map(function (d) {
+    return { t: d.turmaId, disc: d.disc, meta: rhMetaBimestrePorDisciplina(d.turmaId, d.grupo, d.disc), total: d.totalMeta, credito: 0 };
+  });
   return retrato;
 }
 function rhAgendarLancamentos() {
