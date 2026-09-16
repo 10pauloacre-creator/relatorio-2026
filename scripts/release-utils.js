@@ -145,7 +145,29 @@ function renderAppBuildScript(buildMeta) {
   return (
     "window.__RELATORIOS_APP_BUILD__ = " +
     JSON.stringify(buildMeta, null, 2) +
-    ";\n"
+    ";\n\n" +
+    `(function loadRelatorio2026Theme() {
+  var head = document.head;
+  if (!head) return;
+
+  var hasSharedStyles = document.querySelector(
+    'link[href*="local-font-aliases.css"], link[href*="dark-mode-2026.css"]'
+  );
+  if (!hasSharedStyles) {
+    var themeLink = document.createElement("link");
+    themeLink.rel = "stylesheet";
+    themeLink.href = "assets/css/dark-mode-2026.css?v=20260916a";
+    head.appendChild(themeLink);
+  }
+
+  if (!window.__RELATORIO_DARK_THEME_2026__ &&
+      !document.querySelector('script[src*="dark-mode-2026.js"]')) {
+    var themeScript = document.createElement("script");
+    themeScript.src = "assets/js/dark-mode-2026.js?v=20260916a";
+    head.appendChild(themeScript);
+  }
+})();
+`
   );
 }
 
