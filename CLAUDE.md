@@ -329,3 +329,25 @@ Backup atual: `backup/backup-20260424.json`
 7. **Todo relato diário OBRIGATORIAMENTE deve ter 3 abas:** `📄 Relato`, `👥 Presença` e `📝 Atividades` — a função `verificarAbasRelatos()` exibe aviso visual quando alguma falta
 8. **Botões do Plano Anual em linha única:** `[ N ]  Título          [📅 Planj.][✓ Aplic.][⤳ Pulad.][📋 SIMAED]`
 9. **Notificações desativadas no mobile** (≤680px ou User-Agent Mobi/Android/iPhone)
+
+---
+
+## 15. NOTAS BIMESTRAIS ↔ BIBLIOTECA DIGITAL (Supabase compartilhado)
+
+O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-medieval-1`) usam o **mesmo projeto Supabase** (`vgceathgwvtmjxbdpecr`). A integração é feita por tabelas e funções nesse banco. Os SQL ficam em `supabase/2026-09-16-etapa*.sql`.
+
+**Decisões do professor:** nota do bimestre = média entre trabalhos (0–10) e prova (0–10). Comportamento **não desconta nota**, só é registrado com a gravidade. A integração vale para as duas escolas. O 6º Ano fica fora da Biblioteca.
+
+**Login:** `supabase-report-sync.js` exige a conta admin (`10pauloacre@gmail.com`, a mesma da Biblioteca). `report_sync_state` só é lido e gravado por essa conta.
+
+**Tabelas oficiais** (só o admin lê e grava):
+| Tabela | Conteúdo |
+|---|---|
+| `relatorio_turmas` / `relatorio_aluno_vinculo` | painel do Relatório → aluno da Biblioteca (mesma escola, grupo e série; vínculo refeito por gatilho) |
+| `relatorio_bimestres` | início e fim de cada bimestre por escola (use `relatorio_bimestre_da_data`) |
+| `relatorio_turmas_diarias` | turma do diário (`t1`, `t23`, `t89`…) → painéis |
+| `relatorio_aulas` | uma linha por aula; `atividade_vale_ponto` é decisão do professor |
+| `relatorio_lancamentos` | presença e atividade de cada aluno em cada aula |
+| `relatorio_ocorrencias` | observações `.oi` com data, horário e aluno; `gravidade*` é decisão do professor |
+
+**Publicação:** `assets/js/relatorio-lancamentos.js` + `pcMontarRetratoLancamentos()` (casavequia.html) e `rhMontarRetratoLancamentos()` (herminio-main.js) enviam o retrato completo para `relatorio_publicar_lancamentos` a cada mudança (debounce de 4s, só envia quando algo mudou). O montador reaproveita as regras de exibição (`_atvStatus`, `pcResolvePresenceStatus`, `rhGetEstadoAtual`). **Se mudar uma dessas regras, o retrato muda junto.** Se o retrato vier menor que 80% do que já está publicado, nada é marcado como removido.
