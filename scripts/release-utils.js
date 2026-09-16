@@ -150,20 +150,18 @@ function renderAppBuildScript(buildMeta) {
   var head = document.head;
   if (!head) return;
 
-  var hasSharedStyles = document.querySelector(
-    'link[href*="local-font-aliases.css"], link[href*="dark-mode-2026.css"]'
-  );
-  if (!hasSharedStyles) {
+  var hasThemeStyles = document.querySelector('link[href*="dark-mode-2026.css"]');
+  if (!hasThemeStyles) {
     var themeLink = document.createElement("link");
     themeLink.rel = "stylesheet";
-    themeLink.href = "assets/css/dark-mode-2026.css?v=20260916a";
+    themeLink.href = "assets/css/dark-mode-2026.css?v=20260916b";
     head.appendChild(themeLink);
   }
 
   if (!window.__RELATORIO_DARK_THEME_2026__ &&
       !document.querySelector('script[src*="dark-mode-2026.js"]')) {
     var themeScript = document.createElement("script");
-    themeScript.src = "assets/js/dark-mode-2026.js?v=20260916a";
+    themeScript.src = "assets/js/dark-mode-2026.js?v=20260916b";
     head.appendChild(themeScript);
   }
 })();

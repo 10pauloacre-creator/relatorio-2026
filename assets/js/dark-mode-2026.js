@@ -4,6 +4,17 @@
   if (window.__RELATORIO_DARK_THEME_2026__) return;
   window.__RELATORIO_DARK_THEME_2026__ = true;
 
+  /* Carrega o tema diretamente para contornar imports antigos em cache. */
+  if (!document.querySelector('link[href*="dark-mode-2026.css"]')) {
+    var currentScript = document.currentScript;
+    var themeStylesheet = document.createElement("link");
+    themeStylesheet.rel = "stylesheet";
+    themeStylesheet.href = currentScript && currentScript.src
+      ? new URL("../css/dark-mode-2026.css?v=20260916b", currentScript.src).href
+      : "assets/css/dark-mode-2026.css?v=20260916b";
+    document.head.appendChild(themeStylesheet);
+  }
+
   var root = document.documentElement;
   var body = document.body;
   var themeMeta = document.querySelector('meta[name="theme-color"]');
