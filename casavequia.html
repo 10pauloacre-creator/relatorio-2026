@@ -8315,6 +8315,68 @@ function pcSyncAndBroadcast(){
    Varre o DOM uma vez por seção; nada de querySelector dentro do laço de alunos. */
 var _pcLancamentos=null;
 var PC_PRES_CODIGO={pr:'p',fa:'f',fj:'j'};
+/* Bimestre de cada aula pela soma de h/aula, com a mesma distribuição do
+   contador e do diário (pcDiaryAssignBimestersByLoad: meta por disciplina,
+   crédito anterior e aula dividida quando cruza o limite). Sem o corte de data
+   do relatório do diário. Uma aula que cruza o limite fica no bimestre em que
+   começou. */
+function pcBimestresPorCarga(){
+  var groupLabels={lp:'Língua Portuguesa',tl:'Trilhas de Linguagens',tc:'Trilhas de C. Humanas',ar:'Artes'};
+  var records=[],sortOrder=0;
+  var lessonLog=pcProjectionBuildLessonLog();
+  Object.keys(lessonLog||{}).forEach(function(groupKey){
+    Object.keys(lessonLog[groupKey]||{}).forEach(function(turmaId){
+      (lessonLog[groupKey][turmaId]||[]).forEach(function(entry){
+        if(!entry.date)return;
+        records.push({
+          dateKey:String(entry.date),
+          turmaId:turmaId,
+          disciplina:groupLabels[groupKey]||pcResolveDisciplineName(turmaId,entry.entryId),
+          hours:Math.max(1,parseInt(entry.hours,10)||1),
+          startMinutes:pcDiaryResolveEntryStartMinutes(entry.entryId),
+          sortOrder:sortOrder++,
+          entryId:entry.entryId
+        });
+      });
+    });
+  });
+  var porEntrada={},horasPorEntrada={},linhaDoTempo={};
+  pcDiaryAssignBimestersByLoad(records).forEach(function(item){
+    var chave=item.entryId+'|'+item.disciplina;
+    if(!porEntrada[chave]||item.bimestre<porEntrada[chave])porEntrada[chave]=item.bimestre;
+    horasPorEntrada[chave]=(horasPorEntrada[chave]||0)+item.hours;
+    var td=item.turmaId+'|'+item.disciplina;
+    (linhaDoTempo[td]=linhaDoTempo[td]||[]).push([item.dateKey,item.bimestre]);
+  });
+  Object.keys(linhaDoTempo).forEach(function(td){
+    linhaDoTempo[td].sort(function(a,b){return a[0].localeCompare(b[0])||a[1]-b[1];});
+  });
+  return {
+    // Aula sem h/aula lançada (ex.: só atividade): bimestre da última aula
+    // da mesma turma e disciplina até aquela data.
+    resolver:function(turma,codigo,disc,data){
+      var direto=porEntrada['p-'+codigo+'|'+disc];
+      if(direto)return direto;
+      var lista=linhaDoTempo[turma+'|'+disc]||[];
+      var bim=lista.length?lista[0][1]:1;
+      for(var i=0;i<lista.length&&lista[i][0]<=data;i++)bim=lista[i][1];
+      return bim;
+    },
+    // h/aula desta disciplina no relato (um relato pode dividir a carga
+    // entre disciplinas); 0 quando o contador não conta a aula.
+    horas:function(codigo,disc){
+      return horasPorEntrada['p-'+codigo+'|'+disc]||0;
+    }
+  };
+}
+function pcMetasBimestrais(){
+  var config=pcDiaryBuildBimesterConfigMap();
+  return DISC.map(function(d){
+    var turma=PC_PROJECTION_TURMA_ID_MAP[d.t];
+    var cfg=config[turma+'|'+pcDiaryNormalizeDisciplina(d.d)]||{};
+    return {t:turma,disc:d.d,meta:parseInt(cfg.meta,10)||d.bim,total:parseInt(cfg.total,10)||d.tot,credito:parseInt(d.legacyCredit,10)||0};
+  }).filter(function(m){return !!m.t;});
+}
 function pcMontarRetratoLancamentos(){
   var L=window.RelatorioLancamentos;
   var turmas=['t1','t2','t3','t6'];
@@ -8380,7 +8442,14 @@ function pcMontarRetratoLancamentos(){
       }).forEach(function(item){if(item.d)retrato.ocorrencias.push(item);});
     });
   });
-  retrato.aulas=Object.keys(aulas).sort().map(function(k){return aulas[k];});
+  var bimestres=pcBimestresPorCarga();
+  retrato.aulas=Object.keys(aulas).sort().map(function(k){
+    var aula=aulas[k];
+    aula.b=bimestres.resolver(aula.t,aula.c,aula.disc,aula.d);
+    aula.hd=bimestres.horas(aula.c,aula.disc);
+    return aula;
+  });
+  retrato.metas=pcMetasBimestrais();
   return retrato;
 }
 function pcAgendarLancamentos(){
