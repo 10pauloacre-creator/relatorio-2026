@@ -12,6 +12,13 @@
   const PERIOD_LABEL = config.periodLabel || "Ano letivo de 2026";
   const BIMESTERS = ["1", "2", "3", "4"];
   const GRADE_MAX = 5;
+  // Escala: o professor vê e digita trabalhos 0–10 e prova 0–10, e a nota do
+  // bimestre é a MÉDIA das duas. O armazenamento continua em 0–5 (metade),
+  // como sempre foi: média exibida = soma armazenada, as notas já lançadas não
+  // mudam e a Biblioteca (boletim_normalizado) segue compatível.
+  const ESCALA_EXIBICAO = 2;
+  const NOTA_MAX_EXIBICAO = GRADE_MAX * ESCALA_EXIBICAO;
+  const ESCOLA_SLUG = config.escolaSlug || "padre-carlos-casavequia";
   const DISCIPLINES = (config.disciplines || []).map(function (discipline, index) {
     return {
       name: discipline.name,
@@ -51,6 +58,16 @@
   let applyingRemotePanelState = false;
   let state = loadState();
   persistGradeSeedMigrationIfNeeded();
+  // Nota de trabalho calculada no Supabase (atividades que valem ponto,
+  // bimestre pela soma de h/aula). Redesenha quando chega.
+  const notasTrabalho = window.NotasBimestrais
+    ? window.NotasBimestrais.criar({
+      escolaSlug: ESCOLA_SLUG,
+      turmaCodigo: TURMA_ID,
+      disciplinas: DISCIPLINES,
+      aoAtualizar: refreshOpenViews
+    })
+    : null;
 
   renderDisciplineMenus();
   renderAll();
@@ -258,6 +275,17 @@
     return field === "trabalhosRealizados" ? 999 : GRADE_MAX;
   }
 
+  // Nota armazenada (0–5) → nota exibida (0–10), com uma casa decimal.
+  function paraExibicao(value) {
+    const parsed = toNumber(value);
+    return parsed === null ? null : Number((parsed * ESCALA_EXIBICAO).toFixed(1));
+  }
+
+  function formatNota10(value) {
+    const exibida = paraExibicao(value);
+    return exibida === null ? "-" : formatNumber(exibida) + "/10";
+  }
+
   function getFieldStep(field) {
     return field === "trabalhosRealizados" ? 1 : 0.1;
   }
@@ -273,11 +301,12 @@
     }
 
     const max = getFieldMax(field);
+    // Notas: passo de 0,05 no armazenamento = 0,1 na escala exibida (0–10).
     const rounded = field === "trabalhosRealizados"
       ? Math.round(numeric)
-      : Math.round(numeric * 10) / 10;
+      : Math.round(numeric * 20) / 20;
     const clamped = Math.max(0, Math.min(max, rounded));
-    return field === "trabalhosRealizados" ? clamped : Number(clamped.toFixed(1));
+    return field === "trabalhosRealizados" ? clamped : Number(clamped.toFixed(2));
   }
 
   function printableNumber(value, suffix) {
@@ -716,12 +745,35 @@
     return disciplineState.bimestres[bim];
   }
 
+  // Resumo da nota de trabalho calculada no Supabase, ou null se ainda não
+  // carregou / não há atividades valendo ponto neste bimestre.
+  function getWorkGradeSummary(student, disciplineName, bim) {
+    return notasTrabalho ? notasTrabalho.obter(student, disciplineName, bim) : null;
+  }
+
+  // Retorna na escala ARMAZENADA (0–5). Usa o cálculo oficial do banco;
+  // enquanto ele não carrega, cai na contagem antiga do diário sincronizado.
   function calculateAutoWorkGrade(student, disciplineName, bim) {
+    if (notasTrabalho && notasTrabalho.pronto()) {
+      const resumo = getWorkGradeSummary(student, disciplineName, bim);
+      if (!resumo || resumo.nota === null) return null;
+      return sanitizeFieldValue("trabalhos", resumo.nota / ESCALA_EXIBICAO);
+    }
     const metrics = getDisciplineMetrics(student, disciplineName);
     const feitas = Number(metrics.atividadesPorBimestre[bim]) || 0;
     const aplicadas = Number(metrics.atividadesAplicadasPorBimestre[bim]) || 0;
     if (!aplicadas) return null;
-    return Number(Math.min(GRADE_MAX, ((feitas / aplicadas) * GRADE_MAX)).toFixed(1));
+    return Number(Math.min(GRADE_MAX, ((feitas / aplicadas) * GRADE_MAX)).toFixed(2));
+  }
+
+  function describeWorkGrade(student, disciplineName, bim) {
+    const resumo = getWorkGradeSummary(student, disciplineName, bim);
+    if (!notasTrabalho || !notasTrabalho.pronto()) return "Carregando o calculo das atividades...";
+    if (!resumo) return "Nenhuma atividade valendo ponto neste bimestre.";
+    return resumo.atividadesValidas + " atividade(s) valendo ponto, "
+      + formatNumber(resumo.valorAtividade) + " ponto(s) cada. "
+      + "Fez " + resumo.fez + " · nao fez " + resumo.naoFez
+      + (resumo.aguardando ? " · aguardando " + resumo.aguardando + " (fora do calculo)" : "") + ".";
   }
 
   function getStoredWorkGrade(student, disciplineName, bim) {
@@ -882,9 +934,11 @@
       + "</span>";
   }
 
+  // value chega na escala armazenada; o campo mostra e edita na escala 0–10.
   function renderStepper(studentId, bim, field, value, disciplineName) {
     const step = getFieldStep(field);
-    const max = getFieldMax(field);
+    const max = field === "trabalhosRealizados" ? getFieldMax(field) : NOTA_MAX_EXIBICAO;
+    if (field !== "trabalhosRealizados") value = paraExibicao(value);
     const disciplineAttr = disciplineName ? ' data-discipline="' + escapeHtml(disciplineName) + '"' : "";
     return '<div class="stepper">'
       + '<button type="button" data-step="-'+ step +'" data-student="'+ studentId +'" data-bimester="'+ bim +'" data-field="'+ field +'"' + disciplineAttr + '>-</button>'
@@ -997,7 +1051,6 @@
     const total = calculateDisciplineBimTotal(student, disciplineName, bim);
     const autoGrade = calculateAutoWorkGrade(student, disciplineName, bim);
     const effectiveWork = getEffectiveWorkGrade(student, disciplineName, bim);
-    const metrics = getDisciplineMetrics(student, disciplineName);
     const isManual = hasManualWorkGrade(student, disciplineName, bim);
 
     return '<article class="bim-card">'
@@ -1006,14 +1059,14 @@
         + '<div class="bim-card-total">' + (total === null ? "-" : formatNumber(total) + "/10") + "</div>"
       + "</div>"
       + '<div class="field-stack">'
-        + "<div><label>Nota de trabalhos</label>" + renderStepper(student.id, bim, "trabalhos", effectiveWork, disciplineName) + "</div>"
-        + "<div><label>Nota de prova</label>" + renderStepper(student.id, bim, "prova", dados.prova, disciplineName) + "</div>"
+        + "<div><label>Nota de trabalhos (0 a 10)</label>" + renderStepper(student.id, bim, "trabalhos", effectiveWork, disciplineName) + "</div>"
+        + "<div><label>Nota de prova (0 a 10)</label>" + renderStepper(student.id, bim, "prova", dados.prova, disciplineName) + "</div>"
         + '<div class="summary-foot">'
           + (isManual
-            ? "Nota manual em uso. Sugestao automatica: " + (autoGrade === null ? "indisponivel" : formatNumber(autoGrade) + "/5") + ". "
-            : "Sugestao automatica: " + (autoGrade === null ? "aguardando atividades registradas" : formatNumber(autoGrade) + "/5") + ". ")
-          + "Atividades feitas: " + (metrics.atividadesPorBimestre[bim] || 0)
-          + " de " + (metrics.atividadesAplicadasPorBimestre[bim] || 0) + "."
+            ? "Nota manual em uso. Calculo automatico: " + (autoGrade === null ? "indisponivel" : formatNota10(autoGrade)) + ". "
+            : "Calculo automatico: " + (autoGrade === null ? "aguardando atividades marcadas" : formatNota10(autoGrade)) + ". ")
+          + describeWorkGrade(student, disciplineName, bim)
+          + " Nota do bimestre = media entre trabalhos e prova."
           + (isManual ? ' <button class="ghost-btn" style="padding:6px 10px;margin-top:8px" type="button" data-reset-auto="' + student.id + '" data-bimester="' + bim + '" data-discipline="' + escapeHtml(disciplineName) + '">Voltar ao automatico</button>' : "")
         + "</div>"
       + "</div>"
@@ -1078,8 +1131,8 @@
           return {
             numero: student.numero,
             nome: student.nome,
-            trabalhos: trabalhos === null ? "-" : formatNumber(trabalhos) + "/5",
-            prova: prova === null ? "-" : formatNumber(prova) + "/5",
+            trabalhos: formatNota10(trabalhos),
+            prova: formatNota10(prova),
             total: total === null ? "-" : formatNumber(total) + "/10"
           };
         });
@@ -1159,8 +1212,8 @@
         const trabalhos = getEffectiveWorkGrade(student, discipline.name, bim);
         const metricsByDiscipline = getDisciplineMetrics(student, discipline.name);
         linhas.push(
-          bim + "o bim. - trabalhos: " + (trabalhos === null ? "-" : formatNumber(trabalhos) + "/5")
-          + " | prova: " + printableNumber(dados.prova, "/5")
+          bim + "o bim. - trabalhos: " + formatNota10(trabalhos)
+          + " | prova: " + formatNota10(dados.prova)
           + " | total: " + (total === null ? "-" : formatNumber(total) + "/10")
           + " | atividades feitas: " + (metricsByDiscipline.atividadesPorBimestre[bim] || 0)
           + " de " + (metricsByDiscipline.atividadesAplicadasPorBimestre[bim] || 0)
@@ -1273,6 +1326,23 @@
     }
   }
 
+  // Chamado quando a nota de trabalho do banco chega ou muda. Não redesenha um
+  // modal enquanto o professor está digitando dentro dele.
+  function refreshOpenViews() {
+    renderAll();
+    const ativo = document.activeElement;
+    const digitando = function (modalId) {
+      const modal = document.getElementById(modalId);
+      return !!(modal && ativo && modal.contains(ativo) && /^(INPUT|TEXTAREA|SELECT)$/.test(ativo.tagName));
+    };
+    if (currentProfileId !== null && document.getElementById("profileModal").classList.contains("open") && !digitando("profileModal")) {
+      renderProfile(currentProfileId);
+    }
+    if (currentReportId !== null && document.getElementById("reportModal").classList.contains("open") && !digitando("reportModal")) {
+      renderReport(currentReportId);
+    }
+  }
+
   function adjustStepper(button) {
     const student = getStudent(Number(button.dataset.student));
     if (!student) return;
@@ -1283,7 +1353,9 @@
     const current = field === "trabalhos"
       ? getEffectiveWorkGrade(student, disciplineName, bim)
       : toNumber(dados[field]);
-    const next = sanitizeFieldValue(field, (current === null ? 0 : current) + Number(button.dataset.step));
+    const next = field === "trabalhosRealizados"
+      ? sanitizeFieldValue(field, (current === null ? 0 : current) + Number(button.dataset.step))
+      : sanitizeFieldValue(field, ((paraExibicao(current) || 0) + Number(button.dataset.step)) / ESCALA_EXIBICAO);
     dados[field] = next;
     persistAndRefresh(student.id, "Notas atualizadas.");
   }
@@ -1294,7 +1366,10 @@
     const bim = input.dataset.bimester;
     const field = input.dataset.field;
     const disciplineName = input.dataset.discipline || MAIN_DISCIPLINE;
-    getDisciplineBimState(student, disciplineName, bim)[field] = sanitizeFieldValue(field, input.value);
+    const raw = String(input.value).replace(",", ".").trim();
+    getDisciplineBimState(student, disciplineName, bim)[field] = field === "trabalhosRealizados" || raw === ""
+      ? sanitizeFieldValue(field, raw)
+      : sanitizeFieldValue(field, Number(raw) / ESCALA_EXIBICAO);
     persistAndRefresh(student.id, "Notas atualizadas.");
   }
 

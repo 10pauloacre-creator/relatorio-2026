@@ -181,6 +181,11 @@ function _editorSanitizarHtmlSeguro() {
     var original = holder.firstElementChild;
     if (original) alvo.replaceWith(original);
   });
+  // Controles gerados em tempo de execução (ex.: interruptor "vale ponto")
+  // nunca entram no layout salvo.
+  clone.querySelectorAll('[data-runtime-ui]').forEach(function(el) {
+    el.remove();
+  });
   return clone.innerHTML;
 }
 
