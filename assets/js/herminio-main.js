@@ -341,12 +341,90 @@ if (!(infoDisc && contaTema) || estado !== true) return;
 var resumoDiscAluno = rhGarantirResumoDisciplinaAluno(aluno, infoDisc.disc);       resumoDiscAluno.atividadesFeitas += 1;       resumoDiscAluno.atividadesPorBimestre[bim] = (resumoDiscAluno.atividadesPorBimestre[bim] || 0) + 1;     });   });    return {     updatedAt: new Date().toISOString(),     classes: classes   }; }
 function rhSincronizarResumoAlunos() {   localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(rhMontarResumoAlunosSync())); }
 function rhMontarPayloadSyncRemoto() {   return {     localUpdatedAt: localStorage.getItem(RH_DAILY_LOCAL_TS_KEY) || new Date().toISOString(),     presencaCliques: _rhPresencaCliques,     atividadeCliques: _rhAtividadeCliques,     alunosSync: rhMontarResumoAlunosSync()   }; }
-function rhAplicarSyncRemoto(payload, meta) { 
+/* ── Lançamentos oficiais (Supabase: relatorio_aulas / lancamentos / ocorrencias) ──
+   Mesmas regras de rhMontarResumoAlunosSync, mas aula por aula e aluno por aluno. */
+var _rhLancamentos = null;
+function rhMontarRetratoLancamentos() {
+  var L = window.RelatorioLancamentos;
+  var retrato = { versao: 1, turmas: [], aulas: [], ocorrencias: [] };
+  var aulas = {};
+  Object.keys(ALUNOS_RH).forEach(function (turmaId) {
+    retrato.turmas.push({
+      codigo: turmaId,
+      alunos: (ALUNOS_RH[turmaId] || []).map(function (a) { return [a.n, a.nm, !!a.tr]; })
+    });
+  });
+  function obterAula(turmaId, codigo, pane) {
+    if (aulas[codigo]) return aulas[codigo];
+    var data = L.dataIsoDoCodigo(codigo);
+    if (!data) return null;
+    var card = pane.closest('.ea');
+    var infoDisc = rhDisciplinaPane(pane);
+    aulas[codigo] = {
+      c: codigo, t: turmaId, d: data,
+      disc: infoDisc ? infoDisc.disc : '',
+      h: card ? L.textoLimpo(card.querySelector('.ch-h'), /^⏰\s*/) : '',
+      tema: card ? L.textoLimpo(card.querySelector('.ch-i'), /^\S+\s+/) : '',
+      carga: rhHorasPainel(pane),
+      p: null, a: null
+    };
+    return aulas[codigo];
+  }
+  document.querySelectorAll('[id^="p-t"], [id^="a-t"]').forEach(function (pane) {
+    var turmaId = rhDescobrirTurmaPane(pane);
+    if (!turmaId || !ALUNOS_RH[turmaId]) return;
+    var tipo = pane.id.charAt(0) === 'p' ? 'presenca' : 'atividade';
+    var codigo = pane.id.slice(2);
+    var aula = obterAula(turmaId, codigo, pane);
+    if (!aula) return;
+    var mapa = {};
+    (ALUNOS_RH[turmaId] || []).forEach(function (aluno) {
+      var estado = rhGetEstadoAtual(tipo, pane, aluno.n);
+      if (tipo === 'presenca') {
+        if (estado === true) mapa[aluno.n] = 'p';
+        else if (estado === false) mapa[aluno.n] = 'f';
+      } else {
+        mapa[aluno.n] = estado === true ? 'fz' : estado === false ? 'nf' : 'pd';
+      }
+    });
+    if (tipo === 'presenca') aula.p = mapa; else aula.a = mapa;
+  });
+  document.querySelectorAll('.ipane[id^="r-t"]').forEach(function (pane) {
+    if (!pane.querySelector('.oi')) return;
+    var turmaId = rhDescobrirTurmaPane(pane);
+    if (!turmaId || !ALUNOS_RH[turmaId]) return;
+    var card = pane.closest('.ea');
+    var codigo = pane.id.slice(2);
+    var infoDisc = rhDisciplinaPane(pane);
+    L.coletarOcorrencias(pane, {
+      turma: turmaId,
+      relato: codigo,
+      data: L.dataIsoDoCodigo(codigo),
+      horario: card ? L.textoLimpo(card.querySelector('.ch-h'), /^⏰\s*/) : '',
+      disciplina: infoDisc ? infoDisc.disc : '',
+      resolverNumero: null
+    }).forEach(function (item) { if (item.d) retrato.ocorrencias.push(item); });
+  });
+  retrato.aulas = Object.keys(aulas).sort().map(function (k) { return aulas[k]; });
+  return retrato;
+}
+function rhAgendarLancamentos() {
+  if (!window.RelatorioLancamentos) return;
+  if (!_rhLancamentos) {
+    _rhLancamentos = window.RelatorioLancamentos.iniciar({
+      escolaSlug: 'raimundo-herminio-de-melo-2',
+      montarRetrato: rhMontarRetratoLancamentos
+    });
+  }
+  _rhLancamentos.agendar();
+}
+function rhAplicarSyncRemoto(payload, meta) {
 if (!payload || typeof payload !== 'object') return; 
 var localStamp = Date.parse(localStorage.getItem(RH_DAILY_LOCAL_TS_KEY) || '') || 0; 
 var remoteStamp = Date.parse((payload && payload.localUpdatedAt) || (meta && meta.updatedAt) || '') || 0; 
-if (localStamp && remoteStamp && localStamp > remoteStamp) {     rhAgendarSyncRemoto('keep-local');     return;   }   _rhAplicandoSyncRemoto = true;    _rhPresencaCliques = payload.presencaCliques && typeof payload.presencaCliques === 'object'     ? payload.presencaCliques     : {};   _rhAtividadeCliques = payload.atividadeCliques && typeof payload.atividadeCliques === 'object'     ? payload.atividadeCliques     : {};    localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));   localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));   localStorage.setItem(RH_DAILY_LOCAL_TS_KEY, payload.localUpdatedAt || (meta && meta.updatedAt) || new Date().toISOString());   localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(payload.alunosSync || rhMontarResumoAlunosSync()));    rhMarcarPanesInterativosDirty('presenca');   rhMarcarPanesInterativosDirty('atividade');   rhRenderInterativosVisiveis(false);   rhSincronizarResumoAlunos();    _rhAplicandoSyncRemoto = false; }
-function rhAgendarSyncRemoto(reason) { 
+if (localStamp && remoteStamp && localStamp > remoteStamp) {     rhAgendarSyncRemoto('keep-local');     return;   }   _rhAplicandoSyncRemoto = true;    _rhPresencaCliques = payload.presencaCliques && typeof payload.presencaCliques === 'object'     ? payload.presencaCliques     : {};   _rhAtividadeCliques = payload.atividadeCliques && typeof payload.atividadeCliques === 'object'     ? payload.atividadeCliques     : {};    localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));   localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));   localStorage.setItem(RH_DAILY_LOCAL_TS_KEY, payload.localUpdatedAt || (meta && meta.updatedAt) || new Date().toISOString());   localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(payload.alunosSync || rhMontarResumoAlunosSync()));    rhMarcarPanesInterativosDirty('presenca');   rhMarcarPanesInterativosDirty('atividade');   rhRenderInterativosVisiveis(false);   rhSincronizarResumoAlunos();    _rhAplicandoSyncRemoto = false;   rhAgendarLancamentos(); }
+function rhAgendarSyncRemoto(reason) {
+rhAgendarLancamentos();
 if (_rhAplicandoSyncRemoto || !_rhRemoteDailySync) return;   _rhRemoteDailySync.schedulePush(reason || 'daily-change'); }
 function rhIniciarSyncRemoto() { 
 if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return;    _rhRemoteDailySync = window.RelatorioSupabaseSync.createScopeSync({     scope: RH_SUPABASE_DAILY_SCOPE,     schoolSlug: 'raimundo-herminio-de-melo',     classSlug: 'relatos-gerais',     source: 'herminio-html',     debounceMs: 550,     getLocalPayload: function () {       return rhMontarPayloadSyncRemoto();     },     onRemotePayload: function (payload, meta) {       rhAplicarSyncRemoto(payload, meta);     },     onStatus: function (status) {     

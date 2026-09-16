@@ -18,6 +18,7 @@
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260916a"></script>
+<script defer src="assets/js/relatorio-lancamentos.js?v=20260916a"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--tl:#6c3483;--tlv:#e8daef;--tc:#0e7a6b;--tcv:#d1f2eb;--la:#c0570a;--lav:#fdebd0;--az:#1a5276;--og:#876020;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -8270,6 +8271,7 @@ function pcApplyRemoteSync(payload,meta){
   pcRefreshAtividadesVisuals();
   _sincronizarRegistros();
   _pcApplyingRemoteSync=false;
+  pcAgendarLancamentos();
 }
 function pcScheduleRemoteSync(reason){
   if(_pcApplyingRemoteSync||!_pcRemoteDailySync)return;
@@ -8298,6 +8300,7 @@ function pcIniciarSyncRemoto(){
   _pcRemoteDailySync.start().then(function(ready){
     if(!ready)return;
     window.setTimeout(function(){pcScheduleRemoteSync('bootstrap');},900);
+    pcAgendarLancamentos();
   });
 }
 function pcSyncAndBroadcast(){
@@ -8305,6 +8308,90 @@ function pcSyncAndBroadcast(){
   try{localStorage.setItem(PC_ALUNOS_SYNC_KEY,JSON.stringify(pcBuildSyncPayload()));}catch(e){console.warn('[PC sync]',e.message);}
   pcSyncProjectionSeed();
   pcScheduleRemoteSync('daily-sync');
+  pcAgendarLancamentos();
+}
+/* ── Lançamentos oficiais (Supabase: relatorio_aulas / lancamentos / ocorrencias) ──
+   Mesmas regras de pcBuildSyncPayload, mas aula por aula e aluno por aluno.
+   Varre o DOM uma vez por seção; nada de querySelector dentro do laço de alunos. */
+var _pcLancamentos=null;
+var PC_PRES_CODIGO={pr:'p',fa:'f',fj:'j'};
+function pcMontarRetratoLancamentos(){
+  var L=window.RelatorioLancamentos;
+  var turmas=['t1','t2','t3','t6'];
+  var retrato={versao:1,turmas:[],aulas:[],ocorrencias:[]};
+  var aulas={};
+  function isoDoCartao(card){
+    var br=pcFormatCardDate(card);var m=br.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    return m?m[3]+'-'+m[2]+'-'+m[1]:null;
+  }
+  function obterAula(turma,codigo,entryId){
+    if(aulas[codigo])return aulas[codigo];
+    var el=document.getElementById(entryId);
+    var card=el?el.closest('.ea'):null;
+    var data=L.dataIsoDoCodigo(codigo)||(card?isoDoCartao(card):null);
+    if(!data)return null;
+    var disc=pcResolveDisciplineName(turma,entryId);
+    aulas[codigo]={
+      c:codigo,t:turma,d:data,disc:disc,
+      h:card?L.textoLimpo(card.querySelector('.ch-h'),/^⏰\s*/):'',
+      tema:card?L.textoLimpo(card.querySelector('.ch-i'),/^\S+\s+/):'',
+      carga:1,p:null,a:null
+    };
+    return aulas[codigo];
+  }
+  turmas.forEach(function(turma){
+    var alunos=ALUNOS[turma]||[];
+    retrato.turmas.push({codigo:turma,alunos:alunos.map(function(a){return[a.n,a.nm,!!a.tr];})});
+  });
+  Object.entries(PRESENCA).forEach(function(pair){
+    var id=pair[0],cfg=pair[1],turma=cfg.turma;
+    if(turmas.indexOf(turma)<0)return;
+    var codigo=id.replace(/^pl-/,'');
+    var aula=obterAula(turma,codigo,id);if(!aula)return;
+    var carga=pcResolveEntryLoad(id,cfg,aula.disc);
+    if(!carga)return;
+    aula.carga=carga;
+    aula.p={};
+    (ALUNOS[turma]||[]).forEach(function(a){
+      aula.p[a.n]=PC_PRES_CODIGO[pcResolvePresenceStatus(id,a.n,cfg)]||'p';
+    });
+  });
+  turmas.forEach(function(turma){
+    var sec=document.getElementById('sec-'+turma);if(!sec)return;
+    sec.querySelectorAll('.ipane[id^="a-'+turma+'-"]').forEach(function(pane){
+      var codigo=pane.id.slice(2);
+      var aula=obterAula(turma,codigo,pane.id);if(!aula||aula.a)return;
+      var atvId='atv-'+codigo;
+      var cfg=ATIVIDADES[atvId]||{turma:turma,fez:[],naoFez:[],parcial:false};
+      aula.a={};
+      (ALUNOS[turma]||[]).forEach(function(a){aula.a[a.n]=pcResolveActivityStatus(atvId,a.n,cfg);});
+    });
+    sec.querySelectorAll('.ipane[id^="r-'+turma+'-"]').forEach(function(pane){
+      if(!pane.querySelector('.oi'))return;
+      var card=pane.closest('.ea');
+      var codigo=pane.id.slice(2);
+      L.coletarOcorrencias(pane,{
+        turma:turma,
+        relato:codigo,
+        data:L.dataIsoDoCodigo(codigo)||(card?isoDoCartao(card):null),
+        horario:card?L.textoLimpo(card.querySelector('.ch-h'),/^⏰\s*/):'',
+        disciplina:pcResolveDisciplineName(turma,pane.id),
+        resolverNumero:function(nome){var al=pcFindStudentByName(turma,nome);return al?al.n:null;}
+      }).forEach(function(item){if(item.d)retrato.ocorrencias.push(item);});
+    });
+  });
+  retrato.aulas=Object.keys(aulas).sort().map(function(k){return aulas[k];});
+  return retrato;
+}
+function pcAgendarLancamentos(){
+  if(!window.RelatorioLancamentos)return;
+  if(!_pcLancamentos){
+    _pcLancamentos=window.RelatorioLancamentos.iniciar({
+      escolaSlug:'padre-carlos-casavequia',
+      montarRetrato:pcMontarRetratoLancamentos
+    });
+  }
+  _pcLancamentos.agendar();
 }
 function pcCountOpenCards(section){return Array.from(section.querySelectorAll('.ec2')).filter(function(el){return el.classList.contains('on');}).length;}
 function pcGetSectionCards(section){return Array.from(section.querySelectorAll('.ea'));}
