@@ -268,7 +268,7 @@ var mes = parseInt(String(code || '').slice(0, 2), 10);
 if (!mes || mes <= 4) return '1'; 
 if (mes <= 7) return '2'; 
 if (mes <= 9) return '3';   return '4'; }
-var RH_BIMESTRE_AULA_LIMITES = {   't1|lp': 20,   't1|esp': 10,   't1|ing': 10 };
+var RH_BIMESTRE_AULA_LIMITES = {   't1|lp': 30,   't1|esp': 10,   't1|ing': 10 };
 function rhMetaBimestrePorDisciplina(turmaId, grupo, disciplina) { 
 var overrideKey = turmaId + '|' + grupo; 
 if (RH_BIMESTRE_AULA_LIMITES[overrideKey]) {     return RH_BIMESTRE_AULA_LIMITES[overrideKey];   } 
@@ -340,10 +340,20 @@ if (estado === true) {         aluno.atividadesFeitas += 1;         aluno.ativid
 if (!(infoDisc && contaTema) || estado !== true) return;     
 var resumoDiscAluno = rhGarantirResumoDisciplinaAluno(aluno, infoDisc.disc);       resumoDiscAluno.atividadesFeitas += 1;       resumoDiscAluno.atividadesPorBimestre[bim] = (resumoDiscAluno.atividadesPorBimestre[bim] || 0) + 1;     });   });    return {     updatedAt: new Date().toISOString(),     classes: classes   }; }
 function rhSincronizarResumoAlunos() {   localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(rhMontarResumoAlunosSync())); }
-function rhMontarPayloadSyncRemoto() {   return {     localUpdatedAt: localStorage.getItem(RH_DAILY_LOCAL_TS_KEY) || new Date().toISOString(),     presencaCliques: _rhPresencaCliques,     atividadeCliques: _rhAtividadeCliques,     alunosSync: rhMontarResumoAlunosSync()   }; }
+function rhMontarPayloadSyncRemoto() {   return {     localUpdatedAt: localStorage.getItem(RH_DAILY_LOCAL_TS_KEY) || new Date().toISOString(),     presencaCliques: _rhPresencaCliques,     atividadeCliques: _rhAtividadeCliques,     valePonto: _rhValePonto,     alunosSync: rhMontarResumoAlunosSync()   }; }
 /* ── Lançamentos oficiais (Supabase: relatorio_aulas / lancamentos / ocorrencias) ──
    Mesmas regras de rhMontarResumoAlunosSync, mas aula por aula e aluno por aluno. */
 var _rhLancamentos = null;
+/* Interruptor "vale ponto" por atividade: {codigoDaAula:false}. Ausente = vale.
+   Sincronizado entre aparelhos junto com os cliques do diário. */
+var _rhValePonto = (function () { try { return JSON.parse(localStorage.getItem('rh_vale_ponto') || '{}') || {}; } catch (e) { return {}; } })();
+var _rhValePontoUI = null;
+function rhAtividadeValePonto(codigo) { return _rhValePonto[codigo] !== false; }
+function rhDefinirValePonto(codigo, valendo) {
+  if (valendo) delete _rhValePonto[codigo]; else _rhValePonto[codigo] = false;
+  try { localStorage.setItem('rh_vale_ponto', JSON.stringify(_rhValePonto)); } catch (e) {}
+  rhSalvarCliques('atividade');
+}
 function rhMontarRetratoLancamentos() {
   var L = window.RelatorioLancamentos;
   var retrato = { versao: 1, turmas: [], aulas: [], ocorrencias: [] };
@@ -424,6 +434,7 @@ function rhMontarRetratoLancamentos() {
   });
   lista.forEach(function (aula) {
     aula.hd = aula.carga;
+    if (aula.a) aula.vp = rhAtividadeValePonto(aula.c);
     if (aula.b) return;
     var itens = linhaDoTempo[aula.t + '|' + aula.disc] || [];
     var bim = itens.length ? itens[0][1] : 1;
@@ -443,6 +454,10 @@ function rhAgendarLancamentos() {
       escolaSlug: 'raimundo-herminio-de-melo-2',
       montarRetrato: rhMontarRetratoLancamentos
     });
+    _rhValePontoUI = window.RelatorioLancamentos.instalarInterruptorValePonto({
+      estaValendo: rhAtividadeValePonto,
+      definir: rhDefinirValePonto
+    });
   }
   _rhLancamentos.agendar();
 }
@@ -450,7 +465,7 @@ function rhAplicarSyncRemoto(payload, meta) {
 if (!payload || typeof payload !== 'object') return; 
 var localStamp = Date.parse(localStorage.getItem(RH_DAILY_LOCAL_TS_KEY) || '') || 0; 
 var remoteStamp = Date.parse((payload && payload.localUpdatedAt) || (meta && meta.updatedAt) || '') || 0; 
-if (localStamp && remoteStamp && localStamp > remoteStamp) {     rhAgendarSyncRemoto('keep-local');     return;   }   _rhAplicandoSyncRemoto = true;    _rhPresencaCliques = payload.presencaCliques && typeof payload.presencaCliques === 'object'     ? payload.presencaCliques     : {};   _rhAtividadeCliques = payload.atividadeCliques && typeof payload.atividadeCliques === 'object'     ? payload.atividadeCliques     : {};    localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));   localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));   localStorage.setItem(RH_DAILY_LOCAL_TS_KEY, payload.localUpdatedAt || (meta && meta.updatedAt) || new Date().toISOString());   localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(payload.alunosSync || rhMontarResumoAlunosSync()));    rhMarcarPanesInterativosDirty('presenca');   rhMarcarPanesInterativosDirty('atividade');   rhRenderInterativosVisiveis(false);   rhSincronizarResumoAlunos();    _rhAplicandoSyncRemoto = false;   rhAgendarLancamentos(); }
+if (localStamp && remoteStamp && localStamp > remoteStamp) {     rhAgendarSyncRemoto('keep-local');     return;   }   _rhAplicandoSyncRemoto = true;    _rhPresencaCliques = payload.presencaCliques && typeof payload.presencaCliques === 'object'     ? payload.presencaCliques     : {};   _rhAtividadeCliques = payload.atividadeCliques && typeof payload.atividadeCliques === 'object'     ? payload.atividadeCliques     : {};    localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));   localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));   if (payload.valePonto && typeof payload.valePonto === 'object') {     _rhValePonto = payload.valePonto;     localStorage.setItem('rh_vale_ponto', JSON.stringify(_rhValePonto));     if (_rhValePontoUI) document.querySelectorAll('.ipane.on[id^="a-t"]').forEach(_rhValePontoUI.montar);   }   localStorage.setItem(RH_DAILY_LOCAL_TS_KEY, payload.localUpdatedAt || (meta && meta.updatedAt) || new Date().toISOString());   localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(payload.alunosSync || rhMontarResumoAlunosSync()));    rhMarcarPanesInterativosDirty('presenca');   rhMarcarPanesInterativosDirty('atividade');   rhRenderInterativosVisiveis(false);   rhSincronizarResumoAlunos();    _rhAplicandoSyncRemoto = false;   rhAgendarLancamentos(); }
 function rhAgendarSyncRemoto(reason) {
 rhAgendarLancamentos();
 if (_rhAplicandoSyncRemoto || !_rhRemoteDailySync) return;   _rhRemoteDailySync.schedulePush(reason || 'daily-change'); }

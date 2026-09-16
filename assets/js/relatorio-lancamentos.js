@@ -150,10 +150,84 @@ window.RelatorioLancamentos = (function () {
     return itens;
   }
 
+  // ── Interruptor "vale ponto" na aba 📝 Atividades ─────────────────────────
+  // Inserido só quando a aba é aberta (nada de varrer centenas de relatos).
+  // Marcado com data-runtime-ui: o editor de layout remove antes de salvar.
+  var VP_CSS = ""
+    + ".vp-box{display:flex;align-items:center;gap:12px;margin:0 0 12px;padding:10px 12px;border-radius:12px;"
+    + "border:1px solid rgba(26,58,42,.18);background:rgba(26,58,42,.05);font-family:inherit}"
+    + ".vp-box.off{background:rgba(120,120,120,.08);border-color:rgba(120,120,120,.25)}"
+    + ".vp-switch{position:relative;flex:0 0 auto;width:46px;height:26px;cursor:pointer}"
+    + ".vp-switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}"
+    + ".vp-track{position:absolute;inset:0;border-radius:999px;background:#b9c2bd;transition:background .18s ease}"
+    + ".vp-track::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;"
+    + "box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s ease}"
+    + ".vp-switch input:checked+.vp-track{background:#2d6147}"
+    + ".vp-switch input:checked+.vp-track::after{transform:translateX(20px)}"
+    + ".vp-switch input:focus-visible+.vp-track{outline:3px solid rgba(45,97,71,.4);outline-offset:2px}"
+    + ".vp-txt{display:flex;flex-direction:column;gap:2px;min-width:0}"
+    + ".vp-txt strong{font-size:.86rem;color:#1a3a2a}"
+    + ".vp-box.off .vp-txt strong{color:#5a5a5a}"
+    + ".vp-txt span{font-size:.76rem;color:#5a5a5a;line-height:1.35}";
+
+  function instalarInterruptorValePonto(opcoes) {
+    if (!document.getElementById("vp-style")) {
+      var style = document.createElement("style");
+      style.id = "vp-style";
+      style.textContent = VP_CSS;
+      document.head.appendChild(style);
+    }
+
+    function atualizar(box, valendo) {
+      box.classList.toggle("off", !valendo);
+      var input = box.querySelector("input");
+      input.checked = valendo;
+      input.setAttribute("aria-checked", valendo ? "true" : "false");
+      box.querySelector(".vp-txt strong").textContent = valendo ? "⭐ Vale ponto na nota de trabalho" : "Não vale ponto";
+      box.querySelector(".vp-txt span").textContent = valendo
+        ? "Os 10 pontos de trabalho do bimestre são divididos entre as atividades que valem ponto."
+        : "Esta atividade continua registrada, mas não entra no cálculo da nota de trabalho.";
+    }
+
+    function montar(pane) {
+      if (!pane || !/^a-t/.test(pane.id)) return;
+      var codigo = pane.id.slice(2);
+      var box = pane.querySelector('[data-runtime-ui="vale-ponto"]');
+      if (!box) {
+        box = document.createElement("div");
+        box.className = "vp-box";
+        box.setAttribute("data-runtime-ui", "vale-ponto");
+        box.innerHTML = '<label class="vp-switch"><input type="checkbox" role="switch" aria-label="Atividade vale ponto na nota de trabalho"><span class="vp-track"></span></label>'
+          + '<div class="vp-txt"><strong></strong><span></span></div>';
+        box.querySelector("input").addEventListener("change", function (event) {
+          var valendo = !!event.target.checked;
+          atualizar(box, valendo);
+          opcoes.definir(codigo, valendo);
+        });
+        pane.insertBefore(box, pane.firstChild);
+      }
+      atualizar(box, opcoes.estaValendo(codigo));
+    }
+
+    document.addEventListener("click", function (event) {
+      var botao = event.target && event.target.closest ? event.target.closest(".itab") : null;
+      if (!botao) return;
+      var alvo = String(botao.getAttribute("onclick") || "").match(/'(a-t[^']+)'/);
+      if (!alvo) return;
+      window.setTimeout(function () { montar(document.getElementById(alvo[1])); }, 0);
+    });
+
+    // Abas de atividade que já estiverem abertas (ex.: após restaurar layout).
+    document.querySelectorAll('.ipane.on[id^="a-t"]').forEach(montar);
+
+    return { montar: montar };
+  }
+
   return {
     iniciar: iniciar,
     dataIsoDoCodigo: dataIsoDoCodigo,
     textoLimpo: textoLimpo,
-    coletarOcorrencias: coletarOcorrencias
+    coletarOcorrencias: coletarOcorrencias,
+    instalarInterruptorValePonto: instalarInterruptorValePonto
   };
 })();

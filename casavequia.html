@@ -18,7 +18,7 @@
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260916a"></script>
-<script defer src="assets/js/relatorio-lancamentos.js?v=20260916a"></script>
+<script defer src="assets/js/relatorio-lancamentos.js?v=20260916b"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--tl:#6c3483;--tlv:#e8daef;--tc:#0e7a6b;--tcv:#d1f2eb;--la:#c0570a;--lav:#fdebd0;--az:#1a5276;--og:#876020;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -8192,6 +8192,7 @@ function pcBuildRemoteSyncPayload(){
     localUpdatedAt:localStorage.getItem(PC_DAILY_LOCAL_TS_KEY)||new Date().toISOString(),
     presencaCliques:_presManual,
     atividadeCliques:_atvManual,
+    valePonto:_pcValePonto,
     alunosSync:pcBuildSyncPayload()
   };
 }
@@ -8263,6 +8264,11 @@ function pcApplyRemoteSync(payload,meta){
   _pcApplyingRemoteSync=true;
   _presManual=payload.presencaCliques&&typeof payload.presencaCliques==='object'?payload.presencaCliques:{};
   _atvManual=payload.atividadeCliques&&typeof payload.atividadeCliques==='object'?payload.atividadeCliques:{};
+  if(payload.valePonto&&typeof payload.valePonto==='object'){
+    _pcValePonto=payload.valePonto;
+    localStorage.setItem('pc_vale_ponto',JSON.stringify(_pcValePonto));
+    if(_pcValePontoUI)document.querySelectorAll('.ipane.on[id^="a-t"]').forEach(_pcValePontoUI.montar);
+  }
   localStorage.setItem('pres_manual',JSON.stringify(_presManual));
   localStorage.setItem('atv_manual',JSON.stringify(_atvManual));
   localStorage.setItem(PC_DAILY_LOCAL_TS_KEY,payload.localUpdatedAt||(meta&&meta.updatedAt)||new Date().toISOString());
@@ -8315,6 +8321,18 @@ function pcSyncAndBroadcast(){
    Varre o DOM uma vez por seção; nada de querySelector dentro do laço de alunos. */
 var _pcLancamentos=null;
 var PC_PRES_CODIGO={pr:'p',fa:'f',fj:'j'};
+/* Interruptor "vale ponto" por atividade: {codigoDaAula:false}. Ausente = vale.
+   Sincronizado entre aparelhos junto com os cliques do diário. */
+var _pcValePonto=(function(){try{return JSON.parse(localStorage.getItem('pc_vale_ponto')||'{}')||{};}catch(e){return {};}})();
+var _pcValePontoUI=null;
+function pcAtividadeValePonto(codigo){return _pcValePonto[codigo]!==false;}
+function pcDefinirValePonto(codigo,valendo){
+  if(valendo)delete _pcValePonto[codigo];else _pcValePonto[codigo]=false;
+  try{localStorage.setItem('pc_vale_ponto',JSON.stringify(_pcValePonto));}catch(e){}
+  pcMarkLocalSyncChange();
+  pcScheduleRemoteSync('vale-ponto');
+  pcAgendarLancamentos();
+}
 /* Bimestre de cada aula pela soma de h/aula, com a mesma distribuição do
    contador e do diário (pcDiaryAssignBimestersByLoad: meta por disciplina,
    crédito anterior e aula dividida quando cruza o limite). Sem o corte de data
@@ -8447,6 +8465,7 @@ function pcMontarRetratoLancamentos(){
     var aula=aulas[k];
     aula.b=bimestres.resolver(aula.t,aula.c,aula.disc,aula.d);
     aula.hd=bimestres.horas(aula.c,aula.disc);
+    if(aula.a)aula.vp=pcAtividadeValePonto(aula.c);
     return aula;
   });
   retrato.metas=pcMetasBimestrais();
@@ -8458,6 +8477,10 @@ function pcAgendarLancamentos(){
     _pcLancamentos=window.RelatorioLancamentos.iniciar({
       escolaSlug:'padre-carlos-casavequia',
       montarRetrato:pcMontarRetratoLancamentos
+    });
+    _pcValePontoUI=window.RelatorioLancamentos.instalarInterruptorValePonto({
+      estaValendo:pcAtividadeValePonto,
+      definir:pcDefinirValePonto
     });
   }
   _pcLancamentos.agendar();
@@ -11348,7 +11371,7 @@ function iniciarSyncUniversal() {
 </script>
 <script src="assets/js/casavequia-calendar-data.js"></script>
 <script src="assets/js/casavequia-calendar.js"></script>
-<script src="assets/js/editor.js?v=20260812a"></script>
+<script src="assets/js/editor.js?v=20260916a"></script>
 <script src="assets/js/alunos.js"></script>
 <script src="assets/js/livros-prompts.js?v=20260723b"></script>
 <script>
