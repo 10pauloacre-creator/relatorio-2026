@@ -1,0 +1,548 @@
+/*
+ * Relatorio 2026 — paleta escura compartilhada
+ * Inspirada no painel de referencia: grafite profundo, destaque laranja,
+ * verde para resultados positivos e vermelho para alertas/valores negativos.
+ */
+
+html.dark-2026 {
+  color-scheme: dark;
+  --dark-canvas: #111315;
+  --dark-canvas-deep: #0c0e10;
+  --dark-surface: #191c1f;
+  --dark-surface-2: #202327;
+  --dark-surface-3: #272b30;
+  --dark-line: #383d43;
+  --dark-line-soft: #2d3136;
+  --dark-text: #f4f5f6;
+  --dark-muted: #aeb4bd;
+  --dark-faint: #7f8791;
+  --dark-accent: #ffa65b;
+  --dark-accent-strong: #ffb46f;
+  --dark-accent-soft: #412c1e;
+  --dark-positive: #5fdb91;
+  --dark-positive-soft: #173426;
+  --dark-negative: #ff624f;
+  --dark-negative-soft: #3b201f;
+  --dark-info: #75adff;
+  --dark-info-soft: #1c2a3f;
+  --dark-warning: #f5c969;
+  --dark-warning-soft: #3b321d;
+
+  /* Tokens usados pelos relatorios principais. */
+  --vd: #101214;
+  --vm: #23272b;
+  --vc: var(--dark-accent);
+  --vs: var(--dark-positive-soft);
+  --ou: var(--dark-accent);
+  --os: var(--dark-warning-soft);
+  --cr: var(--dark-canvas);
+  --ce: var(--dark-text);
+  --cm: var(--dark-muted);
+  --cl: var(--dark-line);
+  --ra: var(--dark-negative);
+  --rs: var(--dark-negative-soft);
+  --ai: var(--dark-info);
+  --tl: #b691ff;
+  --tlv: #2d2441;
+  --tc: var(--dark-positive);
+  --tcv: var(--dark-positive-soft);
+  --la: var(--dark-accent);
+  --lav: var(--dark-accent-soft);
+  --az: var(--dark-info);
+  --og: var(--dark-warning);
+  --lp: var(--dark-positive);
+  --ing: var(--dark-info);
+  --esp: #b691ff;
+  --art: var(--dark-accent);
+  --plan-bg: var(--dark-canvas);
+  --plan-surface: var(--dark-surface);
+  --plan-dark: var(--dark-canvas-deep);
+  --plan-dark-2: var(--dark-surface);
+  --ss: 0 18px 46px rgba(0, 0, 0, .28);
+  --sc: 0 8px 24px rgba(0, 0, 0, .22);
+
+  /* Tokens usados pelos paineis de alunos e planejamento. */
+  --bg: var(--dark-canvas);
+  --bg-2: var(--dark-canvas-deep);
+  --card: var(--dark-surface);
+  --surface: var(--dark-surface);
+  --surface-2: var(--dark-surface-2);
+  --surface-3: var(--dark-info-soft);
+  --ink: var(--dark-text);
+  --ink-soft: #d3d7dc;
+  --muted: var(--dark-muted);
+  --line: var(--dark-line);
+  --line-2: var(--dark-line-soft);
+  --hero: var(--dark-canvas-deep);
+  --hero-2: var(--dark-surface);
+  --hero-3: var(--dark-accent);
+  --primary: var(--dark-accent);
+  --primary-dk: var(--dark-accent-strong);
+  --primary-soft: var(--dark-accent-soft);
+  --accent: var(--dark-info);
+  --accent-soft: var(--dark-info-soft);
+  --warm: var(--dark-warning);
+  --warm-soft: var(--dark-warning-soft);
+  --danger: var(--dark-negative);
+  --danger-soft: var(--dark-negative-soft);
+  --nac: var(--dark-negative);
+  --nac-bg: var(--dark-negative-soft);
+  --est: #b691ff;
+  --est-bg: #2d2441;
+  --fac: #b7bdc6;
+  --fac-bg: var(--dark-surface-3);
+  --rec: var(--dark-warning);
+  --rec-bg: var(--dark-warning-soft);
+  --sat: var(--dark-info-soft);
+  --sun: var(--dark-negative);
+  --sun-soft: var(--dark-negative-soft);
+  --mile: var(--dark-positive-soft);
+  --mile-bd: #397c59;
+  --shadow: 0 18px 46px rgba(0, 0, 0, .3);
+}
+
+/* Os estilos legados declaram estes tokens depois do tema compartilhado. */
+html.dark-2026 {
+  --vd: #101214 !important;
+  --vm: #23272b !important;
+  --vc: var(--dark-accent) !important;
+  --vs: var(--dark-positive-soft) !important;
+  --ou: var(--dark-accent) !important;
+  --os: var(--dark-warning-soft) !important;
+  --cr: var(--dark-canvas) !important;
+  --ce: var(--dark-text) !important;
+  --cm: var(--dark-muted) !important;
+  --cl: var(--dark-line) !important;
+  --ra: var(--dark-negative) !important;
+  --rs: var(--dark-negative-soft) !important;
+  --ai: var(--dark-info) !important;
+  --bg: var(--dark-canvas) !important;
+  --bg-2: var(--dark-canvas-deep) !important;
+  --card: var(--dark-surface) !important;
+  --surface: var(--dark-surface) !important;
+  --surface-2: var(--dark-surface-2) !important;
+  --surface-3: var(--dark-info-soft) !important;
+  --ink: var(--dark-text) !important;
+  --ink-soft: #d3d7dc !important;
+  --muted: var(--dark-muted) !important;
+  --line: var(--dark-line) !important;
+  --line-2: var(--dark-line-soft) !important;
+  --hero: var(--dark-canvas-deep) !important;
+  --hero-2: var(--dark-surface) !important;
+  --hero-3: var(--dark-accent) !important;
+  --primary: var(--dark-accent) !important;
+  --primary-dk: var(--dark-accent-strong) !important;
+  --primary-soft: var(--dark-accent-soft) !important;
+  --accent: var(--dark-info) !important;
+  --accent-soft: var(--dark-info-soft) !important;
+  --danger: var(--dark-negative) !important;
+  --danger-soft: var(--dark-negative-soft) !important;
+  --shadow: 0 18px 46px rgba(0, 0, 0, .3) !important;
+}
+
+html.dark-2026,
+html.dark-2026 body {
+  background-color: var(--dark-canvas) !important;
+}
+
+html.dark-2026 body {
+  color: var(--dark-text) !important;
+  background-image:
+    radial-gradient(circle at 76% -10%, rgba(255, 166, 91, .07), transparent 28%),
+    linear-gradient(180deg, #111416 0%, #0f1113 100%) !important;
+}
+
+html.dark-2026 body::selection {
+  color: #151719;
+  background: var(--dark-accent);
+}
+
+html.dark-2026 :where(a, button, input, select, textarea, summary) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html.dark-2026 :where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--dark-accent) !important;
+  outline-offset: 2px;
+}
+
+html.dark-2026 :where(input, textarea, select) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 :where(input, textarea)::placeholder {
+  color: var(--dark-faint) !important;
+  opacity: 1;
+}
+
+html.dark-2026 :where(option) {
+  color: var(--dark-text);
+  background: var(--dark-surface-2);
+}
+
+html.dark-2026 :where(hr) {
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 ::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+html.dark-2026 ::-webkit-scrollbar-track {
+  background: var(--dark-canvas-deep);
+}
+
+html.dark-2026 ::-webkit-scrollbar-thumb {
+  background: #464b52;
+  border: 3px solid var(--dark-canvas-deep);
+  border-radius: 999px;
+}
+
+/* Cabecalho e navegacao dos relatorios. */
+html.dark-2026 :where(.cab, .hero) {
+  color: var(--dark-text) !important;
+  background: linear-gradient(135deg, #111416 0%, #171a1d 58%, #202428 100%) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 :where(.cab)::before,
+html.dark-2026 :where(.hero)::before,
+html.dark-2026 :where(.hero)::after {
+  background: radial-gradient(circle, rgba(255, 166, 91, .13), transparent 70%) !important;
+}
+
+html.dark-2026 :where(.cab-t h1, .hero h1, .hero-card strong) {
+  color: var(--dark-text) !important;
+}
+
+html.dark-2026 :where(.cab-t .sub, .hero p, .hero-card span) {
+  color: var(--dark-muted) !important;
+}
+
+html.dark-2026 :where(.cab-t .prof, .hero-chip, .hero-pill, .crumbs, .eyebrow) {
+  color: #ffd4af !important;
+  background: rgba(255, 166, 91, .09) !important;
+  border-color: rgba(255, 166, 91, .34) !important;
+}
+
+html.dark-2026 .nav-w {
+  background: rgba(16, 18, 20, .96) !important;
+  border-color: var(--dark-line) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .2);
+  backdrop-filter: blur(16px);
+}
+
+html.dark-2026 .nb {
+  color: var(--dark-muted) !important;
+}
+
+html.dark-2026 .nb:hover {
+  color: var(--dark-text) !important;
+}
+
+html.dark-2026 .nb.on {
+  color: var(--dark-accent) !important;
+}
+
+html.dark-2026 .nb.on::after {
+  background: var(--dark-accent) !important;
+}
+
+html.dark-2026 .sp {
+  background: var(--dark-line) !important;
+}
+
+html.dark-2026 .main,
+html.dark-2026 .page,
+html.dark-2026 .wrap,
+html.dark-2026 .sec {
+  color: var(--dark-text);
+  background-color: transparent !important;
+}
+
+/* Superficies, paineis, tabelas e camadas elevadas. */
+html.dark-2026 :where(
+  .ea, .eh, .em, .ec2, .ipane, .sc2, .cron-intro, .dc, .cc, .bi,
+  .panel, .summary-card, .table-card, .profile-card, .bim-card,
+  .boletim-panel, .section-block, .report-area, .report-box, .report-preview,
+  .discipline-menu, .modal-card, .modal-body, .empty-state,
+  .card, .mini-card, .panel-card, .discipline-panel, .grid-wrap,
+  .sidebar-card, .shell, .content, .list-row, .toolbar,
+  .pc-cal-shell, .pc-cal-agenda, .pc-cal-week-section, .pc-cal-mini-month,
+  .pc-cal-modal-inner, .pc-cal-edit-form, .pc-planner-shell,
+  .cl-card, .cl-hist-inner, .cl-hist-hd, .cl-livro-atual,
+  .pfm-inner, #atv-float-menu, #painel-editor, #toolbar-texto,
+  .liv-card, .lesson-list, .bim-header, .pc-diary-empty,
+  .pc-diary-viewer, .pc-diary-meta-card, .pc-diary-frame
+) {
+  color: var(--dark-text) !important;
+  background-color: var(--dark-surface) !important;
+  background-image: none !important;
+  border-color: var(--dark-line) !important;
+  box-shadow: var(--sc) !important;
+}
+
+html.dark-2026 :where(.panel-side, .itabs, .table-head, .modal-header, .section-head, .report-tools, .tabs, .tab-line, .view-toggle) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 :where(.ct, .atv-tema, .atv-av, .pres-av, .info-box, .hint, .empty-note, .section-note) {
+  color: #dfe2e6 !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 :where(.ct, .atv-tema) {
+  border-left-color: var(--dark-accent) !important;
+}
+
+html.dark-2026 :where(.ti h2, .ed, .panel-title, .section-title, .modal-title, .bim-card-title, .student-name, .student-name-btn) {
+  color: var(--dark-text) !important;
+}
+
+html.dark-2026 :where(.ti p, .st, .summary-label, .summary-foot, .student-meta, .modal-subtitle, .section-note, .panel-copy, .tab-meta) {
+  color: var(--dark-muted) !important;
+}
+
+html.dark-2026 :where(.summary-value, .sc2 .n, .bim-card-total, .total-pill, .statline strong) {
+  color: var(--dark-text) !important;
+}
+
+html.dark-2026 :where(.table-wrap, .grid-wrap) {
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 :where(table, thead, tbody, tr, th, td) {
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 :where(th, .table-head) {
+  color: var(--dark-muted) !important;
+  background: #16191c !important;
+}
+
+html.dark-2026 :where(td, .student-cell) {
+  color: var(--dark-text) !important;
+  background-color: var(--dark-surface) !important;
+}
+
+html.dark-2026 tbody tr:hover td {
+  background-color: var(--dark-surface-2) !important;
+}
+
+/* Botoes, abas e estados selecionados. */
+html.dark-2026 :where(
+  .ghost-btn, .warning-btn, .discipline-btn, .discipline-option,
+  .close-btn, .inline-btn, .btn, .tab, .boletim-tab,
+  .pc-cal-btn, .pc-cal-chip-btn, .pc-cal-action-btn,
+  .main-tab, .disc-tab, .bim-tab, .liv-tab, .liv-btn,
+  .tb-btn, .pe-btn, .cl-btn-hora, .cl-btn-parar,
+  .rh-hero-btn.ghost, .rh-hero-link.ghost, .rh-hero-btn.soft, .rh-hero-link.soft
+) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+  box-shadow: none !important;
+}
+
+html.dark-2026 :where(
+  .primary-btn, .rh-hero-btn.primary, .rh-hero-link.primary,
+  .pc-cal-btn.primary, .pc-cal-open-modal, .pc-cal-action-btn.primary,
+  .btn.primary, .btn-accent
+) {
+  color: #151719 !important;
+  background: linear-gradient(135deg, var(--dark-accent), var(--dark-accent-strong)) !important;
+  border-color: var(--dark-accent) !important;
+  box-shadow: 0 8px 22px rgba(255, 166, 91, .16) !important;
+}
+
+html.dark-2026 :where(
+  .itab.on, .tab.active, .boletim-tab.active, .discipline-option.active,
+  .main-tab.active, .disc-tab.active, .bim-tab.active, .liv-tab.on,
+  .pc-cal-chip-btn.on, button[aria-selected="true"]
+) {
+  color: var(--dark-accent) !important;
+  background: var(--dark-accent-soft) !important;
+  border-color: var(--dark-accent) !important;
+}
+
+html.dark-2026 :where(button, a, summary, .ea, .panel, .card) {
+  transition: color .16s ease, background-color .16s ease, border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+html.dark-2026 :where(button, a, summary):hover {
+  border-color: #555b62;
+}
+
+/* Indicadores semanticos: positivo, negativo, informativo e atencao. */
+html.dark-2026 :where(
+  .rh-mark-btn.is-green, .atv-r.fz, .ar2.pr, .pfm-badge.fz,
+  .grade-badge.good, .grade-badge.positive, .done-in, .mile-tag,
+  .status-box, .status-positive, .liv-card.concluido, .cl-card.livre,
+  .ch-h, .sw-let
+) {
+  color: var(--dark-positive) !important;
+  background: var(--dark-positive-soft) !important;
+  border-color: #2e704e !important;
+}
+
+html.dark-2026 :where(
+  .rh-mark-btn.is-red, .atv-r.nf, .ar2.fa, .pfm-badge.nf, .pfm-badge.f,
+  .oi, .ng, .report-alert, .absence-chip, .grade-badge.bad,
+  .warning-btn, .status-negative, .liv-card.criando, .cl-card.ocupado,
+  .ch-a, .sw-nac, .sw-sun, .pp-priority-urgent, .pp-tag-overdue
+) {
+  color: var(--dark-negative) !important;
+  background: var(--dark-negative-soft) !important;
+  border-color: #7a3530 !important;
+}
+
+html.dark-2026 :where(.oi.nt, .ch-i, .info, .sw-sat, .grade-badge.info) {
+  color: var(--dark-info) !important;
+  background: var(--dark-info-soft) !important;
+  border-color: #36577f !important;
+}
+
+html.dark-2026 :where(.ch-p, .ng.notice, .pfm-badge.ag, .pfm-badge.fj, .atv-r.ag, .meta-in, .sw-rec) {
+  color: var(--dark-warning) !important;
+  background: var(--dark-warning-soft) !important;
+  border-color: #74612c !important;
+}
+
+html.dark-2026 :where(.oa, .sc2.al .n, .delta.negative, .negative, .danger) {
+  color: var(--dark-negative) !important;
+}
+
+html.dark-2026 :where(.positive, .delta.positive, .success, .cl-card.livre .cl-timer, .cl-card.livre .cl-status) {
+  color: var(--dark-positive) !important;
+}
+
+/* Calendario e planejamento mantem categorias, mas sem fundos claros. */
+html.dark-2026 :where(.pc-cal-grid, .pc-cal-day, .pc-cal-agenda-item, .pc-cal-modal-card, .c-event, .week-sum) {
+  color: var(--dark-text) !important;
+  background-color: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+  box-shadow: none !important;
+}
+
+html.dark-2026 :where(.pc-cal-day.other-month, .blank) {
+  color: var(--dark-faint) !important;
+  background: #151719 !important;
+}
+
+html.dark-2026 :where(.pc-cal-day.has-events, tr.status-letivo td, .row-mon.active) {
+  box-shadow: inset 3px 0 0 var(--dark-accent) !important;
+}
+
+html.dark-2026 :where(.grade-in, .total-in, .done-in, .meta-in, .field, .search-input, .text-stack textarea, .field-stack input) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+}
+
+/* Modais, menus flutuantes e sobreposicoes. */
+html.dark-2026 :where(.modal, .overlay, .pfm) {
+  background: rgba(3, 4, 5, .78) !important;
+  backdrop-filter: blur(8px);
+}
+
+html.dark-2026 :where(.atv-mo:hover, .discipline-option:hover, .list-row:hover, .pp-doc-item:hover) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-3) !important;
+}
+
+/* Projetos pessoais: troca o azul do tema anterior pelo laranja da referencia. */
+html.dark-2026 body[data-pp-page] {
+  --pp-ink: var(--dark-text);
+  --pp-muted: var(--dark-muted);
+  --pp-bg: var(--dark-canvas);
+  --pp-surface: var(--dark-surface);
+  --pp-line: var(--dark-line);
+  --pp-green: var(--dark-accent);
+  --pp-green-dark: var(--dark-text);
+  --pp-green-soft: var(--dark-surface-2);
+  --pp-gold: var(--dark-accent);
+  --pp-red: var(--dark-negative);
+  --pp-shadow: 0 8px 26px rgba(0, 0, 0, .3);
+}
+
+html.dark-2026 body[data-pp-page] :where(.pp-tab.is-active, .pp-button.pp-primary, .pp-star-toggle.is-active) {
+  color: #151719 !important;
+  background: var(--dark-accent) !important;
+  border-color: var(--dark-accent) !important;
+}
+
+html.dark-2026 body[data-pp-page] :where(.pp-ui-icon, .pp-doc-kicker, .pp-mindmap-detail-kicker, .pp-map-detail-kicker) {
+  color: var(--dark-accent) !important;
+}
+
+html.dark-2026 body[data-pp-page] :where(.pp-project-card, .pp-panel, .pp-modal-card, .pp-library-docs, .pp-doc-folder, .pp-map-board, .pp-map-detail, .pp-mindmap-detail) {
+  background: var(--dark-surface) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body[data-pp-page] :where(.pp-mindmap-node[aria-pressed="true"], .pp-map-node.is-selected) {
+  color: var(--dark-text) !important;
+  background: var(--dark-accent-soft) !important;
+  border-color: var(--dark-accent) !important;
+  box-shadow: 0 0 0 3px rgba(255, 166, 91, .16) !important;
+}
+
+/* Cobre estilos claros embutidos nos relatorios sem apagar estados semanticos. */
+html.dark-2026 .main :where([style*="background:#fff"], [style*="background: #fff"], [style*="background:white"], [style*="background: white"]) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 .main :where([style*="background:#f0faf4"], [style*="background: #f0faf4"], [style*="background:#f0fdf4"]) {
+  color: var(--dark-positive) !important;
+  background: var(--dark-positive-soft) !important;
+  border-color: #2e704e !important;
+}
+
+html.dark-2026 .main :where([style*="background:#fdecea"], [style*="background: #fdecea"], [style*="background:#fff1ed"]) {
+  color: var(--dark-negative) !important;
+  background: var(--dark-negative-soft) !important;
+  border-color: #7a3530 !important;
+}
+
+html.dark-2026 #modo-btns button {
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+  color: var(--dark-muted) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .24) !important;
+}
+
+html.dark-2026 #modo-btns button.ativo,
+html.dark-2026 #modo-escuro-btn.ativo {
+  color: var(--dark-accent) !important;
+  background: #2a2d31 !important;
+  border-color: rgba(255, 166, 91, .5) !important;
+}
+
+html.dark-2026 footer {
+  color: var(--dark-faint) !important;
+  background: var(--dark-canvas-deep) !important;
+  border-color: var(--dark-line) !important;
+}
+
+@media (max-width: 680px) {
+  html.dark-2026 :where(.ea, .panel, .summary-card, .card, .modal-card) {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .22) !important;
+  }
+}
+
+@media print {
+  html.dark-2026,
+  html.dark-2026 body {
+    color-scheme: light;
+    color: #111 !important;
+    background: #fff !important;
+  }
+}
