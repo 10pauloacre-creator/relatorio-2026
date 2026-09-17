@@ -19,6 +19,11 @@
   const ESCALA_EXIBICAO = 2;
   const NOTA_MAX_EXIBICAO = GRADE_MAX * ESCALA_EXIBICAO;
   const ESCOLA_SLUG = config.escolaSlug || "padre-carlos-casavequia";
+  // Regras do boletim (motor em assets/js/boletim-regras.js, o mesmo usado no
+  // perfil do aluno na Biblioteca). Casavequia: 3º e 4º bimestres só pelo
+  // cálculo automático (trabalhos + prova da Biblioteca) e recuperação semestral.
+  const REGRAS = config.regras || { bimestresAutomaticos: ["3", "4"], recuperacaoSemestral: true };
+  const SEMESTRES_DO_BIMESTRE = { "2": "1", "4": "2" };
   const DISCIPLINES = (config.disciplines || []).map(function (discipline, index) {
     return {
       name: discipline.name,
@@ -64,6 +69,7 @@
     ? window.NotasBimestrais.criar({
       escolaSlug: ESCOLA_SLUG,
       turmaCodigo: TURMA_ID,
+      scopeKey: PANEL_SCOPE,
       disciplinas: DISCIPLINES,
       aoAtualizar: refreshOpenViews
     })
@@ -194,6 +200,11 @@
   });
 
   document.addEventListener("change", function (event) {
+    const recoveryInput = event.target.closest("input[data-student][data-recuperacao]");
+    if (recoveryInput) {
+      updateRecoveryFromInput(recoveryInput);
+      return;
+    }
     const numericInput = event.target.closest("input[data-student][data-bimester][data-field]");
     if (numericInput) {
       updateNumericFieldFromInput(numericInput);
@@ -484,7 +495,35 @@
       });
     });
 
+    // Bimestres automáticos: notas digitadas não valem e são limpas.
+    BIMESTERS.filter(isAutomaticBimester).forEach(function (bim) {
+      merged.bimestres[bim].trabalhos = "";
+      merged.bimestres[bim].prova = "";
+      Object.keys(merged.boletim).forEach(function (name) {
+        merged.boletim[name].bimestres[bim].trabalhos = "";
+        merged.boletim[name].bimestres[bim].prova = "";
+      });
+    });
+
+    // Prova única de recuperação semestral, por disciplina (escala 0–10).
+    merged.recuperacao = {};
+    DISCIPLINES.forEach(function (discipline) {
+      const saved = savedStudent.recuperacao && savedStudent.recuperacao[discipline.name] ? savedStudent.recuperacao[discipline.name] : {};
+      merged.recuperacao[discipline.name] = { "1": sanitizeNota10(saved["1"]), "2": sanitizeNota10(saved["2"]) };
+    });
+
     return merged;
+  }
+
+  function isAutomaticBimester(bim) {
+    return REGRAS.bimestresAutomaticos.indexOf(String(bim)) >= 0;
+  }
+
+  function sanitizeNota10(value) {
+    if (value === "" || value === null || value === undefined) return "";
+    const numeric = Number(String(value).replace(",", "."));
+    if (!Number.isFinite(numeric)) return "";
+    return Math.max(0, Math.min(10, Math.round(numeric * 10) / 10));
   }
 
   function loadState() {
@@ -777,7 +816,41 @@
   }
 
   function getStoredWorkGrade(student, disciplineName, bim) {
+    if (isAutomaticBimester(bim)) return null;
     return toNumber(getDisciplineBimState(student, disciplineName, bim).trabalhos);
+  }
+
+  // Prova da Biblioteca na escala armazenada (0–5), ou null.
+  function getAutomaticExamGrade(student, disciplineName, bim) {
+    const nota = notasTrabalho ? notasTrabalho.obterProva(student, disciplineName, bim) : null;
+    return nota === null ? null : sanitizeFieldValue("prova", nota / ESCALA_EXIBICAO);
+  }
+
+  function getEffectiveExamGrade(student, disciplineName, bim) {
+    if (isAutomaticBimester(bim)) return getAutomaticExamGrade(student, disciplineName, bim);
+    const manual = toNumber(getDisciplineBimState(student, disciplineName, bim).prova);
+    return manual !== null ? manual : getAutomaticExamGrade(student, disciplineName, bim);
+  }
+
+  // Resultado do motor de regras para uma disciplina (notas em 0–10).
+  function calcularBoletimDisciplina(student, disciplineName) {
+    const bimestres = {};
+    BIMESTERS.forEach(function (bim) {
+      const dados = getDisciplineBimState(student, disciplineName, bim);
+      bimestres[bim] = {
+        trabalhoManual: paraExibicao(dados.trabalhos),
+        provaManual: paraExibicao(dados.prova),
+        trabalhoAuto: paraExibicao(calculateAutoWorkGrade(student, disciplineName, bim)),
+        provaAuto: paraExibicao(getAutomaticExamGrade(student, disciplineName, bim))
+      };
+    });
+    const recuperacao = student.recuperacao && student.recuperacao[disciplineName] ? student.recuperacao[disciplineName] : {};
+    return window.BoletimRegras.calcular({
+      bimestresAutomaticos: REGRAS.bimestresAutomaticos,
+      recuperacaoSemestral: REGRAS.recuperacaoSemestral,
+      bimestres: bimestres,
+      recuperacao: recuperacao
+    });
   }
 
   function hasManualWorkGrade(student, disciplineName, bim) {
@@ -795,22 +868,16 @@
     return Number((Math.round(Number(value) * 2) / 2).toFixed(1));
   }
 
+  // Nota do bimestre (0–10) após a recuperação; enquanto falta trabalho ou
+  // prova, a nota parcial.
   function calculateDisciplineBimTotal(student, disciplineName, bim) {
-    const dados = getDisciplineBimState(student, disciplineName, bim);
-    const trabalhos = getEffectiveWorkGrade(student, disciplineName, bim);
-    const prova = toNumber(dados.prova);
-    if (trabalhos === null && prova === null) return null;
-    return roundFinalGrade((trabalhos || 0) + (prova || 0));
+    const resultado = calcularBoletimDisciplina(student, disciplineName).bimestres[bim];
+    return resultado.notaFinal !== null ? resultado.notaFinal : resultado.notaParcial;
   }
 
+  // Média dos bimestres fechados, com as notas recuperadas.
   function calculateDisciplineAverage(student, disciplineName) {
-    const totals = BIMESTERS.map(function (bim) {
-      return calculateDisciplineBimTotal(student, disciplineName, bim);
-    }).filter(function (value) {
-      return value !== null;
-    });
-    if (!totals.length) return null;
-    return roundFinalGrade(totals.reduce(function (sum, value) { return sum + value; }, 0) / totals.length);
+    return calcularBoletimDisciplina(student, disciplineName).mediaAnual;
   }
 
   function calculateAnnualAverage(student) {
@@ -888,7 +955,7 @@
     });
 
     if (!rows.length) {
-      tableBody.innerHTML = '<tr><td class="table-empty" colspan="5">Nenhum aluno encontrado para esta busca.</td></tr>';
+      tableBody.innerHTML = '<tr><td class="table-empty" colspan="' + (tableColumns().length + 1) + '">Nenhum aluno encontrado para esta busca.</td></tr>';
       return;
     }
 
@@ -900,7 +967,7 @@
           + '<span class="student-name student-name-transferido">' + escapeHtml(student.nome) + "</span>"
           + '<div class="student-meta"><span class="mini-chip chip-transferido">Transferido</span></div>'
           + "</td>"
-          + BIMESTERS.map(function () {
+          + tableColumns().map(function () {
             return '<td><span class="grade-badge grade-transferido"><strong>–</strong></span></td>';
           }).join("")
           + "</tr>";
@@ -915,23 +982,71 @@
         + '<span class="mini-chip">Frequencia: ' + formatNumber(calculateAttendance(student)) + "%</span>"
         + "</div>"
         + "</td>"
-        + BIMESTERS.map(function (bim) {
-          return "<td>" + renderBimGradeBadge(student, bim, currentTableDiscipline) + "</td>";
+        + tableColumns().map(function (coluna) {
+          return coluna.tipo === "bimestre"
+            ? "<td>" + renderBimGradeBadge(student, coluna.bim, currentTableDiscipline) + "</td>"
+            : '<td class="rec-col">' + renderRecoveryBadge(student, coluna.semestre, currentTableDiscipline) + "</td>";
         }).join("")
         + "</tr>";
     }).join("");
   }
 
+  // Nota recuperada: a original pequena, vermelha e riscada; a nova em verde.
+  function renderNotaRecuperada(resultado) {
+    return '<s class="nota-riscada" title="Nota original do bimestre">' + formatNumber(resultado.nota) + "</s> "
+      + '<strong class="nota-recuperada">' + formatNumber(resultado.notaFinal) + "/10</strong>";
+  }
+
   function renderBimGradeBadge(student, bim, disciplineName) {
-    const total = calculateDisciplineBimTotal(student, disciplineName || MAIN_DISCIPLINE, bim);
-    if (total === null) {
-      return '<span class="grade-badge"><strong>-</strong><small>Sem nota</small></span>';
+    const resultado = calcularBoletimDisciplina(student, disciplineName || MAIN_DISCIPLINE).bimestres[bim];
+    if (resultado.nota === null && resultado.notaParcial === null) {
+      return '<span class="grade-badge"><strong>-</strong><small>' + (resultado.automatico ? "Aguardando calculo" : "Sem nota") + "</small></span>";
     }
-    const isRecovery = total < 7;
-    return '<span class="grade-badge ' + (isRecovery ? "recovery" : "good") + '">'
-      + '<strong>' + (isRecovery ? "⚠️ " : "OK ") + formatNumber(total) + "/10</strong>"
-      + "<small>" + (isRecovery ? "Recuperacao" : "Acima de 7") + "</small>"
+    if (!resultado.completo) {
+      const falta = resultado.trabalho === null ? "falta trabalhos" : "falta a prova";
+      return '<span class="grade-badge partial"><strong>' + formatNumber(resultado.notaParcial) + "/10</strong><small>Parcial · " + falta + "</small></span>";
+    }
+    if (resultado.recuperado) {
+      return '<span class="grade-badge good recovered">' + renderNotaRecuperada(resultado)
+        + "<small>" + (resultado.recuperadoPor === "semestral" ? "Recuperado na semestral" : "Recuperado pelo bimestre seguinte") + "</small></span>";
+    }
+    const abaixo = resultado.nota < window.BoletimRegras.MEDIA;
+    return '<span class="grade-badge ' + (abaixo ? "recovery" : "good") + '">'
+      + '<strong>' + (abaixo ? "⚠️ " : "OK ") + formatNumber(resultado.nota) + "/10</strong>"
+      + "<small>" + (abaixo ? "Abaixo da media" : "Acima de 7") + "</small>"
       + "</span>";
+  }
+
+  function renderRecoveryBadge(student, semestre, disciplineName) {
+    const info = calcularBoletimDisciplina(student, disciplineName || MAIN_DISCIPLINE).semestres[semestre];
+    const nota = info.notaRecuperacao;
+    switch (info.situacao) {
+      case "recuperacao_pendente":
+        return '<span class="grade-badge recovery"><strong>Pendente</strong><small>Fazer prova unica</small></span>';
+      case "recuperado_na_semestral":
+        return '<span class="grade-badge good"><strong class="nota-recuperada">' + formatNumber(nota) + "/10</strong><small>Recuperou o semestre</small></span>";
+      case "reprovado":
+        return '<span class="grade-badge failed"><strong>' + formatNumber(nota) + "/10</strong><small>Reprovado</small></span>";
+      case "aprovado":
+      case "recuperado_no_bimestre":
+        return '<span class="grade-badge muted"><strong>–</strong><small>Nao precisa</small></span>';
+      case "aguardando_bimestre":
+        return '<span class="grade-badge muted"><strong>–</strong><small>Aguardando ' + (semestre === "1" ? "2o" : "4o") + " bim.</small></span>";
+      default:
+        return '<span class="grade-badge muted"><strong>–</strong><small>Em andamento</small></span>';
+    }
+  }
+
+  // Colunas da tabela: 1º, 2º, Rec. 1º semestre, 3º, 4º, Rec. 2º semestre.
+  function tableColumns() {
+    const colunas = [];
+    BIMESTERS.forEach(function (bim) {
+      colunas.push({ tipo: "bimestre", bim: bim });
+      if (REGRAS.recuperacaoSemestral && SEMESTRES_DO_BIMESTRE[bim]) {
+        colunas.push({ tipo: "recuperacao", semestre: SEMESTRES_DO_BIMESTRE[bim] });
+      }
+    });
+    return colunas;
   }
 
   // value chega na escala armazenada; o campo mostra e edita na escala 0–10.
@@ -1028,35 +1143,60 @@
       + "</div>"
       + DISCIPLINES.map(function (discipline) {
         const active = currentBoletimDiscipline === discipline.name;
-        const metrics = getDisciplineMetrics(student, discipline.name);
-        const note = discipline.automated
-          ? "Nesta disciplina, cada tema sincronizado no diario conta como atividade aplicada. A nota de trabalhos e distribuida automaticamente ate 5,0 conforme as atividades feitas no bimestre."
-          : "Nesta disciplina, as notas seguem em modo manual nesta fase.";
+        const automaticos = REGRAS.bimestresAutomaticos.map(function (bim) { return bim + "o"; }).join(" e ");
+        const note = "Trabalhos (0 a 10): 10 pontos divididos entre as atividades que valem ponto no bimestre; atividades aguardando ficam fora do calculo. "
+          + "Nota do bimestre = media entre trabalhos e prova."
+          + (automaticos ? " No " + automaticos + " bimestre, valem apenas o calculo automatico de trabalhos e a prova da Biblioteca." : "")
+          + (REGRAS.recuperacaoSemestral ? " Recuperacao: o 2o bimestre recupera o 1o e o 4o recupera o 3o; se ainda ficar abaixo de 7, o aluno faz a prova unica de recuperacao semestral." : "");
         return '<div class="boletim-panel' + (active ? " active" : "") + '" data-boletim-panel="' + escapeHtml(discipline.name) + '">'
           + '<div class="report-alert" style="margin-bottom:14px">'
           + escapeHtml(note)
-          + (discipline.automated ? " Atividades registradas: " + metrics.atividadesFeitas + " de " + metrics.atividadesAplicadas + "." : "")
           + "</div>"
           + '<div class="bim-grid">'
-          + BIMESTERS.map(function (bim) {
-            return renderBimCard(student, bim, discipline.name);
+          + tableColumns().map(function (coluna) {
+            return coluna.tipo === "bimestre"
+              ? renderBimCard(student, coluna.bim, discipline.name)
+              : renderRecoveryCard(student, coluna.semestre, discipline.name);
           }).join("")
           + "</div>"
           + "</div>";
       }).join("");
   }
 
+  function renderBimCardTotal(resultado) {
+    if (resultado.recuperado) return renderNotaRecuperada(resultado);
+    if (resultado.nota !== null) return formatNumber(resultado.nota) + "/10";
+    if (resultado.notaParcial !== null) return formatNumber(resultado.notaParcial) + '/10 <small class="nota-parcial">parcial</small>';
+    return "-";
+  }
+
   function renderBimCard(student, bim, disciplineName) {
     const dados = getDisciplineBimState(student, disciplineName, bim);
-    const total = calculateDisciplineBimTotal(student, disciplineName, bim);
+    const resultado = calcularBoletimDisciplina(student, disciplineName).bimestres[bim];
     const autoGrade = calculateAutoWorkGrade(student, disciplineName, bim);
     const effectiveWork = getEffectiveWorkGrade(student, disciplineName, bim);
     const isManual = hasManualWorkGrade(student, disciplineName, bim);
 
+    if (isAutomaticBimester(bim)) {
+      const prova = getAutomaticExamGrade(student, disciplineName, bim);
+      return '<article class="bim-card automatic">'
+        + '<div class="bim-card-head">'
+          + '<div class="bim-card-title">' + bim + 'o Bimestre <span class="mini-chip">Automatico</span></div>'
+          + '<div class="bim-card-total">' + renderBimCardTotal(resultado) + "</div>"
+        + "</div>"
+        + '<div class="field-stack">'
+          + '<div class="auto-grade-row"><span>Trabalhos</span><strong>' + (autoGrade === null ? "aguardando atividades marcadas" : formatNota10(autoGrade)) + "</strong></div>"
+          + '<div class="summary-foot">' + describeWorkGrade(student, disciplineName, bim) + "</div>"
+          + '<div class="auto-grade-row"><span>Prova da Biblioteca</span><strong>' + (prova === null ? "aguardando a prova bimestral" : formatNota10(prova)) + "</strong></div>"
+          + '<div class="summary-foot">Neste bimestre as notas nao sao digitadas: vem do calculo de trabalhos e da prova bimestral feita na Biblioteca Digital.</div>'
+        + "</div>"
+        + "</article>";
+    }
+
     return '<article class="bim-card">'
       + '<div class="bim-card-head">'
         + '<div class="bim-card-title">' + bim + "o Bimestre</div>"
-        + '<div class="bim-card-total">' + (total === null ? "-" : formatNumber(total) + "/10") + "</div>"
+        + '<div class="bim-card-total">' + renderBimCardTotal(resultado) + "</div>"
       + "</div>"
       + '<div class="field-stack">'
         + "<div><label>Nota de trabalhos (0 a 10)</label>" + renderStepper(student.id, bim, "trabalhos", effectiveWork, disciplineName) + "</div>"
@@ -1071,6 +1211,40 @@
         + "</div>"
       + "</div>"
       + "</article>";
+  }
+
+  function renderRecoveryCard(student, semestre, disciplineName) {
+    const info = calcularBoletimDisciplina(student, disciplineName).semestres[semestre];
+    const bims = info.bimestres.join("o e ") + "o";
+    const podeLancar = info.precisaRecuperacao || info.notaRecuperacao !== null;
+    const valor = student.recuperacao && student.recuperacao[disciplineName] ? student.recuperacao[disciplineName][semestre] : "";
+    const classe = info.situacao === "reprovado" ? " failed" : info.situacao === "recuperado_na_semestral" ? " recovered" : info.precisaRecuperacao ? " pending" : "";
+    return '<article class="bim-card recovery-card' + classe + '">'
+      + '<div class="bim-card-head">'
+        + '<div class="bim-card-title">Recuperacao semestral <small>(' + bims + " bim.)</small></div>"
+        + '<div class="bim-card-total">' + (info.notaRecuperacao === null ? "-" : formatNumber(info.notaRecuperacao) + "/10") + "</div>"
+      + "</div>"
+      + '<div class="field-stack">'
+        + '<div class="recovery-status">' + escapeHtml(window.BoletimRegras.rotuloSituacao(info.situacao)) + "</div>"
+        + (podeLancar
+          ? "<div><label>Nota da prova unica (0 a 10)</label>"
+            + '<div class="stepper"><input type="number" min="0" max="10" step="0.1" value="' + formatInputValue(valor) + '"'
+            + ' data-student="' + student.id + '" data-recuperacao="' + semestre + '" data-discipline="' + escapeHtml(disciplineName) + '"'
+            + ' aria-label="Nota da recuperacao semestral"></div></div>'
+            + '<div class="summary-foot">Com 7 ou mais, o aluno recupera os bimestres abaixo da media do semestre. Abaixo de 7, fica reprovado no semestre.</div>'
+          : '<div class="summary-foot">So e necessaria quando, fechado o semestre, algum bimestre continuar abaixo de 7.</div>')
+      + "</div>"
+      + "</article>";
+  }
+
+  function updateRecoveryFromInput(input) {
+    const student = getStudent(Number(input.dataset.student));
+    if (!student) return;
+    const disciplineName = input.dataset.discipline || MAIN_DISCIPLINE;
+    if (!student.recuperacao) student.recuperacao = {};
+    if (!student.recuperacao[disciplineName]) student.recuperacao[disciplineName] = { "1": "", "2": "" };
+    student.recuperacao[disciplineName][input.dataset.recuperacao] = sanitizeNota10(input.value);
+    persistAndRefresh(student.id, "Recuperacao semestral atualizada.");
   }
 
   function renderAbsenceDetails(metrics) {
@@ -1123,28 +1297,50 @@
       sections: selection.bimesters.map(function (bim) {
         var totals = [];
         var rows = students.map(function (student) {
-          var dados = getDisciplineBimState(student, disciplineName, bim);
           var trabalhos = getEffectiveWorkGrade(student, disciplineName, bim);
-          var prova = toNumber(dados.prova);
-          var total = calculateDisciplineBimTotal(student, disciplineName, bim);
-          if (total !== null) totals.push(total);
+          var prova = getEffectiveExamGrade(student, disciplineName, bim);
+          var resultado = calcularBoletimDisciplina(student, disciplineName).bimestres[bim];
+          if (resultado.notaFinal !== null) totals.push(resultado.notaFinal);
           return {
             numero: student.numero,
             nome: student.nome,
             trabalhos: formatNota10(trabalhos),
             prova: formatNota10(prova),
-            total: total === null ? "-" : formatNumber(total) + "/10"
+            total: describeBimTotalText(resultado)
           };
         });
         var average = totals.length ? roundFinalGrade(totals.reduce(function (sum, value) { return sum + value; }, 0) / totals.length) : null;
         return {
           title: bim + "o bimestre",
           average: average === null ? "-" : formatNumber(average) + "/10",
-          note: "Lista exportada com " + rows.length + " aluno(s) ativos da turma.",
+          note: "Lista exportada com " + rows.length + " aluno(s) ativos da turma." + describeSemesterRecoveryNote(students, disciplineName, bim),
           rows: rows
         };
       })
     };
+  }
+
+  function describeBimTotalText(resultado) {
+    if (resultado.recuperado) {
+      return formatNumber(resultado.nota) + " -> recuperada para " + formatNumber(resultado.notaFinal) + "/10 ("
+        + (resultado.recuperadoPor === "semestral" ? "recuperacao semestral" : "pelo bimestre seguinte") + ")";
+    }
+    if (resultado.nota !== null) return formatNumber(resultado.nota) + "/10";
+    if (resultado.notaParcial !== null) return formatNumber(resultado.notaParcial) + "/10 (parcial)";
+    return "-";
+  }
+
+  // Nas seções do 2º e 4º bimestre, resume a recuperação semestral da turma.
+  function describeSemesterRecoveryNote(students, disciplineName, bim) {
+    const semestre = SEMESTRES_DO_BIMESTRE[bim];
+    if (!REGRAS.recuperacaoSemestral || !semestre) return "";
+    const itens = students.map(function (student) {
+      const info = calcularBoletimDisciplina(student, disciplineName).semestres[semestre];
+      if (!info.precisaRecuperacao) return null;
+      return student.numero + ". " + student.nome + ": " + (info.notaRecuperacao === null ? "pendente" : formatNumber(info.notaRecuperacao) + "/10")
+        + " - " + window.BoletimRegras.rotuloSituacao(info.situacao);
+    }).filter(Boolean);
+    return " Recuperacao semestral (" + semestre + "o semestre): " + (itens.length ? itens.join("; ") : "nenhum aluno precisou") + ".";
   }
 
   function renderObservationDetails(observacoes) {
@@ -1205,16 +1401,23 @@
     DISCIPLINES.forEach(function (discipline) {
       linhas.push("");
       linhas.push("Disciplina: " + discipline.name);
+      if (REGRAS.recuperacaoSemestral) {
+        const boletim = calcularBoletimDisciplina(student, discipline.name);
+        ["1", "2"].forEach(function (sem) {
+          const info = boletim.semestres[sem];
+          linhas.push(sem + "o semestre: " + window.BoletimRegras.rotuloSituacao(info.situacao)
+            + (info.notaRecuperacao !== null ? " (recuperacao semestral: " + formatNumber(info.notaRecuperacao) + "/10)" : ""));
+        });
+      }
       linhas.push("Media parcial: " + (calculateDisciplineAverage(student, discipline.name) === null ? "sem notas suficientes" : formatNumber(calculateDisciplineAverage(student, discipline.name)) + "/10"));
       BIMESTERS.forEach(function (bim) {
-        const dados = getDisciplineBimState(student, discipline.name, bim);
-        const total = calculateDisciplineBimTotal(student, discipline.name, bim);
+        const resultado = calcularBoletimDisciplina(student, discipline.name).bimestres[bim];
         const trabalhos = getEffectiveWorkGrade(student, discipline.name, bim);
         const metricsByDiscipline = getDisciplineMetrics(student, discipline.name);
         linhas.push(
           bim + "o bim. - trabalhos: " + formatNota10(trabalhos)
-          + " | prova: " + formatNota10(dados.prova)
-          + " | total: " + (total === null ? "-" : formatNumber(total) + "/10")
+          + " | prova: " + formatNota10(getEffectiveExamGrade(student, discipline.name, bim))
+          + " | nota: " + describeBimTotalText(resultado)
           + " | atividades feitas: " + (metricsByDiscipline.atividadesPorBimestre[bim] || 0)
           + " de " + (metricsByDiscipline.atividadesAplicadasPorBimestre[bim] || 0)
         );

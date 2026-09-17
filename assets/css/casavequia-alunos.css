@@ -792,3 +792,102 @@ code{
     min-width:760px;
   }
 }
+
+/* ── Boletim: recuperação semestral e bimestres automáticos (17/09/2026) ── */
+.nota-riscada{
+  font-size:.78rem;
+  color:var(--danger);
+  text-decoration:line-through;
+  text-decoration-thickness:2px;
+  opacity:.85;
+  font-weight:600;
+}
+.nota-recuperada{
+  color:#216041;
+  font-weight:800;
+}
+.grade-badge.recovered strong.nota-recuperada{
+  color:#216041;
+}
+.grade-badge.partial{
+  background:#f6f1e4;
+  border:1px dashed rgba(94,101,95,.35);
+}
+.grade-badge.failed{
+  background:#fbe3dd;
+  border:1px solid rgba(181,72,50,.35);
+}
+.grade-badge.failed strong,
+.grade-badge.failed small{
+  color:#8f2e1d;
+}
+.grade-badge.muted{
+  background:#f5f3ee;
+  min-height:74px;
+}
+th.rec-col,
+td.rec-col{
+  background:rgba(42,110,147,.05);
+}
+th.rec-col small{
+  font-weight:500;
+  opacity:.8;
+}
+.nota-parcial{
+  font-size:.72rem;
+  color:var(--muted);
+}
+.bim-card.automatic{
+  background:#f1f6f8;
+  border-color:rgba(42,110,147,.2);
+}
+.auto-grade-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:baseline;
+  padding:10px 12px;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid var(--line);
+}
+.auto-grade-row span{
+  font-size:.8rem;
+  font-weight:700;
+  color:var(--muted);
+}
+.auto-grade-row strong{
+  color:var(--vd);
+  text-align:right;
+}
+.recovery-card{
+  grid-column:1 / -1;
+  background:#f5f3ee;
+  border-color:var(--line);
+}
+.recovery-card.pending{
+  background:#fff4e5;
+  border-color:rgba(201,168,76,.45);
+}
+.recovery-card.recovered{
+  background:#edf8f0;
+  border-color:rgba(74,148,103,.3);
+}
+.recovery-card.failed{
+  background:#fbe3dd;
+  border-color:rgba(181,72,50,.35);
+}
+.recovery-card .bim-card-title small{
+  font-weight:500;
+  color:var(--muted);
+}
+.recovery-status{
+  font-weight:700;
+  color:var(--vd);
+}
+.recovery-card.failed .recovery-status{
+  color:#8f2e1d;
+}
+.recovery-card .stepper input{
+  max-width:140px;
+}
