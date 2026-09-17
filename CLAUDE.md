@@ -357,12 +357,18 @@ O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-
 
 **Escala do boletim:** o professor vê e digita trabalhos 0–10 e prova 0–10, e a nota do bimestre é a média. O **armazenamento continua em 0–5** (campos `trabalhos`/`prova`): média exibida = soma armazenada, notas antigas intactas e `boletim_normalizado` compatível. Em `casavequia-alunos-shared.js` use `paraExibicao`/`formatNota10` e nunca exiba o valor cru. O módulo `assets/js/notas-bimestrais.js` busca a nota calculada no banco (`usarNumero:false` para turmas do diário que juntam séries).
 
-**Motor único do boletim:** `assets/js/boletim-regras.js`. A Biblioteca tem uma **cópia idêntica** (`assets/js/boletim-regras.js`, usada pelo perfil do aluno). Depois de alterar, rode `node scripts/check-boletim-regras.js --copiar` e faça commit nos dois repositórios. Regras:
+**Motor único do boletim:** `assets/js/boletim-regras.js`. A Biblioteca tem uma **cópia idêntica** (`assets/js/boletim-regras.js`, usada pelo perfil do aluno). Depois de alterar, rode `node scripts/check-copias-compartilhadas.js --copiar` e faça commit nos dois repositórios. Regras:
 - a nota do bimestre só fecha com trabalho E prova;
 - bimestres automáticos (`relatorio_regras_escola`; Casavequia = 3º e 4º; Hermínio = nenhum, sem recuperação): o padrão é o cálculo de trabalhos e a prova da Biblioteca (view `relatorio_provas_bimestrais`, 0–10). O professor pode ajustar à mão (origem "ajuste"), e o ajuste vale até ele voltar ao automático;
 - recuperação semestral: o 2º recupera o 1º e o 4º recupera o 3º; se ainda houver bimestre abaixo de 7, prova única (`aluno.recuperacao[disciplina]["1"|"2"]`, já em 0–10). Com 7 ou mais, recupera os bimestres; abaixo disso, reprovado.
 
 O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: só a sessão do próprio aluno ou o admin. **Hermínio: boletins mantidos como estão** (decisão do professor, inclusive o `autofillMissingGrades`).
+
+**Relatório individual do aluno (Etapa 7):** uma fonte só e um documento só para o professor e para o aluno. SQL em `supabase/2026-09-17-etapa7-relatorio-individual.sql`.
+- **Dados:** RPC `relatorio_individual(aluno, bimestre, sessão)` devolve notas (via `get_meu_boletim`), aulas com tema, presença e atividade, frequência em h/aula por disciplina e as ocorrências com data, horário e gravidade. Permissão: administrador ou o próprio aluno com a sessão dele.
+- **Documento:** `assets/js/relatorio-individual.js` (cópia idêntica nos dois repositórios, conferida por `scripts/check-copias-compartilhadas.js`) monta um modelo e dele saem a tela (`html`) e o PDF (`pdf`, jsPDF + autoTable). Mudou o modelo, mudam os dois.
+- **No painel:** o perfil do aluno tem "Relatorio individual", com escolha do bimestre ou do ano todo, "Ver relatorio" e "Baixar PDF". Exige o aluno ligado à conta da Biblioteca.
+- **Comportamento não desconta nota:** aparece como registro, com o resumo por gravidade.
 
 **Bônus do Ranking de Poder (Etapa 6):** a tela do ranking promete "+N na média" por nível. Decisão do professor: o +N vale sobre a soma anual, ou seja, +N÷4 só na **média final do ano**. SQL em `supabase/2026-09-17-etapa6-bonus-ranking-poder.sql`.
 - **Tabela:** Novato e Aprendiz +0, Camponês +0,25, Gladiador +0,5, Rei +1,5, Mago Supremo +2.

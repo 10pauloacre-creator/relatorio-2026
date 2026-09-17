@@ -161,6 +161,15 @@
       return;
     }
 
+    const relatorioButton = event.target.closest("[data-ri-acao]");
+    if (relatorioButton) {
+      const escopo = relatorioButton.closest("[data-ri-bloco]");
+      const seletor = escopo ? escopo.querySelector("[data-ri-bimestre]") : null;
+      abrirRelatorioIndividual(Number(relatorioButton.dataset.riAcao === "pdf" ? relatorioButton.dataset.riPdf : relatorioButton.dataset.riVer),
+        seletor ? seletor.value : "", relatorioButton.dataset.riAcao, escopo);
+      return;
+    }
+
     const closeButton = event.target.closest("[data-close-modal]");
     if (closeButton) {
       closeModal(closeButton.dataset.closeModal);
@@ -1159,6 +1168,7 @@
           + renderTextArea(student, "necessidadesApoio", "Necessidades de apoio", "Frequencia, motivacao, leitura, escrita, concentracao ou rotina de estudos.")
         + "</div>"
       + "</section>"
+      + renderRelatorioIndividualBloco(student)
       + '<div class="report-tools">'
         + '<button class="primary-btn" type="button" data-open-report="' + student.id + '">Relatorio geral</button>'
         + '<button class="ghost-btn" type="button" data-copy-student-summary="' + student.id + '">Copiar resumo para o Codex</button>'
@@ -1431,6 +1441,75 @@
       + "<label>" + escapeHtml(label) + "</label>"
       + '<textarea data-student="' + student.id + '" data-textfield="' + field + '" placeholder="' + escapeHtml(placeholder) + '">' + escapeHtml(student[field] || "") + "</textarea>"
       + "</div>";
+  }
+
+  // ── Relatório individual (Etapa 7) ───────────────────────────────────
+  // Mesma fonte e mesmo documento do "Meu relatório" do aluno.
+  function renderRelatorioIndividualBloco(student) {
+    if (!window.RelatorioIndividual) return "";
+    const opcoes = ['<option value="">Ano todo</option>']
+      .concat(BIMESTERS.map(function (b) { return '<option value="' + b + '">' + b + "o bimestre</option>"; })).join("");
+    return '<section class="section-block" data-ri-bloco="' + student.id + '">'
+      + "<h3>Relatorio individual</h3>"
+      + '<p class="section-note">Notas, frequencia, aulas com tema e presenca, atividades e comportamento. E o mesmo documento que o aluno abre no app.</p>'
+      + '<div class="report-tools">'
+        + '<select data-ri-bimestre aria-label="Periodo do relatorio">' + opcoes + "</select>"
+        + '<button class="primary-btn" type="button" data-ri-acao="ver" data-ri-ver="' + student.id + '">Ver relatorio</button>'
+        + '<button class="ghost-btn" type="button" data-ri-acao="pdf" data-ri-pdf="' + student.id + '">Baixar PDF</button>'
+      + "</div>"
+      + '<div class="summary-foot" data-ri-status></div>'
+      + "</section>";
+  }
+
+  function alunoIdDaBiblioteca(student) {
+    const poder = notasTrabalho && notasTrabalho.obterPoder ? notasTrabalho.obterPoder(student) : null;
+    return poder && poder.alunoId ? poder.alunoId : null;
+  }
+
+  function abrirRelatorioIndividual(studentId, bimestre, acao, escopo) {
+    const student = getStudent(studentId);
+    const status = escopo ? escopo.querySelector("[data-ri-status]") : null;
+    const avisar = function (texto) { if (status) status.textContent = texto; };
+    if (!student) return;
+    const alunoId = alunoIdDaBiblioteca(student);
+    if (!alunoId) {
+      avisar("Este aluno ainda nao esta ligado a conta da Biblioteca, entao o relatorio nao pode ser montado.");
+      return;
+    }
+    const sync = window.RelatorioSupabaseSync;
+    const client = sync && sync.getClient ? sync.getClient() : null;
+    if (!client) {
+      avisar("Sem conexao com o servidor agora.");
+      return;
+    }
+    avisar("Montando o relatorio...");
+    window.RelatorioIndividual.carregar(client, { alunoId: alunoId, bimestre: bimestre })
+      .then(function (dados) {
+        const modelo = window.RelatorioIndividual.montar(dados, {});
+        if (acao === "pdf") {
+          window.RelatorioIndividual.pdf(modelo);
+          avisar("PDF gerado.");
+          return;
+        }
+        if (!document.getElementById("ri-style")) {
+          const style = document.createElement("style");
+          style.id = "ri-style";
+          style.textContent = window.RelatorioIndividual.estilo();
+          document.head.appendChild(style);
+        }
+        document.getElementById("reportTitle").textContent = "Relatorio individual - " + student.nome;
+        document.getElementById("reportSubtitle").textContent = modelo.escola + " · " + modelo.turma + " · " + modelo.periodo;
+        document.getElementById("reportBody").innerHTML =
+          '<div class="report-tools"><button class="primary-btn" type="button" data-ri-acao="pdf" data-ri-pdf="' + student.id + '">Baixar PDF</button></div>'
+          + window.RelatorioIndividual.html(modelo);
+        currentReportId = null;
+        openModal("reportModal");
+        avisar("Relatorio aberto.");
+      })
+      .catch(function (erro) {
+        console.warn("[Relatorio individual]", erro);
+        avisar("Nao foi possivel montar o relatorio agora: " + (erro && erro.message ? erro.message : "erro"));
+      });
   }
 
   function openReport(studentId) {
