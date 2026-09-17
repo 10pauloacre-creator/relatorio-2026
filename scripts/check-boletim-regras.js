@@ -14,7 +14,9 @@ const destino = process.env.BIBLIOTECA_DIR
   : path.join("C:", "Users", "PAULO ROBERTO", "biblioteca-digital-medieval-1", "assets", "js", "boletim-regras.js");
 
 function hash(arquivo) {
-  return crypto.createHash("sha256").update(fs.readFileSync(arquivo)).digest("hex").slice(0, 16);
+  // Ignora CRLF/LF: o Git no Windows converte finais de linha.
+  const texto = fs.readFileSync(arquivo, "utf8").split("\r\n").join("\n");
+  return crypto.createHash("sha256").update(texto).digest("hex").slice(0, 16);
 }
 
 if (process.argv.includes("--copiar")) {
