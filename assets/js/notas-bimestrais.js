@@ -41,6 +41,7 @@ window.NotasBimestrais = (function () {
     var porNome = {};
     var porNumero = {};
     var provas = {};
+    var detalhesProvas = {};
     var carregado = false;
     var carregando = null;
     var aliasParaDisciplina = {};
@@ -95,18 +96,28 @@ window.NotasBimestrais = (function () {
         if (opcoes.scopeKey) {
           var respostaProvas = await sync.getClient()
             .from("relatorio_provas_bimestrais")
-            .select("aluno_relatorio_id,disciplina,bimestre,nota_prova,realizada_em")
+            .select("aluno_relatorio_id,disciplina,bimestre,nota_prova,realizada_em,origem,nota_primeira,nota_recuperacao")
             .eq("scope_key", opcoes.scopeKey)
             .order("realizada_em", { ascending: true });
           if (respostaProvas.error) {
             console.warn("[Notas] não foi possível carregar as provas da Biblioteca.", respostaProvas.error);
           } else {
             var novasProvas = {};
+            var novosDetalhes = {};
             (respostaProvas.data || []).forEach(function (linha) {
               if (linha.nota_prova === null) return;
-              novasProvas[linha.aluno_relatorio_id + "|" + disciplinaDoPainel(linha.disciplina) + "|" + linha.bimestre] = Number(linha.nota_prova);
+              var chaveProva = linha.aluno_relatorio_id + "|" + disciplinaDoPainel(linha.disciplina) + "|" + linha.bimestre;
+              novasProvas[chaveProva] = Number(linha.nota_prova);
+              novosDetalhes[chaveProva] = {
+                nota: Number(linha.nota_prova),
+                primeira: linha.nota_primeira === null ? null : Number(linha.nota_primeira),
+                recuperacao: linha.nota_recuperacao === null ? null : Number(linha.nota_recuperacao),
+                origem: linha.origem,
+                realizadaEm: linha.realizada_em
+              };
             });
             provas = novasProvas;
+            detalhesProvas = novosDetalhes;
           }
         }
         carregado = true;
@@ -130,6 +141,12 @@ window.NotasBimestrais = (function () {
         || null;
     }
 
+    // {nota, primeira, recuperacao, origem, realizadaEm} ou null.
+    function obterProvaDetalhe(aluno, disciplina, bimestre) {
+      if (!carregado || !aluno || aluno.id == null) return null;
+      return detalhesProvas[aluno.id + "|" + disciplina + "|" + bimestre] || null;
+    }
+
     function obterProva(aluno, disciplina, bimestre) {
       if (!carregado || !aluno || aluno.id == null) return null;
       var valor = provas[aluno.id + "|" + disciplina + "|" + bimestre];
@@ -144,6 +161,7 @@ window.NotasBimestrais = (function () {
       carregar: carregar,
       obter: obter,
       obterProva: obterProva,
+      obterProvaDetalhe: obterProvaDetalhe,
       pronto: function () { return carregado; }
     };
   }

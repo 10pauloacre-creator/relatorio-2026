@@ -825,6 +825,18 @@
     return nota === null ? null : sanitizeFieldValue("prova", nota / ESCALA_EXIBICAO);
   }
 
+  // Texto da prova feita no livro da Biblioteca: nota, recuperação do livro e data.
+  function describeLibraryExam(student, disciplineName, bim) {
+    const d = notasTrabalho && notasTrabalho.obterProvaDetalhe ? notasTrabalho.obterProvaDetalhe(student, disciplineName, bim) : null;
+    if (!d) return null;
+    const data = d.realizadaEm ? new Date(d.realizadaEm).toLocaleDateString("pt-BR") : "";
+    let texto = formatNumber(d.nota) + "/10";
+    if (d.recuperacao !== null && d.primeira !== null) {
+      texto += " (prova " + formatNumber(d.primeira) + ", recuperacao do livro " + formatNumber(d.recuperacao) + ": vale a maior)";
+    }
+    return texto + (data ? " · " + data : "");
+  }
+
   function getEffectiveExamGrade(student, disciplineName, bim) {
     const manual = toNumber(getDisciplineBimState(student, disciplineName, bim).prova);
     return manual !== null ? manual : getAutomaticExamGrade(student, disciplineName, bim);
@@ -1205,6 +1217,7 @@
             + renderStepper(student.id, bim, "trabalhos", isManual ? dados.trabalhos : "", disciplineName)
             + (isManual ? resetBtn("data-reset-auto", "Voltar ao automatico") : "") + "</div>"
           + '<div class="auto-grade-row"><span>Prova da Biblioteca</span><strong>' + (provaAuto === null ? "aguardando a prova bimestral" : formatNota10(provaAuto)) + "</strong></div>"
+          + (provaAuto === null ? "" : '<div class="summary-foot">' + escapeHtml(describeLibraryExam(student, disciplineName, bim) || "") + "</div>")
           + "<div><label>" + (provaAjustada ? "Prova: ajuste manual em uso" : "Ajustar prova (opcional)") + "</label>"
             + renderStepper(student.id, bim, "prova", provaAjustada ? dados.prova : "", disciplineName)
             + (provaAjustada ? resetBtn("data-reset-auto-prova", "Voltar ao automatico") : "") + "</div>"
@@ -1221,6 +1234,7 @@
       + '<div class="field-stack">'
         + "<div><label>Nota de trabalhos (0 a 10)</label>" + renderStepper(student.id, bim, "trabalhos", effectiveWork, disciplineName) + "</div>"
         + "<div><label>Nota de prova (0 a 10)</label>" + renderStepper(student.id, bim, "prova", dados.prova, disciplineName) + "</div>"
+        + renderLibraryExamNote(student, disciplineName, bim, dados)
         + '<div class="summary-foot">'
           + (isManual
             ? "Nota manual em uso. Calculo automatico: " + (autoGrade === null ? "indisponivel" : formatNota10(autoGrade)) + ". "
@@ -1231,6 +1245,18 @@
         + "</div>"
       + "</div>"
       + "</article>";
+  }
+
+  // Bimestres manuais: a prova digitada tem prioridade; sem ela, vale a da Biblioteca.
+  function renderLibraryExamNote(student, disciplineName, bim, dados) {
+    const texto = describeLibraryExam(student, disciplineName, bim);
+    if (!texto) return "";
+    const digitada = toNumber(dados.prova) !== null;
+    return '<div class="summary-foot">Prova da Biblioteca: <strong>' + escapeHtml(texto) + "</strong>. "
+      + (digitada
+        ? 'A nota digitada tem prioridade. <button class="ghost-btn reset-auto-btn" type="button" data-reset-auto-prova="' + student.id + '" data-bimester="' + bim + '" data-discipline="' + escapeHtml(disciplineName) + '">Usar a prova da Biblioteca</button>'
+        : "Entra no boletim enquanto o campo acima estiver vazio.")
+      + "</div>";
   }
 
   function renderRecoveryCard(student, semestre, disciplineName) {
