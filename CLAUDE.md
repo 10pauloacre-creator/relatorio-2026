@@ -364,6 +364,14 @@ O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-
 
 O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: só a sessão do próprio aluno ou o admin. **Hermínio: boletins mantidos como estão** (decisão do professor, inclusive o `autofillMissingGrades`).
 
+**Prova da Biblioteca no boletim (Etapa 5):** a view `relatorio_provas_bimestrais` lê as Avaliações Bimestrais dos livros (`prova-runtime.js`), gravadas em `quiz_results` com `quiz_id` "prova-<tema>" e "prova-<tema>-rec". Detalhes em `supabase/2026-09-17-etapa5-provas-dos-livros.sql`.
+- **Nota:** acertos ÷ questões × 10, valendo a maior entre a prova e a recuperação do livro.
+- **Bimestre, escola e série:** saem do caminho do livro. O resultado só entra no painel da mesma escola e série.
+- **Sistema antigo** (`bimester_grades`): continua valendo onde tiver nota.
+- **Prioridade:** a prova digitada pelo professor vence; sem ela, entra a da Biblioteca. No 3º e 4º bimestres da Casavequia, a da Biblioteca é o padrão, com ajuste opcional.
+- **Detalhe da prova:** `notas-bimestrais.js` (`obterProvaDetalhe`) e `get_meu_boletim` (`provaDetalhe`) mostram a prova e a recuperação do livro.
+- **Risco conhecido:** a correção da prova é feita no aparelho do aluno, e `quiz_results` aceita inserção com a chave pública. O primeiro resultado fica travado, e só o admin apaga (`reset_prova_aluno`).
+
 **Conduta: gravidade e Observações (Etapas 4 e 4B):** a Edge Function `classificar-ocorrencias` fica no repositório da Biblioteca. As regras do professor (tabela de níveis, regras operacionais, distinções e interferência na aula) estão em `supabase/functions/_comum/conduta.ts`. Deploy: `supabase functions deploy classificar-ocorrencias --no-verify-jwt --use-api` (a própria função confere o acesso). SQL em `supabase/2026-09-17-etapa4b-observacoes-conduta.sql`.
 - **A gravidade da IA vale sem confirmação** (decisão de 17/09/2026). O professor pode trocar no selo (`relatorio_definir_gravidade`, origem "professor"), e a troca nunca é sobrescrita.
 - A IA classifica **só o ato** (`nivel_base`). A reincidência fica no banco (`relatorio_aplicar_classificacao`): com 2 ou mais registros da mesma categoria em 60 dias, sobe no máximo 1 nível. Conversa, celular, atividade, material e desatenção não passam de médio só por repetição. Cola é grave de saída. Acidente é `sem_infracao`.
