@@ -1113,6 +1113,11 @@
         + renderObservationDetails(metrics.observacoes)
       + "</section>"
       + '<section class="section-block">'
+        + "<h3>Conduta registrada pela IA</h3>"
+        + '<p class="section-note">Ocorrencias dos relatos e observacoes ligadas a este aluno, com a gravidade estabelecida pela IA (voce pode trocar no proprio relato). Comportamento nao desconta nota.</p>'
+        + '<div data-conduta-aluno></div>'
+      + "</section>"
+      + '<section class="section-block">'
         + "<h3>Acompanhamento complementar</h3>"
         + '<div class="text-grid">'
           + renderTextArea(student, "observacoesComplementares", "Observacoes complementares", "Registre evolucao, comportamento recorrente, postura, participacao e fatos relevantes nao capturados automaticamente.")
@@ -1125,6 +1130,12 @@
         + '<button class="primary-btn" type="button" data-open-report="' + student.id + '">Relatorio geral</button>'
         + '<button class="ghost-btn" type="button" data-copy-student-summary="' + student.id + '">Copiar resumo para o Codex</button>'
       + "</div>";
+
+    if (window.RelatorioCondutaAluno) {
+      window.RelatorioCondutaAluno.render(document.querySelector("#profileBody [data-conduta-aluno]"), {
+        escolaSlug: "padre-carlos-casavequia", turma: TURMA_ID, numero: student.numero
+      });
+    }
   }
 
   function renderBoletimSection(student) {
