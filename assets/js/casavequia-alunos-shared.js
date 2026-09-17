@@ -36,6 +36,11 @@
   const MAIN_DISCIPLINE = config.mainDiscipline || (DISCIPLINES[0] ? DISCIPLINES[0].name : "Linguagem");
   const DAILY_SCOPE = "casavequia:daily:shared-v1";
   const PANEL_SCOPE = "casavequia:panel:" + STORAGE_KEY;
+  // Alunos cadastrados na Biblioteca e ausentes da lista fixa (Etapa 5B).
+  if (window.RelatorioAlunosAdicionados) {
+    config.students = window.RelatorioAlunosAdicionados.completarPainel("padre-carlos-casavequia", PANEL_SCOPE, config.students);
+    window.RelatorioAlunosAdicionados.atualizar("padre-carlos-casavequia");
+  }
   const GRADE_SEEDS = window.CASAVEQUIA_GRADE_SEEDS && window.CASAVEQUIA_GRADE_SEEDS[STORAGE_KEY]
     ? window.CASAVEQUIA_GRADE_SEEDS[STORAGE_KEY]
     : (config.gradeSeeds && typeof config.gradeSeeds === "object" ? config.gradeSeeds : null);

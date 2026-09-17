@@ -364,6 +364,19 @@ O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-
 
 O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: só a sessão do próprio aluno ou o admin. **Hermínio: boletins mantidos como estão** (decisão do professor, inclusive o `autofillMissingGrades`).
 
+**Aluno novo entra sozinho (Etapa 5B):** a lista de alunos da Biblioteca é a fonte. Detalhes em `supabase/2026-09-17-etapa5b-alunos-novos-automaticos.sql`.
+- **Registro:** o gatilho em `alunos` (cadastro ou troca de turma) registra em `relatorio_alunos_adicionados` todo aluno de uma turma do Relatório que não está na lista fixa das páginas.
+- **Listas das páginas:** o módulo `assets/js/relatorio-alunos-adicionados.js` é carregado antes das listas `ALUNOS`, `ALUNOS_RH` e `STUDENTS` dos painéis e acrescenta esses alunos no fim, com o próximo número livre. Se a lista mudou, a página recarrega uma vez.
+- **Data de entrada (`de`):** aulas anteriores aparecem como "Entrou dd/mm", sem presença nem atividade.
+- **Chamada no banco:** a publicação grava a chamada completa em `relatorio_chamada`, com o 4º item do aluno no retrato = adicionado, e limpa quem já foi fixado na página.
+- **Não renumerar à mão:** para fixar o aluno no HTML, use o mesmo número que ele já recebeu.
+- **Turma nova:** exige criar a aba ou painel e a linha em `relatorio_turmas` e `relatorio_turmas_diarias`. O resto (vínculo, notas, provas, observações, relatório) é automático.
+
+**Prova só com login (Biblioteca):**
+- **No livro:** `prova-runtime.js` só inicia a prova com o aluno logado (sessão em `bdm-aluno`) ou com o admin.
+- **No banco:** o gatilho `trg_quiz_results_prova_login` só aceita resultado "prova-..." com o cabeçalho `x-bdm-sessao` válido do próprio aluno (enviado por `quiz-save-runtime.js`).
+- **Admin:** o resultado vira "prova-...-teste-N", rótulo "Teste (N)", fora do boletim.
+
 **Prova da Biblioteca no boletim (Etapa 5):** a view `relatorio_provas_bimestrais` lê as Avaliações Bimestrais dos livros (`prova-runtime.js`), gravadas em `quiz_results` com `quiz_id` "prova-<tema>" e "prova-<tema>-rec". Detalhes em `supabase/2026-09-17-etapa5-provas-dos-livros.sql`.
 - **Nota:** acertos ÷ questões × 10, valendo a maior entre a prova e a recuperação do livro.
 - **Bimestre, escola e série:** saem do caminho do livro. O resultado só entra no painel da mesma escola e série.

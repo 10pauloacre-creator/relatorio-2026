@@ -19,6 +19,7 @@
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260916a"></script>
+<script src="assets/js/relatorio-alunos-adicionados.js?v=20260917a"></script>
 <script defer src="assets/js/relatorio-lancamentos.js?v=20260917b"></script>
 <script defer src="assets/js/relatorio-ocorrencias.js?v=20260917b"></script>
 <style>
@@ -7121,6 +7122,15 @@ const ALUNOS={
   t3:[{n:1,nm:'Alonso Queiroz Santiago'},{n:2,nm:'Antoniel Araujo de Lima'},{n:3,nm:'Francisco Kevison de Lima Paixão'},{n:4,nm:'Gabriel Oliveira Evangelista'},{n:5,nm:'Gabriella Farias Moreira'},{n:6,nm:'Hana Beatryz Araujo Sales'},{n:7,nm:'Joaiz Muniz de Souza Júnior'},{n:8,nm:'João Paulo Barreto Chaves'},{n:9,nm:'Karina Paiva Lima'},{n:10,nm:'Kiara Kasiele Silva Paixão'},{n:11,nm:'Lourival Wagner Aparecido Nunes de Lima'},{n:12,nm:'Maria Beatriz Oliveira da Gama'},{n:13,nm:'Maria Eduarda Souza Teixeira'},{n:14,nm:'Matheus Henrique Silveira Santiago'},{n:15,nm:'Mayco Gabriel da Silva Dias'},{n:16,nm:'Natanael Ovides de Sousa'},{n:17,nm:'Sara Machado do Amor Divino'},{n:18,nm:'Sibelly Victória Santiago de Sousa'},{n:19,nm:'Mateus Oliveira da Silva',tr:true}],
   t6:[{n:1,nm:'Àghata Luiza Soouza da Silva'},{n:2,nm:'Angelo de Freitas Soares'},{n:3,nm:'Anthony Mayksson Willames Silva de Lima'},{n:4,nm:'Antônio Yuri da Silva Santos'},{n:5,nm:'Asheley Prince Miranda Lima'},{n:6,nm:'Bianca Alves Bulin'},{n:7,nm:'Cayki Silva de Farias'},{n:8,nm:'Daniel Magalhães de Lima'},{n:9,nm:'Davi Oliveira de Amorim'},{n:10,nm:'Douglas Oliveira Queiroz da Silva'},{n:11,nm:'Fabrício Nunes Ataíde'},{n:12,nm:'Guilherme Castro Pereira'},{n:13,nm:'Hadassa Walthier da Silva'},{n:14,nm:'Hagata Gabriely da Silva Santos'},{n:15,nm:'Isaac Souza Fernandes'},{n:17,nm:'João Pedro Maia de Oliveira'},{n:18,nm:'Joel do Nascimento Cruz'},{n:19,nm:'José Otávio da Silva Paixão'},{n:20,nm:'Lazaro da Silva Martins'},{n:21,nm:'Maria Isabele de Lima Paixão'},{n:22,nm:'Mirella Barroso Lima'},{n:23,nm:'Murilo Santana de Souza'},{n:24,nm:'Nayla Vitória de Sousa Santana'},{n:25,nm:'Neemias de Sousa Amim'},{n:26,nm:'Nicolas da Silva Nogueira'},{n:27,nm:'Pamella Letycia Souza Lino'},{n:28,nm:'Pedro Lucas Fidelis dos Reis'},{n:29,nm:'Sabrina Silva Ribeiro'},{n:30,nm:'Thaemmy Silva de Farias'},{n:31,nm:'Victor Emanoel da Silva do Nascimento'},{n:32,nm:'Vidal Wanderley de Lima'},{n:33,nm:'Wandson Santiago de Sousa'},{n:34,nm:'Yan Lima Rodrigues'},{n:35,nm:'Yasmin Victória Vasconcelos Silva'},{n:36,nm:'Breno Barroso da Silva'}]
 };
+/* Alunos cadastrados na Biblioteca e ausentes da lista acima (Etapa 5B):
+   entram no fim, com a data de entrada. Aulas anteriores não contam para eles. */
+if(window.RelatorioAlunosAdicionados){
+  RelatorioAlunosAdicionados.completarDiario('padre-carlos-casavequia',ALUNOS);
+  RelatorioAlunosAdicionados.atualizar('padre-carlos-casavequia');
+}
+function pcAntesDaEntrada(a,id){return !!(window.RelatorioAlunosAdicionados&&RelatorioAlunosAdicionados.foraDaAula(a,id));}
+function pcForaDaAula(a,id){return !!a.tr||pcAntesDaEntrada(a,id);}
+function pcRotuloFora(a){return a.tr?'Transferido':RelatorioAlunosAdicionados.rotuloEntrada(a);}
 
 /* ★ PRESENÇA — faltaram/faltJ = números de chamada ★ */
 const PRESENCA={
@@ -7467,7 +7477,7 @@ function pcAtualizarResumoPresenca(presId){
   if(!cfg||!el)return;
   var stat=el.previousElementSibling;
   if(!stat||!stat.classList.contains('pres-stat'))return;
-  var ativos=(ALUNOS[cfg.turma]||[]).filter(function(a){return !a.tr;});
+  var ativos=(ALUNOS[cfg.turma]||[]).filter(function(a){return !pcForaDaAula(a,presId);});
   var fa=0,fj=0,pr=0;
   ativos.forEach(function(a){
     var s=pcResolvePresenceStatus(presId,a.n,cfg);
@@ -7482,15 +7492,15 @@ function renderPresenca(){
   Object.entries(PRESENCA).forEach(([id,cfg])=>{
     const el=document.getElementById(id);if(!el||el.dataset.rendered)return;el.dataset.rendered='1';
     const al=ALUNOS[cfg.turma]||[];
-    const ativos=al.filter(a=>!a.tr);
+    const ativos=al.filter(a=>!pcForaDaAula(a,id));
     const fa=cfg.faltaram.length,fj=cfg.faltJ.length,pr=ativos.length-fa-fj;
     if(cfg.parcial){const av=document.createElement('div');av.className='pres-av';av.innerHTML='<span>⚠️</span><span><strong>Lista parcial:</strong> 5 presentes, nomes não registrados. Atualize quando possível.</span>';el.before(av);}
     else{const st=document.createElement('div');st.className='pres-stat';st.innerHTML=`<span>✓ Presentes: <strong>${pr}</strong></span><span>✗ Faltas: <strong>${fa}</strong></span><span>⚠ FJ: <strong>${fj}</strong></span><span>Total: <strong>${ativos.length}</strong></span>`;el.before(st);}
     al.forEach(a=>{
       const row=document.createElement('div');
-      if(a.tr){
+      if(pcForaDaAula(a,id)){
         row.className='ar2 tr';
-        row.innerHTML=`<span class="an">${a.n}</span><span class="ai3">–</span><span class="anm">${a.nm}</span><span class="atg" style="font-size:.6rem;background:#ddd;color:#999;padding:1px 5px;border-radius:3px">Transferido</span>`;
+        row.innerHTML=`<span class="an">${a.n}</span><span class="ai3">–</span><span class="anm">${a.nm}</span><span class="atg" style="font-size:.6rem;background:#ddd;color:#999;padding:1px 5px;border-radius:3px">${pcRotuloFora(a)}</span>`;
         el.appendChild(row);
         return;
       }
@@ -7569,7 +7579,7 @@ function _atvAtualizarStat(atvId,statEl){
   var cfg=ATIVIDADES[atvId]||{fez:[],naoFez:[],parcial:false};
   var st=statEl||document.querySelector('[data-stat="'+atvId+'"]');if(!st)return;
   var fz=0,nf=0,ag=0;
-  al.forEach(function(a){if(a.tr)return;var s=_atvStatus(atvId,a.n,cfg);if(s==='fz')fz++;else if(s==='nf')nf++;else ag++;});
+  al.forEach(function(a){if(pcForaDaAula(a,atvId))return;var s=_atvStatus(atvId,a.n,cfg);if(s==='fz')fz++;else if(s==='nf')nf++;else ag++;});
   st.innerHTML='<span>✓ Entregaram: <strong>'+fz+'</strong></span><span>✗ Não entregaram: <strong>'+nf+'</strong></span><span>⏳ Aguardando: <strong>'+ag+'</strong></span>';
 }
 
@@ -7643,11 +7653,11 @@ function _atvCriarCelulas(el,atvId,turma,cfg){
   }
   al.forEach(function(a){
     var cell=document.createElement('div');
-    if(a.tr){
+    if(pcForaDaAula(a,atvId)){
       cell.className='atv-r tr';
       cell.innerHTML='<span class="aic">–</span>'
         +'<span class="atv-nm">'+a.nm+'</span>'
-        +'<span style="font-size:.6rem;background:#ddd;color:#999;padding:1px 5px;border-radius:3px;flex-shrink:0">Transferido</span>';
+        +'<span style="font-size:.6rem;background:#ddd;color:#999;padding:1px 5px;border-radius:3px;flex-shrink:0">'+pcRotuloFora(a)+'</span>';
       el.appendChild(cell);
       return;
     }
@@ -8127,7 +8137,7 @@ function pcBuildSyncPayload(){
       var mmdd=id.replace('pl-'+turma+'-','');
       var data=mmdd.slice(2)+'/'+mmdd.slice(0,2)+'/2026';
       (ALUNOS[turma]||[]).forEach(function(al){
-        var item=byNum[al.n];if(!item)return;
+        var item=byNum[al.n];if(!item||pcAntesDaEntrada(al,id))return;
         item.totalAulas+=carga;
         var s=pcResolvePresenceStatus(id,al.n,cfg);
         if(s==='fa'||s==='fj'){
@@ -8154,7 +8164,7 @@ function pcBuildSyncPayload(){
         disciplineBucket.atividadesAplicadasPorBimestre[bim]=(disciplineBucket.atividadesAplicadasPorBimestre[bim]||0)+1;
       }
       (ALUNOS[turma]||[]).forEach(function(al){
-        var item=byNum[al.n];if(!item)return;
+        var item=byNum[al.n];if(!item||pcAntesDaEntrada(al,atvId))return;
         var s=pcResolveActivityStatus(atvId,al.n,cfg);
         if(s==='fz'){
           item.atividadesFeitas+=1;
@@ -8424,7 +8434,7 @@ function pcMontarRetratoLancamentos(){
   }
   turmas.forEach(function(turma){
     var alunos=ALUNOS[turma]||[];
-    retrato.turmas.push({codigo:turma,alunos:alunos.map(function(a){return[a.n,a.nm,!!a.tr];})});
+    retrato.turmas.push({codigo:turma,alunos:alunos.map(function(a){return[a.n,a.nm,!!a.tr,!!a.bib];})});
   });
   Object.entries(PRESENCA).forEach(function(pair){
     var id=pair[0],cfg=pair[1],turma=cfg.turma;
@@ -8436,6 +8446,7 @@ function pcMontarRetratoLancamentos(){
     aula.carga=carga;
     aula.p={};
     (ALUNOS[turma]||[]).forEach(function(a){
+      if(pcAntesDaEntrada(a,id))return;
       aula.p[a.n]=PC_PRES_CODIGO[pcResolvePresenceStatus(id,a.n,cfg)]||'p';
     });
   });
@@ -8447,7 +8458,7 @@ function pcMontarRetratoLancamentos(){
       var atvId='atv-'+codigo;
       var cfg=ATIVIDADES[atvId]||{turma:turma,fez:[],naoFez:[],parcial:false};
       aula.a={};
-      (ALUNOS[turma]||[]).forEach(function(a){aula.a[a.n]=pcResolveActivityStatus(atvId,a.n,cfg);});
+      (ALUNOS[turma]||[]).forEach(function(a){if(!pcAntesDaEntrada(a,pane.id))aula.a[a.n]=pcResolveActivityStatus(atvId,a.n,cfg);});
     });
     sec.querySelectorAll('.ipane[id^="r-'+turma+'-"]').forEach(function(pane){
       if(!pane.querySelector('.oi'))return;

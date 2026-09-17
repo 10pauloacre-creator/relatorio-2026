@@ -39,6 +39,7 @@ WITH livros AS (
          q.completed_at
   FROM public.quiz_results q
   WHERE q.quiz_id ~ '^prova-'
+    AND q.quiz_id !~ '-teste-[0-9]+$'   -- testes do admin nunca entram no boletim
     AND q.total BETWEEN 1 AND 100 AND q.correct BETWEEN 0 AND q.total
     AND q.book_path ~ '^/livros/'
     AND (jsonb_typeof(q.answers) <> 'array'
