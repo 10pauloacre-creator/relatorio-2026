@@ -595,6 +595,226 @@ html.dark-2026 footer {
   border-color: var(--dark-line) !important;
 }
 
+/*
+ * Camada final dos relatorios legados.
+ * As paginas principais ainda declaram centenas de regras de modo escuro
+ * depois do tema compartilhado. Estes seletores deliberadamente mais
+ * especificos removem os antigos tons verde/roxo de todas as superficies.
+ */
+html.dark-2026 body.modo-escuro {
+  --cr: var(--dark-canvas) !important;
+  --ce: var(--dark-text) !important;
+  --cm: var(--dark-muted) !important;
+  --cl: var(--dark-line) !important;
+  background: var(--dark-canvas) !important;
+  color: var(--dark-text) !important;
+}
+
+html.dark-2026 body.modo-escuro :is(.main, .sec) {
+  background: transparent !important;
+}
+
+html.dark-2026 body.modo-escuro :is(
+  .ea, .eh, .em, .itabs, .ipane, .ct, .ci, .ccard, .ai2, .ai2s, .atv-av,
+  .sc2, .brow .bi, .sem, .pres-grid .pc, .atv-grid .ac,
+  .cron-intro, .pc-planner-shell, .dc, .dc .dc-body, .cc, .bi,
+  .lesson-item, .bim-header, .liv-card, .cl-hist-inner, .cl-hist-hd,
+  .cl-livro-box, .cl-livro-atual, #toolbar-texto, #painel-editor,
+  .pe-btn, .pe-close, #cl-popup-hora > div
+) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface) !important;
+  border-color: var(--dark-line) !important;
+  box-shadow: none !important;
+}
+
+html.dark-2026 body.modo-escuro :is(
+  .ec2, .lesson-list, .pc-planner-frame, .pc-planner-meta span,
+  .bim-header .badge, .tb-btn, .tb-select, .cl-btn,
+  #atv-float-menu, .pfm-inner, .pc-cal-meta span,
+  .pc-cal-modal-top button, .pc-cal-action-btn
+) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+  box-shadow: none !important;
+}
+
+html.dark-2026 body.modo-escuro :is(.ea, .ci, .ccard, .ai2, .sc2, .dc, .bi, .lesson-item, .liv-card) {
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body.modo-escuro :is(.eh:hover, .atv-mo:hover, .cl-livro-box:hover) {
+  background: var(--dark-surface-2) !important;
+}
+
+html.dark-2026 body.modo-escuro :is(.nav-w, footer, .dc .dc-h, .plano-wrapper .header) {
+  color: var(--dark-text) !important;
+  background: var(--dark-canvas-deep) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body.modo-escuro .edb {
+  color: var(--dark-text) !important;
+  background: #15181b !important;
+  border-right: 1px solid var(--dark-line) !important;
+}
+
+html.dark-2026 body.modo-escuro :is(
+  .cab-t h1, .ti h2, .ed, .cgt, .ci h3, .lesson-title,
+  .bim-header h3, .liv-card-nm, .pe-titulo, .pc-planner-head h3
+) {
+  color: var(--dark-text) !important;
+}
+
+html.dark-2026 body.modo-escuro :is(
+  .ti p, .st, .sc2 .l, .lesson-sub, .liv-disc-h, .pe-grupo,
+  .pc-planner-head p, .pfm-sect, .ai2s, .cl-status, .cl-livro-lbl,
+  .cl-livro-vazio, .pum-det
+) {
+  color: var(--dark-muted) !important;
+}
+
+html.dark-2026 body.modo-escuro :is(.sc2 .n, .dc .dc-h, .ai2h) {
+  color: var(--dark-text) !important;
+}
+
+html.dark-2026 body.modo-escuro .sc2 {
+  border-left-color: #5b6168 !important;
+}
+
+html.dark-2026 body.modo-escuro .sc2.al {
+  border-left-color: var(--dark-negative) !important;
+}
+
+html.dark-2026 body.modo-escuro :is(
+  input:not([type="color"]):not([type="range"]), textarea, select,
+  .cl-livro-campo input, .cl-tema-item input[type="text"]
+) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body.modo-escuro :is(input, textarea)::placeholder {
+  color: var(--dark-faint) !important;
+}
+
+html.dark-2026 body.modo-escuro :is(
+  .main-tab, .disc-tab, .bim-tab, .liv-tab, .btn-st,
+  .rh-hero-pill, .pc-hero-pill
+) {
+  color: var(--dark-muted) !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body.modo-escuro :is(
+  .main-tab.active, .disc-tab.active, .bim-tab.active, .liv-tab.on,
+  .btn-st.on, .ai2h .tg, .ci-up, .pc-planner-kicker
+) {
+  color: var(--dark-accent) !important;
+  background: var(--dark-accent-soft) !important;
+  border-color: var(--dark-accent) !important;
+}
+
+html.dark-2026 body.modo-escuro :is(.lesson-num, .pfm-badge.pd, .atv-r.pd) {
+  color: var(--dark-muted) !important;
+  background: var(--dark-surface-3) !important;
+  border-color: var(--dark-line) !important;
+}
+
+/* Planejamento incorporado: uma unica familia grafite com selecao laranja. */
+html.dark-2026 body.modo-escuro #rh-plan-clone-root :is(
+  .plano-wrapper, .header, .plano-wrapper > .plan-meta, .main-tabs,
+  .content, .page, .disc-panel, .bim-panel, .lesson-list,
+  .lesson-item, .bim-header
+) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface) !important;
+  border-color: var(--dark-line) !important;
+  box-shadow: none !important;
+}
+
+html.dark-2026 body.modo-escuro #rh-plan-clone-root :is(.main-tab, .disc-tab, .bim-tab, .plan-pill, .bim-header .badge) {
+  color: var(--dark-muted) !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body.modo-escuro #rh-plan-clone-root :is(.main-tab.active, .disc-tab.active, .bim-tab.active) {
+  color: #151719 !important;
+  background: var(--dark-accent) !important;
+  border-color: var(--dark-accent) !important;
+}
+
+/* Calendario, contadores e caixas auxiliares seguem as mesmas superficies. */
+html.dark-2026 body.modo-escuro :is(
+  .pc-cal-shell, .pc-cal-agenda, .pc-cal-week-section, .pc-cal-mini-month,
+  .pc-cal-modal-inner, .pc-cal-edit-form, .pc-cal-grid, .pc-cal-day,
+  .pc-cal-agenda-item, .pc-cal-modal-card, .pc-cal-list-empty
+) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface) !important;
+  border-color: var(--dark-line) !important;
+  box-shadow: none !important;
+}
+
+html.dark-2026 body.modo-escuro :is(.pc-cal-intro, .pc-cal-day-summary, .pres-av, .atv-tema, #plano-ultima-mod) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body.modo-escuro :is(.pc-cal-title, .pc-cal-day-date, .pc-cal-mini-top h3, .pc-cal-modal-date, .pc-cal-modal-top h3, .pc-cal-agenda-head h3, .pc-cal-week-section-top strong) {
+  color: var(--dark-text) !important;
+}
+
+/* Estados semanticos: cor somente quando comunica significado. */
+html.dark-2026 body.modo-escuro :is(
+  .rh-mark-btn.is-green, .atv-r.fz, .pfm-badge.fz, .ar2.pr,
+  .liv-card.concluido, .cl-card.livre, .pres-grid .pp, .lesson-item.st-ap
+) {
+  color: var(--dark-positive) !important;
+  background: var(--dark-positive-soft) !important;
+  border-color: #2e704e !important;
+}
+
+html.dark-2026 body.modo-escuro :is(
+  .rh-mark-btn.is-red, .atv-r.nf, .pfm-badge.nf, .pfm-badge.f,
+  .ar2.fa, .liv-card.criando, .cl-card.ocupado, .pres-grid .pf,
+  .ng, .oi, .pe-del, .atv-av.warn
+) {
+  color: var(--dark-negative) !important;
+  background: var(--dark-negative-soft) !important;
+  border-color: #7a3530 !important;
+}
+
+html.dark-2026 body.modo-escuro :is(.oi.nt, .btn-st.sm.on) {
+  color: var(--dark-info) !important;
+  background: var(--dark-info-soft) !important;
+  border-color: #36577f !important;
+}
+
+html.dark-2026 body.modo-escuro :is(
+  .atv-r.ag, .pfm-badge.ag, .pfm-badge.fj, .ar2.fj,
+  .lesson-item.st-pu, .lembrete
+) {
+  color: var(--dark-warning) !important;
+  background: var(--dark-warning-soft) !important;
+  border-color: #74612c !important;
+}
+
+/* Fundos claros embutidos recebem grafite; excecoes semanticas ficam acima. */
+html.dark-2026 body.modo-escuro .main :is(
+  [style*="background:#fff"], [style*="background: #fff"],
+  [style*="background:#faf8f2"], [style*="background:#f5f3ee"]
+) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface) !important;
+  border-color: var(--dark-line) !important;
+}
+
 @media (max-width: 680px) {
   html.dark-2026 :where(.ea, .panel, .summary-card, .card, .modal-card) {
     box-shadow: 0 8px 24px rgba(0, 0, 0, .22) !important;
