@@ -823,6 +823,7 @@ tbody tr:hover td{
   </div>
 </div>
 
+<script src="assets/js/relatorio-alunos-adicionados.js?v=20260917a"></script>
 <script>
 const STORAGE_KEY = "rh_alunos_2serie_2026_v1";
 const SCHOOL_NAME = "E.E. Raimundo Hermínio de Melo";
@@ -846,6 +847,12 @@ const STUDENTS = [
     { id: 11, numero: 11, nome: "Tamyres Soares dos Santos", externalId: "ID-11-TAMYRES-2-RHM2" },
     { id: 12, numero: 12, nome: "Tiago Oliveira da Silva", externalId: "ID-12-TIAGO-2-RHM2" }
   ];
+
+// Alunos cadastrados na Biblioteca e ausentes da lista acima (Etapa 5B).
+if (window.RelatorioAlunosAdicionados) {
+  STUDENTS.push.apply(STUDENTS, window.RelatorioAlunosAdicionados.completarPainel("raimundo-herminio-de-melo-2", "herminio:panel:" + STORAGE_KEY, STUDENTS).slice(STUDENTS.length));
+  window.RelatorioAlunosAdicionados.atualizar("raimundo-herminio-de-melo-2");
+}
 
 const ABSENCE_RECORDS = [];
 
