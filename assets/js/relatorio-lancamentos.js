@@ -12,6 +12,7 @@ window.RelatorioLancamentos = (function () {
   function iniciar(options) {
     var escolaSlug = options.escolaSlug;
     var montarRetrato = options.montarRetrato;
+    var aoPublicar = typeof options.aoPublicar === "function" ? options.aoPublicar : null;
     var timerId = null;
     var enviando = false;
     var pendente = false;
@@ -67,6 +68,9 @@ window.RelatorioLancamentos = (function () {
         ultimaAssinatura = assinaturaAtual;
         try { localStorage.setItem(storageKey, assinaturaAtual); } catch (error) {}
         var resumo = response.data || {};
+        if (aoPublicar) {
+          try { aoPublicar(resumo); } catch (error) { console.warn("[Lançamentos] aoPublicar falhou", error); }
+        }
         if (resumo.alunos_sem_vinculo && resumo.alunos_sem_vinculo.length) {
           console.info("[Lançamentos] alunos sem vínculo com a Biblioteca:", resumo.alunos_sem_vinculo);
         }
