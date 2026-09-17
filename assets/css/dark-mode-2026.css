@@ -815,6 +815,221 @@ html.dark-2026 body.modo-escuro .main :is(
   border-color: var(--dark-line) !important;
 }
 
+/*
+ * Contador e cronograma semanal.
+ * As cores abaixo identificam disciplinas, sem transformar paineis inteiros
+ * em blocos claros ou comprometer a leitura no modo escuro.
+ */
+html.dark-2026 body #sec-cont :is(.dc, .db, .cc, .cch, .ccbody) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body #sec-cont :is(.cgt, .cch, .statline) {
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body #sec-cont :is(.sh, .st2, .ccm, .plt, .ae) {
+  color: #bdc3cb !important;
+}
+
+html.dark-2026 body #sec-cont :is(.sd, .rv, .pln, .cct, .bd2) {
+  color: var(--dark-text) !important;
+}
+
+html.dark-2026 body #sec-cont .d-lp {
+  background: #36c7a3 !important;
+}
+
+html.dark-2026 body #sec-cont .sl-lp {
+  color: var(--dark-text) !important;
+  background: #14382f !important;
+  border-left-color: #36c7a3 !important;
+}
+
+html.dark-2026 body #sec-cont .sl-lp .sd {
+  color: #62e0be !important;
+}
+
+html.dark-2026 body #sec-cont .sl-tl {
+  color: var(--dark-text) !important;
+  background: #302645 !important;
+  border-left-color: #b691ff !important;
+}
+
+html.dark-2026 body #sec-cont .sl-tl .sd {
+  color: #c6a8ff !important;
+}
+
+html.dark-2026 body #sec-cont .sl-tc {
+  color: var(--dark-text) !important;
+  background: #173a29 !important;
+  border-left-color: var(--dark-positive) !important;
+}
+
+html.dark-2026 body #sec-cont .sl-tc .sd {
+  color: var(--dark-positive) !important;
+}
+
+html.dark-2026 body #sec-cont .sl-ar {
+  color: var(--dark-text) !important;
+  background: #432c20 !important;
+  border-left-color: var(--dark-accent) !important;
+}
+
+html.dark-2026 body #sec-cont .sl-ar .sd {
+  color: var(--dark-accent) !important;
+}
+
+html.dark-2026 body #sec-cont .c-se { background: #25292d !important; }
+html.dark-2026 body #sec-cont .c-te { background: #315b91 !important; }
+html.dark-2026 body #sec-cont .c-qu { background: #6547a3 !important; }
+html.dark-2026 body #sec-cont .c-sx { background: #82470f !important; }
+
+html.dark-2026 body #sec-cont .ri {
+  color: var(--dark-text) !important;
+  border: 1px solid var(--dark-line) !important;
+}
+
+html.dark-2026 body #sec-cont .ri-v { background: #17382f !important; }
+html.dark-2026 body #sec-cont .ri-a { background: #20344c !important; }
+html.dark-2026 body #sec-cont .ri-o { background: #3b321d !important; }
+html.dark-2026 body #sec-cont .ri-l { background: #432c20 !important; }
+
+html.dark-2026 body #sec-cont .ri-v .rl { color: #62e0be !important; }
+html.dark-2026 body #sec-cont .ri-a .rl { color: var(--dark-info) !important; }
+html.dark-2026 body #sec-cont .ri-o .rl { color: var(--dark-warning) !important; }
+html.dark-2026 body #sec-cont .ri-l .rl { color: var(--dark-accent) !important; }
+
+html.dark-2026 body #sec-cont .pbg {
+  background: #3a3f45 !important;
+}
+
+html.dark-2026 body #sec-cont .bi {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body #sec-cont .bi.co {
+  color: var(--dark-positive) !important;
+  background: var(--dark-positive-soft) !important;
+  border-color: #2e704e !important;
+}
+
+html.dark-2026 body #sec-cont .bi.at {
+  color: var(--dark-warning) !important;
+  background: var(--dark-warning-soft) !important;
+  border-color: #74612c !important;
+}
+
+html.dark-2026 body #sec-cont .bi.co :is(.bn, .bd2) {
+  color: var(--dark-positive) !important;
+}
+
+html.dark-2026 body #sec-cont .bi.at :is(.bn, .bd2) {
+  color: var(--dark-warning) !important;
+}
+
+html.dark-2026 body #sec-cont .bd-lp {
+  color: #62e0be !important;
+  background: #14382f !important;
+}
+
+html.dark-2026 body #sec-cont .bd-tl {
+  color: #c6a8ff !important;
+  background: #302645 !important;
+}
+
+html.dark-2026 body #sec-cont .bd-tc {
+  color: var(--dark-positive) !important;
+  background: var(--dark-positive-soft) !important;
+}
+
+html.dark-2026 body #sec-cont .bd-ar {
+  color: var(--dark-accent) !important;
+  background: var(--dark-accent-soft) !important;
+}
+
+/* Pagina de projecoes carregada dentro da aba Contador. */
+html.dark-2026 body :is(.discipline-panel, .panel-hero, .proj-wrap, .modal, .modal-head, .modal-body, .modal-foot) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface) !important;
+  background-image: none !important;
+  border-color: var(--dark-line) !important;
+  box-shadow: none !important;
+}
+
+html.dark-2026 body :is(.panel-head h2, .card h3, .sidebar-card h2, .sidebar-card h3, .cum, .summary-total strong) {
+  color: var(--dark-text) !important;
+}
+
+html.dark-2026 body :is(.panel-copy, .card .lead, .sidebar-card p, .delta, .field label, .check, footer.credit) {
+  color: var(--dark-muted) !important;
+}
+
+html.dark-2026 body :is(.panel-kicker, .mile-tag) {
+  color: var(--dark-accent) !important;
+  background: var(--dark-accent-soft) !important;
+  border-color: rgba(255, 166, 91, .4) !important;
+}
+
+html.dark-2026 body :is(.turno-inner, .sync-chip, .summary-total, .note-pill, .x) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body .turno.sync .turno-inner {
+  color: var(--dark-text) !important;
+  background: var(--dark-accent-soft) !important;
+  border-color: rgba(255, 166, 91, .42) !important;
+}
+
+html.dark-2026 body .turno.milestone .turno-inner {
+  color: var(--dark-positive) !important;
+  background: var(--dark-positive-soft) !important;
+  border-color: #2e704e !important;
+}
+
+html.dark-2026 body .view-toggle button {
+  color: var(--dark-muted) !important;
+  background: transparent !important;
+}
+
+html.dark-2026 body .view-toggle button.on {
+  color: #151719 !important;
+  background: var(--dark-accent) !important;
+  box-shadow: none !important;
+}
+
+html.dark-2026 body .note-pill.sync {
+  color: var(--dark-accent) !important;
+  background: var(--dark-accent-soft) !important;
+  border-color: rgba(255, 166, 91, .4) !important;
+}
+
+html.dark-2026 body .note-pill.sabado {
+  color: var(--dark-info) !important;
+  background: var(--dark-info-soft) !important;
+  border-color: #36577f !important;
+}
+
+html.dark-2026 body .note-pill.domingo {
+  color: var(--dark-negative) !important;
+  background: var(--dark-negative-soft) !important;
+  border-color: #7a3530 !important;
+}
+
+html.dark-2026 body :is(.statline, table.proj th, table.proj td, .section-title::after) {
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body .blank {
+  color: var(--dark-faint) !important;
+}
+
 @media (max-width: 680px) {
   html.dark-2026 :where(.ea, .panel, .summary-card, .card, .modal-card) {
     box-shadow: 0 8px 24px rgba(0, 0, 0, .22) !important;
