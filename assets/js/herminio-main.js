@@ -448,6 +448,13 @@ function rhMontarRetratoLancamentos() {
   });
   return retrato;
 }
+// Turma, data e disciplina de um relato (caixa 📝 Observações).
+function rhInfoRelato(pane) {
+  var turmaId = rhDescobrirTurmaPane(pane);
+  if (!turmaId || !ALUNOS_RH[turmaId]) return null;
+  var infoDisc = rhDisciplinaPane(pane);
+  return { turma: turmaId, data: window.RelatorioLancamentos.dataIsoDoCodigo(pane.id.slice(2)), disciplina: infoDisc ? infoDisc.disc : '' };
+}
 function rhAgendarLancamentos() {
   if (!window.RelatorioLancamentos) return;
   if (!_rhLancamentos) {
@@ -457,7 +464,7 @@ function rhAgendarLancamentos() {
       aoPublicar: function () { if (_rhOcorrencias) _rhOcorrencias.agendar(1500); }
     });
     if (window.RelatorioOcorrencias) {
-      _rhOcorrencias = window.RelatorioOcorrencias.iniciar({ escolaSlug: 'raimundo-herminio-de-melo-2' });
+      _rhOcorrencias = window.RelatorioOcorrencias.iniciar({ escolaSlug: 'raimundo-herminio-de-melo-2', infoRelato: rhInfoRelato });
       _rhOcorrencias.agendar(2500);
     }
     _rhValePontoUI = window.RelatorioLancamentos.instalarInterruptorValePonto({

@@ -9,6 +9,28 @@ window.RelatorioLancamentos = (function () {
   var DEBOUNCE_MS = 4000;
   var RETRY_MS = 60000;
 
+  // Aviso discreto de que os relatos (inclusive os adicionados à mão no HTML)
+  // chegaram ao banco. Some sozinho quando deu certo; fica quando falhou.
+  var avisoTimer = null;
+  function avisoBanco(texto, falhou) {
+    var el = document.getElementById("rel-banco-status");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "rel-banco-status";
+      el.setAttribute("role", "status");
+      el.setAttribute("data-runtime-ui", "banco-status");
+      el.style.cssText = "position:fixed;left:12px;bottom:12px;z-index:2147480000;max-width:calc(100vw - 24px);padding:8px 12px;"
+        + "border-radius:999px;font:600 .74rem/1.3 system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.18);pointer-events:none;transition:opacity .3s";
+      document.body.appendChild(el);
+    }
+    el.textContent = texto;
+    el.style.background = falhou ? "#fde4d8" : "#e3f3ea";
+    el.style.color = falhou ? "#8c3514" : "#1f5f3c";
+    el.style.opacity = "1";
+    if (avisoTimer) window.clearTimeout(avisoTimer);
+    if (!falhou) avisoTimer = window.setTimeout(function () { el.style.opacity = "0"; }, 6000);
+  }
+
   function iniciar(options) {
     var escolaSlug = options.escolaSlug;
     var montarRetrato = options.montarRetrato;
@@ -62,12 +84,16 @@ window.RelatorioLancamentos = (function () {
         });
         if (response.error) {
           console.warn("[Lançamentos] publicação falhou; nova tentativa em 1 min.", response.error);
+          avisoBanco("⚠️ Banco não atualizado; nova tentativa em 1 min", true);
           window.setTimeout(function () { agendar("retry"); }, RETRY_MS);
           return;
         }
         ultimaAssinatura = assinaturaAtual;
         try { localStorage.setItem(storageKey, assinaturaAtual); } catch (error) {}
         var resumo = response.data || {};
+        var agora = new Date();
+        avisoBanco("☁️ Banco atualizado às " + String(agora.getHours()).padStart(2, "0") + ":" + String(agora.getMinutes()).padStart(2, "0")
+          + " · " + (resumo.aulas || retrato.aulas.length) + " relatos", false);
         if (aoPublicar) {
           try { aoPublicar(resumo); } catch (error) { console.warn("[Lançamentos] aoPublicar falhou", error); }
         }
@@ -79,6 +105,7 @@ window.RelatorioLancamentos = (function () {
         }
       } catch (error) {
         console.warn("[Lançamentos] sem conexão; nova tentativa em 1 min.", error);
+        avisoBanco("⚠️ Sem conexão com o banco; nova tentativa em 1 min", true);
         window.setTimeout(function () { agendar("retry"); }, RETRY_MS);
       } finally {
         enviando = false;
