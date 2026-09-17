@@ -4,14 +4,18 @@
   if (window.__RELATORIO_DARK_THEME_2026__) return;
   window.__RELATORIO_DARK_THEME_2026__ = true;
 
-  /* Carrega o tema diretamente para contornar imports antigos em cache. */
-  if (!document.querySelector('link[href*="dark-mode-2026.css"]')) {
+  /*
+   * A folha final e anexada depois dos estilos legados da pagina. Assim, as
+   * regras antigas de modo escuro nao recuperam a paleta verde/roxa.
+   */
+  if (!document.querySelector('link[data-relatorio-dark-final="20260916c"]')) {
     var currentScript = document.currentScript;
     var themeStylesheet = document.createElement("link");
     themeStylesheet.rel = "stylesheet";
+    themeStylesheet.dataset.relatorioDarkFinal = "20260916c";
     themeStylesheet.href = currentScript && currentScript.src
-      ? new URL("../css/dark-mode-2026.css?v=20260916b", currentScript.src).href
-      : "assets/css/dark-mode-2026.css?v=20260916b";
+      ? new URL("../css/dark-mode-2026.css?v=20260916c", currentScript.src).href
+      : "assets/css/dark-mode-2026.css?v=20260916c";
     document.head.appendChild(themeStylesheet);
   }
 
