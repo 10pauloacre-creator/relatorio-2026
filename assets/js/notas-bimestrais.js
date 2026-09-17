@@ -8,9 +8,11 @@
 //     escolaSlug: "padre-carlos-casavequia", turmaCodigo: "t1",
 //     disciplinas: [{ name: "Língua Portuguesa", aliases: ["LP"] }],
 //     aoAtualizar: function () { renderAll(); },
-//     usarNumero: true   // false quando a turma do diário junta séries (Hermínio t23)
+//     usarNumero: true,  // false quando a turma do diário junta séries (Hermínio t23)
+//     scopeKey: "casavequia:panel:pc_alunos_1serie_2026_v1" // habilita obterProva
 //   });
 //   notas.obter({ nome, numero }, "Língua Portuguesa", "3") → linha ou null
+//   notas.obterProva({ id }, "Língua Portuguesa", "3") → nota 0–10 da prova da Biblioteca ou null
 window.NotasBimestrais = (function () {
   var RECARREGAR_MS = 120000;
 
@@ -38,6 +40,7 @@ window.NotasBimestrais = (function () {
   function criar(opcoes) {
     var porNome = {};
     var porNumero = {};
+    var provas = {};
     var carregado = false;
     var carregando = null;
     var aliasParaDisciplina = {};
@@ -87,6 +90,25 @@ window.NotasBimestrais = (function () {
         });
         porNome = novoPorNome;
         porNumero = novoPorNumero;
+
+        // Prova bimestral da Biblioteca (0–10), pelo vínculo exato do painel.
+        if (opcoes.scopeKey) {
+          var respostaProvas = await sync.getClient()
+            .from("relatorio_provas_bimestrais")
+            .select("aluno_relatorio_id,disciplina,bimestre,nota_prova,realizada_em")
+            .eq("scope_key", opcoes.scopeKey)
+            .order("realizada_em", { ascending: true });
+          if (respostaProvas.error) {
+            console.warn("[Notas] não foi possível carregar as provas da Biblioteca.", respostaProvas.error);
+          } else {
+            var novasProvas = {};
+            (respostaProvas.data || []).forEach(function (linha) {
+              if (linha.nota_prova === null) return;
+              novasProvas[linha.aluno_relatorio_id + "|" + disciplinaDoPainel(linha.disciplina) + "|" + linha.bimestre] = Number(linha.nota_prova);
+            });
+            provas = novasProvas;
+          }
+        }
         carregado = true;
         if (typeof opcoes.aoAtualizar === "function") {
           try { opcoes.aoAtualizar(); } catch (error) { console.warn("[Notas] falha ao redesenhar", error); }
@@ -108,6 +130,12 @@ window.NotasBimestrais = (function () {
         || null;
     }
 
+    function obterProva(aluno, disciplina, bimestre) {
+      if (!carregado || !aluno || aluno.id == null) return null;
+      var valor = provas[aluno.id + "|" + disciplina + "|" + bimestre];
+      return valor === undefined ? null : valor;
+    }
+
     carregar();
     window.setInterval(carregar, RECARREGAR_MS);
     window.addEventListener("focus", function () { carregar(); });
@@ -115,6 +143,7 @@ window.NotasBimestrais = (function () {
     return {
       carregar: carregar,
       obter: obter,
+      obterProva: obterProva,
       pronto: function () { return carregado; }
     };
   }
