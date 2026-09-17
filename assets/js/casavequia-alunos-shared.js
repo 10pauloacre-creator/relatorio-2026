@@ -22,7 +22,7 @@
   // Regras do boletim (motor em assets/js/boletim-regras.js, o mesmo usado no
   // perfil do aluno na Biblioteca). Casavequia: 3º e 4º bimestres só pelo
   // cálculo automático (trabalhos + prova da Biblioteca) e recuperação semestral.
-  const REGRAS = config.regras || { bimestresAutomaticos: ["3", "4"], recuperacaoSemestral: true };
+  const REGRAS = config.regras || { bimestresAutomaticos: ["3", "4"], recuperacaoSemestral: true, bonusPoder: true };
   const SEMESTRES_DO_BIMESTRE = { "2": "1", "4": "2" };
   const DISCIPLINES = (config.disciplines || []).map(function (discipline, index) {
     return {
@@ -860,9 +860,13 @@
       };
     });
     const recuperacao = student.recuperacao && student.recuperacao[disciplineName] ? student.recuperacao[disciplineName] : {};
+    const poder = notasTrabalho && notasTrabalho.obterPoder ? notasTrabalho.obterPoder(student) : null;
     return window.BoletimRegras.calcular({
       bimestresAutomaticos: REGRAS.bimestresAutomaticos,
       recuperacaoSemestral: REGRAS.recuperacaoSemestral,
+      // Etapa 6: bônus do Ranking de Poder só na média final do ano.
+      bonusPoder: !!(REGRAS.bonusPoder && poder && poder.bonusPoder),
+      pontosPoder: poder ? poder.pontos : null,
       bimestres: bimestres,
       recuperacao: recuperacao
     });
@@ -892,7 +896,8 @@
 
   // Média dos bimestres fechados, com as notas recuperadas.
   function calculateDisciplineAverage(student, disciplineName) {
-    return calcularBoletimDisciplina(student, disciplineName).mediaAnual;
+    const calc = calcularBoletimDisciplina(student, disciplineName);
+    return calc.mediaFinal !== null && calc.mediaFinal !== undefined ? calc.mediaFinal : calc.mediaAnual;
   }
 
   function calculateAnnualAverage(student) {
@@ -1077,6 +1082,16 @@
       + "</div>";
   }
 
+  // Nível do Ranking de Poder e o bônus na média final da disciplina.
+  function renderPowerMetric(student, disciplineName) {
+    const calc = calcularBoletimDisciplina(student, disciplineName);
+    if (!calc.poder) return "";
+    const bonus = calc.poder.bonusMedia.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+    return profileMetric("Ranking de Poder", calc.poder.nome + " · " + calc.poder.pontos + " pts",
+      "Bonus na media final: +" + bonus
+        + (calc.mediaAnual !== null ? " (media " + formatNumber(calc.mediaAnual) + " → " + formatNumber(calc.mediaFinal) + ")" : ""));
+  }
+
   function profileMetric(label, value, foot) {
     return '<article class="profile-card">'
       + '<div class="summary-label">' + escapeHtml(label) + "</div>"
@@ -1112,7 +1127,8 @@
         + profileMetric("Faltas em h/aula", String(metrics.faltas), "Carga horaria ausente consolidada")
         + profileMetric("Presencas em h/aula", String(metrics.presencas), "Presencas registradas nos relatos diarios")
         + profileMetric("Atividades em " + disciplineConfig.shortLabel, String(disciplineMetrics.atividadesFeitas || 0), disciplineConfig.automated ? "Contagem automatica da disciplina ativa" : "Disciplina em modo manual")
-        + profileMetric("Media em " + disciplineConfig.shortLabel, media === null ? "-" : formatNumber(media) + "/10", media === null ? "Ainda sem notas lancadas nesta disciplina" : "Media dos bimestres preenchidos")
+        + profileMetric("Media em " + disciplineConfig.shortLabel, media === null ? "-" : formatNumber(media) + "/10", media === null ? "Ainda sem notas lancadas nesta disciplina" : "Media dos bimestres preenchidos, com o bonus do Ranking de Poder")
+        + renderPowerMetric(student, currentBoletimDiscipline)
       + "</section>"
       + '<section class="section-block">'
         + "<h3>Boletim por disciplina</h3>"

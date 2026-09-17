@@ -364,6 +364,13 @@ O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-
 
 O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: só a sessão do próprio aluno ou o admin. **Hermínio: boletins mantidos como estão** (decisão do professor, inclusive o `autofillMissingGrades`).
 
+**Bônus do Ranking de Poder (Etapa 6):** a tela do ranking promete "+N na média" por nível. Decisão do professor: o +N vale sobre a soma anual, ou seja, +N÷4 só na **média final do ano**. SQL em `supabase/2026-09-17-etapa6-bonus-ranking-poder.sql`.
+- **Tabela:** Novato e Aprendiz +0, Camponês +0,25, Gladiador +0,5, Rei +1,5, Mago Supremo +2.
+- **Limites:** máximo de 10, uma casa decimal. Não muda as notas dos bimestres nem a recuperação.
+- **Onde é calculado:** no motor (`nivelPoder`, `mediaFinal`), que usa os mesmos limites de pontos do `recalc_nivel`.
+- **Interruptor por escola:** `relatorio_regras_escola.bonus_poder`, ligado na Casavequia e desligado na Hermínio.
+- **Dados:** pontos em `relatorio_poder_alunos` (painel) e `pontosPoder` no `get_meu_boletim` (aluno).
+
 **Aluno novo entra sozinho (Etapa 5B):** a lista de alunos da Biblioteca é a fonte. Detalhes em `supabase/2026-09-17-etapa5b-alunos-novos-automaticos.sql`.
 - **Registro:** o gatilho em `alunos` (cadastro ou troca de turma) registra em `relatorio_alunos_adicionados` todo aluno de uma turma do Relatório que não está na lista fixa das páginas.
 - **Listas das páginas:** o módulo `assets/js/relatorio-alunos-adicionados.js` é carregado antes das listas `ALUNOS`, `ALUNOS_RH` e `STUDENTS` dos painéis e acrescenta esses alunos no fim, com o próximo número livre. Se a lista mudou, a página recarrega uma vez.

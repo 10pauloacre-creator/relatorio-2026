@@ -20,10 +20,33 @@
 //         faz a prova única de recuperação semestral. Com 7 ou mais, recupera
 //         os bimestres abaixo da média (vale a nota da recuperação); abaixo
 //         de 7, fica reprovado no semestre.
+//  • Ranking de Poder (Biblioteca), decisão do professor em 17/09/2026: o
+//    bônus do nível ("+N na média" da tela do ranking) vale sobre a soma dos
+//    4 bimestres, ou seja, +N÷4 na MÉDIA FINAL do ano (Mago Supremo: +8 → +2).
+//    Não muda as notas dos bimestres nem a recuperação. Limite de 10;
+//    média final com uma casa decimal (8,75 → 8,8).
+//    Só vale quando a escola liga regras.bonusPoder.
 // ═══════════════════════════════════════════════════════════════════════════
 (function (root) {
   var MEDIA = 7;
   var SEMESTRES = { "1": ["1", "2"], "2": ["3", "4"] };
+  // Mesmos limites de recalc_nivel (Biblioteca) e da tela do ranking.
+  var NIVEIS_PODER = [
+    { nivel: 0, minimo: 0, nome: "Novato", bonusAnual: 0 },
+    { nivel: 1, minimo: 10, nome: "Aprendiz", bonusAnual: 0 },
+    { nivel: 2, minimo: 50, nome: "Camponês", bonusAnual: 1 },
+    { nivel: 3, minimo: 200, nome: "Gladiador", bonusAnual: 2 },
+    { nivel: 4, minimo: 300, nome: "Rei", bonusAnual: 6 },
+    { nivel: 5, minimo: 500, nome: "Mago Supremo", bonusAnual: 8 }
+  ];
+
+  function nivelPoder(pontos) {
+    var p = Number(pontos);
+    if (!Number.isFinite(p)) return null;
+    var atual = NIVEIS_PODER[0];
+    NIVEIS_PODER.forEach(function (n) { if (p >= n.minimo) atual = n; });
+    return { pontos: Math.max(0, Math.round(p)), nivel: atual.nivel, nome: atual.nome, bonusAnual: atual.bonusAnual, bonusMedia: atual.bonusAnual / 4 };
+  }
 
   function numero(valor) {
     if (valor === "" || valor === null || valor === undefined) return null;
@@ -139,11 +162,19 @@
       .map(function (b) { return bimestres[b].notaFinal; })
       .filter(function (v) { return v !== null; });
 
+    var mediaAnual = finais.length ? arredondarMeio(finais.reduce(function (a, v) { return a + v; }, 0) / finais.length) : null;
+    var poder = entrada.bonusPoder ? nivelPoder(entrada.pontosPoder) : null;
+    var mediaFinal = mediaAnual === null
+      ? null
+      : Math.min(10, Math.round((mediaAnual + (poder ? poder.bonusMedia : 0)) * 10) / 10);
+
     return {
       media: MEDIA,
       bimestres: bimestres,
       semestres: semestres,
-      mediaAnual: finais.length ? arredondarMeio(finais.reduce(function (a, v) { return a + v; }, 0) / finais.length) : null,
+      mediaAnual: mediaAnual,
+      poder: poder,                 // {pontos, nivel, nome, bonusAnual, bonusMedia} ou null
+      mediaFinal: mediaFinal,       // média anual + bônus do Ranking de Poder (máx. 10)
       bimestresConsiderados: finais.length
     };
   }
@@ -163,8 +194,10 @@
     MEDIA: MEDIA,
     SEMESTRES: SEMESTRES,
     calcular: calcular,
+    NIVEIS_PODER: NIVEIS_PODER,
+    nivelPoder: nivelPoder,
     rotuloSituacao: function (situacao) { return ROTULOS_SITUACAO[situacao] || situacao; },
-    VERSAO: "2026-09-17b"
+    VERSAO: "2026-09-17c"
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

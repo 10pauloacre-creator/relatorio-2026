@@ -42,6 +42,7 @@ window.NotasBimestrais = (function () {
     var porNumero = {};
     var provas = {};
     var detalhesProvas = {};
+    var poder = {};
     var carregado = false;
     var carregando = null;
     var aliasParaDisciplina = {};
@@ -120,6 +121,22 @@ window.NotasBimestrais = (function () {
             detalhesProvas = novosDetalhes;
           }
         }
+        // Pontos do Ranking de Poder (Etapa 6), pelo vínculo exato do painel.
+        if (opcoes.scopeKey) {
+          var respostaPoder = await sync.getClient()
+            .from("relatorio_poder_alunos")
+            .select("aluno_relatorio_id,pontos,nivel,bonus_poder")
+            .eq("scope_key", opcoes.scopeKey);
+          if (respostaPoder.error) {
+            console.warn("[Notas] não foi possível carregar o Ranking de Poder.", respostaPoder.error);
+          } else {
+            var novoPoder = {};
+            (respostaPoder.data || []).forEach(function (linha) {
+              novoPoder[linha.aluno_relatorio_id] = { pontos: Number(linha.pontos) || 0, nivel: linha.nivel, bonusPoder: !!linha.bonus_poder };
+            });
+            poder = novoPoder;
+          }
+        }
         carregado = true;
         if (typeof opcoes.aoAtualizar === "function") {
           try { opcoes.aoAtualizar(); } catch (error) { console.warn("[Notas] falha ao redesenhar", error); }
@@ -147,6 +164,12 @@ window.NotasBimestrais = (function () {
       return detalhesProvas[aluno.id + "|" + disciplina + "|" + bimestre] || null;
     }
 
+    // {pontos, nivel, bonusPoder} do Ranking de Poder, ou null.
+    function obterPoder(aluno) {
+      if (!carregado || !aluno || aluno.id == null) return null;
+      return poder[aluno.id] || null;
+    }
+
     function obterProva(aluno, disciplina, bimestre) {
       if (!carregado || !aluno || aluno.id == null) return null;
       var valor = provas[aluno.id + "|" + disciplina + "|" + bimestre];
@@ -162,6 +185,7 @@ window.NotasBimestrais = (function () {
       obter: obter,
       obterProva: obterProva,
       obterProvaDetalhe: obterProvaDetalhe,
+      obterPoder: obterPoder,
       pronto: function () { return carregado; }
     };
   }
