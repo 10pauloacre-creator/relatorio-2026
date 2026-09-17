@@ -8,14 +8,14 @@
    * A folha final e anexada depois dos estilos legados da pagina. Assim, as
    * regras antigas de modo escuro nao recuperam a paleta verde/roxa.
    */
-  if (!document.querySelector('link[data-relatorio-dark-final="20260916c"]')) {
+  if (!document.querySelector('link[data-relatorio-dark-final="20260917e"]')) {
     var currentScript = document.currentScript;
     var themeStylesheet = document.createElement("link");
     themeStylesheet.rel = "stylesheet";
-    themeStylesheet.dataset.relatorioDarkFinal = "20260916c";
+    themeStylesheet.dataset.relatorioDarkFinal = "20260917e";
     themeStylesheet.href = currentScript && currentScript.src
-      ? new URL("../css/dark-mode-2026.css?v=20260916c", currentScript.src).href
-      : "assets/css/dark-mode-2026.css?v=20260916c";
+      ? new URL("../css/dark-mode-2026.css?v=20260917e", currentScript.src).href
+      : "assets/css/dark-mode-2026.css?v=20260917e";
     document.head.appendChild(themeStylesheet);
   }
 
