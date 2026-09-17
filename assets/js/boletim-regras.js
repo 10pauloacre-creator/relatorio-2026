@@ -9,8 +9,9 @@
 // Regras (decisões do professor, 16/09/2026):
 //  • Trabalhos 0–10 e prova 0–10; nota do bimestre = média, arredondada para
 //    o 0,5 mais próximo. A nota só é "fechada" com trabalhos E prova lançados.
-//  • Bimestres automáticos (Casavequia: 3º e 4º): valem só o cálculo de
-//    trabalhos e a prova da Biblioteca; notas digitadas são ignoradas.
+//  • Bimestres automáticos (Casavequia: 3º e 4º): o padrão é o cálculo de
+//    trabalhos e a prova da Biblioteca; o professor pode ajustar uma nota à
+//    mão ("ajuste"), e o ajuste vale até ele voltar ao automático.
 //  • Comportamento não desconta nota.
 //  • Recuperação semestral (1º semestre = 1º+2º bim.; 2º = 3º+4º):
 //      1. 1º (ou 3º) bimestre abaixo de 7 é recuperado pela nota do 2º (ou 4º),
@@ -46,8 +47,11 @@
     var trabalhoAuto = numero(dados.trabalhoAuto);
     var provaAuto = numero(dados.provaAuto);
 
-    var trabalho = automatico ? trabalhoAuto : (trabalhoManual !== null ? trabalhoManual : trabalhoAuto);
-    var prova = automatico ? provaAuto : (provaManual !== null ? provaManual : provaAuto);
+    // Nota lançada à mão vale sobre a automática; nos bimestres automáticos
+    // ela é um ajuste pontual do professor.
+    var trabalho = trabalhoManual !== null ? trabalhoManual : trabalhoAuto;
+    var prova = provaManual !== null ? provaManual : provaAuto;
+    var origemManual = automatico ? "ajuste" : "manual";
     var completo = trabalho !== null && prova !== null;
     var parcial = trabalho === null && prova === null ? null : arredondarMeio(((trabalho || 0) + (prova || 0)) / 2);
 
@@ -55,8 +59,8 @@
       automatico: !!automatico,
       trabalho: umaCasa(trabalho),
       prova: umaCasa(prova),
-      origemTrabalho: trabalho === null ? null : (!automatico && trabalhoManual !== null ? "manual" : "automatico"),
-      origemProva: prova === null ? null : (!automatico && provaManual !== null ? "manual" : "automatico"),
+      origemTrabalho: trabalho === null ? null : (trabalhoManual !== null ? origemManual : "automatico"),
+      origemProva: prova === null ? null : (provaManual !== null ? origemManual : "automatico"),
       completo: completo,
       nota: completo ? parcial : null,        // nota bimestral fechada
       notaParcial: completo ? null : parcial, // enquanto falta trabalho ou prova
@@ -160,7 +164,7 @@
     SEMESTRES: SEMESTRES,
     calcular: calcular,
     rotuloSituacao: function (situacao) { return ROTULOS_SITUACAO[situacao] || situacao; },
-    VERSAO: "2026-09-16"
+    VERSAO: "2026-09-17b"
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

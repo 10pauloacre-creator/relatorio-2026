@@ -359,7 +359,7 @@ O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-
 
 **Motor único do boletim:** `assets/js/boletim-regras.js`. A Biblioteca tem uma **cópia idêntica** (`assets/js/boletim-regras.js`, usada pelo perfil do aluno). Depois de alterar, rode `node scripts/check-boletim-regras.js --copiar` e faça commit nos dois repositórios. Regras:
 - a nota do bimestre só fecha com trabalho E prova;
-- bimestres automáticos (`relatorio_regras_escola`; Casavequia = 3º e 4º; Hermínio = nenhum, sem recuperação) ignoram notas digitadas e usam o cálculo de trabalhos e a prova da Biblioteca (view `relatorio_provas_bimestrais`, 0–10);
+- bimestres automáticos (`relatorio_regras_escola`; Casavequia = 3º e 4º; Hermínio = nenhum, sem recuperação): o padrão é o cálculo de trabalhos e a prova da Biblioteca (view `relatorio_provas_bimestrais`, 0–10). O professor pode ajustar à mão (origem "ajuste"), e o ajuste vale até ele voltar ao automático;
 - recuperação semestral: o 2º recupera o 1º e o 4º recupera o 3º; se ainda houver bimestre abaixo de 7, prova única (`aluno.recuperacao[disciplina]["1"|"2"]`, já em 0–10). Com 7 ou mais, recupera os bimestres; abaixo disso, reprovado.
 
 O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: só a sessão do próprio aluno ou o admin. **Hermínio: boletins mantidos como estão** (decisão do professor, inclusive o `autofillMissingGrades`).

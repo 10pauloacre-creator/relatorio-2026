@@ -176,6 +176,16 @@
       return;
     }
 
+    const resetAutoExamButton = event.target.closest("[data-reset-auto-prova]");
+    if (resetAutoExamButton) {
+      const alvo = getStudent(Number(resetAutoExamButton.dataset.resetAutoProva));
+      if (alvo) {
+        getDisciplineBimState(alvo, resetAutoExamButton.dataset.discipline || MAIN_DISCIPLINE, resetAutoExamButton.dataset.bimester).prova = "";
+        persistAndRefresh(alvo.id, "Nota de prova voltou ao calculo automatico.");
+      }
+      return;
+    }
+
     const resetAutoButton = event.target.closest("[data-reset-auto]");
     if (resetAutoButton) {
       clearWorkGradeOverride(
@@ -495,16 +505,6 @@
       });
     });
 
-    // Bimestres automáticos: notas digitadas não valem e são limpas.
-    BIMESTERS.filter(isAutomaticBimester).forEach(function (bim) {
-      merged.bimestres[bim].trabalhos = "";
-      merged.bimestres[bim].prova = "";
-      Object.keys(merged.boletim).forEach(function (name) {
-        merged.boletim[name].bimestres[bim].trabalhos = "";
-        merged.boletim[name].bimestres[bim].prova = "";
-      });
-    });
-
     // Prova única de recuperação semestral, por disciplina (escala 0–10).
     merged.recuperacao = {};
     DISCIPLINES.forEach(function (discipline) {
@@ -816,7 +816,6 @@
   }
 
   function getStoredWorkGrade(student, disciplineName, bim) {
-    if (isAutomaticBimester(bim)) return null;
     return toNumber(getDisciplineBimState(student, disciplineName, bim).trabalhos);
   }
 
@@ -827,7 +826,6 @@
   }
 
   function getEffectiveExamGrade(student, disciplineName, bim) {
-    if (isAutomaticBimester(bim)) return getAutomaticExamGrade(student, disciplineName, bim);
     const manual = toNumber(getDisciplineBimState(student, disciplineName, bim).prova);
     return manual !== null ? manual : getAutomaticExamGrade(student, disciplineName, bim);
   }
@@ -1146,7 +1144,7 @@
         const automaticos = REGRAS.bimestresAutomaticos.map(function (bim) { return bim + "o"; }).join(" e ");
         const note = "Trabalhos (0 a 10): 10 pontos divididos entre as atividades que valem ponto no bimestre; atividades aguardando ficam fora do calculo. "
           + "Nota do bimestre = media entre trabalhos e prova."
-          + (automaticos ? " No " + automaticos + " bimestre, valem apenas o calculo automatico de trabalhos e a prova da Biblioteca." : "")
+          + (automaticos ? " No " + automaticos + " bimestre, o padrao e o calculo automatico de trabalhos e a prova da Biblioteca; voce pode ajustar uma nota quando precisar." : "")
           + (REGRAS.recuperacaoSemestral ? " Recuperacao: o 2o bimestre recupera o 1o e o 4o recupera o 3o; se ainda ficar abaixo de 7, o aluno faz a prova unica de recuperacao semestral." : "");
         return '<div class="boletim-panel' + (active ? " active" : "") + '" data-boletim-panel="' + escapeHtml(discipline.name) + '">'
           + '<div class="report-alert" style="margin-bottom:14px">'
@@ -1177,18 +1175,29 @@
     const effectiveWork = getEffectiveWorkGrade(student, disciplineName, bim);
     const isManual = hasManualWorkGrade(student, disciplineName, bim);
 
+    // Bimestre automático: o cálculo é o padrão; o professor pode ajustar.
     if (isAutomaticBimester(bim)) {
-      const prova = getAutomaticExamGrade(student, disciplineName, bim);
+      const provaAuto = getAutomaticExamGrade(student, disciplineName, bim);
+      const provaAjustada = toNumber(dados.prova) !== null;
+      const resetBtn = function (attr, texto) {
+        return ' <button class="ghost-btn reset-auto-btn" type="button" ' + attr + '="' + student.id + '" data-bimester="' + bim + '" data-discipline="' + escapeHtml(disciplineName) + '">' + texto + "</button>";
+      };
       return '<article class="bim-card automatic">'
         + '<div class="bim-card-head">'
           + '<div class="bim-card-title">' + bim + 'o Bimestre <span class="mini-chip">Automatico</span></div>'
           + '<div class="bim-card-total">' + renderBimCardTotal(resultado) + "</div>"
         + "</div>"
         + '<div class="field-stack">'
-          + '<div class="auto-grade-row"><span>Trabalhos</span><strong>' + (autoGrade === null ? "aguardando atividades marcadas" : formatNota10(autoGrade)) + "</strong></div>"
+          + '<div class="auto-grade-row"><span>Trabalhos (calculo)</span><strong>' + (autoGrade === null ? "aguardando atividades marcadas" : formatNota10(autoGrade)) + "</strong></div>"
           + '<div class="summary-foot">' + describeWorkGrade(student, disciplineName, bim) + "</div>"
-          + '<div class="auto-grade-row"><span>Prova da Biblioteca</span><strong>' + (prova === null ? "aguardando a prova bimestral" : formatNota10(prova)) + "</strong></div>"
-          + '<div class="summary-foot">Neste bimestre as notas nao sao digitadas: vem do calculo de trabalhos e da prova bimestral feita na Biblioteca Digital.</div>'
+          + "<div><label>" + (isManual ? "Trabalhos: ajuste manual em uso" : "Ajustar trabalhos (opcional)") + "</label>"
+            + renderStepper(student.id, bim, "trabalhos", isManual ? dados.trabalhos : "", disciplineName)
+            + (isManual ? resetBtn("data-reset-auto", "Voltar ao automatico") : "") + "</div>"
+          + '<div class="auto-grade-row"><span>Prova da Biblioteca</span><strong>' + (provaAuto === null ? "aguardando a prova bimestral" : formatNota10(provaAuto)) + "</strong></div>"
+          + "<div><label>" + (provaAjustada ? "Prova: ajuste manual em uso" : "Ajustar prova (opcional)") + "</label>"
+            + renderStepper(student.id, bim, "prova", provaAjustada ? dados.prova : "", disciplineName)
+            + (provaAjustada ? resetBtn("data-reset-auto-prova", "Voltar ao automatico") : "") + "</div>"
+          + '<div class="summary-foot">O padrao deste bimestre e o calculo automatico. Um ajuste manual vale ate voce voltar ao automatico.</div>'
         + "</div>"
         + "</article>";
     }
