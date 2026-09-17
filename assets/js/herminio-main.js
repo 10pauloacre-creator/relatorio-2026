@@ -348,6 +348,7 @@ var _rhLancamentos = null;
    Sincronizado entre aparelhos junto com os cliques do diário. */
 var _rhValePonto = (function () { try { return JSON.parse(localStorage.getItem('rh_vale_ponto') || '{}') || {}; } catch (e) { return {}; } })();
 var _rhValePontoUI = null;
+var _rhOcorrencias = null; /* selos de gravidade das ocorrências (Etapa 4) */
 function rhAtividadeValePonto(codigo) { return _rhValePonto[codigo] !== false; }
 function rhDefinirValePonto(codigo, valendo) {
   if (valendo) delete _rhValePonto[codigo]; else _rhValePonto[codigo] = false;
@@ -452,8 +453,13 @@ function rhAgendarLancamentos() {
   if (!_rhLancamentos) {
     _rhLancamentos = window.RelatorioLancamentos.iniciar({
       escolaSlug: 'raimundo-herminio-de-melo-2',
-      montarRetrato: rhMontarRetratoLancamentos
+      montarRetrato: rhMontarRetratoLancamentos,
+      aoPublicar: function () { if (_rhOcorrencias) _rhOcorrencias.agendar(1500); }
     });
+    if (window.RelatorioOcorrencias) {
+      _rhOcorrencias = window.RelatorioOcorrencias.iniciar({ escolaSlug: 'raimundo-herminio-de-melo-2' });
+      _rhOcorrencias.agendar(2500);
+    }
     _rhValePontoUI = window.RelatorioLancamentos.instalarInterruptorValePonto({
       estaValendo: rhAtividadeValePonto,
       definir: rhDefinirValePonto
