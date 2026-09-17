@@ -125,14 +125,14 @@ window.NotasBimestrais = (function () {
         if (opcoes.scopeKey) {
           var respostaPoder = await sync.getClient()
             .from("relatorio_poder_alunos")
-            .select("aluno_relatorio_id,pontos,nivel,bonus_poder")
+            .select("aluno_relatorio_id,aluno_id,pontos,nivel,bonus_poder")
             .eq("scope_key", opcoes.scopeKey);
           if (respostaPoder.error) {
             console.warn("[Notas] não foi possível carregar o Ranking de Poder.", respostaPoder.error);
           } else {
             var novoPoder = {};
             (respostaPoder.data || []).forEach(function (linha) {
-              novoPoder[linha.aluno_relatorio_id] = { pontos: Number(linha.pontos) || 0, nivel: linha.nivel, bonusPoder: !!linha.bonus_poder };
+              novoPoder[linha.aluno_relatorio_id] = { pontos: Number(linha.pontos) || 0, nivel: linha.nivel, bonusPoder: !!linha.bonus_poder, alunoId: linha.aluno_id };
             });
             poder = novoPoder;
           }
