@@ -1,35 +1,39 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// RELATORIO-INDIVIDUAL.JS — relatório do aluno, igual para professor e aluno
+// RELATORIO-INDIVIDUAL.JS — Relatório Individual Anual do Aluno
 // ───────────────────────────────────────────────────────────────────────────
+// Monta o documento do modelo do professor
+// (docs/modelo_relatorio_individual_anual_aluno.html) já preenchido com os
+// dados do banco (RPC relatorio_individual): identificação, notas por
+// bimestre, relatório de provas, atividades feitas e observações de
+// comportamento, com cabeçalho oficial e assinatura.
+//
 // Usado pelo painel do professor (Relatório 2026) E pelo perfil do aluno
 // (Biblioteca Digital). Os dois repositórios têm uma cópia IDÊNTICA deste
-// arquivo; confira com `node scripts/check-copias-compartilhadas.js`.
+// arquivo (`node scripts/check-copias-compartilhadas.js`), e os dois abrem o
+// MESMO documento: o que o professor imprime é o que o aluno baixa.
 //
-// Os dados vêm de uma fonte só (RPC relatorio_individual) e as duas telas
-// montam o MESMO modelo; a tela e o PDF saem desse modelo. Assim o PDF que o
-// professor gera e o que o aluno baixa são o mesmo documento.
+// O documento abre numa janela própria com o botão "Imprimir / Salvar PDF",
+// que chama a tela de impressão do navegador (lá o aluno escolhe "Salvar como
+// PDF"). Padrão de documento: A4, margens de 15 mm, Times New Roman 12pt.
 //
-// Conteúdo: notas (trabalhos, prova, recuperação e bônus do Ranking de
-// Poder), frequência em h/aula, aulas com tema, presença e atividade, e o
-// comportamento com data, horário e gravidade. Comportamento NÃO desconta
-// nota: entra como registro.
+// O relatório é sempre ANUAL e se atualiza sozinho: cada novo relato, prova
+// ou observação lançada entra na próxima vez que o documento for aberto.
 //
-// Depende de window.BoletimRegras (motor das notas) e, para o PDF, de jsPDF
-// com autoTable.
+// Depende de window.BoletimRegras (motor das notas).
 // ═══════════════════════════════════════════════════════════════════════════
 (function (root) {
-  var VERSAO = "2026-09-17a";
+  var VERSAO = "2026-09-17b";
+  var BIMESTRES = ["1", "2", "3", "4"];
+  var PROFESSOR = "Paulo Roberto Ramalho Magalhães";
 
   var ROTULO_PRESENCA = { presente: "Presente", falta: "Falta", falta_justificada: "Falta justificada" };
-  var ROTULO_ATIVIDADE = { fez: "Fez", nao_fez: "Nao fez", aguardando: "Aguardando", pendente: "Sem marcacao" };
-  var ROTULO_GRAVIDADE = { leve: "Leve", medio: "Medio", grave: "Grave", muito_grave: "Muito grave" };
-  var ROTULO_PAPEL = { autor: "", vitima: "Vitima", testemunha: "Testemunha", envolvido: "Envolvido", destaque: "Destaque" };
-  var BIMESTRES = ["1", "2", "3", "4"];
+  var ROTULO_GRAVIDADE = { leve: "Leve", medio: "Médio", grave: "Grave", muito_grave: "Muito grave" };
+  var ROTULO_PAPEL = { vitima: "Vítima (sem infração)", testemunha: "Testemunha", envolvido: "Envolvido", destaque: "Destaque positivo" };
 
   function numero(valor, casas) {
-    if (valor === null || valor === undefined || valor === "") return "-";
+    if (valor === null || valor === undefined || valor === "") return "—";
     var n = Number(valor);
-    if (!isFinite(n)) return "-";
+    if (!isFinite(n)) return "—";
     return n.toFixed(casas === undefined ? 1 : casas).replace(".", ",");
   }
 
@@ -38,7 +42,7 @@
     return partes.length === 3 ? partes[2] + "/" + partes[1] + "/" + partes[0] : "";
   }
 
-  function escapeHtml(valor) {
+  function esc(valor) {
     return String(valor === null || valor === undefined ? "" : valor)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
@@ -66,276 +70,286 @@
     });
   }
 
-  // ── Seções ────────────────────────────────────────────────────────────
-  function secaoNotas(boletim, bimestre) {
-    var linhas = [];
-    var observacoes = [];
-    var notaPoder = null;
-    (boletim.disciplinas || []).forEach(function (disciplina) {
-      var calc = calcularDisciplina(boletim, disciplina);
-      if (bimestre) {
-        var r = calc.bimestres[bimestre];
-        linhas.push([
-          disciplina.nome,
-          numero(r.trabalho), numero(r.prova),
-          r.notaFinal !== null ? numero(r.notaFinal) : (r.notaParcial !== null ? numero(r.notaParcial) + " (parcial)" : "-"),
-          r.recuperado ? "Recuperado (nota anterior " + numero(r.nota) + ")"
-            : (r.completo ? (r.nota >= calc.media ? "Acima da media" : "Abaixo da media")
-              : (r.trabalho === null && r.prova === null ? "Sem notas" : (r.trabalho === null ? "Falta trabalhos" : "Falta prova")))
-        ]);
-      } else {
-        var celulas = [disciplina.nome];
-        BIMESTRES.forEach(function (b) {
-          var item = calc.bimestres[b];
-          celulas.push(item.notaFinal !== null ? numero(item.notaFinal) : (item.notaParcial !== null ? numero(item.notaParcial) + "*" : "-"));
-        });
-        celulas.push(numero(calc.mediaAnual));
-        celulas.push(numero(calc.mediaFinal));
-        linhas.push(celulas);
-      }
-      // O bônus é do aluno, não da disciplina: uma linha só no rodapé.
-      if (calc.poder && calc.poder.bonusMedia > 0 && !bimestre) {
-        notaPoder = "Ranking de Poder: " + calc.poder.nome + " (" + calc.poder.pontos + " pts) soma +"
-          + numero(calc.poder.bonusMedia, 2) + " na media final de cada disciplina.";
-      }
-      ["1", "2"].forEach(function (semestre) {
-        var info = calc.semestres[semestre];
-        if (!info || !info.precisaRecuperacao) return;
-        observacoes.push(disciplina.nome + " - recuperacao semestral do " + semestre + "o semestre: "
-          + (info.notaRecuperacao === null ? "pendente" : numero(info.notaRecuperacao) + "/10")
-          + " - " + root.BoletimRegras.rotuloSituacao(info.situacao) + ".");
-      });
-    });
-    var colunas = bimestre
-      ? ["Disciplina", "Trabalhos", "Prova", "Nota do bimestre", "Situacao"]
-      : ["Disciplina", "1o bim.", "2o bim.", "3o bim.", "4o bim.", "Media", "Media final"];
-    return {
-      titulo: bimestre ? "Notas do " + bimestre + "o bimestre" : "Notas do ano",
-      colunas: colunas,
-      linhas: linhas,
-      notas: (notaPoder ? [notaPoder] : []).concat(observacoes).concat(bimestre ? [] : ["* nota parcial: falta lancar trabalhos ou prova."])
-    };
+  /** Data do registro mais recente: é o que "atualiza" o relatório. */
+  function ultimaAtualizacao(dados) {
+    var datas = [];
+    (dados.aulas || []).forEach(function (a) { if (a.data) datas.push(String(a.data).slice(0, 10)); });
+    (dados.ocorrencias || []).forEach(function (o) { if (o.data) datas.push(String(o.data).slice(0, 10)); });
+    datas.sort();
+    return datas.length ? dataBr(datas[datas.length - 1]) : dataBr(dados.geradoEm);
   }
 
-  function secaoFrequencia(dados) {
-    var linhas = (dados.frequencia || []).map(function (f) {
-      return [
-        f.disciplina + (dados.bimestre ? "" : " (" + f.bimestre + "o bim.)"),
-        numero(f.horas, 0), numero(f.presencas, 0), numero(f.faltas, 0), numero(f.faltasJustificadas, 0),
-        f.percentual === null || f.percentual === undefined ? "-" : numero(f.percentual) + "%"
-      ];
-    });
-    var soma = (dados.frequencia || []).reduce(function (a, f) {
-      a.horas += Number(f.horas) || 0; a.presencas += Number(f.presencas) || 0;
-      a.faltas += Number(f.faltas) || 0; a.fj += Number(f.faltasJustificadas) || 0;
-      return a;
-    }, { horas: 0, presencas: 0, faltas: 0, fj: 0 });
-    if (linhas.length) {
-      linhas.push(["TOTAL", numero(soma.horas, 0), numero(soma.presencas, 0), numero(soma.faltas, 0), numero(soma.fj, 0),
-        soma.horas > 0 ? numero(100 * soma.presencas / soma.horas) + "%" : "-"]);
+  // ── Seções do modelo ──────────────────────────────────────────────────
+  function tabelaNotas(calc) {
+    var linhas = BIMESTRES.map(function (b) {
+      var r = calc.bimestres[b];
+      var nota = r.notaFinal !== null ? numero(r.notaFinal) : (r.notaParcial !== null ? numero(r.notaParcial) + " (parcial)" : "—");
+      return "<tr><td><strong>" + b + "º Bimestre</strong></td><td>" + numero(r.prova) + "</td><td>" + numero(r.trabalho)
+        + "</td><td>" + nota + "</td></tr>";
+    }).join("");
+    return '<table class="notas">'
+      + "<tr><th>Bimestre</th><th>Prova</th><th>Trabalhos</th><th>Nota do bimestre</th></tr>"
+      + linhas + "</table>";
+  }
+
+  function notaRodapeNotas(calc, disciplina) {
+    var partes = ["Nota do bimestre = média entre prova e trabalhos, ambas de 0 a 10."];
+    if (calc.mediaAnual !== null) {
+      partes.push("Média dos bimestres lançados: " + numero(calc.mediaAnual) + ".");
     }
-    return {
-      titulo: "Frequencia (em h/aula)",
-      colunas: ["Disciplina", "h/aula", "Presencas", "Faltas", "Falta just.", "Presenca"],
-      linhas: linhas,
-      notas: []
-    };
+    if (calc.poder && calc.poder.bonusMedia > 0) {
+      partes.push("Ranking de Poder: " + calc.poder.nome + " (" + calc.poder.pontos + " pontos) soma +"
+        + numero(calc.poder.bonusMedia, 2) + " na média final, que fica em " + numero(calc.mediaFinal) + ".");
+    }
+    BIMESTRES.forEach(function (b) {
+      var r = calc.bimestres[b];
+      if (r.recuperado) {
+        partes.push(b + "º bimestre recuperado: nota anterior " + numero(r.nota) + ", passou a valer " + numero(r.notaFinal) + ".");
+      }
+    });
+    ["1", "2"].forEach(function (s) {
+      var info = calc.semestres[s];
+      if (!info || !info.precisaRecuperacao) return;
+      partes.push("Recuperação semestral do " + s + "º semestre: "
+        + (info.notaRecuperacao === null ? "pendente" : numero(info.notaRecuperacao) + "/10")
+        + " — " + root.BoletimRegras.rotuloSituacao(info.situacao) + ".");
+    });
+    return partes.join(" ");
   }
 
-  function secaoAulas(dados) {
-    var linhas = (dados.aulas || []).map(function (a) {
-      return [
-        dataBr(a.data), a.disciplina || "", a.tema || "-",
-        numero(a.carga, 0),
-        ROTULO_PRESENCA[a.presenca] || "Sem marcacao",
-        a.temAtividade ? (ROTULO_ATIVIDADE[a.atividade] || "Sem marcacao") + (a.valePonto === false ? " (nao vale ponto)" : "") : "-"
-      ];
+  function tabelaProvas(disciplina, calc) {
+    var linhas = BIMESTRES.map(function (b) {
+      var bruto = (disciplina.bimestres || {})[b] || {};
+      var detalhe = bruto.provaDetalhe;
+      var r = calc.bimestres[b];
+      var texto;
+      if (r.prova === null) {
+        texto = "Prova ainda não registrada neste bimestre.";
+      } else if (r.origemProva === "automatico" && detalhe) {
+        texto = "Avaliação Bimestral feita no livro da Biblioteca Digital: <strong>" + numero(r.prova) + "/10</strong>"
+          + (detalhe.realizadaEm ? ", em " + dataBr(detalhe.realizadaEm) : "") + ".";
+        if (detalhe.recuperacao !== null && detalhe.recuperacao !== undefined && detalhe.primeira !== null && detalhe.primeira !== undefined) {
+          texto += " Primeira prova: " + numero(detalhe.primeira) + "; recuperação do livro: " + numero(detalhe.recuperacao)
+            + ". Vale a maior das duas.";
+        }
+      } else if (r.origemProva === "ajuste") {
+        texto = "Nota ajustada pelo professor: <strong>" + numero(r.prova) + "/10</strong>.";
+      } else {
+        texto = "Nota lançada pelo professor: <strong>" + numero(r.prova) + "/10</strong>.";
+      }
+      return "<tr><td>" + b + "º Bimestre</td><td>" + texto + "</td></tr>";
+    }).join("");
+    return '<table class="provas">' + linhas + "</table>";
+  }
+
+  function atividadesDaDisciplina(dados, disciplina, calc) {
+    var valorPorBimestre = {};
+    var previstas = 0;
+    BIMESTRES.forEach(function (b) {
+      var resumo = ((disciplina.bimestres || {})[b] || {}).resumoTrabalho || {};
+      valorPorBimestre[b] = Number(resumo.valorAtividade) || 0;
+      previstas += Number(resumo.atividadesValidas) || 0;
+    });
+    var linhas = [];
+    var feitas = 0;
+    (dados.aulas || []).forEach(function (a) {
+      if (a.disciplina !== disciplina.nome || !a.temAtividade) return;
+      var b = String(a.bimestre);
+      var nota;
+      if (a.valePonto === false) nota = "não vale ponto";
+      else if (a.atividade === "fez") { nota = numero(valorPorBimestre[b], 2); feitas += 1; }
+      else if (a.atividade === "nao_fez") nota = "0,00";
+      else nota = "aguardando";
+      linhas.push("<tr><td>" + dataBr(a.data) + "</td><td>" + b + "º</td><td>" + esc(a.tema || "—") + "</td><td>" + nota + "</td></tr>");
+    });
+    var notaGeral = [];
+    BIMESTRES.forEach(function (b) {
+      var r = calc.bimestres[b];
+      if (r.trabalho !== null) notaGeral.push(b + "º: " + numero(r.trabalho));
     });
     return {
-      titulo: "Aulas, temas e atividades",
-      colunas: ["Data", "Disciplina", "Tema", "h/aula", "Presenca", "Atividade"],
-      linhas: linhas,
-      notas: linhas.length ? [] : ["Nenhuma aula registrada neste periodo."]
+      previstas: previstas,
+      feitas: feitas,
+      notaGeral: notaGeral.length ? notaGeral.join(" · ") : "—",
+      html: '<table class="resumo-atv">'
+        + "<tr><th>Total de atividades previstas</th><th>Atividades realizadas</th><th>Nota de trabalhos por bimestre</th></tr>"
+        + "<tr><td>" + previstas + " atividade(s) valendo ponto</td><td>" + feitas + " de " + previstas + "</td><td>"
+        + (notaGeral.length ? notaGeral.join(" · ") : "—") + "</td></tr></table>"
+        + '<table class="atividades"><thead><tr><th>Data</th><th>Bimestre</th><th>Tema</th><th>Nota</th></tr></thead><tbody>'
+        + (linhas.length ? linhas.join("") : '<tr><td colspan="4">Nenhuma atividade registrada nesta disciplina até agora.</td></tr>')
+        + "</tbody></table>"
     };
   }
 
-  function secaoComportamento(dados) {
+  function frequenciaDaDisciplina(dados, nome) {
+    var soma = { horas: 0, presencas: 0, faltas: 0, fj: 0 };
+    (dados.frequencia || []).forEach(function (f) {
+      if (f.disciplina !== nome) return;
+      soma.horas += Number(f.horas) || 0;
+      soma.presencas += Number(f.presencas) || 0;
+      soma.faltas += Number(f.faltas) || 0;
+      soma.fj += Number(f.faltasJustificadas) || 0;
+    });
+    if (!soma.horas) return "Sem aulas registradas nesta disciplina até agora.";
+    return "Frequência: " + numero(soma.presencas, 0) + " de " + numero(soma.horas, 0) + " h/aula ("
+      + numero(100 * soma.presencas / soma.horas) + "%), " + numero(soma.faltas, 0) + " falta(s) e "
+      + numero(soma.fj, 0) + " falta(s) justificada(s).";
+  }
+
+  function tabelaObservacoes(dados) {
     var linhas = (dados.ocorrencias || []).map(function (o) {
-      var situacao = o.papel && o.papel !== "autor"
-        ? ROTULO_PAPEL[o.papel] || "Envolvido"
-        : (o.positiva ? "Destaque" : (o.semInfracao ? "Sem infracao" : (ROTULO_GRAVIDADE[o.gravidade] || "Aguardando analise")));
-      if (o.reincidencia) situacao += " (reincidencia)";
-      return [
-        dataBr(o.data) + (o.horario ? " " + o.horario : ""),
-        o.disciplina || "-",
-        situacao,
-        (o.categoria ? String(o.categoria).replace(/_/g, " ") + ": " : "") + (o.descricao || o.texto || "")
-      ];
+      var gravidade = o.papel && o.papel !== "autor"
+        ? (ROTULO_PAPEL[o.papel] || "Envolvido")
+        : (o.positiva ? "Destaque positivo" : (o.semInfracao ? "Sem infração" : (ROTULO_GRAVIDADE[o.gravidade] || "Em análise")));
+      if (o.reincidencia) gravidade += " (reincidência)";
+      var relato = esc(o.descricao || o.texto || "");
+      if (o.disciplina) relato = "<em>" + esc(o.disciplina) + ":</em> " + relato;
+      return "<tr><td>" + dataBr(o.data) + "</td><td>" + esc(o.horario || "—") + "</td><td>" + gravidade
+        + "</td><td>0,0</td><td>" + relato + "</td></tr>";
     });
     var r = dados.resumoConduta || {};
-    var resumo = "Registros: " + (r.leve || 0) + " leve(s), " + (r.medio || 0) + " medio(s), "
-      + (r.grave || 0) + " grave(s), " + (r.muitoGrave || 0) + " muito grave(s)"
-      + (r.destaques ? ", " + r.destaques + " destaque(s) positivo(s)" : "") + ".";
     return {
-      titulo: "Comportamento",
-      colunas: ["Data e hora", "Disciplina", "Gravidade", "Registro"],
-      linhas: linhas,
-      notas: [resumo, "Comportamento nao desconta nota: fica registrado para o acompanhamento pedagogico."]
-        .concat(r.aguardandoIA ? [r.aguardandoIA + " registro(s) ainda em analise pela IA."] : [])
+      resumo: "Registros no ano: " + (r.leve || 0) + " leve(s), " + (r.medio || 0) + " médio(s), " + (r.grave || 0)
+        + " grave(s), " + (r.muitoGrave || 0) + " muito grave(s)"
+        + (r.destaques ? " e " + r.destaques + " destaque(s) positivo(s)" : "") + ".",
+      html: '<table class="observacoes"><thead><tr><th>Data</th><th>Hora</th><th>Gravidade</th>'
+        + "<th>Pontos perdidos</th><th>Relato</th></tr></thead><tbody>"
+        + (linhas.length ? linhas.join("") : '<tr><td colspan="5">Nenhuma observação registrada até agora.</td></tr>')
+        + "</tbody></table>"
     };
-  }
-
-  /* Modelo do documento: mesma estrutura para a tela e para o PDF. */
-  function montar(dados, opcoes) {
-    opcoes = opcoes || {};
-    var boletim = (dados.boletins || [])[opcoes.indice || 0] || { disciplinas: [], regras: {} };
-    var bimestre = dados.bimestre || null;
-    var periodo = bimestre ? bimestre + "o bimestre de 2026" : "Ano letivo de 2026";
-    return {
-      versao: VERSAO,
-      titulo: "Relatorio individual do aluno",
-      escola: boletim.escola || "",
-      turma: boletim.turma || "",
-      aluno: (boletim.numero ? boletim.numero + ". " : "") + (boletim.aluno || ""),
-      periodo: periodo,
-      geradoEm: dados.geradoEm || new Date().toISOString(),
-      transferido: !!boletim.transferido,
-      secoes: [
-        secaoNotas(boletim, bimestre),
-        secaoFrequencia(dados),
-        secaoAulas(dados),
-        secaoComportamento(dados)
-      ]
-    };
-  }
-
-  function nomeArquivo(modelo) {
-    var base = (modelo.aluno + " " + modelo.periodo).normalize("NFD").replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").toLowerCase();
-    return "relatorio-" + base.slice(0, 60) + ".pdf";
-  }
-
-  // ── Tela ──────────────────────────────────────────────────────────────
-  function html(modelo) {
-    var cabecalho = '<header class="ri-head">'
-      + '<h2>' + escapeHtml(modelo.titulo) + "</h2>"
-      + '<div class="ri-aluno">' + escapeHtml(modelo.aluno) + "</div>"
-      + '<div class="ri-sub">' + escapeHtml([modelo.escola, modelo.turma, modelo.periodo].filter(Boolean).join(" · ")) + "</div>"
-      + "</header>";
-    var corpo = modelo.secoes.map(function (secao) {
-      var linhas = secao.linhas.length
-        ? secao.linhas.map(function (linha) {
-          return "<tr>" + linha.map(function (celula) { return "<td>" + escapeHtml(celula) + "</td>"; }).join("") + "</tr>";
-        }).join("")
-        : '<tr><td colspan="' + secao.colunas.length + '">Nada registrado neste periodo.</td></tr>';
-      return '<section class="ri-secao"><h3>' + escapeHtml(secao.titulo) + "</h3>"
-        + '<table class="ri-tabela"><thead><tr>'
-        + secao.colunas.map(function (coluna) { return "<th>" + escapeHtml(coluna) + "</th>"; }).join("")
-        + "</tr></thead><tbody>" + linhas + "</tbody></table>"
-        + (secao.notas || []).map(function (nota) { return '<p class="ri-nota">' + escapeHtml(nota) + "</p>"; }).join("")
-        + "</section>";
-    }).join("");
-    return '<div class="ri-doc">' + cabecalho + corpo
-      + '<footer class="ri-pe">Gerado em ' + escapeHtml(dataBr(modelo.geradoEm)) + " · mesmo documento no painel do professor e no perfil do aluno.</footer></div>";
   }
 
   var CSS = ""
-    + ".ri-doc{font-family:inherit;color:#243127;line-height:1.5}"
-    + ".ri-head{border-bottom:2px solid #2d6147;padding-bottom:10px;margin-bottom:16px}"
-    + ".ri-head h2{margin:0;font-size:1.15rem;color:#1a3a2a}"
-    + ".ri-aluno{font-weight:700;margin-top:6px}"
-    + ".ri-sub{font-size:.82rem;color:#5e655f}"
-    + ".ri-secao{margin-bottom:20px}"
-    + ".ri-secao h3{font-size:.95rem;color:#1a3a2a;margin:0 0 8px}"
-    + ".ri-tabela{width:100%;border-collapse:collapse;font-size:.8rem}"
-    + ".ri-tabela th,.ri-tabela td{border:1px solid #e0e5e1;padding:6px 8px;text-align:left;vertical-align:top}"
-    + ".ri-tabela th{background:#eef3ef;font-weight:700}"
-    + ".ri-nota{font-size:.76rem;color:#5e655f;margin:6px 0 0}"
-    + ".ri-pe{font-size:.74rem;color:#5e655f;border-top:1px solid #e0e5e1;padding-top:8px}";
+    + ":root{--azul:#1f4e79;--azul-claro:#eaf2f8;--cinza:#f2f2f2;--borda:#737373;--texto:#111}"
+    + "*{box-sizing:border-box}"
+    + "body{margin:0;background:#ececec;color:var(--texto);font-family:'Times New Roman',Times,serif;font-size:12pt;line-height:1.35}"
+    + ".toolbar{position:sticky;top:0;z-index:20;display:flex;gap:8px;justify-content:center;padding:10px;background:#1e1e1e;box-shadow:0 2px 8px rgba(0,0,0,.2)}"
+    + ".toolbar button{border:0;border-radius:5px;padding:10px 16px;font:700 12pt 'Times New Roman',Times,serif;cursor:pointer}"
+    + ".toolbar .primaria{background:#c9a84c;color:#3a2b06}"
+    + ".toolbar .aviso{color:#e8e2d2;font-size:10pt;align-self:center}"
+    + ".page{width:210mm;min-height:297mm;margin:14px auto;padding:15mm;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.18)}"
+    + ".official-header{width:100%;display:block;margin:0 0 12px}"
+    + "h1{text-align:center;margin:10px 0 2px;font-size:16pt;letter-spacing:.2px}"
+    + ".subtitle{text-align:center;color:#444;font-size:10pt;margin-bottom:14px}"
+    + ".section-title{margin:15px 0 7px;padding:6px 8px;background:var(--azul);color:#fff;font-size:12pt;font-weight:700;break-after:avoid}"
+    + ".section-note{margin:-1px 0 7px;color:#404040;font-size:10pt}"
+    + "table{width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom:10px}"
+    + "th,td{border:1px solid var(--borda);padding:6px;vertical-align:middle;overflow-wrap:anywhere;font-size:12pt}"
+    + "th{background:var(--azul-claro);text-align:center;font-weight:700}"
+    + ".identificacao td{height:30px}"
+    + ".label{width:20%;background:var(--cinza);font-weight:700}"
+    + ".notas th:nth-child(1){width:24%}.notas td{text-align:center;height:30px}"
+    + ".provas td:first-child{width:22%;background:var(--cinza);font-weight:700;text-align:center}"
+    + ".provas td:last-child{height:52px}"
+    + ".resumo-atv td{text-align:center;height:32px}"
+    + ".atividades th:nth-child(1){width:15%}.atividades th:nth-child(2){width:12%}.atividades th:nth-child(3){width:58%}.atividades th:nth-child(4){width:15%}"
+    + ".atividades td:nth-child(1),.atividades td:nth-child(2),.atividades td:nth-child(4){text-align:center}"
+    + ".observacoes th:nth-child(1){width:12%}.observacoes th:nth-child(2){width:10%}.observacoes th:nth-child(3){width:18%}.observacoes th:nth-child(4){width:12%}"
+    + ".observacoes td:nth-child(1),.observacoes td:nth-child(2),.observacoes td:nth-child(3),.observacoes td:nth-child(4){text-align:center}"
+    + ".signature{margin-top:26px;text-align:center;break-inside:avoid}"
+    + ".signature img{width:250px;max-width:72%;display:block;margin:0 auto -10px}"
+    + ".signature-line{width:330px;max-width:80%;margin:0 auto 5px;border-top:1px solid #333}"
+    + ".signature-name{font-weight:700}.signature-role{font-size:10pt;color:#444}"
+    + ".page-break{break-before:page;page-break-before:always}"
+    + "@page{size:A4 portrait;margin:15mm}"
+    + "@media print{body{background:#fff;font-size:12pt}"
+    + ".toolbar{display:none !important}"
+    + ".page{width:auto;min-height:auto;margin:0;padding:0;box-shadow:none}"
+    + "thead{display:table-header-group}tr{break-inside:avoid}"
+    + ".section-title,th,.label,.provas td:first-child{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
 
-  function estilo() {
-    return CSS;
-  }
-
-  // ── PDF ───────────────────────────────────────────────────────────────
-  function pdf(modelo, opcoes) {
+  /**
+   * Documento completo (HTML) do Relatório Individual Anual do Aluno.
+   * opcoes: {disciplina: nome ou vazio (todas), recursos: {cabecalho, assinatura}}
+   */
+  function documento(dados, opcoes) {
     opcoes = opcoes || {};
-    var jsPDFRef = (root.jspdf && root.jspdf.jsPDF) || root.jsPDF;
-    if (!jsPDFRef) throw new Error("jsPDF não está carregado nesta página.");
-    var doc = new jsPDFRef({ orientation: "portrait", unit: "pt", format: "a4" });
-    var largura = doc.internal.pageSize.getWidth();
-    var y = 48;
+    var recursos = opcoes.recursos || {};
+    var boletim = (dados.boletins || [])[opcoes.indice || 0] || { disciplinas: [], regras: {} };
+    var disciplinas = (boletim.disciplinas || []).filter(function (d) {
+      return !opcoes.disciplina || d.nome === opcoes.disciplina;
+    });
+    var aluno = (boletim.numero ? boletim.numero + ". " : "") + (boletim.aluno || "");
+    var corpo = "";
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(15);
-    doc.text(modelo.titulo, 40, y);
-    y += 20;
-    doc.setFontSize(12);
-    doc.text(modelo.aluno, 40, y);
-    y += 16;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(90);
-    doc.text([modelo.escola, modelo.turma, modelo.periodo].filter(Boolean).join(" | "), 40, y);
-    y += 12;
-    doc.setDrawColor(45, 97, 71);
-    doc.setLineWidth(1.2);
-    doc.line(40, y, largura - 40, y);
-    y += 16;
-    doc.setTextColor(0);
-
-    var alturaPagina = doc.internal.pageSize.getHeight();
-    modelo.secoes.forEach(function (secao) {
-      if (typeof doc.autoTable !== "function") throw new Error("jsPDF-AutoTable não está carregado nesta página.");
-      if (y > alturaPagina - 140) { doc.addPage(); y = 48; }
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(11);
-      doc.setTextColor(26, 58, 42);
-      doc.text(secao.titulo, 40, y);
-      doc.setTextColor(0);
-      doc.setFont("helvetica", "normal");
-      doc.autoTable({
-        startY: y + 8,
-        head: [secao.colunas],
-        body: secao.linhas.length ? secao.linhas : [[{ content: "Nada registrado neste periodo.", colSpan: secao.colunas.length }]],
-        margin: { left: 40, right: 40, bottom: 48 },
-        theme: "grid",
-        styles: { font: "helvetica", fontSize: 8, cellPadding: 4, overflow: "linebreak", lineColor: [224, 229, 225] },
-        headStyles: { fillColor: [45, 97, 71], textColor: 255, fontStyle: "bold" },
-        alternateRowStyles: { fillColor: [244, 247, 245] }
-      });
-      y = doc.lastAutoTable.finalY + 14;
-      (secao.notas || []).forEach(function (nota) {
-        var linhas = doc.splitTextToSize(nota, largura - 80);
-        if (y + linhas.length * 10 > alturaPagina - 48) { doc.addPage(); y = 48; }
-        doc.setFontSize(8);
-        doc.setTextColor(95);
-        doc.text(linhas, 40, y);
-        doc.setTextColor(0);
-        y += linhas.length * 10 + 2;
-      });
-      y += 10;
+    disciplinas.forEach(function (disciplina, indice) {
+      var calc = calcularDisciplina(boletim, disciplina);
+      var atividades = atividadesDaDisciplina(dados, disciplina, calc);
+      var quebra = indice > 0 ? " page-break" : "";
+      if (disciplinas.length > 1) {
+        corpo += '<div class="section-title' + quebra + '">COMPONENTE CURRICULAR: ' + esc(disciplina.nome.toUpperCase()) + "</div>";
+      }
+      corpo += '<div class="section-title' + (disciplinas.length > 1 ? "" : quebra) + '">1 - NOTAS</div>'
+        + '<div class="section-note">' + esc(notaRodapeNotas(calc, disciplina)) + "</div>"
+        + tabelaNotas(calc)
+        + '<div class="section-note">' + esc(frequenciaDaDisciplina(dados, disciplina.nome)) + "</div>"
+        + '<div class="section-title">2 - RELATÓRIO DE PROVAS</div>'
+        + '<div class="section-note">Desempenho na avaliação de cada bimestre.</div>'
+        + tabelaProvas(disciplina, calc)
+        + '<div class="section-title page-break">3 - ATIVIDADES FEITAS</div>'
+        + '<div class="section-note">Cada atividade que vale ponto no bimestre divide os 10 pontos de trabalho. "Aguardando" fica fora do cálculo até ser corrigida.</div>'
+        + atividades.html;
     });
 
-    var paginas = doc.internal.getNumberOfPages();
-    for (var i = 1; i <= paginas; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(120);
-      doc.text("Gerado em " + dataBr(modelo.geradoEm) + " · " + modelo.periodo + " · pagina " + i + "/" + paginas,
-        40, doc.internal.pageSize.getHeight() - 24);
-    }
-    if (opcoes.salvar !== false) doc.save(nomeArquivo(modelo));
-    return doc;
+    var observacoes = tabelaObservacoes(dados);
+    corpo += '<div class="section-title page-break">4 - OBSERVAÇÕES</div>'
+      + '<div class="section-note">' + esc(observacoes.resumo)
+      + " Comportamento não desconta nota: o registro serve ao acompanhamento pedagógico, por isso a coluna de pontos perdidos fica em 0,0.</div>"
+      + observacoes.html;
+
+    var identificacao = '<table class="identificacao">'
+      + '<tr><td class="label">Unidade escolar:</td><td>' + esc(boletim.escola || "") + "</td>"
+      + '<td class="label">Ano letivo:</td><td>2026</td></tr>'
+      + '<tr><td class="label">Aluno(a):</td><td>' + esc(aluno) + "</td>"
+      + '<td class="label">Última atualização:</td><td>' + esc(ultimaAtualizacao(dados)) + "</td></tr>"
+      + '<tr><td class="label">Série/Ano:</td><td>' + esc(String(boletim.turma || "").split("·").pop().trim()) + "</td>"
+      + '<td class="label">Turma:</td><td>' + esc(String(boletim.turma || "").split("·").pop().trim()) + "</td></tr>"
+      + '<tr><td class="label">Professor:</td><td><strong>' + PROFESSOR + "</strong></td>"
+      + '<td class="label">Componente curricular:</td><td>'
+      + esc(disciplinas.map(function (d) { return d.nome; }).join(", ") || "—") + "</td></tr>"
+      + "</table>";
+
+    return "<!DOCTYPE html>\n<html lang=\"pt-BR\"><head><meta charset=\"UTF-8\">"
+      + '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+      + "<title>Relatório Individual Anual — " + esc(aluno) + "</title>"
+      + "<style>" + CSS + "</style></head><body>"
+      + '<div class="toolbar">'
+      + '<button type="button" class="primaria" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>'
+      + '<button type="button" onclick="window.close()">Fechar</button>'
+      + '<span class="aviso">Na tela de impressão, escolha "Salvar como PDF" para baixar.</span>'
+      + "</div>"
+      + '<main class="page">'
+      + (recursos.cabecalho ? '<img class="official-header" src="' + esc(recursos.cabecalho) + '" alt="Cabeçalho oficial">' : "")
+      + "<h1>RELATÓRIO INDIVIDUAL ANUAL DO ALUNO</h1>"
+      + '<div class="subtitle">Documento de acompanhamento, atualizado a cada novo relato, prova ou observação</div>'
+      + '<div class="section-title">DADOS DE IDENTIFICAÇÃO</div>'
+      + identificacao
+      + corpo
+      + '<div class="signature">'
+      + (recursos.assinatura ? '<img src="' + esc(recursos.assinatura) + '" alt="Assinatura">' : "")
+      + '<div class="signature-line"></div>'
+      + '<div class="signature-name">' + PROFESSOR + "</div>"
+      + '<div class="signature-role">Professor responsável</div>'
+      + "</div></main></body></html>";
+  }
+
+  /** Abre o documento numa janela própria. Devolve null se o navegador bloquear. */
+  function abrir(html, opcoes) {
+    opcoes = opcoes || {};
+    var janela = root.open("", opcoes.nome || "relatorio-individual", opcoes.recursosJanela || "width=900,height=1000");
+    if (!janela) return null;
+    janela.document.open();
+    janela.document.write(html);
+    janela.document.close();
+    janela.focus();
+    return janela;
   }
 
   var api = {
     VERSAO: VERSAO,
     carregar: carregar,
-    montar: montar,
-    html: html,
-    estilo: estilo,
-    pdf: pdf,
-    nomeArquivo: nomeArquivo
+    documento: documento,
+    abrir: abrir
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

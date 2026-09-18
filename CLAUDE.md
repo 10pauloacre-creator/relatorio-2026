@@ -364,11 +364,13 @@ O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-
 
 O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: só a sessão do próprio aluno ou o admin. **Hermínio: boletins mantidos como estão** (decisão do professor, inclusive o `autofillMissingGrades`).
 
-**Relatório individual do aluno (Etapa 7):** uma fonte só e um documento só para o professor e para o aluno. SQL em `supabase/2026-09-17-etapa7-relatorio-individual.sql`.
-- **Dados:** RPC `relatorio_individual(aluno, bimestre, sessão)` devolve notas (via `get_meu_boletim`), aulas com tema, presença e atividade, frequência em h/aula por disciplina e as ocorrências com data, horário e gravidade. Permissão: administrador ou o próprio aluno com a sessão dele.
-- **Documento:** `assets/js/relatorio-individual.js` (cópia idêntica nos dois repositórios, conferida por `scripts/check-copias-compartilhadas.js`) monta um modelo e dele saem a tela (`html`) e o PDF (`pdf`, jsPDF + autoTable). Mudou o modelo, mudam os dois.
-- **No painel:** o perfil do aluno tem "Relatorio individual", com escolha do bimestre ou do ano todo, "Ver relatorio" e "Baixar PDF". Exige o aluno ligado à conta da Biblioteca.
-- **Comportamento não desconta nota:** aparece como registro, com o resumo por gravidade.
+**Relatório Individual Anual do Aluno (Etapas 7 e 8):** um documento só, para o professor e para o aluno, montado a partir do modelo do professor (`docs/modelo_relatorio_individual_anual_aluno.html`, na Biblioteca). SQL em `supabase/2026-09-17-etapa7-relatorio-individual.sql`.
+- **Dados:** RPC `relatorio_individual(aluno, bimestre, sessão)` devolve notas (via `get_meu_boletim`), aulas com tema, presença e atividade, frequência em h/aula e as ocorrências com data, horário e gravidade. Lê o administrador ou o próprio aluno com a sessão dele.
+- **Documento:** `assets/js/relatorio-individual.js` (cópia idêntica nos dois repositórios, conferida por `scripts/check-copias-compartilhadas.js`) devolve o HTML completo: cabeçalho oficial, identificação, 1 Notas, 2 Relatório de provas, 3 Atividades feitas, 4 Observações e assinatura. Imagens em `assets/img/relatorio-individual/` (Relatório) e `assets/images/relatorio-individual/` (Biblioteca); passe o caminho ABSOLUTO em `recursos`, porque a janela nasce em about:blank.
+- **Impressão:** abre em janela própria com "🖨️ Imprimir / Salvar PDF" (`window.print()`); o PDF sai pela tela de impressão do navegador. Padrão A4, margem 15 mm, Times New Roman 12pt.
+- **Sempre anual e sempre atual:** o documento é montado na hora, então cada novo relato, prova, atividade ou observação entra na abertura seguinte. "Última atualização" = data do registro mais recente.
+- **Onde fica:** painel do professor, no perfil do aluno ("Relatorio Individual Anual", com escolha do componente curricular); e perfil do aluno na Biblioteca, na aba BOLETIM ("📄 MEU RELATÓRIO").
+- **Comportamento não desconta nota:** a coluna "Pontos perdidos" fica em 0,0, com a explicação no documento.
 
 **Bônus do Ranking de Poder (Etapa 6):** a tela do ranking promete "+N na média" por nível. Decisão do professor: o +N vale sobre a soma anual, ou seja, +N÷4 só na **média final do ano**. SQL em `supabase/2026-09-17-etapa6-bonus-ranking-poder.sql`.
 - **Tabela:** Novato e Aprendiz +0, Camponês +0,25, Gladiador +0,5, Rei +1,5, Mago Supremo +2.
