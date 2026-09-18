@@ -824,6 +824,8 @@ tbody tr:hover td{
 </div>
 
 <script src="assets/js/relatorio-alunos-adicionados.js?v=20260917a"></script>
+<script src="assets/js/boletim-regras.js?v=20260917d"></script>
+<script src="assets/js/herminio-regras-extras.js?v=20260918a"></script>
 <script>
 const STORAGE_KEY = "rh_alunos_2serie_2026_v1";
 const SCHOOL_NAME = "E.E. Raimundo Hermínio de Melo";
@@ -878,6 +880,37 @@ let remoteDailySync = null;
 let remoteSyncRetryTimer = null;
 let remoteSyncRetryCount = 0;
 let applyingRemotePanelState = false;
+
+// Etapa 8E (decisão de 18/09/2026): desconto por comportamento na nota do
+// bimestre e bônus do Ranking de Poder na média final, com os dados do banco.
+const regrasExtras = window.HerminioRegrasExtras
+  ? window.HerminioRegrasExtras.criar({ scopeKey: "herminio:panel:" + STORAGE_KEY, aoAtualizar: function () { renderAll(); } })
+  : null;
+
+function aplicarDescontoConduta(total, student, disciplineName, bim) {
+  const desconto = regrasExtras && total !== null ? regrasExtras.desconto(student, disciplineName, bim) : 0;
+  return desconto ? Math.max(0, Number((total - desconto).toFixed(2))) : total;
+}
+
+function aplicarBonusPoder(media, student) {
+  const bonus = regrasExtras && media !== null ? regrasExtras.bonusMedia(student) : 0;
+  return bonus ? Math.min(10, Math.round((media + bonus) * 10) / 10) : media;
+}
+
+function renderRegrasExtrasBimestre(student, disciplineName, bim) {
+  const desconto = regrasExtras ? regrasExtras.desconto(student, disciplineName, bim) : 0;
+  if (!desconto) return "";
+  return '<div class="summary-foot" style="color:#8c3514"><strong>Comportamento: -' + formatNumber(desconto)
+    + "</strong> na nota do bimestre (" + regrasExtras.ocorrencias(student, disciplineName, bim)
+    + " ocorrencia(s); limite de 2,0).</div>";
+}
+
+function renderMetricaPoder(student) {
+  const nivel = regrasExtras ? regrasExtras.poder(student) : null;
+  if (!nivel) return "";
+  return profileMetric("Ranking de Poder", nivel.nome + " · " + nivel.pontos + " pts",
+    "Bonus na media final: +" + nivel.bonusMedia.toLocaleString("pt-BR", { maximumFractionDigits: 2 }));
+}
 
 let state = loadState();
 renderAll();
@@ -1433,7 +1466,8 @@ function renderProfile(studentId) {
       + profileMetric("Faltas em h/aula", String(absence.aulas), "Carga horária ausente consolidada")
       + profileMetric("Presencas em h/aula", String(absence.presencas), "Presencas registradas nos relatos diarios")
       + profileMetric("Atividades feitas", String(calculateWorksTotal(student)), "Soma automatica registrada nos relatos")
-      + profileMetric("Média anual parcial", media === null ? "—" : formatNumber(media) + "/10", media === null ? "Ainda sem notas lançadas" : "Média dos bimestres preenchidos")
+      + profileMetric("Média anual parcial", media === null ? "—" : formatNumber(media) + "/10", media === null ? "Ainda sem notas lançadas" : "Média dos bimestres preenchidos, com o bônus do Ranking de Poder")
+      + renderMetricaPoder(student)
     + '</section>'
     + '<section class="section-block">'
       + '<h3>Panorama por bimestre</h3>'
@@ -1485,6 +1519,7 @@ function renderBimCard(student, bim) {
       + '<div class="bim-card-total">' + (total === null ? "—" : formatNumber(total) + "/10") + "</div>"
     + '</div>'
     + '<div class="field-stack">'
+      + renderRegrasExtrasBimestre(student, EXPORT_DISCIPLINE_NAME, bim)
       + '<div><label>Nota de trabalhos</label>' + renderStepper(student.id, bim, "trabalhos", dados.trabalhos) + '</div>'
       + '<div><label>Nota de prova</label>' + renderStepper(student.id, bim, "prova", dados.prova) + '</div>'
       + '<div class="summary-foot">Atividades feitas nos relatos diarios: ' + getBimesterWorksCount(student, bim) + '</div>'
@@ -1635,13 +1670,13 @@ function calculateBimTotal(student, bim) {
   const trabalhos = toNumber(student.bimestres[bim].trabalhos);
   const prova = toNumber(student.bimestres[bim].prova);
   if (trabalhos === null && prova === null) return null;
-  return roundFinalGrade((trabalhos || 0) + (prova || 0));
+  return aplicarDescontoConduta(roundFinalGrade((trabalhos || 0) + (prova || 0)), student, EXPORT_DISCIPLINE_NAME, bim);
 }
 
 function calculateAnnualAverage(student) {
   const totals = BIMESTERS.map(function (bim) { return calculateBimTotal(student, bim); }).filter(function (value) { return value !== null; });
   if (!totals.length) return null;
-  return roundFinalGrade(totals.reduce(function (sum, value) { return sum + value; }, 0) / totals.length);
+  return aplicarBonusPoder(roundFinalGrade(totals.reduce(function (sum, value) { return sum + value; }, 0) / totals.length), student);
 }
 
 function calculateWorksTotal(student) {
