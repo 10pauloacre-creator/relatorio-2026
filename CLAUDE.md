@@ -364,6 +364,10 @@ O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-
 
 O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: só a sessão do próprio aluno ou o admin. **Hermínio: boletins mantidos como estão** (decisão do professor, inclusive o `autofillMissingGrades`).
 
+**Segurança e tempo real (Etapas 8C e 8D):**
+- **`boletim_normalizado` fechada:** a view roda como dono do banco e estava aberta para a chave pública, que lia nome e notas de todos. Agora só responde ao professor logado (`private.is_relatorio_admin`); `report-boletim-api.js` (página de notas do admin na Biblioteca) envia o token da sessão. O aluno vê o próprio boletim só por `get_meu_boletim`.
+- **Aviso em tempo real:** gatilhos por instrução em `relatorio_lancamentos`, `relatorio_ocorrencias`, `relatorio_aulas` e `report_sync_state` mandam `realtime.send` no canal público "relatorio-atualizado" (evento "atualizado"), no máximo um a cada 5 s. O aviso só leva a hora, nenhum dado. O boletim aberto no app busca de novo em 6–10 s; com o app em segundo plano, busca ao voltar. Falha no aviso nunca atrapalha a gravação.
+
 **Desconto por comportamento (Etapa 8B, decisão de 17/09/2026):** SQL em `supabase/2026-09-17-etapa8b-provas-no-relatorio-e-desconto-conduta.sql`.
 - **Valores:** leve 0,25 · médio 0,5 · grave 1,0 · muito grave 2,0 por ocorrência de quem praticou o ato (`relatorio_pontos_conduta`).
 - **Onde desconta:** na nota do bimestre da disciplina em que aconteceu, até 2,0 por bimestre, com a nota nunca abaixo de 0. Entra antes da recuperação, então o bimestre seguinte ou a recuperação semestral ainda podem recuperar.
