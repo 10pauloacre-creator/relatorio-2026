@@ -164,9 +164,8 @@
     const relatorioButton = event.target.closest("[data-ri-acao]");
     if (relatorioButton) {
       const escopo = relatorioButton.closest("[data-ri-bloco]");
-      const seletor = escopo ? escopo.querySelector("[data-ri-bimestre]") : null;
-      abrirRelatorioIndividual(Number(relatorioButton.dataset.riAcao === "pdf" ? relatorioButton.dataset.riPdf : relatorioButton.dataset.riVer),
-        seletor ? seletor.value : "", relatorioButton.dataset.riAcao, escopo);
+      const seletor = escopo ? escopo.querySelector("[data-ri-disciplina]") : null;
+      abrirRelatorioIndividual(Number(relatorioButton.dataset.riAbrir), seletor ? seletor.value : "", escopo);
       return;
     }
 
@@ -1447,15 +1446,14 @@
   // Mesma fonte e mesmo documento do "Meu relatório" do aluno.
   function renderRelatorioIndividualBloco(student) {
     if (!window.RelatorioIndividual) return "";
-    const opcoes = ['<option value="">Ano todo</option>']
-      .concat(BIMESTERS.map(function (b) { return '<option value="' + b + '">' + b + "o bimestre</option>"; })).join("");
+    const opcoes = ['<option value="">Todas as disciplinas</option>']
+      .concat(DISCIPLINES.map(function (d) { return '<option value="' + escapeHtml(d.name) + '">' + escapeHtml(d.name) + "</option>"; })).join("");
     return '<section class="section-block" data-ri-bloco="' + student.id + '">'
-      + "<h3>Relatorio individual</h3>"
-      + '<p class="section-note">Notas, frequencia, aulas com tema e presenca, atividades e comportamento. E o mesmo documento que o aluno abre no app.</p>'
+      + "<h3>Relatorio Individual Anual</h3>"
+      + '<p class="section-note">Documento oficial com identificacao, notas por bimestre, relatorio de provas, atividades feitas e observacoes. Abre com o botao Imprimir / Salvar PDF. E o mesmo documento que o aluno abre no app.</p>'
       + '<div class="report-tools">'
-        + '<select data-ri-bimestre aria-label="Periodo do relatorio">' + opcoes + "</select>"
-        + '<button class="primary-btn" type="button" data-ri-acao="ver" data-ri-ver="' + student.id + '">Ver relatorio</button>'
-        + '<button class="ghost-btn" type="button" data-ri-acao="pdf" data-ri-pdf="' + student.id + '">Baixar PDF</button>'
+        + '<select data-ri-disciplina aria-label="Componente curricular do relatorio">' + opcoes + "</select>"
+        + '<button class="primary-btn" type="button" data-ri-acao="abrir" data-ri-abrir="' + student.id + '">Abrir relatorio</button>'
       + "</div>"
       + '<div class="summary-foot" data-ri-status></div>'
       + "</section>";
@@ -1466,7 +1464,7 @@
     return poder && poder.alunoId ? poder.alunoId : null;
   }
 
-  function abrirRelatorioIndividual(studentId, bimestre, acao, escopo) {
+  function abrirRelatorioIndividual(studentId, disciplina, escopo) {
     const student = getStudent(studentId);
     const status = escopo ? escopo.querySelector("[data-ri-status]") : null;
     const avisar = function (texto) { if (status) status.textContent = texto; };
@@ -1483,28 +1481,20 @@
       return;
     }
     avisar("Montando o relatorio...");
-    window.RelatorioIndividual.carregar(client, { alunoId: alunoId, bimestre: bimestre })
+    window.RelatorioIndividual.carregar(client, { alunoId: alunoId })
       .then(function (dados) {
-        const modelo = window.RelatorioIndividual.montar(dados, {});
-        if (acao === "pdf") {
-          window.RelatorioIndividual.pdf(modelo);
-          avisar("PDF gerado.");
-          return;
-        }
-        if (!document.getElementById("ri-style")) {
-          const style = document.createElement("style");
-          style.id = "ri-style";
-          style.textContent = window.RelatorioIndividual.estilo();
-          document.head.appendChild(style);
-        }
-        document.getElementById("reportTitle").textContent = "Relatorio individual - " + student.nome;
-        document.getElementById("reportSubtitle").textContent = modelo.escola + " · " + modelo.turma + " · " + modelo.periodo;
-        document.getElementById("reportBody").innerHTML =
-          '<div class="report-tools"><button class="primary-btn" type="button" data-ri-acao="pdf" data-ri-pdf="' + student.id + '">Baixar PDF</button></div>'
-          + window.RelatorioIndividual.html(modelo);
-        currentReportId = null;
-        openModal("reportModal");
-        avisar("Relatorio aberto.");
+        const html = window.RelatorioIndividual.documento(dados, {
+          disciplina: disciplina || "",
+          recursos: {
+            // Caminho absoluto: a janela do relatorio nasce em about:blank.
+            cabecalho: new URL("assets/img/relatorio-individual/cabecalho-oficial.png", window.location.href).href,
+            assinatura: new URL("assets/img/relatorio-individual/assinatura-professor.png", window.location.href).href
+          }
+        });
+        const janela = window.RelatorioIndividual.abrir(html, { nome: "relatorio-" + student.id });
+        avisar(janela
+          ? "Relatorio aberto em outra janela. Use o botao Imprimir / Salvar PDF."
+          : "O navegador bloqueou a janela do relatorio. Libere os pop-ups deste site e tente de novo.");
       })
       .catch(function (erro) {
         console.warn("[Relatorio individual]", erro);
