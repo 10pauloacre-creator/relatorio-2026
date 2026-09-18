@@ -420,3 +420,12 @@ O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: s�
 - **Comportamento desconta nota** (Etapa 8B, abaixo).
 
 **Publicação:** `assets/js/relatorio-lancamentos.js` + `pcMontarRetratoLancamentos()` (casavequia.html) e `rhMontarRetratoLancamentos()` (herminio-main.js) enviam o retrato completo para `relatorio_publicar_lancamentos` a cada mudança (debounce de 4s, só envia quando algo mudou). O montador reaproveita as regras de exibição (`_atvStatus`, `pcResolvePresenceStatus`, `rhGetEstadoAtual`). **Se mudar uma dessas regras, o retrato muda junto.** Se o retrato vier menor que 80% do que já está publicado, nada é marcado como removido.
+
+---
+
+## 16. PROJEÇÕES INTEGRADAS (aba Contador das duas escolas)
+
+`planejamento-aulas-2026.html` é uma página só, embutida em iframe na aba Contador. Sem parâmetro atende a Casavequia; com `?escola=herminio` atende a Hermínio (config em `ESCOLAS_PLANEJADOR`). Cada escola tem chaves próprias no localStorage e escopos próprios no Supabase (`casavequia:*` / `herminio:projection-seed|planner-state:shared-v1`).
+- **Semente:** a página da escola monta turmas, disciplinas, metas, aulas lançadas (mesma soma do Contador), registros datados e calendário — `pcBuildProjectionSeed()` (casavequia.html) e `rhBuildProjectionSeed()` (herminio-main.js).
+- **Grade semanal da Hermínio:** não há grade fixa (rodízio). Ela é deduzida dos relatos das últimas 4 semanas; só entra disciplina com aula nas últimas 2 semanas. O professor pode ajustar a grade na tela de projeções, e o ajuste manual prevalece.
+- **Contador:** os cartões usam as datas projetadas (grade + feriados + recesso). Bimestres já concluídos mostram a data real em que a soma dos relatos atingiu a meta.
