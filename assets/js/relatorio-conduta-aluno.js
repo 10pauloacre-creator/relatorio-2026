@@ -10,10 +10,10 @@
 window.RelatorioCondutaAluno = (function () {
   var ROTULOS = { leve: "Leve", medio: "Médio", grave: "Grave", muito_grave: "Muito grave" };
   var PAPEIS = { vitima: "Vítima", testemunha: "Testemunha", envolvido: "Envolvido", destaque: "⭐ Destaque" };
+  // Cores nos temas claro e escuro: classes .cond-chip--* em casavequia-alunos.css.
   var CORES = {
-    leve: "background:#e3f3ea;color:#1f5f3c", medio: "background:#fdf1d8;color:#7a5305",
-    grave: "background:#fde4d8;color:#8c3514", muito_grave: "background:#f9d4d4;color:#7d1414",
-    neutro: "background:#eef1f5;color:#3f4a5a", destaque: "background:#fff5d6;color:#6b5205"
+    leve: "leve", medio: "medio", grave: "grave", muito_grave: "muito-grave",
+    neutro: "neutro", destaque: "destaque"
   };
   var cache = {};
 
@@ -21,8 +21,8 @@ window.RelatorioCondutaAluno = (function () {
     return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
-  function chip(texto, estilo) {
-    return '<span style="display:inline-block;padding:2px 9px;border-radius:999px;font-size:.72rem;font-weight:600;margin:0 4px 4px 0;' + estilo + '">' + esc(texto) + "</span>";
+  function chip(texto, tipo) {
+    return '<span class="cond-chip cond-chip--' + tipo + '">' + esc(texto) + "</span>";
   }
 
   async function buscar(opcoes) {
@@ -60,8 +60,8 @@ window.RelatorioCondutaAluno = (function () {
       + (o.origem === "observacao" ? " · observação" : "") + "</div>"
       + "<div>" + chips + "</div>"
       + "<div>" + esc(principal) + "</div>"
-      + (ctx.descricao && o.texto ? '<div style="font-size:.78rem;opacity:.75;margin-top:4px">Relato: ' + esc(o.texto) + "</div>" : "")
-      + (o.gravidade_justificativa ? '<div style="font-size:.78rem;opacity:.75;margin-top:4px">' + esc(o.gravidade_justificativa) + "</div>" : "")
+      + (ctx.descricao && o.texto ? '<div class="cond-detalhe">Relato: ' + esc(o.texto) + "</div>" : "")
+      + (o.gravidade_justificativa ? '<div class="cond-detalhe">' + esc(o.gravidade_justificativa) + "</div>" : "")
       + "</article>";
   }
 
@@ -80,7 +80,7 @@ window.RelatorioCondutaAluno = (function () {
         if (o.papel === "destaque" || o.positiva) destaques++;
         else if (o.papel === "autor" && o.gravidade) cont[o.gravidade]++;
       });
-      container.innerHTML = '<div style="margin-bottom:10px">'
+      container.innerHTML = '<div class="cond-resumo">'
         + Object.keys(cont).map(function (g) { return chip(ROTULOS[g] + ": " + cont[g], CORES[g]); }).join("")
         + chip("Destaques: " + destaques, CORES.destaque)
         + '</div><div class="observation-list">' + itens.map(renderItem).join("") + "</div>";

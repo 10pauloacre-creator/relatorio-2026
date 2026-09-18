@@ -1286,7 +1286,7 @@
   // Comportamento desconta na nota do bimestre (Etapa 8B).
   function renderDescontoConduta(resultado) {
     if (!resultado || !resultado.descontoConduta) return "";
-    return '<div class="summary-foot" style="color:#8c3514"><strong>Comportamento: -' + formatNumber(resultado.descontoConduta)
+    return '<div class="summary-foot conduta-desconto"><strong>Comportamento: -' + formatNumber(resultado.descontoConduta)
       + "</strong> na nota do bimestre (" + resultado.ocorrenciasConduta + " ocorrencia(s); limite de 2,0). Media sem desconto: "
       + formatNumber(resultado.notaSemDesconto) + ".</div>";
   }
