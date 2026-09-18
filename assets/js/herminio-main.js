@@ -103,10 +103,52 @@ if (!relatoId) return fallbackHoras;
 if (Object.prototype.hasOwnProperty.call(RH_HORAS_OFICIAIS_POR_RELATO, relatoId)) return RH_HORAS_OFICIAIS_POR_RELATO[relatoId];
 return fallbackHoras;
 }
-function rhHorasOficiaisCard(card, fallbackHoras) {
+function rhHorasBaseCard(card, fallbackHoras) {
 if (!card) return fallbackHoras;
 var relato = card.querySelector('.ipane[id^="r-"]');
 return rhHorasOficiaisRelatoId(relato ? relato.id : '', fallbackHoras);
+}
+// Regra dos 15 minutos (decisão de 18/09/2026): cada aula de 2h + 2h15 conta
+// 4 h/aula e sobra 15 min. Somados por turma e disciplina, na ordem das datas,
+// a cada 60 min o relato em que a hora fecha ganha +1 h/aula extra.
+// Relatos com hora oficial definida à mão (RH_HORAS_OFICIAIS_POR_RELATO) ficam como estão.
+function rhMinutosExtrasCard(card) {
+var relatoId = rhRelatoIdCard(card);
+if (relatoId && Object.prototype.hasOwnProperty.call(RH_HORAS_OFICIAIS_POR_RELATO, relatoId)) return 0;
+var titulo = card ? card.querySelector('.em .ed') : null;
+var horas = parseHorasRH(titulo ? titulo.textContent : '');
+return Math.max(0, Math.round((horas - Math.floor(horas)) * 60));
+}
+var _rhHorasExtrasCache = null;
+function rhMapaHorasExtras() {
+if (_rhHorasExtrasCache) return _rhHorasExtrasCache;
+var porRelato = {};
+var resto = {};
+var total = {};
+var grupos = {};
+coletarAulasLancadasRH({ base: true }).registros.forEach(function(reg) {
+  var chave = reg.turmaId + '|' + reg.grupo;
+  (grupos[chave] = grupos[chave] || []).push(reg);
+});
+Object.keys(grupos).forEach(function(chave) {
+  var minutos = 0;
+  grupos[chave].sort(function(a, b) { return a.data.localeCompare(b.data) || String(a.relatoId).localeCompare(String(b.relatoId)); }).forEach(function(reg) {
+    minutos += reg.minutos || 0;
+    if (minutos >= 60 && reg.relatoId) {
+      minutos -= 60;
+      porRelato[reg.relatoId] = (porRelato[reg.relatoId] || 0) + 1;
+      total[chave] = (total[chave] || 0) + 1;
+    }
+  });
+  resto[chave] = minutos;
+});
+_rhHorasExtrasCache = { porRelato: porRelato, resto: resto, total: total };
+return _rhHorasExtrasCache;
+}
+function rhHorasOficiaisCard(card, fallbackHoras) {
+var base = rhHorasBaseCard(card, fallbackHoras);
+if (!base) return base;
+return base + (rhMapaHorasExtras().porRelato[rhRelatoIdCard(card)] || 0);
 }
 function rhRelatoIdCard(card) {
 if (!card) return '';
@@ -139,7 +181,8 @@ function rhDataChaveIso(data) {
 if (!(data instanceof Date) || isNaN(data.getTime())) return '';
 var mes = String(data.getMonth() + 1).padStart(2, '0');
 var dia = String(data.getDate()).padStart(2, '0');   return data.getFullYear() + '-' + mes + '-' + dia; }
-function coletarAulasLancadasRH() { 
+function coletarAulasLancadasRH(opcoes) { 
+var horasCard = opcoes && opcoes.base ? rhHorasBaseCard : rhHorasOficiaisCard;
 var mapa = {}; 
 var ultimaData = null;
 var datasDetalhadas = {};
@@ -155,7 +198,7 @@ var infoDisc = normalizarDiscRH(titulo.textContent);
 if (!infoDisc) return;
 var turmaId = turmaIdForcada || RH_SECOES_TURMA[(card.closest('.sec') || {}).id];
 if (!turmaId) return;
-var horas = rhHorasOficiaisCard(card, Math.floor(parseHorasRH(titulo.textContent) || 0));
+var horas = horasCard(card, Math.floor(parseHorasRH(titulo.textContent) || 0));
 var chave = turmaId + '_' + infoDisc.disc;   mapa[chave] = (mapa[chave] || 0) + horas;
 var data = parseDataCardRH(card);
 if (data) {
@@ -163,7 +206,7 @@ var dataKey = rhDataChaveIso(data);
 datasDetalhadas[turmaId + '|' + infoDisc.disc + '|' + dataKey] = true;
 if (!ultimaDataTurma[turmaId] || data > ultimaDataTurma[turmaId]) ultimaDataTurma[turmaId] = data;
 if (!ultimaData || data > ultimaData) ultimaData = data;
-if (horas > 0) registros.push({ turmaId: turmaId, grupo: infoDisc.grupo, disc: infoDisc.disc, data: dataKey, horas: horas });
+if (horas > 0) registros.push({ turmaId: turmaId, grupo: infoDisc.grupo, disc: infoDisc.disc, data: dataKey, horas: horas, relatoId: relatoId, minutos: rhMinutosExtrasCard(card) });
 }
 if (relatoId) paneContabilizado[relatoId] = true;
 }
@@ -195,14 +238,14 @@ if (ultimaDataTurma[turmaId] && data <= ultimaDataTurma[turmaId]) return;
 var dataKey = rhDataChaveIso(data);
 var detalhadoKey = turmaId + '|' + infoDisc.disc + '|' + dataKey;
 if (datasDetalhadas[detalhadoKey]) return;
-var horas = rhHorasOficiaisCard(card, Math.floor(parseHorasRH(textoTitulo) || 0));
+var horas = horasCard(card, Math.floor(parseHorasRH(textoTitulo) || 0));
 if (!horas) return;
 var chave = turmaId + '_' + infoDisc.disc;
 mapa[chave] = (mapa[chave] || 0) + horas;
 datasDetalhadas[detalhadoKey] = true;
-registros.push({ turmaId: turmaId, grupo: infoDisc.grupo, disc: infoDisc.disc, data: dataKey, horas: horas });
-if (!ultimaData || data > ultimaData) ultimaData = data;
 var relatoResumoId = rhRelatoIdCard(card);
+registros.push({ turmaId: turmaId, grupo: infoDisc.grupo, disc: infoDisc.disc, data: dataKey, horas: horas, relatoId: relatoResumoId, minutos: rhMinutosExtrasCard(card) });
+if (!ultimaData || data > ultimaData) ultimaData = data;
 if (relatoResumoId) paneContabilizado[relatoResumoId] = true;
 });   }
 document.querySelectorAll('.ea').forEach(function(card) {
@@ -210,7 +253,8 @@ var relatoId = rhRelatoIdCard(card);
 if (!relatoId || paneContabilizado[relatoId]) return;
 if (!/^r-(t1|g1)-/.test(relatoId)) return;
 rhSomarCard(card, 't1');
-});    return { mapa: mapa, ultimaData: ultimaData, registros: registros }; }
+});    // Registro sem data não entra na regra dos 15 minutos.
+   return { mapa: mapa, ultimaData: ultimaData, registros: registros }; }
 function getBimAtualRH(feitas, bimestre) { 
 if (!bimestre) return 1;   for (var b = 1; b <= 4; b++) {   
 if (feitas < b * bimestre) return b;   }   return 4; }
@@ -457,8 +501,14 @@ function rhMontarRetratoLancamentos() {
     aula.b = bim;
   });
   retrato.aulas = lista;
+  // Turma com o ciclo encerrado (herminio-ciclo.js): o crédito completa a carga
+  // do ano, para o banco marcar todos os bimestres como concluídos.
+  var concluidas = ((window.HERMINIO_CICLO_ESTUDOS || {}).concluidas) || [];
+  var somaCarga = {};
+  lista.forEach(function (aula) { somaCarga[aula.t + '|' + aula.disc] = (somaCarga[aula.t + '|' + aula.disc] || 0) + (aula.carga || 0); });
   retrato.metas = DISC_RH.map(function (d) {
-    return { t: d.turmaId, disc: d.disc, meta: rhMetaBimestrePorDisciplina(d.turmaId, d.grupo, d.disc), total: d.totalMeta, credito: 0 };
+    var credito = concluidas.indexOf(d.turmaId) >= 0 ? Math.max(0, (d.totalMeta || 0) - (somaCarga[d.turmaId + '|' + d.disc] || 0)) : 0;
+    return { t: d.turmaId, disc: d.disc, meta: rhMetaBimestrePorDisciplina(d.turmaId, d.grupo, d.disc), total: d.totalMeta, credito: credito };
   });
   return retrato;
 }
@@ -719,6 +769,7 @@ function rhBuildProjectionSeed(dadosProntos) {
   var anchor = rhDataChaveIso(dados.ultimaData || new Date());
   var ciclo = rhProjectionCiclo();
   var grades = rhProjectionGradeDoCiclo(ciclo);
+  var horasExtras = rhMapaHorasExtras();
   var porGrupo = {};
   DISC_RH.forEach(function(base) {
     var metas = getMetasContRH(base);
@@ -733,7 +784,9 @@ function rhBuildProjectionSeed(dadosProntos) {
         metas: {},
         lancadas: {},
         registros: {},
-        totais: {}
+        totais: {},
+        minutos: {},
+        extras: {}
       };
     }
     var disc = porGrupo[base.grupo];
@@ -744,6 +797,8 @@ function rhBuildProjectionSeed(dadosProntos) {
     disc.totais[base.turmaId] = Math.round(metas.total || bimestre * 4);
     // Mesma soma do Contador: relatos digitais são a fonte de verdade.
     disc.lancadas[base.turmaId] = Math.round(dados.mapa[base.turmaId + '_' + base.disc] || 0);
+    disc.minutos[base.turmaId] = horasExtras.resto[base.turmaId + '|' + base.grupo] || 0;
+    disc.extras[base.turmaId] = horasExtras.total[base.turmaId + '|' + base.grupo] || 0;
     disc.registros[base.turmaId] = (dados.registros || []).filter(function(reg) {
       return reg.turmaId === base.turmaId && reg.disc === base.disc;
     }).map(function(reg) {
@@ -914,8 +969,12 @@ document.addEventListener('DOMContentLoaded', function() {
 function renderContRH() {   Object.keys(RH_GRUPOS_CONT).forEach(function(grupo) {
 var el = document.getElementById(RH_GRUPOS_CONT[grupo].container);
 if (el) el.innerHTML = '';   });
+// Relatos podem ter mudado (editor): refaz a regra dos 15 minutos.
+_rhHorasExtrasCache = null;
 var dados = coletarAulasLancadasRH();
 var seed = rhBuildProjectionSeed(dados);
+var extrasPorTurma = rhMapaHorasExtras().total;
+var turmasConcluidas = (seed.ciclo && seed.ciclo.concluidas) || [];
 rhSyncProjectionSeed('contador', seed);
 var projecao = ProjecaoCiclo.simular(rhResolveProjectionRuntimeState(seed)).porDisc;
 var upd = document.getElementById('rh-cont-upd');
@@ -929,24 +988,27 @@ var proj = projecao[base.grupo + '|' + base.turmaId];
 var feitas = proj ? proj.launched : Math.round(((dados.mapa[base.turmaId + '_' + base.disc] || 0) + Number.EPSILON) * 100) / 100;
 var bimestre = proj ? proj.meta : metas.bimestre;
 var total = proj ? proj.total : metas.total;
+// Turma que encerrou o ciclo (herminio-ciclo.js): todas as aulas contam como concluídas.
+var turmaConcluida = turmasConcluidas.indexOf(base.turmaId) >= 0;
+var horasExtras = extrasPorTurma[base.turmaId + '|' + base.grupo] || 0;
 var bimAtual = getBimAtualRH(feitas, bimestre);
 var inicioBim = bimestre ? (bimAtual - 1) * bimestre : 0;
 var feitasBim = bimestre ? Math.max(0, Math.round(((feitas - inicioBim) + Number.EPSILON) * 100) / 100) : 0;
 var faltamBim = bimestre ? Math.max(0, Math.round(((bimestre - feitasBim) + Number.EPSILON) * 100) / 100) : 0;
 var faltamAno = total ? Math.max(0, Math.round(((total - feitas) + Number.EPSILON) * 100) / 100) : 0;
-var pctBim = bimestre ? Math.min((feitasBim / bimestre) * 100, 100) : 0;
-var pctAno = total ? Math.min((feitas / total) * 100, 100) : 0;
+var pctBim = turmaConcluida ? 100 : (bimestre ? Math.min((feitasBim / bimestre) * 100, 100) : 0);
+var pctAno = turmaConcluida ? 100 : (total ? Math.min((feitas / total) * 100, 100) : 0);
 var naGrade = !!(proj && proj.emCiclo);
 var card = document.createElement('div');     card.className = 'cc';
-var badgeTxt = bimestre ? (bimAtual + 'º Bimestre') : confGrupo.badge;
-var metaTxt = base.disc       + (naGrade ? ' · ' + proj.semanal + ' h/aula/sem no rodízio' : '')       + (bimestre ? ' · ' + fmtHoraAula(bimestre) + ' h/aula bimestrais' : '')       + (total ? ' · ' + fmtHoraAula(total) + ' h/aula anuais' : '');
+var badgeTxt = turmaConcluida ? 'Concluída' : (bimestre ? (bimAtual + 'º Bimestre') : confGrupo.badge);
+var metaTxt = base.disc       + (naGrade ? ' · ' + proj.semanal + ' h/aula/sem no rodízio' : '')       + (bimestre ? ' · ' + fmtHoraAula(bimestre) + ' h/aula bimestrais' : '')       + (total ? ' · ' + fmtHoraAula(total) + ' h/aula anuais' : '')       + (horasExtras ? ' · inclui ' + horasExtras + ' h/aula extra' + (horasExtras > 1 ? 's' : '') + ' (15 min acumulados)' : '');
 var previsaoHtml = '';
 if (bimestre) {       previsaoHtml = '<div style="font-size:.69rem;color:var(--cm);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin:13px 0 6px">Previsão de conclusão por bimestre</div><div class="brow">' + [1, 2, 3, 4].map(function(b) {
-var ok = feitas >= b * bimestre;
+var ok = turmaConcluida || feitas >= b * bimestre;
 var cls = ok ? 'co' : (b === bimAtual ? 'at' : '');
 var rotulo = ok ? '&#10004; Concluído' : (proj && proj.closes[b] ? rhProjectionFormatarData(proj.closes[b]) : (naGrade ? 'Não fecha até 2027' : 'Fora do rodízio'));         return '<div class="bi ' + cls + '"><div class="bn">' + b + 'º Bim</div><div class="bd2">' + rotulo + '</div></div>';       }).join('') + '</div>';     }
-var encerramento = feitas >= total ? 'Concluído' : (proj && proj.yearEnd ? rhProjectionFormatarData(proj.yearEnd) : (naGrade ? 'Sem conclusão até 2027' : 'sem previsão'));
-var observacao = feitas >= total       ? '<div class="ae"><strong>Encerramento anual previsto:</strong> Concluído.<br>* Carga anual desta disciplina já cumprida pelos relatos lançados.</div>'       : naGrade       ? '<div class="ae"><strong>Encerramento anual previsto:</strong> ' + encerramento + '.<br>* Ciclo de estudos (rodízio): ' + (proj.inicio && proj.launched === 0 ? 'começa em ' + rhProjectionFormatarData(proj.inicio) + ', quando a disciplina ou turma anterior encerrar' : 'a disciplina segue nos dias da sua trilha') + '. A projeção considera o calendário escolar, o recesso e as aulas já lançadas.</div>'       : '<div class="ae"><strong>Encerramento anual previsto:</strong> ' + encerramento + '.<br>* Disciplina fora do ciclo de estudos atual (rodízio definido em herminio-ciclo.js).</div>';      card.innerHTML =       '<div class="cch">'         + '<div><div class="cct">' + RH_TURMA_LABELS[base.turmaId] + '</div><div class="ccm">' + metaTxt + '</div></div>'         + '<div class="ccb" style="' + confGrupo.badgeStyle + '">' + badgeTxt + '</div>'       + '</div>'       + '<div class="ccbody">'         + '<div class="pg">'           + '<div class="pl"><span class="plt">' + (bimestre ? (bimAtual + 'º Bimestre') : 'Aulas lançadas') + '</span><span class="pln">' + fmtHoraAula(bimestre ? feitasBim : feitas) + (bimestre ? ' / ' + fmtHoraAula(bimestre) + ' · faltam ' + fmtHoraAula(faltamBim) : ' h/aula acumuladas') + '</span></div>'           + '<div class="pbg"><div class="pf" style="width:' + pctBim + '%;background:' + confGrupo.bar + '"></div></div>'         + '</div>'         + '<div class="pg">'           + '<div class="pl"><span class="plt">Total do ano</span><span class="pln">' + fmtHoraAula(feitas) + (total ? ' / ' + fmtHoraAula(total) + ' · faltam ' + fmtHoraAula(faltamAno) : ' h/aula registradas') + '</span></div>'           + '<div class="pbg"><div class="pf dm" style="width:' + pctAno + '%;background:' + confGrupo.bar + '"></div></div>'         + '</div>'         + previsaoHtml         + observacao       + '</div>';      container.appendChild(card);   }); }
+var encerramento = feitas >= total || turmaConcluida ? 'Concluído' : (proj && proj.yearEnd ? rhProjectionFormatarData(proj.yearEnd) : (naGrade ? 'Sem conclusão até 2027' : 'sem previsão'));
+var observacao = turmaConcluida       ? '<div class="ae"><strong>Encerramento anual previsto:</strong> Concluído.<br>* Turma com o ciclo de estudos encerrado: carga mínima cumprida e todas as aulas concluídas.</div>'       : feitas >= total       ? '<div class="ae"><strong>Encerramento anual previsto:</strong> Concluído.<br>* Carga anual desta disciplina já cumprida pelos relatos lançados.</div>'       : naGrade       ? '<div class="ae"><strong>Encerramento anual previsto:</strong> ' + encerramento + '.<br>* Ciclo de estudos (rodízio): ' + (proj.inicio && proj.launched === 0 ? 'começa em ' + rhProjectionFormatarData(proj.inicio) + ', quando a disciplina ou turma anterior encerrar' : 'a disciplina segue nos dias da sua trilha') + '. A projeção considera o calendário escolar, o recesso e as aulas já lançadas.</div>'       : '<div class="ae"><strong>Encerramento anual previsto:</strong> ' + encerramento + '.<br>* Disciplina fora do ciclo de estudos atual (rodízio definido em herminio-ciclo.js).</div>';      card.innerHTML =       '<div class="cch">'         + '<div><div class="cct">' + RH_TURMA_LABELS[base.turmaId] + '</div><div class="ccm">' + metaTxt + '</div></div>'         + '<div class="ccb" style="' + confGrupo.badgeStyle + '">' + badgeTxt + '</div>'       + '</div>'       + '<div class="ccbody">'         + '<div class="pg">'           + (turmaConcluida ? '<div class="pl"><span class="plt">Ciclo encerrado</span><span class="pln">todas as aulas concluídas</span></div>' : '<div class="pl"><span class="plt">' + (bimestre ? (bimAtual + 'º Bimestre') : 'Aulas lançadas') + '</span><span class="pln">' + fmtHoraAula(bimestre ? feitasBim : feitas) + (bimestre ? ' / ' + fmtHoraAula(bimestre) + ' · faltam ' + fmtHoraAula(faltamBim) : ' h/aula acumuladas') + '</span></div>')           + '<div class="pbg"><div class="pf" style="width:' + pctBim + '%;background:' + confGrupo.bar + '"></div></div>'         + '</div>'         + '<div class="pg">'           + '<div class="pl"><span class="plt">Total do ano</span><span class="pln">' + fmtHoraAula(feitas) + (turmaConcluida ? ' h/aula · concluído' : (total ? ' / ' + fmtHoraAula(total) + ' · faltam ' + fmtHoraAula(faltamAno) : ' h/aula registradas')) + '</span></div>'           + '<div class="pbg"><div class="pf dm" style="width:' + pctAno + '%;background:' + confGrupo.bar + '"></div></div>'         + '</div>'         + previsaoHtml         + observacao       + '</div>';      container.appendChild(card);   }); }
 // ═══════════════════════════════════════════════════════ //  INIT // ═══════════════════════════════════════════════════════ 
 // ═══════════════════════════════════════════════════════ //  LIVROS — troca de aba // ═══════════════════════════════════════════════════════
 var PROMPT_LIVROS_TEXTO='Prompt de livros temporariamente simplificado para manter a pagina interativa.';

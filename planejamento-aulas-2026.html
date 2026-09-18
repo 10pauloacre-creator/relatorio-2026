@@ -10,8 +10,8 @@
 <script defer src="assets/js/dark-mode-2026.js?v=20260917e"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260916a"></script>
-<script src="assets/js/herminio-ciclo.js?v=20260918a"></script>
-<script src="assets/js/projecao-ciclo.js?v=20260918a"></script>
+<script src="assets/js/herminio-ciclo.js?v=20260918b"></script>
+<script src="assets/js/projecao-ciclo.js?v=20260918c"></script>
 <style>
   :root{
     --bg:#eff3ea;
@@ -704,6 +704,8 @@
   .note-pill.ano-fim{background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:700}
   .mile-tag.ciclo-inicio{background:#dcfce7;color:#166534}
   .mile-tag.ciclo-fim{background:#fef3c7;color:#92400e}
+  .mile-tag.ciclo-extra{background:#e0e7ff;color:#3730a3}
+  html.dark-2026 body .mile-tag.ciclo-extra{color:var(--dark-info) !important;background:var(--dark-info-soft) !important;border-color:#36577f !important}
   .ciclo-aviso{color:var(--danger);font-weight:700}
   html.dark-2026 body .note-pill.ciclo-inicio, html.dark-2026 body .mile-tag.ciclo-inicio{color:var(--dark-positive) !important;background:var(--dark-positive-soft) !important;border-color:#2e704e !important}
   html.dark-2026 body .note-pill.ciclo-fim, html.dark-2026 body .mile-tag.ciclo-fim{color:var(--dark-accent) !important;background:var(--dark-accent-soft) !important;border-color:rgba(255,166,91,.4) !important}
@@ -1710,7 +1712,7 @@ let cicloCache = {assinatura:'', sim:null};
 function cicloSimulacao(){
   if(!cicloAtivo()) return null;
   const assinatura = JSON.stringify([state.anchorDate, state.feriados, state.recesso, state.facultativoLetivo, state.ciclo, state.turmas,
-    state.disciplinas.map(d=>[d.id, d.nome, d.nBimestres, d.turmasAtivas, d.metas, d.lancadas, d.totais])]);
+    state.disciplinas.map(d=>[d.id, d.nome, d.nBimestres, d.turmasAtivas, d.metas, d.lancadas, d.totais, d.minutos])]);
   if(assinatura !== cicloCache.assinatura) cicloCache = {assinatura, sim:window.ProjecaoCiclo.simular(state)};
   return cicloCache.sim;
 }
@@ -1728,7 +1730,7 @@ function futureProjectionForDiscipline(disc, days){
         closes:st.closes, launched:st.launched, meta:st.meta, total:st.total, yearEnd:st.yearEnd,
         currentBim:Math.min(disc.nBimestres || 4, Math.floor(st.launched / st.meta) + 1),
         completedBims:Math.min(disc.nBimestres || 4, Math.floor(st.launched / st.meta)),
-        emCiclo:st.emCiclo, inicio:st.inicio, semanal:st.semanal
+        emCiclo:st.emCiclo, inicio:st.inicio, semanal:st.semanal, concluida:st.concluida
       };
     });
     return {proj, resumo};
@@ -1881,21 +1883,23 @@ function buildTurmaCard(turma, disc, fullInfo, futureInfo){
   const sim = cicloSimulacao();
   const foraDoCiclo = !!sim && !futureInfo.emCiclo;
   const semData = foraDoCiclo ? 'fora do rodízio' : 'não fecha até 2027';
-  const annualEnd = launched >= total
+  // Turma com o ciclo encerrado: todas as aulas contam como concluídas.
+  const concluida = !!futureInfo.concluida;
+  const annualEnd = launched >= total || concluida
     ? 'concluído'
     : (futureInfo.yearEnd ? brDateShort(futureInfo.yearEnd) : semData);
   let lead = `${esc(disc.nome)} · ${weeklyForTurma(disc, turma.id)} h/aula por semana`;
   if(sim){
     lead = futureInfo.emCiclo
       ? `${esc(disc.nome)} · ${futureInfo.semanal} h/aula por semana no rodízio${futureInfo.inicio && launched === 0 ? ` · começa ${esc(brDateShort(futureInfo.inicio))}` : ''}`
-      : `${esc(disc.nome)} · ${launched >= total ? 'carga anual cumprida' : 'fora do rodízio'}`;
+      : `${esc(disc.nome)} · ${concluida ? 'ciclo encerrado · todas as aulas concluídas' : (launched >= total ? 'carga anual cumprida' : 'fora do rodízio')}`;
   }
   const passaDoAno = sim && sim.fimAnoLetivo && futureInfo.yearEnd && futureInfo.yearEnd > sim.fimAnoLetivo && launched < total;
   let lines = '';
   for(let bim = 1; bim <= (disc.nBimestres || 4); bim += 1){
     let value = '';
     const target = bim * meta;
-    if(launched >= target){
+    if(launched >= target || concluida){
       // Com rodízio (Hermínio), simular a grade atual desde janeiro não indica a data real.
       const closedAt = realCloses[bim] || (ESCOLA.exigeGradeSemanal ? fullInfo.closes[bim] : '');
       value = closedAt ? brDateShort(closedAt) : 'concluído';
@@ -2004,11 +2008,12 @@ function renderProjectionTable(disc, days, futureProj, lastDate){
       const cell = ((futureProj.proj[turma.id] || {})[day.k]) || null;
       if(cell){
         const tags = (cell.inicio ? `<span class="mile-tag ciclo-inicio">começa</span>` : '')
+          + (cell.extra ? `<span class="mile-tag ciclo-extra">${cell.add - cell.extra}h + ${cell.extra} extra</span>` : '')
           + cell.closes.map(bim=>`<span class="mile-tag">fecha ${bim}º</span>`).join('')
           + (cell.fim ? `<span class="mile-tag ciclo-fim">encerra</span>` : '');
         const body = cell.sync
           ? `<div class="turno-inner"><span class="cum">${cell.cum}</span><span class="delta">aulas já lançadas até esta data</span></div>`
-          : `<div class="turno-inner"><span class="cum">${cell.cum}</span><span class="delta">+${cell.add} aula(s) projetadas</span>${tags}</div>`;
+          : `<div class="turno-inner"><span class="cum">${cell.cum}</span><span class="delta">${cell.extra ? `+${cell.add - cell.extra}h + ${cell.extra} extra (15 min acumulados)` : `+${cell.add} aula(s) projetadas`}</span>${tags}</div>`;
         cells += `<td class="turno ${cell.sync ? 'sync' : ''} ${cell.closes.length ? 'milestone' : ''}">${body}</td>`;
       }else{
         cells += `<td class="blank">—</td>`;
@@ -2053,7 +2058,7 @@ function renderCicloResumo(sim){
       ${passa ? `<div class="summary-total"><span class="ciclo-aviso">Passa do término do ano letivo (${esc(brDateShort(sim.fimAnoLetivo))}).</span></div>` : ''}
     </article>`;
   }).join('')}</div>
-  <div class="hint">A turma seguinte começa no dia letivo após a anterior encerrar todas as disciplinas. Em cada trilha, a próxima disciplina assume os dias quando a anterior completa os 4 bimestres.</div>`;
+  <div class="hint">A turma seguinte começa no dia letivo após a anterior encerrar todas as disciplinas. Em cada trilha, a próxima disciplina assume os dias quando a anterior completa os 4 bimestres; se ela encerra no meio do dia, as horas restantes já entram para a próxima. Quando uma trilha acaba, a disciplina ainda ativa assume também os dias dela. Cada dia de 4h15 soma 15 min; a cada 60 min acumulados, o dia vale 4h + 1 extra.${Object.keys(sim.concluidas || {}).length ? ` Ciclo encerrado: ${esc(state.turmas.filter(t=>sim.concluidas[t.id]).map(t=>t.nome).join(', '))}.` : ''}</div>`;
 }
 
 function renderPanel(){
