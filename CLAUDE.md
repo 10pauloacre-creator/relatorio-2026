@@ -336,7 +336,7 @@ Backup atual: `backup/backup-20260424.json`
 
 O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-medieval-1`) usam o **mesmo projeto Supabase** (`vgceathgwvtmjxbdpecr`). A integração é feita por tabelas e funções nesse banco. Os SQL ficam em `supabase/2026-09-16-etapa*.sql`.
 
-**Decisões do professor:** nota do bimestre = média entre trabalhos (0–10) e prova (0–10). Comportamento **não desconta nota**, só é registrado com a gravidade. A integração vale para as duas escolas. O 6º Ano fica fora da Biblioteca.
+**Decisões do professor:** nota do bimestre = média entre trabalhos (0–10) e prova (0–10). Comportamento **desconta nota** desde 17/09/2026 (Etapa 8B; antes só era registrado). A integração vale para as duas escolas. O 6º Ano fica fora da Biblioteca.
 
 **Login:** `supabase-report-sync.js` exige a conta admin (`10pauloacre@gmail.com`, a mesma da Biblioteca). `report_sync_state` só é lido e gravado por essa conta.
 
@@ -364,13 +364,22 @@ O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-
 
 O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: só a sessão do próprio aluno ou o admin. **Hermínio: boletins mantidos como estão** (decisão do professor, inclusive o `autofillMissingGrades`).
 
+**Desconto por comportamento (Etapa 8B, decisão de 17/09/2026):** SQL em `supabase/2026-09-17-etapa8b-provas-no-relatorio-e-desconto-conduta.sql`.
+- **Valores:** leve 0,25 · médio 0,5 · grave 1,0 · muito grave 2,0 por ocorrência de quem praticou o ato (`relatorio_pontos_conduta`).
+- **Onde desconta:** na nota do bimestre da disciplina em que aconteceu, até 2,0 por bimestre, com a nota nunca abaixo de 0. Entra antes da recuperação, então o bimestre seguinte ou a recuperação semestral ainda podem recuperar.
+- **Não descontam:** vítima, testemunha, envolvido, destaque, "sem infração", registros positivos e ocorrência sem disciplina.
+- **Dados:** `relatorio_desconto_conduta` (boletim do aluno, `descontoConduta` em cada bimestre) e view `relatorio_descontos_conduta` (painel). O motor aplica em `calcularBimestre` (`notaSemDesconto`, `descontoConduta`, `ocorrenciasConduta`).
+- **Interruptor por escola:** `relatorio_regras_escola.desconto_conduta`, ligado na Casavequia e desligado na Hermínio.
+- **IA:** o prompt da classificação avisa que a gravidade custa nota; por isso, na dúvida, o nível menor.
+
 **Relatório Individual Anual do Aluno (Etapas 7 e 8):** um documento só, para o professor e para o aluno, montado a partir do modelo do professor (`docs/modelo_relatorio_individual_anual_aluno.html`, na Biblioteca). SQL em `supabase/2026-09-17-etapa7-relatorio-individual.sql`.
 - **Dados:** RPC `relatorio_individual(aluno, bimestre, sessão)` devolve notas (via `get_meu_boletim`), aulas com tema, presença e atividade, frequência em h/aula e as ocorrências com data, horário e gravidade. Lê o administrador ou o próprio aluno com a sessão dele.
 - **Documento:** `assets/js/relatorio-individual.js` (cópia idêntica nos dois repositórios, conferida por `scripts/check-copias-compartilhadas.js`) devolve o HTML completo: cabeçalho oficial, identificação, 1 Notas, 2 Relatório de provas, 3 Atividades feitas, 4 Observações e assinatura. Imagens em `assets/img/relatorio-individual/` (Relatório) e `assets/images/relatorio-individual/` (Biblioteca); passe o caminho ABSOLUTO em `recursos`, porque a janela nasce em about:blank.
 - **Impressão:** abre em janela própria com "🖨️ Imprimir / Salvar PDF" (`window.print()`); o PDF sai pela tela de impressão do navegador. Padrão A4, margem 15 mm, Times New Roman 12pt.
 - **Sempre anual e sempre atual:** o documento é montado na hora, então cada novo relato, prova, atividade ou observação entra na abertura seguinte. "Última atualização" = data do registro mais recente.
 - **Onde fica:** painel do professor, no perfil do aluno ("Relatorio Individual Anual", com escolha do componente curricular); e perfil do aluno na Biblioteca, na aba BOLETIM ("📄 MEU RELATÓRIO").
-- **Comportamento não desconta nota:** a coluna "Pontos perdidos" fica em 0,0, com a explicação no documento.
+- **Relatório de provas:** cada Avaliação Bimestral do livro aparece como o aluno vê ao terminar a prova (nota, aproveitamento, acertos, erros, não respondidas, tempo e desempenho por habilidade), a partir da view `relatorio_provas_livros` (log de respostas de `quiz_results`).
+- **Comportamento:** coluna "Comportamento" na tabela de notas (desconto aplicado) e "Pontos perdidos" por ocorrência nas observações.
 
 **Bônus do Ranking de Poder (Etapa 6):** a tela do ranking promete "+N na média" por nível. Decisão do professor: o +N vale sobre a soma anual, ou seja, +N÷4 só na **média final do ano**. SQL em `supabase/2026-09-17-etapa6-bonus-ranking-poder.sql`.
 - **Tabela:** Novato e Aprendiz +0, Camponês +0,25, Gladiador +0,5, Rei +1,5, Mago Supremo +2.
@@ -408,6 +417,6 @@ O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: s�
 - **Privacidade:** os nomes da turma viram «A7» antes de ir para a IA (`pseudonimizar`).
 - A ficha do aluno no painel da Casavequia mostra tudo em "Conduta registrada pela IA" (`assets/js/relatorio-conduta-aluno.js`).
 - `relatorio-lancamentos.js` mostra "☁️ Banco atualizado às HH:MM", confirmando que os relatos, inclusive os escritos à mão no HTML, chegaram ao banco. A publicação só acontece quando a página é aberta com o login do professor.
-- **Comportamento não desconta nota.**
+- **Comportamento desconta nota** (Etapa 8B, abaixo).
 
 **Publicação:** `assets/js/relatorio-lancamentos.js` + `pcMontarRetratoLancamentos()` (casavequia.html) e `rhMontarRetratoLancamentos()` (herminio-main.js) enviam o retrato completo para `relatorio_publicar_lancamentos` a cada mudança (debounce de 4s, só envia quando algo mudou). O montador reaproveita as regras de exibição (`_atvStatus`, `pcResolvePresenceStatus`, `rhGetEstadoAtual`). **Se mudar uma dessas regras, o retrato muda junto.** Se o retrato vier menor que 80% do que já está publicado, nada é marcado como removido.

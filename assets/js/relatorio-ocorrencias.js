@@ -12,7 +12,8 @@
 //    relatorio_ocorrencias), ligado ao aluno para o relatório individual.
 //    A IA também roda sozinha no servidor (pg_cron), com a página fechada.
 //
-// Comportamento NÃO desconta nota. Tudo aqui é data-runtime-ui: o editor de
+// Comportamento desconta na nota do bimestre (Etapa 8B: leve 0,25 · médio
+// 0,5 · grave 1,0 · muito grave 2,0, até 2,0). Tudo aqui é data-runtime-ui: o editor de
 // layout remove antes de salvar. Nada de querySelector dentro de laço por
 // aluno: os dados do banco são indexados uma vez.
 // ═══════════════════════════════════════════════════════════════════════════
