@@ -1001,10 +1001,45 @@
 </div>
 
 <script>
-const STORAGE_KEY = 'previsoes_aulas_2026_local';
-const SOURCE_KEY = 'casavequia_projection_seed_v1';
-const PLANNER_SCOPE = 'casavequia:planner-state:shared-v1';
-const PLANNER_SEED_SCOPE = 'casavequia:projection-seed:shared-v1';
+// A mesma página atende as duas escolas. Sem parâmetro, abre a Casavequia
+// (chaves originais preservadas); com ?escola=herminio, abre a Hermínio.
+const ESCOLAS_PLANEJADOR = {
+  casavequia:{
+    storageKey:'previsoes_aulas_2026_local',
+    sourceKey:'casavequia_projection_seed_v1',
+    plannerScope:'casavequia:planner-state:shared-v1',
+    seedScope:'casavequia:projection-seed:shared-v1',
+    schoolSlug:'padre-carlos-casavequia',
+    seedBuilder:'pcBuildProjectionSeed',
+    turmasOficiais:['t1','t2','t3','t6'],
+    exigeGradeSemanal:true,
+    // A página da Casavequia sempre projeta as três séries de Português.
+    // Sem essa grade, trata-se de um estado legado incompleto e não deve
+    // substituir os dados sincronizados a partir do Contador.
+    disciplinaObrigatoria:{id:'lp', turmas:['t1','t2','t3']},
+    exportName:'projecoes-aulas-2026.json'
+  },
+  herminio:{
+    storageKey:'herminio_previsoes_aulas_2026_local',
+    sourceKey:'herminio_projection_seed_v1',
+    plannerScope:'herminio:planner-state:shared-v1',
+    seedScope:'herminio:projection-seed:shared-v1',
+    schoolSlug:'raimundo-herminio-de-melo',
+    seedBuilder:'rhBuildProjectionSeed',
+    turmasOficiais:['t89','t1','t23'],
+    // O rodízio pode deixar todas as turmas sem aula na grade por um tempo.
+    exigeGradeSemanal:false,
+    disciplinaObrigatoria:null,
+    exportName:'projecoes-aulas-2026-herminio.json'
+  }
+};
+const ESCOLA_ID = new URLSearchParams(window.location.search).get('escola') === 'herminio' ? 'herminio' : 'casavequia';
+const ESCOLA = ESCOLAS_PLANEJADOR[ESCOLA_ID];
+const STORAGE_KEY = ESCOLA.storageKey;
+const SOURCE_KEY = ESCOLA.sourceKey;
+const PLANNER_SCOPE = ESCOLA.plannerScope;
+const PLANNER_SEED_SCOPE = ESCOLA.seedScope;
+if(ESCOLA_ID === 'herminio') document.title = 'Projeções de aulas 2026 · R. Hermínio';
 const START_YEAR = 2026;
 const PROJECTION_LIMIT_YEAR = 2027;
 const DIAS_AB = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
@@ -1061,6 +1096,54 @@ function uniquePush(list, value){
 }
 
 function schoolFallbackState(){
+  return ESCOLA_ID === 'herminio' ? herminioFallbackState() : casavequiaFallbackState();
+}
+
+function herminioFallbackState(){
+  const turmas3 = ['t89','t1','t23'];
+  const porTurma = (ids, value) => Object.fromEntries(ids.map(id=>[id, typeof value === 'object' ? Object.assign({}, value[id] || {}) : value]));
+  const disc = (id, nome, cor, ids, metas, totais, lancadas, grade) => ({
+    id, nome, cor, nBimestres:4, turmasAtivas:ids.slice(),
+    grade:porTurma(ids, grade || {}), metas, lancadas, totais
+  });
+  return {
+    // Mesma função da base da Casavequia: a tela não abre zerada antes de a
+    // página da Hermínio gravar a semente com os relatos atuais (retrato de 17/09/2026).
+    source:'herminio-fallback',
+    generatedAt:new Date().toISOString(),
+    schoolName:'E.E. Raimundo Hermínio de Melo',
+    anchorDate:'2026-09-17',
+    recesso:{start:'2026-07-20', end:'2026-07-31'},
+    facultativoLetivo:false,
+    feriados:[
+      {date:'2026-09-07',nome:'Independência do Brasil',tipo:'nacional'},
+      {date:'2026-10-12',nome:'Nossa Senhora Aparecida',tipo:'nacional'},
+      {date:'2026-11-02',nome:'Finados',tipo:'nacional'},
+      {date:'2026-11-15',nome:'Proclamação da República',tipo:'nacional'},
+      {date:'2026-11-17',nome:'Tratado de Petrópolis',tipo:'estadual'},
+      {date:'2026-11-20',nome:'Consciência Negra',tipo:'nacional'},
+      {date:'2026-12-24',nome:'Véspera de Natal',tipo:'facultativo'},
+      {date:'2026-12-25',nome:'Natal',tipo:'nacional'}
+    ],
+    notesByDate:{},
+    turmas:[
+      {id:'t89',nome:'8º/9º Ano'},
+      {id:'t1',nome:'1ª Série'},
+      {id:'t23',nome:'2ª/3ª Série'}
+    ],
+    disciplinas:[
+      disc('lp','Língua Portuguesa','#0f766e',turmas3,{t89:40,t1:30,t23:30},{t89:160,t1:120,t23:120},{t89:114,t1:117,t23:0},{t89:{1:1,2:2,3:2,4:2,5:2}}),
+      disc('ing','Inglês','#1d4ed8',turmas3,{t89:10,t1:10,t23:10},{t89:40,t1:40,t23:40},{t89:40,t1:46,t23:0}),
+      disc('esp','Espanhol','#6d28d9',turmas3,{t89:10,t1:10,t23:10},{t89:40,t1:40,t23:40},{t89:40,t1:40,t23:0}),
+      disc('art','Arte','#c26a06',turmas3,{t89:10,t1:10,t23:10},{t89:40,t1:40,t23:40},{t89:38,t1:40,t23:0},{t89:{1:2,2:1,3:3,4:1,5:3}}),
+      disc('red','Redação','#047857',['t1','t23'],{t1:10,t23:10},{t1:40,t23:40},{t1:36,t23:0})
+    ],
+    activeDisc:'lp',
+    showOnlyActive:false
+  };
+}
+
+function casavequiaFallbackState(){
   return {
     // Esta base impede que a tela fique zerada quando aberta diretamente,
     // antes da sincronização com a página Contador estar disponível.
@@ -1257,7 +1340,7 @@ function normalizeState(){
   if(typeof state.showOnlyActive !== 'boolean') state.showOnlyActive = false;
   if(typeof state.userAnchorOverride !== 'boolean') state.userAnchorOverride = false;
 
-  const desiredOrder = {t1:1,t2:2,t3:3,t6:4};
+  const desiredOrder = Object.fromEntries(ESCOLA.turmasOficiais.map((id, index)=>[id, index + 1]));
   state.turmas.sort((a,b)=>{
     const oa = desiredOrder[a.id] || 99;
     const ob = desiredOrder[b.id] || 99;
@@ -1268,7 +1351,7 @@ function normalizeState(){
   // existiam (por exemplo, outra "3ª Série"). Ao abrir o estado compartilhado,
   // essas cópias sem aulas passavam a ser as turmas ativas. Convertemos cada
   // alias pelo nome para a ID oficial e removemos a duplicata antes dos cálculos.
-  const officialIds = new Set(['t1','t2','t3','t6']);
+  const officialIds = new Set(ESCOLA.turmasOficiais);
   const officialByName = {};
   state.turmas.forEach(turma=>{
     if(turma && officialIds.has(turma.id)) officialByName[normalizeText(turma.nome)] = turma.id;
@@ -1331,25 +1414,26 @@ function normalizeState(){
 
 function isUsableCounterSeed(candidate){
   if(!candidate || !Array.isArray(candidate.turmas) || !Array.isArray(candidate.disciplinas)) return false;
-  const hasCoreTurmas = ['t1','t2','t3','t6'].every(id=>candidate.turmas.some(turma=>turma && turma.id === id));
+  const hasCoreTurmas = ESCOLA.turmasOficiais.every(id=>candidate.turmas.some(turma=>turma && turma.id === id));
   const weekly = candidate.disciplinas.reduce((sum,disc)=>sum + Object.keys(disc.grade || {}).reduce((gradeSum,turmaId)=>gradeSum + sumValues((disc.grade || {})[turmaId]), 0), 0);
   const launched = candidate.disciplinas.reduce((sum,disc)=>sum + sumValues(disc.lancadas || {}), 0);
-  return hasCoreTurmas && candidate.disciplinas.length >= 4 && weekly > 0 && launched > 0;
+  return hasCoreTurmas && candidate.disciplinas.length >= 4 && (weekly > 0 || !ESCOLA.exigeGradeSemanal) && launched > 0;
 }
 
 function isUsablePlannerState(candidate){
   if(!isUsableCounterSeed(candidate)) return false;
-  const portuguese = candidate.disciplinas.find(disc=>disc && disc.id === 'lp');
-  // A página da Casavequia sempre projeta as três séries de Português.
-  // Sem essa grade, trata-se de um estado legado incompleto e não deve
-  // substituir os dados sincronizados a partir do Contador.
-  return !!portuguese && ['t1','t2','t3'].every(turmaId=>sumValues((portuguese.grade || {})[turmaId]) > 0);
+  const obrigatoria = ESCOLA.disciplinaObrigatoria;
+  if(!obrigatoria) return true;
+  const disc = candidate.disciplinas.find(item=>item && item.id === obrigatoria.id);
+  return !!disc && obrigatoria.turmas.every(turmaId=>sumValues((disc.grade || {})[turmaId]) > 0);
 }
 
 function readSeedFromOpener(){
   try{
-    if(!window.opener || typeof window.opener.pcBuildProjectionSeed !== 'function') return null;
-    const openerSeed = window.opener.pcBuildProjectionSeed();
+    // Aberta em nova aba (opener) ou embutida na aba Contador (parent).
+    const host = [window.opener, window.parent].find(win=>win && win !== window && typeof win[ESCOLA.seedBuilder] === 'function');
+    if(!host) return null;
+    const openerSeed = host[ESCOLA.seedBuilder]();
     if(!isUsableCounterSeed(openerSeed)) return null;
     localStorage.setItem(SOURCE_KEY, JSON.stringify(openerSeed));
     return openerSeed;
@@ -1439,7 +1523,7 @@ function initPlannerSync(){
 
   plannerSeedRemoteSync = window.RelatorioSupabaseSync.createScopeSync({
     scope: PLANNER_SEED_SCOPE,
-    schoolSlug: 'padre-carlos-casavequia',
+    schoolSlug: ESCOLA.schoolSlug,
     classSlug: 'projecoes-aulas',
     source: 'planejamento-aulas-2026-seed',
     readOnly: true,
@@ -1450,7 +1534,7 @@ function initPlannerSync(){
 
   plannerRemoteSync = window.RelatorioSupabaseSync.createScopeSync({
     scope: PLANNER_SCOPE,
-    schoolSlug: 'padre-carlos-casavequia',
+    schoolSlug: ESCOLA.schoolSlug,
     classSlug: 'projecoes-aulas',
     source: 'planejamento-aulas-2026',
     debounceMs: 450,
@@ -1706,10 +1790,32 @@ function setDisc(id){
   render();
 }
 
+// Bimestre já concluído: data real em que a soma dos relatos atingiu a meta.
+// Aulas anteriores à digitalização (crédito) entram como saldo inicial.
+function realClosesForTurma(disc, turmaId){
+  const registros = ((disc.registros || {})[turmaId] || []).filter(entry=>entry && entry.date)
+    .sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  if(!registros.length) return {};
+  const meta = metaForTurma(disc, turmaId);
+  const registrado = registros.reduce((sum,entry)=>sum + Math.max(0, Number(entry.hours) || 0), 0);
+  let acc = Math.max(0, launchedForTurma(disc, turmaId) - registrado);
+  let target = Math.floor(acc / meta) + 1;
+  const closes = {};
+  registros.forEach(entry=>{
+    acc += Math.max(0, Number(entry.hours) || 0);
+    while(target <= (disc.nBimestres || 4) && acc >= target * meta){
+      closes[target] = entry.date;
+      target += 1;
+    }
+  });
+  return closes;
+}
+
 function buildTurmaCard(turma, disc, fullInfo, futureInfo){
   const meta = futureInfo.meta;
   const launched = futureInfo.launched;
   const total = futureInfo.total;
+  const realCloses = realClosesForTurma(disc, turma.id);
   const currentBim = Math.min(disc.nBimestres || 4, Math.floor(launched / meta) + 1);
   const currentProgress = launched - (Math.floor(launched / meta) * meta);
   const annualEnd = launched >= total
@@ -1720,7 +1826,9 @@ function buildTurmaCard(turma, disc, fullInfo, futureInfo){
     let value = '';
     const target = bim * meta;
     if(launched >= target){
-      value = fullInfo.closes[bim] ? brDateShort(fullInfo.closes[bim]) : 'concluído';
+      // Com rodízio (Hermínio), simular a grade atual desde janeiro não indica a data real.
+      const closedAt = realCloses[bim] || (ESCOLA.exigeGradeSemanal ? fullInfo.closes[bim] : '');
+      value = closedAt ? brDateShort(closedAt) : 'concluído';
     }else{
       value = futureInfo.closes[bim] ? brDateShort(futureInfo.closes[bim]) : 'não fecha até 2027';
     }
@@ -2155,7 +2263,7 @@ function doExport(){
   const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.download = 'projecoes-aulas-2026.json';
+  link.download = ESCOLA.exportName;
   link.click();
   URL.revokeObjectURL(link.href);
 }

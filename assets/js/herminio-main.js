@@ -145,6 +145,7 @@ var ultimaData = null;
 var datasDetalhadas = {};
 var ultimaDataTurma = {};
 var paneContabilizado = {};
+var registros = [];
 function rhSomarCard(card, turmaIdForcada) {
 var titulo = card.querySelector('.em .ed');
 if (!titulo) return;
@@ -162,6 +163,7 @@ var dataKey = rhDataChaveIso(data);
 datasDetalhadas[turmaId + '|' + infoDisc.disc + '|' + dataKey] = true;
 if (!ultimaDataTurma[turmaId] || data > ultimaDataTurma[turmaId]) ultimaDataTurma[turmaId] = data;
 if (!ultimaData || data > ultimaData) ultimaData = data;
+if (horas > 0) registros.push({ turmaId: turmaId, grupo: infoDisc.grupo, disc: infoDisc.disc, data: dataKey, horas: horas });
 }
 if (relatoId) paneContabilizado[relatoId] = true;
 }
@@ -198,6 +200,7 @@ if (!horas) return;
 var chave = turmaId + '_' + infoDisc.disc;
 mapa[chave] = (mapa[chave] || 0) + horas;
 datasDetalhadas[detalhadoKey] = true;
+registros.push({ turmaId: turmaId, grupo: infoDisc.grupo, disc: infoDisc.disc, data: dataKey, horas: horas });
 if (!ultimaData || data > ultimaData) ultimaData = data;
 var relatoResumoId = rhRelatoIdCard(card);
 if (relatoResumoId) paneContabilizado[relatoResumoId] = true;
@@ -207,12 +210,10 @@ var relatoId = rhRelatoIdCard(card);
 if (!relatoId || paneContabilizado[relatoId]) return;
 if (!/^r-(t1|g1)-/.test(relatoId)) return;
 rhSomarCard(card, 't1');
-});    return { mapa: mapa, ultimaData: ultimaData }; }
+});    return { mapa: mapa, ultimaData: ultimaData, registros: registros }; }
 function getBimAtualRH(feitas, bimestre) { 
 if (!bimestre) return 1;   for (var b = 1; b <= 4; b++) {   
 if (feitas < b * bimestre) return b;   }   return 4; }
-function addDiasRH(data, dias) { 
-var d = new Date(data);   d.setDate(d.getDate() + dias);   return d; }
 function rhSalvarCliques(tipo) {   localStorage.setItem(RH_DAILY_LOCAL_TS_KEY, new Date().toISOString()); 
 if (tipo === 'presenca') {     localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));     rhAgendarSyncRemoto('presenca');     return;   }   localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));   rhAgendarSyncRemoto('atividade'); }
 function rhExtrairTurmaDoTitulo(txt) { 
@@ -560,13 +561,6 @@ function getMetasContRH(base) {
 var semanais = base.semanais || 0; 
 var bimestre = base.bimestreMeta != null     ? base.bimestreMeta     : (semanais ? Math.round((semanais * 10 + Number.EPSILON) * 100) / 100 : 0); 
 var total = base.totalMeta != null     ? base.totalMeta     : (semanais ? Math.round((semanais * 40 + Number.EPSILON) * 100) / 100 : 0);   return { semanais: semanais, bimestre: bimestre, total: total }; }
-function calcBimestresRH(disc, feitas, dataRef) { 
-if (!disc.bimestre || !disc.semanais) return []; 
-var atual = [];   for (var b = 1; b <= 4; b++) {   
-var meta = b * disc.bimestre;   
-if (feitas >= meta) {       atual.push({ b: b, ok: true });       continue;     }   
-var faltam = meta - feitas;   
-var semanas = Math.ceil(faltam / disc.semanais);     atual.push({ b: b, ok: false, data: addDiasRH(dataRef, semanas * 7) });   }   return atual; }
 // ═══════════════════════════════════════════════════════ //  FUNÇÕES DE NAVEGAÇÃO // ═══════════════════════════════════════════════════════
 function aba(id, btn) {   document.querySelectorAll('.sec').forEach(function(s){ s.classList.remove('on'); });   document.querySelectorAll('.nb').forEach(function(b){ b.classList.remove('on'); }); 
 var sec = document.getElementById(id); 
@@ -653,37 +647,421 @@ function renderPresencaRH() {   rhRenderPresencaInterativa(); }
 // ═══════════════════════════════════════════════════════ //  ATIVIDADES — renderização por turma // ═══════════════════════════════════════════════════════
 function renderAtividadesRH() {   rhRenderAtividadeInterativa(); }
 // ═══════════════════════════════════════════════════════ //  CONTADOR DE H/AULAS // ═══════════════════════════════════════════════════════
-function renderContRH() {   Object.keys(RH_GRUPOS_CONT).forEach(function(grupo) {   
-var el = document.getElementById(RH_GRUPOS_CONT[grupo].container);   
-if (el) el.innerHTML = '';   });  
-var dados = coletarAulasLancadasRH(); 
-var dataRef = dados.ultimaData || new Date(); 
-var upd = document.getElementById('rh-cont-upd'); 
-if (upd) {     upd.innerHTML = '&#128197; Última atualização: ' + (dados.ultimaData ? fmtDataRH(dados.ultimaData) : '—');   }    DISC_RH.forEach(function(base) {   
-var confGrupo = RH_GRUPOS_CONT[base.grupo];   
-var container = document.getElementById(confGrupo.container);   
-if (!container) return;    
-var metas = getMetasContRH(base);   
-var feitas = Math.round(((dados.mapa[base.turmaId + '_' + base.disc] || 0) + Number.EPSILON) * 100) / 100;   
-var semanais = metas.semanais;   
-var bimestre = metas.bimestre;   
-var total = metas.total;   
-var bimAtual = getBimAtualRH(feitas, bimestre);   
-var inicioBim = bimestre ? (bimAtual - 1) * bimestre : 0;   
-var feitasBim = bimestre ? Math.max(0, Math.round(((feitas - inicioBim) + Number.EPSILON) * 100) / 100) : 0;   
-var faltamBim = bimestre ? Math.max(0, Math.round(((bimestre - feitasBim) + Number.EPSILON) * 100) / 100) : 0;   
-var faltamAno = total ? Math.max(0, Math.round(((total - feitas) + Number.EPSILON) * 100) / 100) : 0;   
-var pctBim = bimestre ? Math.min((feitasBim / bimestre) * 100, 100) : 0;   
-var pctAno = total ? Math.min((feitas / total) * 100, 100) : 0;   
-var bimestres = calcBimestresRH({ semanais: semanais, bimestre: bimestre }, feitas, dataRef);    
-var card = document.createElement('div');     card.className = 'cc';    
-var badgeTxt = bimestre ? (bimAtual + 'º Bimestre') : confGrupo.badge;   
-var metaTxt = base.disc       + (bimestre ? ' · ' + fmtHoraAula(bimestre) + ' h/aula bimestrais' : '')       + (total ? ' · ' + fmtHoraAula(total) + ' h/aula anuais' : '');    
-var previsaoHtml = '';   
-if (bimestres.length) {       previsaoHtml = '<div class="brow">' + bimestres.map(function(item) {       
-var cls = item.ok ? 'co' : (item.b === bimAtual ? 'at' : '');       
-var rotulo = item.ok ? '&#10004; Concluído' : fmtDataRH(item.data);         return '<div class="bi ' + cls + '"><div class="bn">' + item.b + 'º Bim</div><div class="bd2">' + rotulo + '</div></div>';       }).join('') + '</div>';     }    
-var observacao = semanais       ? '<div class="ae">Estimativa calculada a partir dos relatos diários já lançados.</div>'       : '<div class="ae">Metas bimestrais e anuais definidas. Defina a carga semanal se quiser liberar a previsão automática de conclusão.</div>';      card.innerHTML =       '<div class="cch">'         + '<div><div class="cct">' + RH_TURMA_LABELS[base.turmaId] + '</div><div class="ccm">' + metaTxt + '</div></div>'         + '<div class="ccb" style="' + confGrupo.badgeStyle + '">' + badgeTxt + '</div>'       + '</div>'       + '<div class="ccbody">'         + '<div class="pg">'           + '<div class="pl"><span class="plt">' + (bimestre ? (bimAtual + 'º Bimestre') : 'Aulas lançadas') + '</span><span class="pln">' + fmtHoraAula(bimestre ? feitasBim : feitas) + (bimestre ? ' / ' + fmtHoraAula(bimestre) + ' · faltam ' + fmtHoraAula(faltamBim) : ' h/aula acumuladas') + '</span></div>'           + '<div class="pbg"><div class="pf" style="width:' + pctBim + '%;background:' + confGrupo.bar + '"></div></div>'         + '</div>'         + '<div class="pg">'           + '<div class="pl"><span class="plt">Total do ano</span><span class="pln">' + fmtHoraAula(feitas) + (total ? ' / ' + fmtHoraAula(total) + ' · faltam ' + fmtHoraAula(faltamAno) : ' h/aula registradas') + '</span></div>'           + '<div class="pbg"><div class="pf dm" style="width:' + pctAno + '%;background:' + confGrupo.bar + '"></div></div>'         + '</div>'         + previsaoHtml         + observacao       + '</div>';      container.appendChild(card);   }); }
+// ═══════════════════════════════════════════════════════
+//  PROJEÇÕES INTEGRADAS — mesmo mecanismo da Casavequia
+//  A página gera a semente (aulas lançadas, metas, grade e calendário),
+//  planejamento-aulas-2026.html?escola=herminio projeta as próximas aulas
+//  e o Contador usa as datas previstas de fechamento dos bimestres.
+// ═══════════════════════════════════════════════════════
+var RH_PROJECTION_SEED_KEY = 'herminio_projection_seed_v1';
+var RH_PROJECTION_STATE_KEY = 'herminio_previsoes_aulas_2026_local';
+var RH_PROJECTION_LOCAL_TS_KEY = 'herminio_projection_seed_local_ts';
+var RH_SUPABASE_PROJECTION_SCOPE = 'herminio:projection-seed:shared-v1';
+var RH_SUPABASE_PLANNER_SCOPE = 'herminio:planner-state:shared-v1';
+var RH_PROJECTION_LIMIT_YEAR = 2027;
+var RH_PROJECTION_TURMAS = [
+  { id: 't89', nome: '8º/9º Ano' },
+  { id: 't1', nome: '1ª Série' },
+  { id: 't23', nome: '2ª/3ª Série' }
+];
+var RH_PROJECTION_GRUPOS = ['lp', 'ing', 'esp', 'art', 'red'];
+var RH_PROJECTION_CORES = { lp: '#0f766e', ing: '#1d4ed8', esp: '#6d28d9', art: '#c26a06', red: '#047857' };
+// Calendário estadual 2026 (os mesmos feriados e recesso da Casavequia).
+// Ajustes finos ficam nos botões Recesso e Feriados das projeções.
+var RH_PROJECTION_CALENDARIO = {
+  recesso: { start: '2026-07-20', end: '2026-07-31' },
+  feriados: [
+    { date: '2026-01-01', nome: 'Ano Novo', tipo: 'nacional' },
+    { date: '2026-01-22', nome: 'Feriado estadual (Lei nº 3.137/2016)', tipo: 'estadual' },
+    { date: '2026-02-16', nome: 'Carnaval', tipo: 'facultativo' },
+    { date: '2026-02-17', nome: 'Carnaval', tipo: 'facultativo' },
+    { date: '2026-02-18', nome: 'Quarta-feira de Cinzas', tipo: 'facultativo' },
+    { date: '2026-03-08', nome: 'Dia Internacional da Mulher', tipo: 'estadual' },
+    { date: '2026-04-03', nome: 'Sexta-feira Santa', tipo: 'nacional' },
+    { date: '2026-04-20', nome: 'Antecipação do feriado de Tiradentes', tipo: 'nacional' },
+    { date: '2026-04-21', nome: 'Tiradentes', tipo: 'nacional' },
+    { date: '2026-05-01', nome: 'Dia do Trabalho', tipo: 'nacional' },
+    { date: '2026-06-04', nome: 'Corpus Christi', tipo: 'facultativo' },
+    { date: '2026-06-15', nome: 'Aniversário do Estado', tipo: 'estadual' },
+    { date: '2026-09-05', nome: 'Dia da Amazônia', tipo: 'estadual' },
+    { date: '2026-09-07', nome: 'Independência do Brasil', tipo: 'nacional' },
+    { date: '2026-10-12', nome: 'Nossa Senhora Aparecida', tipo: 'nacional' },
+    { date: '2026-11-02', nome: 'Finados', tipo: 'nacional' },
+    { date: '2026-11-15', nome: 'Proclamação da República', tipo: 'nacional' },
+    { date: '2026-11-17', nome: 'Tratado de Petrópolis', tipo: 'estadual' },
+    { date: '2026-11-20', nome: 'Consciência Negra', tipo: 'nacional' },
+    { date: '2026-12-24', nome: 'Véspera de Natal', tipo: 'facultativo' },
+    { date: '2026-12-25', nome: 'Natal', tipo: 'nacional' }
+  ]
+};
+// A Hermínio trabalha em rodízio de turmas, sem grade fixa no Cronograma.
+// A grade semanal é deduzida dos relatos das últimas 4 semanas; só entra a
+// disciplina que teve aula nas últimas 2 semanas (a turma está no rodízio).
+var RH_PROJECTION_JANELA_DIAS = 28;
+var RH_PROJECTION_ATIVA_DIAS = 14;
+var _rhProjectionSeedRemoteSync = null;
+var _rhPlannerStateRemoteSync = null;
+var _rhApplyingProjectionSeedRemote = false;
+var _rhProjectionSeedAssinatura = '';
+
+function rhProjectionAddDias(iso, dias) {
+  var d = new Date(iso + 'T12:00:00');
+  d.setDate(d.getDate() + dias);
+  return rhDataChaveIso(d);
+}
+function rhProjectionDiaSemana(iso) {
+  return new Date(iso + 'T12:00:00').getDay();
+}
+function rhProjectionDiaBloqueado(iso, calendario) {
+  var rec = calendario.recesso || {};
+  if (rec.start && iso >= rec.start && iso <= rec.end) return true;
+  return (calendario.feriados || []).some(function(item) { return item.date === iso; });
+}
+function rhProjectionInferirGrade(registros, anchorIso) {
+  var inicio = rhProjectionAddDias(anchorIso, -(RH_PROJECTION_JANELA_DIAS - 1));
+  var ativaDesde = rhProjectionAddDias(anchorIso, -(RH_PROJECTION_ATIVA_DIAS - 1));
+  var ocorrencias = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  for (var dia = inicio; dia <= anchorIso; dia = rhProjectionAddDias(dia, 1)) {
+    var dowDia = rhProjectionDiaSemana(dia);
+    if (ocorrencias[dowDia] != null && !rhProjectionDiaBloqueado(dia, RH_PROJECTION_CALENDARIO)) ocorrencias[dowDia] += 1;
+  }
+  var somas = {};
+  var ativas = {};
+  (registros || []).forEach(function(reg) {
+    if (!reg.data || reg.data < inicio || reg.data > anchorIso) return;
+    var dow = rhProjectionDiaSemana(reg.data);
+    if (ocorrencias[dow] == null) return;
+    var chave = reg.grupo + '|' + reg.turmaId;
+    if (!somas[chave]) somas[chave] = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    somas[chave][dow] += reg.horas || 0;
+    if (reg.data >= ativaDesde) ativas[chave] = true;
+  });
+  var grades = {};
+  Object.keys(somas).forEach(function(chave) {
+    if (!ativas[chave]) return;
+    var medias = {};
+    var semanal = 0;
+    Object.keys(ocorrencias).forEach(function(dow) {
+      medias[dow] = ocorrencias[dow] ? somas[chave][dow] / ocorrencias[dow] : 0;
+      semanal += medias[dow];
+    });
+    var totalSemana = Math.round(semanal);
+    if (!totalSemana) return;
+    // Distribui a carga semanal (inteira) pelos dias, pelo maior resto.
+    var grade = {};
+    var usado = 0;
+    var restos = Object.keys(medias).map(function(dow) {
+      var cota = medias[dow] * totalSemana / semanal;
+      grade[dow] = Math.floor(cota);
+      usado += grade[dow];
+      return { dow: dow, resto: cota - grade[dow] };
+    }).sort(function(a, b) { return (b.resto - a.resto) || (a.dow - b.dow); });
+    for (var i = 0; usado < totalSemana && i < restos.length; i += 1) {
+      grade[restos[i].dow] += 1;
+      usado += 1;
+    }
+    Object.keys(grade).forEach(function(dow) { if (!grade[dow]) delete grade[dow]; });
+    grades[chave] = grade;
+  });
+  return grades;
+}
+function rhBuildProjectionSeed(dadosProntos) {
+  var dados = dadosProntos || coletarAulasLancadasRH();
+  var anchor = rhDataChaveIso(dados.ultimaData || new Date());
+  var grades = rhProjectionInferirGrade(dados.registros, anchor);
+  var porGrupo = {};
+  DISC_RH.forEach(function(base) {
+    var metas = getMetasContRH(base);
+    if (!porGrupo[base.grupo]) {
+      porGrupo[base.grupo] = {
+        id: base.grupo,
+        nome: base.disc,
+        cor: RH_PROJECTION_CORES[base.grupo] || '#0f766e',
+        nBimestres: 4,
+        turmasAtivas: [],
+        grade: {},
+        metas: {},
+        lancadas: {},
+        registros: {},
+        totais: {}
+      };
+    }
+    var disc = porGrupo[base.grupo];
+    var bimestre = Math.max(1, Math.round(metas.bimestre || 10));
+    if (disc.turmasAtivas.indexOf(base.turmaId) < 0) disc.turmasAtivas.push(base.turmaId);
+    disc.grade[base.turmaId] = grades[base.grupo + '|' + base.turmaId] || {};
+    disc.metas[base.turmaId] = bimestre;
+    disc.totais[base.turmaId] = Math.round(metas.total || bimestre * 4);
+    // Mesma soma do Contador: relatos digitais são a fonte de verdade.
+    disc.lancadas[base.turmaId] = Math.round(dados.mapa[base.turmaId + '_' + base.disc] || 0);
+    disc.registros[base.turmaId] = (dados.registros || []).filter(function(reg) {
+      return reg.turmaId === base.turmaId && reg.disc === base.disc;
+    }).map(function(reg) {
+      return { date: reg.data, hours: reg.horas, source: 'relato' };
+    }).sort(function(a, b) { return a.date.localeCompare(b.date); });
+  });
+  return {
+    source: 'herminio-html',
+    generatedAt: new Date().toISOString(),
+    schoolName: 'E.E. Raimundo Hermínio de Melo',
+    anchorDate: anchor,
+    recesso: Object.assign({}, RH_PROJECTION_CALENDARIO.recesso),
+    facultativoLetivo: false,
+    feriados: RH_PROJECTION_CALENDARIO.feriados.map(function(item) { return Object.assign({}, item); }),
+    turmas: RH_PROJECTION_TURMAS.map(function(item) { return Object.assign({}, item); }),
+    disciplinas: RH_PROJECTION_GRUPOS.filter(function(grupo) { return !!porGrupo[grupo]; }).map(function(grupo) { return porGrupo[grupo]; }),
+    activeDisc: 'lp'
+  };
+}
+function rhProjectionClone(value) {
+  try { return JSON.parse(JSON.stringify(value == null ? null : value)); } catch (e) { return null; }
+}
+function rhProjectionManualNumbers(automatico, localDisc, manualKey, valueKey) {
+  var merged = Object.assign({}, automatico || {});
+  var manual = (localDisc && localDisc[manualKey]) || {};
+  Object.keys(manual).forEach(function(turmaId) {
+    var valor = parseInt(((localDisc || {})[valueKey] || {})[turmaId], 10);
+    if (manual[turmaId] && Number.isFinite(valor)) merged[turmaId] = valor;
+  });
+  return merged;
+}
+function rhProjectionManualGrade(automatica, localDisc) {
+  var merged = rhProjectionClone(automatica) || {};
+  var manual = (localDisc && localDisc.gradeManuais) || {};
+  Object.keys(manual).forEach(function(turmaId) {
+    Object.keys(manual[turmaId] || {}).forEach(function(dow) {
+      if (!manual[turmaId][dow]) return;
+      if (!merged[turmaId]) merged[turmaId] = {};
+      merged[turmaId][dow] = parseInt((((localDisc || {}).grade || {})[turmaId] || {})[dow], 10) || 0;
+    });
+  });
+  return merged;
+}
+function rhReadProjectionRuntimeState() {
+  try {
+    var raw = localStorage.getItem(RH_PROJECTION_STATE_KEY);
+    var parsed = raw ? JSON.parse(raw) : null;
+    return parsed && Array.isArray(parsed.disciplinas) && parsed.disciplinas.length ? parsed : null;
+  } catch (e) {
+    return null;
+  }
+}
+// Semente atual + ajustes manuais feitos nas projeções (grade, metas, calendário).
+function rhResolveProjectionRuntimeState(seed) {
+  var stored = rhReadProjectionRuntimeState();
+  if (!stored) return seed;
+  var merged = rhProjectionClone(seed) || seed;
+  var storedByDisc = {};
+  (stored.disciplinas || []).forEach(function(disc) { if (disc && disc.id) storedByDisc[disc.id] = disc; });
+  merged.userAnchorOverride = !!stored.userAnchorOverride;
+  merged.anchorDate = merged.userAnchorOverride && stored.anchorDate ? stored.anchorDate : merged.anchorDate;
+  merged.facultativoLetivo = typeof stored.facultativoLetivo === 'boolean' ? stored.facultativoLetivo : !!merged.facultativoLetivo;
+  if (stored.userCalendarOverride) {
+    if (stored.recesso && stored.recesso.start && stored.recesso.end) merged.recesso = rhProjectionClone(stored.recesso);
+    if (Array.isArray(stored.feriados)) merged.feriados = rhProjectionClone(stored.feriados);
+  }
+  merged.disciplinas.forEach(function(disc) {
+    var localDisc = storedByDisc[disc.id];
+    if (!localDisc) return;
+    if (localDisc.nBimestres) disc.nBimestres = localDisc.nBimestres;
+    disc.grade = rhProjectionManualGrade(disc.grade, localDisc);
+    disc.metas = rhProjectionManualNumbers(disc.metas, localDisc, 'metasManuais', 'metas');
+    disc.totais = rhProjectionManualNumbers(disc.totais, localDisc, 'totaisManuais', 'totais');
+    disc.lancadas = rhProjectionManualNumbers(disc.lancadas, localDisc, 'lancadasManuais', 'lancadas');
+  });
+  return merged;
+}
+function rhProjectionBuildDays(seed) {
+  var feriadosPorDia = {};
+  (seed.feriados || []).forEach(function(item) {
+    if (!feriadosPorDia[item.date]) feriadosPorDia[item.date] = [];
+    feriadosPorDia[item.date].push(item);
+  });
+  var dias = [];
+  var cursor = new Date(2026, 0, 1, 12, 0, 0);
+  while (cursor.getFullYear() <= RH_PROJECTION_LIMIT_YEAR) {
+    var key = rhDataChaveIso(cursor);
+    var dow = cursor.getDay();
+    var letivo = dow >= 1 && dow <= 5;
+    if (letivo && seed.recesso && seed.recesso.start && key >= seed.recesso.start && key <= seed.recesso.end) letivo = false;
+    if (letivo && (feriadosPorDia[key] || []).some(function(item) { return !(item.tipo === 'facultativo' && seed.facultativoLetivo); })) letivo = false;
+    dias.push({ k: key, dow: dow, letivo: letivo });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return dias;
+}
+// Mesmo cálculo da tela de projeções: saldo lançado + grade semanal em dias letivos.
+function rhProjectionBuildCounterStateMap(seed) {
+  var mapa = {};
+  var dias = rhProjectionBuildDays(seed);
+  (seed.disciplinas || []).forEach(function(disc) {
+    var nBimestres = disc.nBimestres || 4;
+    (disc.turmasAtivas || []).forEach(function(turmaId) {
+      var grade = (disc.grade || {})[turmaId] || {};
+      var semanal = Object.keys(grade).reduce(function(soma, dow) { return soma + (parseInt(grade[dow], 10) || 0); }, 0);
+      var meta = Math.max(1, parseInt((disc.metas || {})[turmaId], 10) || 10);
+      var launched = Math.max(0, parseInt((disc.lancadas || {})[turmaId], 10) || 0);
+      var total = parseInt((disc.totais || {})[turmaId], 10) || meta * nBimestres;
+      var acc = launched;
+      var alvo = Math.floor(launched / meta) + 1;
+      var closes = {};
+      var yearEnd = launched >= total ? seed.anchorDate : '';
+      if (semanal > 0) {
+        dias.forEach(function(dia) {
+          if (acc >= total || dia.k <= seed.anchorDate || !dia.letivo) return;
+          var add = parseInt(grade[dia.dow], 10) || 0;
+          if (add <= 0) return;
+          acc += add;
+          while (alvo <= nBimestres && acc >= alvo * meta) {
+            if (!closes[alvo]) closes[alvo] = dia.k;
+            alvo += 1;
+          }
+          if (!yearEnd && acc >= total) yearEnd = dia.k;
+        });
+      }
+      mapa[disc.id + '|' + turmaId] = { launched: launched, meta: meta, total: total, semanal: semanal, closes: closes, yearEnd: yearEnd, nBimestres: nBimestres };
+    });
+  });
+  return mapa;
+}
+function rhProjectionFormatarData(iso) {
+  var partes = String(iso || '').split('-');
+  return partes.length === 3 ? partes[2] + '/' + partes[1] + '/' + partes[0] : '';
+}
+function rhProjectionAssinatura(seed) {
+  var copia = Object.assign({}, seed);
+  delete copia.generatedAt;
+  return JSON.stringify(copia);
+}
+function rhSyncProjectionSeed(reason, seedPronta) {
+  var seed = seedPronta || rhBuildProjectionSeed();
+  var assinatura = rhProjectionAssinatura(seed);
+  // Reabrir o Contador sem relato novo não regrava nem reenvia a semente.
+  if (assinatura === _rhProjectionSeedAssinatura) return;
+  _rhProjectionSeedAssinatura = assinatura;
+  var updatedAt = new Date().toISOString();
+  try {
+    localStorage.setItem(RH_PROJECTION_SEED_KEY, JSON.stringify(seed));
+    localStorage.setItem(RH_PROJECTION_LOCAL_TS_KEY, updatedAt);
+  } catch (e) {
+    console.warn('[RH projection seed]', e.message);
+  }
+  if (!_rhApplyingProjectionSeedRemote && _rhProjectionSeedRemoteSync) {
+    _rhProjectionSeedRemoteSync.schedulePush(reason || 'projection-seed');
+  }
+}
+function rhRenderContSeVisivel() {
+  var sec = document.getElementById('sec-cont');
+  if (sec && sec.classList.contains('on')) renderContRH();
+}
+function rhApplyRemoteProjectionSeed(payload, meta) {
+  if (!payload || !payload.seed) return;
+  var localStamp = Date.parse(localStorage.getItem(RH_PROJECTION_LOCAL_TS_KEY) || '') || 0;
+  var remoteStamp = Date.parse((payload && payload.updatedAt) || (meta && meta.updatedAt) || '') || 0;
+  if (localStamp && remoteStamp && localStamp > remoteStamp) {
+    if (_rhProjectionSeedRemoteSync) _rhProjectionSeedRemoteSync.schedulePush('keep-local-seed');
+    return;
+  }
+  _rhApplyingProjectionSeedRemote = true;
+  try {
+    localStorage.setItem(RH_PROJECTION_SEED_KEY, JSON.stringify(payload.seed));
+    localStorage.setItem(RH_PROJECTION_LOCAL_TS_KEY, (payload && payload.updatedAt) || (meta && meta.updatedAt) || new Date().toISOString());
+  } catch (e) {
+    console.warn('[RH projection remote]', e.message);
+  }
+  _rhApplyingProjectionSeedRemote = false;
+}
+function rhIniciarProjectionSeedSync() {
+  if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return;
+  _rhProjectionSeedRemoteSync = window.RelatorioSupabaseSync.createScopeSync({
+    scope: RH_SUPABASE_PROJECTION_SCOPE,
+    schoolSlug: 'raimundo-herminio-de-melo',
+    classSlug: 'projecoes-aulas',
+    source: 'herminio-html',
+    debounceMs: 550,
+    getLocalPayload: function() {
+      return { updatedAt: localStorage.getItem(RH_PROJECTION_LOCAL_TS_KEY) || new Date().toISOString(), seed: rhBuildProjectionSeed() };
+    },
+    onRemotePayload: function(payload, meta) {
+      rhApplyRemoteProjectionSeed(payload, meta);
+    },
+    onStatus: function(status) {
+      if (status === 'erro') console.warn('[SupabaseSync] Semente de projeções da Hermínio permaneceu em modo local.');
+    }
+  });
+  _rhProjectionSeedRemoteSync.start().then(function(ready) {
+    if (!ready) return;
+    window.setTimeout(function() { _rhProjectionSeedRemoteSync.schedulePush('bootstrap-seed'); }, 900);
+  });
+}
+function rhIniciarPlannerStateSync() {
+  if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return;
+  _rhPlannerStateRemoteSync = window.RelatorioSupabaseSync.createScopeSync({
+    scope: RH_SUPABASE_PLANNER_SCOPE,
+    schoolSlug: 'raimundo-herminio-de-melo',
+    classSlug: 'projecoes-aulas',
+    source: 'herminio-html',
+    readOnly: true,
+    onRemotePayload: function(payload) {
+      if (!payload || !Array.isArray(payload.disciplinas) || !payload.disciplinas.length) return;
+      try {
+        localStorage.setItem(RH_PROJECTION_STATE_KEY, JSON.stringify(payload));
+      } catch (e) {
+        console.warn('[RH projection state]', e.message);
+      }
+      rhRenderContSeVisivel();
+    },
+    onStatus: function(status) {
+      if (status === 'erro') console.warn('[SupabaseSync] Estado das projeções da Hermínio permaneceu em modo local.');
+    }
+  });
+  _rhPlannerStateRemoteSync.start();
+}
+// A tela de projeções (iframe) grava o estado; o Contador acompanha na hora.
+window.addEventListener('storage', function(event) {
+  if (event.key === RH_PROJECTION_STATE_KEY) rhRenderContSeVisivel();
+});
+document.addEventListener('DOMContentLoaded', function() {
+  rhSyncProjectionSeed('bootstrap-local');
+  rhIniciarProjectionSeedSync();
+  rhIniciarPlannerStateSync();
+});
+function renderContRH() {   Object.keys(RH_GRUPOS_CONT).forEach(function(grupo) {
+var el = document.getElementById(RH_GRUPOS_CONT[grupo].container);
+if (el) el.innerHTML = '';   });
+var dados = coletarAulasLancadasRH();
+var seed = rhBuildProjectionSeed(dados);
+rhSyncProjectionSeed('contador', seed);
+var projecao = rhProjectionBuildCounterStateMap(rhResolveProjectionRuntimeState(seed));
+var upd = document.getElementById('rh-cont-upd');
+if (upd) {     upd.innerHTML = '&#128197; Última atualização: ' + (dados.ultimaData ? fmtDataRH(dados.ultimaData) : '—');   }    DISC_RH.forEach(function(base) {
+var confGrupo = RH_GRUPOS_CONT[base.grupo];
+var container = document.getElementById(confGrupo.container);
+if (!container) return;
+var metas = getMetasContRH(base);
+var proj = projecao[base.grupo + '|' + base.turmaId];
+// Como na Casavequia, ajustes manuais das projeções (lançadas, metas) valem aqui.
+var feitas = proj ? proj.launched : Math.round(((dados.mapa[base.turmaId + '_' + base.disc] || 0) + Number.EPSILON) * 100) / 100;
+var bimestre = proj ? proj.meta : metas.bimestre;
+var total = proj ? proj.total : metas.total;
+var bimAtual = getBimAtualRH(feitas, bimestre);
+var inicioBim = bimestre ? (bimAtual - 1) * bimestre : 0;
+var feitasBim = bimestre ? Math.max(0, Math.round(((feitas - inicioBim) + Number.EPSILON) * 100) / 100) : 0;
+var faltamBim = bimestre ? Math.max(0, Math.round(((bimestre - feitasBim) + Number.EPSILON) * 100) / 100) : 0;
+var faltamAno = total ? Math.max(0, Math.round(((total - feitas) + Number.EPSILON) * 100) / 100) : 0;
+var pctBim = bimestre ? Math.min((feitasBim / bimestre) * 100, 100) : 0;
+var pctAno = total ? Math.min((feitas / total) * 100, 100) : 0;
+var naGrade = !!(proj && proj.semanal > 0);
+var card = document.createElement('div');     card.className = 'cc';
+var badgeTxt = bimestre ? (bimAtual + 'º Bimestre') : confGrupo.badge;
+var metaTxt = base.disc       + (naGrade ? ' · ' + proj.semanal + ' h/aula/sem' : '')       + (bimestre ? ' · ' + fmtHoraAula(bimestre) + ' h/aula bimestrais' : '')       + (total ? ' · ' + fmtHoraAula(total) + ' h/aula anuais' : '');
+var previsaoHtml = '';
+if (bimestre) {       previsaoHtml = '<div style="font-size:.69rem;color:var(--cm);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin:13px 0 6px">Previsão de conclusão por bimestre</div><div class="brow">' + [1, 2, 3, 4].map(function(b) {
+var ok = feitas >= b * bimestre;
+var cls = ok ? 'co' : (b === bimAtual ? 'at' : '');
+var rotulo = ok ? '&#10004; Concluído' : (proj && proj.closes[b] ? rhProjectionFormatarData(proj.closes[b]) : (naGrade ? 'Não fecha até 2027' : 'Fora da grade'));         return '<div class="bi ' + cls + '"><div class="bn">' + b + 'º Bim</div><div class="bd2">' + rotulo + '</div></div>';       }).join('') + '</div>';     }
+var encerramento = feitas >= total ? 'Concluído' : (proj && proj.yearEnd ? rhProjectionFormatarData(proj.yearEnd) : (naGrade ? 'Sem conclusão até 2027' : 'sem previsão'));
+var observacao = feitas >= total       ? '<div class="ae"><strong>Encerramento anual previsto:</strong> Concluído.<br>* Carga anual desta disciplina já cumprida pelos relatos lançados.</div>'       : naGrade       ? '<div class="ae"><strong>Encerramento anual previsto:</strong> ' + encerramento + '.<br>* Projeções consideram a grade semanal das Projeções integradas, o calendário escolar, o recesso e as aulas já lançadas.</div>'       : '<div class="ae"><strong>Encerramento anual previsto:</strong> ' + encerramento + '.<br>* Turma sem aulas desta disciplina nas últimas 2 semanas (rodízio). Defina a grade semanal nas Projeções integradas para prever as datas.</div>';      card.innerHTML =       '<div class="cch">'         + '<div><div class="cct">' + RH_TURMA_LABELS[base.turmaId] + '</div><div class="ccm">' + metaTxt + '</div></div>'         + '<div class="ccb" style="' + confGrupo.badgeStyle + '">' + badgeTxt + '</div>'       + '</div>'       + '<div class="ccbody">'         + '<div class="pg">'           + '<div class="pl"><span class="plt">' + (bimestre ? (bimAtual + 'º Bimestre') : 'Aulas lançadas') + '</span><span class="pln">' + fmtHoraAula(bimestre ? feitasBim : feitas) + (bimestre ? ' / ' + fmtHoraAula(bimestre) + ' · faltam ' + fmtHoraAula(faltamBim) : ' h/aula acumuladas') + '</span></div>'           + '<div class="pbg"><div class="pf" style="width:' + pctBim + '%;background:' + confGrupo.bar + '"></div></div>'         + '</div>'         + '<div class="pg">'           + '<div class="pl"><span class="plt">Total do ano</span><span class="pln">' + fmtHoraAula(feitas) + (total ? ' / ' + fmtHoraAula(total) + ' · faltam ' + fmtHoraAula(faltamAno) : ' h/aula registradas') + '</span></div>'           + '<div class="pbg"><div class="pf dm" style="width:' + pctAno + '%;background:' + confGrupo.bar + '"></div></div>'         + '</div>'         + previsaoHtml         + observacao       + '</div>';      container.appendChild(card);   }); }
 // ═══════════════════════════════════════════════════════ //  INIT // ═══════════════════════════════════════════════════════ 
 // ═══════════════════════════════════════════════════════ //  LIVROS — troca de aba // ═══════════════════════════════════════════════════════
 var PROMPT_LIVROS_TEXTO='Prompt de livros temporariamente simplificado para manter a pagina interativa.';
