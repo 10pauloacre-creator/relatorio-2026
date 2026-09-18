@@ -362,7 +362,9 @@ O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-
 - bimestres automáticos (`relatorio_regras_escola`; Casavequia = 3º e 4º; Hermínio = nenhum, sem recuperação): o padrão é o cálculo de trabalhos e a prova da Biblioteca (view `relatorio_provas_bimestrais`, 0–10). O professor pode ajustar à mão (origem "ajuste"), e o ajuste vale até ele voltar ao automático;
 - recuperação semestral: o 2º recupera o 1º e o 4º recupera o 3º; se ainda houver bimestre abaixo de 7, prova única (`aluno.recuperacao[disciplina]["1"|"2"]`, já em 0–10). Com 7 ou mais, recupera os bimestres; abaixo disso, reprovado.
 
-O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: só a sessão do próprio aluno ou o admin. **Hermínio: boletins mantidos como estão** (decisão do professor, inclusive o `autofillMissingGrades`).
+O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: só a sessão do próprio aluno ou o admin. **Hermínio: boletins com cálculo próprio** (decisão do professor, inclusive o `autofillMissingGrades`); desde 18/09/2026 recebem o desconto por comportamento e o bônus do Ranking de Poder por `assets/js/herminio-regras-extras.js` (Etapa 8E), com os mesmos dados do banco.
+
+**Chave de disciplina (Etapa 8E):** `relatorio_disciplina_chave()` (banco) e `HerminioRegrasExtras.chave()` (painel) igualam "Língua Inglesa"/"Inglês", "Língua Espanhola"/"Espanhol" e "Artes"/"Arte". O `get_meu_boletim` e o desconto comparam disciplina por ela; sem isso, nota de trabalho, prova e desconto de Inglês e Espanhol da Hermínio se perdiam. SQL em `supabase/2026-09-18-etapa8e-regras-herminio.sql`.
 
 **Segurança e tempo real (Etapas 8C e 8D):**
 - **`boletim_normalizado` fechada:** a view roda como dono do banco e estava aberta para a chave pública, que lia nome e notas de todos. Agora só responde ao professor logado (`private.is_relatorio_admin`); `report-boletim-api.js` (página de notas do admin na Biblioteca) envia o token da sessão. O aluno vê o próprio boletim só por `get_meu_boletim`.
@@ -373,7 +375,7 @@ O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: s�
 - **Onde desconta:** na nota do bimestre da disciplina em que aconteceu, até 2,0 por bimestre, com a nota nunca abaixo de 0. Entra antes da recuperação, então o bimestre seguinte ou a recuperação semestral ainda podem recuperar.
 - **Não descontam:** vítima, testemunha, envolvido, destaque, "sem infração", registros positivos e ocorrência sem disciplina.
 - **Dados:** `relatorio_desconto_conduta` (boletim do aluno, `descontoConduta` em cada bimestre) e view `relatorio_descontos_conduta` (painel). O motor aplica em `calcularBimestre` (`notaSemDesconto`, `descontoConduta`, `ocorrenciasConduta`).
-- **Interruptor por escola:** `relatorio_regras_escola.desconto_conduta`, ligado na Casavequia e desligado na Hermínio.
+- **Interruptor por escola:** `relatorio_regras_escola.desconto_conduta`, ligado nas duas escolas (Hermínio desde 18/09/2026).
 - **IA:** o prompt da classificação avisa que a gravidade custa nota; por isso, na dúvida, o nível menor.
 
 **Relatório Individual Anual do Aluno (Etapas 7 e 8):** um documento só, para o professor e para o aluno, montado a partir do modelo do professor (`docs/modelo_relatorio_individual_anual_aluno.html`, na Biblioteca). SQL em `supabase/2026-09-17-etapa7-relatorio-individual.sql`.
@@ -389,7 +391,7 @@ O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: s�
 - **Tabela:** Novato e Aprendiz +0, Camponês +0,25, Gladiador +0,5, Rei +1,5, Mago Supremo +2.
 - **Limites:** máximo de 10, uma casa decimal. Não muda as notas dos bimestres nem a recuperação.
 - **Onde é calculado:** no motor (`nivelPoder`, `mediaFinal`), que usa os mesmos limites de pontos do `recalc_nivel`.
-- **Interruptor por escola:** `relatorio_regras_escola.bonus_poder`, ligado na Casavequia e desligado na Hermínio.
+- **Interruptor por escola:** `relatorio_regras_escola.bonus_poder`, ligado nas duas escolas (Hermínio desde 18/09/2026).
 - **Dados:** pontos em `relatorio_poder_alunos` (painel) e `pontosPoder` no `get_meu_boletim` (aluno).
 
 **Aluno novo entra sozinho (Etapa 5B):** a lista de alunos da Biblioteca é a fonte. Detalhes em `supabase/2026-09-17-etapa5b-alunos-novos-automaticos.sql`.
