@@ -11,7 +11,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260916a"></script>
 <script src="assets/js/herminio-ciclo.js?v=20260918b"></script>
-<script src="assets/js/projecao-ciclo.js?v=20260918c"></script>
+<script src="assets/js/projecao-ciclo.js?v=20260918d"></script>
 <style>
   :root{
     --bg:#eff3ea;
@@ -1059,7 +1059,8 @@ const START_YEAR = 2026;
 const PROJECTION_LIMIT_YEAR = 2027;
 const DIAS_AB = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
 const DISC_CORES = ['#187a63','#6d28d9','#1d4ed8','#c26a06','#be123c','#047857','#7c2d12','#4338ca'];
-const WEEK = [{k:1,ab:'Seg'},{k:2,ab:'Ter'},{k:3,ab:'Qua'},{k:4,ab:'Qui'},{k:5,ab:'Sex'}];
+// Sábado entra na grade para aulas lançadas à mão (0 por padrão).
+const WEEK = [{k:1,ab:'Seg'},{k:2,ab:'Ter'},{k:3,ab:'Qua'},{k:4,ab:'Qui'},{k:5,ab:'Sex'},{k:6,ab:'Sáb'}];
 const TIPO_LABEL = {nacional:'Feriado nacional',estadual:'Feriado estadual',facultativo:'Ponto facultativo'};
 let state = null;
 let plannerSeed = null;
@@ -1433,7 +1434,9 @@ function normalizeState(){
       state.turmas.forEach(t=>{
         const dias = gradeCiclo[disc.id + '|' + t.id] || {};
         disc.grade[t.id] = {};
-        WEEK.forEach(day=>{ disc.grade[t.id][day.k] = Math.max(0, numberValue(dias[day.k], 0)); });
+        const sabado = numberValue((disc.grade[t.id] || {})[6], 0);
+        disc.grade[t.id] = {};
+        WEEK.forEach(day=>{ disc.grade[t.id][day.k] = day.k === 6 ? Math.max(0, sabado) : Math.max(0, numberValue(dias[day.k], 0)); });
       });
     });
   }
@@ -1629,7 +1632,7 @@ function buildDays(endYear = PROJECTION_LIMIT_YEAR){
       status,
       notes,
       holidays,
-      isProjectionDay:dow >= 1 && dow <= 5 && status === 'letivo'
+      isProjectionDay:(dow >= 1 && dow <= 5 && status === 'letivo') || (dow === 6 && status === 'sabado')
     });
     cursor.setDate(cursor.getDate() + 1);
   }
@@ -1712,7 +1715,7 @@ let cicloCache = {assinatura:'', sim:null};
 function cicloSimulacao(){
   if(!cicloAtivo()) return null;
   const assinatura = JSON.stringify([state.anchorDate, state.feriados, state.recesso, state.facultativoLetivo, state.ciclo, state.turmas,
-    state.disciplinas.map(d=>[d.id, d.nome, d.nBimestres, d.turmasAtivas, d.metas, d.lancadas, d.totais, d.minutos])]);
+    state.disciplinas.map(d=>[d.id, d.nome, d.nBimestres, d.turmasAtivas, d.metas, d.lancadas, d.totais, d.minutos, d.grade])]);
   if(assinatura !== cicloCache.assinatura) cicloCache = {assinatura, sim:window.ProjecaoCiclo.simular(state)};
   return cicloCache.sim;
 }
@@ -1935,7 +1938,7 @@ function renderGrid(disc){
     html += `<tr><td class="turma-cell">${esc(turma.nome)}</td>`;
     WEEK.forEach(day=>{
       const value = numberValue(grade[day.k], 0);
-      html += `<td><input class="grade-in ${value === 0 ? 'zero' : ''}" type="number" min="0" step="1" value="${value}"${cicloAtivo() ? ' disabled title="Definido pelo ciclo de estudos"' : ''} oninput="onGrade('${disc.id}','${turma.id}',${day.k},this.value)"></td>`;
+      html += `<td><input class="grade-in ${value === 0 ? 'zero' : ''}" type="number" min="0" step="1" value="${value}"${cicloAtivo() && day.k !== 6 ? ' disabled title="Definido pelo ciclo de estudos"' : ''} oninput="onGrade('${disc.id}','${turma.id}',${day.k},this.value)"></td>`;
     });
     html += `<td class="week-sum">${weeklyForTurma(disc, turma.id)}</td>`;
     html += `<td><input class="meta-in" type="number" min="1" step="1" value="${metaForTurma(disc, turma.id)}" oninput="onMeta('${disc.id}','${turma.id}',this.value)"></td>`;
@@ -1959,13 +1962,17 @@ function cicloEventos(day){
   return (sim && sim.eventos[day.k]) || [];
 }
 
+function sabadoComAula(day){
+  return state.disciplinas.some(disc=>Object.keys(disc.grade || {}).some(turmaId=>numberValue(((disc.grade || {})[turmaId] || {})[6], 0) > 0));
+}
+
 function dayNotePills(day){
   const pills = [];
   if(day.k === state.anchorDate) pills.push(`<span class="note-pill sync">Saldo lançado até ${esc(brDateShort(day.k))}</span>`);
   day.holidays.forEach(item=>{
     pills.push(`<span class="note-pill ${esc(item.tipo)}">${esc(item.nome)}</span>`);
   });
-  if(day.status === 'sabado' && !day.holidays.length) pills.push(`<span class="note-pill sabado">Sábado visível na linha do tempo</span>`);
+  if(day.status === 'sabado' && !day.holidays.length) pills.push(`<span class="note-pill sabado">${sabadoComAula(day) ? 'Sábado com aula' : 'Sábado visível na linha do tempo'}</span>`);
   if(day.status === 'domingo') pills.push(`<span class="note-pill domingo">Domingo · limitador da semana</span>`);
   if(day.status === 'recesso') pills.push(`<span class="note-pill recesso">Recesso escolar</span>`);
   cicloEventos(day).forEach(ev=>{
@@ -2102,7 +2109,7 @@ function renderPanel(){
 
     <div class="section-title">Grade semanal, metas e aulas já lançadas</div>
     ${renderGrid(disc)}
-    ${cicloAtivo() ? '<div class="hint">No rodízio, os dias de aula vêm do ciclo de estudos e não são editados aqui. Metas, lançadas e total do ano continuam editáveis.</div>' : ''}
+    ${cicloAtivo() ? '<div class="hint">No rodízio, os dias de segunda a sexta vêm do ciclo de estudos. O sábado é editável: as horas lançadas nele vão para a disciplina da linha quando ela estiver na vez; senão, para a disciplina ativa da turma. Metas, lançadas e total do ano continuam editáveis.</div>' : ''}
     <div class="cfg-row">
       <div class="field">
         <label>Data-base das aulas lançadas</label>
