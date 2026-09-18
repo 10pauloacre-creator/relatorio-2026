@@ -18,6 +18,7 @@
   }
 
   // Dias de 2026 a 2027; letivo = segunda a sexta fora de recesso e feriado.
+  // Sábado livre (sem feriado nem recesso) só recebe aula da grade editada à mão.
   function construirDias(state) {
     var feriados = {};
     (state.feriados || []).forEach(function (item) {
@@ -29,8 +30,8 @@
     while (cursor.getFullYear() <= ANO_LIMITE) {
       var k = chaveDia(cursor);
       var dow = cursor.getDay();
-      var letivo = dow >= 1 && dow <= 5 && !feriados[k] && !(recesso.start && k >= recesso.start && k <= recesso.end);
-      dias.push({ k: k, dow: dow, letivo: letivo });
+      var livre = !feriados[k] && !(recesso.start && k >= recesso.start && k <= recesso.end);
+      dias.push({ k: k, dow: dow, letivo: dow >= 1 && dow <= 5 && livre, sabado: dow === 6 && livre });
       cursor.setDate(cursor.getDate() + 1);
     }
     return dias;
@@ -82,8 +83,9 @@
     var idx = 0;
     while (idx < dias.length && dias[idx].k <= anchor) idx += 1;
 
+    // Prepara as turmas do rodízio: trilhas (dias fixos) e filas de disciplinas.
     var etapas = [];
-    var primeiraAtiva = true;
+    var preparadas = [];
     (ciclo.etapas || []).forEach(function (etapa) {
       var turmaId = etapa.turma;
       var trilhas = (etapa.trilhas || []).map(function (trilha) {
@@ -116,105 +118,140 @@
         })
       };
       etapas.push(resumo);
-      var pendente = function () { return trilhas.some(function (t) { return t.fila.length; }); };
-      if (!pendente()) return;
+      preparadas.push({ turmaId: turmaId, trilhas: trilhas, resumo: resumo, anunciarInicio: true });
+    });
+    function pendenteEtapa(p) { return p.trilhas.some(function (t) { return t.fila.length; }); }
 
-      // A turma em andamento na data-base não "começa": ela continua.
-      var jaIniciada = trilhas.some(function (t) {
-        return t.filaTotal.some(function (id) { return porDisc[id + '|' + turmaId].launched > 0; });
-      });
-      var anunciarInicio = !(primeiraAtiva && jaIniciada);
-      resumo.emAndamento = primeiraAtiva && jaIniciada;
-      primeiraAtiva = false;
-      var ultimoDia = '';
-
-      // Trilha sem disciplina cede os dias à disciplina de outra trilha ainda ativa.
-      // Também recebe as horas que sobram no dia em que a fila da trilha acaba.
-      function filaDoDia(trilha, dia) {
-        if (trilha.fila.length) return trilha.fila;
-        if (!trilha.cedeDias) return null;
-        var outra = trilhas.filter(function (t) { return t !== trilha && t.fila.length; })[0];
-        if (!outra) return null;
-        if (trilha.emprestadaPara !== outra.fila[0]) {
-          trilha.emprestadaPara = outra.fila[0];
-          evento(dia.k, 'disc-inicio', nomeDisc(outra.fila[0]) + ' assume os dias de ' + trilha.nome + ' · ' + resumo.turmaNome);
-        }
-        return outra.fila;
+    // Uma turma por vez. A turma em andamento na data-base não "começa": ela continua.
+    var atual = -1;
+    var primeiraAtiva = true;
+    function proximaEtapa() {
+      for (var i = atual + 1; i < preparadas.length; i += 1) {
+        var p = preparadas[i];
+        if (!pendenteEtapa(p)) continue;
+        atual = i;
+        var jaIniciada = p.trilhas.some(function (t) {
+          return t.filaTotal.some(function (id) { return porDisc[id + '|' + p.turmaId].launched > 0; });
+        });
+        p.anunciarInicio = !(primeiraAtiva && jaIniciada);
+        p.resumo.emAndamento = primeiraAtiva && jaIniciada;
+        primeiraAtiva = false;
+        return p;
       }
+      atual = preparadas.length;
+      return null;
+    }
+    var etapa = proximaEtapa();
 
-      function registrarAula(dia, id, horas, extra, comeca) {
-        var st = porDisc[id + '|' + turmaId];
-        var cell = st.cells[dia.k];
-        if (!cell || cell.sync) {
-          cell = { cum: st.acc, add: 0, extra: 0, closes: [], inicio: false, fim: false };
-          st.cells[dia.k] = cell;
-        }
-        cell.add += horas + extra;
-        cell.extra += extra;
-        cell.cum = st.acc;
-        if (comeca) cell.inicio = true;
-        while (st.alvo <= st.nBimestres && st.acc >= st.alvo * st.meta) {
-          cell.closes.push(st.alvo);
-          st.closes[st.alvo] = dia.k;
-          st.alvo += 1;
-        }
-        if (st.acc >= st.total) cell.fim = true;
+    // Trilha sem disciplina cede os dias à disciplina de outra trilha ainda ativa:
+    // nenhum horário fica vago enquanto a turma tiver disciplina pendente.
+    function filaDoDia(p, trilha, dia) {
+      if (trilha && trilha.fila.length) return trilha.fila;
+      if (trilha && !trilha.cedeDias) return null;
+      var outra = p.trilhas.filter(function (t) { return t !== trilha && t.fila.length; })[0];
+      if (!outra) return null;
+      if (trilha && trilha.emprestadaPara !== outra.fila[0]) {
+        trilha.emprestadaPara = outra.fila[0];
+        evento(dia.k, 'disc-inicio', nomeDisc(outra.fila[0]) + ' assume os dias de ' + trilha.nome + ' · ' + p.resumo.turmaNome);
       }
+      return outra.fila;
+    }
+    // Sábado (grade editada à mão): a disciplina da linha, se estiver na vez;
+    // senão, a disciplina ativa da turma.
+    function filaDoSabado(p, discId) {
+      var dona = p.trilhas.filter(function (t) { return t.fila[0] === discId; })[0];
+      if (dona) return dona.fila;
+      var ativa = p.trilhas.filter(function (t) { return t.fila.length; })[0];
+      return ativa ? ativa.fila : null;
+    }
 
-      while (pendente() && idx < dias.length) {
-        var dia = dias[idx];
-        idx += 1;
-        if (!dia.letivo) continue;
-        trilhas.forEach(function (trilha) {
-          var blocos = Math.max(0, inteiro(trilha.dias[dia.dow], 0));
-          if (!blocos) return;
-          var minutos = Math.max(0, inteiro(trilha.minutosExtras[dia.dow], 0));
-          var fila = filaDoDia(trilha, dia);
-          // O dia é dividido em blocos de 1 h/aula e, no fim, os minutos extras.
-          // Se a disciplina encerra no meio do dia, o restante vai para a próxima.
-          while (fila && fila.length && (blocos > 0 || minutos > 0)) {
-            var id = fila[0];
-            var st = porDisc[id + '|' + turmaId];
-            if (!resumo.inicio) {
-              resumo.inicio = dia.k;
-              if (anunciarInicio) evento(dia.k, 'turma-inicio', resumo.turmaNome + ' começa o ciclo');
-            }
-            var comeca = false;
-            if (!st.inicio) {
-              st.inicio = dia.k;
-              comeca = st.acc === 0;
-              if (comeca) evento(dia.k, 'disc-inicio', nomeDisc(id) + ' começa · ' + resumo.turmaNome);
-            }
-            var horas = Math.min(blocos, st.total - st.acc);
-            blocos -= horas;
-            st.acc += horas;
-            var extra = 0;
-            if (blocos === 0 && minutos > 0) {
-              st.min += minutos;
-              minutos = 0;
-              if (st.min >= 60 && st.acc < st.total) {
-                st.min -= 60;
-                st.acc += 1;
-                st.extras += 1;
-                extra = 1;
-              }
-            }
-            registrarAula(dia, id, horas, extra, comeca);
-            ultimoDia = dia.k;
-            if (st.acc < st.total) break;
-            st.yearEnd = dia.k;
-            st.fim = dia.k;
-            evento(dia.k, 'disc-fim', nomeDisc(id) + ' encerra · ' + resumo.turmaNome);
-            fila.shift();
-            if (!fila.length) fila = filaDoDia(trilha, dia);
+    function registrarAula(p, dia, id, horas, extra, comeca) {
+      var st = porDisc[id + '|' + p.turmaId];
+      var cell = st.cells[dia.k];
+      if (!cell || cell.sync) {
+        cell = { cum: st.acc, add: 0, extra: 0, closes: [], inicio: false, fim: false };
+        st.cells[dia.k] = cell;
+      }
+      cell.add += horas + extra;
+      cell.extra += extra;
+      cell.cum = st.acc;
+      if (comeca) cell.inicio = true;
+      while (st.alvo <= st.nBimestres && st.acc >= st.alvo * st.meta) {
+        cell.closes.push(st.alvo);
+        st.closes[st.alvo] = dia.k;
+        st.alvo += 1;
+      }
+      if (st.acc >= st.total) cell.fim = true;
+    }
+
+    // Consome um horário do dia (blocos de 1 h/aula e, no fim, os minutos extras).
+    // Se a disciplina encerra no meio, o restante vai para a próxima; se a turma
+    // encerra no meio, o restante já vai para a próxima turma do rodízio.
+    function consumirHorario(horario, dia) {
+      while (etapa && (horario.blocos > 0 || horario.minutos > 0)) {
+        var p = etapa;
+        var fila = horario.sabado
+          ? filaDoSabado(p, horario.disc)
+          : filaDoDia(p, p.trilhas[horario.trilha] || null, dia);
+        if (!fila || !fila.length) return;
+        var id = fila[0];
+        var st = porDisc[id + '|' + p.turmaId];
+        if (!p.resumo.inicio) {
+          p.resumo.inicio = dia.k;
+          if (p.anunciarInicio) evento(dia.k, 'turma-inicio', p.resumo.turmaNome + ' começa o ciclo');
+        }
+        var comeca = false;
+        if (!st.inicio) {
+          st.inicio = dia.k;
+          comeca = st.acc === 0;
+          if (comeca) evento(dia.k, 'disc-inicio', nomeDisc(id) + ' começa · ' + p.resumo.turmaNome);
+        }
+        var horas = Math.min(horario.blocos, st.total - st.acc);
+        horario.blocos -= horas;
+        st.acc += horas;
+        var extra = 0;
+        if (horario.blocos === 0 && horario.minutos > 0) {
+          st.min += horario.minutos;
+          horario.minutos = 0;
+          if (st.min >= 60 && st.acc < st.total) {
+            st.min -= 60;
+            st.acc += 1;
+            st.extras += 1;
+            extra = 1;
           }
+        }
+        registrarAula(p, dia, id, horas, extra, comeca);
+        if (st.acc < st.total) return;
+        st.yearEnd = dia.k;
+        st.fim = dia.k;
+        evento(dia.k, 'disc-fim', nomeDisc(id) + ' encerra · ' + p.resumo.turmaNome);
+        fila.shift();
+        if (!pendenteEtapa(p)) {
+          p.resumo.fim = dia.k;
+          evento(dia.k, 'turma-fim', p.resumo.turmaNome + ' encerra o ciclo');
+          etapa = proximaEtapa();
+        }
+      }
+    }
+
+    while (etapa && idx < dias.length) {
+      var dia = dias[idx];
+      idx += 1;
+      var horarios = [];
+      if (dia.letivo) {
+        // Os horários do dia seguem as trilhas da turma que abre o dia.
+        etapa.trilhas.forEach(function (trilha, i) {
+          var blocos = Math.max(0, inteiro(trilha.dias[dia.dow], 0));
+          if (blocos) horarios.push({ trilha: i, blocos: blocos, minutos: Math.max(0, inteiro(trilha.minutosExtras[dia.dow], 0)) });
+        });
+      } else if (dia.sabado) {
+        (state.disciplinas || []).forEach(function (disc) {
+          var blocos = Math.max(0, inteiro((((disc.grade || {})[etapa.turmaId]) || {})[6], 0));
+          if (blocos) horarios.push({ sabado: true, disc: disc.id, blocos: blocos, minutos: 0 });
         });
       }
-      if (!pendente() && ultimoDia) {
-        resumo.fim = ultimoDia;
-        evento(ultimoDia, 'turma-fim', resumo.turmaNome + ' encerra o ciclo');
-      }
-    });
+      horarios.forEach(function (horario) { consumirHorario(horario, dia); });
+    }
 
     // Datas de cada disciplina no quadro do ciclo.
     etapas.forEach(function (resumo) {

@@ -861,6 +861,12 @@ function rhResolveProjectionRuntimeState(seed) {
     disc.metas = rhProjectionManualNumbers(disc.metas, localDisc, 'metasManuais', 'metas');
     disc.totais = rhProjectionManualNumbers(disc.totais, localDisc, 'totaisManuais', 'totais');
     disc.lancadas = rhProjectionManualNumbers(disc.lancadas, localDisc, 'lancadasManuais', 'lancadas');
+    // Sábado com aula, lançado à mão na grade das projeções (seg–sex vêm do ciclo).
+    Object.keys(localDisc.gradeManuais || {}).forEach(function(turmaId) {
+      if (!(localDisc.gradeManuais[turmaId] || {})[6]) return;
+      disc.grade[turmaId] = Object.assign({}, disc.grade[turmaId] || {});
+      disc.grade[turmaId][6] = Math.max(0, parseInt((((localDisc.grade || {})[turmaId]) || {})[6], 10) || 0);
+    });
   });
   return merged;
 }
