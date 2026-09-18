@@ -22,7 +22,7 @@
   // Regras do boletim (motor em assets/js/boletim-regras.js, o mesmo usado no
   // perfil do aluno na Biblioteca). Casavequia: 3º e 4º bimestres só pelo
   // cálculo automático (trabalhos + prova da Biblioteca) e recuperação semestral.
-  const REGRAS = config.regras || { bimestresAutomaticos: ["3", "4"], recuperacaoSemestral: true, bonusPoder: true };
+  const REGRAS = config.regras || { bimestresAutomaticos: ["3", "4"], recuperacaoSemestral: true, bonusPoder: true, descontoConduta: true };
   const SEMESTRES_DO_BIMESTRE = { "2": "1", "4": "2" };
   const DISCIPLINES = (config.disciplines || []).map(function (discipline, index) {
     return {
@@ -864,7 +864,9 @@
         trabalhoManual: paraExibicao(dados.trabalhos),
         provaManual: paraExibicao(dados.prova),
         trabalhoAuto: paraExibicao(calculateAutoWorkGrade(student, disciplineName, bim)),
-        provaAuto: paraExibicao(getAutomaticExamGrade(student, disciplineName, bim))
+        provaAuto: paraExibicao(getAutomaticExamGrade(student, disciplineName, bim)),
+        descontoConduta: notasTrabalho && notasTrabalho.obterDescontoConduta
+          ? notasTrabalho.obterDescontoConduta(student, disciplineName, bim) : null
       };
     });
     const recuperacao = student.recuperacao && student.recuperacao[disciplineName] ? student.recuperacao[disciplineName] : {};
@@ -874,6 +876,8 @@
       recuperacaoSemestral: REGRAS.recuperacaoSemestral,
       // Etapa 6: bônus do Ranking de Poder só na média final do ano.
       bonusPoder: !!(REGRAS.bonusPoder && poder && poder.bonusPoder),
+      // Etapa 8B: comportamento desconta na nota do bimestre (até 2,0).
+      descontoConduta: !!REGRAS.descontoConduta,
       pontosPoder: poder ? poder.pontos : null,
       bimestres: bimestres,
       recuperacao: recuperacao
@@ -1155,7 +1159,7 @@
       + "</section>"
       + '<section class="section-block">'
         + "<h3>Conduta registrada pela IA</h3>"
-        + '<p class="section-note">Ocorrencias dos relatos e observacoes ligadas a este aluno, com a gravidade estabelecida pela IA (voce pode trocar no proprio relato). Comportamento nao desconta nota.</p>'
+        + '<p class="section-note">Ocorrencias dos relatos e observacoes ligadas a este aluno, com a gravidade estabelecida pela IA (voce pode trocar no proprio relato). Cada ocorrencia desconta na nota do bimestre da disciplina: leve 0,25, medio 0,5, grave 1,0, muito grave 2,0, ate 2,0 por bimestre.</p>'
         + '<div data-conduta-aluno></div>'
       + "</section>"
       + '<section class="section-block">'
@@ -1241,6 +1245,7 @@
           + '<div class="bim-card-total">' + renderBimCardTotal(resultado) + "</div>"
         + "</div>"
         + '<div class="field-stack">'
+          + renderDescontoConduta(resultado)
           + '<div class="auto-grade-row"><span>Trabalhos (calculo)</span><strong>' + (autoGrade === null ? "aguardando atividades marcadas" : formatNota10(autoGrade)) + "</strong></div>"
           + '<div class="summary-foot">' + describeWorkGrade(student, disciplineName, bim) + "</div>"
           + "<div><label>" + (isManual ? "Trabalhos: ajuste manual em uso" : "Ajustar trabalhos (opcional)") + "</label>"
@@ -1262,6 +1267,7 @@
         + '<div class="bim-card-total">' + renderBimCardTotal(resultado) + "</div>"
       + "</div>"
       + '<div class="field-stack">'
+        + renderDescontoConduta(resultado)
         + "<div><label>Nota de trabalhos (0 a 10)</label>" + renderStepper(student.id, bim, "trabalhos", effectiveWork, disciplineName) + "</div>"
         + "<div><label>Nota de prova (0 a 10)</label>" + renderStepper(student.id, bim, "prova", dados.prova, disciplineName) + "</div>"
         + renderLibraryExamNote(student, disciplineName, bim, dados)
@@ -1275,6 +1281,14 @@
         + "</div>"
       + "</div>"
       + "</article>";
+  }
+
+  // Comportamento desconta na nota do bimestre (Etapa 8B).
+  function renderDescontoConduta(resultado) {
+    if (!resultado || !resultado.descontoConduta) return "";
+    return '<div class="summary-foot" style="color:#8c3514"><strong>Comportamento: -' + formatNumber(resultado.descontoConduta)
+      + "</strong> na nota do bimestre (" + resultado.ocorrenciasConduta + " ocorrencia(s); limite de 2,0). Media sem desconto: "
+      + formatNumber(resultado.notaSemDesconto) + ".</div>";
   }
 
   // Bimestres manuais: a prova digitada tem prioridade; sem ela, vale a da Biblioteca.

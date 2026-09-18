@@ -43,6 +43,7 @@ window.NotasBimestrais = (function () {
     var provas = {};
     var detalhesProvas = {};
     var poder = {};
+    var descontos = {};
     var carregado = false;
     var carregando = null;
     var aliasParaDisciplina = {};
@@ -121,6 +122,25 @@ window.NotasBimestrais = (function () {
             detalhesProvas = novosDetalhes;
           }
         }
+        // Desconto por comportamento (Etapa 8B), pelo vínculo exato do painel.
+        if (opcoes.scopeKey) {
+          var respostaDesconto = await sync.getClient()
+            .from("relatorio_descontos_conduta")
+            .select("aluno_relatorio_id,disciplina,bimestre,pontos,ocorrencias,regra_ligada")
+            .eq("scope_key", opcoes.scopeKey);
+          if (respostaDesconto.error) {
+            console.warn("[Notas] não foi possível carregar o desconto por comportamento.", respostaDesconto.error);
+          } else {
+            var novosDescontos = {};
+            (respostaDesconto.data || []).forEach(function (linha) {
+              if (!linha.regra_ligada) return;
+              novosDescontos[linha.aluno_relatorio_id + "|" + disciplinaDoPainel(linha.disciplina) + "|" + linha.bimestre] = {
+                pontos: Number(linha.pontos) || 0, ocorrencias: Number(linha.ocorrencias) || 0
+              };
+            });
+            descontos = novosDescontos;
+          }
+        }
         // Pontos do Ranking de Poder (Etapa 6), pelo vínculo exato do painel.
         if (opcoes.scopeKey) {
           var respostaPoder = await sync.getClient()
@@ -164,6 +184,12 @@ window.NotasBimestrais = (function () {
       return detalhesProvas[aluno.id + "|" + disciplina + "|" + bimestre] || null;
     }
 
+    // {pontos, ocorrencias} tirados pelo comportamento no bimestre, ou null.
+    function obterDescontoConduta(aluno, disciplina, bimestre) {
+      if (!carregado || !aluno || aluno.id == null) return null;
+      return descontos[aluno.id + "|" + disciplina + "|" + bimestre] || null;
+    }
+
     // {pontos, nivel, bonusPoder} do Ranking de Poder, ou null.
     function obterPoder(aluno) {
       if (!carregado || !aluno || aluno.id == null) return null;
@@ -186,6 +212,7 @@ window.NotasBimestrais = (function () {
       obterProva: obterProva,
       obterProvaDetalhe: obterProvaDetalhe,
       obterPoder: obterPoder,
+      obterDescontoConduta: obterDescontoConduta,
       pronto: function () { return carregado; }
     };
   }

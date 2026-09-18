@@ -12,7 +12,12 @@
 //  • Bimestres automáticos (Casavequia: 3º e 4º): o padrão é o cálculo de
 //    trabalhos e a prova da Biblioteca; o professor pode ajustar uma nota à
 //    mão ("ajuste"), e o ajuste vale até ele voltar ao automático.
-//  • Comportamento não desconta nota.
+//  • Comportamento DESCONTA nota (decisão do professor em 17/09/2026, que
+//    substitui a regra anterior): cada ocorrência de quem praticou o ato tira
+//    leve 0,25 · médio 0,5 · grave 1,0 · muito grave 2,0 da nota do bimestre
+//    da disciplina em que aconteceu, até 2,0 por bimestre; a nota não fica
+//    abaixo de 0. O banco soma e limita (descontoConduta); o desconto entra
+//    antes da recuperação. Só vale quando a escola liga regras.descontoConduta.
 //  • Recuperação semestral (1º semestre = 1º+2º bim.; 2º = 3º+4º):
 //      1. 1º (ou 3º) bimestre abaixo de 7 é recuperado pela nota do 2º (ou 4º),
 //         se ela for 7 ou mais: vale a nota maior.
@@ -62,8 +67,9 @@
     return valor === null ? null : Number(valor.toFixed(1));
   }
 
-  // entrada.bimestres[b] = { trabalhoManual, provaManual, trabalhoAuto, provaAuto }
-  function calcularBimestre(dados, automatico) {
+  // entrada.bimestres[b] = { trabalhoManual, provaManual, trabalhoAuto, provaAuto,
+  //                         descontoConduta: {pontos, ocorrencias} }
+  function calcularBimestre(dados, automatico, comDesconto) {
     dados = dados || {};
     var trabalhoManual = numero(dados.trabalhoManual);
     var provaManual = numero(dados.provaManual);
@@ -76,7 +82,10 @@
     var prova = provaManual !== null ? provaManual : provaAuto;
     var origemManual = automatico ? "ajuste" : "manual";
     var completo = trabalho !== null && prova !== null;
-    var parcial = trabalho === null && prova === null ? null : arredondarMeio(((trabalho || 0) + (prova || 0)) / 2);
+    var semDesconto = trabalho === null && prova === null ? null : arredondarMeio(((trabalho || 0) + (prova || 0)) / 2);
+    var conduta = comDesconto && dados.descontoConduta ? dados.descontoConduta : null;
+    var desconto = conduta ? Math.min(2, Math.max(0, Number(conduta.pontos) || 0)) : 0;
+    var parcial = semDesconto === null ? null : Math.max(0, Number((semDesconto - desconto).toFixed(2)));
 
     return {
       automatico: !!automatico,
@@ -90,7 +99,10 @@
       notaFinal: completo ? parcial : null,   // após recuperação
       recuperado: false,
       recuperadoPor: null,                    // "bimestre" | "semestral"
-      abaixoDaMedia: completo ? parcial < MEDIA : false
+      abaixoDaMedia: completo ? parcial < MEDIA : false,
+      notaSemDesconto: semDesconto,           // média de prova e trabalhos
+      descontoConduta: desconto,              // pontos tirados pelo comportamento
+      ocorrenciasConduta: conduta ? Number(conduta.ocorrencias) || 0 : 0
     };
   }
 
@@ -101,7 +113,7 @@
     var recuperacoes = entrada.recuperacao || {};
     var bimestres = {};
     ["1", "2", "3", "4"].forEach(function (b) {
-      bimestres[b] = calcularBimestre((entrada.bimestres || {})[b], automaticos.indexOf(b) >= 0);
+      bimestres[b] = calcularBimestre((entrada.bimestres || {})[b], automaticos.indexOf(b) >= 0, !!entrada.descontoConduta);
     });
 
     var semestres = {};
@@ -197,7 +209,7 @@
     NIVEIS_PODER: NIVEIS_PODER,
     nivelPoder: nivelPoder,
     rotuloSituacao: function (situacao) { return ROTULOS_SITUACAO[situacao] || situacao; },
-    VERSAO: "2026-09-17c"
+    VERSAO: "2026-09-17d"
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

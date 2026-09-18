@@ -4,7 +4,8 @@
 // Lê do banco tudo o que a IA ligou a este aluno: ocorrências dos relatos e
 // tags das Observações (autor, vítima, testemunha, envolvido, destaque), com
 // data, horário, disciplina, gravidade, categoria, interferência e contexto.
-// Comportamento NÃO desconta nota; aqui é só registro pedagógico.
+// Comportamento desconta na nota do bimestre da disciplina (Etapa 8B):
+// leve 0,25 · médio 0,5 · grave 1,0 · muito grave 2,0, até 2,0 por bimestre.
 // ═══════════════════════════════════════════════════════════════════════════
 window.RelatorioCondutaAluno = (function () {
   var ROTULOS = { leve: "Leve", medio: "Médio", grave: "Grave", muito_grave: "Muito grave" };

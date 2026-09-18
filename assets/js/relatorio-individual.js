@@ -19,10 +19,16 @@
 // O relatório é sempre ANUAL e se atualiza sozinho: cada novo relato, prova
 // ou observação lançada entra na próxima vez que o documento for aberto.
 //
+// Relatório de provas = o mesmo resultado que o aluno vê ao terminar a prova
+// no livro (prova-report.js), em versão compacta para papel.
+// Comportamento desconta nota (Etapa 8B): leve 0,25 · médio 0,5 · grave 1,0 ·
+// muito grave 2,0, na nota do bimestre da disciplina, até 2,0 por bimestre.
+//
 // Depende de window.BoletimRegras (motor das notas).
 // ═══════════════════════════════════════════════════════════════════════════
 (function (root) {
-  var VERSAO = "2026-09-17b";
+  var VERSAO = "2026-09-17c";
+  var PONTOS_CONDUTA = { leve: 0.25, medio: 0.5, grave: 1, muito_grave: 2 };
   var BIMESTRES = ["1", "2", "3", "4"];
   var PROFESSOR = "Paulo Roberto Ramalho Magalhães";
 
@@ -64,6 +70,7 @@
       bimestresAutomaticos: regras.bimestresAutomaticos || [],
       recuperacaoSemestral: !!regras.recuperacaoSemestral,
       bonusPoder: !!regras.bonusPoder,
+      descontoConduta: !!regras.descontoConduta,
       pontosPoder: boletim.pontosPoder,
       bimestres: disciplina.bimestres,
       recuperacao: disciplina.recuperacao
@@ -84,16 +91,18 @@
     var linhas = BIMESTRES.map(function (b) {
       var r = calc.bimestres[b];
       var nota = r.notaFinal !== null ? numero(r.notaFinal) : (r.notaParcial !== null ? numero(r.notaParcial) + " (parcial)" : "—");
+      var desconto = r.descontoConduta ? "−" + numero(r.descontoConduta, 2) : "—";
       return "<tr><td><strong>" + b + "º Bimestre</strong></td><td>" + numero(r.prova) + "</td><td>" + numero(r.trabalho)
-        + "</td><td>" + nota + "</td></tr>";
+        + "</td><td>" + desconto + "</td><td>" + nota + "</td></tr>";
     }).join("");
     return '<table class="notas">'
-      + "<tr><th>Bimestre</th><th>Prova</th><th>Trabalhos</th><th>Nota do bimestre</th></tr>"
+      + "<tr><th>Bimestre</th><th>Prova</th><th>Trabalhos</th><th>Comportamento</th><th>Nota do bimestre</th></tr>"
       + linhas + "</table>";
   }
 
   function notaRodapeNotas(calc, disciplina) {
-    var partes = ["Nota do bimestre = média entre prova e trabalhos, ambas de 0 a 10."];
+    var partes = ["Nota do bimestre = média entre prova e trabalhos (0 a 10), menos o desconto por comportamento"
+      + " (leve 0,25 · médio 0,5 · grave 1,0 · muito grave 2,0, até 2,0 por bimestre)."];
     if (calc.mediaAnual !== null) {
       partes.push("Média dos bimestres lançados: " + numero(calc.mediaAnual) + ".");
     }
@@ -117,29 +126,55 @@
     return partes.join(" ");
   }
 
-  function tabelaProvas(disciplina, calc) {
-    var linhas = BIMESTRES.map(function (b) {
-      var bruto = (disciplina.bimestres || {})[b] || {};
-      var detalhe = bruto.provaDetalhe;
-      var r = calc.bimestres[b];
-      var texto;
-      if (r.prova === null) {
-        texto = "Prova ainda não registrada neste bimestre.";
-      } else if (r.origemProva === "automatico" && detalhe) {
-        texto = "Avaliação Bimestral feita no livro da Biblioteca Digital: <strong>" + numero(r.prova) + "/10</strong>"
-          + (detalhe.realizadaEm ? ", em " + dataBr(detalhe.realizadaEm) : "") + ".";
-        if (detalhe.recuperacao !== null && detalhe.recuperacao !== undefined && detalhe.primeira !== null && detalhe.primeira !== undefined) {
-          texto += " Primeira prova: " + numero(detalhe.primeira) + "; recuperação do livro: " + numero(detalhe.recuperacao)
-            + ". Vale a maior das duas.";
-        }
-      } else if (r.origemProva === "ajuste") {
-        texto = "Nota ajustada pelo professor: <strong>" + numero(r.prova) + "/10</strong>.";
-      } else {
-        texto = "Nota lançada pelo professor: <strong>" + numero(r.prova) + "/10</strong>.";
-      }
-      return "<tr><td>" + b + "º Bimestre</td><td>" + texto + "</td></tr>";
+  function minutos(segundos) {
+    var s = Number(segundos) || 0;
+    if (!s) return "";
+    var m = Math.round(s / 60);
+    return m < 1 ? "menos de 1 min" : m + " min";
+  }
+
+  // Mesmo conteúdo da tela "Resultado da Avaliação" do livro (prova-report.js):
+  // nota, aproveitamento, acertos, erros, não respondidas e desempenho por
+  // habilidade; aqui em tabela, para caber no papel.
+  function resultadoDaProva(p) {
+    var pct = p.total > 0 ? Math.round(100 * p.acertos / p.total) : 0;
+    var porQuestao = p.total > 0 ? 10 / p.total : 0;
+    var cabeca = "<strong>" + (p.recuperacao ? "Recuperação da Avaliação Bimestral" : "Avaliação Bimestral") + "</strong>"
+      + (p.data ? " · " + dataBr(p.data) : "") + (p.tempoSegundos ? " · tempo: " + minutos(p.tempoSegundos) : "");
+    var resumo = '<table class="prova-resumo"><tr><th>Nota</th><th>Aproveitamento</th><th>Acertos</th><th>Erros</th><th>Não respondidas</th></tr>'
+      + "<tr><td><strong>" + numero(p.nota) + "</strong> / 10,0</td><td>" + pct + "%</td>"
+      + "<td>" + p.acertos + " (" + numero(p.acertos * porQuestao) + " pts)</td>"
+      + "<td>" + (p.erros || 0) + "</td><td>" + (p.naoRespondidas || 0) + "</td></tr></table>";
+    var habilidades = (p.descritores || []).map(function (d) {
+      var dPct = d.total > 0 ? Math.round(100 * d.acertos / d.total) : 0;
+      return "<tr><td><strong>" + esc(d.codigo) + "</strong>" + (d.nome ? " — " + esc(d.nome) : "") + "</td>"
+        + "<td>" + d.acertos + "/" + d.total + " (" + dPct + "%)</td></tr>";
     }).join("");
-    return '<table class="provas">' + linhas + "</table>";
+    return '<div class="prova-bloco"><div class="prova-cabeca">' + cabeca + "</div>" + resumo
+      + (habilidades ? '<table class="habilidades"><tr><th>Desempenho por habilidade</th><th>Acertos</th></tr>' + habilidades + "</table>" : "")
+      + "</div>";
+  }
+
+  function tabelaProvas(dados, disciplina, calc) {
+    return BIMESTRES.map(function (b) {
+      var r = calc.bimestres[b];
+      var provas = (dados.provas || []).filter(function (p) {
+        return p.disciplina === disciplina.nome && String(p.bimestre) === b;
+      });
+      var corpo;
+      if (provas.length) {
+        corpo = provas.map(resultadoDaProva).join("");
+        if (provas.length > 1) corpo += '<div class="section-note">Vale a maior nota entre a prova e a recuperação do livro.</div>';
+        if (r.prova !== null && r.origemProva !== "automatico") {
+          corpo += '<div class="section-note">No boletim vale a nota lançada pelo professor: ' + numero(r.prova) + "/10.</div>";
+        }
+      } else if (r.prova !== null) {
+        corpo = '<div class="prova-bloco">Nota de prova lançada pelo professor: <strong>' + numero(r.prova) + "/10</strong>.</div>";
+      } else {
+        corpo = '<div class="prova-bloco">Prova ainda não registrada neste bimestre.</div>';
+      }
+      return '<div class="prova-bimestre"><div class="prova-titulo">' + b + "º Bimestre</div>" + corpo + "</div>";
+    }).join("");
   }
 
   function atividadesDaDisciplina(dados, disciplina, calc) {
@@ -196,7 +231,13 @@
       + numero(soma.fj, 0) + " falta(s) justificada(s).";
   }
 
-  function tabelaObservacoes(dados) {
+  function pontosPerdidos(o, regraLigada) {
+    if (!regraLigada || (o.papel && o.papel !== "autor") || o.positiva || o.semInfracao || !o.gravidade) return "0,00";
+    if (!o.disciplina) return "0,00 (sem disciplina)";
+    return "−" + numero(PONTOS_CONDUTA[o.gravidade] || 0, 2);
+  }
+
+  function tabelaObservacoes(dados, regraLigada) {
     var linhas = (dados.ocorrencias || []).map(function (o) {
       var gravidade = o.papel && o.papel !== "autor"
         ? (ROTULO_PAPEL[o.papel] || "Envolvido")
@@ -205,7 +246,7 @@
       var relato = esc(o.descricao || o.texto || "");
       if (o.disciplina) relato = "<em>" + esc(o.disciplina) + ":</em> " + relato;
       return "<tr><td>" + dataBr(o.data) + "</td><td>" + esc(o.horario || "—") + "</td><td>" + gravidade
-        + "</td><td>0,0</td><td>" + relato + "</td></tr>";
+        + "</td><td>" + pontosPerdidos(o, regraLigada) + "</td><td>" + relato + "</td></tr>";
     });
     var r = dados.resumoConduta || {};
     return {
@@ -238,7 +279,7 @@
     + "th{background:var(--azul-claro);text-align:center;font-weight:700}"
     + ".identificacao td{height:30px}"
     + ".label{width:20%;background:var(--cinza);font-weight:700}"
-    + ".notas th:nth-child(1){width:24%}.notas td{text-align:center;height:30px}"
+    + ".notas td{text-align:center;height:30px}"
     + ".provas td:first-child{width:22%;background:var(--cinza);font-weight:700;text-align:center}"
     + ".provas td:last-child{height:52px}"
     + ".resumo-atv td{text-align:center;height:32px}"
@@ -246,6 +287,13 @@
     + ".atividades td:nth-child(1),.atividades td:nth-child(2),.atividades td:nth-child(4){text-align:center}"
     + ".observacoes th:nth-child(1){width:12%}.observacoes th:nth-child(2){width:10%}.observacoes th:nth-child(3){width:18%}.observacoes th:nth-child(4){width:12%}"
     + ".observacoes td:nth-child(1),.observacoes td:nth-child(2),.observacoes td:nth-child(3),.observacoes td:nth-child(4){text-align:center}"
+    + ".notas th:nth-child(1){width:22%}"
+    + ".prova-bimestre{border:1px solid var(--borda);margin-bottom:10px;break-inside:avoid}"
+    + ".prova-titulo{background:var(--cinza);font-weight:700;padding:5px 8px;border-bottom:1px solid var(--borda)}"
+    + ".prova-bloco{padding:8px}.prova-bloco+.prova-bloco{border-top:1px dashed var(--borda)}"
+    + ".prova-cabeca{margin-bottom:6px}"
+    + ".prova-resumo td{text-align:center}.prova-bimestre table{margin-bottom:6px}"
+    + ".habilidades th:nth-child(2){width:22%}.habilidades td:nth-child(2){text-align:center}"
     + ".signature{margin-top:26px;text-align:center;break-inside:avoid}"
     + ".signature img{width:250px;max-width:72%;display:block;margin:0 auto -10px}"
     + ".signature-line{width:330px;max-width:80%;margin:0 auto 5px;border-top:1px solid #333}"
@@ -284,17 +332,22 @@
         + tabelaNotas(calc)
         + '<div class="section-note">' + esc(frequenciaDaDisciplina(dados, disciplina.nome)) + "</div>"
         + '<div class="section-title">2 - RELATÓRIO DE PROVAS</div>'
-        + '<div class="section-note">Desempenho na avaliação de cada bimestre.</div>'
-        + tabelaProvas(disciplina, calc)
+        + '<div class="section-note">Resultado de cada Avaliação Bimestral, como o aluno vê ao terminar a prova no livro.</div>'
+        + tabelaProvas(dados, disciplina, calc)
         + '<div class="section-title page-break">3 - ATIVIDADES FEITAS</div>'
         + '<div class="section-note">Cada atividade que vale ponto no bimestre divide os 10 pontos de trabalho. "Aguardando" fica fora do cálculo até ser corrigida.</div>'
         + atividades.html;
     });
 
-    var observacoes = tabelaObservacoes(dados);
+    var descontoLigado = !!(boletim.regras || {}).descontoConduta;
+    var observacoes = tabelaObservacoes(dados, descontoLigado);
     corpo += '<div class="section-title page-break">4 - OBSERVAÇÕES</div>'
       + '<div class="section-note">' + esc(observacoes.resumo)
-      + " Comportamento não desconta nota: o registro serve ao acompanhamento pedagógico, por isso a coluna de pontos perdidos fica em 0,0.</div>"
+      + (descontoLigado
+        ? " Cada ocorrência desconta na nota do bimestre da disciplina em que aconteceu: leve 0,25 · médio 0,5 · grave 1,0 · muito grave 2,0,"
+          + " até 2,0 pontos por bimestre em cada disciplina (o total aplicado aparece na tabela de notas)."
+        : " Nesta escola o comportamento fica registrado sem descontar nota.")
+      + "</div>"
       + observacoes.html;
 
     var identificacao = '<table class="identificacao">'
