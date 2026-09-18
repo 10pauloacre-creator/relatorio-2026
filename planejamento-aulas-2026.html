@@ -10,6 +10,8 @@
 <script defer src="assets/js/dark-mode-2026.js?v=20260917e"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260916a"></script>
+<script src="assets/js/herminio-ciclo.js?v=20260918a"></script>
+<script src="assets/js/projecao-ciclo.js?v=20260918a"></script>
 <style>
   :root{
     --bg:#eff3ea;
@@ -695,6 +697,17 @@
   .note-pill.recesso{background:var(--rec-bg);border-color:rgba(194,106,6,.14);color:var(--rec)}
   .note-pill.sabado{background:var(--sat);border-color:rgba(29,78,216,.14);color:var(--accent)}
   .note-pill.domingo{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:#fff}
+  /* Ciclo de estudos (rodízio da Hermínio): início e fim de turma e disciplina. */
+  .note-pill.ciclo-inicio{background:#dcfce7;border-color:#86efac;color:#166534;font-weight:700}
+  .note-pill.ciclo-fim{background:#fef3c7;border-color:#fcd34d;color:#92400e;font-weight:700}
+  .note-pill.ciclo-turma{border-width:2px}
+  .note-pill.ano-fim{background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:700}
+  .mile-tag.ciclo-inicio{background:#dcfce7;color:#166534}
+  .mile-tag.ciclo-fim{background:#fef3c7;color:#92400e}
+  .ciclo-aviso{color:var(--danger);font-weight:700}
+  html.dark-2026 body .note-pill.ciclo-inicio, html.dark-2026 body .mile-tag.ciclo-inicio{color:var(--dark-positive) !important;background:var(--dark-positive-soft) !important;border-color:#2e704e !important}
+  html.dark-2026 body .note-pill.ciclo-fim, html.dark-2026 body .mile-tag.ciclo-fim{color:var(--dark-accent) !important;background:var(--dark-accent-soft) !important;border-color:rgba(255,166,91,.4) !important}
+  html.dark-2026 body .note-pill.ano-fim{color:var(--dark-negative) !important;background:var(--dark-negative-soft) !important;border-color:#7a3530 !important}
   .turno{
     text-align:left;
   }
@@ -1138,6 +1151,7 @@ function herminioFallbackState(){
       disc('art','Arte','#c26a06',turmas3,{t89:10,t1:10,t23:10},{t89:40,t1:40,t23:40},{t89:38,t1:40,t23:0},{t89:{1:2,2:1,3:3,4:1,5:3}}),
       disc('red','Redação','#047857',['t1','t23'],{t1:10,t23:10},{t1:40,t23:40},{t1:36,t23:0})
     ],
+    ciclo:deepClone(window.HERMINIO_CICLO_ESTUDOS || null) || undefined,
     activeDisc:'lp',
     showOnlyActive:false
   };
@@ -1407,6 +1421,20 @@ function normalizeState(){
       });
     });
   });
+  // Rodízio (Hermínio): os dias de cada disciplina vêm do ciclo de estudos.
+  if(cicloAtivo()){
+    const gradeCiclo = {};
+    state.ciclo.etapas.forEach(etapa=>(etapa.trilhas || []).forEach(trilha=>(trilha.fila || []).forEach(discId=>{
+      gradeCiclo[discId + '|' + etapa.turma] = trilha.dias || {};
+    })));
+    state.disciplinas.forEach(disc=>{
+      state.turmas.forEach(t=>{
+        const dias = gradeCiclo[disc.id + '|' + t.id] || {};
+        disc.grade[t.id] = {};
+        WEEK.forEach(day=>{ disc.grade[t.id][day.k] = Math.max(0, numberValue(dias[day.k], 0)); });
+      });
+    });
+  }
   if(!state.disciplinas.find(d=>d.id === state.activeDisc)){
     state.activeDisc = state.disciplinas[0] ? state.disciplinas[0].id : null;
   }
@@ -1672,7 +1700,39 @@ function fullProjectionForDiscipline(disc, days){
   return {proj, resumo};
 }
 
+function cicloAtivo(){
+  return !!(state && state.ciclo && Array.isArray(state.ciclo.etapas) && state.ciclo.etapas.length && window.ProjecaoCiclo);
+}
+
+// A simulação do rodízio cobre todas as turmas e disciplinas de uma vez;
+// guardada até mudar algo que interfira nas datas.
+let cicloCache = {assinatura:'', sim:null};
+function cicloSimulacao(){
+  if(!cicloAtivo()) return null;
+  const assinatura = JSON.stringify([state.anchorDate, state.feriados, state.recesso, state.facultativoLetivo, state.ciclo, state.turmas,
+    state.disciplinas.map(d=>[d.id, d.nome, d.nBimestres, d.turmasAtivas, d.metas, d.lancadas, d.totais])]);
+  if(assinatura !== cicloCache.assinatura) cicloCache = {assinatura, sim:window.ProjecaoCiclo.simular(state)};
+  return cicloCache.sim;
+}
+
 function futureProjectionForDiscipline(disc, days){
+  const sim = cicloSimulacao();
+  if(sim){
+    const proj = {};
+    const resumo = {};
+    turmasForDisc(disc).forEach(turma=>{
+      const st = sim.porDisc[disc.id + '|' + turma.id];
+      if(!st) return;
+      proj[turma.id] = st.cells;
+      resumo[turma.id] = {
+        closes:st.closes, launched:st.launched, meta:st.meta, total:st.total, yearEnd:st.yearEnd,
+        currentBim:Math.min(disc.nBimestres || 4, Math.floor(st.launched / st.meta) + 1),
+        completedBims:Math.min(disc.nBimestres || 4, Math.floor(st.launched / st.meta)),
+        emCiclo:st.emCiclo, inicio:st.inicio, semanal:st.semanal
+      };
+    });
+    return {proj, resumo};
+  }
   const anchor = state.anchorDate;
   const proj = {};
   const resumo = {};
@@ -1818,9 +1878,19 @@ function buildTurmaCard(turma, disc, fullInfo, futureInfo){
   const realCloses = realClosesForTurma(disc, turma.id);
   const currentBim = Math.min(disc.nBimestres || 4, Math.floor(launched / meta) + 1);
   const currentProgress = launched - (Math.floor(launched / meta) * meta);
+  const sim = cicloSimulacao();
+  const foraDoCiclo = !!sim && !futureInfo.emCiclo;
+  const semData = foraDoCiclo ? 'fora do rodízio' : 'não fecha até 2027';
   const annualEnd = launched >= total
     ? 'concluído'
-    : (futureInfo.yearEnd ? brDateShort(futureInfo.yearEnd) : 'não fecha até 2027');
+    : (futureInfo.yearEnd ? brDateShort(futureInfo.yearEnd) : semData);
+  let lead = `${esc(disc.nome)} · ${weeklyForTurma(disc, turma.id)} h/aula por semana`;
+  if(sim){
+    lead = futureInfo.emCiclo
+      ? `${esc(disc.nome)} · ${futureInfo.semanal} h/aula por semana no rodízio${futureInfo.inicio && launched === 0 ? ` · começa ${esc(brDateShort(futureInfo.inicio))}` : ''}`
+      : `${esc(disc.nome)} · ${launched >= total ? 'carga anual cumprida' : 'fora do rodízio'}`;
+  }
+  const passaDoAno = sim && sim.fimAnoLetivo && futureInfo.yearEnd && futureInfo.yearEnd > sim.fimAnoLetivo && launched < total;
   let lines = '';
   for(let bim = 1; bim <= (disc.nBimestres || 4); bim += 1){
     let value = '';
@@ -1830,18 +1900,18 @@ function buildTurmaCard(turma, disc, fullInfo, futureInfo){
       const closedAt = realCloses[bim] || (ESCOLA.exigeGradeSemanal ? fullInfo.closes[bim] : '');
       value = closedAt ? brDateShort(closedAt) : 'concluído';
     }else{
-      value = futureInfo.closes[bim] ? brDateShort(futureInfo.closes[bim]) : 'não fecha até 2027';
+      value = futureInfo.closes[bim] ? brDateShort(futureInfo.closes[bim]) : semData;
     }
-    lines += `<div class="statline"><span>${bim}º bimestre</span><span class="value ${value === 'não fecha até 2027' ? 'miss' : ''}">${esc(value)}</span></div>`;
+    lines += `<div class="statline"><span>${bim}º bimestre</span><span class="value ${value === semData ? 'miss' : ''}">${esc(value)}</span></div>`;
   }
   return `<article class="card">
     <h3>${esc(turma.nome)}</h3>
-    <div class="lead">${esc(disc.nome)} · ${weeklyForTurma(disc, turma.id)} h/aula por semana</div>
+    <div class="lead">${lead}</div>
     <div class="statline"><span>Já lançadas</span><span class="value">${launched}</span></div>
     <div class="statline"><span>Bimestre atual</span><span class="value">${currentBim}º · ${currentProgress}/${meta}</span></div>
     <div class="statline"><span>Total anual</span><span class="value">${launched}/${total}</span></div>
     ${lines}
-    <div class="summary-total"><strong>Encerramento anual previsto:</strong> ${esc(annualEnd)}.</div>
+    <div class="summary-total"><strong>Encerramento anual previsto:</strong> ${esc(annualEnd)}.${passaDoAno ? ` <span class="ciclo-aviso">Passa do término do ano letivo (${esc(brDateShort(sim.fimAnoLetivo))}).</span>` : ''}</div>
     <div class="summary-total"><strong>Próxima projeção útil:</strong> ${futureInfo.closes[currentBim] ? esc(brDate(futureInfo.closes[currentBim])) : 'sem fechamento restante até 2027'}.</div>
   </article>`;
 }
@@ -1861,7 +1931,7 @@ function renderGrid(disc){
     html += `<tr><td class="turma-cell">${esc(turma.nome)}</td>`;
     WEEK.forEach(day=>{
       const value = numberValue(grade[day.k], 0);
-      html += `<td><input class="grade-in ${value === 0 ? 'zero' : ''}" type="number" min="0" step="1" value="${value}" oninput="onGrade('${disc.id}','${turma.id}',${day.k},this.value)"></td>`;
+      html += `<td><input class="grade-in ${value === 0 ? 'zero' : ''}" type="number" min="0" step="1" value="${value}"${cicloAtivo() ? ' disabled title="Definido pelo ciclo de estudos"' : ''} oninput="onGrade('${disc.id}','${turma.id}',${day.k},this.value)"></td>`;
     });
     html += `<td class="week-sum">${weeklyForTurma(disc, turma.id)}</td>`;
     html += `<td><input class="meta-in" type="number" min="1" step="1" value="${metaForTurma(disc, turma.id)}" oninput="onMeta('${disc.id}','${turma.id}',this.value)"></td>`;
@@ -1873,6 +1943,18 @@ function renderGrid(disc){
   return html;
 }
 
+const CICLO_EVENTO_VISUAL = {
+  'turma-fim':{classe:'ciclo-fim ciclo-turma', icone:'■'},
+  'disc-fim':{classe:'ciclo-fim', icone:'■'},
+  'turma-inicio':{classe:'ciclo-inicio ciclo-turma', icone:'▶'},
+  'disc-inicio':{classe:'ciclo-inicio', icone:'▶'},
+  'ano-fim':{classe:'ano-fim', icone:'⚑'}
+};
+function cicloEventos(day){
+  const sim = cicloSimulacao();
+  return (sim && sim.eventos[day.k]) || [];
+}
+
 function dayNotePills(day){
   const pills = [];
   if(day.k === state.anchorDate) pills.push(`<span class="note-pill sync">Saldo lançado até ${esc(brDateShort(day.k))}</span>`);
@@ -1882,6 +1964,10 @@ function dayNotePills(day){
   if(day.status === 'sabado' && !day.holidays.length) pills.push(`<span class="note-pill sabado">Sábado visível na linha do tempo</span>`);
   if(day.status === 'domingo') pills.push(`<span class="note-pill domingo">Domingo · limitador da semana</span>`);
   if(day.status === 'recesso') pills.push(`<span class="note-pill recesso">Recesso escolar</span>`);
+  cicloEventos(day).forEach(ev=>{
+    const visual = CICLO_EVENTO_VISUAL[ev.tipo] || CICLO_EVENTO_VISUAL['ano-fim'];
+    pills.push(`<span class="note-pill ${visual.classe}">${visual.icone} ${esc(ev.texto)}</span>`);
+  });
   return pills.length ? pills.join('') : `<span class="note-pill">Projeção regular</span>`;
 }
 
@@ -1898,6 +1984,7 @@ function shouldKeepRow(day, futureProj, lastDate){
   if(!state.showOnlyActive) return day.k >= state.anchorDate && day.k <= lastDate;
   if(day.k < state.anchorDate && day.k !== state.anchorDate) return false;
   if(day.status === 'domingo' || day.status === 'sabado' || day.status === 'feriado' || day.status === 'recesso') return true;
+  if(cicloEventos(day).length) return true;
   return Object.keys(futureProj.proj || {}).some(turmaId=>!!(futureProj.proj[turmaId] || {})[day.k]);
 }
 
@@ -1916,7 +2003,9 @@ function renderProjectionTable(disc, days, futureProj, lastDate){
     activeTurmas.forEach(turma=>{
       const cell = ((futureProj.proj[turma.id] || {})[day.k]) || null;
       if(cell){
-        const tags = cell.closes.map(bim=>`<span class="mile-tag">fecha ${bim}º</span>`).join('');
+        const tags = (cell.inicio ? `<span class="mile-tag ciclo-inicio">começa</span>` : '')
+          + cell.closes.map(bim=>`<span class="mile-tag">fecha ${bim}º</span>`).join('')
+          + (cell.fim ? `<span class="mile-tag ciclo-fim">encerra</span>` : '');
         const body = cell.sync
           ? `<div class="turno-inner"><span class="cum">${cell.cum}</span><span class="delta">aulas já lançadas até esta data</span></div>`
           : `<div class="turno-inner"><span class="cum">${cell.cum}</span><span class="delta">+${cell.add} aula(s) projetadas</span>${tags}</div>`;
@@ -1937,6 +2026,34 @@ function renderProjectionTable(disc, days, futureProj, lastDate){
     <button class="${state.showOnlyActive ? 'on' : ''}" type="button" onclick="setShowOnlyActive(true)">Só datas com movimento</button>
   </div>
   <div class="proj-wrap"><table class="proj"><thead>${head}</thead><tbody>${rows}</tbody></table></div>`;
+}
+
+// Quadro do rodízio: ordem das turmas, dias de cada trilha e datas de cada disciplina.
+function renderCicloResumo(sim){
+  const diasTxt = dias => WEEK.filter(day=>numberValue((dias || {})[day.k], 0) > 0)
+    .map(day=>`${day.ab} ${numberValue(dias[day.k], 0)}h`).join(' · ') || 'sem dias';
+  const periodoDisc = item => {
+    if(item.concluida) return 'concluída';
+    const fim = item.fim ? brDateShort(item.fim) : 'não fecha até 2027';
+    if(item.launched > 0) return `em curso → ${fim}`;
+    return item.inicio ? `${brDateShort(item.inicio)} → ${fim}` : 'aguardando';
+  };
+  return `<div class="cards">${sim.etapas.map((etapa, index)=>{
+    const periodo = etapa.inicio
+      ? `${etapa.emAndamento ? 'em andamento' : brDateShort(etapa.inicio)} → ${etapa.fim ? brDateShort(etapa.fim) : 'não fecha até 2027'}`
+      : 'sem aulas pendentes';
+    const passa = sim.fimAnoLetivo && etapa.inicio && (!etapa.fim || etapa.fim > sim.fimAnoLetivo);
+    const trilhas = etapa.trilhas.map(trilha=>`
+      <div class="statline"><span><strong>${esc(trilha.nome)}</strong></span><span class="value">${esc(diasTxt(trilha.dias))}</span></div>
+      ${trilha.disciplinas.map(item=>`<div class="statline"><span>${esc(item.nome)}</span><span class="value">${esc(periodoDisc(item))}</span></div>`).join('')}`).join('');
+    return `<article class="card">
+      <h3>${index + 1}º · ${esc(etapa.turmaNome)}</h3>
+      <div class="lead">${esc(periodo)}</div>
+      ${trilhas}
+      ${passa ? `<div class="summary-total"><span class="ciclo-aviso">Passa do término do ano letivo (${esc(brDateShort(sim.fimAnoLetivo))}).</span></div>` : ''}
+    </article>`;
+  }).join('')}</div>
+  <div class="hint">A turma seguinte começa no dia letivo após a anterior encerrar todas as disciplinas. Em cada trilha, a próxima disciplina assume os dias quando a anterior completa os 4 bimestres.</div>`;
 }
 
 function renderPanel(){
@@ -1973,11 +2090,14 @@ function renderPanel(){
       </div>
     </div>
 
+    ${cicloAtivo() ? `<div class="section-title">Ciclo de estudos · rodízio das turmas</div>${renderCicloResumo(cicloSimulacao())}` : ''}
+
     <div class="section-title">Fechamento dos bimestres por turma</div>
     <div class="cards">${activeTurmas.map(turma=>buildTurmaCard(turma, disc, full.resumo[turma.id], future.resumo[turma.id])).join('')}</div>
 
     <div class="section-title">Grade semanal, metas e aulas já lançadas</div>
     ${renderGrid(disc)}
+    ${cicloAtivo() ? '<div class="hint">No rodízio, os dias de aula vêm do ciclo de estudos e não são editados aqui. Metas, lançadas e total do ano continuam editáveis.</div>' : ''}
     <div class="cfg-row">
       <div class="field">
         <label>Data-base das aulas lançadas</label>
