@@ -100,6 +100,10 @@ window.RelatorioOcorrencias = (function () {
   }
 
   function iniciar(opcoes) {
+    // Página de arquivo de um ano encerrado: só leitura.
+    if (document.documentElement.hasAttribute("data-arquivo-ate")) {
+      return { agendar: function () {}, atualizar: function () { return Promise.resolve(); }, decorar: function () {} };
+    }
     var escolaSlug = opcoes.escolaSlug;
     // infoRelato(pane) → {turma, relato, data (AAAA-MM-DD), disciplina}
     var infoRelato = typeof opcoes.infoRelato === "function" ? opcoes.infoRelato : null;

@@ -459,6 +459,30 @@ Toda página que carrega `supabase-report-sync.js` exige conta. O tipo de acesso
 
 **Segurança corrigida junto (o cadastro já estava aberto):** gatilho `profiles_trava_role` impede que uma conta se promova a `role='admin'` (o `private.is_admin()` confia nessa coluna); `alunos` só é lida pelo professor (`bdm_e_professor()`). SQL em `supabase/2026-09-19-etapa9-contas-de-professores.sql`.
 
-**Páginas públicas (19/09/2026):** `privacidade.html` (Política de Privacidade, LGPD) e `termos.html` (Termos de Serviço) NÃO carregam `supabase-report-sync.js`, então abrem sem conta. Links discretos "Privacidade · Termos" no rodapé do `index.html` (`.legal`) e na tela de login (`.rel-auth-legal`, em todas as páginas trancadas). Estão em `scripts/build-web-release.js`, que o GitHub Pages usa: página nova só é publicada se entrar nessa lista. Ao ligar um serviço novo (IA, hospedagem, analytics), atualize a seção 6 da política.
+**Páginas públicas (19/09/2026):** `privacidade.html` (Política de Privacidade, LGPD) e `termos.html` (Termos de Serviço) NÃO carregam `supabase-report-sync.js`, então abrem sem conta. Links discretos "Privacidade · Termos" no rodapé do `index.html` (`.legal`) e na tela de login (`.rel-auth-legal`, em todas as páginas trancadas). Estão em `scripts/build-web-release.js`, que o GitHub Pages usa: página nova só é publicada se entrar nessa lista. Ao ligar um serviço novo (IA, hospedagem, analytics), atualize a seção 6 da política. A seção 9 (prazo de guarda) promete guarda por tempo indeterminado, por ano letivo (seção 18 abaixo).
 
 **Pendências do professor (painel do Supabase):** ligar o Google (Authentication → Providers, com Client ID/Secret do Google Cloud) e incluir `https://relatorio.skin/**` e `https://10pauloacre-creator.github.io/relatorio-2026/**` em Authentication → URL Configuration → Redirect URLs (a URL da Biblioteca que já está lá fica). No Google Cloud, a origem autorizada é `https://relatorio.skin`. O repositório é **público**: os relatos escritos no HTML (com nomes de alunos) continuam legíveis no código-fonte, mesmo com a página trancada.
+
+---
+
+## 18. ANO LETIVO E DADOS PERMANENTES (Etapa 10, 19/09/2026)
+
+**Decisão do professor:** todos os dados ficam guardados para sempre e podem ser recuperados e consultados a qualquer momento, por ano letivo. SQL em `supabase/2026-09-19-etapa10-ano-letivo-permanente.sql`.
+
+**Botão "📅 Ano letivo AAAA ▾"** no cabeçalho (`header.cab .cab-t`) da Casavequia e da Hermínio (`assets/js/ano-letivo.js`, com `data-runtime-ui`). Lista os anos com registros (`relatorio_anos_letivos`) com aulas, dias, h/aula, turmas, alunos, ocorrências e versões guardadas. "Abrir AAAA" leva à página de arquivo do ano (`arquivo/anos-letivos.json`); "⬇️ Baixar todos os dados" gera o JSON completo do ano (`relatorio_exportar_ano`: aulas, lançamentos, ocorrências, observações, chamada, metas, estado das páginas e lixeira).
+
+**A página diz a escola e o ano:** `<html data-escola-slug="…" data-ano-letivo="2026">`. `RelatorioLancamentos.dataIsoDoCodigo` usa esse ano (os códigos dos relatos só têm dia e mês), e o retrato publicado leva `ano`.
+
+**O que garante a permanência (banco):**
+- **Lixeira permanente** (`relatorio_lixeira`): toda linha apagada de aulas, lançamentos, ocorrências, observações, chamada, alunos adicionados, metas e `report_sync_state` é copiada antes. A lixeira não aceita UPDATE nem DELETE.
+- **Histórico diário** do estado das páginas (`relatorio_estado_historico`, gatilho em `report_sync_state`): a última versão de cada dia. Só a versão do dia muda; as anteriores são imutáveis. Consultar: `relatorio_versoes_estado(scope)`. Restaurar: `relatorio_restaurar_estado(scope, dia)` (a versão atual vai para a lixeira antes).
+- **Contas dos professores:** `professor_dados_historico` (mesma regra, o dono lê o próprio histórico; sai junto se a conta for apagada, direito do titular).
+- **Chamada por ano** (`relatorio_chamada_historico`, `na_lista` = ainda na lista da página).
+- **Virada do ano sem colisão:** `relatorio_id_aula(slug, código, data)`: 2026 mantém `escola:código`; de 2027 em diante, `escola:AAAA:código`. A publicação só compara (trava dos 80%) e marca como removidas as aulas/ocorrências dos anos presentes no retrato.
+
+**Virada do ano (fazer nesta ordem):**
+1. Com a página ainda com os relatos do ano que termina: `node scripts/arquivar-ano-letivo.js 2026` (opcional `--ate AAAA-MM-DD`; padrão = hoje). Cria `arquivo/2026/casavequia.html` e `herminio.html` e registra em `arquivo/anos-letivos.json`. Commit e push.
+2. Só depois, trocar os relatos da página pelos do ano novo, atualizar `ALUNOS` etc., e mudar `data-ano-letivo` nas duas páginas e `anoAtual` no `anos-letivos.json` para o ano novo. Nunca mude o `data-ano-letivo` com relatos do ano anterior na página: a publicação dataria essas aulas no ano novo.
+3. As chaves de escopo `*:shared-v1` continuam as mesmas: o arquivo do ano lê o estado como estava na data do arquivamento, no histórico.
+
+**Página de arquivo** (`data-arquivo-ate`): `supabase-report-sync.js` lê cada escopo por `relatorio_estado_ate` e nunca grava nem escuta o tempo real; a publicação dos lançamentos e a IA das observações ficam desligadas; `<base href="../../">`; o `localStorage` fica isolado em memória (só as chaves `sb-*` da sessão passam). Limitações conhecidas: o iframe de projeções e o Firebase do plano anual continuam lendo os dados atuais; os scripts em `assets/` são os atuais do site.

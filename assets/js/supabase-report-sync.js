@@ -540,7 +540,10 @@ window.RelatorioSupabaseSync = (function () {
     var scope = options.scope || "";
     var channelTopic = options.channelTopic || ("report-sync:" + scope + ":" + (++syncInstanceCounter));
     var debounceMs = typeof options.debounceMs === "number" ? options.debounceMs : 300;
-    var readOnly = !!options.readOnly;
+    // Página de arquivo de um ano encerrado (<html data-arquivo-ate="AAAA-MM-DD">):
+    // lê o estado como estava naquela data, no histórico permanente, e nunca grava.
+    var arquivoAte = perUser ? "" : (document.documentElement.getAttribute("data-arquivo-ate") || "");
+    var readOnly = !!options.readOnly || !!arquivoAte;
     var getLocalPayload = typeof options.getLocalPayload === "function"
       ? options.getLocalPayload
       : function () { return null; };
@@ -593,11 +596,19 @@ window.RelatorioSupabaseSync = (function () {
       if (!client || !scope) return null;
       await whenAuthorized();
 
-      var response = await client
-        .from(table)
-        .select("scope_key,payload,updated_at")
-        .eq("scope_key", scope)
-        .maybeSingle();
+      var response;
+      if (arquivoAte) {
+        response = await client.rpc("relatorio_estado_ate", { p_scope_key: scope, p_ate: arquivoAte });
+        if (!response.error && response.data) {
+          response = { data: { payload: response.data.payload, updated_at: response.data.updated_at } };
+        }
+      } else {
+        response = await client
+          .from(table)
+          .select("scope_key,payload,updated_at")
+          .eq("scope_key", scope)
+          .maybeSingle();
+      }
 
       if (response.error) {
         if (isAuthError(response.error)) {
@@ -686,7 +697,7 @@ window.RelatorioSupabaseSync = (function () {
     }
 
     function subscribe() {
-      if (!client || !scope || channel) return;
+      if (!client || !scope || channel || arquivoAte) return;
 
       channel = client
         .channel(channelTopic)
