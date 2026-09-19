@@ -960,7 +960,7 @@ tbody tr:hover td{
 
 <script src="assets/js/relatorio-alunos-adicionados.js?v=20260917a"></script>
 <script src="assets/js/boletim-regras.js?v=20260917d"></script>
-<script src="assets/js/herminio-regras-extras.js?v=20260918a"></script>
+<script src="assets/js/herminio-regras-extras.js?v=20260919a"></script>
 <script>
 const STORAGE_KEY = "rh_alunos_8e9ano_2026_v1";
 const SCHOOL_NAME = "E.E. Raimundo Hermínio de Melo";
@@ -1062,8 +1062,26 @@ function autofillMissingGrades(currentState) {
 // Etapa 8E (decisão de 18/09/2026): desconto por comportamento na nota do
 // bimestre e bônus do Ranking de Poder na média final, com os dados do banco.
 const regrasExtras = window.HerminioRegrasExtras
-  ? window.HerminioRegrasExtras.criar({ scopeKey: "herminio:panel:" + STORAGE_KEY, aoAtualizar: function () { renderAll(); } })
+  ? window.HerminioRegrasExtras.criar({ scopeKey: "herminio:panel:" + STORAGE_KEY, aoAtualizar: function () { aplicarProvasBiblioteca(); renderAll(); } })
   : null;
+
+// Etapa 9C (decisão de 19/09/2026): prova feita na Biblioteca vira a nota de
+// prova do bimestre, mesmo com nota já lançada; sem prova feita, fica a manual.
+function aplicarProvasBiblioteca() {
+  if (!regrasExtras) return;
+  try {
+    const mudou = regrasExtras.aplicarProvas(state.alunos, DISCIPLINES.map(function (d) { return d.name; }), getDisciplineBimState);
+    if (mudou) saveState(mudou + " nota(s) de prova atualizada(s) com a prova da Biblioteca.");
+  } catch (erro) {
+    console.warn("[Provas Biblioteca] não foi possível aplicar.", erro);
+  }
+}
+
+function rotuloProva(student, bim, disciplina) {
+  return regrasExtras && regrasExtras.provaBiblioteca(student, disciplina, bim) !== null
+    ? "Nota de prova · prova da Biblioteca"
+    : "Nota de prova";
+}
 
 function aplicarDescontoConduta(total, student, disciplineName, bim) {
   const desconto = regrasExtras && total !== null ? regrasExtras.desconto(student, disciplineName, bim) : 0;
@@ -2019,7 +2037,7 @@ function renderBimCard(student, bim, disciplineName) {
     + '<div class="field-stack">'
       + renderRegrasExtrasBimestre(student, disciplineName, bim)
       + '<div><label>Nota de trabalhos</label>' + renderStepper(student.id, bim, "trabalhos", manualWork, disciplineName) + '</div>'
-      + '<div><label>Nota de prova</label>' + renderStepper(student.id, bim, "prova", dados.prova, disciplineName) + '</div>'
+      + '<div><label>' + rotuloProva(student, bim, disciplineName) + '</label>' + renderStepper(student.id, bim, "prova", dados.prova, disciplineName) + '</div>'
       + (disciplineName === MAIN_DISCIPLINE
         ? '<div class="auto-work-note' + (isManual ? ' manual-work-note' : '') + '">'
           + (isManual
@@ -2416,9 +2434,11 @@ function sanitizeFieldValue(field, rawValue) {
   }
 
   const max = getFieldMax(field);
-  const rounded = field === "trabalhosRealizados" ? Math.round(number) : Math.round(number * 10) / 10;
+  // Prova com duas casas: a da Biblioteca (0 a 10) cai em 0–5 como 3,25 etc.
+  const rounded = field === "trabalhosRealizados" ? Math.round(number)
+    : (field === "prova" ? Math.round(number * 100) / 100 : Math.round(number * 10) / 10);
   const clamped = Math.max(0, Math.min(max, rounded));
-  return field === "trabalhosRealizados" ? clamped : Number(clamped.toFixed(1));
+  return field === "trabalhosRealizados" ? clamped : Number(clamped.toFixed(field === "prova" ? 2 : 1));
 }
 
 function toNumber(value) {
