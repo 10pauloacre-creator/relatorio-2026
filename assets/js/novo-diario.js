@@ -1122,7 +1122,31 @@
       return true;
     },
     diarios: function () { return estado.diarios.filter(function (d) { return !d.excluido; }); },
-    renderizar: function () { if (A) renderTodos(); }
+    renderizar: function () { if (A) renderTodos(); },
+    // Grava um diário pronto (assistente de IA do Meu Diário). Com "id" de um
+    // diário existente, atualiza; sem ele, cria. Devolve o id ou "".
+    salvar: function (dados) {
+      if (!A || !dados || turmasDe().indexOf(dados.turma) < 0 || !dados.dateKey || !dados.discNome) return "";
+      var existente = dados.id ? estado.diarios.filter(function (x) { return x.id === dados.id && !x.excluido; })[0] : null;
+      var id = existente ? existente.id : A.novoId(dados.turma, dados.dateKey, dados.discNome, "");
+      if (!id) return "";
+      var base = relVazio(), rel = Object.assign(base, (existente && existente.rel) || {}, dados.rel || {});
+      rel.atividade = Object.assign(relVazio().atividade, rel.atividade || {});
+      if (!rel.atividade.houve) { rel.atividade.fez = []; rel.atividade.naoFez = []; }
+      var t = agora();
+      var d = Object.assign({}, existente || {}, {
+        id: id, turma: dados.turma, dateKey: dados.dateKey, disc: A.codigoDisc(dados.discNome, dados.turma), discNome: dados.discNome,
+        assunto: dados.assunto || "", ini: dados.ini || "", fim: dados.fim || "", horas: dados.horas || 1, minutos: dados.minutos || 0,
+        rel: rel, rascunho: dados.rascunho || (existente && existente.rascunho) || "",
+        criadoEm: (existente && existente.criadoEm) || t, atualizadoEm: t
+      });
+      estado.removidos = estado.removidos.filter(function (r) { return r.id !== id; });
+      estado.diarios = estado.diarios.filter(function (x) { return x.id !== id; });
+      estado.diarios.push(d);
+      tentar(function () { A.limparCliques(id); });
+      persistir();
+      return id;
+    }
   };
 
   function iniciar() {
