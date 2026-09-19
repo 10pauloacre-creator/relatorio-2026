@@ -143,6 +143,9 @@ function _editorCapturarBaselineProtegido(root) {
   _editorProtectedBaseline = {};
   if (!scope) return;
   scope.querySelectorAll('[data-ed-protected="1"]').forEach(function(el) {
+    // Conteúdo gerado em tempo de execução (ex.: diários do "+ Novo Diário") nunca
+    // entra no layout salvo, então também não pode entrar na linha de base.
+    if (el.closest('[data-runtime-ui]')) return;
     var key = el.getAttribute('data-ed-node');
     if (key) _editorProtectedBaseline[key] = el.outerHTML;
   });

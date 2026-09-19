@@ -1,0 +1,274 @@
+/* Painéis de alunos (Casavequia e Hermínio): selos de conduta e modo escuro. */
+/* ── Conduta (selos) e desconto: classes usadas no tema claro ─────────── */
+.cond-resumo{margin-bottom:10px}
+.cond-chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.74rem;font-weight:600;margin:0 4px 4px 0;border:1px solid transparent}
+.cond-chip--leve{background:#e3f3ea;color:#1f5f3c}
+.cond-chip--medio{background:#fdf1d8;color:#7a5305}
+.cond-chip--grave{background:#fde4d8;color:#8c3514}
+.cond-chip--muito-grave{background:#f9d4d4;color:#7d1414}
+.cond-chip--neutro{background:#eef1f5;color:#3f4a5a}
+.cond-chip--destaque{background:#fff5d6;color:#6b5205}
+.cond-detalhe{font-size:.8rem;color:var(--muted);margin-top:4px}
+.conduta-desconto{color:#8c3514}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MODO ESCURO DO PAINEL DE ALUNOS (18/09/2026)
+   O tema escuro global (dark-mode-2026.css) escurece fundos, mas troca
+   --vd (verde usado aqui para títulos, nomes e notas) por quase preto e não
+   cobre os fundos creme fixos deste painel: títulos sumiam e cartões claros
+   ficavam com texto claro. Aqui o painel ganha uma paleta própria:
+   superfícies grafite, texto claro com contraste AA ou melhor e cor só para
+   status (verde = ok, vermelho = abaixo/recuperação, âmbar = parcial,
+   azul = automático). Sem sombras; bordas finas separam as camadas.
+   A classe painel-alunos está no html dos painéis casavequia-alunos-*.html
+   e herminio-alunos-*.html (este arquivo é compartilhado).
+   ═══════════════════════════════════════════════════════════════════════ */
+html.dark-2026.painel-alunos{
+  --pa-bg:#111315;
+  --pa-surface:#191c1f;
+  --pa-raised:#202327;
+  --pa-raised-2:#272b30;
+  --pa-line:#353a40;
+  --pa-line-soft:#2a2e33;
+  --pa-text:#f4f5f6;
+  --pa-text-2:#d8dce0;
+  --pa-muted:#b3b9c1;
+  --pa-faint:#8d959e;
+  --pa-ok:#86e3ae;
+  --pa-ok-bg:#15291d;
+  --pa-ok-line:#2c5e41;
+  --pa-bad:#ff9a8b;
+  --pa-bad-bg:#331c1a;
+  --pa-bad-line:#6b3530;
+  --pa-warn:#f3d07f;
+  --pa-warn-bg:#2f2817;
+  --pa-warn-line:#6a5830;
+  --pa-info:#9cc7ff;
+  --pa-info-bg:#18222f;
+  --pa-info-line:#314a6b;
+}
+html.dark-2026.painel-alunos body{
+  background:var(--pa-bg) !important;
+  color:var(--pa-text) !important;
+}
+
+/* Superfícies */
+html.dark-2026.painel-alunos :is(.panel,.summary-card,.table-card,.modal-card,.panel-side,.discipline-menu){
+  background:var(--pa-surface) !important;
+  background-image:none !important;
+  border:1px solid var(--pa-line) !important;
+  box-shadow:none !important;
+  color:var(--pa-text) !important;
+}
+html.dark-2026.painel-alunos :is(.table-head,.report-tools){
+  background:transparent !important;
+  border-color:var(--pa-line) !important;
+}
+/* Cabeçalho do perfil é fixo: precisa de fundo sólido para o conteúdo não passar por baixo. */
+html.dark-2026.painel-alunos .modal-header{
+  background:var(--pa-surface) !important;
+  border-color:var(--pa-line) !important;
+}
+html.dark-2026.painel-alunos .modal{background:rgba(0,0,0,.72) !important}
+html.dark-2026.painel-alunos :is(.section-block,.report-section){
+  background:transparent !important;
+  box-shadow:none !important;
+  border-top-color:var(--pa-line) !important;
+}
+html.dark-2026.painel-alunos :is(.profile-card,.bim-card,.observation-item,.report-box,.report-preview,.guide-list li,.recovery-card){
+  background:var(--pa-raised) !important;
+  background-image:none !important;
+  border:1px solid var(--pa-line) !important;
+  box-shadow:none !important;
+  color:var(--pa-text-2) !important;
+}
+html.dark-2026.painel-alunos .bim-card.automatic{border-color:var(--pa-info-line) !important}
+html.dark-2026.painel-alunos .auto-grade-row{
+  background:var(--pa-surface) !important;
+  border:1px solid var(--pa-line) !important;
+}
+
+/* Texto: títulos, principal e secundário */
+html.dark-2026.painel-alunos :is(.panel-title,.table-head h2,.modal-title,.section-block h3,.report-section h3,
+  .bim-card-title,.student-name-btn,.summary-value,.recovery-status,.observation-item strong,.guide-list li strong,
+  .auto-grade-row strong,.bim-card-total){
+  color:var(--pa-text) !important;
+}
+html.dark-2026.painel-alunos :is(.panel-main p,.table-head p,.section-note,.modal-subtitle,.summary-label,.summary-foot,
+  .field-stack label,.text-stack label,.observation-date,.auto-grade-row span,.table-empty,.nota-parcial,
+  .recovery-card .bim-card-title small,.cond-detalhe){
+  color:var(--pa-muted) !important;
+  background:transparent !important;
+  border-color:var(--pa-line) !important;
+}
+html.dark-2026.painel-alunos .empty-state{
+  color:var(--pa-muted) !important;
+  background:var(--pa-raised) !important;
+  border:1px dashed var(--pa-line) !important;
+  box-shadow:none !important;
+}
+
+/* Status do painel */
+html.dark-2026.painel-alunos .status-box{
+  background:var(--pa-ok-bg) !important;
+  border:1px solid var(--pa-ok-line) !important;
+  color:#cfeedd !important;
+}
+html.dark-2026.painel-alunos .status-box strong{color:var(--pa-ok) !important}
+
+/* Caixas de aviso (regras do boletim, relatório) */
+html.dark-2026.painel-alunos .report-alert{
+  background:var(--pa-info-bg) !important;
+  border:1px solid var(--pa-info-line) !important;
+  color:#dbe8fb !important;
+}
+
+/* Controles */
+html.dark-2026.painel-alunos :is(.ghost-btn,.close-btn,.discipline-option){
+  background:var(--pa-raised) !important;
+  color:var(--pa-text) !important;
+  border:1px solid var(--pa-line) !important;
+  box-shadow:none !important;
+}
+html.dark-2026.painel-alunos :is(.ghost-btn,.close-btn,.discipline-option):hover{background:var(--pa-raised-2) !important}
+html.dark-2026.painel-alunos .discipline-option.active{
+  background:var(--pa-info-bg) !important;
+  border-color:var(--pa-info-line) !important;
+  color:var(--pa-text) !important;
+}
+html.dark-2026.painel-alunos .warning-btn{
+  background:var(--pa-bad-bg) !important;
+  color:var(--pa-bad) !important;
+  border:1px solid var(--pa-bad-line) !important;
+}
+html.dark-2026.painel-alunos .primary-btn{color:#2a1f05 !important;box-shadow:none !important}
+html.dark-2026.painel-alunos :is(.search-input,.stepper input,.text-stack textarea,.report-area){
+  background:var(--pa-bg) !important;
+  color:var(--pa-text) !important;
+  border:1px solid var(--pa-line) !important;
+  box-shadow:none !important;
+}
+html.dark-2026.painel-alunos :is(.search-input,.text-stack textarea,.report-area)::placeholder{color:var(--pa-faint) !important}
+html.dark-2026.painel-alunos .stepper button{
+  background:var(--pa-raised-2) !important;
+  color:var(--pa-text) !important;
+  border:1px solid var(--pa-line) !important;
+}
+
+/* Tabela da turma */
+html.dark-2026.painel-alunos thead th{
+  background:var(--pa-raised) !important;
+  color:var(--pa-muted) !important;
+  border-bottom:1px solid var(--pa-line) !important;
+}
+html.dark-2026.painel-alunos tbody td{border-bottom:1px solid var(--pa-line-soft) !important}
+html.dark-2026.painel-alunos :is(th.rec-col,td.rec-col){background:rgba(156,199,255,.05) !important}
+html.dark-2026.painel-alunos .student-number{
+  background:var(--pa-raised-2) !important;
+  color:var(--pa-text) !important;
+}
+html.dark-2026.painel-alunos .mini-chip{
+  background:var(--pa-raised-2) !important;
+  color:var(--pa-text-2) !important;
+  border:1px solid var(--pa-line) !important;
+}
+
+/* Notas: neutro, ok, recuperação/abaixo, parcial */
+html.dark-2026.painel-alunos :is(.grade-badge,.grade-badge.muted){
+  background:var(--pa-raised) !important;
+  border:1px solid var(--pa-line) !important;
+  color:var(--pa-muted) !important;
+}
+html.dark-2026.painel-alunos .grade-badge strong{color:var(--pa-text) !important}
+html.dark-2026.painel-alunos .grade-badge small{color:var(--pa-muted) !important}
+html.dark-2026.painel-alunos .grade-badge.good{
+  background:var(--pa-ok-bg) !important;
+  border-color:var(--pa-ok-line) !important;
+}
+html.dark-2026.painel-alunos :is(.grade-badge.good strong,.grade-badge.good small,.nota-recuperada,.grade-badge.recovered strong.nota-recuperada){
+  color:var(--pa-ok) !important;
+}
+html.dark-2026.painel-alunos :is(.grade-badge.recovery,.grade-badge.failed){
+  background:var(--pa-bad-bg) !important;
+  border-color:var(--pa-bad-line) !important;
+}
+html.dark-2026.painel-alunos :is(.grade-badge.recovery strong,.grade-badge.recovery small,.grade-badge.failed strong,.grade-badge.failed small,
+  .nota-riscada,.recovery-card.failed .recovery-status,.conduta-desconto,.conduta-desconto strong){
+  color:var(--pa-bad) !important;
+}
+html.dark-2026.painel-alunos .grade-badge.partial{
+  background:var(--pa-warn-bg) !important;
+  border:1px dashed var(--pa-warn-line) !important;
+}
+html.dark-2026.painel-alunos :is(.grade-badge.partial strong,.grade-badge.partial small){color:var(--pa-warn) !important}
+
+/* Recuperação semestral */
+html.dark-2026.painel-alunos .recovery-card.pending{background:var(--pa-warn-bg) !important;border-color:var(--pa-warn-line) !important}
+html.dark-2026.painel-alunos .recovery-card.recovered{background:var(--pa-ok-bg) !important;border-color:var(--pa-ok-line) !important}
+html.dark-2026.painel-alunos .recovery-card.failed{background:var(--pa-bad-bg) !important;border-color:var(--pa-bad-line) !important}
+
+/* Transferidos: apagados, mas legíveis */
+html.dark-2026.painel-alunos :is(.chip-transferido,.grade-transferido,.student-row-transferido .student-number){
+  background:var(--pa-raised) !important;
+  color:var(--pa-faint) !important;
+}
+html.dark-2026.painel-alunos :is(.student-name-transferido,.grade-transferido strong){color:var(--pa-faint) !important}
+
+/* Faltas */
+html.dark-2026.painel-alunos .absence-chip{
+  background:var(--pa-bad-bg) !important;
+  color:var(--pa-bad) !important;
+  border:1px solid var(--pa-bad-line) !important;
+}
+
+/* Selos de conduta: tons escuros com texto claro */
+html.dark-2026.painel-alunos .cond-chip--leve{background:var(--pa-ok-bg);color:var(--pa-ok);border-color:var(--pa-ok-line)}
+html.dark-2026.painel-alunos .cond-chip--medio{background:var(--pa-warn-bg);color:var(--pa-warn);border-color:var(--pa-warn-line)}
+html.dark-2026.painel-alunos :is(.cond-chip--grave,.cond-chip--muito-grave){background:var(--pa-bad-bg);color:var(--pa-bad);border-color:var(--pa-bad-line)}
+html.dark-2026.painel-alunos .cond-chip--muito-grave{font-weight:800}
+html.dark-2026.painel-alunos .cond-chip--neutro{background:var(--pa-raised-2);color:var(--pa-text-2);border-color:var(--pa-line)}
+html.dark-2026.painel-alunos .cond-chip--destaque{background:var(--pa-warn-bg);color:#ffe3a3;border-color:var(--pa-warn-line)}
+
+/* ── Classes que só os painéis da Hermínio usam ──────────────────────── */
+html.dark-2026.painel-alunos .student-name{color:var(--pa-text) !important}
+html.dark-2026.painel-alunos :is(thead tr:last-child th){background:var(--pa-raised) !important}
+html.dark-2026.painel-alunos tbody tr:nth-child(even) td{background:rgba(255,255,255,.015) !important}
+html.dark-2026.painel-alunos tbody tr:hover td{background:var(--pa-raised) !important}
+html.dark-2026.painel-alunos .total-pill{
+  background:var(--pa-ok-bg) !important;
+  color:var(--pa-ok) !important;
+  border:1px solid var(--pa-ok-line) !important;
+}
+html.dark-2026.painel-alunos .total-pill.empty{
+  background:var(--pa-raised) !important;
+  color:var(--pa-muted) !important;
+  border-color:var(--pa-line) !important;
+}
+html.dark-2026.painel-alunos :is(.boletim-tab,.inline-btn){
+  background:var(--pa-raised) !important;
+  color:var(--pa-text) !important;
+  border:1px solid var(--pa-line) !important;
+  box-shadow:none !important;
+}
+html.dark-2026.painel-alunos .boletim-tab.active{
+  background:var(--pa-info-bg) !important;
+  border-color:var(--pa-info-line) !important;
+  color:var(--pa-text) !important;
+}
+html.dark-2026.painel-alunos .boletim-panel-note{
+  background:var(--pa-info-bg) !important;
+  border:1px solid var(--pa-info-line) !important;
+  color:#dbe8fb !important;
+}
+html.dark-2026.painel-alunos .auto-work-note{
+  background:var(--pa-ok-bg) !important;
+  border:1px solid var(--pa-ok-line) !important;
+  color:#cfeedd !important;
+}
+html.dark-2026.painel-alunos .manual-work-note{
+  background:var(--pa-warn-bg) !important;
+  border:1px solid var(--pa-warn-line) !important;
+  color:#f1e2bd !important;
+}
+html.dark-2026.painel-alunos :is(.report-meta,.profile-card .summary-label){color:var(--pa-muted) !important}
+html.dark-2026.painel-alunos .absence-chip strong{color:var(--pa-bad) !important}
