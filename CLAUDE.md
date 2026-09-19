@@ -32,6 +32,7 @@ C:\Downloads\relatorio-2026\
 ```
 
 **GitHub:** `https://github.com/10pauloacre-creator/relatorio-2026`
+**Vercel:** projeto `relatorios` na conta `10pauloacre-creator` (equipe `10pauloacre-creators-projects`), ligado ao GitHub desde 19/09/2026 → `https://relatorios-ten-pi.vercel.app`. Cada push na `main` publica nos dois lugares (GitHub Pages e Vercel). O `vercel.json` roda `npm run build:pages` e serve só `dist/` (a mesma lista de `scripts/build-web-release.js`). O branch `gh-pages` também gera uma prévia no Vercel, sem efeito.
 **Branch:** `main`
 **Último commit:** `f5dc531` — relatos 09-10/04, contador e plano LGG renovados
 
