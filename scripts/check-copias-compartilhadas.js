@@ -1,6 +1,7 @@
 // Confere se os arquivos compartilhados são idênticos nos dois repositórios.
 // O boletim do professor (Relatório 2026) e o do aluno (Biblioteca Digital)
-// precisam calcular as mesmas notas e gerar o mesmo relatório em PDF.
+// precisam calcular as mesmas notas e gerar o mesmo relatório em PDF, e as
+// duas plataformas mostram a mesma página e as mesmas logos da AXION PROEDUQ.
 //
 //   node scripts/check-copias-compartilhadas.js          → só confere
 //   node scripts/check-copias-compartilhadas.js --copiar → copia daqui para a Biblioteca
@@ -8,23 +9,38 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-const ARQUIVOS = ["boletim-regras.js", "relatorio-individual.js"];
+// Caminhos a partir da raiz de cada repositório.
+const ARQUIVOS = [
+  "assets/js/boletim-regras.js",
+  "assets/js/relatorio-individual.js",
+  "axion-proeduq.html",
+  "assets/marca/axion-escuro.webp",
+  "assets/marca/axion-escuro-sm.webp",
+  "assets/marca/axion-claro.webp",
+  "assets/marca/axion-claro-sm.webp",
+  "assets/marca/plataforma-relatorio.webp",
+  "assets/marca/plataforma-biblioteca.webp"
+];
+const TEXTO = /\.(js|html|css|json)$/i;
 
 const biblioteca = process.env.BIBLIOTECA_DIR
   || path.join("C:", "Users", "PAULO ROBERTO", "biblioteca-digital-medieval-1");
 
 function hash(arquivo) {
-  // Ignora CRLF/LF: o Git no Windows converte finais de linha.
-  const texto = fs.readFileSync(arquivo, "utf8").split("\r\n").join("\n");
-  return crypto.createHash("sha256").update(texto).digest("hex").slice(0, 16);
+  // Texto: ignora CRLF/LF, porque o Git no Windows converte finais de linha.
+  const conteudo = TEXTO.test(arquivo)
+    ? fs.readFileSync(arquivo, "utf8").split("\r\n").join("\n")
+    : fs.readFileSync(arquivo);
+  return crypto.createHash("sha256").update(conteudo).digest("hex").slice(0, 16);
 }
 
 let falhou = false;
 ARQUIVOS.forEach(function (nome) {
-  const origem = path.join(__dirname, "..", "assets", "js", nome);
-  const destino = path.join(biblioteca, "assets", "js", nome);
+  const origem = path.join(__dirname, "..", nome);
+  const destino = path.join(biblioteca, nome);
 
   if (process.argv.includes("--copiar")) {
+    fs.mkdirSync(path.dirname(destino), { recursive: true });
     fs.copyFileSync(origem, destino);
     console.log("Copiado:", nome, "→", destino);
   }

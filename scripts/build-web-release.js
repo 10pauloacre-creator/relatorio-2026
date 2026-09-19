@@ -39,6 +39,7 @@ const rootFileAllowlist = new Set([
   "manifest.json",
   "maskable-icon-512.png",
   "planejamento-aulas-2026.html",
+  "axion-proeduq.html",
   "privacidade.html",
   "termos.html",
   "projetos-pessoais.html",

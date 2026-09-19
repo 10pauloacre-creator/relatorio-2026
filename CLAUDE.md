@@ -486,3 +486,14 @@ Toda página que carrega `supabase-report-sync.js` exige conta. O tipo de acesso
 3. As chaves de escopo `*:shared-v1` continuam as mesmas: o arquivo do ano lê o estado como estava na data do arquivamento, no histórico.
 
 **Página de arquivo** (`data-arquivo-ate`): `supabase-report-sync.js` lê cada escopo por `relatorio_estado_ate` e nunca grava nem escuta o tempo real; a publicação dos lançamentos e a IA das observações ficam desligadas; `<base href="../../">`; o `localStorage` fica isolado em memória (só as chaves `sb-*` da sessão passam). Limitações conhecidas: o iframe de projeções e o Firebase do plano anual continuam lendo os dados atuais; os scripts em `assets/` são os atuais do site.
+
+---
+
+## 19. MARCA AXION PROEDUQ (19/09/2026)
+
+"AXION PROEDUQ · Tecnologia que move a educação." é a marca que abriga o Relatório (relatorio.skin), a Biblioteca Digital (biblioteca-ac.com) e os projetos futuros.
+- **Página institucional:** `axion-proeduq.html` (pública, sem login): quem somos, propósito, princípios, valores, plataformas, integração, objetivos, identidade visual e contato. Links para os dois domínios são absolutos, então a mesma página serve aos dois sites.
+- **Logos:** originais em `assets/icons/axion-bg-escuro.png` e `axion-bg-claro.png`; versões recortadas para a web em `assets/marca/` (`axion-escuro[-sm].webp`, `axion-claro[-sm].webp`, `plataforma-*.webp`).
+- **Onde aparece:** rodapé da página inicial (`.marca`, com "PROPRIEDADE DA AXION PROEDUQ" e os links legais), rodapé da tela de login (`.rel-auth-marca`, em `supabase-report-sync.js`) e, na Biblioteca, rodapé da tela de abertura (`#splash-marca`) e dos painéis (`.marca-axion` nos `.content-footer`).
+- **Cópia idêntica nos dois repositórios:** a página e as imagens de `assets/marca/` estão em `scripts/check-copias-compartilhadas.js`. Alterou aqui, rode `node scripts/check-copias-compartilhadas.js --copiar` e faça commit nos dois.
+- Na página inicial, a regra global `a:not(.projetos-pessoais) > img` dá 320 px às imagens; a logo usa seletor mais específico. O rodapé é `<div>` e não `<footer>`, porque `dark-mode-2026.css` pinta `footer`.
