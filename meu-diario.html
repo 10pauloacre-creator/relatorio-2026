@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-acesso="professor">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a3a2a">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<title>Meu Diário</title>
+<script>window.NOVO_DIARIO_MANUAL = true;</script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="assets/js/supabase-report-sync.js?v=20260919c"></script>
+<script defer src="assets/js/novo-diario.js?v=20260919c"></script>
+<style>
+:root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--og:#876020;--card:#fff;--fundo:#f3f1ea;--ss:0 4px 24px rgba(26,58,42,.10);--r:14px;--rs2:8px}
+@media (prefers-color-scheme:dark){:root{--vd:#9fd8b4;--vm:#6fcf97;--vc:#4a9467;--vs:#1f3b2b;--os:#3a3219;--cr:#15211a;--ce:#e6efe9;--cm:#a4b8ab;--cl:#2a3a31;--rs:#3a1d1a;--card:#1b2a21;--fundo:#0f1914;--ss:0 4px 24px rgba(0,0,0,.35)}}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--fundo);color:var(--ce);min-height:100vh}
+button{font-family:inherit}
+.md-top{background:linear-gradient(135deg,#1a3a2a,#2d6147 60%,#4a9467);color:#fff;padding:18px 20px}
+.md-top-i{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.md-top h1{font-family:'Playfair Display',serif;font-size:1.5rem;flex:1;min-width:180px}
+.md-top h1 small{display:block;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:400;opacity:.85;margin-top:2px}
+.md-sync{font-size:.76rem;background:rgba(255,255,255,.14);border-radius:999px;padding:6px 12px;white-space:nowrap}
+.md-top button{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.8rem;cursor:pointer}
+.md-tabs{background:var(--card);border-bottom:1px solid var(--cl);position:sticky;top:0;z-index:50;overflow-x:auto}
+.md-tabs-i{max-width:1100px;margin:0 auto;display:flex;gap:2px;padding:0 12px}
+.md-tab{padding:13px 14px;border:none;background:none;color:var(--cm);font-weight:600;font-size:.86rem;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.md-tab.on{color:var(--vm);border-bottom-color:var(--vm)}
+.main{max-width:1100px;margin:0 auto;padding:22px 16px 60px}
+.sec{display:none}.sec.on{display:block}
+.md-hero{background:var(--card);border-radius:var(--r);box-shadow:var(--ss);padding:18px 20px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.md-hero h2{font-family:'Playfair Display',serif;color:var(--vd);font-size:1.3rem;flex:1;min-width:200px}
+.md-hero h2 small{display:block;font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--cm);font-weight:400;margin-top:3px}
+.md-btn{border:none;border-radius:10px;padding:10px 16px;font-weight:700;font-size:.86rem;cursor:pointer;background:var(--cl);color:var(--ce)}
+.md-btn.pri{background:var(--vm);color:#fff}
+.md-btn.perigo{background:var(--rs);color:var(--ra)}
+.md-btn.mini{padding:6px 10px;font-size:.76rem}
+.md-card{background:var(--card);border-radius:var(--r);box-shadow:var(--ss);padding:18px 20px;margin-bottom:16px}
+.md-card h3{font-family:'Playfair Display',serif;color:var(--vd);font-size:1.08rem;margin-bottom:10px}
+.md-card p{font-size:.88rem;line-height:1.55;color:var(--cm)}
+.md-f{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.md-f label{font-size:.72rem;font-weight:700;color:var(--vm);text-transform:uppercase;letter-spacing:.04em}
+.md-f input,.md-f select,.md-f textarea,.md-in{padding:9px 11px;border:2px solid var(--cl);border-radius:10px;font:inherit;font-size:.9rem;color:var(--ce);background:var(--cr);width:100%}
+.md-f textarea{min-height:120px;resize:vertical}
+.md-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.md-vazio{text-align:center;padding:40px 20px;color:var(--cm);font-size:.92rem}
+.md-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.md-stat{background:var(--card);border-radius:12px;box-shadow:var(--ss);padding:14px 16px}
+.md-stat b{display:block;font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--vd)}
+.md-stat span{font-size:.76rem;color:var(--cm)}
+.md-cont{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.md-cc{background:var(--card);border-radius:12px;box-shadow:var(--ss);padding:14px 16px}
+.md-cc h4{font-size:.95rem;color:var(--vd)}
+.md-cc .sub{font-size:.76rem;color:var(--cm);margin:2px 0 10px}
+.md-bar{height:9px;background:var(--cl);border-radius:99px;overflow:hidden;margin:4px 0 8px}
+.md-bar i{display:block;height:100%;background:var(--vc)}
+.md-bar.ano i{background:var(--ou)}
+.md-lbl{display:flex;justify-content:space-between;font-size:.74rem;color:var(--cm)}
+.md-bims{display:flex;gap:4px;margin-top:6px}
+.md-bims span{flex:1;text-align:center;font-size:.66rem;padding:4px 0;border-radius:6px;background:var(--cl);color:var(--cm)}
+.md-bims span.co{background:var(--vs);color:var(--vm);font-weight:700}
+.md-bims span.at{background:var(--os);color:var(--og);font-weight:700}
+.md-alunos{display:flex;flex-wrap:wrap;gap:6px}
+.md-alunos button{border:1px solid var(--cl);background:var(--cr);color:var(--ce);border-radius:999px;padding:5px 11px;font-size:.78rem;cursor:pointer}
+.md-alunos button.tr{opacity:.5;text-decoration:line-through}
+.md-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.md-row .md-in{flex:1}
+.md-row .n{font-family:'DM Mono',monospace;font-size:.78rem;width:28px;color:var(--cm)}
+.md-row label{font-size:.76rem;display:flex;gap:4px;align-items:center;white-space:nowrap}
+.md-x{background:none;border:none;color:var(--ra);font-size:1.05rem;cursor:pointer;padding:4px}
+details.md-turma{border:1px solid var(--cl);border-radius:12px;padding:0 14px;margin-bottom:12px;background:var(--card)}
+details.md-turma>summary{cursor:pointer;padding:13px 0;font-weight:700;color:var(--vd)}
+details.md-turma[open]>summary{border-bottom:1px solid var(--cl);margin-bottom:12px}
+.md-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1a3a2a;color:#fff;padding:10px 18px;border-radius:999px;font-size:.84rem;z-index:20000;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+/* Cards de diário (mesmo padrão da Casavequia) */
+.ea{background:var(--card);border-radius:var(--r);box-shadow:var(--ss);margin-bottom:18px;overflow:hidden}
+.eh{display:flex;align-items:center;cursor:pointer;user-select:none}
+.edb{background:#1a3a2a;color:#fff;padding:17px 19px;min-width:96px;text-align:center;flex-shrink:0}
+.edb .d{font-family:'DM Mono',monospace;font-size:1.9rem;font-weight:500;line-height:1}
+.edb .my{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;opacity:.74;margin-top:2px}
+.em{flex:1;padding:13px 19px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.ed{font-family:'Playfair Display',serif;font-size:1.02rem;color:var(--vd);font-weight:600}
+.ec{display:flex;flex-wrap:wrap;gap:5px}
+.ch{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:500}
+.ch-h{background:var(--vs);color:var(--vm)}.ch-p{background:var(--os);color:#7a5c10}
+.ch-a{background:var(--rs);color:var(--ra)}.ch-i{background:#dbeeff;color:var(--ai)}
+.et{padding:17px 19px;color:var(--cm);font-size:.95rem;transition:transform .25s;flex-shrink:0}.et.op{transform:rotate(180deg)}
+.ec2{display:none;border-top:1px solid var(--cl)}.ec2.on{display:block}
+.itabs{display:flex;background:var(--cr);border-bottom:1px solid var(--cl);padding:0 14px;overflow-x:auto}
+.itab{padding:9px 13px;background:transparent;border:none;font-size:.77rem;font-weight:500;cursor:pointer;color:var(--cm);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.itab.on{color:var(--vm);border-bottom-color:var(--vm);font-weight:700}
+.ipane{display:none;padding:18px 20px 22px}.ipane.on{display:block}
+.st{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cm);font-weight:700;margin:16px 0 7px}.st:first-child{margin-top:0}
+.ct{background:var(--cr);border-left:3px solid var(--vc);padding:11px 15px;border-radius:0 var(--rs2) var(--rs2) 0;font-size:.88rem;line-height:1.65}
+.ol{display:flex;flex-direction:column;gap:9px}
+.oi{background:var(--rs);border:1px solid #f5c6c0;border-radius:var(--rs2);padding:11px 15px;display:flex;gap:11px;align-items:flex-start}
+.oi.nt{background:#f0f7ff;border-color:#bdd9f5;color:#1f2d3a}
+.oi-ic{font-size:1.05rem;flex-shrink:0}
+.oa{font-weight:600;font-size:.86rem;color:var(--ra);margin-bottom:2px}.oi.nt .oa{color:var(--ai)}.od{font-size:.83rem;line-height:1.5}
+.ng{background:var(--os);border:1px solid #e0c87a;border-radius:var(--rs2);padding:11px 15px;font-size:.84rem;line-height:1.6}
+.ai2{margin-top:14px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:var(--rs2);padding:15px 17px;color:#fff}
+.ai2h{display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.ai2h .tg{background:rgba(201,168,76,.25);color:var(--ou);border:1px solid rgba(201,168,76,.4);border-radius:4px;font-size:.64rem;font-weight:700;letter-spacing:.12em;padding:2px 7px;text-transform:uppercase}
+.ai2h span{font-size:.8rem;opacity:.7}
+.ai2i{background:rgba(255,255,255,.07);border-radius:6px;padding:9px 11px;margin-bottom:7px;font-size:.83rem;line-height:1.55}
+.ai2a{font-family:'DM Mono',monospace;color:var(--ou);font-size:.76rem;margin-bottom:2px}
+.ai2p{display:inline-flex;background:rgba(192,57,43,.25);color:#ff8a8a;border-radius:4px;padding:1px 6px;font-size:.7rem;font-weight:600;margin-bottom:3px}
+.ai2p.warn{background:rgba(230,126,34,.25);color:#ffc08a}.ai2p.grave{background:rgba(192,57,43,.45);color:#ff6b6b}
+.ai2t{opacity:.85}.ai2s{margin-top:9px;border-top:1px solid rgba(255,255,255,.1);padding-top:9px;font-size:.78rem;opacity:.75;font-style:italic}
+.lembrete{background:#1a1a2e;border:2px dashed var(--ou);border-radius:var(--rs2);padding:12px 16px;margin:14px 0;color:#fff}
+.lembrete-tag{display:inline-flex;background:rgba(201,168,76,.3);color:var(--ou);border-radius:4px;font-size:.66rem;font-weight:700;letter-spacing:.1em;padding:2px 8px;text-transform:uppercase;margin-bottom:8px}
+.lembrete-txt{font-size:.83rem;line-height:1.6;opacity:.9}
+.atv-tema{background:var(--cr);border-left:3px solid var(--ou);padding:10px 14px;border-radius:0 var(--rs2) var(--rs2) 0;font-size:.87rem;margin-bottom:12px}
+.atv-av{background:var(--os);border:1px solid #e0c87a;border-radius:var(--rs2);padding:9px 13px;font-size:.81rem;margin-bottom:12px;display:flex;gap:8px}
+.md-mstat{font-size:.74rem;color:var(--cm);margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap}.md-mstat strong{color:var(--ce)}
+.md-mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:5px}
+.md-m{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:6px;font-size:.8rem;cursor:pointer;border:none;text-align:left;background:var(--cl);color:var(--ce)}
+.md-m .n{font-family:'DM Mono',monospace;font-size:.67rem;opacity:.6;width:20px;flex-shrink:0}
+.md-m .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.md-m .tag{font-size:.62rem;font-weight:700}
+.md-m.pr,.md-m.fz{background:#e6f6ec;color:#1f6b43}.md-m.fa,.md-m.nf{background:#fde2df;color:#a4291d}.md-m.fj{background:#fff4d6;color:#7a5c10}
+.md-m.tr{opacity:.45;cursor:default}
+.md-ajuda{font-size:.74rem;color:var(--cm);margin-bottom:8px}
+/* Relatório do aluno */
+.md-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:center;justify-content:center;padding:14px}
+.md-rel{background:var(--card);color:var(--ce);border-radius:16px;max-width:760px;width:100%;max-height:94vh;overflow-y:auto;padding:24px}
+.md-rel h2{font-family:'Playfair Display',serif;color:var(--vd)}
+.md-rel h4{margin:16px 0 6px;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--vm)}
+.md-rel table{width:100%;border-collapse:collapse;font-size:.84rem}
+.md-rel td,.md-rel th{border-bottom:1px solid var(--cl);padding:6px 4px;text-align:left}
+@media print{
+  body.md-imprimindo>*:not(.md-ov){display:none!important}
+  body.md-imprimindo .md-ov{position:static;background:none;padding:0}
+  body.md-imprimindo .md-rel{max-height:none;box-shadow:none;color:#000;background:#fff}
+  body.md-imprimindo .md-noprint{display:none!important}
+}
+@media(max-width:560px){.edb{min-width:74px;padding:14px 12px}.edb .d{font-size:1.5rem}.em{padding:11px 12px}.et{padding:12px}}
+</style>
+</head>
+<body>
+<header class="md-top"><div class="md-top-i">
+  <h1>📘 Meu Diário<small id="md-quem">Carregando…</small></h1>
+  <span class="md-sync" id="md-sync">☁️ Conectando…</span>
+  <button type="button" id="md-sair">Sair</button>
+</div></header>
+<nav class="md-tabs"><div class="md-tabs-i" id="md-tabs"></div></nav>
+<main class="main" id="md-main">
+  <section class="sec" id="sec-inicio"></section>
+  <section class="sec" id="sec-cont"></section>
+  <section class="sec" id="sec-config"></section>
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   Meu Diário — plataforma de cada professor (Etapa 9)
+   Dados particulares em professor_dados (RLS: só o dono), em dois escopos:
+     "meu-diario:estrutura:v1"  escolas, turmas, alunos e disciplinas
+     "meu-diario:diarios:v1"    diários (gerido por novo-diario.js)
+   Os recursos são os mesmos das escolas do administrador: + Novo Diário com
+   IA, ✏️ edição completa, presença, atividades, contador e relatório do aluno.
+   ═══════════════════════════════════════════════════════════════════════ */
+function tog(h){var c=h.nextElementSibling,t=h.querySelector('.et'),o=c.classList.contains('on');c.classList.toggle('on',!o);if(t)t.classList.toggle('op',!o);}
+function itab(btn,pid){var ec=btn.closest('.ec2');ec.querySelectorAll('.itab').forEach(function(b){b.classList.remove('on');});ec.querySelectorAll('.ipane').forEach(function(p){p.classList.remove('on');});btn.classList.add('on');var p=document.getElementById(pid);if(p)p.classList.add('on');}
+
+(function(){
+  'use strict';
+  var SCOPE_ESTRUTURA='meu-diario:estrutura:v1';
+  var MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  var usuario=null, E=null, syncE=null, PRES={}, ATV={};
+  var statusDiarios='', statusEstrutura='';
+
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function agora(){return new Date().toISOString();}
+  function novoId(p){return p+Math.random().toString(36).slice(2,7)+Date.now().toString(36).slice(-3);}
+  function slug(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,10)||'d';}
+  function toast(msg){var t=document.createElement('div');t.className='md-toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},2600);}
+  function lsKey(){return 'md_estrutura_'+usuario.id;}
+  function turma(id){return (E.turmas||[]).filter(function(t){return t.id===id;})[0]||null;}
+  function escola(id){return (E.escolas||[]).filter(function(e){return e.id===id;})[0]||null;}
+  function diarios(){return window.NovoDiario?window.NovoDiario.diarios():[];}
+  function dataBr(k){return k.slice(8,10)+'/'+k.slice(5,7)+'/'+k.slice(0,4);}
+
+  // ── Estrutura: local + banco ─────────────────────────────────────────
+  function vazia(){return{versao:1,perfil:{nome:(usuario&&usuario.nome)||''},escolas:[],turmas:[],atualizadoEm:''};}
+  function lerLocal(){try{var e=JSON.parse(localStorage.getItem(lsKey())||'null');if(e&&Array.isArray(e.turmas))return e;}catch(x){}return vazia();}
+  function salvar(motivo){
+    E.atualizadoEm=agora();
+    try{localStorage.setItem(lsKey(),JSON.stringify(E));}catch(x){}
+    if(syncE)syncE.pushNow('force');
+    desenharTudo();
+    if(window.NovoDiario)window.NovoDiario.renderizar();
+  }
+  function aplicarRemotoEstrutura(payload){
+    if(!payload||!Array.isArray(payload.turmas))return;
+    if(String(payload.atualizadoEm||'')<String(E.atualizadoEm||''))
+      {if(syncE)syncE.schedulePush('local-mais-novo');return;}
+    E=payload;
+    try{localStorage.setItem(lsKey(),JSON.stringify(E));}catch(x){}
+    desenharTudo();
+    if(window.NovoDiario)window.NovoDiario.renderizar();
+  }
+
+  // ── Estado da sincronização ─────────────────────────────────────────
+  function mostrarStatus(){
+    var el=document.getElementById('md-sync');if(!el)return;
+    var s=[statusDiarios,statusEstrutura];
+    var h=new Date();var hh=('0'+h.getHours()).slice(-2)+':'+('0'+h.getMinutes()).slice(-2);
+    if(s.indexOf('offline')>=0||!navigator.onLine)el.textContent='📴 Sem internet — salvo neste aparelho';
+    else if(s.indexOf('erro')>=0)el.textContent='⚠️ Falha ao sincronizar — tentando de novo';
+    else if(s.indexOf('salvando')>=0)el.textContent='☁️ Salvando…';
+    else if(s.indexOf('conectando')>=0)el.textContent='☁️ Conectando…';
+    else el.textContent='☁️ Sincronizado às '+hh;
+  }
+
+  // ── Abas ────────────────────────────────────────────────────────────
+  var abaAtual='';
+  function abas(){return [{id:'inicio',rotulo:'🏠 Início'}].concat((E.turmas||[]).map(function(t){return{id:t.id,rotulo:t.nome};})).concat([{id:'cont',rotulo:'📊 Contador'},{id:'config',rotulo:'⚙️ Turmas e alunos'}]);}
+  function irPara(id){
+    if(!document.getElementById('sec-'+id))id='inicio';
+    abaAtual=id;
+    try{localStorage.setItem('md_aba',id);}catch(x){}
+    document.querySelectorAll('#md-main>.sec').forEach(function(s){s.classList.toggle('on',s.id==='sec-'+id);});
+    document.querySelectorAll('.md-tab').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-aba')===id);});
+    window.scrollTo(0,0);
+  }
+  function desenharAbas(){
+    document.getElementById('md-tabs').innerHTML=abas().map(function(a){return '<button type="button" class="md-tab" data-aba="'+esc(a.id)+'">'+esc(a.rotulo)+'</button>';}).join('');
+    document.querySelectorAll('.md-tab').forEach(function(b){b.addEventListener('click',function(){irPara(b.getAttribute('data-aba'));});});
+  }
+
+  // ── Seções das turmas (os cards entram pelo novo-diario.js) ─────────
+  function garantirSecoes(){
+    var main=document.getElementById('md-main'),cont=document.getElementById('sec-cont');
+    var ids=(E.turmas||[]).map(function(t){return t.id;});
+    main.querySelectorAll('section[data-turma]').forEach(function(s){if(ids.indexOf(s.getAttribute('data-turma'))<0)s.remove();});
+    (E.turmas||[]).forEach(function(t){
+      var sec=document.getElementById('sec-'+t.id);
+      if(!sec){
+        sec=document.createElement('section');sec.className='sec';sec.id='sec-'+t.id;sec.setAttribute('data-turma',t.id);
+        sec.innerHTML='<div class="md-hero"></div><div class="md-stats"></div><div class="md-lista"></div>';
+        main.insertBefore(sec,cont);
+      }
+      var esc1=escola(t.escolaId);
+      sec.querySelector('.md-hero').innerHTML='<h2>'+esc(t.nome)+'<small>'+esc(esc1?esc1.nome:'Sem escola')+' · '+t.alunos.filter(function(a){return!a.tr;}).length+' alunos · '+esc(t.disciplinas.map(function(d){return d.nome;}).join(', ')||'sem disciplinas')+'</small></h2>'
+        +'<button type="button" class="md-btn pri" data-acao="novo">+ Novo Diário</button>'
+        +'<button type="button" class="md-btn" data-acao="alunos">👥 Relatório dos alunos</button>';
+      sec.querySelector('[data-acao="novo"]').onclick=function(){
+        if(!t.disciplinas.length){toast('Cadastre ao menos uma disciplina na aba ⚙️ Turmas e alunos.');irPara('config');return;}
+        if(!t.alunos.length){toast('Cadastre os alunos da turma na aba ⚙️ Turmas e alunos.');irPara('config');return;}
+        window.novoDiarioAbrir(t.id);
+      };
+      sec.querySelector('[data-acao="alunos"]').onclick=function(){abrirListaAlunos(t.id);};
+      var lista=sec.querySelector('.md-lista');
+      if(!lista.querySelector('.md-vazio'))lista.insertAdjacentHTML('afterbegin','<div class="md-vazio" hidden>Nenhum diário ainda. Toque em <strong>+ Novo Diário</strong> para registrar a primeira aula.</div>');
+    });
+  }
+
+  // Soma de h/aula por turma e disciplina.
+  function somaHoras(){
+    var m={};
+    diarios().forEach(function(d){var k=d.turma+'|'+d.disc;m[k]=(m[k]||0)+(parseInt(d.horas,10)||0);});
+    return m;
+  }
+
+  function desenharEstatisticasTurmas(){
+    var soma=somaHoras();
+    (E.turmas||[]).forEach(function(t){
+      var sec=document.getElementById('sec-'+t.id);if(!sec)return;
+      var ds=diarios().filter(function(d){return d.turma===t.id;});
+      var horas=t.disciplinas.reduce(function(s,d){return s+(soma[t.id+'|'+d.id]||0);},0);
+      var ultimo=ds.map(function(d){return d.dateKey;}).sort().pop();
+      sec.querySelector('.md-stats').innerHTML=
+        '<div class="md-stat"><b>'+ds.length+'</b><span>Diários</span></div>'
+        +'<div class="md-stat"><b>'+horas+'</b><span>H/aula dadas</span></div>'
+        +'<div class="md-stat"><b>'+(ultimo?dataBr(ultimo).slice(0,5):'—')+'</b><span>Último registro</span></div>';
+      var v=sec.querySelector('.md-vazio');if(v)v.hidden=ds.length>0;
+    });
+  }
+
+  // ── Presença e atividades clicáveis ─────────────────────────────────
+  var ROT={pr:'Presente',fa:'Falta',fj:'Falta just.',fz:'Fez',nf:'Não fez',au:'—'};
+  var PROX_P={pr:'fa',fa:'fj',fj:'pr'}, PROX_A={au:'fz',fz:'nf',nf:'au'};
+  function estadoP(d,n){var r=d.rel||{};return (r.faltaram||[]).indexOf(n)>=0?'fa':(r.faltJ||[]).indexOf(n)>=0?'fj':'pr';}
+  function estadoA(d,n){var a=(d.rel||{}).atividade||{};return (a.fez||[]).indexOf(n)>=0?'fz':(a.naoFez||[]).indexOf(n)>=0?'nf':'au';}
+  function desenharMarcacoes(){
+    var porId={};diarios().forEach(function(d){porId[d.id]=d;});
+    document.querySelectorAll('[data-md-pres],[data-md-atv]').forEach(function(host){
+      var tipo=host.hasAttribute('data-md-pres')?'p':'a';
+      var id=host.getAttribute(tipo==='p'?'data-md-pres':'data-md-atv');
+      var d=porId[id],t=d&&turma(d.turma);if(!d||!t)return;
+      var cont={};
+      var html=t.alunos.map(function(a){
+        if(a.tr)return '<button type="button" class="md-m tr" disabled><span class="n">'+a.n+'</span><span class="nm">'+esc(a.nm)+'</span><span class="tag">Transf.</span></button>';
+        var s=tipo==='p'?estadoP(d,a.n):estadoA(d,a.n);cont[s]=(cont[s]||0)+1;
+        return '<button type="button" class="md-m '+s+'" data-n="'+a.n+'"><span class="n">'+a.n+'</span><span class="nm">'+esc(a.nm)+'</span><span class="tag">'+ROT[s]+'</span></button>';
+      }).join('');
+      var resumo=tipo==='p'
+        ?'<span>✓ Presentes: <strong>'+(cont.pr||0)+'</strong></span><span>✗ Faltas: <strong>'+(cont.fa||0)+'</strong></span><span>⚠ Just.: <strong>'+(cont.fj||0)+'</strong></span>'
+        :'<span>✓ Fizeram: <strong>'+(cont.fz||0)+'</strong></span><span>✗ Não fizeram: <strong>'+(cont.nf||0)+'</strong></span><span>Sem marcação: <strong>'+(cont.au||0)+'</strong></span>';
+      host.innerHTML='<div class="md-ajuda">Toque no aluno para trocar: '+(tipo==='p'?'presente → falta → falta justificada':'fez → não fez → sem marcação')+'.</div><div class="md-mstat">'+resumo+'</div><div class="md-mgrid">'+html+'</div>';
+      host.querySelectorAll('.md-m[data-n]').forEach(function(b){
+        b.addEventListener('click',function(){
+          var n=parseInt(b.getAttribute('data-n'),10);
+          window.NovoDiario.alterar(id,function(dd){
+            var r=dd.rel;
+            if(tipo==='p'){
+              var prox=PROX_P[estadoP(dd,n)];
+              r.faltaram=(r.faltaram||[]).filter(function(x){return x!==n;});
+              r.faltJ=(r.faltJ||[]).filter(function(x){return x!==n;});
+              if(prox==='fa')r.faltaram.push(n);else if(prox==='fj')r.faltJ.push(n);
+            }else{
+              var pa=PROX_A[estadoA(dd,n)];
+              r.atividade.fez=(r.atividade.fez||[]).filter(function(x){return x!==n;});
+              r.atividade.naoFez=(r.atividade.naoFez||[]).filter(function(x){return x!==n;});
+              if(pa==='fz')r.atividade.fez.push(n);else if(pa==='nf')r.atividade.naoFez.push(n);
+            }
+          });
+        });
+      });
+    });
+  }
+
+  // ── Contador ────────────────────────────────────────────────────────
+  function desenharContador(){
+    var sec=document.getElementById('sec-cont'),soma=somaHoras();
+    if(!(E.turmas||[]).length){sec.innerHTML='<div class="md-card"><div class="md-vazio">Crie uma turma para acompanhar as h/aula.</div></div>';return;}
+    sec.innerHTML='<div class="md-hero"><h2>Contador de h/aula<small>O bimestre fecha pela soma de aulas: com meta de 10 h/aula, o 1º termina na 10ª, o 2º na 20ª…</small></h2></div>'
+      +(E.turmas||[]).map(function(t){
+        if(!t.disciplinas.length)return '';
+        return '<h3 style="font-family:Playfair Display,serif;color:var(--vd);margin:18px 0 10px">'+esc(t.nome)+'</h3><div class="md-cont">'+t.disciplinas.map(function(d){
+          var feitas=soma[t.id+'|'+d.id]||0,meta=Math.max(1,d.metaBim||10),total=Math.max(meta,d.total||meta*4);
+          var nb=Math.max(1,Math.round(total/meta)),bim=Math.min(nb,Math.floor(feitas/meta)+1),noBim=Math.min(meta,feitas-(bim-1)*meta);
+          var bims='';for(var b=1;b<=nb;b++)bims+='<span class="'+(feitas>=b*meta?'co':b===bim?'at':'')+'">'+b+'º</span>';
+          return '<div class="md-cc"><h4>'+esc(d.nome)+'</h4><div class="sub">'+meta+' h/aula por bimestre · '+total+' no ano</div>'
+            +'<div class="md-lbl"><span>'+(feitas>=total?'Ano concluído':bim+'º bimestre')+'</span><span>'+noBim+'/'+meta+'</span></div><div class="md-bar"><i style="width:'+Math.min(100,noBim/meta*100)+'%"></i></div>'
+            +'<div class="md-lbl"><span>Ano</span><span>'+feitas+'/'+total+'</span></div><div class="md-bar ano"><i style="width:'+Math.min(100,feitas/total*100)+'%"></i></div>'
+            +'<div class="md-bims">'+bims+'</div></div>';
+        }).join('')+'</div>';
+      }).join('');
+  }
+
+  // ── Início ──────────────────────────────────────────────────────────
+  function desenharInicio(){
+    var sec=document.getElementById('sec-inicio');
+    var nome=(E.perfil&&E.perfil.nome)||usuario.nome||'';
+    if(!(E.turmas||[]).length){
+      sec.innerHTML='<div class="md-card"><h3>Bem-vindo'+(nome?', '+esc(nome.split(' ')[0]):'')+'! 👋</h3><p>Sua plataforma está pronta e vazia. Comece criando a primeira turma: você poderá registrar diários com a ajuda da IA, marcar presença e atividades, acompanhar o contador de h/aula e gerar o relatório de cada aluno. Só você vê os seus dados, em qualquer aparelho em que entrar.</p></div>'
+        +'<div class="md-card"><h3>Criar a primeira turma</h3>'+formTurma()+'</div>';
+      ligarFormTurma(sec);
+      return;
+    }
+    var ds=diarios().slice().sort(function(a,b){return (b.dateKey+b.ini).localeCompare(a.dateKey+a.ini);});
+    var soma=somaHoras(),horas=Object.keys(soma).reduce(function(s,k){return s+soma[k];},0);
+    sec.innerHTML='<div class="md-hero"><h2>Olá'+(nome?', '+esc(nome.split(' ')[0]):'')+'<small>Resumo das suas turmas</small></h2></div>'
+      +'<div class="md-stats"><div class="md-stat"><b>'+E.turmas.length+'</b><span>Turmas</span></div><div class="md-stat"><b>'+ds.length+'</b><span>Diários</span></div><div class="md-stat"><b>'+horas+'</b><span>H/aula dadas</span></div>'
+      +'<div class="md-stat"><b>'+E.turmas.reduce(function(s,t){return s+t.alunos.filter(function(a){return!a.tr;}).length;},0)+'</b><span>Alunos</span></div></div>'
+      +'<div class="md-card"><h3>Últimos registros</h3>'+(ds.length?'<table style="width:100%;border-collapse:collapse;font-size:.86rem">'+ds.slice(0,8).map(function(d){var t=turma(d.turma);return '<tr style="border-bottom:1px solid var(--cl)"><td style="padding:7px 4px;white-space:nowrap">'+dataBr(d.dateKey).slice(0,5)+'</td><td style="padding:7px 4px">'+esc(t?t.nome:'')+'</td><td style="padding:7px 4px">'+esc(d.discNome)+'</td><td style="padding:7px 4px;color:var(--cm)">'+esc(d.assunto)+'</td></tr>';}).join('')+'</table>':'<p>Nenhum diário ainda. Abra uma turma e toque em + Novo Diário.</p>')+'</div>'
+      +'<div class="md-card"><h3>Suas turmas</h3><div class="md-alunos">'+E.turmas.map(function(t){return '<button type="button" data-ir="'+t.id+'">'+esc(t.nome)+'</button>';}).join('')+'</div></div>';
+    sec.querySelectorAll('[data-ir]').forEach(function(b){b.onclick=function(){irPara(b.getAttribute('data-ir'));};});
+  }
+
+  // ── Formulário de turma (criação) ───────────────────────────────────
+  function formTurma(){
+    var escolas=(E.escolas||[]);
+    return '<div class="md-grid">'
+      +'<div class="md-f"><label>Escola</label>'+(escolas.length?'<select data-f="escola">'+escolas.map(function(e){return '<option value="'+e.id+'">'+esc(e.nome)+'</option>';}).join('')+'<option value="__nova">+ Nova escola…</option></select>':'')+'<input type="text" data-f="escolaNova" placeholder="Nome da escola"'+(escolas.length?' hidden':'')+'></div>'
+      +'<div class="md-f"><label>Turma</label><input type="text" data-f="turma" placeholder="Ex.: 7º Ano A"></div>'
+      +'<div class="md-f"><label>H/aula por bimestre (cada disciplina)</label><input type="number" data-f="meta" min="1" value="10"></div></div>'
+      +'<div class="md-f"><label>Disciplinas (separe por vírgula)</label><input type="text" data-f="disc" placeholder="Ex.: Língua Portuguesa, Artes"></div>'
+      +'<div class="md-f"><label>Alunos (um por linha, na ordem da chamada)</label><textarea data-f="alunos" placeholder="Ana Clara Souza&#10;Bruno Lima&#10;…"></textarea></div>'
+      +'<button type="button" class="md-btn pri" data-f="criar">Criar turma</button>';
+  }
+  function ligarFormTurma(box){
+    var sel=box.querySelector('[data-f="escola"]'),nova=box.querySelector('[data-f="escolaNova"]');
+    if(sel)sel.onchange=function(){nova.hidden=sel.value!=='__nova';};
+    box.querySelector('[data-f="criar"]').onclick=function(){
+      var v=function(k){var el=box.querySelector('[data-f="'+k+'"]');return el?el.value.trim():'';};
+      var escolaId=sel&&sel.value!=='__nova'?sel.value:'';
+      if(!escolaId){if(!v('escolaNova'))return toast('Informe o nome da escola.');escolaId=novoId('e');E.escolas.push({id:escolaId,nome:v('escolaNova')});}
+      if(!v('turma'))return toast('Informe o nome da turma.');
+      var meta=Math.max(1,parseInt(v('meta'),10)||10);
+      var vistos={};
+      var disciplinas=v('disc').split(',').map(function(s){return s.trim();}).filter(Boolean).map(function(nome){var id=slug(nome);while(vistos[id])id+='x';vistos[id]=1;return{id:id,nome:nome,metaBim:meta,total:meta*4};});
+      var alunos=v('alunos').split(/\n/).map(function(s){return s.replace(/^\s*\d+[\s.)-]*/,'').trim();}).filter(Boolean).map(function(nm,i){return{n:i+1,nm:nm};});
+      var t={id:novoId('t'),nome:v('turma'),escolaId:escolaId,alunos:alunos,disciplinas:disciplinas};
+      E.turmas.push(t);
+      salvar('turma');
+      toast('Turma criada.');
+      irPara(t.id);
+    };
+  }
+
+  // ── Configuração ────────────────────────────────────────────────────
+  function desenharConfig(){
+    var sec=document.getElementById('sec-config');
+    var html='<div class="md-hero"><h2>Turmas e alunos<small>Escolas, turmas, chamada e disciplinas. Alterações sincronizam na hora.</small></h2>'
+      +'<button type="button" class="md-btn" data-cfg="exportar">⬇️ Baixar cópia dos dados</button></div>'
+      +'<div class="md-card"><h3>Seu nome</h3><div class="md-row"><input class="md-in" data-cfg="nome" value="'+esc((E.perfil&&E.perfil.nome)||'')+'"><button type="button" class="md-btn mini pri" data-cfg="salvar-nome">Salvar</button></div></div>'
+      +'<div class="md-card"><h3>Escolas</h3>'+((E.escolas||[]).map(function(e){return '<div class="md-row"><input class="md-in" data-escola="'+e.id+'" value="'+esc(e.nome)+'"><button type="button" class="md-x" data-rm-escola="'+e.id+'" title="Remover">✕</button></div>';}).join('')||'<p>Nenhuma escola.</p>')
+      +'<button type="button" class="md-btn mini" data-cfg="salvar-escolas">Salvar nomes</button></div>'
+      +(E.turmas||[]).map(function(t){
+        return '<details class="md-turma" data-t="'+t.id+'"><summary>'+esc(t.nome)+' — '+t.alunos.length+' alunos, '+t.disciplinas.length+' disciplinas</summary>'
+          +'<div class="md-grid"><div class="md-f"><label>Nome da turma</label><input data-tf="nome" value="'+esc(t.nome)+'"></div>'
+          +'<div class="md-f"><label>Escola</label><select data-tf="escola">'+(E.escolas||[]).map(function(e){return '<option value="'+e.id+'"'+(e.id===t.escolaId?' selected':'')+'>'+esc(e.nome)+'</option>';}).join('')+'</select></div></div>'
+          +'<div class="md-f"><label>Disciplinas</label>'+t.disciplinas.map(function(d){return '<div class="md-row" data-disc="'+d.id+'"><input class="md-in" data-df="nome" value="'+esc(d.nome)+'"><label>Meta/bim <input class="md-in" style="width:70px" type="number" min="1" data-df="meta" value="'+d.metaBim+'"></label><label>Ano <input class="md-in" style="width:76px" type="number" min="1" data-df="total" value="'+d.total+'"></label><button type="button" class="md-x" data-rm-disc="'+d.id+'" title="Remover">✕</button></div>';}).join('')
+          +'<div class="md-row"><input class="md-in" data-df-nova placeholder="Nova disciplina"><button type="button" class="md-btn mini" data-add-disc>+ Adicionar</button></div></div>'
+          +'<div class="md-f"><label>Chamada</label>'+t.alunos.map(function(a){return '<div class="md-row" data-aluno="'+a.n+'"><span class="n">'+a.n+'</span><input class="md-in" data-af="nm" value="'+esc(a.nm)+'"><label><input type="checkbox" data-af="tr"'+(a.tr?' checked':'')+'> Transferido</label><button type="button" class="md-x" data-rm-aluno="'+a.n+'" title="Remover">✕</button></div>';}).join('')
+          +'<textarea class="md-in" data-novos placeholder="Adicionar alunos: um por linha (entram no fim da chamada)" style="min-height:70px;margin-top:6px"></textarea></div>'
+          +'<div class="md-row"><button type="button" class="md-btn pri" data-salvar-turma>💾 Salvar turma</button><span style="flex:1"></span><button type="button" class="md-btn perigo" data-rm-turma>Excluir turma</button></div></details>';
+      }).join('')
+      +'<div class="md-card"><h3>Nova turma</h3><div id="md-nova-turma">'+formTurma()+'</div></div>';
+    sec.innerHTML=html;
+    ligarFormTurma(sec.querySelector('#md-nova-turma'));
+    sec.querySelector('[data-cfg="salvar-nome"]').onclick=function(){E.perfil=E.perfil||{};E.perfil.nome=sec.querySelector('[data-cfg="nome"]').value.trim();salvar('perfil');toast('Nome salvo.');};
+    sec.querySelector('[data-cfg="salvar-escolas"]').onclick=function(){sec.querySelectorAll('[data-escola]').forEach(function(i){var e=escola(i.getAttribute('data-escola'));if(e&&i.value.trim())e.nome=i.value.trim();});salvar('escolas');toast('Escolas salvas.');};
+    sec.querySelectorAll('[data-rm-escola]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-rm-escola');if(E.turmas.some(function(t){return t.escolaId===id;}))return toast('Há turmas nesta escola. Mude a escola delas antes.');E.escolas=E.escolas.filter(function(e){return e.id!==id;});salvar('escolas');};});
+    sec.querySelector('[data-cfg="exportar"]').onclick=exportar;
+    sec.querySelectorAll('details.md-turma').forEach(function(box){
+      var t=turma(box.getAttribute('data-t'));
+      box.querySelector('[data-salvar-turma]').onclick=function(){
+        t.nome=box.querySelector('[data-tf="nome"]').value.trim()||t.nome;
+        t.escolaId=box.querySelector('[data-tf="escola"]').value||t.escolaId;
+        box.querySelectorAll('[data-disc]').forEach(function(r){var d=t.disciplinas.filter(function(x){return x.id===r.getAttribute('data-disc');})[0];if(!d)return;d.nome=r.querySelector('[data-df="nome"]').value.trim()||d.nome;d.metaBim=Math.max(1,parseInt(r.querySelector('[data-df="meta"]').value,10)||d.metaBim);d.total=Math.max(d.metaBim,parseInt(r.querySelector('[data-df="total"]').value,10)||d.total);});
+        box.querySelectorAll('[data-aluno]').forEach(function(r){var a=t.alunos.filter(function(x){return x.n===parseInt(r.getAttribute('data-aluno'),10);})[0];if(!a)return;a.nm=r.querySelector('[data-af="nm"]').value.trim()||a.nm;if(r.querySelector('[data-af="tr"]').checked)a.tr=true;else delete a.tr;});
+        var prox=t.alunos.reduce(function(m,a){return Math.max(m,a.n);},0);
+        box.querySelector('[data-novos]').value.split(/\n/).map(function(s){return s.replace(/^\s*\d+[\s.)-]*/,'').trim();}).filter(Boolean).forEach(function(nm){t.alunos.push({n:++prox,nm:nm});});
+        salvar('turma');toast('Turma salva.');
+      };
+      box.querySelector('[data-add-disc]').onclick=function(){
+        var nome=box.querySelector('[data-df-nova]').value.trim();if(!nome)return;
+        var id=slug(nome);while(t.disciplinas.some(function(d){return d.id===id;}))id+='x';
+        var meta=(t.disciplinas[0]&&t.disciplinas[0].metaBim)||10;
+        t.disciplinas.push({id:id,nome:nome,metaBim:meta,total:meta*4});salvar('disc');
+      };
+      box.querySelectorAll('[data-rm-disc]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-rm-disc');var usados=diarios().filter(function(d){return d.turma===t.id&&d.disc===id;}).length;if(!confirm(usados?'Esta disciplina tem '+usados+' diário(s). Eles continuam salvos, mas saem do contador. Remover?':'Remover a disciplina?'))return;t.disciplinas=t.disciplinas.filter(function(d){return d.id!==id;});salvar('disc');};});
+      box.querySelectorAll('[data-rm-aluno]').forEach(function(b){b.onclick=function(){if(!confirm('Remover este aluno da chamada? (Para quem saiu da escola, prefira marcar "Transferido".)'))return;var n=parseInt(b.getAttribute('data-rm-aluno'),10);t.alunos=t.alunos.filter(function(a){return a.n!==n;});salvar('aluno');};});
+      box.querySelector('[data-rm-turma]').onclick=function(){if(!confirm('Excluir a turma "'+t.nome+'"? Os diários dela deixam de aparecer.'))return;E.turmas=E.turmas.filter(function(x){return x.id!==t.id;});salvar('turma');irPara('config');};
+    });
+  }
+
+  function exportar(){
+    var dados={exportadoEm:agora(),conta:usuario.email,estrutura:E,diarios:diarios()};
+    var blob=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='meu-diario-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();
+  }
+
+  // ── Relatório do aluno ──────────────────────────────────────────────
+  function abrirListaAlunos(tid){
+    var t=turma(tid);
+    abrirOverlay('<h2>Relatório dos alunos — '+esc(t.nome)+'</h2><p style="font-size:.86rem;color:var(--cm);margin:6px 0 14px">Escolha o aluno para ver frequência, atividades e ocorrências.</p><div class="md-alunos">'
+      +t.alunos.map(function(a){return '<button type="button" class="'+(a.tr?'tr':'')+'" data-n="'+a.n+'">'+a.n+'. '+esc(a.nm)+'</button>';}).join('')+'</div>'
+      +'<div class="md-noprint" style="margin-top:16px;text-align:right"><button type="button" class="md-btn" data-fechar>Fechar</button></div>',function(ov){
+        ov.querySelectorAll('[data-n]').forEach(function(b){b.onclick=function(){abrirRelatorio(tid,parseInt(b.getAttribute('data-n'),10));};});
+      });
+  }
+  function abrirRelatorio(tid,n){
+    var t=turma(tid),a=t.alunos.filter(function(x){return x.n===n;})[0];
+    var ds=diarios().filter(function(d){return d.turma===tid;}).sort(function(x,y){return (x.dateKey+x.ini).localeCompare(y.dateKey+y.ini);});
+    var porDisc={},faltas=[],atvs=[],ocs=[];
+    ds.forEach(function(d){
+      var h=parseInt(d.horas,10)||1,s=estadoP(d,n);
+      var k=d.discNome||'';porDisc[k]=porDisc[k]||{aulas:0,falt:0,fz:0,nf:0};
+      porDisc[k].aulas+=h;
+      if(s!=='pr'){porDisc[k].falt+=h;faltas.push({d:d,s:s});}
+      if(d.rel&&d.rel.atividade&&d.rel.atividade.houve){var sa=estadoA(d,n);if(sa==='fz')porDisc[k].fz++;if(sa==='nf')porDisc[k].nf++;atvs.push({d:d,s:sa});}
+      ((d.rel&&d.rel.comportamento)||[]).forEach(function(c){if((c.alunos||[]).indexOf(n)>=0)ocs.push({d:d,c:c});});
+    });
+    var linhas=Object.keys(porDisc).map(function(k){var p=porDisc[k];var freq=p.aulas?Math.round((p.aulas-p.falt)/p.aulas*100):100;return '<tr><td>'+esc(k)+'</td><td>'+p.aulas+'</td><td>'+p.falt+'</td><td><strong>'+freq+'%</strong></td><td>'+p.fz+' / '+(p.fz+p.nf)+'</td></tr>';}).join('');
+    var esc1=escola(t.escolaId);
+    abrirOverlay('<h2>'+esc(a.nm)+'</h2><p style="font-size:.86rem;color:var(--cm);margin-top:4px">'+esc(t.nome)+' · Nº '+a.n+(esc1?' · '+esc(esc1.nome):'')+' · Professor(a): '+esc((E.perfil&&E.perfil.nome)||usuario.email)+' · Emitido em '+new Date().toLocaleDateString('pt-BR')+'</p>'
+      +'<h4>Frequência e atividades por disciplina</h4>'+(linhas?'<table><tr><th>Disciplina</th><th>H/aula</th><th>Faltas (h)</th><th>Frequência</th><th>Atividades feitas</th></tr>'+linhas+'</table>':'<p>Nenhum diário registrado.</p>')
+      +'<h4>Faltas</h4>'+(faltas.length?'<table>'+faltas.map(function(f){return '<tr><td>'+dataBr(f.d.dateKey)+'</td><td>'+esc(f.d.discNome)+'</td><td>'+(f.s==='fj'?'Justificada':'Falta')+'</td><td>'+esc(f.d.assunto)+'</td></tr>';}).join('')+'</table>':'<p>Nenhuma falta.</p>')
+      +'<h4>Atividades</h4>'+(atvs.length?'<table>'+atvs.map(function(x){return '<tr><td>'+dataBr(x.d.dateKey)+'</td><td>'+esc(x.d.discNome)+'</td><td>'+esc(x.d.rel.atividade.titulo||x.d.assunto)+'</td><td>'+({fz:'Fez',nf:'Não fez',au:'Sem marcação'})[x.s]+'</td></tr>';}).join('')+'</table>':'<p>Nenhuma atividade registrada.</p>')
+      +'<h4>Observações de conduta</h4>'+(ocs.length?'<table>'+ocs.map(function(o){return '<tr><td>'+dataBr(o.d.dateKey)+'</td><td>'+esc(o.d.discNome)+'</td><td>'+({advertencia:'⚠️ Advertência',grave:'🚨 Grave',destaque:'✅ Destaque'})[o.c.tipo]+'</td><td>'+esc(o.c.texto)+'</td></tr>';}).join('')+'</table>':'<p>Nenhuma ocorrência.</p>')
+      +'<div class="md-noprint" style="margin-top:18px;display:flex;gap:10px;justify-content:flex-end"><button type="button" class="md-btn" data-voltar>← Alunos</button><button type="button" class="md-btn pri" data-imprimir>🖨️ Imprimir / Salvar PDF</button></div>',function(ov){
+        ov.querySelector('[data-voltar]').onclick=function(){abrirListaAlunos(tid);};
+        ov.querySelector('[data-imprimir]').onclick=function(){document.body.classList.add('md-imprimindo');window.print();setTimeout(function(){document.body.classList.remove('md-imprimindo');},500);};
+      });
+  }
+  function abrirOverlay(html,ligar){
+    var velho=document.querySelector('.md-ov');if(velho)velho.remove();
+    var ov=document.createElement('div');ov.className='md-ov';ov.innerHTML='<div class="md-rel" role="dialog" aria-modal="true">'+html+'</div>';
+    ov.addEventListener('mousedown',function(e){if(e.target===ov)ov.remove();});
+    document.body.appendChild(ov);
+    var f=ov.querySelector('[data-fechar]');if(f)f.onclick=function(){ov.remove();};
+    if(ligar)ligar(ov);
+  }
+
+  // ── Desenho geral ───────────────────────────────────────────────────
+  function desenharTudo(){
+    var nome=(E.perfil&&E.perfil.nome)||usuario.nome;
+    document.getElementById('md-quem').textContent=(nome?nome+' · ':'')+usuario.email;
+    desenharAbas();garantirSecoes();desenharInicio();desenharConfig();desenharContador();desenharEstatisticasTurmas();
+    irPara(abaAtual||(function(){try{return localStorage.getItem('md_aba');}catch(x){return '';}})()||'inicio');
+  }
+  function aposRenderDiarios(){desenharMarcacoes();desenharEstatisticasTurmas();desenharContador();if(abaAtual==='inicio')desenharInicio();}
+
+  // ── Adaptador do novo-diario.js ─────────────────────────────────────
+  function adaptador(){
+    return {
+      chave:'md', perUser:true, scope:'meu-diario:diarios:v1', lsKey:'md_diarios_'+usuario.id, schoolSlug:'meu-diario',
+      turmas:function(){return (E.turmas||[]).map(function(t){return t.id;});},
+      comHoras:true, presencaNeutra:false,
+      rotulo:function(t){var x=turma(t);return x?x.nome:t;},
+      alunos:function(t){var x=turma(t);return x?x.alunos:[];},
+      disciplinas:function(t){var x=turma(t);return x?x.disciplinas.map(function(d){return d.nome;}):[];},
+      pres:function(){return PRES;}, atv:function(){return ATV;},
+      kPres:function(id){return 'pl-'+id;}, kAtv:function(id){return 'atv-'+id;},
+      codigoDisc:function(nome,t){var x=turma(t);var d=x&&x.disciplinas.filter(function(y){return y.nome===nome;})[0];return d?d.id:slug(nome);},
+      discDoTitulo:function(){return '';},
+      novoId:function(t,dateKey,discNome,ignorar){
+        var base=t+'-'+dateKey.slice(5,7)+dateKey.slice(8,10)+this.codigoDisc(discNome,t);
+        var usados={};diarios().forEach(function(d){usados[d.id]=1;});
+        var letras=['','a','b','c','d','e','f','g','h'];
+        for(var i=0;i<letras.length;i++){var id=base+letras[i];if(id===ignorar||(!usados[id]&&!document.getElementById('r-'+id)))return id;}
+        return '';
+      },
+      mesmoId:function(s){return s.dateKey===s.dateKey0&&s.discNome===s.discNome0;},
+      tituloCard:function(d){var x=turma(d.turma);var disc=x&&x.disciplinas.filter(function(y){return y.id===d.disc;})[0];return (disc?disc.nome:d.discNome)+' — '+d.horas+'h/aula';},
+      estadoPresenca:function(id,n){var c=PRES['pl-'+id]||{faltaram:[],faltJ:[]};return c.faltaram.indexOf(n)>=0?'fa':c.faltJ.indexOf(n)>=0?'fj':'pr';},
+      estadoAtividade:function(id,n){var c=ATV['atv-'+id]||{fez:[],naoFez:[]};return c.fez.indexOf(n)>=0?'fz':c.naoFez.indexOf(n)>=0?'nf':'au';},
+      parcialPresenca:function(){return false;}, parcialAtividade:function(){return false;},
+      temAtividade:function(id){return !!ATV['atv-'+id];},
+      limparCliques:function(){},
+      paineis:function(d){
+        var atv=(d.rel&&d.rel.atividade)||{};
+        return {
+          p:'<div data-md-pres="'+esc(d.id)+'"></div>',
+          a:atv.houve
+            ?'<div class="atv-tema"><strong>'+esc(atv.titulo||'Atividade')+'</strong>'+(atv.descricao?'<br><span style="font-size:.82rem;color:var(--cm)">'+esc(atv.descricao)+'</span>':'')+'</div><div data-md-atv="'+esc(d.id)+'"></div>'
+            :'<div class="atv-av"><span>📋</span><span>Nenhuma atividade nesta aula. Para registrar, toque em ✏️ e marque "Houve atividade".</span></div>'
+        };
+      },
+      sincronizar:aposRenderDiarios,
+      durEmTitulo:function(txt){var m=/(\d+)\s*h\/aula/i.exec(txt||'');return m?{horas:parseInt(m[1],10)}:null;},
+      aoStatus:function(s){statusDiarios=s;mostrarStatus();}
+    };
+  }
+
+  // ── Início da página ────────────────────────────────────────────────
+  function iniciar(){
+    var S=window.RelatorioSupabaseSync;
+    usuario=S.auth.currentUser();
+    E=lerLocal();
+    if(!E.perfil||!E.perfil.nome){E.perfil=E.perfil||{};E.perfil.nome=usuario.nome||'';}
+    desenharTudo();
+    document.getElementById('md-sair').onclick=function(){if(confirm('Sair da conta neste aparelho?'))S.auth.signOut();};
+    syncE=S.createScopeSync({
+      perUser:true, scope:SCOPE_ESTRUTURA, source:'meu-diario', debounceMs:250,
+      getLocalPayload:function(){return E;},
+      onRemotePayload:aplicarRemotoEstrutura,
+      onStatus:function(s){statusEstrutura=s;mostrarStatus();}
+    });
+    syncE.start().then(function(){
+      // Conta nova: a primeira gravação cria o registro no banco.
+      if(!E.atualizadoEm){E.atualizadoEm=agora();syncE.pushNow('force');}
+    });
+    window.NovoDiario.iniciar(adaptador());
+    window.addEventListener('online',mostrarStatus);window.addEventListener('offline',mostrarStatus);
+  }
+  function quandoPronto(){
+    var S=window.RelatorioSupabaseSync;
+    if(!S||!window.NovoDiario){setTimeout(quandoPronto,50);return;}
+    S.auth.whenAuthorized().then(function(){if(!usuario)iniciar();});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',quandoPronto);else quandoPronto();
+})();
+</script>
+</body>
+</html>
