@@ -27,7 +27,7 @@
 // Depende de window.BoletimRegras (motor das notas).
 // ═══════════════════════════════════════════════════════════════════════════
 (function (root) {
-  var VERSAO = "2026-09-17c";
+  var VERSAO = "2026-09-19a";
   var PONTOS_CONDUTA = { leve: 0.25, medio: 0.5, grave: 1, muito_grave: 2 };
   var BIMESTRES = ["1", "2", "3", "4"];
   var PROFESSOR = "Paulo Roberto Ramalho Magalhães";
@@ -133,29 +133,101 @@
     return m < 1 ? "menos de 1 min" : m + " min";
   }
 
-  // Mesmo conteúdo da tela "Resultado da Avaliação" do livro (prova-report.js):
-  // nota, aproveitamento, acertos, erros, não respondidas e desempenho por
-  // habilidade; aqui em tabela, para caber no papel.
-  function resultadoDaProva(p) {
-    var pct = p.total > 0 ? Math.round(100 * p.acertos / p.total) : 0;
-    var porQuestao = p.total > 0 ? 10 / p.total : 0;
-    var cabeca = "<strong>" + (p.recuperacao ? "Recuperação da Avaliação Bimestral" : "Avaliação Bimestral") + "</strong>"
-      + (p.data ? " · " + dataBr(p.data) : "") + (p.tempoSegundos ? " · tempo: " + minutos(p.tempoSegundos) : "");
-    var resumo = '<table class="prova-resumo"><tr><th>Nota</th><th>Aproveitamento</th><th>Acertos</th><th>Erros</th><th>Não respondidas</th></tr>'
-      + "<tr><td><strong>" + numero(p.nota) + "</strong> / 10,0</td><td>" + pct + "%</td>"
-      + "<td>" + p.acertos + " (" + numero(p.acertos * porQuestao) + " pts)</td>"
-      + "<td>" + (p.erros || 0) + "</td><td>" + (p.naoRespondidas || 0) + "</td></tr></table>";
-    var habilidades = (p.descritores || []).map(function (d) {
-      var dPct = d.total > 0 ? Math.round(100 * d.acertos / d.total) : 0;
-      return "<tr><td><strong>" + esc(d.codigo) + "</strong>" + (d.nome ? " — " + esc(d.nome) : "") + "</td>"
-        + "<td>" + d.acertos + "/" + d.total + " (" + dPct + "%)</td></tr>";
-    }).join("");
-    return '<div class="prova-bloco"><div class="prova-cabeca">' + cabeca + "</div>" + resumo
-      + (habilidades ? '<table class="habilidades"><tr><th>Desempenho por habilidade</th><th>Acertos</th></tr>' + habilidades + "</table>" : "")
-      + "</div>";
+  // Mesma tela "Resultado da Avaliação" que o aluno vê ao terminar a prova no
+  // livro (prova-report.js), no tema claro: cabeçalho, anel da nota, cartões,
+  // legenda, grade de questões, desempenho e desempenho por habilidade.
+  var IC = {
+    award: '<path d="M12 2v4M5.6 5.6l2.9 2.9M2 12h4M18.4 5.6l-2.9 2.9M22 12h-4"/><circle cx="12" cy="15" r="5"/><path d="M10 15l1.5 1.5L14 14"/>',
+    book: '<path d="M4 19.5V4.5A1.5 1.5 0 0 1 5.5 3H19a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H5.5A1.5 1.5 0 0 1 4 19.5z"/><path d="M8 7h8M8 11h6"/>',
+    cap: '<path d="M22 9L12 4 2 9l10 5 10-5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/>',
+    cal: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/>',
+    trophy: '<path d="M6 4h12v5a6 6 0 0 1-12 0z"/><path d="M6 6H3.5A2.5 2.5 0 0 0 6 10.5M18 6h2.5A2.5 2.5 0 0 1 18 10.5"/><path d="M10 15h4M9 20h6M12 15v5"/>',
+    check: '<circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.3 2.3 4.7-4.7"/>',
+    x: '<circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/>',
+    minus: '<circle cx="12" cy="12" r="9"/><path d="M8.5 12h7"/>',
+    doc: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
+    chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'
+  };
+
+  function icone(nome) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+      + IC[nome] + "</svg>";
   }
 
-  function tabelaProvas(dados, disciplina, calc) {
+  function resultadoDaProva(p, disciplina, serie) {
+    var total = Number(p.total) || 0;
+    var acertos = Number(p.acertos) || 0;
+    var erros = Number(p.erros) || 0;
+    var vazias = Number(p.naoRespondidas) || 0;
+    var pct = total > 0 ? Math.round(100 * acertos / total) : 0;
+    var porQuestao = total > 0 ? 10 / total : 0;
+    var raio = 92;
+    var circ = 2 * Math.PI * raio;
+    var titulo = p.recuperacao ? "Resultado da Recuperação" : "Resultado da Avaliação";
+
+    var h = '<div class="prova-bloco pr">';
+    h += '<div class="pr-head"><span class="pr-head-icon">' + icone("award") + "</span>"
+      + '<div class="pr-title">' + titulo + '</div><div class="pr-chips">'
+      + '<span class="pr-chip">' + icone("book") + "<span>Disciplina: <b>" + esc(disciplina) + "</b></span></span>"
+      + (serie ? '<span class="pr-chip">' + icone("cap") + "<span>Ano: <b>" + esc(serie) + "</b></span></span>" : "")
+      + '<span class="pr-chip">' + icone("cal") + "<span>Data: <b>" + (dataBr(p.data) || "—") + "</b></span></span>"
+      + (p.tempoSegundos ? '<span class="pr-chip"><span>Tempo: <b>' + minutos(p.tempoSegundos) + "</b></span></span>" : "")
+      + "</div></div>";
+
+    h += '<div class="pr-score"><div class="pr-ring-wrap">'
+      + '<svg viewBox="0 0 200 200" class="pr-ring" aria-hidden="true">'
+      + '<circle cx="100" cy="100" r="' + raio + '" class="pr-ring-track"></circle>'
+      + '<circle cx="100" cy="100" r="' + raio + '" class="pr-ring-fill" style="stroke-dasharray:' + circ.toFixed(1)
+      + ";stroke-dashoffset:" + (circ * (1 - pct / 100)).toFixed(1) + '"></circle></svg>'
+      + '<div class="pr-ring-label"><span class="pr-ring-cap">Nota do aluno</span>'
+      + '<span class="pr-ring-num">' + numero(p.nota) + '</span><span class="pr-ring-max">/ 10,0</span></div></div>'
+      + '<div class="pr-badge">' + icone("trophy") + "<span>" + pct + "% de aproveitamento</span></div></div>";
+
+    h += '<div class="pr-stats">'
+      + '<div class="pr-stat ok">' + icone("check") + '<span class="pr-stat-n">' + acertos + '</span><span class="pr-stat-l">Acertos</span><span class="pr-stat-s">' + numero(acertos * porQuestao) + " pontos</span></div>"
+      + '<div class="pr-stat err">' + icone("x") + '<span class="pr-stat-n">' + erros + '</span><span class="pr-stat-l">Erros</span><span class="pr-stat-s">' + numero(erros * porQuestao) + " pontos</span></div>"
+      + '<div class="pr-stat non">' + icone("minus") + '<span class="pr-stat-n">' + vazias + '</span><span class="pr-stat-l">Não respondidas</span><span class="pr-stat-s">0,0 ponto</span></div>'
+      + '<div class="pr-stat tot">' + icone("doc") + '<span class="pr-stat-n">10,0</span><span class="pr-stat-l">Pontuação total</span><span class="pr-stat-s">Valor máximo</span></div></div>';
+
+    h += '<div class="pr-legend"><span><i class="pr-dot ok"></i> Acertou</span><span><i class="pr-dot err"></i> Errou</span>'
+      + '<span><i class="pr-dot non"></i> Não respondida</span></div>';
+
+    var questoes = p.questoes || [];
+    if (questoes.length) {
+      h += '<div class="pr-grid">' + questoes.map(function (q, i) {
+        var cls = "non", marca = "–", pts = "–";
+        if (q.marcou) {
+          if (q.ok) { cls = "ok"; marca = "✓"; pts = numero(porQuestao); }
+          else { cls = "err"; marca = "✕"; pts = numero(0); }
+        }
+        var dica = "Questão " + (i + 1) + (q.marcou ? " · marcou " + q.marcou : " · não respondida") + " · correta " + (q.correta || "?");
+        return '<div class="pr-q ' + cls + '" title="' + esc(dica) + '"><div class="pr-q-ball"><span class="pr-q-n">' + (i + 1)
+          + '</span><span class="pr-q-mk">' + marca + '</span></div><span class="pr-q-pt">' + pts + "</span></div>";
+      }).join("") + "</div>";
+    }
+
+    h += '<div class="pr-perf"><div class="pr-perf-side">' + icone("chart") + '<div><div class="pr-perf-t">Desempenho</div>'
+      + '<div class="pr-perf-s">Cada questão certa vale ' + numero(porQuestao) + " ponto.</div></div></div>"
+      + '<div class="pr-perf-calc">'
+      + '<div class="pr-calc-row is-ok"><span>Acertos: ' + acertos + " × " + numero(porQuestao) + "</span><b>" + numero(acertos * porQuestao) + "</b></div>"
+      + '<div class="pr-calc-row is-err"><span>Erros: ' + erros + " × 0,0</span><b>0,0</b></div>"
+      + '<div class="pr-calc-row"><span>Não respondidas: ' + vazias + " × 0,0</span><b>0,0</b></div>"
+      + '<div class="pr-calc-total"><span>Total</span><b>' + numero(p.nota) + " / 10,0</b></div></div></div>";
+
+    var habilidades = (p.descritores || []).map(function (d) {
+      var dPct = d.total > 0 ? Math.round(100 * d.acertos / d.total) : 0;
+      return '<div class="pr-desc"><span class="pr-desc-code">' + esc(d.codigo) + (d.nome ? " <i>— " + esc(d.nome) + "</i>" : "")
+        + '</span><span class="pr-desc-val">' + d.acertos + "/" + d.total + " (" + dPct + "%)</span></div>";
+    }).join("");
+    if (habilidades) {
+      h += '<div class="pr-gab"><h4>Desempenho por habilidade</h4><div class="pr-desc-list">' + habilidades + "</div>"
+        + (questoes.length ? '<p class="pr-gab-hint">Passe o mouse sobre um número da grade para ver o que o aluno marcou e qual era a alternativa correta.</p>' : "")
+        + "</div>";
+    }
+    return h + "</div>";
+  }
+
+  function tabelaProvas(dados, disciplina, calc, serie) {
     return BIMESTRES.map(function (b) {
       var r = calc.bimestres[b];
       var provas = (dados.provas || []).filter(function (p) {
@@ -163,7 +235,7 @@
       });
       var corpo;
       if (provas.length) {
-        corpo = provas.map(resultadoDaProva).join("");
+        corpo = provas.map(function (p) { return resultadoDaProva(p, disciplina.nome, serie); }).join("");
         if (provas.length > 1) corpo += '<div class="section-note">Vale a maior nota entre a prova e a recuperação do livro.</div>';
         if (r.prova !== null && r.origemProva !== "automatico") {
           corpo += '<div class="section-note">No boletim vale a nota lançada pelo professor: ' + numero(r.prova) + "/10.</div>";
@@ -288,12 +360,66 @@
     + ".observacoes th:nth-child(1){width:12%}.observacoes th:nth-child(2){width:10%}.observacoes th:nth-child(3){width:18%}.observacoes th:nth-child(4){width:12%}"
     + ".observacoes td:nth-child(1),.observacoes td:nth-child(2),.observacoes td:nth-child(3),.observacoes td:nth-child(4){text-align:center}"
     + ".notas th:nth-child(1){width:22%}"
-    + ".prova-bimestre{border:1px solid var(--borda);margin-bottom:10px;break-inside:avoid}"
-    + ".prova-titulo{background:var(--cinza);font-weight:700;padding:5px 8px;border-bottom:1px solid var(--borda)}"
+    + ".prova-bimestre{border:1px solid var(--borda);margin-bottom:10px}"
+    + ".prova-titulo{background:var(--cinza);font-weight:700;padding:5px 8px;border-bottom:1px solid var(--borda);break-after:avoid}"
     + ".prova-bloco{padding:8px}.prova-bloco+.prova-bloco{border-top:1px dashed var(--borda)}"
-    + ".prova-cabeca{margin-bottom:6px}"
-    + ".prova-resumo td{text-align:center}.prova-bimestre table{margin-bottom:6px}"
-    + ".habilidades th:nth-child(2){width:22%}.habilidades td:nth-child(2){text-align:center}"
+    + ".prova-bloco.pr{break-inside:avoid;"
+    + "--pr-bg:#fff;--pr-surface:#f7faf8;--pr-line:#e4ebe6;--pr-ink:#14261c;--pr-ink-2:#4d6357;--pr-muted:#7b8c83;"
+    + "--pr-green:#15803d;--pr-green-2:#16a34a;--pr-green-soft:#eaf6ee;--pr-green-line:#c9e6d4;"
+    + "--pr-red:#dc2626;--pr-red-soft:#fdf1f1;--pr-red-line:#f3d3d3;--pr-grey:#6b7280;--pr-grey-soft:#f4f5f4;--pr-grey-line:#e2e5e3;"
+    + "--pr-blue:#2563eb;--pr-blue-soft:#eff4fd;--pr-blue-line:#d3e0f7;--pr-track:#e6f0ea;"
+    + "color:var(--pr-ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.4;"
+    + "-webkit-print-color-adjust:exact;print-color-adjust:exact}"
+    + ".pr-head{text-align:center;margin-bottom:8px}"
+    + ".pr-head-icon{display:block;margin:0 auto 4px;width:28px;height:28px;color:var(--pr-green)}.pr-head-icon svg{width:100%;height:100%}"
+    + ".pr-title{font-size:15pt;font-weight:800;margin-bottom:8px;color:var(--pr-ink)}"
+    + ".pr-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}"
+    + ".pr-chip{display:inline-flex;align-items:center;gap:5px;font-size:9pt;color:var(--pr-ink-2);background:var(--pr-surface);border:1px solid var(--pr-line);border-radius:999px;padding:3px 10px}"
+    + ".pr-chip svg{width:13px;height:13px;color:var(--pr-green);flex:none}.pr-chip b{color:var(--pr-ink)}"
+    + ".pr-score{background:var(--pr-surface);border:1px solid var(--pr-line);border-radius:12px;padding:12px 8px;margin-bottom:8px}"
+    + ".pr-ring-wrap{position:relative;width:150px;height:150px;margin:0 auto}"
+    + ".pr-ring{width:100%;height:100%;transform:rotate(-90deg);display:block}"
+    + ".pr-ring-track{fill:none;stroke:var(--pr-track);stroke-width:9}"
+    + ".pr-ring-fill{fill:none;stroke:var(--pr-green);stroke-width:9;stroke-linecap:round}"
+    + ".pr-ring-label{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center}"
+    + ".pr-ring-cap{font-size:9pt;font-weight:600;color:var(--pr-ink-2)}"
+    + ".pr-ring-num{font-size:30pt;font-weight:800;line-height:1.05;color:var(--pr-green)}"
+    + ".pr-ring-max{font-size:11pt;font-weight:700;color:var(--pr-muted)}"
+    + ".pr-badge{display:flex;align-items:center;justify-content:center;gap:6px;margin:8px auto 0;width:fit-content;font-size:10pt;font-weight:700;border-radius:999px;padding:4px 14px;background:var(--pr-green-soft);color:var(--pr-green);border:1px solid var(--pr-green-line)}"
+    + ".pr-badge svg{width:15px;height:15px}"
+    + ".pr-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}"
+    + ".pr-stat{border-radius:10px;padding:7px 4px;text-align:center;border:1px solid}"
+    + ".pr-stat svg{width:18px;height:18px;margin:0 auto 2px;display:block}"
+    + ".pr-stat-n{display:block;font-size:15pt;font-weight:800;line-height:1.1}"
+    + ".pr-stat-l{display:block;font-size:9pt;font-weight:600;color:var(--pr-ink-2)}"
+    + ".pr-stat-s{display:block;font-size:8.5pt;color:var(--pr-muted);margin-top:3px;padding-top:3px;border-top:1px solid var(--pr-line)}"
+    + ".pr-stat.ok{background:var(--pr-green-soft);border-color:var(--pr-green-line)}.pr-stat.ok svg{color:var(--pr-green)}"
+    + ".pr-stat.err{background:var(--pr-red-soft);border-color:var(--pr-red-line)}.pr-stat.err svg{color:var(--pr-red)}"
+    + ".pr-stat.non{background:var(--pr-grey-soft);border-color:var(--pr-grey-line)}.pr-stat.non svg{color:var(--pr-grey)}"
+    + ".pr-stat.tot{background:var(--pr-blue-soft);border-color:var(--pr-blue-line)}.pr-stat.tot svg{color:var(--pr-blue)}"
+    + ".pr-legend{display:flex;justify-content:center;gap:18px;background:var(--pr-surface);border:1px solid var(--pr-line);border-radius:8px;padding:5px;margin-bottom:8px;font-size:9pt;font-weight:600;color:var(--pr-ink-2)}"
+    + ".pr-legend span{display:inline-flex;align-items:center;gap:5px}"
+    + ".pr-dot{width:11px;height:11px;border-radius:50%;display:inline-block}"
+    + ".pr-dot.ok{background:var(--pr-green-2)}.pr-dot.err{background:var(--pr-red)}.pr-dot.non{background:var(--pr-grey)}"
+    + ".pr-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px 4px;margin-bottom:8px}"
+    + ".pr-q{display:flex;flex-direction:column;align-items:center;gap:2px}"
+    + ".pr-q-ball{width:100%;max-width:34px;aspect-ratio:1;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;line-height:1}"
+    + ".pr-q-n{font-size:8.5pt;font-weight:800}.pr-q-mk{font-size:7pt;font-weight:700}"
+    + ".pr-q-pt{font-size:8pt;font-weight:600;color:var(--pr-muted)}"
+    + ".pr-q.ok .pr-q-ball{background:var(--pr-green-2)}.pr-q.err .pr-q-ball{background:var(--pr-red)}.pr-q.non .pr-q-ball{background:var(--pr-grey)}"
+    + ".pr-perf{display:flex;align-items:center;gap:14px;background:var(--pr-surface);border:1px solid var(--pr-line);border-radius:10px;padding:9px 12px;margin-bottom:8px}"
+    + ".pr-perf-side{display:flex;align-items:flex-start;gap:8px;flex:1}.pr-perf-side svg{width:20px;height:20px;color:var(--pr-green);flex:none}"
+    + ".pr-perf-t{font-size:11pt;font-weight:800;color:var(--pr-green)}.pr-perf-s{font-size:9pt;color:var(--pr-muted)}"
+    + ".pr-perf-calc{flex:1.2}"
+    + ".pr-calc-row{display:flex;justify-content:space-between;font-size:10pt;padding:1px 0;color:var(--pr-ink-2)}"
+    + ".pr-calc-row.is-ok b{color:var(--pr-green)}.pr-calc-row.is-err b{color:var(--pr-red)}"
+    + ".pr-calc-total{display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid var(--pr-line);font-size:11pt;font-weight:800}"
+    + ".pr-gab h4{font-size:11pt;font-weight:800;color:var(--pr-green);margin:0 0 5px}"
+    + ".pr-desc-list{display:flex;flex-direction:column;gap:4px}"
+    + ".pr-desc{display:flex;justify-content:space-between;gap:10px;background:var(--pr-surface);border:1px solid var(--pr-line);border-radius:8px;padding:5px 9px;font-size:9.5pt}"
+    + ".pr-desc-code{font-weight:700}.pr-desc-code i{font-style:normal;font-weight:500;color:var(--pr-ink-2)}"
+    + ".pr-desc-val{font-weight:700;color:var(--pr-muted);white-space:nowrap}"
+    + ".pr-gab-hint{font-size:9pt;color:var(--pr-muted);margin:6px 0 0}"
     + ".signature{margin-top:26px;text-align:center;break-inside:avoid}"
     + ".signature img{width:250px;max-width:72%;display:block;margin:0 auto -10px}"
     + ".signature-line{width:330px;max-width:80%;margin:0 auto 5px;border-top:1px solid #333}"
@@ -318,6 +444,7 @@
       return !opcoes.disciplina || d.nome === opcoes.disciplina;
     });
     var aluno = (boletim.numero ? boletim.numero + ". " : "") + (boletim.aluno || "");
+    var serie = String(boletim.turma || "").split("·").pop().trim();
     var corpo = "";
 
     disciplinas.forEach(function (disciplina, indice) {
@@ -333,7 +460,7 @@
         + '<div class="section-note">' + esc(frequenciaDaDisciplina(dados, disciplina.nome)) + "</div>"
         + '<div class="section-title">2 - RELATÓRIO DE PROVAS</div>'
         + '<div class="section-note">Resultado de cada Avaliação Bimestral, como o aluno vê ao terminar a prova no livro.</div>'
-        + tabelaProvas(dados, disciplina, calc)
+        + tabelaProvas(dados, disciplina, calc, serie)
         + '<div class="section-title page-break">3 - ATIVIDADES FEITAS</div>'
         + '<div class="section-note">Cada atividade que vale ponto no bimestre divide os 10 pontos de trabalho. "Aguardando" fica fora do cálculo até ser corrigida.</div>'
         + atividades.html;
