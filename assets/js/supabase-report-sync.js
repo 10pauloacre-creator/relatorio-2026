@@ -208,7 +208,7 @@ window.RelatorioSupabaseSync = (function () {
   function translateAuthError(error) {
     var message = String(error && error.message || "");
     if (/invalid login credentials/i.test(message)) return "E-mail ou senha incorretos.";
-    if (/email not confirmed/i.test(message)) return "Este e-mail ainda não foi confirmado. Abra o link que enviamos para ele.";
+    if (/email not confirmed/i.test(message)) return "Este e-mail ainda não foi confirmado. Abra o link que enviamos para ele (confira também a pasta Spam).";
     if (/already registered|already been registered|user already exists/i.test(message)) return "Já existe uma conta com este e-mail. Use \"Entrar\".";
     if (/password should be|weak password|at least/i.test(message)) return "A senha precisa ter pelo menos 8 caracteres, com letras e números.";
     if (/unable to validate email|invalid email|email address .* is invalid/i.test(message)) return "Confira o e-mail digitado.";
@@ -257,6 +257,36 @@ window.RelatorioSupabaseSync = (function () {
       options: { redirectTo: urlDeRetorno() }
     });
     if (response.error) throw new Error(translateAuthError(response.error));
+  }
+
+  async function resendConfirmation(email) {
+    var client = getClient();
+    if (!client) throw new Error("Supabase indisponível nesta página.");
+    var response = await client.auth.resend({ type: "signup", email: normalizeEmail(email), options: { emailRedirectTo: urlDeRetorno() } });
+    if (response.error) throw new Error(translateAuthError(response.error));
+  }
+
+  // Botão "Reenviar e-mail de confirmação" logo abaixo da mensagem.
+  function oferecerReenvio(caixa, email) {
+    if (!caixa || caixa.parentNode.querySelector(".rel-auth-reenviar")) return;
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "rel-auth-link rel-auth-reenviar";
+    b.style.marginTop = "8px";
+    b.textContent = "Reenviar e-mail de confirmação";
+    b.addEventListener("click", async function () {
+      b.disabled = true;
+      try {
+        await resendConfirmation(email);
+        caixa.className = "rel-auth-ok";
+        caixa.textContent = "Enviamos de novo para " + email + ". Confira a caixa de entrada e também a pasta Spam.";
+      } catch (error) {
+        caixa.className = "rel-auth-error";
+        caixa.textContent = error.message;
+      }
+      window.setTimeout(function () { b.disabled = false; }, 60000);
+    });
+    caixa.insertAdjacentElement("afterend", b);
   }
 
   async function sendPasswordReset(email) {
@@ -480,18 +510,20 @@ window.RelatorioSupabaseSync = (function () {
             desenharGate();
             var ok = authGateEl.querySelector(".rel-auth-error");
             ok.className = "rel-auth-ok";
-            ok.textContent = "Conta criada! Enviamos um link de confirmação para " + email + ". Abra o link e depois entre aqui.";
+            ok.textContent = "Conta criada! Enviamos um link de confirmação para " + email + ". Se não aparecer na caixa de entrada em alguns minutos, confira a pasta Spam. Depois de abrir o link, entre aqui.";
+            oferecerReenvio(ok, email);
             return;
           }
         } else if (m === "esqueci") {
           await sendPasswordReset(email);
           errorBox.className = "rel-auth-ok";
-          errorBox.textContent = "Se houver uma conta com este e-mail, o link chega em alguns minutos.";
+          errorBox.textContent = "Se houver uma conta com este e-mail, o link chega em alguns minutos. Confira também a pasta Spam.";
         } else {
           await updatePassword(senha);
         }
       } catch (error) {
         errorBox.textContent = error.message;
+        if (/não foi confirmado/.test(error.message)) oferecerReenvio(errorBox, email);
       } finally {
         submit.disabled = false;
         submit.textContent = rotulo;
