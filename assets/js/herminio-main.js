@@ -1506,7 +1506,7 @@ return;
 }
 if (document.querySelector('script[data-rh-editor-loader="1"]')) return;
 var script = document.createElement('script');
-script.src = 'assets/js/editor.js?v=20260721a';
+script.src = 'assets/js/editor.js?v=20260919a';
 script.async = false;
 script.setAttribute('data-rh-editor-loader', '1');
 script.onload = function() {
