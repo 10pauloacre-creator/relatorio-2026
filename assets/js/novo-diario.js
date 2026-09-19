@@ -245,6 +245,7 @@
     };
   }
 
+  function turmasDe() { return typeof A.turmas === "function" ? A.turmas() : A.turmas; }
   function idLivreDom(id) {
     return !document.getElementById("p-" + id) && !document.getElementById("r-" + id) && !document.getElementById("a-" + id);
   }
@@ -406,9 +407,15 @@
     });
   }
   function renderTodos(semEcossistema) {
+    // Cards abertos (e a aba interna de cada um) continuam como estavam.
+    var abertos = {};
+    document.querySelectorAll("[data-novo-diario] .ec2.on").forEach(function (ec) {
+      var card = ec.closest("[data-novo-diario]"), pane = ec.querySelector(".ipane.on");
+      abertos[card.getAttribute("data-novo-diario")] = pane ? pane.id.charAt(0) : "r";
+    });
     limparGerados();
     estado.diarios.forEach(function (d) {
-      if (A.turmas.indexOf(d.turma) < 0) return;
+      if (turmasDe().indexOf(d.turma) < 0) return;
       if (d.origem) ocultarOriginal(d.origem);
       if (d.excluido) return;
       var sec = document.getElementById("sec-" + d.turma);
@@ -427,7 +434,18 @@
       }
       var holder = document.createElement("div");
       holder.innerHTML = montarCard(d);
-      inserirCard(sec, holder.firstElementChild, d.dateKey + "T" + (d.ini || "00:00"));
+      var novo = holder.firstElementChild;
+      inserirCard(sec, novo, d.dateKey + "T" + (d.ini || "00:00"));
+      if (abertos[d.id]) {
+        novo.querySelector(".ec2").classList.add("on");
+        var seta = novo.querySelector(".et");
+        if (seta) seta.classList.add("op");
+        var letra = abertos[d.id];
+        novo.querySelectorAll(".ipane").forEach(function (p) { p.classList.toggle("on", p.id.charAt(0) === letra); });
+        novo.querySelectorAll(".itab").forEach(function (b) {
+          b.classList.toggle("on", (b.getAttribute("onclick") || "").indexOf("'" + letra + "-") >= 0);
+        });
+      }
     });
     decorar();
     if (!semEcossistema) A.sincronizar();
@@ -435,7 +453,7 @@
 
   // ── caneta ✏️ em todos os cards das abas de turma ─────────────
   function decorar() {
-    A.turmas.forEach(function (t) {
+    turmasDe().forEach(function (t) {
       var sec = document.getElementById("sec-" + t);
       if (!sec) return;
       sec.querySelectorAll(".ea").forEach(function (card) {
@@ -463,7 +481,7 @@
     var sec = card && card.closest(".sec");
     var t = sec && sec.id ? sec.id.replace(/^sec-/, "") : "";
     var pane = card && card.querySelector('.ipane[id^="r-"], .ipane[id^="p-"]');
-    if (!pane || !A || A.turmas.indexOf(t) < 0) return;
+    if (!pane || !A || turmasDe().indexOf(t) < 0) return;
     abrirEdicao(t, pane.id.slice(2));
   }, true);
 
@@ -482,12 +500,14 @@
     if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return;
     sync = window.RelatorioSupabaseSync.createScopeSync({
       scope: A.scope,
+      perUser: !!A.perUser,
       schoolSlug: A.schoolSlug,
       classSlug: "novos-diarios",
-      source: A.chave === "rh" ? "herminio-novo-diario" : "casavequia-novo-diario",
-      debounceMs: 400,
+      source: A.chave === "rh" ? "herminio-novo-diario" : A.chave === "cv" ? "casavequia-novo-diario" : "meu-diario",
+      debounceMs: 250,
       getLocalPayload: function () { return { versao: 2, diarios: estado.diarios, removidos: estado.removidos }; },
-      onRemotePayload: aplicarRemoto
+      onRemotePayload: aplicarRemoto,
+      onStatus: function (status, detalhe) { if (typeof A.aoStatus === "function") A.aoStatus(status, detalhe); }
     });
     sync.start();
   }
@@ -1033,7 +1053,7 @@
     var existente = estado.diarios.filter(function (d) { return d.id === idAntigo; })[0];
     var t = agora();
     var d = {
-      id: id, turma: st.turma, dateKey: st.dateKey, disc: A.codigoDisc(st.discNome), discNome: st.discNome, assunto: st.assunto,
+      id: id, turma: st.turma, dateKey: st.dateKey, disc: A.codigoDisc(st.discNome, st.turma), discNome: st.discNome, assunto: st.assunto,
       ini: st.ini, fim: st.fim, horas: st.horas, minutos: st.minutos || 0, rel: rel, rascunho: st.rascunho || "",
       criadoEm: (existente && existente.criadoEm) || t, atualizadoEm: t
     };
@@ -1080,15 +1100,39 @@
 
   // ── API pública e inicialização ───────────────────────────────
   window.novoDiarioAbrir = function (t) {
-    if (!A || A.turmas.indexOf(t) < 0) return;
+    if (!A || turmasDe().indexOf(t) < 0) return;
     abrirNovo(t, null);
   };
   window.novoDiarioEditar = function (t, id) { if (A) abrirEdicao(t, id); };
 
+  // Meu Diário (e qualquer página nova) entrega o próprio adaptador.
+  window.NovoDiario = {
+    iniciar: function (adaptador) {
+      if (A) return;
+      A = adaptador;
+      iniciarComAdaptador();
+    },
+    // Altera um diário salvo (cliques de presença/atividade na própria página).
+    alterar: function (id, mutador) {
+      var d = estado.diarios.filter(function (x) { return x.id === id && !x.excluido; })[0];
+      if (!d) return false;
+      mutador(d);
+      d.atualizadoEm = agora();
+      persistir();
+      return true;
+    },
+    diarios: function () { return estado.diarios.filter(function (d) { return !d.excluido; }); },
+    renderizar: function () { if (A) renderTodos(); }
+  };
+
   function iniciar() {
+    if (A || window.NOVO_DIARIO_MANUAL) return;
     if (typeof ALUNOS_RH !== "undefined" && typeof PRESENCA_RH !== "undefined") A = adaptadorHerminio();
     else if (typeof ALUNOS !== "undefined" && typeof PRESENCA !== "undefined") A = adaptadorCasavequia();
     if (!A) return;
+    iniciarComAdaptador();
+  }
+  function iniciarComAdaptador() {
     injetarEstilo();
     estado = lerLocal();
     if (estado.diarios.length) renderTodos(); else decorar();

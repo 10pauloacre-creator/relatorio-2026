@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-acesso="inicio">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +11,8 @@
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="assets/css/dark-mode-2026.css?v=20260916a">
 <script defer src="assets/js/dark-mode-2026.js?v=20260917e"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="assets/js/supabase-report-sync.js?v=20260919c"></script>
 <title>Relatórios 2026</title> <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -77,6 +79,10 @@ a:not(.projetos-pessoais) > img {
   a:not(.projetos-pessoais) > img, .projetos-pessoais { width: 320px; height: 320px; max-width: none; max-height: none; }
   a:hover { transform: translateY(-8px) scale(1.05); }
 }
+.conta-barra { position: fixed; top: 12px; right: 12px; display: flex; gap: 8px; align-items: center; z-index: 10;
+  font-size: .78rem; color: #a9c4b2; }
+.conta-barra button { background: rgba(255,255,255,.08); color: #e9f3ec; border: 1px solid rgba(255,255,255,.2);
+  border-radius: 999px; padding: 6px 12px; font-weight: 700; cursor: pointer; }
 </style>
 </head>
 <body class="dark-page">
@@ -96,6 +102,22 @@ a:not(.projetos-pessoais) > img {
   <span>Ideias, projetos, ferramentas e I.As em um só lugar.</span>
 </a>
 
+<div class="conta-barra" id="conta-barra" hidden><span id="conta-email"></span><button type="button" id="conta-sair">Sair</button></div>
+<script>
+// Tela inicial (Etapa 9): as escolas são da conta do administrador; qualquer
+// outra conta segue para o Meu Diário, com os próprios dados.
+document.addEventListener('DOMContentLoaded', function () {
+  var S = window.RelatorioSupabaseSync;
+  if (!S) return;
+  S.auth.whenAuthorized().then(function () {
+    if (!S.auth.isAdmin()) { window.location.replace(window.RELATORIO_SUPABASE_CONFIG.professorHome); return; }
+    var barra = document.getElementById('conta-barra');
+    document.getElementById('conta-email').textContent = (S.auth.currentUser() || {}).email || '';
+    document.getElementById('conta-sair').onclick = function () { if (confirm('Sair da conta neste aparelho?')) S.auth.signOut(); };
+    barra.hidden = false;
+  });
+});
+</script>
 <script defer src="assets/app-build.js?v=20260717a"></script>
 <script defer src="assets/js/app-update.js?v=20260717c"></script>
 </body>
