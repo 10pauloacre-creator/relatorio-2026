@@ -1231,6 +1231,8 @@
     const autoGrade = calculateAutoWorkGrade(student, disciplineName, bim);
     const effectiveWork = getEffectiveWorkGrade(student, disciplineName, bim);
     const isManual = hasManualWorkGrade(student, disciplineName, bim);
+    // Sem nota digitada, o campo de prova mostra a prova feita no livro.
+    const provaDaBiblioteca = toNumber(dados.prova) === null && getAutomaticExamGrade(student, disciplineName, bim) !== null;
 
     // Bimestre automático: o cálculo é o padrão; o professor pode ajustar.
     if (isAutomaticBimester(bim)) {
@@ -1269,7 +1271,8 @@
       + '<div class="field-stack">'
         + renderDescontoConduta(resultado)
         + "<div><label>Nota de trabalhos (0 a 10)</label>" + renderStepper(student.id, bim, "trabalhos", effectiveWork, disciplineName) + "</div>"
-        + "<div><label>Nota de prova (0 a 10)</label>" + renderStepper(student.id, bim, "prova", dados.prova, disciplineName) + "</div>"
+        + "<div><label>" + (provaDaBiblioteca ? "Nota de prova (0 a 10) · prova da Biblioteca" : "Nota de prova (0 a 10)") + "</label>"
+          + renderStepper(student.id, bim, "prova", getEffectiveExamGrade(student, disciplineName, bim), disciplineName) + "</div>"
         + renderLibraryExamNote(student, disciplineName, bim, dados)
         + '<div class="summary-foot">'
           + (isManual
@@ -1299,7 +1302,7 @@
     return '<div class="summary-foot">Prova da Biblioteca: <strong>' + escapeHtml(texto) + "</strong>. "
       + (digitada
         ? 'A nota digitada tem prioridade. <button class="ghost-btn reset-auto-btn" type="button" data-reset-auto-prova="' + student.id + '" data-bimester="' + bim + '" data-discipline="' + escapeHtml(disciplineName) + '">Usar a prova da Biblioteca</button>'
-        : "Entra no boletim enquanto o campo acima estiver vazio.")
+        : "Ja esta no campo acima e vale no boletim. Digite outra nota so se quiser substituir.")
       + "</div>";
   }
 
@@ -1703,9 +1706,10 @@
     const field = button.dataset.field;
     const disciplineName = button.dataset.discipline || MAIN_DISCIPLINE;
     const dados = getDisciplineBimState(student, disciplineName, bim);
+    // Trabalhos e prova partem do valor em uso (o automático, se não houver nota digitada).
     const current = field === "trabalhos"
       ? getEffectiveWorkGrade(student, disciplineName, bim)
-      : toNumber(dados[field]);
+      : (field === "prova" ? getEffectiveExamGrade(student, disciplineName, bim) : toNumber(dados[field]));
     const next = field === "trabalhosRealizados"
       ? sanitizeFieldValue(field, (current === null ? 0 : current) + Number(button.dataset.step))
       : sanitizeFieldValue(field, ((paraExibicao(current) || 0) + Number(button.dataset.step)) / ESCALA_EXIBICAO);

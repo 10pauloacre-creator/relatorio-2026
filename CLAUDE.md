@@ -367,7 +367,7 @@ O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: s�
 **Chave de disciplina (Etapa 8E):** `relatorio_disciplina_chave()` (banco) e `HerminioRegrasExtras.chave()` (painel) igualam "Língua Inglesa"/"Inglês", "Língua Espanhola"/"Espanhol" e "Artes"/"Arte". O `get_meu_boletim` e o desconto comparam disciplina por ela; sem isso, nota de trabalho, prova e desconto de Inglês e Espanhol da Hermínio se perdiam. SQL em `supabase/2026-09-18-etapa8e-regras-herminio.sql`.
 
 **Segurança e tempo real (Etapas 8C e 8D):**
-- **`boletim_normalizado` fechada:** a view roda como dono do banco e estava aberta para a chave pública, que lia nome e notas de todos. Agora só responde ao professor logado (`private.is_relatorio_admin`); `report-boletim-api.js` (página de notas do admin na Biblioteca) envia o token da sessão. O aluno vê o próprio boletim só por `get_meu_boletim`.
+- **`boletim_normalizado` fechada:** a view roda como dono do banco e estava aberta para a chave pública, que lia nome e notas de todos. Agora só responde ao professor logado (`private.is_relatorio_admin`); `report-boletim-api.js` (página de notas do admin na Biblioteca) envia o token da sessão. O aluno vê o próprio boletim só por `get_meu_boletim`. Desde 19/09/2026 (Etapa 9B) a página de notas do admin (`bimester-grades-admin.js`) NÃO usa mais essa view (só tinha as notas digitadas, em 0–5, e mostrava todo mundo com 0,0): ela chama `get_meu_boletim` de cada aluno da turma (6 em paralelo) e calcula com `boletim-regras.js`, igual ao perfil do aluno; o botão da linha abre o Relatório Individual.
 - **Aviso em tempo real:** gatilhos por instrução em `relatorio_lancamentos`, `relatorio_ocorrencias`, `relatorio_aulas` e `report_sync_state` mandam `realtime.send` no canal público "relatorio-atualizado" (evento "atualizado"), no máximo um a cada 5 s. O aviso só leva a hora, nenhum dado. O boletim aberto no app busca de novo em 6–10 s; com o app em segundo plano, busca ao voltar. Falha no aviso nunca atrapalha a gravação.
 
 **Desconto por comportamento (Etapa 8B, decisão de 17/09/2026):** SQL em `supabase/2026-09-17-etapa8b-provas-no-relatorio-e-desconto-conduta.sql`.
@@ -400,6 +400,7 @@ O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: s�
 - **Data de entrada (`de`):** aulas anteriores aparecem como "Entrou dd/mm", sem presença nem atividade.
 - **Chamada no banco:** a publicação grava a chamada completa em `relatorio_chamada`, com o 4º item do aluno no retrato = adicionado, e limpa quem já foi fixado na página.
 - **Não renumerar à mão:** para fixar o aluno no HTML, use o mesmo número que ele já recebeu.
+- **Vínculo imediato (Etapa 9B, `supabase/2026-09-19-etapa9b-sincronia-notas.sql`):** `relatorio_sincronizar_vinculos` também vincula os alunos de `relatorio_alunos_adicionados`, com o mesmo id/número do `completarPainel` (maior da lista fixa + ordem), e um gatilho roda no cadastro. Antes o vínculo só nascia quando o painel da turma era salvo de novo, e a prova do aluno novo não chegava a lugar nenhum (caso Clarisse, 2ª Série). `get_meu_boletim` inclui o aluno vinculado mesmo fora da lista salva e devolve `scopeKey`.
 - **Turma nova:** exige criar a aba ou painel e a linha em `relatorio_turmas` e `relatorio_turmas_diarias`. O resto (vínculo, notas, provas, observações, relatório) é automático.
 
 **Prova só com login (Biblioteca):**
@@ -411,7 +412,7 @@ O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: s�
 - **Nota:** acertos ÷ questões × 10, valendo a maior entre a prova e a recuperação do livro.
 - **Bimestre, escola e série:** saem do caminho do livro. O resultado só entra no painel da mesma escola e série.
 - **Sistema antigo** (`bimester_grades`): continua valendo onde tiver nota.
-- **Prioridade:** a prova digitada pelo professor vence; sem ela, entra a da Biblioteca. No 3º e 4º bimestres da Casavequia, a da Biblioteca é o padrão, com ajuste opcional.
+- **Prioridade:** a prova digitada pelo professor vence; sem ela, entra a da Biblioteca. No painel da Casavequia, o campo "Nota de prova" mostra a da Biblioteca quando não há nota digitada (e os botões −/+ partem dela). No 3º e 4º bimestres da Casavequia, a da Biblioteca é o padrão, com ajuste opcional.
 - **Detalhe da prova:** `notas-bimestrais.js` (`obterProvaDetalhe`) e `get_meu_boletim` (`provaDetalhe`) mostram a prova e a recuperação do livro.
 - **Risco conhecido:** a correção da prova é feita no aparelho do aluno, e `quiz_results` aceita inserção com a chave pública. O primeiro resultado fica travado, e só o admin apaga (`reset_prova_aluno`).
 
