@@ -32,7 +32,7 @@ C:\Downloads\relatorio-2026\
 ```
 
 **GitHub:** `https://github.com/10pauloacre-creator/relatorio-2026`
-**Vercel:** projeto `relatorios` na conta `10pauloacre-creator` (equipe `10pauloacre-creators-projects`), ligado ao GitHub desde 19/09/2026 → `https://relatorios-ten-pi.vercel.app`. Cada push na `main` publica nos dois lugares (GitHub Pages e Vercel). O `vercel.json` roda `npm run build:pages` e serve só `dist/` (a mesma lista de `scripts/build-web-release.js`). O branch `gh-pages` também gera uma prévia no Vercel, sem efeito.
+**Vercel:** projeto `relatorios` na conta `10pauloacre-creator` (equipe `10pauloacre-creators-projects`), ligado ao GitHub desde 19/09/2026 → domínio oficial **`https://relatorio.skin`** (o `relatorios-ten-pi.vercel.app` foi removido em 19/09/2026; `www.relatorio.skin` não existe). Cada push na `main` publica nos dois lugares (GitHub Pages e Vercel). O `vercel.json` roda `npm run build:pages` e serve só `dist/` (a mesma lista de `scripts/build-web-release.js`). O branch `gh-pages` também gera uma prévia no Vercel, sem efeito.
 **Branch:** `main`
 **Último commit:** `f5dc531` — relatos 09-10/04, contador e plano LGG renovados
 
@@ -461,4 +461,4 @@ Toda página que carrega `supabase-report-sync.js` exige conta. O tipo de acesso
 
 **Páginas públicas (19/09/2026):** `privacidade.html` (Política de Privacidade, LGPD) e `termos.html` (Termos de Serviço) NÃO carregam `supabase-report-sync.js`, então abrem sem conta. Links discretos "Privacidade · Termos" no rodapé do `index.html` (`.legal`) e na tela de login (`.rel-auth-legal`, em todas as páginas trancadas). Estão em `scripts/build-web-release.js`, que o GitHub Pages usa: página nova só é publicada se entrar nessa lista. Ao ligar um serviço novo (IA, hospedagem, analytics), atualize a seção 6 da política.
 
-**Pendências do professor (painel do Supabase):** ligar o Google (Authentication → Providers, com Client ID/Secret do Google Cloud) e incluir `https://10pauloacre-creator.github.io/relatorio-2026/**` em Authentication → URL Configuration → Redirect URLs. O repositório é **público**: os relatos escritos no HTML (com nomes de alunos) continuam legíveis no código-fonte, mesmo com a página trancada.
+**Pendências do professor (painel do Supabase):** ligar o Google (Authentication → Providers, com Client ID/Secret do Google Cloud) e incluir `https://relatorio.skin/**` e `https://10pauloacre-creator.github.io/relatorio-2026/**` em Authentication → URL Configuration → Redirect URLs (a URL da Biblioteca que já está lá fica). No Google Cloud, a origem autorizada é `https://relatorio.skin`. O repositório é **público**: os relatos escritos no HTML (com nomes de alunos) continuam legíveis no código-fonte, mesmo com a página trancada.
