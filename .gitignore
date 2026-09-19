@@ -27,3 +27,7 @@ android/capacitor.settings.gradle
 
 # Release metadata local
 release/app-version.json
+
+# Crash logs da JVM
+hs_err_pid*.log
+replay_pid*.log

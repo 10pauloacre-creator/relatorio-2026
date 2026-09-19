@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="painel-alunos">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -845,6 +845,7 @@ tbody tr:hover td{
   }
 }
 </style>
+<link rel="stylesheet" href="assets/css/painel-alunos-escuro.css?v=20260918a">
 </head>
 <body>
 <header class="hero">
@@ -1109,7 +1110,7 @@ function aplicarBonusPoder(media, student) {
 function renderRegrasExtrasBimestre(student, disciplineName, bim) {
   const desconto = regrasExtras ? regrasExtras.desconto(student, disciplineName, bim) : 0;
   if (!desconto) return "";
-  return '<div class="summary-foot" style="color:#8c3514"><strong>Comportamento: -' + formatNumber(desconto)
+  return '<div class="summary-foot conduta-desconto"><strong>Comportamento: -' + formatNumber(desconto)
     + "</strong> na nota do bimestre (" + regrasExtras.ocorrencias(student, disciplineName, bim)
     + " ocorrencia(s); limite de 2,0).</div>";
 }
