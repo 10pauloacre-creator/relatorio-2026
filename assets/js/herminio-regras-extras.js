@@ -9,6 +9,10 @@
 //     relatorio_descontos_conduta, já somada e limitada);
 //   • bônus do Ranking de Poder na média final (+N÷4 do nível, via
 //     BoletimRegras.nivelPoder e view relatorio_poder_alunos).
+//   • prova da Biblioteca (Etapa 9C, decisão de 19/09/2026): quando o aluno fez
+//     a Avaliação Bimestral no livro, a nota de prova do bimestre é a dele,
+//     mesmo que já houvesse nota lançada; sem prova feita, fica a manual
+//     (view relatorio_provas_bimestrais; o painel grava com aplicarProvas).
 // Só o professor logado lê essas views. Recarrega a cada minuto e ao voltar
 // para a página.
 // ═══════════════════════════════════════════════════════════════════════════
@@ -30,6 +34,7 @@ window.HerminioRegrasExtras = (function () {
   function criar(opcoes) {
     var descontos = {};
     var poder = {};
+    var provas = {};
     var carregado = false;
     var carregando = false;
 
@@ -46,12 +51,21 @@ window.HerminioRegrasExtras = (function () {
             .eq("scope_key", opcoes.scopeKey),
           client.from("relatorio_poder_alunos")
             .select("aluno_relatorio_id,pontos,bonus_poder")
+            .eq("scope_key", opcoes.scopeKey),
+          client.from("relatorio_provas_bimestrais")
+            .select("aluno_relatorio_id,disciplina,bimestre,nota_prova")
             .eq("scope_key", opcoes.scopeKey)
         ]);
-        if (respostas[0].error || respostas[1].error) {
-          console.warn("[Regras Hermínio] não foi possível carregar.", respostas[0].error || respostas[1].error);
+        var falha = respostas.filter(function (r) { return r.error; })[0];
+        if (falha) {
+          console.warn("[Regras Hermínio] não foi possível carregar.", falha.error);
           return false;
         }
+        var novasProvas = {};
+        (respostas[2].data || []).forEach(function (l) {
+          if (l.nota_prova === null || l.nota_prova === undefined) return;
+          novasProvas[l.aluno_relatorio_id + "|" + chave(l.disciplina) + "|" + l.bimestre] = Number(l.nota_prova);
+        });
         var novosDescontos = {};
         (respostas[0].data || []).forEach(function (l) {
           if (!l.regra_ligada) return;
@@ -65,6 +79,7 @@ window.HerminioRegrasExtras = (function () {
         });
         descontos = novosDescontos;
         poder = novoPoder;
+        provas = novasProvas;
         carregado = true;
         if (typeof opcoes.aoAtualizar === "function") {
           try { opcoes.aoAtualizar(); } catch (erro) { console.warn("[Regras Hermínio] falha ao redesenhar", erro); }
@@ -115,6 +130,36 @@ window.HerminioRegrasExtras = (function () {
       bonusMedia: function (student) {
         var nivel = this.poder(student);
         return nivel ? nivel.bonusMedia : 0;
+      },
+      /** Nota (0 a 10) da prova feita na Biblioteca, ou null. */
+      provaBiblioteca: function (student, disciplina, bim) {
+        if (!carregado || !student) return null;
+        var nota = provas[student.id + "|" + chave(disciplina) + "|" + bim];
+        return nota === undefined ? null : nota;
+      },
+      /**
+       * Grava a prova da Biblioteca no campo de prova (escala 0–5 do painel)
+       * de cada aluno que fez a prova. Devolve quantas notas mudaram.
+       * celula(student, disciplina, bim) → objeto do bimestre com .prova.
+       */
+      aplicarProvas: function (alunos, disciplinas, celula) {
+        if (!carregado) return 0;
+        var self = this;
+        var mudou = 0;
+        (alunos || []).forEach(function (student) {
+          (disciplinas || []).forEach(function (disciplina) {
+            ["1", "2", "3", "4"].forEach(function (bim) {
+              var nota = self.provaBiblioteca(student, disciplina, bim);
+              if (nota === null) return;
+              var alvo = Math.round(nota * 50) / 100;
+              var cel = celula(student, disciplina, bim);
+              if (!cel || Number(cel.prova) === alvo && cel.prova !== "") return;
+              cel.prova = alvo;
+              mudou += 1;
+            });
+          });
+        });
+        return mudou;
       },
       pronto: function () { return carregado; }
     };
