@@ -10,78 +10,118 @@
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <title>Meu Diário</title>
-<script>window.NOVO_DIARIO_MANUAL = true;</script>
+<script>
+window.NOVO_DIARIO_MANUAL = true;
+// Tema escolhido antes do primeiro desenho (evita piscar claro→escuro).
+(function(){var m='';try{m=localStorage.getItem('modo-tema')||'';}catch(e){}
+  if(!m)m=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'escuro':'claro';
+  window.MD_TEMA_INICIAL=m;
+  if(m==='escuro')document.documentElement.classList.add('dark-2026');})();
+</script>
+<script defer src="assets/js/dark-mode-2026.js?v=20260917e"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260919e"></script>
-<script defer src="assets/js/novo-diario.js?v=20260919c"></script>
+<script defer src="assets/js/meu-diario-recursos.js?v=20260919a"></script>
+<script defer src="assets/js/meu-diario-ia.js?v=20260919a"></script>
+<script defer src="assets/js/novo-diario.js?v=20260919d"></script>
 <style>
-:root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--og:#876020;--card:#fff;--fundo:#f3f1ea;--ss:0 4px 24px rgba(26,58,42,.10);--r:14px;--rs2:8px}
-@media (prefers-color-scheme:dark){:root{--vd:#9fd8b4;--vm:#6fcf97;--vc:#4a9467;--vs:#1f3b2b;--os:#3a3219;--cr:#15211a;--ce:#e6efe9;--cm:#a4b8ab;--cl:#2a3a31;--rs:#3a1d1a;--card:#1b2a21;--fundo:#0f1914;--ss:0 4px 24px rgba(0,0,0,.35)}}
+:root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--og:#876020;--card:#fff;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px;
+  /* Tokens próprios do Meu Diário (redefinidos no modo escuro). */
+  --md-sup:#fff;--md-sup2:#faf8f2;--md-sup3:#f5f3ee;--md-linha:#e8e5de;--md-titulo:#1a3a2a;--md-acento:#2d6147;--md-acento-txt:#fff;--md-destaque:#2d6147;--md-fundo:#faf8f2}
+html.dark-2026{--md-sup:#191c1f;--md-sup2:#202327;--md-sup3:#272b30;--md-linha:#383d43;--md-titulo:#f4f5f6;--md-acento:#ffa65b;--md-acento-txt:#1b130b;--md-destaque:#ffa65b;--md-fundo:#111315}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:var(--fundo);color:var(--ce);min-height:100vh}
+body{font-family:'DM Sans',sans-serif;background:var(--md-fundo);color:var(--ce);min-height:100vh}
 button{font-family:inherit}
-.md-top{background:linear-gradient(135deg,#1a3a2a,#2d6147 60%,#4a9467);color:#fff;padding:18px 20px}
-.md-top-i{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.md-top h1{font-family:'Playfair Display',serif;font-size:1.5rem;flex:1;min-width:180px}
-.md-top h1 small{display:block;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:400;opacity:.85;margin-top:2px}
-.md-sync{font-size:.76rem;background:rgba(255,255,255,.14);border-radius:999px;padding:6px 12px;white-space:nowrap}
-.md-top button{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.8rem;cursor:pointer}
-.md-tabs{background:var(--card);border-bottom:1px solid var(--cl);position:sticky;top:0;z-index:50;overflow-x:auto}
-.md-tabs-i{max-width:1100px;margin:0 auto;display:flex;gap:2px;padding:0 12px}
-.md-tab{padding:13px 14px;border:none;background:none;color:var(--cm);font-weight:600;font-size:.86rem;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
-.md-tab.on{color:var(--vm);border-bottom-color:var(--vm)}
-.main{max-width:1100px;margin:0 auto;padding:22px 16px 60px}
-.sec{display:none}.sec.on{display:block}
-.md-hero{background:var(--card);border-radius:var(--r);box-shadow:var(--ss);padding:18px 20px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.md-hero h2{font-family:'Playfair Display',serif;color:var(--vd);font-size:1.3rem;flex:1;min-width:200px}
-.md-hero h2 small{display:block;font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--cm);font-weight:400;margin-top:3px}
-.md-btn{border:none;border-radius:10px;padding:10px 16px;font-weight:700;font-size:.86rem;cursor:pointer;background:var(--cl);color:var(--ce)}
-.md-btn.pri{background:var(--vm);color:#fff}
-.md-btn.perigo{background:var(--rs);color:var(--ra)}
-.md-btn.mini{padding:6px 10px;font-size:.76rem}
-.md-card{background:var(--card);border-radius:var(--r);box-shadow:var(--ss);padding:18px 20px;margin-bottom:16px}
-.md-card h3{font-family:'Playfair Display',serif;color:var(--vd);font-size:1.08rem;margin-bottom:10px}
+a{color:var(--md-destaque)}
+/* ── Cabeçalho e abas (mesmo desenho da Casavequia) ── */
+.cab{background:linear-gradient(135deg,var(--vd),var(--vm) 60%,var(--vc));color:#fff;position:relative;overflow:hidden}
+.cab::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:rgba(201,168,76,.15)}
+.cab-i{max-width:1200px;margin:0 auto;padding:30px 40px 24px;position:relative;z-index:1;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.md-avatar{width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(201,168,76,.7);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:#f5e6be;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.cab-t{flex:1;min-width:220px}
+.cab-t h1{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;line-height:1.2}
+.cab-t .sub{font-size:.8rem;opacity:.82;margin-top:4px;font-weight:300;letter-spacing:.04em;text-transform:uppercase}
+.cab-t .prof{margin-top:9px;display:inline-flex;align-items:center;gap:7px;background:rgba(201,168,76,.25);border:1px solid rgba(201,168,76,.5);border-radius:20px;padding:4px 13px;font-size:.8rem;font-weight:500;color:var(--os);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.md-cab-acoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.md-sync{font-size:.74rem;background:rgba(255,255,255,.14);border-radius:999px;padding:6px 12px;white-space:nowrap}
+.md-sair{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.8rem;cursor:pointer}
+#modo-btns{display:flex;gap:6px}
+#modo-btns button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+#modo-btns .btn-claro{background:#fff;border-color:#e8e5de;color:#c9a84c}
+#modo-btns .btn-escuro{background:#1a3a2a;border-color:#4a9467;color:#c9a84c}
+#modo-btns button.ativo{transform:scale(1.12);box-shadow:0 4px 14px rgba(0,0,0,.35);border-color:#c9a84c}
+.nav-w{background:var(--vd);border-bottom:3px solid var(--ou);position:sticky;top:0;z-index:100}
+.nav-i{max-width:1200px;margin:0 auto;display:flex;align-items:center;padding:0 40px;overflow-x:auto;scrollbar-width:none}
+.nav-i::-webkit-scrollbar{display:none}
+.nb{padding:12px 15px;background:transparent;border:none;color:rgba(255,255,255,.6);font-size:.8rem;font-weight:500;cursor:pointer;transition:all .2s;position:relative;white-space:nowrap;flex-shrink:0}
+.nb:hover{color:#fff}.nb.on{color:var(--ou);font-weight:700}
+.nb.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--ou);margin-bottom:-3px}
+.sp{width:1px;height:16px;background:rgba(255,255,255,.15);flex-shrink:0;margin:0 1px}
+.main{max-width:1200px;margin:0 auto;padding:30px 40px 60px}
+.sec{display:none;animation:fi .3s ease}.sec.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.th{display:flex;align-items:center;gap:15px;margin-bottom:22px;padding-bottom:14px;border-bottom:2px solid var(--md-linha);flex-wrap:wrap}
+.tb{background:var(--vm);color:#fff;font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;padding:9px 15px;border-radius:var(--rs2);line-height:1;flex-shrink:0}
+.tb.gz{background:#444}.tb.ou{background:linear-gradient(135deg,#c9a84c,#e8c86a)}.tb.mr{background:linear-gradient(135deg,#8c6a2a,#d8b45b)}.tb.az{background:#1a5276}.tb.ia{background:linear-gradient(135deg,#1a1a2e,#2d3a6e)}
+.ti{flex:1;min-width:200px}
+.ti h2{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--md-titulo)}
+.ti p{font-size:.82rem;color:var(--cm);margin-top:2px}
+.md-acoes{display:flex;gap:10px;flex-wrap:wrap;margin:-8px 0 20px}
+.sr{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:13px;margin-bottom:24px}
+.sc2{background:var(--md-sup);border-radius:var(--rs2);padding:15px 17px;box-shadow:var(--sc);border-left:4px solid var(--vc)}
+.sc2 .n{font-family:'DM Mono',monospace;font-size:1.65rem;font-weight:500;color:var(--vm);line-height:1}
+.sc2 .l{font-size:.7rem;color:var(--cm);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+footer{background:var(--vd);color:rgba(255,255,255,.55);text-align:center;padding:18px 20px;font-size:.76rem;letter-spacing:.04em}
+footer a{color:rgba(255,255,255,.75)}
+/* ── Componentes do Meu Diário ── */
+.md-btn{border:none;border-radius:10px;padding:10px 16px;font-weight:700;font-size:.84rem;cursor:pointer;background:var(--md-sup3);color:var(--ce);border:1px solid var(--md-linha)}
+.md-btn.pri{background:var(--md-acento);color:var(--md-acento-txt);border-color:var(--md-acento)}
+.md-btn.perigo{background:var(--rs);color:var(--ra);border-color:#f5c6c0}
+.md-btn.mini{padding:6px 10px;font-size:.75rem;border-radius:8px}
+.md-btn:disabled{opacity:.5;cursor:not-allowed}
+.md-card{background:var(--md-sup);border-radius:var(--r);box-shadow:var(--ss);padding:18px 20px;margin-bottom:16px}
+.md-card h3{font-family:'Playfair Display',serif;color:var(--md-titulo);font-size:1.08rem;margin-bottom:10px}
 .md-card p{font-size:.88rem;line-height:1.55;color:var(--cm)}
 .md-f{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
-.md-f label{font-size:.72rem;font-weight:700;color:var(--vm);text-transform:uppercase;letter-spacing:.04em}
-.md-f input,.md-f select,.md-f textarea,.md-in{padding:9px 11px;border:2px solid var(--cl);border-radius:10px;font:inherit;font-size:.9rem;color:var(--ce);background:var(--cr);width:100%}
+.md-f label{font-size:.7rem;font-weight:700;color:var(--md-destaque);text-transform:uppercase;letter-spacing:.05em}
+.md-f input,.md-f select,.md-f textarea,.md-in{padding:9px 11px;border:2px solid var(--md-linha);border-radius:10px;font:inherit;font-size:.9rem;color:var(--ce);background:var(--md-sup2);width:100%}
 .md-f textarea{min-height:120px;resize:vertical}
 .md-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 .md-vazio{text-align:center;padding:40px 20px;color:var(--cm);font-size:.92rem}
-.md-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
-.md-stat{background:var(--card);border-radius:12px;box-shadow:var(--ss);padding:14px 16px}
-.md-stat b{display:block;font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--vd)}
-.md-stat span{font-size:.76rem;color:var(--cm)}
 .md-cont{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-.md-cc{background:var(--card);border-radius:12px;box-shadow:var(--ss);padding:14px 16px}
-.md-cc h4{font-size:.95rem;color:var(--vd)}
+.md-cc{background:var(--md-sup);border-radius:12px;box-shadow:var(--ss);padding:14px 16px;border-top:4px solid var(--vc)}
+.md-cc h4{font-size:.95rem;color:var(--md-titulo)}
 .md-cc .sub{font-size:.76rem;color:var(--cm);margin:2px 0 10px}
-.md-bar{height:9px;background:var(--cl);border-radius:99px;overflow:hidden;margin:4px 0 8px}
+.md-bar{height:9px;background:var(--md-linha);border-radius:99px;overflow:hidden;margin:4px 0 8px}
 .md-bar i{display:block;height:100%;background:var(--vc)}
 .md-bar.ano i{background:var(--ou)}
 .md-lbl{display:flex;justify-content:space-between;font-size:.74rem;color:var(--cm)}
 .md-bims{display:flex;gap:4px;margin-top:6px}
-.md-bims span{flex:1;text-align:center;font-size:.66rem;padding:4px 0;border-radius:6px;background:var(--cl);color:var(--cm)}
+.md-bims span{flex:1;text-align:center;font-size:.66rem;padding:4px 0;border-radius:6px;background:var(--md-linha);color:var(--cm)}
 .md-bims span.co{background:var(--vs);color:var(--vm);font-weight:700}
 .md-bims span.at{background:var(--os);color:var(--og);font-weight:700}
+.md-h3{font-family:'Playfair Display',serif;color:var(--md-titulo);margin:18px 0 10px;font-size:1.1rem}
 .md-alunos{display:flex;flex-wrap:wrap;gap:6px}
-.md-alunos button{border:1px solid var(--cl);background:var(--cr);color:var(--ce);border-radius:999px;padding:5px 11px;font-size:.78rem;cursor:pointer}
+.md-alunos button{border:1px solid var(--md-linha);background:var(--md-sup2);color:var(--ce);border-radius:999px;padding:5px 11px;font-size:.78rem;cursor:pointer}
 .md-alunos button.tr{opacity:.5;text-decoration:line-through}
 .md-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
 .md-row .md-in{flex:1}
 .md-row .n{font-family:'DM Mono',monospace;font-size:.78rem;width:28px;color:var(--cm)}
 .md-row label{font-size:.76rem;display:flex;gap:4px;align-items:center;white-space:nowrap}
 .md-x{background:none;border:none;color:var(--ra);font-size:1.05rem;cursor:pointer;padding:4px}
-details.md-turma{border:1px solid var(--cl);border-radius:12px;padding:0 14px;margin-bottom:12px;background:var(--card)}
-details.md-turma>summary{cursor:pointer;padding:13px 0;font-weight:700;color:var(--vd)}
-details.md-turma[open]>summary{border-bottom:1px solid var(--cl);margin-bottom:12px}
-.md-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1a3a2a;color:#fff;padding:10px 18px;border-radius:999px;font-size:.84rem;z-index:20000;box-shadow:0 8px 24px rgba(0,0,0,.3)}
-/* Cards de diário (mesmo padrão da Casavequia) */
-.ea{background:var(--card);border-radius:var(--r);box-shadow:var(--ss);margin-bottom:18px;overflow:hidden}
+details.md-turma{border:1px solid var(--md-linha);border-radius:12px;padding:0 14px;margin-bottom:12px;background:var(--md-sup)}
+details.md-turma>summary{cursor:pointer;padding:13px 0;font-weight:700;color:var(--md-titulo)}
+details.md-turma[open]>summary{border-bottom:1px solid var(--md-linha);margin-bottom:12px}
+.md-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1a3a2a;color:#fff;padding:10px 18px;border-radius:999px;font-size:.84rem;z-index:20000;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:92vw;text-align:center}
+.md-tabela{width:100%;border-collapse:collapse;font-size:.86rem}
+.md-tabela td{padding:7px 4px;border-bottom:1px solid var(--md-linha)}
+/* ── Cards de diário (padrão da Casavequia) ── */
+.ea{background:var(--md-sup);border-radius:var(--r);box-shadow:var(--ss);margin-bottom:18px;overflow:hidden;transition:box-shadow .2s}
+.ea:hover{box-shadow:0 6px 32px rgba(26,58,42,.14)}
 .eh{display:flex;align-items:center;cursor:pointer;user-select:none}
-.edb{background:#1a3a2a;color:#fff;padding:17px 19px;min-width:96px;text-align:center;flex-shrink:0}
+.edb{background:var(--vd);color:#fff;padding:17px 19px;min-width:96px;text-align:center;flex-shrink:0}
 .edb .d{font-family:'DM Mono',monospace;font-size:1.9rem;font-weight:500;line-height:1}
 .edb .my{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;opacity:.74;margin-top:2px}
 .em{flex:1;padding:13px 19px;display:flex;flex-direction:column;gap:5px;min-width:0}
@@ -92,15 +132,15 @@ details.md-turma[open]>summary{border-bottom:1px solid var(--cl);margin-bottom:1
 .ch-a{background:var(--rs);color:var(--ra)}.ch-i{background:#dbeeff;color:var(--ai)}
 .et{padding:17px 19px;color:var(--cm);font-size:.95rem;transition:transform .25s;flex-shrink:0}.et.op{transform:rotate(180deg)}
 .ec2{display:none;border-top:1px solid var(--cl)}.ec2.on{display:block}
-.itabs{display:flex;background:var(--cr);border-bottom:1px solid var(--cl);padding:0 14px;overflow-x:auto}
+.itabs{display:flex;background:#f5f3ee;border-bottom:1px solid var(--cl);padding:0 20px;overflow-x:auto}
 .itab{padding:9px 13px;background:transparent;border:none;font-size:.77rem;font-weight:500;cursor:pointer;color:var(--cm);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
-.itab.on{color:var(--vm);border-bottom-color:var(--vm);font-weight:700}
-.ipane{display:none;padding:18px 20px 22px}.ipane.on{display:block}
+.itab:hover{color:var(--vd)}.itab.on{color:var(--vm);border-bottom-color:var(--vm);font-weight:700}
+.ipane{display:none;padding:18px 22px 22px}.ipane.on{display:block}
 .st{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cm);font-weight:700;margin:16px 0 7px}.st:first-child{margin-top:0}
 .ct{background:var(--cr);border-left:3px solid var(--vc);padding:11px 15px;border-radius:0 var(--rs2) var(--rs2) 0;font-size:.88rem;line-height:1.65}
 .ol{display:flex;flex-direction:column;gap:9px}
 .oi{background:var(--rs);border:1px solid #f5c6c0;border-radius:var(--rs2);padding:11px 15px;display:flex;gap:11px;align-items:flex-start}
-.oi.nt{background:#f0f7ff;border-color:#bdd9f5;color:#1f2d3a}
+.oi.nt{background:#f0f7ff;border-color:#bdd9f5}
 .oi-ic{font-size:1.05rem;flex-shrink:0}
 .oa{font-weight:600;font-size:.86rem;color:var(--ra);margin-bottom:2px}.oi.nt .oa{color:var(--ai)}.od{font-size:.83rem;line-height:1.5}
 .ng{background:var(--os);border:1px solid #e0c87a;border-radius:var(--rs2);padding:11px 15px;font-size:.84rem;line-height:1.6}
@@ -120,71 +160,134 @@ details.md-turma[open]>summary{border-bottom:1px solid var(--cl);margin-bottom:1
 .atv-av{background:var(--os);border:1px solid #e0c87a;border-radius:var(--rs2);padding:9px 13px;font-size:.81rem;margin-bottom:12px;display:flex;gap:8px}
 .md-mstat{font-size:.74rem;color:var(--cm);margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap}.md-mstat strong{color:var(--ce)}
 .md-mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:5px}
-.md-m{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:6px;font-size:.8rem;cursor:pointer;border:none;text-align:left;background:var(--cl);color:var(--ce)}
+.md-m{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:6px;font-size:.8rem;cursor:pointer;border:none;text-align:left;background:var(--md-sup3);color:var(--ce)}
 .md-m .n{font-family:'DM Mono',monospace;font-size:.67rem;opacity:.6;width:20px;flex-shrink:0}
 .md-m .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .md-m .tag{font-size:.62rem;font-weight:700}
 .md-m.pr,.md-m.fz{background:#e6f6ec;color:#1f6b43}.md-m.fa,.md-m.nf{background:#fde2df;color:#a4291d}.md-m.fj{background:#fff4d6;color:#7a5c10}
 .md-m.tr{opacity:.45;cursor:default}
 .md-ajuda{font-size:.74rem;color:var(--cm);margin-bottom:8px}
-/* Relatório do aluno */
+/* ── Janelas (relatório do aluno e módulos) ── */
 .md-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:center;justify-content:center;padding:14px}
-.md-rel{background:var(--card);color:var(--ce);border-radius:16px;max-width:760px;width:100%;max-height:94vh;overflow-y:auto;padding:24px}
-.md-rel h2{font-family:'Playfair Display',serif;color:var(--vd)}
-.md-rel h4{margin:16px 0 6px;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--vm)}
+.md-rel{background:var(--md-sup);color:var(--ce);border-radius:16px;max-width:760px;width:100%;max-height:94vh;overflow-y:auto;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.4)}
+.md-rel h2{font-family:'Playfair Display',serif;color:var(--md-titulo)}
+.md-rel h4{margin:16px 0 6px;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--md-destaque)}
 .md-rel table{width:100%;border-collapse:collapse;font-size:.84rem}
-.md-rel td,.md-rel th{border-bottom:1px solid var(--cl);padding:6px 4px;text-align:left}
+.md-rel td,.md-rel th{border-bottom:1px solid var(--md-linha);padding:6px 4px;text-align:left}
+/* ── Modo escuro grafite: textos e superfícies que usam os tokens verdes ── */
+html.dark-2026 body{background:var(--md-fundo)}
+html.dark-2026 .md-avatar{background:rgba(255,166,91,.08);border-color:rgba(255,166,91,.55);color:#ffd4af}
+html.dark-2026 .md-sync,html.dark-2026 .md-sair{background:rgba(255,255,255,.06)!important;border-color:var(--md-linha)!important;color:var(--dark-text)!important}
+html.dark-2026 footer{background:#0c0e10!important;color:var(--dark-muted)!important;border-top:1px solid var(--md-linha)}
+html.dark-2026 .tb{background:#272b30!important;color:#ffb46f!important;border:1px solid #383d43}
+html.dark-2026 .th{border-color:var(--md-linha)}
+html.dark-2026 .sc2{background:var(--md-sup)!important;border-left-color:var(--dark-accent)!important}
+html.dark-2026 .sc2 .n{color:var(--dark-text)!important}
+html.dark-2026 .ed{color:var(--dark-text)!important}
+html.dark-2026 .md-cc{border-top-color:var(--dark-accent)}
+html.dark-2026 .md-bar i{background:var(--dark-positive)}
+html.dark-2026 .md-bar.ano i{background:var(--dark-accent)}
+html.dark-2026 .md-bims span.co{background:var(--dark-positive-soft);color:var(--dark-positive)}
+html.dark-2026 .md-bims span.at{background:var(--dark-accent-soft);color:var(--dark-accent)}
+html.dark-2026 .md-m.pr,html.dark-2026 .md-m.fz{background:var(--dark-positive-soft);color:var(--dark-positive)}
+html.dark-2026 .md-m.fa,html.dark-2026 .md-m.nf{background:var(--dark-negative-soft);color:var(--dark-negative)}
+html.dark-2026 .md-m.fj{background:var(--dark-warning-soft);color:var(--dark-warning)}
+html.dark-2026 .md-btn.perigo{background:var(--dark-negative-soft)!important;color:var(--dark-negative)!important;border-color:#7a3530!important}
+html.dark-2026 .md-btn.pri{background:linear-gradient(135deg,var(--dark-accent),var(--dark-accent-strong))!important;color:#151719!important;border-color:var(--dark-accent)!important}
+html.dark-2026 .md-btn:not(.pri):not(.perigo){background:var(--md-sup2)!important;color:var(--dark-text)!important;border-color:var(--md-linha)!important}
+html.dark-2026 .md-toast{background:#272b30;border:1px solid #383d43;color:var(--dark-text)}
+html.dark-2026 .md-ov{background:rgba(3,4,5,.78);backdrop-filter:blur(8px)}
+html.dark-2026 .md-rel{border:1px solid var(--md-linha)}
+html.dark-2026 .itab.on{color:var(--dark-accent)!important;border-bottom-color:var(--dark-accent)!important;background:transparent!important}
 @media print{
   body.md-imprimindo>*:not(.md-ov){display:none!important}
   body.md-imprimindo .md-ov{position:static;background:none;padding:0}
   body.md-imprimindo .md-rel{max-height:none;box-shadow:none;color:#000;background:#fff}
   body.md-imprimindo .md-noprint{display:none!important}
 }
-@media(max-width:560px){.edb{min-width:74px;padding:14px 12px}.edb .d{font-size:1.5rem}.em{padding:11px 12px}.et{padding:12px}}
+@media(max-width:760px){.cab-i{padding:22px 16px 18px;gap:14px}.md-avatar{width:58px;height:58px;font-size:1.3rem}.cab-t{min-width:0;flex:1 1 calc(100% - 80px)}.cab-t .prof{max-width:100%;font-size:.72rem}.cab-t h1{font-size:1.3rem}.nav-i{padding:0 8px}.main{padding:20px 14px 50px}}
+@media(max-width:560px){.edb{min-width:74px;padding:14px 12px}.edb .d{font-size:1.5rem}.em{padding:11px 12px}.et{padding:12px}.md-cab-acoes{width:100%}}
 </style>
 </head>
 <body>
-<header class="md-top"><div class="md-top-i">
-  <h1>📘 Meu Diário<small id="md-quem">Carregando…</small></h1>
-  <span class="md-sync" id="md-sync">☁️ Conectando…</span>
-  <button type="button" id="md-sair">Sair</button>
+<header class="cab"><div class="cab-i">
+  <div class="md-avatar" id="md-avatar" aria-hidden="true">📘</div>
+  <div class="cab-t">
+    <h1 id="md-titulo">Diário de Aulas</h1>
+    <div class="sub" id="md-escolas">Meu Diário</div>
+    <div class="prof" id="md-quem">✦ Carregando… ✦</div>
+  </div>
+  <div class="md-cab-acoes">
+    <div id="modo-btns">
+      <button type="button" class="btn-claro" id="modo-claro-btn" title="Modo claro" aria-label="Modo claro">☀️</button>
+      <button type="button" class="btn-escuro" id="modo-escuro-btn" title="Modo escuro" aria-label="Modo escuro">🌙</button>
+    </div>
+    <span class="md-sync" id="md-sync">☁️ Conectando…</span>
+    <button type="button" class="md-sair" id="md-sair">Sair</button>
+  </div>
 </div></header>
-<nav class="md-tabs"><div class="md-tabs-i" id="md-tabs"></div></nav>
+<nav class="nav-w"><div class="nav-i" id="md-tabs"></div></nav>
 <main class="main" id="md-main">
   <section class="sec" id="sec-inicio"></section>
+  <section class="sec" id="sec-plano"></section>
+  <section class="sec" id="sec-seq"></section>
+  <section class="sec" id="sec-livros"></section>
+  <section class="sec" id="sec-cal"></section>
   <section class="sec" id="sec-cont"></section>
+  <section class="sec" id="sec-ia"></section>
   <section class="sec" id="sec-config"></section>
 </main>
+<footer><span id="md-rodape">Meu Diário</span> &nbsp;|&nbsp; <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════════
-   Meu Diário — plataforma de cada professor (Etapa 9)
-   Dados particulares em professor_dados (RLS: só o dono), em dois escopos:
-     "meu-diario:estrutura:v1"  escolas, turmas, alunos e disciplinas
-     "meu-diario:diarios:v1"    diários (gerido por novo-diario.js)
-   Os recursos são os mesmos das escolas do administrador: + Novo Diário com
-   IA, ✏️ edição completa, presença, atividades, contador e relatório do aluno.
+   Meu Diário — plataforma de cada professor (Etapa 9 + Etapa 11)
+   Dados particulares em professor_dados (RLS: só o dono), em três escopos:
+     "meu-diario:estrutura:v1"  escolas, turmas, alunos e disciplinas (aqui)
+     "meu-diario:diarios:v1"    diários (novo-diario.js)
+     "meu-diario:recursos:v1"   plano de aulas, sequências, livros e calendário
+                                (meu-diario-recursos.js)
+   A aba 🤖 I.A (meu-diario-ia.js) usa a chave de API do próprio professor.
+   Os módulos entram por window.MD_MODULOS e recebem a API window.MeuDiario.
    ═══════════════════════════════════════════════════════════════════════ */
 function tog(h){var c=h.nextElementSibling,t=h.querySelector('.et'),o=c.classList.contains('on');c.classList.toggle('on',!o);if(t)t.classList.toggle('op',!o);}
 function itab(btn,pid){var ec=btn.closest('.ec2');ec.querySelectorAll('.itab').forEach(function(b){b.classList.remove('on');});ec.querySelectorAll('.ipane').forEach(function(p){p.classList.remove('on');});btn.classList.add('on');var p=document.getElementById(pid);if(p)p.classList.add('on');}
+
+// ── Tema claro / escuro (mesma chave "modo-tema" das páginas do administrador) ──
+function setModo(modo){
+  document.body.classList.toggle('modo-escuro',modo==='escuro');
+  document.documentElement.classList.toggle('dark-2026',modo==='escuro');
+  try{localStorage.setItem('modo-tema',modo);}catch(e){}
+  var c=document.getElementById('modo-claro-btn'),e=document.getElementById('modo-escuro-btn');
+  if(c)c.classList.toggle('ativo',modo==='claro');
+  if(e)e.classList.toggle('ativo',modo==='escuro');
+  var meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',modo==='escuro'?'#111315':'#1a3a2a');
+  if(window.Relatorio2026Theme)window.Relatorio2026Theme.refresh();
+}
+setModo(window.MD_TEMA_INICIAL||'claro');
+document.getElementById('modo-claro-btn').onclick=function(){setModo('claro');};
+document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');};
 
 (function(){
   'use strict';
   var SCOPE_ESTRUTURA='meu-diario:estrutura:v1';
   var MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   var usuario=null, E=null, syncE=null, PRES={}, ATV={};
-  var statusDiarios='', statusEstrutura='';
+  var STATUS={};
 
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function agora(){return new Date().toISOString();}
   function novoId(p){return p+Math.random().toString(36).slice(2,7)+Date.now().toString(36).slice(-3);}
   function slug(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,10)||'d';}
-  function toast(msg){var t=document.createElement('div');t.className='md-toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},2600);}
+  function toast(msg){var t=document.createElement('div');t.className='md-toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},2800);}
   function lsKey(){return 'md_estrutura_'+usuario.id;}
   function turma(id){return (E.turmas||[]).filter(function(t){return t.id===id;})[0]||null;}
   function escola(id){return (E.escolas||[]).filter(function(e){return e.id===id;})[0]||null;}
   function diarios(){return window.NovoDiario?window.NovoDiario.diarios():[];}
   function dataBr(k){return k.slice(8,10)+'/'+k.slice(5,7)+'/'+k.slice(0,4);}
+  function modulos(){return window.MD_MODULOS||[];}
+  function cadaModulo(metodo,arg){var out=[];modulos().forEach(function(m){if(typeof m[metodo]==='function'){try{out.push(m[metodo](arg));}catch(e){console.warn('[MeuDiario]',m.nome,metodo,e);}}});return out;}
+  function rotuloCurto(nome){var m=/^\s*(\d+\s*[ºª°]?)/.exec(nome||'');return m?m[1].replace(/\s+/g,''):(String(nome||'?').trim().slice(0,2)||'?');}
 
   // ── Estrutura: local + banco ─────────────────────────────────────────
   function vazia(){return{versao:1,perfil:{nome:(usuario&&usuario.nome)||''},escolas:[],turmas:[],atualizadoEm:''};}
@@ -206,10 +309,11 @@ function itab(btn,pid){var ec=btn.closest('.ec2');ec.querySelectorAll('.itab').f
     if(window.NovoDiario)window.NovoDiario.renderizar();
   }
 
-  // ── Estado da sincronização ─────────────────────────────────────────
+  // ── Estado da sincronização (todos os escopos) ──────────────────────
+  function status(chave,s){STATUS[chave]=s;mostrarStatus();}
   function mostrarStatus(){
     var el=document.getElementById('md-sync');if(!el)return;
-    var s=[statusDiarios,statusEstrutura];
+    var s=Object.keys(STATUS).map(function(k){return STATUS[k];});
     var h=new Date();var hh=('0'+h.getHours()).slice(-2)+':'+('0'+h.getMinutes()).slice(-2);
     if(s.indexOf('offline')>=0||!navigator.onLine)el.textContent='📴 Sem internet — salvo neste aparelho';
     else if(s.indexOf('erro')>=0)el.textContent='⚠️ Falha ao sincronizar — tentando de novo';
@@ -220,44 +324,51 @@ function itab(btn,pid){var ec=btn.closest('.ec2');ec.querySelectorAll('.itab').f
 
   // ── Abas ────────────────────────────────────────────────────────────
   var abaAtual='';
-  function abas(){return [{id:'inicio',rotulo:'🏠 Início'}].concat((E.turmas||[]).map(function(t){return{id:t.id,rotulo:t.nome};})).concat([{id:'cont',rotulo:'📊 Contador'},{id:'config',rotulo:'⚙️ Turmas e alunos'}]);}
+  function abas(){
+    return [{id:'inicio',rotulo:'🏠 Início'}]
+      .concat((E.turmas||[]).map(function(t){return{id:t.id,rotulo:t.nome};}))
+      .concat([{id:'plano',rotulo:'📚 Plano de Aulas'},{id:'seq',rotulo:'🗂 Sequências'},{id:'livros',rotulo:'📖 Livros'},{id:'cal',rotulo:'📆 Calendário'},{id:'cont',rotulo:'📊 Contador'},{id:'ia',rotulo:'🤖 I.A'},{id:'config',rotulo:'⚙️ Turmas e alunos'}]);
+  }
   function irPara(id){
     if(!document.getElementById('sec-'+id))id='inicio';
     abaAtual=id;
     try{localStorage.setItem('md_aba',id);}catch(x){}
     document.querySelectorAll('#md-main>.sec').forEach(function(s){s.classList.toggle('on',s.id==='sec-'+id);});
-    document.querySelectorAll('.md-tab').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-aba')===id);});
+    document.querySelectorAll('.nb[data-aba]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-aba')===id);});
+    cadaModulo('aoAbrir',id);
     window.scrollTo(0,0);
   }
   function desenharAbas(){
-    document.getElementById('md-tabs').innerHTML=abas().map(function(a){return '<button type="button" class="md-tab" data-aba="'+esc(a.id)+'">'+esc(a.rotulo)+'</button>';}).join('');
-    document.querySelectorAll('.md-tab').forEach(function(b){b.addEventListener('click',function(){irPara(b.getAttribute('data-aba'));});});
+    document.getElementById('md-tabs').innerHTML=abas().map(function(a,i){return (i?'<div class="sp"></div>':'')+'<button type="button" class="nb" data-aba="'+esc(a.id)+'">'+esc(a.rotulo)+'</button>';}).join('');
+    document.querySelectorAll('.nb[data-aba]').forEach(function(b){b.addEventListener('click',function(){irPara(b.getAttribute('data-aba'));});});
   }
 
   // ── Seções das turmas (os cards entram pelo novo-diario.js) ─────────
   function garantirSecoes(){
-    var main=document.getElementById('md-main'),cont=document.getElementById('sec-cont');
+    var main=document.getElementById('md-main'),ref=document.getElementById('sec-plano');
     var ids=(E.turmas||[]).map(function(t){return t.id;});
     main.querySelectorAll('section[data-turma]').forEach(function(s){if(ids.indexOf(s.getAttribute('data-turma'))<0)s.remove();});
     (E.turmas||[]).forEach(function(t){
       var sec=document.getElementById('sec-'+t.id);
       if(!sec){
         sec=document.createElement('section');sec.className='sec';sec.id='sec-'+t.id;sec.setAttribute('data-turma',t.id);
-        sec.innerHTML='<div class="md-hero"></div><div class="md-stats"></div><div class="md-lista"></div>';
-        main.insertBefore(sec,cont);
+        sec.innerHTML='<div class="th"></div><div class="md-acoes"></div><div class="sr"></div><div class="md-lista"></div>';
+        main.insertBefore(sec,ref);
       }
       var esc1=escola(t.escolaId);
-      sec.querySelector('.md-hero').innerHTML='<h2>'+esc(t.nome)+'<small>'+esc(esc1?esc1.nome:'Sem escola')+' · '+t.alunos.filter(function(a){return!a.tr;}).length+' alunos · '+esc(t.disciplinas.map(function(d){return d.nome;}).join(', ')||'sem disciplinas')+'</small></h2>'
-        +'<button type="button" class="md-btn pri" data-acao="novo">+ Novo Diário</button>'
-        +'<button type="button" class="md-btn" data-acao="alunos">👥 Relatório dos alunos</button>';
+      sec.querySelector('.th').innerHTML='<div class="tb">'+esc(rotuloCurto(t.nome))+'</div><div class="ti"><h2>'+esc(t.nome)+'</h2><p>'+esc(esc1?esc1.nome:'Sem escola')+' · '+t.alunos.filter(function(a){return!a.tr;}).length+' alunos · '+esc(t.disciplinas.map(function(d){return d.nome;}).join(', ')||'sem disciplinas')+'</p></div>';
+      sec.querySelector('.md-acoes').innerHTML='<button type="button" class="md-btn pri" data-acao="novo">+ Novo Diário</button>'
+        +'<button type="button" class="md-btn" data-acao="alunos">👥 Relatório dos alunos</button>'
+        +'<button type="button" class="md-btn" data-acao="ia">🤖 Registrar com a I.A</button>';
       sec.querySelector('[data-acao="novo"]').onclick=function(){
         if(!t.disciplinas.length){toast('Cadastre ao menos uma disciplina na aba ⚙️ Turmas e alunos.');irPara('config');return;}
         if(!t.alunos.length){toast('Cadastre os alunos da turma na aba ⚙️ Turmas e alunos.');irPara('config');return;}
         window.novoDiarioAbrir(t.id);
       };
       sec.querySelector('[data-acao="alunos"]').onclick=function(){abrirListaAlunos(t.id);};
+      sec.querySelector('[data-acao="ia"]').onclick=function(){irPara('ia');if(window.MeuDiarioIA)window.MeuDiarioIA.sugerir('Registre a aula de hoje da turma '+t.nome+': ');};
       var lista=sec.querySelector('.md-lista');
-      if(!lista.querySelector('.md-vazio'))lista.insertAdjacentHTML('afterbegin','<div class="md-vazio" hidden>Nenhum diário ainda. Toque em <strong>+ Novo Diário</strong> para registrar a primeira aula.</div>');
+      if(!lista.querySelector('.md-vazio'))lista.insertAdjacentHTML('afterbegin','<div class="md-card md-vazio" hidden>Nenhum diário ainda. Toque em <strong>+ Novo Diário</strong> para registrar a primeira aula — ou peça à 🤖 I.A.</div>');
     });
   }
 
@@ -275,10 +386,13 @@ function itab(btn,pid){var ec=btn.closest('.ec2');ec.querySelectorAll('.itab').f
       var ds=diarios().filter(function(d){return d.turma===t.id;});
       var horas=t.disciplinas.reduce(function(s,d){return s+(soma[t.id+'|'+d.id]||0);},0);
       var ultimo=ds.map(function(d){return d.dateKey;}).sort().pop();
-      sec.querySelector('.md-stats').innerHTML=
-        '<div class="md-stat"><b>'+ds.length+'</b><span>Diários</span></div>'
-        +'<div class="md-stat"><b>'+horas+'</b><span>H/aula dadas</span></div>'
-        +'<div class="md-stat"><b>'+(ultimo?dataBr(ultimo).slice(0,5):'—')+'</b><span>Último registro</span></div>';
+      var faltas=ds.reduce(function(s,d){return s+((d.rel&&d.rel.faltaram)||[]).length;},0);
+      sec.querySelector('.sr').innerHTML=
+        '<div class="sc2"><div class="n">'+ds.length+'</div><div class="l">Diários</div></div>'
+        +'<div class="sc2"><div class="n">'+horas+'</div><div class="l">H/aula dadas</div></div>'
+        +'<div class="sc2"><div class="n">'+t.alunos.filter(function(a){return!a.tr;}).length+'</div><div class="l">Alunos</div></div>'
+        +'<div class="sc2 al"><div class="n">'+faltas+'</div><div class="l">Faltas registradas</div></div>'
+        +'<div class="sc2"><div class="n">'+(ultimo?dataBr(ultimo).slice(0,5):'—')+'</div><div class="l">Último registro</div></div>';
       var v=sec.querySelector('.md-vazio');if(v)v.hidden=ds.length>0;
     });
   }
@@ -329,11 +443,11 @@ function itab(btn,pid){var ec=btn.closest('.ec2');ec.querySelectorAll('.itab').f
   // ── Contador ────────────────────────────────────────────────────────
   function desenharContador(){
     var sec=document.getElementById('sec-cont'),soma=somaHoras();
-    if(!(E.turmas||[]).length){sec.innerHTML='<div class="md-card"><div class="md-vazio">Crie uma turma para acompanhar as h/aula.</div></div>';return;}
-    sec.innerHTML='<div class="md-hero"><h2>Contador de h/aula<small>O bimestre fecha pela soma de aulas: com meta de 10 h/aula, o 1º termina na 10ª, o 2º na 20ª…</small></h2></div>'
-      +(E.turmas||[]).map(function(t){
+    var cab='<div class="th"><div class="tb gz">📊</div><div class="ti"><h2>Contador de h/aula</h2><p>O bimestre fecha pela soma de aulas: com meta de 10 h/aula, o 1º termina na 10ª, o 2º na 20ª…</p></div></div>';
+    if(!(E.turmas||[]).length){sec.innerHTML=cab+'<div class="md-card"><div class="md-vazio">Crie uma turma para acompanhar as h/aula.</div></div>';return;}
+    sec.innerHTML=cab+(E.turmas||[]).map(function(t){
         if(!t.disciplinas.length)return '';
-        return '<h3 style="font-family:Playfair Display,serif;color:var(--vd);margin:18px 0 10px">'+esc(t.nome)+'</h3><div class="md-cont">'+t.disciplinas.map(function(d){
+        return '<h3 class="md-h3">'+esc(t.nome)+'</h3><div class="md-cont">'+t.disciplinas.map(function(d){
           var feitas=soma[t.id+'|'+d.id]||0,meta=Math.max(1,d.metaBim||10),total=Math.max(meta,d.total||meta*4);
           var nb=Math.max(1,Math.round(total/meta)),bim=Math.min(nb,Math.floor(feitas/meta)+1),noBim=Math.min(meta,feitas-(bim-1)*meta);
           var bims='';for(var b=1;b<=nb;b++)bims+='<span class="'+(feitas>=b*meta?'co':b===bim?'at':'')+'">'+b+'º</span>';
@@ -349,20 +463,23 @@ function itab(btn,pid){var ec=btn.closest('.ec2');ec.querySelectorAll('.itab').f
   function desenharInicio(){
     var sec=document.getElementById('sec-inicio');
     var nome=(E.perfil&&E.perfil.nome)||usuario.nome||'';
+    var cab='<div class="th"><div class="tb gz">🏠</div><div class="ti"><h2>Olá'+(nome?', '+esc(nome.split(' ')[0]):'')+'!</h2><p>Resumo das suas turmas, próximos eventos e últimos registros</p></div></div>';
     if(!(E.turmas||[]).length){
-      sec.innerHTML='<div class="md-card"><h3>Bem-vindo'+(nome?', '+esc(nome.split(' ')[0]):'')+'! 👋</h3><p>Sua plataforma está pronta e vazia. Comece criando a primeira turma: você poderá registrar diários com a ajuda da IA, marcar presença e atividades, acompanhar o contador de h/aula e gerar o relatório de cada aluno. Só você vê os seus dados, em qualquer aparelho em que entrar.</p></div>'
+      sec.innerHTML=cab+'<div class="md-card"><h3>Bem-vindo'+(nome?', '+esc(nome.split(' ')[0]):'')+'! 👋</h3><p>Sua plataforma está pronta. Comece criando a primeira turma: você poderá registrar diários (à mão ou com a 🤖 I.A), marcar presença e atividades, montar o plano de aulas, as sequências e os livros, organizar o calendário, acompanhar o contador de h/aula e gerar o relatório de cada aluno. Só você vê os seus dados, em qualquer aparelho em que entrar.</p></div>'
         +'<div class="md-card"><h3>Criar a primeira turma</h3>'+formTurma()+'</div>';
       ligarFormTurma(sec);
       return;
     }
     var ds=diarios().slice().sort(function(a,b){return (b.dateKey+b.ini).localeCompare(a.dateKey+a.ini);});
     var soma=somaHoras(),horas=Object.keys(soma).reduce(function(s,k){return s+soma[k];},0);
-    sec.innerHTML='<div class="md-hero"><h2>Olá'+(nome?', '+esc(nome.split(' ')[0]):'')+'<small>Resumo das suas turmas</small></h2></div>'
-      +'<div class="md-stats"><div class="md-stat"><b>'+E.turmas.length+'</b><span>Turmas</span></div><div class="md-stat"><b>'+ds.length+'</b><span>Diários</span></div><div class="md-stat"><b>'+horas+'</b><span>H/aula dadas</span></div>'
-      +'<div class="md-stat"><b>'+E.turmas.reduce(function(s,t){return s+t.alunos.filter(function(a){return!a.tr;}).length;},0)+'</b><span>Alunos</span></div></div>'
-      +'<div class="md-card"><h3>Últimos registros</h3>'+(ds.length?'<table style="width:100%;border-collapse:collapse;font-size:.86rem">'+ds.slice(0,8).map(function(d){var t=turma(d.turma);return '<tr style="border-bottom:1px solid var(--cl)"><td style="padding:7px 4px;white-space:nowrap">'+dataBr(d.dateKey).slice(0,5)+'</td><td style="padding:7px 4px">'+esc(t?t.nome:'')+'</td><td style="padding:7px 4px">'+esc(d.discNome)+'</td><td style="padding:7px 4px;color:var(--cm)">'+esc(d.assunto)+'</td></tr>';}).join('')+'</table>':'<p>Nenhum diário ainda. Abra uma turma e toque em + Novo Diário.</p>')+'</div>'
+    sec.innerHTML=cab
+      +'<div class="sr"><div class="sc2"><div class="n">'+E.turmas.length+'</div><div class="l">Turmas</div></div><div class="sc2"><div class="n">'+ds.length+'</div><div class="l">Diários</div></div><div class="sc2"><div class="n">'+horas+'</div><div class="l">H/aula dadas</div></div>'
+      +'<div class="sc2"><div class="n">'+E.turmas.reduce(function(s,t){return s+t.alunos.filter(function(a){return!a.tr;}).length;},0)+'</div><div class="l">Alunos</div></div></div>'
+      +cadaModulo('inicioHtml').join('')
+      +'<div class="md-card"><h3>Últimos registros</h3>'+(ds.length?'<table class="md-tabela">'+ds.slice(0,8).map(function(d){var t=turma(d.turma);return '<tr><td style="white-space:nowrap">'+dataBr(d.dateKey).slice(0,5)+'</td><td>'+esc(t?t.nome:'')+'</td><td>'+esc(d.discNome)+'</td><td style="color:var(--cm)">'+esc(d.assunto)+'</td></tr>';}).join('')+'</table>':'<p>Nenhum diário ainda. Abra uma turma e toque em + Novo Diário.</p>')+'</div>'
       +'<div class="md-card"><h3>Suas turmas</h3><div class="md-alunos">'+E.turmas.map(function(t){return '<button type="button" data-ir="'+t.id+'">'+esc(t.nome)+'</button>';}).join('')+'</div></div>';
     sec.querySelectorAll('[data-ir]').forEach(function(b){b.onclick=function(){irPara(b.getAttribute('data-ir'));};});
+    sec.querySelectorAll('[data-ir-aba]').forEach(function(b){b.onclick=function(){irPara(b.getAttribute('data-ir-aba'));};});
   }
 
   // ── Formulário de turma (criação) ───────────────────────────────────
@@ -381,25 +498,41 @@ function itab(btn,pid){var ec=btn.closest('.ec2');ec.querySelectorAll('.itab').f
     if(sel)sel.onchange=function(){nova.hidden=sel.value!=='__nova';};
     box.querySelector('[data-f="criar"]').onclick=function(){
       var v=function(k){var el=box.querySelector('[data-f="'+k+'"]');return el?el.value.trim():'';};
-      var escolaId=sel&&sel.value!=='__nova'?sel.value:'';
-      if(!escolaId){if(!v('escolaNova'))return toast('Informe o nome da escola.');escolaId=novoId('e');E.escolas.push({id:escolaId,nome:v('escolaNova')});}
-      if(!v('turma'))return toast('Informe o nome da turma.');
-      var meta=Math.max(1,parseInt(v('meta'),10)||10);
-      var vistos={};
-      var disciplinas=v('disc').split(',').map(function(s){return s.trim();}).filter(Boolean).map(function(nome){var id=slug(nome);while(vistos[id])id+='x';vistos[id]=1;return{id:id,nome:nome,metaBim:meta,total:meta*4};});
-      var alunos=v('alunos').split(/\n/).map(function(s){return s.replace(/^\s*\d+[\s.)-]*/,'').trim();}).filter(Boolean).map(function(nm,i){return{n:i+1,nm:nm};});
-      var t={id:novoId('t'),nome:v('turma'),escolaId:escolaId,alunos:alunos,disciplinas:disciplinas};
-      E.turmas.push(t);
-      salvar('turma');
+      var r=criarTurma({escolaId:sel&&sel.value!=='__nova'?sel.value:'',escolaNova:v('escolaNova'),nome:v('turma'),meta:v('meta'),disciplinas:v('disc').split(','),alunos:v('alunos').split(/\n/)});
+      if(r.erro)return toast(r.erro);
       toast('Turma criada.');
-      irPara(t.id);
+      irPara(r.turma.id);
     };
+  }
+  // Usada pelo formulário e pela I.A. Devolve {turma} ou {erro}.
+  function criarTurma(o){
+    var escolaId=o.escolaId||'';
+    if(!escolaId&&o.escolaNova){
+      var existente=(E.escolas||[]).filter(function(e){return slug(e.nome)===slug(o.escolaNova)&&e.nome.toLowerCase()===String(o.escolaNova).trim().toLowerCase();})[0];
+      if(existente)escolaId=existente.id;
+      else{escolaId=novoId('e');E.escolas.push({id:escolaId,nome:String(o.escolaNova).trim()});}
+    }
+    if(!escolaId&&(E.escolas||[]).length===1)escolaId=E.escolas[0].id;
+    if(!escolaId)return{erro:'Informe o nome da escola.'};
+    if(!String(o.nome||'').trim())return{erro:'Informe o nome da turma.'};
+    var meta=Math.max(1,parseInt(o.meta,10)||10);
+    var vistos={};
+    var disciplinas=(o.disciplinas||[]).map(function(d){return typeof d==='string'?{nome:d}:d;}).filter(function(d){return d&&String(d.nome||'').trim();}).map(function(d){
+      var nome=String(d.nome).trim(),id=slug(nome);while(vistos[id])id+='x';vistos[id]=1;
+      var mb=Math.max(1,parseInt(d.metaBim,10)||meta);
+      return{id:id,nome:nome,metaBim:mb,total:Math.max(mb,parseInt(d.total,10)||mb*4)};
+    });
+    var alunos=(o.alunos||[]).map(function(s){return String(s||'').replace(/^\s*\d+[\s.)-]*/,'').trim();}).filter(Boolean).map(function(nm,i){return{n:i+1,nm:nm};});
+    var t={id:novoId('t'),nome:String(o.nome).trim(),escolaId:escolaId,alunos:alunos,disciplinas:disciplinas};
+    E.turmas.push(t);
+    salvar('turma');
+    return{turma:t};
   }
 
   // ── Configuração ────────────────────────────────────────────────────
   function desenharConfig(){
     var sec=document.getElementById('sec-config');
-    var html='<div class="md-hero"><h2>Turmas e alunos<small>Escolas, turmas, chamada e disciplinas. Alterações sincronizam na hora.</small></h2>'
+    var html='<div class="th"><div class="tb gz">⚙️</div><div class="ti"><h2>Turmas e alunos</h2><p>Escolas, turmas, chamada e disciplinas. Alterações sincronizam na hora.</p></div>'
       +'<button type="button" class="md-btn" data-cfg="exportar">⬇️ Baixar cópia dos dados</button></div>'
       +'<div class="md-card"><h3>Seu nome</h3><div class="md-row"><input class="md-in" data-cfg="nome" value="'+esc((E.perfil&&E.perfil.nome)||'')+'"><button type="button" class="md-btn mini pri" data-cfg="salvar-nome">Salvar</button></div></div>'
       +'<div class="md-card"><h3>Escolas</h3>'+((E.escolas||[]).map(function(e){return '<div class="md-row"><input class="md-in" data-escola="'+e.id+'" value="'+esc(e.nome)+'"><button type="button" class="md-x" data-rm-escola="'+e.id+'" title="Remover">✕</button></div>';}).join('')||'<p>Nenhuma escola.</p>')
@@ -428,24 +561,40 @@ function itab(btn,pid){var ec=btn.closest('.ec2');ec.querySelectorAll('.itab').f
         t.escolaId=box.querySelector('[data-tf="escola"]').value||t.escolaId;
         box.querySelectorAll('[data-disc]').forEach(function(r){var d=t.disciplinas.filter(function(x){return x.id===r.getAttribute('data-disc');})[0];if(!d)return;d.nome=r.querySelector('[data-df="nome"]').value.trim()||d.nome;d.metaBim=Math.max(1,parseInt(r.querySelector('[data-df="meta"]').value,10)||d.metaBim);d.total=Math.max(d.metaBim,parseInt(r.querySelector('[data-df="total"]').value,10)||d.total);});
         box.querySelectorAll('[data-aluno]').forEach(function(r){var a=t.alunos.filter(function(x){return x.n===parseInt(r.getAttribute('data-aluno'),10);})[0];if(!a)return;a.nm=r.querySelector('[data-af="nm"]').value.trim()||a.nm;if(r.querySelector('[data-af="tr"]').checked)a.tr=true;else delete a.tr;});
-        var prox=t.alunos.reduce(function(m,a){return Math.max(m,a.n);},0);
-        box.querySelector('[data-novos]').value.split(/\n/).map(function(s){return s.replace(/^\s*\d+[\s.)-]*/,'').trim();}).filter(Boolean).forEach(function(nm){t.alunos.push({n:++prox,nm:nm});});
+        adicionarAlunos(t,box.querySelector('[data-novos]').value.split(/\n/),true);
         salvar('turma');toast('Turma salva.');
       };
       box.querySelector('[data-add-disc]').onclick=function(){
         var nome=box.querySelector('[data-df-nova]').value.trim();if(!nome)return;
-        var id=slug(nome);while(t.disciplinas.some(function(d){return d.id===id;}))id+='x';
-        var meta=(t.disciplinas[0]&&t.disciplinas[0].metaBim)||10;
-        t.disciplinas.push({id:id,nome:nome,metaBim:meta,total:meta*4});salvar('disc');
+        adicionarDisciplina(t,{nome:nome});salvar('disc');
       };
       box.querySelectorAll('[data-rm-disc]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-rm-disc');var usados=diarios().filter(function(d){return d.turma===t.id&&d.disc===id;}).length;if(!confirm(usados?'Esta disciplina tem '+usados+' diário(s). Eles continuam salvos, mas saem do contador. Remover?':'Remover a disciplina?'))return;t.disciplinas=t.disciplinas.filter(function(d){return d.id!==id;});salvar('disc');};});
       box.querySelectorAll('[data-rm-aluno]').forEach(function(b){b.onclick=function(){if(!confirm('Remover este aluno da chamada? (Para quem saiu da escola, prefira marcar "Transferido".)'))return;var n=parseInt(b.getAttribute('data-rm-aluno'),10);t.alunos=t.alunos.filter(function(a){return a.n!==n;});salvar('aluno');};});
       box.querySelector('[data-rm-turma]').onclick=function(){if(!confirm('Excluir a turma "'+t.nome+'"? Os diários dela deixam de aparecer.'))return;E.turmas=E.turmas.filter(function(x){return x.id!==t.id;});salvar('turma');irPara('config');};
     });
   }
+  // Acrescenta alunos no fim da chamada (sem salvar). Ignora nomes repetidos.
+  function adicionarAlunos(t,nomes,permitirRepetido){
+    var prox=t.alunos.reduce(function(m,a){return Math.max(m,a.n);},0),novos=[];
+    var ja={};t.alunos.forEach(function(a){ja[a.nm.trim().toLowerCase()]=1;});
+    (nomes||[]).map(function(s){return String(s||'').replace(/^\s*\d+[\s.)-]*/,'').trim();}).filter(Boolean).forEach(function(nm){
+      if(!permitirRepetido&&ja[nm.toLowerCase()])return;
+      ja[nm.toLowerCase()]=1;var a={n:++prox,nm:nm};t.alunos.push(a);novos.push(a);
+    });
+    return novos;
+  }
+  function adicionarDisciplina(t,o){
+    var nome=String(o.nome||'').trim();if(!nome)return null;
+    var jaExiste=t.disciplinas.filter(function(d){return d.nome.toLowerCase()===nome.toLowerCase();})[0];if(jaExiste)return jaExiste;
+    var id=slug(nome);while(t.disciplinas.some(function(d){return d.id===id;}))id+='x';
+    var meta=Math.max(1,parseInt(o.metaBim,10)||(t.disciplinas[0]&&t.disciplinas[0].metaBim)||10);
+    var d={id:id,nome:nome,metaBim:meta,total:Math.max(meta,parseInt(o.total,10)||meta*4)};
+    t.disciplinas.push(d);return d;
+  }
 
   function exportar(){
     var dados={exportadoEm:agora(),conta:usuario.email,estrutura:E,diarios:diarios()};
+    cadaModulo('exportar').forEach(function(x){if(x)Object.keys(x).forEach(function(k){dados[k]=x[k];});});
     var blob=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
     var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='meu-diario-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();
   }
@@ -488,18 +637,29 @@ function itab(btn,pid){var ec=btn.closest('.ec2');ec.querySelectorAll('.itab').f
     var ov=document.createElement('div');ov.className='md-ov';ov.innerHTML='<div class="md-rel" role="dialog" aria-modal="true">'+html+'</div>';
     ov.addEventListener('mousedown',function(e){if(e.target===ov)ov.remove();});
     document.body.appendChild(ov);
-    var f=ov.querySelector('[data-fechar]');if(f)f.onclick=function(){ov.remove();};
+    ov.querySelectorAll('[data-fechar]').forEach(function(f){f.onclick=function(){ov.remove();};});
     if(ligar)ligar(ov);
+    return ov;
   }
 
   // ── Desenho geral ───────────────────────────────────────────────────
+  function desenharCabecalho(){
+    var nome=(E.perfil&&E.perfil.nome)||usuario.nome||'';
+    var ano=new Date().getFullYear();
+    document.getElementById('md-titulo').textContent='Diário de Aulas '+ano;
+    document.getElementById('md-escolas').textContent=(E.escolas||[]).map(function(e){return e.nome;}).join(' · ')||'Meu Diário';
+    document.getElementById('md-quem').textContent='✦ '+(nome?nome+' · ':'')+usuario.email+' ✦';
+    var ini=nome.split(/\s+/).filter(Boolean);
+    document.getElementById('md-avatar').textContent=ini.length?(ini[0][0]+(ini.length>1?ini[ini.length-1][0]:'')).toUpperCase():'📘';
+    document.getElementById('md-rodape').textContent='Meu Diário · '+(nome||usuario.email)+' · Ano Letivo '+ano;
+  }
   function desenharTudo(){
-    var nome=(E.perfil&&E.perfil.nome)||usuario.nome;
-    document.getElementById('md-quem').textContent=(nome?nome+' · ':'')+usuario.email;
+    desenharCabecalho();
     desenharAbas();garantirSecoes();desenharInicio();desenharConfig();desenharContador();desenharEstatisticasTurmas();
+    cadaModulo('desenhar');
     irPara(abaAtual||(function(){try{return localStorage.getItem('md_aba');}catch(x){return '';}})()||'inicio');
   }
-  function aposRenderDiarios(){desenharMarcacoes();desenharEstatisticasTurmas();desenharContador();if(abaAtual==='inicio')desenharInicio();}
+  function aposRenderDiarios(){desenharMarcacoes();desenharEstatisticasTurmas();desenharContador();if(abaAtual==='inicio')desenharInicio();cadaModulo('aposDiarios');}
 
   // ── Adaptador do novo-diario.js ─────────────────────────────────────
   function adaptador(){
@@ -539,9 +699,19 @@ function itab(btn,pid){var ec=btn.closest('.ec2');ec.querySelectorAll('.itab').f
       },
       sincronizar:aposRenderDiarios,
       durEmTitulo:function(txt){var m=/(\d+)\s*h\/aula/i.exec(txt||'');return m?{horas:parseInt(m[1],10)}:null;},
-      aoStatus:function(s){statusDiarios=s;mostrarStatus();}
+      aoStatus:function(s){status('diarios',s);}
     };
   }
+
+  // ── API para os módulos (recursos e I.A) ────────────────────────────
+  window.MeuDiario={
+    esc:esc, toast:toast, novoId:novoId, slug:slug, agora:agora, dataBr:dataBr, MESES:MESES,
+    usuario:function(){return usuario;}, estrutura:function(){return E;},
+    turma:turma, escola:escola, diarios:diarios, somaHoras:somaHoras,
+    salvarEstrutura:salvar, criarTurma:criarTurma, adicionarAlunos:adicionarAlunos, adicionarDisciplina:adicionarDisciplina,
+    irPara:irPara, abaAtual:function(){return abaAtual;}, abrirOverlay:abrirOverlay, status:status,
+    sync:function(){return window.RelatorioSupabaseSync;}
+  };
 
   // ── Início da página ────────────────────────────────────────────────
   function iniciar(){
@@ -549,13 +719,14 @@ function itab(btn,pid){var ec=btn.closest('.ec2');ec.querySelectorAll('.itab').f
     usuario=S.auth.currentUser();
     E=lerLocal();
     if(!E.perfil||!E.perfil.nome){E.perfil=E.perfil||{};E.perfil.nome=usuario.nome||'';}
+    cadaModulo('iniciar',window.MeuDiario);
     desenharTudo();
     document.getElementById('md-sair').onclick=function(){if(confirm('Sair da conta neste aparelho?'))S.auth.signOut();};
     syncE=S.createScopeSync({
       perUser:true, scope:SCOPE_ESTRUTURA, source:'meu-diario', debounceMs:250,
       getLocalPayload:function(){return E;},
       onRemotePayload:aplicarRemotoEstrutura,
-      onStatus:function(s){statusEstrutura=s;mostrarStatus();}
+      onStatus:function(s){status('estrutura',s);}
     });
     syncE.start().then(function(){
       // Conta nova: a primeira gravação cria o registro no banco.
