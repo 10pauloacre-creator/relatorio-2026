@@ -437,3 +437,24 @@ O aluno vê o boletim em `get_meu_boletim(aluno_id, progress_session_token)`: s�
 - **Sábado na grade (as duas escolas):** a coluna "Sáb" (`WEEK` com `k:6`) vale 0 por padrão. Sábado sem feriado nem recesso só projeta aula quando a grade tiver horas nele, e o Contador da Casavequia (`pcProjectionBuildDays`) segue a mesma regra.
 - **Regra dos 15 minutos (Hermínio, 18/09/2026):** o dia de 4h15 (2h + 2h15) conta 4 h/aula e sobra 15 min. `rhMapaHorasExtras()` soma os minutos por turma e disciplina, na ordem das datas, e a cada 60 min o relato em que a hora fecha ganha +1 h/aula dentro de `rhHorasOficiaisCard` — então o Contador, o bimestre de cada aula e a frequência enviados ao banco usam a mesma conta. Relatos em `RH_HORAS_OFICIAIS_POR_RELATO` ficam como estão. Nas projeções, o resto de minutos segue acumulando (`minutosExtras` na trilha) e o dia aparece como "4h + 1 extra".
 - **Contador:** os cartões usam as datas projetadas (grade + feriados + recesso). Bimestres já concluídos mostram a data real em que a soma dos relatos atingiu a meta.
+
+---
+
+## 17. CONTAS DE PROFESSORES (Etapa 9, 19/09/2026)
+
+Toda página que carrega `supabase-report-sync.js` exige conta. O tipo de acesso vem de `<html data-acesso>`:
+- **vazio (padrão)**: páginas das escolas do administrador (Casavequia, Hermínio, painéis de alunos, projeções, projetos pessoais). Só a conta `10pauloacre@gmail.com`; outra conta é levada a `meu-diario.html`.
+- **`inicio`** (`index.html`): qualquer conta; o administrador vê as escolas, os demais vão para o Meu Diário.
+- **`professor`** (`meu-diario.html`): qualquer conta, com os próprios dados.
+
+**Tela de conta:** Entrar · Criar conta (nome, e-mail, senha ≥ 8 com letras e números; confirmação por e-mail) · Esqueci a senha (link → "nova senha") · Entrar com o Google (o botão só aparece quando o provedor estiver ligado no Supabase). Sair apaga do aparelho as cópias locais com o id do usuário.
+
+**Dados particulares:** tabela `professor_dados (user_id, scope_key, payload)`, RLS só do dono, no Realtime. `createScopeSync({perUser:true})` grava nela. O Meu Diário usa `meu-diario:estrutura:v1` (escolas, turmas, alunos, disciplinas) e `meu-diario:diarios:v1` (diários do `novo-diario.js`, adaptador próprio via `NovoDiario.iniciar`). Os dados do administrador continuam em `report_sync_state`/`relatorio_*` (só admin).
+
+**Sincronia imediata:** gravação com debounce de 250–300 ms + Realtime; ao voltar para a aba, ao ganhar foco ou ao voltar a internet, todos os escopos buscam de novo e reenviam o que ficou pendente (`recuperarTudo`). Medido: ~0,5 s entre dois navegadores.
+
+**IA para todos:** `organizar-relato` aceita qualquer conta logada, com cota de 40 pedidos/dia (`ia_consumir_cota`, `private.ia_uso`); o administrador não tem cota.
+
+**Segurança corrigida junto (o cadastro já estava aberto):** gatilho `profiles_trava_role` impede que uma conta se promova a `role='admin'` (o `private.is_admin()` confia nessa coluna); `alunos` só é lida pelo professor (`bdm_e_professor()`). SQL em `supabase/2026-09-19-etapa9-contas-de-professores.sql`.
+
+**Pendências do professor (painel do Supabase):** ligar o Google (Authentication → Providers, com Client ID/Secret do Google Cloud) e incluir `https://10pauloacre-creator.github.io/relatorio-2026/**` em Authentication → URL Configuration → Redirect URLs. O repositório é **público**: os relatos escritos no HTML (com nomes de alunos) continuam legíveis no código-fonte, mesmo com a página trancada.
