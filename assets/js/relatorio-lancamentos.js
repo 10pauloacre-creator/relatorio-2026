@@ -31,7 +31,21 @@ window.RelatorioLancamentos = (function () {
     if (!falhou) avisoTimer = window.setTimeout(function () { el.style.opacity = "0"; }, 6000);
   }
 
+  // Ano letivo da página: <html data-ano-letivo="2026">. Os códigos dos
+  // relatos só têm dia e mês (p-t1-0410); o ano vem daqui.
+  function anoLetivo() {
+    var ano = parseInt(document.documentElement.getAttribute("data-ano-letivo"), 10);
+    return ano >= 2000 && ano < 3000 ? ano : 2026;
+  }
+
+  // Página de arquivo de um ano encerrado (scripts/arquivar-ano-letivo.js):
+  // só leitura, nada é publicado.
+  function ehArquivo() {
+    return document.documentElement.hasAttribute("data-arquivo-ate");
+  }
+
   function iniciar(options) {
+    if (ehArquivo()) return { agendar: function () {}, publicarAgora: function () { return Promise.resolve(); } };
     var escolaSlug = options.escolaSlug;
     var montarRetrato = options.montarRetrato;
     var aoPublicar = typeof options.aoPublicar === "function" ? options.aoPublicar : null;
@@ -71,6 +85,7 @@ window.RelatorioLancamentos = (function () {
         return;
       }
       if (!retrato || !Array.isArray(retrato.aulas) || !retrato.aulas.length) return;
+      if (!retrato.ano) retrato.ano = anoLetivo();
 
       var texto = JSON.stringify(retrato);
       var assinaturaAtual = assinatura(texto);
@@ -139,7 +154,7 @@ window.RelatorioLancamentos = (function () {
     var mes = parseInt(m[1], 10);
     var dia = parseInt(m[2], 10);
     if (mes < 1 || mes > 12 || dia < 1 || dia > 31) return null;
-    return (ano || 2026) + "-" + m[1] + "-" + m[2];
+    return (ano || anoLetivo()) + "-" + m[1] + "-" + m[2];
   }
 
   function textoLimpo(el, prefixo) {
@@ -256,6 +271,8 @@ window.RelatorioLancamentos = (function () {
 
   return {
     iniciar: iniciar,
+    anoLetivo: anoLetivo,
+    ehArquivo: ehArquivo,
     dataIsoDoCodigo: dataIsoDoCodigo,
     textoLimpo: textoLimpo,
     coletarOcorrencias: coletarOcorrencias,
