@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#030b1f">
+<meta name="description" content="AXION PROEDUQ: tecnologia que move a educação. Conheça os princípios, os valores, os objetivos e as plataformas Relatório e Biblioteca Digital.">
+<meta property="og:title" content="AXION PROEDUQ">
+<meta property="og:description" content="Tecnologia que move a educação.">
+<meta property="og:image" content="assets/marca/axion-escuro.webp">
+<link rel="icon" href="favicon.ico" sizes="any">
+<title>AXION PROEDUQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Página institucional da AXION PROEDUQ.
+   Cópia idêntica no Relatório e na Biblioteca (scripts/check-copias-compartilhadas.js). */
+:root {
+  --navy: #030b1f;
+  --navy-2: #081a3d;
+  --blue: #0b4df0;
+  --cyan: #00b8f0;
+  --grad: linear-gradient(100deg, #0b4df0 0%, #1a7cf5 50%, #00b8f0 100%);
+
+  --bg: #f6f8fc;
+  --surface: #ffffff;
+  --surface-2: #eef3fb;
+  --text: #0a1733;
+  --muted: #52607a;
+  --line: #dde5f2;
+  --accent: #0b4df0;
+  --accent-soft: rgba(11, 77, 240, .08);
+  --shadow: 0 1px 2px rgba(10, 23, 51, .04), 0 12px 32px rgba(10, 23, 51, .06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #050d22;
+    --surface: #0b1733;
+    --surface-2: #0f1e40;
+    --text: #e8eefb;
+    --muted: #9aa9c6;
+    --line: rgba(120, 160, 230, .16);
+    --accent: #4fb4ff;
+    --accent-soft: rgba(79, 180, 255, .1);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 16px 40px rgba(0, 0, 0, .35);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #050d22;
+  --surface: #0b1733;
+  --surface-2: #0f1e40;
+  --text: #e8eefb;
+  --muted: #9aa9c6;
+  --line: rgba(120, 160, 230, .16);
+  --accent: #4fb4ff;
+  --accent-soft: rgba(79, 180, 255, .1);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 16px 40px rgba(0, 0, 0, .35);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+a { color: var(--accent); }
+h1, h2, h3, .num { font-family: "Montserrat", "Segoe UI", system-ui, sans-serif; letter-spacing: -.01em; }
+.wrap { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+
+/* ── Barra superior ── */
+.topo {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(3, 11, 31, .82);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(120, 170, 255, .12);
+}
+.topo .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 60px; }
+.topo-logo img { height: 40px; width: auto; }
+.topo nav { display: flex; gap: 4px; }
+.topo nav a {
+  color: #c9d6f2; text-decoration: none; font-size: .86rem; font-weight: 500;
+  padding: 8px 12px; border-radius: 8px; transition: background .2s, color .2s;
+}
+.topo nav a:hover { background: rgba(255, 255, 255, .07); color: #fff; }
+@media (max-width: 760px) { .topo nav a:not(.cta-mini) { display: none; } }
+.topo nav a.cta-mini { background: rgba(0, 184, 240, .14); color: #7fd8ff; border: 1px solid rgba(0, 184, 240, .3); }
+
+/* ── Abertura ── */
+.hero {
+  position: relative; overflow: hidden; color: #eaf1ff;
+  background:
+    radial-gradient(60% 70% at 18% 20%, rgba(11, 77, 240, .35), transparent 60%),
+    radial-gradient(50% 60% at 85% 75%, rgba(0, 184, 240, .22), transparent 60%),
+    var(--navy);
+  padding: 88px 0 96px;
+}
+.hero::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(120, 170, 255, .07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 170, 255, .07) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+          mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+}
+.hero .wrap { position: relative; text-align: center; }
+.hero-logo { width: min(640px, 92%); height: auto; margin: 0 auto 28px; }
+.hero-lead { max-width: 720px; margin: 0 auto 34px; font-size: 1.12rem; color: #b9c7e6; }
+.hero-acoes { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 22px;
+  border-radius: 12px; font-weight: 600; font-size: .95rem; text-decoration: none;
+  transition: transform .2s, box-shadow .2s, background .2s;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn-pri { background: var(--grad); color: #fff; box-shadow: 0 10px 30px rgba(11, 77, 240, .35); }
+.btn-sec { color: #dce7ff; border: 1px solid rgba(160, 190, 255, .3); background: rgba(255, 255, 255, .04); }
+.btn-sec:hover { background: rgba(255, 255, 255, .09); }
+
+/* ── Seções ── */
+section { padding: 88px 0; }
+.rotulo {
+  display: inline-block; font-size: .74rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--accent); background: var(--accent-soft); padding: 5px 12px; border-radius: 999px; margin-bottom: 14px;
+}
+h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); line-height: 1.2; margin: 0 0 14px; font-weight: 800; }
+.intro { color: var(--muted); max-width: 680px; margin: 0 0 44px; font-size: 1.05rem; }
+.alt { background: var(--surface-2); }
+.degrade { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* Quem somos */
+.quem { display: grid; grid-template-columns: 1.25fr 1fr; gap: 48px; align-items: center; }
+.quem p { margin: 0 0 16px; color: var(--muted); font-size: 1.04rem; }
+.quem p strong { color: var(--text); }
+.numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.numero { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; box-shadow: var(--shadow); }
+.numero .num { font-size: 2rem; font-weight: 800; line-height: 1.1; }
+.numero span { display: block; margin-top: 6px; font-size: .86rem; color: var(--muted); }
+@media (max-width: 860px) { .quem { grid-template-columns: 1fr; gap: 32px; } }
+
+/* Cartões genéricos */
+.grade { display: grid; gap: 18px; }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 900px) { .g3 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 620px) { .g3 { grid-template-columns: 1fr; } }
+.cartao {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 26px;
+  box-shadow: var(--shadow); transition: transform .25s, border-color .25s;
+}
+.cartao:hover { transform: translateY(-3px); border-color: rgba(11, 77, 240, .35); }
+.cartao h3 { margin: 16px 0 8px; font-size: 1.08rem; font-weight: 700; }
+.cartao p { margin: 0; color: var(--muted); font-size: .95rem; }
+.icone {
+  width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center;
+  background: var(--grad); color: #fff; box-shadow: 0 8px 20px rgba(11, 77, 240, .28);
+}
+.icone svg { width: 24px; height: 24px; }
+
+/* Propósito */
+.proposito { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.proposito .cartao { position: relative; overflow: hidden; }
+.proposito .cartao::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--grad);
+}
+.proposito .cartao .tag { font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.proposito .cartao p { margin-top: 10px; color: var(--text); font-size: 1rem; }
+@media (max-width: 860px) { .proposito { grid-template-columns: 1fr; } }
+
+/* Valores */
+.valores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--surface); }
+.valor { padding: 24px 26px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.valor:nth-child(3n) { border-right: 0; }
+.valor:nth-last-child(-n+3) { border-bottom: 0; }
+.valor strong { display: block; font-family: "Montserrat", sans-serif; font-size: 1rem; margin-bottom: 4px; }
+.valor span { color: var(--muted); font-size: .92rem; }
+@media (max-width: 760px) {
+  .valores { grid-template-columns: 1fr; }
+  .valor, .valor:nth-child(3n) { border-right: 0; }
+  .valor:nth-last-child(-n+3) { border-bottom: 1px solid var(--line); }
+  .valor:last-child { border-bottom: 0; }
+}
+
+/* Plataformas */
+.plataformas { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+@media (max-width: 900px) { .plataformas { grid-template-columns: 1fr; } }
+.plat { display: flex; flex-direction: column; padding: 30px; }
+.plat-cab { display: flex; align-items: center; gap: 16px; }
+.plat-cab img { width: 72px; height: 72px; border-radius: 18px; box-shadow: 0 10px 24px rgba(0, 0, 0, .18); }
+.plat-cab h3 { margin: 0; font-size: 1.3rem; }
+.plat-cab .dominio { font-size: .86rem; color: var(--accent); font-weight: 600; }
+.plat-resumo { margin: 20px 0 18px !important; color: var(--text) !important; font-size: 1rem !important; }
+.plat h4 { margin: 18px 0 8px; font-size: .74rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lista li { position: relative; padding-left: 26px; font-size: .94rem; color: var(--muted); }
+.lista li::before {
+  content: ""; position: absolute; left: 0; top: .5em; width: 14px; height: 8px;
+  border-left: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg);
+}
+.publico { display: flex; flex-wrap: wrap; gap: 8px; }
+.publico span { font-size: .8rem; font-weight: 600; padding: 5px 11px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.plat .btn { margin-top: 26px; align-self: flex-start; }
+
+/* Conexão entre as plataformas */
+.fluxo { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: stretch; gap: 14px; margin-bottom: 30px; }
+.no { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; text-align: center; box-shadow: var(--shadow); }
+.no strong { display: block; font-family: "Montserrat", sans-serif; margin-bottom: 6px; }
+.no span { font-size: .88rem; color: var(--muted); }
+.no.centro { background: var(--grad); border-color: transparent; color: #fff; box-shadow: 0 14px 34px rgba(11, 77, 240, .3); }
+.no.centro span { color: rgba(255, 255, 255, .86); }
+.seta { display: grid; place-items: center; color: var(--accent); }
+.seta svg { width: 34px; height: 34px; }
+@media (max-width: 760px) {
+  .fluxo { grid-template-columns: 1fr; }
+  .seta svg { transform: rotate(90deg); }
+}
+.integracoes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 28px; }
+.integracoes li { font-size: .95rem; }
+@media (max-width: 760px) { .integracoes { grid-template-columns: 1fr; } }
+
+/* Objetivos */
+.objetivos { counter-reset: obj; display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.objetivo { display: flex; gap: 16px; align-items: flex-start; }
+.objetivo::before {
+  counter-increment: obj; content: counter(obj, decimal-leading-zero);
+  flex: none; font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 1.1rem;
+  width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent);
+}
+.objetivo h3 { margin: 4px 0 4px; font-size: 1.02rem; }
+.objetivo p { margin: 0; color: var(--muted); font-size: .94rem; }
+@media (max-width: 760px) { .objetivos { grid-template-columns: 1fr; } }
+
+/* Próximos projetos */
+.futuro {
+  display: flex; gap: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  border: 1.5px dashed rgba(11, 77, 240, .35); border-radius: 18px; padding: 30px; background: var(--surface);
+}
+.futuro h3 { margin: 0 0 6px; font-size: 1.2rem; }
+.futuro p { margin: 0; color: var(--muted); max-width: 640px; }
+
+/* A marca */
+.marca-kit { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.marca-painel { border-radius: 18px; padding: 44px 32px; display: grid; place-items: center; border: 1px solid var(--line); min-height: 200px; }
+.marca-painel img { width: min(360px, 100%); height: auto; }
+.marca-painel.claro { background: #ffffff; }
+.marca-painel.escuro { background: var(--navy); border-color: var(--line); }
+.marca-legenda { margin-top: 10px; font-size: .82rem; color: var(--muted); text-align: center; }
+.paleta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+.cor { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 14px 8px 8px; font-size: .84rem; }
+.cor i { width: 30px; height: 30px; border-radius: 8px; display: block; }
+.cor code { color: var(--muted); font-size: .78rem; }
+@media (max-width: 760px) { .marca-kit { grid-template-columns: 1fr; } }
+
+/* Rodapé */
+.rodape { background: var(--navy); color: #a9bbe0; padding: 56px 0 36px; }
+.rodape-topo { display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; align-items: flex-start; }
+.rodape-topo img { width: 240px; height: auto; }
+.rodape h4 { margin: 0 0 10px; color: #eaf1ff; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; }
+.rodape ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .9rem; }
+.rodape a { color: #cfe0ff; text-decoration: none; }
+.rodape a:hover { text-decoration: underline; }
+.rodape-base {
+  margin-top: 40px; padding-top: 22px; border-top: 1px solid rgba(160, 190, 255, .14);
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: .82rem;
+}
+.maiusc { letter-spacing: .16em; text-transform: uppercase; font-weight: 600; }
+
+/* Entrada suave dos blocos */
+.surge { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+.surge.visivel { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .surge { opacity: 1; transform: none; transition: none; } }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="wrap">
+    <a class="topo-logo" href="#inicio" aria-label="AXION PROEDUQ, início"><img src="assets/marca/axion-escuro-sm.webp" alt="AXION PROEDUQ" width="151" height="40"></a>
+    <nav aria-label="Seções">
+      <a href="#quem-somos">Quem somos</a>
+      <a href="#principios">Princípios</a>
+      <a href="#plataformas">Plataformas</a>
+      <a href="#objetivos">Objetivos</a>
+      <a class="cta-mini" href="index.html">← Voltar ao início</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="hero" id="inicio">
+  <div class="wrap">
+    <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">AXION PROEDUQ, tecnologia que move a educação</h1>
+    <img class="hero-logo" src="assets/marca/axion-escuro.webp" alt="AXION PROEDUQ. Tecnologia que move a educação." width="1400" height="371">
+    <p class="hero-lead">Criamos plataformas digitais que aproximam professores, alunos e famílias, organizam o dia a dia da escola e transformam registros de aula em aprendizagem que se acompanha, se mede e se celebra.</p>
+    <div class="hero-acoes">
+      <a class="btn btn-pri" href="#plataformas">Conheça as plataformas</a>
+      <a class="btn btn-sec" href="#principios">Nossos princípios</a>
+    </div>
+  </div>
+</div>
+
+<section id="quem-somos">
+  <div class="wrap quem surge">
+    <div>
+      <span class="rotulo">Quem somos</span>
+      <h2>Nascemos dentro da sala de aula</h2>
+      <p>A <strong>AXION PROEDUQ</strong> reúne as tecnologias educacionais criadas pelo professor <strong>Paulo Roberto Ramalho Magalhães</strong>, em Senador Guiomard, no Acre. Cada ferramenta surgiu de uma necessidade real da escola: registrar aulas com cuidado, acompanhar cada aluno de perto e oferecer leitura e estudo de qualidade, inclusive onde a internet é instável.</p>
+      <p>Hoje a marca abriga duas plataformas que trabalham juntas, o <strong>Relatório</strong> e a <strong>Biblioteca Digital</strong>, e é a casa dos próximos projetos que vierem para somar à educação.</p>
+    </div>
+    <div class="numeros">
+      <div class="numero"><div class="num degrade">2</div><span>plataformas integradas em uso</span></div>
+      <div class="numero"><div class="num degrade">2</div><span>escolas públicas atendidas no Acre</span></div>
+      <div class="numero"><div class="num degrade">100%</div><span>gratuito para alunos e escolas</span></div>
+      <div class="numero"><div class="num degrade">2026</div><span>ano de fundação da marca</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="proposito">
+  <div class="wrap">
+    <div class="surge">
+      <span class="rotulo">Propósito</span>
+      <h2>Por que existimos</h2>
+      <p class="intro">Três ideias guiam tudo o que construímos.</p>
+    </div>
+    <div class="proposito surge">
+      <div class="cartao"><span class="tag">Missão</span><p>Colocar tecnologia simples, segura e gratuita a serviço do ensino, para que o professor ensine melhor e o aluno aprenda mais.</p></div>
+      <div class="cartao"><span class="tag">Visão</span><p>Ser referência em tecnologia educacional feita a partir da escola pública, reconhecida pela utilidade no dia a dia e pelo respeito aos dados de cada aluno.</p></div>
+      <div class="cartao"><span class="tag">Compromisso</span><p>Cada funcionalidade precisa resolver um problema real da sala de aula. Se não ajuda o professor ou o aluno, não entra.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="principios">
+  <div class="wrap">
+    <div class="surge">
+      <span class="rotulo">Princípios</span>
+      <h2>Como trabalhamos</h2>
+      <p class="intro">Os princípios que orientam cada decisão, do desenho de uma tela à forma de guardar uma nota.</p>
+    </div>
+    <div class="grade g3 surge">
+      <div class="cartao">
+        <div class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg></div>
+        <h3>O aluno no centro</h3>
+        <p>Toda ferramenta existe para a aprendizagem do aluno: acompanhar o progresso, reconhecer o esforço e agir cedo quando algo não vai bem.</p>
+      </div>
+      <div class="cartao">
+        <div class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+        <h3>O professor decide</h3>
+        <p>A inteligência artificial organiza e sugere. A decisão pedagógica final, sobre nota, conduta ou conteúdo, é sempre do professor.</p>
+      </div>
+      <div class="cartao">
+        <div class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+        <h3>Privacidade por padrão</h3>
+        <p>Cada pessoa vê apenas o que é dela. Nomes de alunos são trocados por códigos antes de irem para a IA, e seguimos a LGPD.</p>
+      </div>
+      <div class="cartao">
+        <div class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></div>
+        <h3>Nada se perde</h3>
+        <p>O histórico escolar é patrimônio do aluno. Os registros ficam guardados por ano letivo, com cada alteração datada e recuperável.</p>
+      </div>
+      <div class="cartao">
+        <div class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+        <h3>Acesso para todos</h3>
+        <p>Funciona no celular, instala como aplicativo e continua útil sem internet. A realidade da escola rural faz parte do projeto.</p>
+      </div>
+      <div class="cartao">
+        <div class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg></div>
+        <h3>Melhoria contínua</h3>
+        <p>As plataformas evoluem toda semana, a partir do uso real em sala. O retorno de professores e alunos vira funcionalidade.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="valores">
+  <div class="wrap">
+    <div class="surge">
+      <span class="rotulo">Valores</span>
+      <h2>O que não negociamos</h2>
+      <p class="intro">Valores que valem para cada linha de código e cada conversa com a escola.</p>
+    </div>
+    <div class="valores surge">
+      <div class="valor"><strong>Ética</strong><span>Dados de alunos só servem à vida escolar deles. Nunca para publicidade.</span></div>
+      <div class="valor"><strong>Transparência</strong><span>Regras claras sobre como as notas são calculadas e como os dados são usados.</span></div>
+      <div class="valor"><strong>Simplicidade</strong><span>Menos cliques, menos telas, mais tempo para ensinar.</span></div>
+      <div class="valor"><strong>Rigor pedagógico</strong><span>Tecnologia que respeita o currículo, o bimestre e o jeito de avaliar da escola.</span></div>
+      <div class="valor"><strong>Inclusão</strong><span>Gratuito, leve e pensado para quem tem pouco sinal e aparelho simples.</span></div>
+      <div class="valor"><strong>Responsabilidade</strong><span>Cuidar do registro de cada aluno como cuidamos de um documento oficial.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="plataformas">
+  <div class="wrap">
+    <div class="surge">
+      <span class="rotulo">Plataformas</span>
+      <h2>O que já está em uso</h2>
+      <p class="intro">Duas plataformas, um mesmo banco de dados seguro. O que o professor registra em uma aparece, na hora certa, na outra.</p>
+    </div>
+    <div class="plataformas surge">
+      <article class="cartao plat">
+        <div class="plat-cab">
+          <img src="assets/marca/plataforma-relatorio.webp" alt="" width="72" height="72">
+          <div><h3>Relatório</h3><span class="dominio">relatorio.skin</span></div>
+        </div>
+        <p class="plat-resumo">O diário digital do professor. Reúne relatos de aula, frequência, atividades, conduta e notas de cada turma num só lugar, com cálculos automáticos e histórico permanente.</p>
+        <h4>Para quem</h4>
+        <div class="publico"><span>Professores</span><span>Coordenação</span></div>
+        <h4>Objetivos</h4>
+        <ul class="lista">
+          <li>Registrar cada aula com tema, presença e atividades em poucos minutos.</li>
+          <li>Acompanhar a carga horária e fechar os bimestres pela soma real de aulas.</li>
+          <li>Calcular notas de trabalho, prova e conduta com regras claras e iguais para todos.</li>
+          <li>Guardar para sempre o histórico de cada ano letivo.</li>
+        </ul>
+        <h4>O que já faz</h4>
+        <ul class="lista">
+          <li>Relatos organizados por IA a partir do rascunho do professor.</li>
+          <li>Contador de h/aula, planejamento anual e projeção do calendário.</li>
+          <li>Relatório individual anual do aluno, pronto para imprimir.</li>
+          <li>Meu Diário: qualquer professor cria a conta e usa com os próprios dados.</li>
+        </ul>
+        <a class="btn btn-pri" href="https://relatorio.skin/" rel="noopener">Acessar o Relatório →</a>
+      </article>
+
+      <article class="cartao plat">
+        <div class="plat-cab">
+          <img src="assets/marca/plataforma-biblioteca.webp" alt="" width="72" height="72">
+          <div><h3>Biblioteca Digital</h3><span class="dominio">biblioteca-ac.com</span></div>
+        </div>
+        <p class="plat-resumo">O acervo digital do aluno, com estética medieval. Livros de cada série, disciplina e bimestre, avaliações, jogos e um ranking que transforma o estudo em jornada.</p>
+        <h4>Para quem</h4>
+        <div class="publico"><span>Alunos</span><span>Professores</span><span>Famílias</span></div>
+        <h4>Objetivos</h4>
+        <ul class="lista">
+          <li>Garantir acesso ao material de estudo pelo celular, inclusive sem internet.</li>
+          <li>Tornar a leitura e a revisão mais envolventes, com desafios e recompensas.</li>
+          <li>Avaliar a aprendizagem a cada bimestre, com resultado detalhado por habilidade.</li>
+          <li>Dar ao aluno acesso ao próprio boletim e ao próprio relatório.</li>
+        </ul>
+        <h4>O que já faz</h4>
+        <ul class="lista">
+          <li>Livros digitais por série, disciplina e bimestre, para as duas escolas.</li>
+          <li>Avaliação bimestral com login, que entra direto na nota de prova.</li>
+          <li>Ranking de Poder, com níveis que dão bônus na média final.</li>
+          <li>Jogos educativos e aplicativo Android para estudar offline.</li>
+        </ul>
+        <a class="btn btn-pri" href="https://biblioteca-ac.com/" rel="noopener">Acessar a Biblioteca →</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="integracao">
+  <div class="wrap">
+    <div class="surge">
+      <span class="rotulo">Integração</span>
+      <h2>Como as plataformas se conectam</h2>
+      <p class="intro">As duas plataformas compartilham um banco de dados protegido, e cada informação segue o caminho certo.</p>
+    </div>
+    <div class="fluxo surge" role="img" aria-label="O Relatório envia frequência, atividades e conduta ao banco compartilhado; a Biblioteca envia provas e recebe o boletim.">
+      <div class="no"><strong>Relatório</strong><span>frequência, atividades, conduta e notas digitadas</span></div>
+      <div class="seta" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h14l-3-3"/><path d="M20 15H6l3 3"/></svg></div>
+      <div class="no centro"><strong>Banco compartilhado</strong><span>seguro, com acesso por conta e histórico permanente</span></div>
+      <div class="seta" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h14l-3-3"/><path d="M20 15H6l3 3"/></svg></div>
+      <div class="no"><strong>Biblioteca Digital</strong><span>provas bimestrais, ranking, boletim e relatório do aluno</span></div>
+    </div>
+    <ul class="lista integracoes surge">
+      <li>A prova feita no livro digital vira a nota de prova do bimestre no diário.</li>
+      <li>Frequência e atividades do diário viram a nota de trabalho do aluno.</li>
+      <li>As observações de conduta aparecem no relatório e no boletim, com as regras combinadas.</li>
+      <li>O aluno vê o próprio boletim e o relatório anual, sempre atualizados.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="objetivos">
+  <div class="wrap">
+    <div class="surge">
+      <span class="rotulo">Objetivos</span>
+      <h2>Aonde queremos chegar</h2>
+      <p class="intro">Metas que orientam o crescimento da AXION PROEDUQ e das plataformas que ela abriga.</p>
+    </div>
+    <div class="objetivos surge">
+      <div class="objetivo"><div><h3>Devolver tempo ao professor</h3><p>Automatizar o que é repetitivo, como cálculos, contagens e relatórios, para sobrar mais tempo para ensinar.</p></div></div>
+      <div class="objetivo"><div><h3>Acompanhar cada aluno de perto</h3><p>Transformar registros diários em sinais claros de quem precisa de apoio, a tempo de agir.</p></div></div>
+      <div class="objetivo"><div><h3>Levar o estudo a qualquer lugar</h3><p>Material de qualidade no celular, com ou sem internet, para alunos de escolas urbanas e rurais.</p></div></div>
+      <div class="objetivo"><div><h3>Aproximar escola e família</h3><p>Boletins e relatórios que o aluno e o responsável entendem e acessam quando quiserem.</p></div></div>
+      <div class="objetivo"><div><h3>Crescer com segurança</h3><p>Levar as plataformas a mais professores e escolas sem abrir mão da privacidade e da qualidade.</p></div></div>
+      <div class="objetivo"><div><h3>Inovar a partir da escola</h3><p>Criar novos projetos sempre a partir de necessidades reais observadas em sala de aula.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="marca">
+  <div class="wrap">
+    <div class="surge">
+      <span class="rotulo">A marca</span>
+      <h2>Identidade AXION PROEDUQ</h2>
+      <p class="intro">O “X” formado por setas que se cruzam representa caminhos que se encontram: ensino e tecnologia avançando juntos. Há uma versão para cada tipo de fundo.</p>
+    </div>
+    <div class="marca-kit surge">
+      <div>
+        <div class="marca-painel claro"><img src="assets/marca/axion-claro.webp" alt="Logo AXION PROEDUQ para fundo claro" width="1400" height="263" loading="lazy"></div>
+        <p class="marca-legenda">Para fundo claro</p>
+      </div>
+      <div>
+        <div class="marca-painel escuro"><img src="assets/marca/axion-escuro.webp" alt="Logo AXION PROEDUQ para fundo escuro" width="1400" height="371" loading="lazy"></div>
+        <p class="marca-legenda">Para fundo escuro</p>
+      </div>
+    </div>
+    <div class="paleta surge" aria-label="Cores da marca">
+      <span class="cor"><i style="background:#030b1f"></i><span>Azul-noite<br><code>#030B1F</code></span></span>
+      <span class="cor"><i style="background:#0b4df0"></i><span>Azul AXION<br><code>#0B4DF0</code></span></span>
+      <span class="cor"><i style="background:#00b8f0"></i><span>Ciano<br><code>#00B8F0</code></span></span>
+      <span class="cor"><i style="background:#ffffff;border:1px solid #dde5f2"></i><span>Branco<br><code>#FFFFFF</code></span></span>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="futuro">
+  <div class="wrap surge">
+    <div class="futuro">
+      <div>
+        <span class="rotulo">Em breve</span>
+        <h3>Novos projetos a caminho</h3>
+        <p>A AXION PROEDUQ foi criada para abrigar as próximas ideias. Novas plataformas serão apresentadas aqui assim que estiverem prontas para as escolas.</p>
+      </div>
+      <a class="btn btn-pri" href="mailto:10pauloacre@gmail.com?subject=AXION%20PROEDUQ">Fale conosco</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="rodape">
+  <div class="wrap">
+    <div class="rodape-topo">
+      <div>
+        <img src="assets/marca/axion-escuro-sm.webp" alt="AXION PROEDUQ. Tecnologia que move a educação." width="560" height="148" loading="lazy">
+      </div>
+      <div>
+        <h4>Plataformas</h4>
+        <ul>
+          <li><a href="https://relatorio.skin/" rel="noopener">Relatório</a></li>
+          <li><a href="https://biblioteca-ac.com/" rel="noopener">Biblioteca Digital</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Privacidade</h4>
+        <ul>
+          <li><a href="https://relatorio.skin/privacidade.html" rel="noopener">Política do Relatório</a></li>
+          <li><a href="https://relatorio.skin/termos.html" rel="noopener">Termos do Relatório</a></li>
+          <li><a href="https://biblioteca-ac.com/politica-de-privacidade.html" rel="noopener">Política da Biblioteca</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contato</h4>
+        <ul>
+          <li><a href="mailto:10pauloacre@gmail.com">10pauloacre@gmail.com</a></li>
+          <li>Senador Guiomard · Acre</li>
+        </ul>
+      </div>
+    </div>
+    <div class="rodape-base">
+      <span>© <span id="ano">2026</span> AXION PROEDUQ. Todos os direitos reservados.</span>
+      <span class="maiusc">Tecnologia que move a educação</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var ano = document.getElementById("ano");
+  if (ano) ano.textContent = String(Math.max(2026, new Date().getFullYear()));
+  var blocos = document.querySelectorAll(".surge");
+  if (!("IntersectionObserver" in window)) {
+    blocos.forEach(function (b) { b.classList.add("visivel"); });
+    return;
+  }
+  var obs = new IntersectionObserver(function (entradas) {
+    entradas.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add("visivel"); obs.unobserve(e.target); }
+    });
+  }, { rootMargin: "0px 0px -8% 0px" });
+  blocos.forEach(function (b) { obs.observe(b); });
+})();
+</script>
+</body>
+</html>
