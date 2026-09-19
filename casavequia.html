@@ -8653,6 +8653,7 @@ function pcDecorateSectionHero(sectionId,cfg){
     return'<button class="pc-hero-pill" type="button" onclick="pcGoTab(\''+item.id+'\')">'+item.label+'</button>';
   }).join('');
   var actions='<div class="pc-hero-actions">'
+    +(/^sec-t\d$/.test(sectionId)?'<button class="pc-hero-btn primary" type="button" onclick="novoDiarioAbrir(\''+sectionId.slice(4)+'\')">+ Novo Diário</button>':'')
     +'<button class="pc-hero-btn primary" type="button" onclick="pcHeroToggleSection(\''+sectionId+'\',true)">Abrir todos os relatos</button>'
     +'<button class="pc-hero-btn ghost" type="button" onclick="pcHeroToggleSection(\''+sectionId+'\',false)">Fechar todos</button>'
     +'<button class="pc-hero-btn ghost" type="button" onclick="pcHeroScrollLatest(\''+sectionId+'\')">Ir para o mais recente</button>'
@@ -11419,8 +11420,9 @@ function iniciarSyncUniversal() {
 </script>
 <script src="assets/js/casavequia-calendar-data.js"></script>
 <script src="assets/js/casavequia-calendar.js"></script>
-<script src="assets/js/editor.js?v=20260916a"></script>
+<script src="assets/js/editor.js?v=20260919a"></script>
 <script src="assets/js/alunos.js"></script>
+<script src="assets/js/novo-diario.js?v=20260919a"></script>
 <script src="assets/js/livros-prompts.js?v=20260723b"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
