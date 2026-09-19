@@ -1,0 +1,15 @@
+<!-- Supabase → Authentication → Emails → "Alterar endereço de e-mail"
+     Assunto: Confirme a troca do seu e-mail -->
+<div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#1f2d24;line-height:1.55">
+  <p style="margin:0 0 18px;font-size:13px;font-weight:bold;letter-spacing:.06em;color:#2d6147">AXION PROEDUQ</p>
+  <h2 style="margin:0 0 12px;color:#1a3a2a">Confirme o novo e-mail</h2>
+  <p>Recebemos um pedido para trocar o e-mail da sua conta de <strong>{{ .Email }}</strong> para <strong>{{ .NewEmail }}</strong>.</p>
+  <p>Para concluir a troca, confirme:</p>
+  <p style="margin:24px 0">
+    <a href="{{ .ConfirmationURL }}" style="background:#2d6147;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;display:inline-block">Confirmar troca de e-mail</a>
+  </p>
+  <p style="font-size:13px;color:#5a5a5a">Se o botão não funcionar, copie e cole este endereço no navegador:<br>{{ .ConfirmationURL }}</p>
+  <p style="font-size:13px;color:#5a5a5a">Se você não pediu esta troca, ignore este e-mail e troque a sua senha: o e-mail da conta continua o mesmo.</p>
+  <hr style="border:none;border-top:1px solid #e3e3e3;margin:24px 0">
+  <p style="font-size:12px;color:#7a7a7a">Axion ProEduq · Relatório (relatorio.skin) e Biblioteca Digital<br>Este é um e-mail automático; não é preciso respondê-lo.</p>
+</div>
