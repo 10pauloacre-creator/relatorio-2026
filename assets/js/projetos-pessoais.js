@@ -107,6 +107,216 @@
       ['Empacotamento Android', 'Criar projeto nativo, assinatura, variantes e testes em aparelho.', 'Auditoria de prontidão concluída.']
     ] }
   ];
+  var AXION_PHASES = [
+    { id: 'f01', title: 'Identidade verbal e arquitetura de marca', summary: 'Fechar o discurso da companhia e a regra de nomes antes de produzir qualquer arte, site ou proposta. Tudo o que vier depois copia daqui.', tasks: [
+      ['Slogan institucional', 'Tecnologia que move a educação. Usado no site, nas propostas e na assinatura de e-mail.', 'Nenhuma. É o primeiro bloco.', true],
+      ['Assinatura publicitária', 'Ensinar. Aprender. Evoluir. Usada em peças de divulgação, vídeos e redes sociais. As duas convivem.', 'Slogan institucional definido.', true],
+      ['Descritor curto da companhia', 'AXION PROEDUQ é uma companhia de tecnologia educacional dedicada ao desenvolvimento de plataformas, aplicativos e experiências digitais que ampliam as possibilidades de ensinar e aprender.', 'Nenhuma.', true],
+      ['Descritor forte para apresentação institucional', 'Criamos tecnologia para transformar a maneira como professores ensinam, alunos aprendem e escolas desenvolvem novas experiências educacionais.', 'Descritor curto definido.', true],
+      ['Frase de posicionamento do site', 'Tecnologia criada para quem ensina e para quem aprende. Entra logo abaixo do título na primeira página.', 'Descritores definidos.', true],
+      ['Cinco pilares de marca', 'Inovação, Autonomia, Simplicidade, Evolução e Acesso, cada um com uma linha de explicação. São o eixo de todo texto institucional.', 'Descritores definidos.', true],
+      ['Regra de arquitetura de marca', 'Produto tem nome próprio e recebe o selo uma plataforma AXION PROEDUQ. Nunca prefixar produto com Axion, para que cada plataforma construa personalidade e a companhia acumule reputação.', 'Nenhuma.', true],
+      ['Lista de nomes reservados', 'Avalia, Sala, Trilhas, Mestre e Conecta. Conferir domínio livre e busca no INPI antes de adotar qualquer um deles.', 'Regra de arquitetura definida.'],
+      ['Guia de tom de voz em uma página', 'A companhia é séria e confiável; os produtos podem ser lúdicos e gamificados. Escrever o que dizer, o que evitar e três exemplos de frase certa e errada.', 'Pilares definidos.'],
+      ['Glossário de termos padronizados', 'Companhia, plataforma, produto, escola parceira, rede de ensino, professor, estudante. Evita variação de palavra entre site, sistema e proposta.', 'Tom de voz definido.']
+    ] },
+    { id: 'f02', title: 'Identidade visual e ativos de apresentação', summary: 'Transformar a marca em arquivos prontos para uso em tela, impressão e proposta, sem depender de refazer arte a cada peça.', tasks: [
+      ['Logotipo principal criado', 'Versões para fundo claro e escuro em assets/icons/axion-bg-claro.png e axion-bg-escuro.png.', 'Identidade verbal fechada.', true],
+      ['Versões web otimizadas', 'Recortes em webp em assets/marca/, com tamanhos -sm para cabeçalho e tamanho cheio para hero.', 'Logotipo criado.', true],
+      ['Ícone da companhia', 'icon-axion.png em uso nos projetos e no hub.', 'Logotipo criado.', true],
+      ['Favicon e ícones de aplicativo', 'Gerar favicon.ico de 32px, apple-touch-icon de 180px e ícones PWA de 192 e 512px a partir do mesmo símbolo.', 'Ícone definido.'],
+      ['Paleta de cores oficial', 'Definir primária, secundária, neutros e cores de estado (sucesso, alerta, erro), com hex e variante para modo escuro. Conferir contraste mínimo de 4.5:1 em texto.', 'Logotipo criado.'],
+      ['Tipografia oficial', 'Uma fonte de título e uma de texto, com licença livre para uso comercial. Hospedar no próprio domínio para não depender de terceiro e não vazar acesso do visitante.', 'Paleta definida.'],
+      ['Versão monocromática e regras de uso', 'Logo em preto, em branco e em traço único, com área de respiro e tamanho mínimo. Evita deformação em ofício, carimbo e camiseta.', 'Logotipo criado.'],
+      ['Manual de marca em PDF', 'Reunir logo, paleta, tipografia, usos proibidos, arquitetura de marca e tom de voz em um arquivo só. É o que se envia a gráfica e a parceiro.', 'Paleta, tipografia e tom de voz prontos.'],
+      ['Selo uma plataforma AXION PROEDUQ', 'Arte em svg e webp, clara e escura, para aplicar no rodapé de cada produto sem redesenhar.', 'Regra de arquitetura definida.'],
+      ['Imagens de apresentação dos produtos', 'Mockups em notebook, tablet e celular com telas reais da Biblioteca e do Relatório, em modo claro e escuro.', 'Capturas padronizadas disponíveis.'],
+      ['Banco de capturas de tela com dados fictícios', 'Resolução padronizada e nenhum nome de aluno real. Essa regra é de LGPD, não de estética.', 'Ambiente de teste com dados fictícios.'],
+      ['Vídeo de demonstração de 60 a 90 segundos', 'Roteiro, gravação de tela, narração e legenda embutida. Serve para site, rede social e proposta, e funciona sem som.', 'Mockups e capturas prontos.']
+    ] },
+    { id: 'f03', title: 'Domínio, DNS e e-mail comercial', summary: 'Garantir que o endereço da companhia é dela, que o e-mail chega e que ninguém consegue se passar pela marca.', tasks: [
+      ['Domínio axionproeduq.com.br registrado', 'Registro feito no Registro.br em nome da companhia.', 'Nenhuma.', true],
+      ['Renovação automática e contato conferidos', 'Ativar débito automático e confirmar que o e-mail de contato do domínio é um endereço que você lê todo dia. Domínio que vence derruba site e e-mail juntos.', 'Domínio registrado.'],
+      ['Domínios defensivos avaliados', 'Conferir axionproeduq.com e axionproeduq.app e decidir se vale registrar para proteger a marca de uso indevido.', 'Domínio principal ativo.'],
+      ['DNS concentrado em um painel só', 'Escolher entre Registro.br e Cloudflare e manter todos os registros no mesmo lugar. DNS espalhado é a causa mais comum de site fora do ar sem explicação.', 'Domínio registrado.'],
+      ['E-mail comercial criado', 'Google Workspace ou Zoho Mail, com contato@, suporte@, comercial@ e admin@axionproeduq.com.br. Nunca usar Gmail pessoal em proposta pública.', 'DNS sob controle.'],
+      ['SPF, DKIM e DMARC configurados', 'Os três registros impedem que o e-mail caia em spam e que terceiros falsifiquem a marca. Começar o DMARC em p=none, observar por duas semanas e subir para quarantine.', 'E-mail comercial criado.'],
+      ['Teste de entregabilidade', 'Enviar para Gmail, Outlook e um endereço institucional do governo e conferir no cabeçalho se SPF, DKIM e DMARC passaram.', 'Registros publicados e propagados.'],
+      ['Assinatura de e-mail padronizada', 'Nome, cargo, logo pequena, site e slogan, em HTML leve que não quebre em cliente antigo nem vire anexo.', 'Manual de marca pronto.'],
+      ['2FA e códigos de recuperação da conta de e-mail', 'Verificação em duas etapas com aplicativo autenticador e códigos de recuperação guardados no cofre de senhas.', 'E-mail comercial criado.']
+    ] },
+    { id: 'f04', title: 'Contas, organizações e cofre de credenciais', summary: 'Criar a camada de contas da companhia ainda no plano gratuito, mas já com a disciplina de segurança de uma empresa.', tasks: [
+      ['Gerenciador de senhas escolhido', 'Bitwarden gratuito ou 1Password. A partir daqui, nenhuma credencial vive em papel, bloco de notas ou navegador.', 'E-mail comercial criado.'],
+      ['Senha mestra forte e backup do cofre', 'Frase longa, fácil de lembrar e impossível de adivinhar. Exportação criptografada guardada fora do computador principal.', 'Cofre criado.'],
+      ['2FA em todas as contas críticas', 'GitHub, Supabase, Vercel, Google, Registro.br e banco. Preferir aplicativo autenticador a SMS, que é vulnerável a troca de chip.', 'Cofre criado.'],
+      ['Organização no GitHub', 'Criar axion-proeduq no plano gratuito e ativar a exigência de 2FA para todos os membros.', 'Conta comercial com 2FA.'],
+      ['Organização no Supabase', 'Criar a organização da companhia e convidar o e-mail comercial como owner. Sem isso a transferência de projeto não aparece.', 'Conta comercial criada.'],
+      ['Team na Vercel', 'Criar o time da companhia. Atenção: o plano Hobby proíbe uso comercial, então a troca para Pro precisa acontecer antes do primeiro faturamento.', 'Conta comercial criada.'],
+      ['Firebase sob a conta da companhia', 'Não existe botão de transferir. Adicionar o e-mail comercial como Proprietário no IAM do projeto.', 'Conta comercial criada.'],
+      ['Inventário de contas em planilha', 'Serviço, plano, dono, e-mail, custo, data de renovação e onde fica a credencial. É o documento que evita perder um serviço por esquecimento.', 'Contas criadas.'],
+      ['Política de menor privilégio', 'Nenhuma conta, chave ou integração com mais permissão do que precisa. Revisar a cada três meses.', 'Inventário pronto.'],
+      ['Conta de recuperação de emergência', 'Um segundo endereço, fora do domínio da companhia, cadastrado como recuperação nos serviços críticos. Protege contra perda do domínio.', 'Contas criadas.']
+    ] },
+    { id: 'f05', title: 'Transferência dos projetos para a conta Axion', summary: 'Levar GitHub, Supabase, Vercel e Firebase da conta pessoal para a companhia sem tirar nada do ar e sem perder histórico.', tasks: [
+      ['Backup completo antes de mexer', 'git clone --mirror de cada repositório, dump do Postgres do Supabase e exportação do Firestore, guardados em dois lugares. Nada começa sem isso.', 'Cofre e inventário prontos.'],
+      ['Janela de transferência combinada', 'Escolher horário sem aula, avisar quem usa e não publicar nada enquanto a transferência corre.', 'Backup concluído.'],
+      ['Repositórios transferidos no GitHub', 'Settings, Transfer ownership, para a organização axion-proeduq. O GitHub mantém redirecionamento das URLs antigas.', 'Organização criada e backup feito.'],
+      ['git remote atualizado no computador', 'git remote set-url origin no relatorio-2026 e na Biblioteca. Conferir com git remote -v e fazer um push de teste.', 'Repositórios transferidos.'],
+      ['GitHub Pages conferido', 'O endereço passa a ser axion-proeduq.github.io. Conferir CNAME, certificado e se o site continua abrindo.', 'Repositórios transferidos.'],
+      ['Projeto Supabase transferido', 'Project Settings, Transfer project. O ID vgceathgwvtmjxbdpecr, as chaves e as URLs continuam iguais, então o código não muda.', 'Organização Supabase criada.'],
+      ['Vercel reconectada ao GitHub', 'Transferir os projetos para o time e reinstalar a integração apontando para a organização, senão o deploy automático para de disparar.', 'Team criado e repositórios transferidos.'],
+      ['Domínios conferidos na Vercel', 'relatorio.skin e biblioteca-ac.com precisam continuar com certificado válido e apontamento correto depois da transferência.', 'Projetos transferidos.'],
+      ['Firebase passado para a companhia', 'Adicionar como Proprietário, testar o plano anual, e só então remover a conta pessoal.', 'Conta comercial no IAM.'],
+      ['Redirect URLs do Supabase revistas', 'Authentication, URL Configuration: incluir os endereços novos e remover os que saíram do ar. Login quebra em silêncio quando isso fica para depois.', 'Endereços definitivos conhecidos.'],
+      ['Teste de ponta a ponta depois da transferência', 'Login, sincronia, Realtime, publicação de relato, prova, boletim e PWA, nas duas escolas e em celular.', 'Todas as transferências concluídas.'],
+      ['Referências atualizadas no código e na documentação', 'CLAUDE.md, README, links fixos e qualquer URL que aponte para a conta pessoal.', 'Teste de ponta a ponta aprovado.'],
+      ['Conta pessoal rebaixada', 'Só depois de tudo verde: remover ou reduzir para leitura, mantendo um acesso de emergência documentado.', 'Tudo funcionando pela conta da companhia.']
+    ] },
+    { id: 'f06', title: 'Site institucional da companhia', summary: 'Publicar a página que apresenta a companhia e abriga as plataformas, no domínio próprio e com qualidade de vitrine.', tasks: [
+      ['Página institucional criada', 'axion-proeduq.html publicada nos dois sites, com quem somos, propósito, princípios, valores, plataformas e contato.', 'Identidade verbal e visual prontas.', true],
+      ['Publicação no domínio próprio', 'Apontar axionproeduq.com.br para o site institucional, com www redirecionando para a raiz.', 'DNS sob controle.'],
+      ['Hero conforme a identidade', 'AXION PROEDUQ, o slogan, o parágrafo de apresentação e o botão Conheça nossas soluções.', 'Identidade verbal fechada.'],
+      ['Seção Soluções', 'Um cartão por plataforma com logo, uma linha de descrição, situação e link. Biblioteca Digital e Relatório primeiro; os futuros como em breve.', 'Arquitetura de marca definida.'],
+      ['Seção Sobre e pilares', 'Quem somos, propósito e os cinco pilares, com a linguagem já aprovada.', 'Pilares definidos.'],
+      ['Página de contato', 'Formulário com proteção antispam, e-mail comercial, cidade e estado. Nunca publicar telefone pessoal.', 'E-mail comercial criado.'],
+      ['Rodapé institucional', 'AXION PROEDUQ, Tecnologia Educacional, Ensinar. Aprender. Evoluir., links legais e CNPJ quando existir.', 'Identidade verbal fechada.'],
+      ['SEO básico', 'title, description, canonical, Open Graph, imagem de compartilhamento, sitemap.xml e robots.txt.', 'Site publicado.'],
+      ['Dados estruturados de organização', 'JSON-LD do tipo Organization com nome, logo, site, e-mail e redes. Ajuda o Google a mostrar a marca corretamente.', 'Site publicado.'],
+      ['Acessibilidade conferida', 'Contraste mínimo, navegação só por teclado, texto alternativo em toda imagem e teste com leitor de tela. Em contrato público, acessibilidade é exigência.', 'Site publicado.'],
+      ['Desempenho conferido', 'Imagens em webp com width e height declarados, fontes locais, Lighthouse acima de 90 no celular.', 'Site publicado.'],
+      ['Teste em aparelhos reais', 'Android modesto, iPhone, tablet e notebook, em modo claro e escuro, com internet lenta.', 'Site publicado.']
+    ] },
+    { id: 'f07', title: 'Arquitetura de domínios e selo nos produtos', summary: 'Organizar onde cada plataforma mora e fazer a companhia aparecer dentro de cada produto, sem apagar a marca do produto.', tasks: [
+      ['Mapa de subdomínios definido', 'relatorio., biblioteca., app., docs., status., suporte. e api. em axionproeduq.com.br. Definir antes de divulgar qualquer endereço.', 'Domínio ativo.'],
+      ['Decisão sobre os domínios atuais', 'relatorio.skin e biblioteca-ac.com continuam válidos; quando migrar, mantê-los redirecionando por pelo menos doze meses.', 'Mapa de subdomínios definido.'],
+      ['Selo aplicado no Relatório', 'Marca no rodapé e na tela de login, com os links legais.', 'Selo criado.', true],
+      ['Selo aplicado na Biblioteca', 'BIBLIOTECA DIGITAL, uma plataforma AXION PROEDUQ, no rodapé da abertura e dos painéis.', 'Selo criado.', true],
+      ['Redirecionamentos 301 planejados', 'Toda troca de endereço mantém o antigo respondendo, para não perder o que já foi compartilhado com professor e aluno.', 'Mapa de subdomínios definido.'],
+      ['HTTPS e HSTS em todos os subdomínios', 'Conferir renovação automática de certificado e ativar HSTS depois de confirmar que tudo funciona em https.', 'Subdomínios publicados.'],
+      ['Espaço reservado para produtos futuros', 'Página do site com Avalia, Sala, Trilhas, Mestre e Conecta como em breve, para mostrar ambição sem prometer data.', 'Nomes reservados.']
+    ] },
+    { id: 'f08', title: 'Segurança de dados e defesa contra ataques', summary: 'A companhia guarda dado de criança e adolescente. Esta fase não é opcional e precisa estar pronta antes de qualquer proposta ao governo.', tasks: [
+      ['Revisão completa de RLS no Supabase', 'Toda tabela com dado de aluno ou professor precisa de política ativa. Testar de fato: com a chave pública, tentar ler o que não deveria e confirmar que o banco recusa.', 'Acesso ao projeto Supabase.'],
+      ['Nenhuma chave secreta no repositório', 'Só a chave anônima pode aparecer no código. A service_role jamais. Rodar varredura de segredos no histórico do git, não só nos arquivos atuais.', 'Acesso ao repositório.'],
+      ['Decisão sobre repositório público com nome de aluno', 'O relatorio-2026 é público e os relatos no HTML trazem nomes. Fechar o repositório ou remover os nomes. Página trancada não protege o código-fonte.', 'Backup concluído.'],
+      ['Cabeçalhos de segurança', 'Content-Security-Policy, X-Content-Type-Options, Referrer-Policy, Permissions-Policy e HSTS. Bloqueiam a maior parte dos ataques de injeção em página.', 'Site publicado.'],
+      ['Proteção contra força bruta no login', 'Limite de tentativas, espera crescente e bloqueio temporário. Sem isso, senha fraca de professor vira porta de entrada.', 'Autenticação em produção.'],
+      ['Proteção contra bot e sobrecarga', 'Cloudflare na frente do domínio ou o firewall da Vercel, com regra de taxa nas rotas de login, de IA e de gravação.', 'DNS sob controle.'],
+      ['Validação no servidor, nunca só na tela', 'Toda gravação confere permissão no banco. O que o navegador manda pode ser adulterado por qualquer aluno curioso.', 'RLS revisada.'],
+      ['Revisão das Edge Functions', 'Conferir autenticação, cota, tempo limite e o que vai para o log. Função aberta sem verificação é o elo mais fácil de explorar.', 'Acesso ao projeto Supabase.'],
+      ['Rotação de chaves programada', 'Trocar chaves e tokens a cada seis meses e sempre que alguém deixar o time. Anotar a data da última rotação no inventário.', 'Inventário de contas pronto.'],
+      ['Backup automático com teste de restauração', 'Backup diário do banco e, pelo menos uma vez, restaurar de verdade em um projeto de teste. Backup nunca testado não é backup.', 'Ambiente de teste criado.'],
+      ['Registro de acessos administrativos', 'Saber quem entrou, quando e de onde, guardado por doze meses. É o que permite investigar um incidente.', 'Acesso ao projeto Supabase.'],
+      ['Plano de resposta a incidente escrito', 'O que fazer nas duas primeiras horas: conter, avaliar o alcance, comunicar a ANPD em até dois dias úteis e avisar os titulares afetados.', 'Encarregado de dados nomeado.'],
+      ['Dependências monitoradas', 'Dependabot ou npm audit no repositório, com revisão mensal. Biblioteca desatualizada é vetor de ataque conhecido.', 'Repositórios na organização.'],
+      ['Teste de invasão básico feito por você mesmo', 'Tentar abrir o boletim de outro aluno, subir arquivo malicioso, injetar HTML no relato, burlar a prova e repetir a requisição de gravação. Anotar cada resultado.', 'RLS revisada e cabeçalhos ativos.'],
+      ['Ambiente de teste separado da produção', 'Um projeto Supabase sem dado real para experimentar mudança de schema. Nenhum teste toca o banco da escola.', 'Organização Supabase criada.']
+    ] },
+    { id: 'f09', title: 'LGPD, privacidade e conformidade', summary: 'Colocar no papel a base legal para tratar dado de aluno. Sem esta fase não existe contrato com rede pública de ensino.', tasks: [
+      ['Política de Privacidade publicada', 'privacidade.html no ar, aberta sem login.', 'Site publicado.', true],
+      ['Termos de Serviço publicados', 'termos.html no ar, aberto sem login.', 'Site publicado.', true],
+      ['Documentos atualizados para a companhia', 'Trocar o responsável de pessoa física para AXION PROEDUQ e listar cada serviço usado (Supabase, Vercel, Firebase, provedor de IA, e-mail).', 'CNPJ aberto ou em andamento.'],
+      ['Encarregado de dados nomeado', 'Indicar o responsável e publicar o canal de contato, como a LGPD exige. Pode ser você, desde que esteja escrito.', 'Documentos atualizados.'],
+      ['Registro das operações de tratamento', 'Planilha com dado coletado, finalidade, base legal, quem acessa, onde fica e por quanto tempo. É o primeiro documento que um órgão pede.', 'Documentos atualizados.'],
+      ['Base legal para dado de menor definida', 'Aluno é criança ou adolescente. Definir entre consentimento do responsável e execução de política pública por meio de convênio com a escola.', 'Encarregado nomeado.'],
+      ['Contrato de operador com a escola ou rede', 'Modelo que deixa claro que a companhia trata dado em nome da instituição, e não por conta própria.', 'Base legal definida.'],
+      ['Canal de direitos do titular', 'Formulário para pedir acesso, correção, portabilidade ou exclusão, com prazo de resposta publicado.', 'Encarregado nomeado.'],
+      ['Prazo de guarda coerente com a prática', 'A política promete guarda por ano letivo e por tempo indeterminado. Conferir se o banco realmente cumpre e se o titular consegue sair.', 'Registro de operações pronto.'],
+      ['Anonimização em toda demonstração', 'Nenhuma captura, vídeo ou proposta com nome real de aluno. Usar sempre o ambiente de teste.', 'Ambiente de teste criado.']
+    ] },
+    { id: 'f10', title: 'Qualidade, testes e prevenção de bugs', summary: 'Evitar que uma publicação apressada derrube o diário de uma escola inteira em dia de conselho de classe.', tasks: [
+      ['Ambiente de teste separado', 'Branch de preview na Vercel ligado ao banco de teste. Nenhuma experiência acontece sobre o dado real.', 'Organização e team criados.'],
+      ['Checklist de publicação escrito', 'Passos obrigatórios antes de cada push: rodar as verificações, abrir a página, testar login, sincronia e um relato completo.', 'Ambiente de teste criado.'],
+      ['Scripts de verificação sempre rodados', 'node scripts/check-copias-compartilhadas.js e os demais scripts do repositório, antes de cada publicação.', 'Repositórios na organização.'],
+      ['Roteiro de teste manual por plataforma', 'Lista numerada de telas e ações com resultado esperado. O mesmo roteiro serve para provar funcionamento em proposta.', 'Checklist de publicação pronto.'],
+      ['Teste em aparelho modesto e internet lenta', 'Android antigo em rede 3G. A Casavequia já travou por excesso de varredura de DOM, e isso só aparece em aparelho fraco.', 'Roteiro de teste pronto.'],
+      ['Regra de ouro do DOM registrada', 'Nunca colocar querySelectorAll dentro de laço que percorre alunos ou relatos. Indexar o DOM uma vez e consultar o índice.', 'Nenhuma.'],
+      ['Monitoramento de erro em produção', 'Sentry no plano gratuito ou coletor próprio, para descobrir o bug antes do professor reclamar.', 'Site em produção.'],
+      ['Plano de rollback testado', 'Saber voltar à versão anterior na Vercel em menos de cinco minutos, e ter feito isso pelo menos uma vez de propósito.', 'Deploy automático funcionando.'],
+      ['Registro de bugs corrigidos mantido', 'Manter a tabela do CLAUDE.md atualizada com causa e correção. Evita repetir o mesmo erro seis meses depois.', 'Nenhuma.'],
+      ['Revisão do diff antes de publicar', 'Ler a mudança inteira. Em alteração de banco, revisar a política de acesso junto, no mesmo momento.', 'Nenhuma.'],
+      ['Teste de carga simples', 'Simular trinta professores e trezentos alunos ao mesmo tempo antes de oferecer o sistema a uma rede.', 'Ambiente de teste criado.']
+    ] },
+    { id: 'f11', title: 'Observabilidade, backup e continuidade', summary: 'Saber que algo quebrou antes do cliente saber, e conseguir voltar ao ar mesmo no pior cenário.', tasks: [
+      ['Página de status pública', 'status.axionproeduq.com.br informando se cada plataforma está no ar. Transparência conta ponto em avaliação técnica.', 'Subdomínios definidos.'],
+      ['Alerta de indisponibilidade', 'Monitor externo gratuito que avisa por e-mail quando o site sai do ar, medindo de fora da infraestrutura.', 'Site em produção.'],
+      ['Painel de números de uso', 'Professores, alunos, aulas, provas e relatórios por semana. Serve para operação e vira argumento na proposta.', 'Banco em produção.'],
+      ['Backup em três lugares', 'Banco, cópia em outro provedor e cópia local. Regra simples: dois meios diferentes e um fora do ambiente.', 'Backup automático configurado.'],
+      ['Limites dos planos gratuitos vigiados', 'Saber o teto de cada serviço e o que acontece ao estourar, antes de estourar no meio do bimestre.', 'Inventário de contas pronto.'],
+      ['Plano de continuidade escrito', 'O que fazer se um serviço encerrar, se a conta for bloqueada ou se você ficar indisponível por doença ou viagem.', 'Inventário e backups prontos.']
+    ] },
+    { id: 'f12', title: 'Suporte, atendimento e documentação', summary: 'O que separa um projeto pessoal de uma companhia é a certeza de que alguém responde quando algo dá errado.', tasks: [
+      ['Canal oficial de suporte', 'suporte@axionproeduq.com.br com resposta padronizada e registro de cada atendimento.', 'E-mail comercial criado.'],
+      ['Prazo de atendimento publicado', 'Por exemplo: resposta em até um dia útil. O poder público cobra esse compromisso em contrato.', 'Canal de suporte ativo.'],
+      ['Base de conhecimento', 'Perguntas frequentes e passo a passo com imagem, separados por professor e por aluno.', 'Plataformas estáveis.'],
+      ['Manual do professor em PDF', 'Entrar, lançar relato, corrigir presença, fechar bimestre e emitir o relatório individual.', 'Base de conhecimento iniciada.'],
+      ['Manual do aluno', 'Entrar, ler o livro, fazer a prova e ver o boletim, em linguagem direta e com imagem.', 'Base de conhecimento iniciada.'],
+      ['Vídeos curtos de treinamento', 'Um por tarefa principal, de até três minutos, com legenda.', 'Manuais prontos.'],
+      ['Formulário de erro dentro do sistema', 'Botão que já envia versão, tela e navegador preenchidos, para não depender do relato do usuário.', 'Monitoramento configurado.'],
+      ['Registro de chamados', 'Planilha ou ferramenta gratuita com data, assunto e tempo de resposta. Vira prova de capacidade de suporte na proposta.', 'Canal de suporte ativo.']
+    ] },
+    { id: 'f13', title: 'Integrações e ecossistema técnico', summary: 'Fazer as plataformas conversarem entre si e com os sistemas que a rede de ensino já usa.', tasks: [
+      ['Conta única entre as plataformas', 'Professor e aluno entram uma vez e circulam entre Biblioteca e Relatório sem novo login.', 'Transferência concluída.'],
+      ['Documentação da integração atual', 'Registrar tabelas, views e funções compartilhadas no Supabase, com quem lê e quem grava cada uma.', 'Acesso ao projeto Supabase.'],
+      ['Exportação de dados em formato aberto', 'CSV e JSON de notas, frequência e ocorrências, para a secretaria importar no sistema dela.', 'Banco estável.'],
+      ['Importação de turmas e alunos por planilha', 'Receber a lista da escola e criar turmas sem digitação manual. É o maior obstáculo na adoção por uma rede.', 'Banco estável.'],
+      ['Estudo do sistema da rede estadual', 'Descobrir qual sistema a SEE do Acre usa, o que ele exporta e o que aceita receber. Define o esforço real de integração.', 'Contato com a secretaria iniciado.'],
+      ['API pública documentada', 'Só depois de estável. Chave por instituição, limite de uso, versionamento e documentação com exemplo.', 'Plataformas estáveis.'],
+      ['Entrada com conta institucional', 'Google Workspace da escola ou Gov.br, quando a rede exigir identidade oficial.', 'Autenticação estável.'],
+      ['Aplicativo Android publicado', 'A pasta android já existe no repositório. Assinar, testar em aparelho real e publicar quando o PWA estiver maduro.', 'PWA estável em produção.']
+    ] },
+    { id: 'f14', title: 'Registro legal da empresa e da marca', summary: 'Sem CNPJ e sem marca registrada não se vende ao governo nem se protege o nome. O INPI leva cerca de um ano, então esta fase começa cedo.', tasks: [
+      ['Busca de anterioridade no INPI', 'Conferir se AXION PROEDUQ já está registrado antes de investir em arte, papelaria e domínio adicional.', 'Nome definido.'],
+      ['Decisão de formato jurídico', 'MEI tem teto de faturamento e restrição de atividade. Avaliar ME ou EI com um contador, pensando em contrato público.', 'Busca de anterioridade feita.'],
+      ['CNPJ aberto', 'Necessário para emitir nota fiscal e para contratar com o poder público. Sem CNPJ não há proposta.', 'Formato jurídico definido.'],
+      ['CNAE correto', 'Desenvolvimento de programas sob encomenda, desenvolvimento e licenciamento de programas customizáveis e suporte técnico. CNAE errado trava licitação.', 'CNPJ em abertura.'],
+      ['Conta bancária da empresa', 'Separar completamente da conta pessoal, desde o primeiro centavo.', 'CNPJ aberto.'],
+      ['Marca registrada no INPI', 'AXION PROEDUQ nas classes 9, 41 e 42. Protocolar cedo, porque o processo leva cerca de um ano.', 'Busca de anterioridade feita.'],
+      ['Contador contratado', 'Regime tributário, emissão de nota e obrigações mensais. Simples Nacional costuma ser o caminho no início.', 'CNPJ aberto.'],
+      ['Certidões negativas em dia', 'Federal, estadual, municipal, FGTS e trabalhista. Sem elas o contrato público não é assinado.', 'CNPJ aberto.'],
+      ['Cadastro no SICAF', 'Obrigatório para licitação federal e usado como referência por estados e municípios.', 'Certidões em dia.'],
+      ['Registro do programa de computador', 'Registro no INPI do código-fonte. Opcional, mas fortalece a proposta e protege a autoria.', 'CNPJ aberto.']
+    ] },
+    { id: 'f15', title: 'Marketing digital e presença pública', summary: 'Construir a reputação que faz um secretário de educação aceitar a reunião. Conteúdo útil ao professor, não propaganda.', tasks: [
+      ['Perfis sociais criados', 'Instagram, LinkedIn e YouTube com o mesmo nome, a mesma arte e a mesma descrição.', 'Identidade visual pronta.'],
+      ['Página de empresa no LinkedIn', 'É onde decisor público e gestor de rede costumam conferir se a companhia existe de verdade.', 'Perfis criados.'],
+      ['Linha editorial definida', 'Ensinar. Aprender. Evoluir. como eixo. Publicar o que ajuda o professor na segunda-feira, não o que elogia a empresa.', 'Tom de voz definido.'],
+      ['Calendário de conteúdo', 'Dois posts por semana: bastidor do desenvolvimento, dica prática para professor e resultado real de uso.', 'Linha editorial definida.'],
+      ['Página de imprensa no site', 'Logo em alta resolução, textos prontos, números e contato, para quem for publicar sobre a companhia.', 'Site publicado.'],
+      ['Prova social coletada', 'Depoimento de professor e de aluno, com autorização por escrito e sem expor menor de idade.', 'Uso real em andamento.'],
+      ['Números de uso apurados', 'Aulas registradas, livros publicados, provas feitas e alunos atendidos, com data de apuração.', 'Painel de uso pronto.'],
+      ['Estudo de caso da Casavequia', 'Uma página: o problema, o que foi feito, quanto tempo levou e o que mudou, com números.', 'Números apurados.'],
+      ['Apresentação institucional em slides', 'De doze a quinze telas, com versão curta de cinco minutos e versão completa para reunião técnica.', 'Estudo de caso pronto.'],
+      ['E-mail de prospecção escrito', 'Curto, com uma frase de valor, um número real e um link de demonstração. Nada de anexo pesado.', 'Apresentação pronta.']
+    ] },
+    { id: 'f16', title: 'Proposta comercial e estratégia governamental', summary: 'Transformar a plataforma que já funciona em uma escola em contrato com a rede estadual, e depois em escala nacional.', tasks: [
+      ['Mapa dos decisores', 'SEE do Acre, coordenações de ensino, núcleos regionais e secretarias municipais. Nome, cargo e caminho até cada um.', 'Dossiê iniciado.'],
+      ['Dossiê institucional em PDF', 'Quem é a companhia, o que entrega, prova de uso, segurança, LGPD, suporte e continuidade. É o documento que abre a porta.', 'Identidade e números prontos.'],
+      ['Alinhamento com a BNCC e o currículo do Acre', 'Mostrar qual competência cada recurso atende. É a primeira pergunta técnica da secretaria.', 'Dossiê iniciado.'],
+      ['Proposta técnica padrão', 'Escopo, requisitos, arquitetura, segurança, prazo de implantação, treinamento e suporte, em modelo reaproveitável.', 'Dossiê pronto.'],
+      ['Planilha de preços', 'Por aluno, por escola ou por rede, com faixa de desconto por volume e custo de implantação separado.', 'Custo real calculado.'],
+      ['Cálculo de custo e margem por aluno', 'Quanto custa cada aluno em infraestrutura, suporte e IA, para não assinar contrato no prejuízo.', 'Inventário de custos pronto.'],
+      ['Piloto gratuito desenhado', 'Uma escola, um bimestre, com metas definidas antes de começar e relatório de resultado no fim.', 'Plataformas estáveis.'],
+      ['Relatório de resultado do piloto', 'Frequência, entrega de atividade, desempenho e opinião de professor e aluno, com números e gráfico.', 'Piloto concluído.'],
+      ['Caminhos de contratação estudados', 'Dispensa por valor, pregão eletrônico, inexigibilidade por exclusividade e termo de cooperação. Cada um tem exigência diferente.', 'CNPJ aberto.'],
+      ['Documentação de habilitação pronta', 'Contrato social, certidões, atestado de capacidade técnica e declarações, em pasta organizada e atualizada.', 'CNPJ e certidões prontos.'],
+      ['Atestado de capacidade técnica', 'Pedir à escola onde o sistema já roda. É exigência em quase toda licitação e você já tem o direito a ele.', 'Uso real comprovado.'],
+      ['Termo de cooperação com a escola atual', 'Formaliza o que já acontece na Casavequia e na Hermínio, e vira referência para a secretaria.', 'CNPJ aberto.'],
+      ['Apresentação para banca técnica', 'Demonstração ao vivo de dez minutos, com plano B em vídeo gravado caso a internet falhe. Sempre falha.', 'Apresentação institucional pronta.'],
+      ['Respostas prontas para objeção', 'Preço, segurança do dado do aluno, dependência de internet, treinamento, continuidade se a empresa fechar e quem é o dono do dado.', 'Dossiê pronto.'],
+      ['Proposta de escala estadual e nacional', 'O que muda para atender toda a rede: infraestrutura, suporte, treinamento, equipe e custo por faixa de alunos.', 'Piloto validado.']
+    ] },
+    { id: 'f17', title: 'Passagem para contas comerciais e escala', summary: 'Sair do plano gratuito no momento certo: nem antes de precisar, nem depois de descumprir regra de uso.', tasks: [
+      ['Gatilhos de mudança definidos', 'Trocar de plano quando houver contrato assinado, dado de outra rede ou uso perto do limite gratuito. Escrever os três gatilhos.', 'Inventário de contas pronto.'],
+      ['Vercel Pro assinada', 'O plano Hobby proíbe uso comercial. Assinar antes do primeiro faturamento, não depois.', 'Gatilho atingido.'],
+      ['Supabase Pro assinado', 'Backup de sete dias, mais recursos e suporte. Necessário para sustentar compromisso de contrato.', 'Gatilho atingido.'],
+      ['Google Workspace pago', 'E-mail profissional com garantia de disponibilidade e administração de contas da equipe.', 'Gatilho atingido.'],
+      ['GitHub Team', 'Quando houver mais de uma pessoa no código, para controle de acesso e revisão obrigatória.', 'Segunda pessoa no time.'],
+      ['Orçamento anual de infraestrutura', 'Somar todos os custos e comparar com o preço cobrado por aluno, revisando a cada semestre.', 'Planos contratados.'],
+      ['Plano de crescimento da equipe', 'Definir quem entra primeiro: suporte, desenvolvimento ou comercial, e a partir de qual número de escolas.', 'Contrato assinado.'],
+      ['Contrato e SLA revisados', 'Disponibilidade prometida, prazo de resposta e penalidade compatíveis com o que a infraestrutura realmente aguenta.', 'Planos contratados.']
+    ] }
+  ];
 
   var state = emptyState();
   var sync = null;
@@ -350,6 +560,81 @@
     if (!rural || rural.logo !== 'assets/icons/icone-rural-manager.png') { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
     return Boolean(rural);
   }
+  function axionPhaseNumber(index) { return (index + 1 < 10 ? '0' : '') + (index + 1); }
+  function axionChecklistSeed() {
+    var stamp = SEED_TIMESTAMP;
+    return AXION_PHASES.map(function (phase, index) {
+      var children = phase.tasks.map(function (task, taskIndex) {
+        return { id: 'chk-axion-' + phase.id + '-' + (taskIndex + 1), text: task[0] + ' — ' + task[1], done: task[3] === true, children: [], createdAt: stamp, updatedAt: stamp };
+      });
+      var complete = children.length > 0 && children.every(function (child) { return child.done; });
+      return { id: 'chk-axion-' + phase.id, text: axionPhaseNumber(index) + '. ' + phase.title, done: complete, children: children, createdAt: stamp, updatedAt: stamp };
+    });
+  }
+  function axionMindMapSeed(project) {
+    var stamp = SEED_TIMESTAMP;
+    var root = 'map-root-' + project.id;
+    function phaseDetails(phase) {
+      var pending = phase.tasks.filter(function (task) { return task[3] !== true; }).length;
+      return phase.summary + '\n\nSituação: ' + (phase.tasks.length - pending) + ' de ' + phase.tasks.length + ' passos concluídos.\n\nPassos desta fase:\n' + phase.tasks.map(function (task, index) {
+        return (index + 1) + '. ' + (task[3] === true ? '[feito] ' : '') + task[0] + ' — ' + task[1] + '\nDependência: ' + task[2];
+      }).join('\n\n');
+    }
+    var nodes = [
+      { id: root, parentId: null, title: 'AXION PROEDUQ', description: 'Companhia de tecnologia educacional que abriga a Biblioteca Digital, o Relatório e os produtos futuros.\n\nSlogan institucional: Tecnologia que move a educação.\nAssinatura publicitária: Ensinar. Aprender. Evoluir.\n\nO plano de organização tem ' + AXION_PHASES.length + ' fases e ' + AXION_PHASES.reduce(function (total, phase) { return total + phase.tasks.length; }, 0) + ' passos, do domínio à proposta para a rede estadual de ensino.', kind: 'root', order: 0, createdAt: stamp, updatedAt: stamp },
+      { id: 'map-axion-identidade', parentId: root, title: 'Identidade verbal aprovada', description: 'Descritor curto:\nAXION PROEDUQ é uma companhia de tecnologia educacional dedicada ao desenvolvimento de plataformas, aplicativos e experiências digitais que ampliam as possibilidades de ensinar e aprender.\n\nDescritor institucional forte:\nCriamos tecnologia para transformar a maneira como professores ensinam, alunos aprendem e escolas desenvolvem novas experiências educacionais.\n\nPosicionamento do site:\nTecnologia criada para quem ensina e para quem aprende.\n\nPilares: Inovação, Autonomia, Simplicidade, Evolução e Acesso.\n\nPersonalidade: tecnológica, inteligente, moderna, organizada, confiável e jovem. A companhia é séria; os produtos podem ser lúdicos.', kind: 'rule', order: 1, createdAt: stamp, updatedAt: stamp },
+      { id: 'map-axion-arquitetura', parentId: root, title: 'Arquitetura de marca', description: 'Regra: o produto tem nome próprio e recebe o selo da companhia. Nunca prefixar produto com Axion.\n\nAXION PROEDUQ (companhia)\n└ Biblioteca Digital — uma plataforma AXION PROEDUQ\n└ Relatório — uma plataforma AXION PROEDUQ\n\nNomes reservados para produtos futuros: Avalia, Sala, Trilhas, Mestre e Conecta.\n\nPor que assim: cada plataforma constrói personalidade própria enquanto a empresa-mãe acumula reputação. O selo fica em português, uma plataforma AXION PROEDUQ, para manter a comunicação brasileira.', kind: 'rule', order: 2, createdAt: stamp, updatedAt: stamp },
+      { id: 'map-axion-ativos', parentId: root, title: 'Onde estão os ativos', description: 'Logos originais: assets/icons/axion-bg-claro.png e axion-bg-escuro.png.\nVersões web: assets/marca/ (axion-claro, axion-escuro e variantes -sm em webp).\nÍcone da companhia: assets/icons/icon-axion.png.\nPágina institucional: axion-proeduq.html, publicada nos dois sites.\nDocumentos públicos: privacidade.html e termos.html, abertos sem login.\n\nA página e as imagens de marca são cópia idêntica nos dois repositórios: depois de alterar, rodar node scripts/check-copias-compartilhadas.js --copiar e fazer commit nos dois.', kind: 'folder', order: 3, createdAt: stamp, updatedAt: stamp },
+      { id: 'map-axion-contas', parentId: root, title: 'Contas a transferir', description: 'GitHub: criar a organização axion-proeduq e usar Transfer ownership. O endereço do Pages passa a ser axion-proeduq.github.io e o git remote local precisa ser atualizado.\n\nSupabase: criar organização e usar Transfer project. O ID do projeto, as chaves e as URLs continuam iguais, então o código não muda.\n\nVercel: criar o team e transferir os projetos. É preciso reinstalar a integração com o GitHub apontando para a organização. O plano Hobby proíbe uso comercial.\n\nFirebase: não existe transferência. Adicionar o e-mail da companhia como Proprietário no IAM e depois remover o antigo.\n\nNenhuma credencial é guardada neste mapa.', kind: 'folder', order: 4, createdAt: stamp, updatedAt: stamp }
+    ];
+    AXION_PHASES.forEach(function (phase, index) {
+      nodes.push({ id: 'map-axion-' + phase.id, parentId: root, title: axionPhaseNumber(index) + '. ' + phase.title, description: phaseDetails(phase), kind: 'folder', order: index + 5, createdAt: stamp, updatedAt: stamp });
+    });
+    return createMindMap(project, nodes);
+  }
+  function ensureAxionProject() {
+    if (state.migrations.axionProeduqV1) return false;
+    var stamp = SEED_TIMESTAMP;
+    var axion = coreProjectByName('AXION PROEDUQ', 'project-axion-proeduq');
+    var changed = false;
+    if (!axion) {
+      axion = {
+        id: 'project-axion-proeduq',
+        name: 'AXION PROEDUQ',
+        description: 'Companhia de tecnologia educacional que abriga a Biblioteca Digital, o Relatório e os produtos futuros. Tecnologia que move a educação. Este projeto guarda o passo a passo de organização da companhia, do domínio já registrado até a proposta para a rede estadual de ensino, com checklist por fase e mapa mental com o detalhe técnico de cada etapa.',
+        status: 'Desenvolvimento', type: 'Outro', url: 'https://axionproeduq.com.br', logo: 'assets/icons/icon-axion.png',
+        tools: [
+          { id: 'tool-axion-github', provider: 'GitHub', label: 'GitHub — organização a criar', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-axion-supabase', provider: 'Supabase', label: 'Supabase — organização a criar', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-axion-vercel', provider: 'Vercel', label: 'Vercel — team a criar', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-axion-firebase', provider: 'Firebase', label: 'Firebase — passar a propriedade', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-axion-dominio', provider: 'Outra', label: 'Registro.br — axionproeduq.com.br', url: 'https://registro.br/', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-axion-claude', provider: 'Claude', label: 'Claude', url: 'https://claude.ai/', createdAt: stamp, updatedAt: stamp }
+        ],
+        checklist: axionChecklistSeed(),
+        relatedProjectIds: [], createdAt: stamp, updatedAt: stamp
+      };
+      axion.mindMap = axionMindMapSeed(axion);
+      state.projects.push(axion); changed = true;
+    }
+    [
+      coreProjectByName('Biblioteca digital', 'project-biblioteca-digital'),
+      coreProjectByName('Relatórios diários', 'project-relatorios-diarios')
+    ].forEach(function (produto) {
+      if (!produto) return;
+      var deProduto = Array.isArray(produto.relatedProjectIds) ? produto.relatedProjectIds : [];
+      if (deProduto.indexOf(axion.id) < 0) { produto.relatedProjectIds = deProduto.concat(axion.id); produto.updatedAt = stamp; changed = true; }
+      var daCompanhia = Array.isArray(axion.relatedProjectIds) ? axion.relatedProjectIds : [];
+      if (daCompanhia.indexOf(produto.id) < 0) { axion.relatedProjectIds = daCompanhia.concat(produto.id); axion.updatedAt = stamp; changed = true; }
+    });
+    if (!state.activities.some(function (activity) { return activity.id === 'activity-axion-proeduq-add'; })) {
+      state.activities.push({ id: 'activity-axion-proeduq-add', projectId: axion.id, title: 'AXION PROEDUQ adicionada como companhia', details: 'Plano de organização com ' + AXION_PHASES.length + ' fases e ' + AXION_PHASES.reduce(function (total, phase) { return total + phase.tasks.length; }, 0) + ' passos, da identidade verbal à proposta governamental. Domínio axionproeduq.com.br já registrado, página institucional e logos publicados. Pendente: organizações no GitHub, Supabase e Vercel, e-mail comercial e transferência dos projetos.', occurredAt: stamp, source: 'Manual', externalUrl: 'https://axionproeduq.com.br', idempotencyKey: 'activity-axion-proeduq-add', createdAt: stamp, updatedAt: stamp });
+      changed = true;
+    }
+    state.migrations.axionProeduqV1 = { addedAt: stamp, projectId: axion.id, phases: AXION_PHASES.length, tasks: AXION_PHASES.reduce(function (total, phase) { return total + phase.tasks.length; }, 0) };
+    if (changed) persist('axion-proeduq-add'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return changed;
+  }
   function libraryDocumentationBlueprint() {
     return {
       title: 'Mapa do projeto Biblioteca Digital',
@@ -485,13 +770,21 @@
     });
     return createMindMap(project, nodes);
   }
+  function mindMapSeedFor(project) {
+    if (project.id === 'project-biblioteca-digital') return libraryMindMapSeed(project);
+    if (project.id === 'project-rural-manager') return ruralManagerMindMapSeed(project);
+    if (project.id === 'project-axion-proeduq') return axionMindMapSeed(project);
+    return createMindMap(project);
+  }
+  function isSeedMindMapProject(project) {
+    return project.id === 'project-biblioteca-digital' || project.id === 'project-rural-manager' || project.id === 'project-axion-proeduq';
+  }
   function ensureProjectMindMaps() {
     var changed = false;
     active(state.projects).forEach(function (project) {
       if (project.mindMap && Array.isArray(project.mindMap.nodes) && project.mindMap.nodes.length) return;
-      var isSeedProject = project.id === 'project-biblioteca-digital' || project.id === 'project-rural-manager';
-      project.mindMap = project.id === 'project-biblioteca-digital' ? libraryMindMapSeed(project) : project.id === 'project-rural-manager' ? ruralManagerMindMapSeed(project) : createMindMap(project);
-      project.updatedAt = isSeedProject ? SEED_TIMESTAMP : now();
+      project.mindMap = mindMapSeedFor(project);
+      project.updatedAt = isSeedMindMapProject(project) ? SEED_TIMESTAMP : now();
       changed = true;
     });
     if (changed) persist('mindmaps-bootstrap');
@@ -500,7 +793,7 @@
   function getMindMap(project) {
     if (!project) return null;
     if (!project.mindMap || !Array.isArray(project.mindMap.nodes) || !project.mindMap.nodes.length) {
-      project.mindMap = project.id === 'project-biblioteca-digital' ? libraryMindMapSeed(project) : project.id === 'project-rural-manager' ? ruralManagerMindMapSeed(project) : createMindMap(project);
+      project.mindMap = mindMapSeedFor(project);
       project.updatedAt = now(); persist('mindmap-create');
     }
     return project.mindMap;
@@ -1567,7 +1860,7 @@
     }
   }
   function boot() {
-    loadCache(); ensureCoreProjects(); ensureReportsProjectIcon(); ensureLibraryProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache(); ensureCoreProjects(); ensureReportsProjectIcon(); ensureLibraryProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureAxionProject(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
