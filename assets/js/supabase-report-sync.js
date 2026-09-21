@@ -203,6 +203,37 @@ window.RelatorioSupabaseSync = (function () {
   }
   function destrancar() {
     document.documentElement.classList.remove("rel-trancado");
+    marcaAxion();
+  }
+
+  // Dentro do app a marca da AXION fica sempre presente, mas discreta. Na tela
+  // inicial e nas telas de conta ela aparece grande, por isso são puladas aqui.
+  function marcaAxion() {
+    if (window.top !== window.self) return;
+    if (modoPagina === "inicio") return;
+    if (!document.body) {
+      document.addEventListener("DOMContentLoaded", marcaAxion, { once: true });
+      return;
+    }
+    if (document.querySelector(".rel-axion-rodape, .marca-logo, .rodape-axion")) return;
+    if (!document.getElementById("rel-axion-style")) {
+      var style = document.createElement("style");
+      style.id = "rel-axion-style";
+      style.textContent = ".rel-axion-rodape{display:flex;flex-direction:column;align-items:center;gap:3px;padding:20px 14px 26px;text-align:center;"
+        + "opacity:.3;transition:opacity .25s ease}"
+        + ".rel-axion-rodape:hover{opacity:.75}"
+        + ".rel-axion-rodape img{width:104px;height:auto;max-width:60vw;display:block;border-radius:0;box-shadow:none}"
+        + ".rel-axion-rodape span{font-size:.54rem;letter-spacing:.18em;font-weight:700;color:inherit}"
+        + ".rel-axion-rodape a{display:block;border-radius:0;overflow:visible;transform:none!important;box-shadow:none!important;color:inherit;text-decoration:none}";
+      (document.head || document.documentElement).appendChild(style);
+    }
+    var box = document.createElement("div");
+    box.className = "rel-axion-rodape";
+    box.setAttribute("data-runtime-ui", "axion");
+    box.innerHTML = '<a href="axion-proeduq.html" aria-label="Conheça a AXION PROEDUQ">'
+      + '<img src="assets/marca/axion-escuro-sm.webp" alt="AXION PROEDUQ" width="560" height="148" loading="lazy"></a>'
+      + "<span>PROPRIEDADE DA AXION PROEDUQ</span>";
+    document.body.appendChild(box);
   }
 
   function translateAuthError(error) {
@@ -383,8 +414,8 @@ window.RelatorioSupabaseSync = (function () {
     + ".rel-auth-legal a:hover{text-decoration:underline;transform:none;box-shadow:none;color:#C2CE9E}"
     + ".rel-auth-marca{display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:14px;padding-top:14px;border-top:1px solid #262B23}"
     + ".rel-auth-marca a{display:block;border-radius:0;overflow:visible}.rel-auth-marca a:hover{transform:none;box-shadow:none}"
-    + ".rel-auth-gate .rel-auth-marca a>img{width:120px;height:auto;max-width:none;max-height:none;opacity:.75}"
-    + ".rel-auth-marca span{font-size:.58rem;letter-spacing:.2em;font-weight:700;color:#7E8279}"
+    + ".rel-auth-gate .rel-auth-marca a>img{width:172px;height:auto;max-width:none;max-height:none;opacity:1}"
+    + ".rel-auth-marca span{font-size:.6rem;letter-spacing:.2em;font-weight:700;color:#B6B7AE}"
     + "@media(prefers-reduced-motion:reduce){.rel-auth-card,.rel-auth-card>*{animation-duration:.01s}.rel-auth-gate::before,.rel-auth-gate::after{animation:none}}";
 
   var GOOGLE_SVG = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 38.2 44 33 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';

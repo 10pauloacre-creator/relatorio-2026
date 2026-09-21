@@ -496,6 +496,10 @@ O "← Início" da Casavequia e da Hermínio aponta para `escolas.html`. O `mani
 
 **Regra:** nada de azul, roxo azulado, neon ou ilustração escolar infantil nas páginas da marca. O verde é cor de ação e destaque, nunca o fundo.
 
+**Marca AXION no site e no app (decisão de 20/09/2026):**
+- **Bem visível** no rodapé do site (`index.html`, 210 px), na tela inicial do administrador (`escolas.html`, 230 px) e na tela de conta de qualquer página (`.rel-auth-marca`, 172 px, opacidade 1) — sempre com "PROPRIEDADE DA AXION PROEDUQ".
+- **Discreta dentro do app**: `supabase-report-sync.js` acrescenta sozinho `.rel-axion-rodape` no fim do `body` quando a página é liberada (104 px, opacidade 0,3, 0,75 no hover, `data-runtime-ui="axion"`). Pula páginas em iframe, a tela inicial (`data-acesso="inicio"`) e páginas que já mostram a marca grande (`.marca-logo`, `.rodape-axion`). Não é preciso editar página por página.
+
 **Páginas públicas (20/09/2026):** `index.html` (site de apresentação), `privacidade.html` (Política de Privacidade, LGPD) e `termos.html` (Termos de Serviço) NÃO carregam `supabase-report-sync.js`, então abrem sem conta. Links legais completos no rodapé do `index.html` (Privacidade, Termos, Cookies e LGPD, com âncoras `#cookies` e `#direitos`) e na tela de login (`.rel-auth-legal`, em todas as páginas trancadas). Estão em `scripts/build-web-release.js`, que o GitHub Pages usa: página nova só é publicada se entrar nessa lista. Ao ligar um serviço novo (IA, hospedagem, analytics), atualize a seção 6 da política. A seção 9 (prazo de guarda) promete guarda por tempo indeterminado, por ano letivo (seção 18 abaixo).
 
 **Pendências do professor (painel do Supabase):** ligar o Google (Authentication → Providers, com Client ID/Secret do Google Cloud) e incluir `https://relatorio.skin/**` e `https://10pauloacre-creator.github.io/relatorio-2026/**` em Authentication → URL Configuration → Redirect URLs (a URL da Biblioteca que já está lá fica). No Google Cloud, a origem autorizada é `https://relatorio.skin`. O repositório é **público**: os relatos escritos no HTML (com nomes de alunos) continuam legíveis no código-fonte, mesmo com a página trancada.
