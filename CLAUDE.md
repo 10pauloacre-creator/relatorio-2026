@@ -480,6 +480,11 @@ Toda página que carrega `supabase-report-sync.js` exige conta. O tipo de acesso
 
 **IA para todos:** `organizar-relato` aceita qualquer conta logada, com cota de 40 pedidos/dia (`ia_consumir_cota`, `private.ia_uso`); o administrador não tem cota.
 
+**Porta de contas com a Biblioteca (Etapa 13, 21/09/2026) — decisão do professor:** as contas do RELATORIO SKIN NÃO têm acesso nem integração de dados com a Biblioteca Digital (integração futura, a definir de forma segura e individual). Admin = só `10pauloacre@gmail.com`; alunos da Biblioteca = só os pré-cadastrados pelo professor.
+- **Incidente:** login com o Google no relatorio.skin voltou para a Biblioteca, porque `https://relatorio.skin/**` não está em Authentication → URL Configuration → Redirect URLs, e o Supabase usa a Site URL (Biblioteca). A Biblioteca já estava aberta como admin nesse navegador. Nenhuma conta nova virou admin (conferido no banco).
+- **Correções:** a Biblioteca (`assets/js/supabase-config.js`) devolve ao `relatorio.skin/entrar.html` todo retorno `?code=` que não nasceu nela, e apaga/recusa qualquer sessão que não seja do administrador (também em `auth/login.html` e `index.html`). No banco, `private.is_admin()`, `private.is_relatorio_admin()` e `bdm_e_professor()` exigem o e-mail do administrador; `handle_new_user` só cria perfil em `profiles` para ele (antes todo professor novo ganhava perfil "aluno" e aparecia nos painéis da Biblioteca); `profiles` só aceita INSERT/UPDATE dele. SQL em `supabase/2026-09-21-etapa13-admin-so-email.sql`.
+- **Nunca** conceder admin só por `profiles.role`; sempre o e-mail do administrador junto.
+
 **Segurança corrigida junto (o cadastro já estava aberto):** gatilho `profiles_trava_role` impede que uma conta se promova a `role='admin'` (o `private.is_admin()` confia nessa coluna); `alunos` só é lida pelo professor (`bdm_e_professor()`). SQL em `supabase/2026-09-19-etapa9-contas-de-professores.sql`.
 
 ## 20. MARCA RELATORIO SKIN E SITE PÚBLICO (20/09/2026)
