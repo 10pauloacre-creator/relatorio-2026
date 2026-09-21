@@ -1123,6 +1123,17 @@
     },
     diarios: function () { return estado.diarios.filter(function (d) { return !d.excluido; }); },
     renderizar: function () { if (A) renderTodos(); },
+    // Visão só de leitura da escola atual (assistente de I.A das escolas).
+    adaptador: function () {
+      if (!A) return null;
+      return {
+        chave: A.chave, turmas: turmasDe().slice(), comHoras: A.comHoras !== false,
+        rotulo: function (t) { return A.rotulo(t); },
+        alunos: function (t) { return A.alunos(t) || []; },
+        disciplinas: function (t) { return A.disciplinas(t) || []; },
+        codigoDisc: function (nome, t) { return A.codigoDisc(nome, t); }
+      };
+    },
     // Grava um diário pronto (assistente de IA do Meu Diário). Com "id" de um
     // diário existente, atualiza; sem ele, cria. Devolve o id ou "".
     salvar: function (dados) {
@@ -1134,9 +1145,12 @@
       rel.atividade = Object.assign(relVazio().atividade, rel.atividade || {});
       if (!rel.atividade.houve) { rel.atividade.fez = []; rel.atividade.naoFez = []; }
       var t = agora();
+      // Hermínio conta a carga em minutos (horário do relato); Casavequia, em h/aula.
+      var minutos = dados.minutos || 0;
+      if (A.comHoras === false) minutos = minutosDoIntervalo(dados.ini, dados.fim) || minutos || (parseInt(dados.horas, 10) || 1) * 60;
       var d = Object.assign({}, existente || {}, {
         id: id, turma: dados.turma, dateKey: dados.dateKey, disc: A.codigoDisc(dados.discNome, dados.turma), discNome: dados.discNome,
-        assunto: dados.assunto || "", ini: dados.ini || "", fim: dados.fim || "", horas: dados.horas || 1, minutos: dados.minutos || 0,
+        assunto: dados.assunto || "", ini: dados.ini || "", fim: dados.fim || "", horas: dados.horas || 1, minutos: minutos,
         rel: rel, rascunho: dados.rascunho || (existente && existente.rascunho) || "",
         criadoEm: (existente && existente.criadoEm) || t, atualizadoEm: t
       });
