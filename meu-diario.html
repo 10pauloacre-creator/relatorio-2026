@@ -23,7 +23,7 @@ window.NOVO_DIARIO_MANUAL = true;
 <script defer src="assets/js/dark-mode-2026.js?v=20260921a"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260921b"></script>
-<script defer src="assets/js/conta-skin.js?v=20260921c"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921d"></script>
 <script defer src="assets/js/meu-diario-recursos.js?v=20260921a"></script>
 <script defer src="assets/js/meu-diario-ia.js?v=20260921b"></script>
 <script defer src="assets/js/novo-diario.js?v=20260921c"></script>
@@ -39,12 +39,27 @@ a{color:var(--md-destaque)}
 /* ── Cabeçalho e abas (mesmo desenho da Casavequia) ── */
 .cab{background:linear-gradient(135deg,var(--vd),var(--vm) 60%,var(--vc));color:#fff;position:relative;overflow:hidden}
 .cab::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:rgba(201,168,76,.15)}
-.cab-i{max-width:1200px;margin:0 auto;padding:30px 40px 24px;position:relative;z-index:1;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.cab-i{max-width:1200px;margin:0 auto;padding:14px 40px 24px;position:relative;z-index:1;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
 .md-avatar{width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(201,168,76,.7);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:#f5e6be;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.25)}
 .cab-t{flex:1;min-width:220px}
 .cab-t h1{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;line-height:1.2}
 .cab-t .sub{font-size:.8rem;opacity:.82;margin-top:4px;font-weight:300;letter-spacing:.04em;text-transform:uppercase}
 .cab-t .prof{margin-top:9px;display:inline-flex;align-items:center;gap:7px;background:rgba(201,168,76,.25);border:1px solid rgba(201,168,76,.5);border-radius:20px;padding:4px 13px;font-size:.8rem;font-weight:500;color:var(--os);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cab-barra{max-width:1200px;margin:0 auto;padding:14px 40px 0;position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.md-ano-btn{font:inherit;color:inherit;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:0 10px;cursor:pointer;line-height:1.25}
+.md-ano-btn span{font-size:.7em;opacity:.8}
+.md-ano-btn:hover{background:rgba(255,255,255,.22)}
+.md-ano-menu{position:absolute;z-index:3000;min-width:170px;background:#fff;color:#2b2b2b;border:1px solid #e8e5de;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.28);padding:6px;display:flex;flex-direction:column;gap:2px;font-family:'DM Sans',sans-serif}
+.md-ano-tit{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#7a7a7a;padding:6px 10px 4px}
+.md-ano-menu button{background:none;border:none;text-align:left;padding:8px 10px;border-radius:8px;font:inherit;font-size:.9rem;cursor:pointer;color:inherit}
+.md-ano-menu button:hover{background:#f5f3ee}
+.md-ano-menu button.on{font-weight:700;color:#2d6147}
+.md-ano-menu button.novo{border-top:1px solid #e8e5de;border-radius:0 0 8px 8px;margin-top:2px;color:#2d6147}
+html.dark-2026 .md-ano-menu{background:#191c1f;color:#f4f5f6;border-color:#383d43}
+html.dark-2026 .md-ano-menu button:hover{background:#272b30}
+html.dark-2026 .md-ano-menu button.on,html.dark-2026 .md-ano-menu button.novo{color:#ffa65b}
+html.dark-2026 .md-ano-menu button.novo{border-top-color:#383d43}
+@media(max-width:760px){.cab-barra{padding:12px 16px 0}}
 .md-cab-acoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .md-sync{font-size:.74rem;background:rgba(255,255,255,.14);border-radius:999px;padding:6px 12px;white-space:nowrap}
 .md-sair{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.8rem;cursor:pointer}
@@ -240,23 +255,22 @@ html.dark-2026 .itab.on{color:var(--dark-accent)!important;border-bottom-color:v
 </style>
 </head>
 <body>
-<header class="cab"><div class="cab-i">
+<header class="cab"><div class="cab-barra">
+  <a class="md-sair md-voltar" href="escolas.html" title="Voltar para as escolas">← Escolas</a>
+  <div id="modo-btns">
+      <button type="button" class="btn-claro" id="modo-claro-btn" title="Modo claro" aria-label="Modo claro">☀️</button>
+      <button type="button" class="btn-escuro" id="modo-escuro-btn" title="Modo escuro" aria-label="Modo escuro">🌙</button>
+    </div>
+</div><div class="cab-i">
   <div class="md-avatar" id="md-avatar" aria-hidden="true">🏫</div>
   <div class="cab-t">
     <h1 id="md-titulo">Diário de Aulas</h1>
     <div class="sub" id="md-escolas">Meu Diário</div>
-    <div class="prof" id="md-quem">✦ Carregando… ✦</div>
   </div>
   <div class="md-cab-acoes">
-    <div id="modo-btns">
-      <button type="button" class="btn-claro" id="modo-claro-btn" title="Modo claro" aria-label="Modo claro">☀️</button>
-      <button type="button" class="btn-escuro" id="modo-escuro-btn" title="Modo escuro" aria-label="Modo escuro">🌙</button>
-    </div>
     <span class="md-sync" id="md-sync">☁️ Conectando…</span>
-    <a class="md-sair md-voltar" href="escolas.html" title="Voltar para as escolas">← Escolas</a>
-    <a class="md-sair md-voltar" id="md-painel" href="#" hidden title="Trocar para o painel dos alunos da Educação Especial">🔀 Mudar painel: AEE</a>
+    <a class="md-sair md-voltar" id="md-painel" href="#" hidden>🔀 Mudar painel</a>
     <a id="md-chip" href="perfil.html"></a>
-    <button type="button" class="md-sair" id="md-sair">Sair</button>
   </div>
 </div></header>
 <nav class="nav-w"><div class="nav-i" id="md-tabs"></div></nav>
@@ -562,6 +576,23 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   function ligarSeletorAno(box){
     var s=box.querySelector('[data-ano]');
     if(s)s.onchange=function(){var a=parseInt(s.value,10);if(a&&a!==ANO)mudarAno(a);};
+  }
+  // Botão do ano no título: lista os anos letivos da escola e "+ Iniciar" o próximo.
+  function abrirMenuAno(ev){
+    if(ev)ev.stopPropagation();
+    var velho=document.getElementById('md-ano-menu');
+    if(velho){velho.remove();return;}
+    var btn=document.getElementById('md-ano-btn'),anos=anosDaEscola(),prox=anos[anos.length-1]+1;
+    var m=document.createElement('div');
+    m.id='md-ano-menu';m.className='md-ano-menu';m.setAttribute('role','menu');
+    m.innerHTML='<div class="md-ano-tit">Ano letivo</div>'+anos.slice().reverse().map(function(a){
+      return '<button type="button" role="menuitem" data-a="'+a+'"'+(a===ANO?' class="on"':'')+'>'+a+(a===ANO?' ✓':'')+'</button>';
+    }).join('')+'<button type="button" role="menuitem" data-a="'+prox+'" class="novo">+ Iniciar '+prox+'</button>';
+    var r=btn.getBoundingClientRect();
+    m.style.top=(r.bottom+window.scrollY+6)+'px';m.style.left=(r.left+window.scrollX)+'px';
+    document.body.appendChild(m);
+    m.onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;var a=parseInt(b.getAttribute('data-a'),10);m.remove();if(a&&a!==ANO)mudarAno(a);};
+    setTimeout(function(){document.addEventListener('click',function fora(e){if(!m.contains(e.target)){m.remove();document.removeEventListener('click',fora);}});},0);
   }
   function anoAnteriorComTurmas(){return anosComTurmas().filter(function(a){return a<ANO;}).pop()||0;}
   function opcoesCadastro(){
@@ -963,15 +994,15 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   // ── Desenho geral ───────────────────────────────────────────────────
   function desenharCabecalho(){
     var nome=perfilNome(),e=escolaAtual();
-    document.getElementById('md-titulo').textContent='Diário de Aulas '+ANO;
+    document.getElementById('md-titulo').innerHTML='Diário de Aulas <button type="button" class="md-ano-btn" id="md-ano-btn" aria-haspopup="true" title="Escolher o ano letivo">'+ANO+' <span aria-hidden="true">▾</span></button>';
+    document.getElementById('md-ano-btn').onclick=abrirMenuAno;
     document.getElementById('md-escolas').textContent=e?e.nome+(e.inep?' · INEP '+e.inep.codigo:''):'Carregando…';
-    document.getElementById('md-quem').textContent=nome?'✦ '+nome+' ✦':'';
     var av=document.getElementById('md-avatar');
     if(e&&e.imagem)av.innerHTML='<img src="'+esc(e.imagem)+'" alt="">';else av.textContent=(e&&e.icone)||'🏫';
     document.getElementById('md-rodape').textContent=(e?e.nome+' · ':'')+(nome?nome+' · ':'')+'Ano Letivo '+ANO;
     if(e)document.title=e.nome+' — Meu Diário';
     var pn=document.getElementById('md-painel');
-    if(pn){pn.hidden=!(e&&C().ocupacao.temAEE(e.ocupacoes));pn.href='aee.html?escola='+encodeURIComponent(ESCOLA_ID);}
+    if(pn)C().ocupacao.botaoPainel(pn,e,'regente');
   }
   // Ocupação obrigatória (Etapa 15). Sem "regente", esta escola abre no painel do AEE.
   function conferirOcupacao(){
@@ -1061,7 +1092,6 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     C().perfil.aoMudar(function(){if(E)desenharCabecalho();});
     cadaModulo('iniciar',window.MeuDiario);
     if(escolaAtual())desenharTudo();else document.getElementById('sec-inicio').innerHTML='<div class="md-card md-vazio">Carregando a escola…</div>',document.getElementById('sec-inicio').classList.add('on');
-    document.getElementById('md-sair').onclick=function(){if(confirm('Sair da conta neste aparelho?'))S.auth.signOut();};
     syncE=S.createScopeSync({
       perUser:true, scope:SCOPE_ESTRUTURA, source:'meu-diario', debounceMs:250,
       getLocalPayload:function(){return E;},
