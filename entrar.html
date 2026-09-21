@@ -32,7 +32,7 @@ body::after{width:680px;height:680px;right:-240px;bottom:-260px;background:rgba(
 /* Abertura da marca — só na primeira visita deste aparelho. */
 #abertura{position:fixed;inset:0;z-index:2147483600!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
   background:#0A0B0A;animation:saiAbertura .7s ease 2.1s forwards}
-#abertura img{width:min(360px,74vw);border-radius:16px;opacity:0;transform:translateY(14px) scale(.97);animation:entraMarca .9s cubic-bezier(.22,1,.36,1) .15s forwards}
+#abertura img{width:min(360px,74vw);height:auto;border-radius:16px;opacity:0;transform:translateY(14px) scale(.97);animation:entraMarca .9s cubic-bezier(.22,1,.36,1) .15s forwards}
 #abertura .traco{width:min(360px,74vw);height:2px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
 #abertura .traco i{display:block;height:100%;width:0;background:linear-gradient(90deg,#A7B58A,#C2CE9E);animation:enche 1.5s cubic-bezier(.4,0,.2,1) .45s forwards}
 #abertura span{font-size:.7rem;letter-spacing:.3em;color:#7E8279;opacity:0;animation:entraMarca .7s ease .8s forwards}
