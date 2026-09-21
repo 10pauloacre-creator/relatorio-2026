@@ -219,7 +219,10 @@
     });
   }
 
+  // Ferramentas entregues às páginas que montam o próprio assistente (AEE).
+  function ferramentas() { return { hoje: hojeKey, pseudonimizar: pseudonimizar, restaurar: restaurar, ocultarNomes: ocultarNomes, mapaAlunos: mapaAlunos }; }
   function sistema() {
+    if (M.sistema) return M.sistema(ferramentas());
     var d = new Date(), E = M.estrutura();
     return filtrarAcoes([
       'Você é o assistente de I.A ' + (M.nomePlataforma || 'do "Meu Diário"') + ', o diário escolar digital do(a) professor(a) ' + (((E.perfil && E.perfil.nome) || "").trim() || "usuário") + ". Responda sempre em português do Brasil, com clareza e sem rodeios.",
@@ -678,6 +681,8 @@
   // Aplica uma ação. Devolve a mensagem de sucesso ou lança o erro.
   async function aplicar(a, origem) {
     var R = window.MeuDiarioRecursos, perdidos = [], t, d, msg;
+    // A página pode ter ações próprias (ex.: AEE): devolve a mensagem ou undefined.
+    if (M.aplicarAcao) { var propria = await M.aplicarAcao(a, ferramentas(), origem); if (propria !== undefined) return propria; }
     if (!acaoPermitida(a.tipo)) throw new Error("Esta ação não existe aqui: " + a.tipo + ". Nesta página a I.A registra e altera diários.");
     if (!R && ["plano_bimestre", "plano_status", "sequencia", "livro", "evento_calendario", "remover_evento"].indexOf(a.tipo) >= 0) throw new Error("Esta ação só existe no Meu Diário.");
     var aviso = function (m) { return perdidos.length ? m + " ⚠️ Não encontrei: " + perdidos.join(", ") + "." : m; };
@@ -779,6 +784,7 @@
     throw new Error("Tipo de ação desconhecido: " + a.tipo + ".");
   }
   function descrever(a) {
+    if (M.descreverAcao) { var x = M.descreverAcao(a, ferramentas()); if (x) return x; }
     var tn = function () { try { return turmaDe(a.turma).nome; } catch (e) { return a.turma || "?"; } };
     switch (a.tipo) {
       case "criar_diario": return { ic: "📝", t: "Registrar diário — " + tn() + " · " + (a.disciplina || "") + " · " + (a.data ? M.dataBr(a.data) : "?"), d: [txt(a.assunto), a.horas ? a.horas + " h/aula" : "", (a.faltaram || []).length ? (a.faltaram.length + " falta(s)") : "sem faltas", a.atividade && a.atividade.houve ? "com atividade" : ""].filter(Boolean).join(" · ") };

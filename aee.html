@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-acesso="professor" data-auth-voltar="index.html">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a3a2a">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<title>Painel AEE</title>
+<script>
+(function(){var m='';try{m=localStorage.getItem('modo-tema')||'';}catch(e){}
+  if(!m)m=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'escuro':'claro';
+  window.MD_TEMA_INICIAL=m;
+  if(m==='escuro')document.documentElement.classList.add('dark-2026');})();
+</script>
+<script defer src="assets/js/dark-mode-2026.js?v=20260921a"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="assets/js/supabase-report-sync.js?v=20260921b"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921b"></script>
+<script defer src="assets/js/meu-diario-ia.js?v=20260921b"></script>
+<style>
+/* Base visual do Meu Diário (copiada de meu-diario.html) */
+:root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--og:#876020;--card:#fff;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px;
+  /* Tokens próprios do Meu Diário (redefinidos no modo escuro). */
+  --md-sup:#fff;--md-sup2:#faf8f2;--md-sup3:#f5f3ee;--md-linha:#e8e5de;--md-titulo:#1a3a2a;--md-acento:#2d6147;--md-acento-txt:#fff;--md-destaque:#2d6147;--md-fundo:#faf8f2}
+html.dark-2026{--md-sup:#191c1f;--md-sup2:#202327;--md-sup3:#272b30;--md-linha:#383d43;--md-titulo:#f4f5f6;--md-acento:#ffa65b;--md-acento-txt:#1b130b;--md-destaque:#ffa65b;--md-fundo:#111315}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--md-fundo);color:var(--ce);min-height:100vh}
+button{font-family:inherit}
+a{color:var(--md-destaque)}
+/* ── Cabeçalho e abas (mesmo desenho da Casavequia) ── */
+.cab{background:linear-gradient(135deg,var(--vd),var(--vm) 60%,var(--vc));color:#fff;position:relative;overflow:hidden}
+.cab::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:rgba(201,168,76,.15)}
+.cab-i{max-width:1200px;margin:0 auto;padding:30px 40px 24px;position:relative;z-index:1;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.md-avatar{width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(201,168,76,.7);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:#f5e6be;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.cab-t{flex:1;min-width:220px}
+.cab-t h1{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;line-height:1.2}
+.cab-t .sub{font-size:.8rem;opacity:.82;margin-top:4px;font-weight:300;letter-spacing:.04em;text-transform:uppercase}
+.cab-t .prof{margin-top:9px;display:inline-flex;align-items:center;gap:7px;background:rgba(201,168,76,.25);border:1px solid rgba(201,168,76,.5);border-radius:20px;padding:4px 13px;font-size:.8rem;font-weight:500;color:var(--os);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.md-cab-acoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.md-sync{font-size:.74rem;background:rgba(255,255,255,.14);border-radius:999px;padding:6px 12px;white-space:nowrap}
+.md-sair{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.8rem;cursor:pointer}
+.md-voltar{text-decoration:none;white-space:nowrap}
+.md-avatar{overflow:hidden}.md-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+#modo-btns{display:flex;gap:6px}
+#modo-btns button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+#modo-btns .btn-claro{background:#fff;border-color:#e8e5de;color:#c9a84c}
+#modo-btns .btn-escuro{background:#1a3a2a;border-color:#4a9467;color:#c9a84c}
+#modo-btns button.ativo{transform:scale(1.12);box-shadow:0 4px 14px rgba(0,0,0,.35);border-color:#c9a84c}
+.nav-w{background:var(--vd);border-bottom:3px solid var(--ou);position:sticky;top:0;z-index:100}
+.nav-i{max-width:1200px;margin:0 auto;display:flex;align-items:center;padding:0 40px;overflow-x:auto;scrollbar-width:none}
+.nav-i::-webkit-scrollbar{display:none}
+.nb{padding:12px 15px;background:transparent;border:none;color:rgba(255,255,255,.6);font-size:.8rem;font-weight:500;cursor:pointer;transition:all .2s;position:relative;white-space:nowrap;flex-shrink:0}
+.nb:hover{color:#fff}.nb.on{color:var(--ou);font-weight:700}
+.nb.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--ou);margin-bottom:-3px}
+.sp{width:1px;height:16px;background:rgba(255,255,255,.15);flex-shrink:0;margin:0 1px}
+.main{max-width:1200px;margin:0 auto;padding:30px 40px 60px}
+.sec{display:none;animation:fi .3s ease}.sec.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.th{display:flex;align-items:center;gap:15px;margin-bottom:22px;padding-bottom:14px;border-bottom:2px solid var(--md-linha);flex-wrap:wrap}
+.tb{background:var(--vm);color:#fff;font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;padding:9px 15px;border-radius:var(--rs2);line-height:1;flex-shrink:0}
+.tb.gz{background:#444}.tb.ou{background:linear-gradient(135deg,#c9a84c,#e8c86a)}.tb.mr{background:linear-gradient(135deg,#8c6a2a,#d8b45b)}.tb.az{background:#1a5276}.tb.ia{background:linear-gradient(135deg,#1a1a2e,#2d3a6e)}
+.ti{flex:1;min-width:200px}
+.ti h2{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--md-titulo)}
+.ti p{font-size:.82rem;color:var(--cm);margin-top:2px}
+.md-acoes{display:flex;gap:10px;flex-wrap:wrap;margin:-8px 0 20px}
+.sr{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:13px;margin-bottom:24px}
+.sc2{background:var(--md-sup);border-radius:var(--rs2);padding:15px 17px;box-shadow:var(--sc);border-left:4px solid var(--vc)}
+.sc2 .n{font-family:'DM Mono',monospace;font-size:1.65rem;font-weight:500;color:var(--vm);line-height:1}
+.sc2 .l{font-size:.7rem;color:var(--cm);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+footer{background:var(--vd);color:rgba(255,255,255,.55);text-align:center;padding:18px 20px;font-size:.76rem;letter-spacing:.04em}
+footer a{color:rgba(255,255,255,.75)}
+/* ── Componentes do Meu Diário ── */
+.md-btn{border:none;border-radius:10px;padding:10px 16px;font-weight:700;font-size:.84rem;cursor:pointer;background:var(--md-sup3);color:var(--ce);border:1px solid var(--md-linha)}
+.md-btn.pri{background:var(--md-acento);color:var(--md-acento-txt);border-color:var(--md-acento)}
+.md-btn.perigo{background:var(--rs);color:var(--ra);border-color:#f5c6c0}
+.md-btn.mini{padding:6px 10px;font-size:.75rem;border-radius:8px}
+.md-btn:disabled{opacity:.5;cursor:not-allowed}
+.md-card{background:var(--md-sup);border-radius:var(--r);box-shadow:var(--ss);padding:18px 20px;margin-bottom:16px}
+.md-card h3{font-family:'Playfair Display',serif;color:var(--md-titulo);font-size:1.08rem;margin-bottom:10px}
+.md-card p{font-size:.88rem;line-height:1.55;color:var(--cm)}
+.md-f{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.md-f label{font-size:.7rem;font-weight:700;color:var(--md-destaque);text-transform:uppercase;letter-spacing:.05em}
+.md-f input,.md-f select,.md-f textarea,.md-in{padding:9px 11px;border:2px solid var(--md-linha);border-radius:10px;font:inherit;font-size:.9rem;color:var(--ce);background:var(--md-sup2);width:100%}
+.md-f textarea{min-height:120px;resize:vertical}
+.md-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.md-vazio{text-align:center;padding:40px 20px;color:var(--cm);font-size:.92rem}
+.md-cont{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.md-cc{background:var(--md-sup);border-radius:12px;box-shadow:var(--ss);padding:14px 16px;border-top:4px solid var(--vc)}
+.md-cc h4{font-size:.95rem;color:var(--md-titulo)}
+.md-cc .sub{font-size:.76rem;color:var(--cm);margin:2px 0 10px}
+.md-bar{height:9px;background:var(--md-linha);border-radius:99px;overflow:hidden;margin:4px 0 8px}
+.md-bar i{display:block;height:100%;background:var(--vc)}
+.md-bar.ano i{background:var(--ou)}
+.md-lbl{display:flex;justify-content:space-between;font-size:.74rem;color:var(--cm)}
+.md-bims{display:flex;gap:4px;margin-top:6px}
+.md-bims span{flex:1;text-align:center;font-size:.66rem;padding:4px 0;border-radius:6px;background:var(--md-linha);color:var(--cm)}
+.md-bims span.co{background:var(--vs);color:var(--vm);font-weight:700}
+.md-bims span.at{background:var(--os);color:var(--og);font-weight:700}
+.md-h3{font-family:'Playfair Display',serif;color:var(--md-titulo);margin:18px 0 10px;font-size:1.1rem}
+.md-alunos{display:flex;flex-wrap:wrap;gap:6px}
+.md-alunos button{border:1px solid var(--md-linha);background:var(--md-sup2);color:var(--ce);border-radius:999px;padding:5px 11px;font-size:.78rem;cursor:pointer}
+.md-alunos button.tr{opacity:.5;text-decoration:line-through}
+.md-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.md-row .md-in{flex:1}
+.md-row .n{font-family:'DM Mono',monospace;font-size:.78rem;width:28px;color:var(--cm)}
+.md-row label{font-size:.76rem;display:flex;gap:4px;align-items:center;white-space:nowrap}
+.md-x{background:none;border:none;color:var(--ra);font-size:1.05rem;cursor:pointer;padding:4px}
+details.md-turma{border:1px solid var(--md-linha);border-radius:12px;padding:0 14px;margin-bottom:12px;background:var(--md-sup)}
+details.md-turma>summary{cursor:pointer;padding:13px 0;font-weight:700;color:var(--md-titulo)}
+details.md-turma[open]>summary{border-bottom:1px solid var(--md-linha);margin-bottom:12px}
+.md-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1a3a2a;color:#fff;padding:10px 18px;border-radius:999px;font-size:.84rem;z-index:20000;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:92vw;text-align:center}
+.md-tabela{width:100%;border-collapse:collapse;font-size:.86rem}
+.md-tabela td{padding:7px 4px;border-bottom:1px solid var(--md-linha)}
+/* ── Cards de diário (padrão da Casavequia) ── */
+.ea{background:var(--md-sup);border-radius:var(--r);box-shadow:var(--ss);margin-bottom:18px;overflow:hidden;transition:box-shadow .2s}
+.ea:hover{box-shadow:0 6px 32px rgba(26,58,42,.14)}
+.eh{display:flex;align-items:center;cursor:pointer;user-select:none}
+.edb{background:var(--vd);color:#fff;padding:17px 19px;min-width:96px;text-align:center;flex-shrink:0}
+.edb .d{font-family:'DM Mono',monospace;font-size:1.9rem;font-weight:500;line-height:1}
+.edb .my{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;opacity:.74;margin-top:2px}
+.em{flex:1;padding:13px 19px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.ed{font-family:'Playfair Display',serif;font-size:1.02rem;color:var(--vd);font-weight:600}
+.ec{display:flex;flex-wrap:wrap;gap:5px}
+.ch{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:500}
+.ch-h{background:var(--vs);color:var(--vm)}.ch-p{background:var(--os);color:#7a5c10}
+.ch-a{background:var(--rs);color:var(--ra)}.ch-i{background:#dbeeff;color:var(--ai)}
+.et{padding:17px 19px;color:var(--cm);font-size:.95rem;transition:transform .25s;flex-shrink:0}.et.op{transform:rotate(180deg)}
+.ec2{display:none;border-top:1px solid var(--cl)}.ec2.on{display:block}
+.itabs{display:flex;background:#f5f3ee;border-bottom:1px solid var(--cl);padding:0 20px;overflow-x:auto}
+.itab{padding:9px 13px;background:transparent;border:none;font-size:.77rem;font-weight:500;cursor:pointer;color:var(--cm);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.itab:hover{color:var(--vd)}.itab.on{color:var(--vm);border-bottom-color:var(--vm);font-weight:700}
+.ipane{display:none;padding:18px 22px 22px}.ipane.on{display:block}
+.st{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cm);font-weight:700;margin:16px 0 7px}.st:first-child{margin-top:0}
+.ct{background:var(--cr);border-left:3px solid var(--vc);padding:11px 15px;border-radius:0 var(--rs2) var(--rs2) 0;font-size:.88rem;line-height:1.65}
+.ol{display:flex;flex-direction:column;gap:9px}
+.oi{background:var(--rs);border:1px solid #f5c6c0;border-radius:var(--rs2);padding:11px 15px;display:flex;gap:11px;align-items:flex-start}
+.oi.nt{background:#f0f7ff;border-color:#bdd9f5}
+.oi-ic{font-size:1.05rem;flex-shrink:0}
+.oa{font-weight:600;font-size:.86rem;color:var(--ra);margin-bottom:2px}.oi.nt .oa{color:var(--ai)}.od{font-size:.83rem;line-height:1.5}
+.ng{background:var(--os);border:1px solid #e0c87a;border-radius:var(--rs2);padding:11px 15px;font-size:.84rem;line-height:1.6}
+.ai2{margin-top:14px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:var(--rs2);padding:15px 17px;color:#fff}
+.ai2h{display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.ai2h .tg{background:rgba(201,168,76,.25);color:var(--ou);border:1px solid rgba(201,168,76,.4);border-radius:4px;font-size:.64rem;font-weight:700;letter-spacing:.12em;padding:2px 7px;text-transform:uppercase}
+.ai2h span{font-size:.8rem;opacity:.7}
+.ai2i{background:rgba(255,255,255,.07);border-radius:6px;padding:9px 11px;margin-bottom:7px;font-size:.83rem;line-height:1.55}
+.ai2a{font-family:'DM Mono',monospace;color:var(--ou);font-size:.76rem;margin-bottom:2px}
+.ai2p{display:inline-flex;background:rgba(192,57,43,.25);color:#ff8a8a;border-radius:4px;padding:1px 6px;font-size:.7rem;font-weight:600;margin-bottom:3px}
+.ai2p.warn{background:rgba(230,126,34,.25);color:#ffc08a}.ai2p.grave{background:rgba(192,57,43,.45);color:#ff6b6b}
+.ai2t{opacity:.85}.ai2s{margin-top:9px;border-top:1px solid rgba(255,255,255,.1);padding-top:9px;font-size:.78rem;opacity:.75;font-style:italic}
+.lembrete{background:#1a1a2e;border:2px dashed var(--ou);border-radius:var(--rs2);padding:12px 16px;margin:14px 0;color:#fff}
+.lembrete-tag{display:inline-flex;background:rgba(201,168,76,.3);color:var(--ou);border-radius:4px;font-size:.66rem;font-weight:700;letter-spacing:.1em;padding:2px 8px;text-transform:uppercase;margin-bottom:8px}
+.lembrete-txt{font-size:.83rem;line-height:1.6;opacity:.9}
+.atv-tema{background:var(--cr);border-left:3px solid var(--ou);padding:10px 14px;border-radius:0 var(--rs2) var(--rs2) 0;font-size:.87rem;margin-bottom:12px}
+.atv-av{background:var(--os);border:1px solid #e0c87a;border-radius:var(--rs2);padding:9px 13px;font-size:.81rem;margin-bottom:12px;display:flex;gap:8px}
+.md-mstat{font-size:.74rem;color:var(--cm);margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap}.md-mstat strong{color:var(--ce)}
+.md-mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:5px}
+.md-m{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:6px;font-size:.8rem;cursor:pointer;border:none;text-align:left;background:var(--md-sup3);color:var(--ce)}
+.md-m .n{font-family:'DM Mono',monospace;font-size:.67rem;opacity:.6;width:20px;flex-shrink:0}
+.md-m .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.md-m .tag{font-size:.62rem;font-weight:700}
+.md-m.pr,.md-m.fz{background:#e6f6ec;color:#1f6b43}.md-m.fa,.md-m.nf{background:#fde2df;color:#a4291d}.md-m.fj{background:#fff4d6;color:#7a5c10}
+.md-m.tr{opacity:.45;cursor:default}
+.md-ajuda{font-size:.74rem;color:var(--cm);margin-bottom:8px}
+/* ── Escola, ano letivo e cadastro de turmas (Etapa 14) ── */
+.md-ano{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;color:var(--md-destaque);background:var(--md-sup);border:1px solid var(--md-linha);border-radius:999px;padding:5px 6px 5px 14px}
+.md-ano select{border:none;background:var(--md-sup3);color:var(--ce);border-radius:999px;padding:6px 10px;font:inherit;font-weight:700;cursor:pointer}
+.md-opcoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:14px}
+.md-opcao{display:flex;flex-direction:column;gap:5px;text-align:left;border:1px solid var(--md-linha);background:var(--md-sup2);color:var(--ce);border-radius:14px;padding:16px;cursor:pointer;transition:border-color .15s,transform .15s}
+.md-opcao:hover{border-color:var(--md-destaque);transform:translateY(-2px)}
+.md-opcao span{font-size:1.6rem}.md-opcao b{font-size:.95rem;color:var(--md-titulo)}.md-opcao small{font-size:.78rem;color:var(--cm);line-height:1.45}
+.md-escola{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.md-escola-face{width:132px;height:132px;border-radius:22px;background:linear-gradient(160deg,#2a3324,#141712);display:flex;align-items:center;justify-content:center;font-size:3.6rem;overflow:hidden;flex-shrink:0;box-shadow:var(--sc)}
+.md-escola-face img{width:100%;height:100%;object-fit:cover}
+.md-icones{display:flex;flex-wrap:wrap;gap:6px}
+.md-icones button{width:40px;height:40px;border-radius:10px;border:2px solid var(--md-linha);background:var(--md-sup2);font-size:1.25rem;cursor:pointer}
+.md-icones button.on{border-color:var(--md-destaque)}
+.md-inep{margin-top:16px;padding:14px 16px;border-radius:12px;background:var(--md-sup2);border:1px solid var(--md-linha);font-size:.86rem;line-height:1.55}
+.md-inep span{color:var(--cm);font-size:.8rem}
+.md-perigo{border:2px solid rgba(192,57,43,.45)}
+.md-perigo h3{color:var(--ra)!important}
+.md-perigo-l{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--md-linha)}
+.md-perigo-l>div:first-child{flex:1;min-width:220px}
+.md-perigo-l b{display:block;font-size:.9rem;color:var(--ce)}.md-perigo-l span{font-size:.78rem;color:var(--cm)}
+.md-imp{border:1px solid var(--md-linha);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.md-imp small{color:var(--cm);font-weight:400}
+.md-checks{display:flex;flex-direction:column;gap:6px;font-size:.86rem}
+.md-f label.md-btn{text-transform:none;letter-spacing:0;color:var(--ce);display:inline-block}
+html.dark-2026 .md-perigo{border-color:#7a3530}
+html.dark-2026 .md-perigo h3{color:var(--dark-negative)!important}
+html.dark-2026 .md-ano select{background:var(--md-sup3);color:var(--dark-text)}
+/* ── Janelas (relatório do aluno e módulos) ── */
+.md-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:center;justify-content:center;padding:14px}
+.md-rel{background:var(--md-sup);color:var(--ce);border-radius:16px;max-width:760px;width:100%;max-height:94vh;overflow-y:auto;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.4)}
+.md-rel h2{font-family:'Playfair Display',serif;color:var(--md-titulo)}
+.md-rel h4{margin:16px 0 6px;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--md-destaque)}
+.md-rel table{width:100%;border-collapse:collapse;font-size:.84rem}
+.md-rel td,.md-rel th{border-bottom:1px solid var(--md-linha);padding:6px 4px;text-align:left}
+/* ── Modo escuro grafite: textos e superfícies que usam os tokens verdes ── */
+html.dark-2026 body{background:var(--md-fundo)}
+html.dark-2026 .md-avatar{background:rgba(255,166,91,.08);border-color:rgba(255,166,91,.55);color:#ffd4af}
+html.dark-2026 .md-sync,html.dark-2026 .md-sair{background:rgba(255,255,255,.06)!important;border-color:var(--md-linha)!important;color:var(--dark-text)!important}
+html.dark-2026 footer{background:#0c0e10!important;color:var(--dark-muted)!important;border-top:1px solid var(--md-linha)}
+html.dark-2026 .tb{background:#272b30!important;color:#ffb46f!important;border:1px solid #383d43}
+html.dark-2026 .th{border-color:var(--md-linha)}
+html.dark-2026 .sc2{background:var(--md-sup)!important;border-left-color:var(--dark-accent)!important}
+html.dark-2026 .sc2 .n{color:var(--dark-text)!important}
+html.dark-2026 .ed{color:var(--dark-text)!important}
+html.dark-2026 .md-cc{border-top-color:var(--dark-accent)}
+html.dark-2026 .md-bar i{background:var(--dark-positive)}
+html.dark-2026 .md-bar.ano i{background:var(--dark-accent)}
+html.dark-2026 .md-bims span.co{background:var(--dark-positive-soft);color:var(--dark-positive)}
+html.dark-2026 .md-bims span.at{background:var(--dark-accent-soft);color:var(--dark-accent)}
+html.dark-2026 .md-m.pr,html.dark-2026 .md-m.fz{background:var(--dark-positive-soft);color:var(--dark-positive)}
+html.dark-2026 .md-m.fa,html.dark-2026 .md-m.nf{background:var(--dark-negative-soft);color:var(--dark-negative)}
+html.dark-2026 .md-m.fj{background:var(--dark-warning-soft);color:var(--dark-warning)}
+html.dark-2026 .md-btn.perigo{background:var(--dark-negative-soft)!important;color:var(--dark-negative)!important;border-color:#7a3530!important}
+html.dark-2026 .md-btn.pri{background:linear-gradient(135deg,var(--dark-accent),var(--dark-accent-strong))!important;color:#151719!important;border-color:var(--dark-accent)!important}
+html.dark-2026 .md-btn:not(.pri):not(.perigo){background:var(--md-sup2)!important;color:var(--dark-text)!important;border-color:var(--md-linha)!important}
+html.dark-2026 .md-toast{background:#272b30;border:1px solid #383d43;color:var(--dark-text)}
+html.dark-2026 .md-ov{background:rgba(3,4,5,.78);backdrop-filter:blur(8px)}
+html.dark-2026 .md-rel{border:1px solid var(--md-linha)}
+html.dark-2026 .itab.on{color:var(--dark-accent)!important;border-bottom-color:var(--dark-accent)!important;background:transparent!important}
+@media print{
+  body.md-imprimindo>*:not(.md-ov){display:none!important}
+  body.md-imprimindo .md-ov{position:static;background:none;padding:0}
+  body.md-imprimindo .md-rel{max-height:none;box-shadow:none;color:#000;background:#fff}
+  body.md-imprimindo .md-noprint{display:none!important}
+}
+@media(max-width:760px){.cab-i{padding:22px 16px 18px;gap:14px}.md-avatar{width:58px;height:58px;font-size:1.3rem}.cab-t{min-width:0;flex:1 1 calc(100% - 80px)}.cab-t .prof{max-width:100%;font-size:.72rem}.cab-t h1{font-size:1.3rem}.nav-i{padding:0 8px}.main{padding:20px 14px 50px}}
+@media(max-width:560px){.edb{min-width:74px;padding:14px 12px}.edb .d{font-size:1.5rem}.em{padding:11px 12px}.et{padding:12px}.md-cab-acoes{width:100%}}
+
+/* ── Painel AEE (Etapa 15) ── */
+.aee-cab-aluno{display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:var(--md-sup);border-radius:var(--r);box-shadow:var(--ss);padding:18px 20px;margin-bottom:16px}
+.aee-foto{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#2d6147,#4a9467);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;overflow:hidden;flex-shrink:0;border:3px solid var(--ou)}
+.aee-foto img{width:100%;height:100%;object-fit:cover}
+.aee-cab-aluno h2{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--md-titulo);line-height:1.15}
+.aee-meta{font-size:.84rem;color:var(--cm);margin-top:4px}
+.aee-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.aee-chip{font-size:.74rem;font-weight:700;padding:4px 10px;border-radius:999px;background:#ede7fb;color:#5b3fa6;border:1px solid #d9cdf5}
+.aee-chip.cid{background:var(--md-sup3);color:var(--cm);border-color:var(--md-linha)}
+.aee-cod{display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:.86rem;background:var(--md-sup2);border:1px dashed var(--md-destaque);color:var(--md-titulo);border-radius:10px;padding:6px 10px;cursor:pointer}
+.aee-cod small{font-family:'DM Sans',sans-serif;color:var(--cm)}
+.aee-sub{display:flex;gap:4px;overflow-x:auto;background:var(--md-sup);border-radius:12px;padding:5px;box-shadow:var(--sc);margin-bottom:16px;scrollbar-width:none}
+.aee-sub button{border:none;background:none;color:var(--cm);font:inherit;font-size:.82rem;font-weight:600;padding:9px 13px;border-radius:9px;cursor:pointer;white-space:nowrap}
+.aee-sub button.on{background:var(--md-acento);color:var(--md-acento-txt)}
+.aee-2col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.aee-bloco h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--md-destaque);margin-bottom:5px}
+.aee-bloco p{font-size:.9rem;line-height:1.6;color:var(--ce);white-space:pre-wrap}
+.aee-bloco p.vazio{color:var(--cm);font-style:italic}
+.aee-tab{width:100%;border-collapse:collapse;font-size:.86rem}
+.aee-tab th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--cm);text-align:left;padding:8px 6px;border-bottom:2px solid var(--md-linha)}
+.aee-tab td{padding:9px 6px;border-bottom:1px solid var(--md-linha)}
+.aee-tab td.n{font-family:'DM Mono',monospace;text-align:center}
+.aee-tab th.n{text-align:center}
+.nota-b{color:#1f7a4d;font-weight:700}.nota-r{color:var(--ra);font-weight:700}
+.aee-reg{border-left:4px solid var(--vc);background:var(--md-sup);border-radius:0 12px 12px 0;box-shadow:var(--sc);padding:12px 16px;margin-bottom:10px}
+.aee-reg.ocorrencia{border-left-color:var(--ra)}.aee-reg.atendimento{border-left-color:#7c5cc4}.aee-reg.comunicado{border-left-color:var(--ou)}.aee-reg.avaliacao{border-left-color:#2980b9}.aee-reg.nota{border-left-color:#0e7a6b}
+.aee-reg .top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.76rem;color:var(--cm)}
+.aee-reg .top b{color:var(--md-titulo);font-size:.82rem}
+.aee-reg .tx{font-size:.9rem;line-height:1.6;margin-top:6px;white-space:pre-wrap}
+.aee-reg .ac{margin-left:auto;display:flex;gap:6px}
+.aee-filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.aee-filtros .md-in,.aee-filtros select{width:auto;min-width:150px;flex:1}
+.aee-meta-pei{border:1px solid var(--md-linha);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--md-sup)}
+.aee-meta-pei .st{display:inline-block;font-size:.7rem;font-weight:800;padding:3px 9px;border-radius:999px;margin:0;letter-spacing:.03em;text-transform:none}
+.st-nao_iniciada{background:var(--md-sup3);color:var(--cm)}.st-em_andamento{background:#fff4d6;color:#7a5c10}.st-atingida{background:#e6f6ec;color:#1f6b43}.st-revisar{background:#fde2df;color:#a4291d}
+.aee-pastas{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.aee-pasta{background:var(--md-sup);border-radius:12px;box-shadow:var(--sc);padding:14px}
+.aee-pasta h4{font-size:.9rem;color:var(--md-titulo);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.aee-doc{display:flex;gap:6px;align-items:center;font-size:.8rem;padding:6px 0;border-top:1px solid var(--md-linha)}
+.aee-doc span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aee-doc button{border:none;background:none;cursor:pointer;font-size:.85rem;padding:2px 4px}
+.aee-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.aee-card{background:var(--md-sup);border-radius:14px;box-shadow:var(--ss);padding:14px 16px;cursor:pointer;border:1px solid transparent;transition:border-color .15s,transform .15s;text-align:left;font:inherit;color:var(--ce);display:flex;gap:12px}
+.aee-card:hover{border-color:var(--md-destaque);transform:translateY(-2px)}
+.aee-card .aee-foto{width:52px;height:52px;font-size:1.1rem;border-width:2px}
+.aee-card b{font-size:.98rem;color:var(--md-titulo);display:block}
+.aee-card small{display:block;font-size:.76rem;color:var(--cm);margin-top:2px}
+.aee-alerta{color:var(--ra)!important;font-weight:700}
+.aee-def{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px}
+.aee-def label{display:flex;gap:8px;align-items:center;font-size:.84rem;border:1px solid var(--md-linha);border-radius:10px;padding:8px 10px;background:var(--md-sup2);cursor:pointer;text-transform:none;letter-spacing:0;font-weight:500;color:var(--ce)}
+.aee-def input{width:auto!important}
+.nb .x{margin-left:6px;opacity:.6;font-weight:400}
+.nb .x:hover{opacity:1}
+.aee-aviso{background:#ede7fb;border:1px solid #d9cdf5;color:#4a3390;border-radius:10px;padding:10px 14px;font-size:.82rem;line-height:1.5;margin-bottom:14px}
+html.dark-2026 .aee-chip{background:rgba(155,125,230,.16);color:#c9b6ff;border-color:rgba(155,125,230,.35)}
+html.dark-2026 .aee-aviso{background:rgba(155,125,230,.12);color:#d9ccff;border-color:rgba(155,125,230,.3)}
+html.dark-2026 .aee-foto{border-color:#ffa65b}
+html.dark-2026 .st-em_andamento{background:var(--dark-warning-soft);color:var(--dark-warning)}
+html.dark-2026 .st-atingida{background:var(--dark-positive-soft);color:var(--dark-positive)}
+html.dark-2026 .st-revisar{background:var(--dark-negative-soft);color:var(--dark-negative)}
+html.dark-2026 .nota-b{color:var(--dark-positive)}
+html.dark-2026 .aee-sub button.on{background:linear-gradient(135deg,var(--dark-accent),var(--dark-accent-strong));color:#151719}
+@media(max-width:560px){.aee-cab-aluno{padding:14px}.aee-cab-aluno h2{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<header class="cab"><div class="cab-i">
+  <div class="md-avatar" id="md-avatar" aria-hidden="true">♿</div>
+  <div class="cab-t">
+    <h1 id="md-titulo">Painel da Educação Especial</h1>
+    <div class="sub" id="md-escolas">Carregando…</div>
+    <div class="prof" id="md-quem">✦ … ✦</div>
+  </div>
+  <div class="md-cab-acoes">
+    <div id="modo-btns">
+      <button type="button" class="btn-claro" id="modo-claro-btn" title="Modo claro" aria-label="Modo claro">☀️</button>
+      <button type="button" class="btn-escuro" id="modo-escuro-btn" title="Modo escuro" aria-label="Modo escuro">🌙</button>
+    </div>
+    <a class="md-sair md-voltar" href="escolas.html">← Escolas</a>
+    <a class="md-sair md-voltar" id="md-painel" href="#" hidden>🔀 Mudar painel: Regente</a>
+    <a id="md-chip" href="perfil.html"></a>
+    <button type="button" class="md-sair" id="md-sair">Sair</button>
+  </div>
+</div></header>
+<nav class="nav-w"><div class="nav-i" id="md-tabs"></div></nav>
+<main class="main" id="md-main">
+  <section class="sec on" id="sec-inicio"><div class="md-card md-vazio">Carregando…</div></section>
+  <section class="sec" id="sec-novo"></section>
+  <section class="sec" id="sec-ia"></section>
+  <section class="sec" id="sec-config"></section>
+</main>
+<footer><span id="md-rodape">Painel AEE</span> &nbsp;|&nbsp; <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
+
+<script>
+function setModo(modo){
+  document.documentElement.classList.toggle('dark-2026',modo==='escuro');
+  try{localStorage.setItem('modo-tema',modo);}catch(e){}
+  document.getElementById('modo-claro-btn').classList.toggle('ativo',modo==='claro');
+  document.getElementById('modo-escuro-btn').classList.toggle('ativo',modo==='escuro');
+  if(window.Relatorio2026Theme)window.Relatorio2026Theme.refresh();
+}
+setModo(window.MD_TEMA_INICIAL||'claro');
+document.getElementById('modo-claro-btn').onclick=function(){setModo('claro');};
+document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');};
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Painel da Educação Especial (Etapa 15, 21/09/2026) — aee.html?escola=<id>
+   Modos (pela ocupação do professor na escola):
+     mediador / assistente → uma aba para cada aluno acompanhado
+     aee                   → "Alunos do AEE" com filtros + abas dos abertos
+     regente (só)          → abre o perfil de um aluno vinculado (?aluno=)
+   O aluno é compartilhado entre contas pelo CÓDIGO (tabelas aee_*): todos os
+   profissionais vinculados veem o mesmo perfil, registros, boletim e
+   documentos. Estrutura das escolas: professor_dados (meu-diario:estrutura:v1).
+   ═══════════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+  var SCOPE='meu-diario:estrutura:v1';
+  var P=new URLSearchParams(location.search), ESCOLA_ID=P.get('escola')||'', ALUNO_INICIAL=P.get('aluno')||'';
+  var PAPEIS={mediador:'Professor mediador',assistente:'Assistente Educacional',aee:'Professor AEE',regente:'Professor regente'};
+  var DEFICIENCIAS=['TEA (Transtorno do Espectro Autista)','Deficiência intelectual','Deficiência física','Deficiência auditiva / surdez','Deficiência visual / baixa visão','Cegueira','Surdocegueira','Deficiência múltipla','Síndrome de Down','Paralisia cerebral','TDAH','Transtornos de aprendizagem (dislexia, discalculia…)','Altas habilidades / superdotação','Outra'];
+  var TIPOS={atendimento:'🧩 Atendimento AEE',diario:'📓 Acompanhamento',avaliacao:'📊 Avaliação',ocorrencia:'⚠️ Ocorrência',comunicado:'✉️ Família',relatorio:'📄 Relatório',nota:'🔢 Nota'};
+  var PASTAS=['Laudos e saúde','Relatórios','PEI e planejamento','Atividades adaptadas','Avaliações','Família e comunicação','Outros'];
+  var ST_PEI={nao_iniciada:'Não iniciada',em_andamento:'Em andamento',atingida:'Atingida',revisar:'Revisar'};
+  var CAMPOS_PERFIL=[['comunicacao','Comunicação','Como o aluno se comunica (fala, gestos, prancha, Libras…)'],['necessidades','Necessidades de apoio','Em que precisa de ajuda na rotina e nas atividades'],['potencialidades','Potencialidades e interesses','O que faz bem, do que gosta, o que motiva'],['estrategias','Estratégias que funcionam','Adaptações, rotina visual, tempo extra, lugar na sala…'],['cuidados','Cuidados de saúde','Medicação, alergias, crises, restrições (só o necessário)'],['crise','Sinais de crise e como agir','Gatilhos, sinais de alerta e o que fazer'],['observacoes','Outras observações','']];
+
+  var S,C,cli,usuario,E=null,syncE=null,carregado=false;
+  var ESC=null,OCUP=[],MODO='',VINC=[],DET={},ABERTOS=[],abaAtual='',subAba={};
+  var FILTRO={q:'',def:'',serie:'',prof:'',ordem:'nome'};
+  var EQUIPE_TODOS={},ULTIMO_REG={};
+
+  function $(s,r){return (r||document).querySelector(s);}
+  function esc(v){return C.esc(v);}
+  function toast(m){var t=document.createElement('div');t.className='md-toast';t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove();},3200);}
+  function hoje(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+  function dataBr(k){return k?String(k).slice(8,10)+'/'+String(k).slice(5,7)+'/'+String(k).slice(0,4):'';}
+  function nomeCurto(n){var p=String(n||'').trim().split(/\s+/);return p.length>1?p[0]+' '+p[p.length-1]:p[0]||'';}
+  function perfilNome(){var p=C.perfil.dados();return (p&&p.nome)||usuario.nome||usuario.email;}
+  function idadeDe(a){var i=C.perfil.idade(a.nascimento||'');return i===null?'':i+' anos';}
+  function fotoHtml(a){return a.foto?'<img src="'+esc(a.foto)+'" alt="">':esc(C.iniciais(a.nome));}
+  function aluno(id){var v=VINC.filter(function(x){return x.aluno_id===id;})[0];return v?v.aee_alunos:null;}
+  function meuPapel(id){var v=VINC.filter(function(x){return x.aluno_id===id;})[0];return v?v.papel:'';}
+  function editor(id){return ['mediador','assistente','aee'].indexOf(meuPapel(id))>=0;}
+  function papelPadrao(){return OCUP.indexOf('aee')>=0?'aee':OCUP.indexOf('mediador')>=0?'mediador':OCUP.indexOf('assistente')>=0?'assistente':'regente';}
+  function abrirOverlay(html,ligar){
+    var velho=document.querySelector('.md-ov');if(velho)velho.remove();
+    var ov=document.createElement('div');ov.className='md-ov';ov.innerHTML='<div class="md-rel" role="dialog" aria-modal="true">'+html+'</div>';
+    ov.addEventListener('mousedown',function(e){if(e.target===ov)ov.remove();});
+    document.body.appendChild(ov);
+    ov.querySelectorAll('[data-fechar]').forEach(function(f){f.onclick=function(){ov.remove();};});
+    if(ligar)ligar(ov);
+    return ov;
+  }
+
+  // ── Escola e estrutura ──────────────────────────────────────────────
+  function lsKey(){return 'md_estrutura_'+usuario.id;}
+  function lerLocal(){try{var e=JSON.parse(localStorage.getItem(lsKey())||'null');if(e&&Array.isArray(e.turmas))return e;}catch(x){}return{versao:1,perfil:{},escolas:[],turmas:[],atualizadoEm:''};}
+  function salvarE(){
+    if(!carregado){toast('Aguarde: sincronizando…');return Promise.resolve(false);}
+    E.atualizadoEm=new Date().toISOString();
+    try{localStorage.setItem(lsKey(),JSON.stringify(E));}catch(x){}
+    return syncE.pushNow('force');
+  }
+  function resolverEscola(){
+    var e=(E.escolas||[]).filter(function(x){return x.id===ESCOLA_ID;})[0];
+    if(e){ESC=e;OCUP=e.ocupacoes||[];return true;}
+    var f=C.FIXAS.filter(function(x){return x.id===ESCOLA_ID;})[0];
+    if(f&&S.auth.isAdmin()){
+      var v=(E.fixas||{})[f.id]||{};
+      ESC={id:f.id,nome:f.nome,fixa:f,inep:v.inep,ocupacoes:v.ocupacoes||['regente'],icone:'🏛️'};OCUP=ESC.ocupacoes;return true;
+    }
+    return false;
+  }
+  function definirModo(){
+    MODO=OCUP.indexOf('aee')>=0?'aee':(OCUP.indexOf('mediador')>=0||OCUP.indexOf('assistente')>=0)?'mediador':'regente';
+  }
+
+  // ── Dados do banco ──────────────────────────────────────────────────
+  function carregarVinculos(){
+    return cli.from('aee_vinculos').select('aluno_id,papel,escola_local,disciplina,aee_alunos(*)').eq('user_id',usuario.id).then(function(r){
+      if(r.error)throw new Error(r.error.message);
+      VINC=(r.data||[]).filter(function(v){return v.aee_alunos&&(!v.escola_local||v.escola_local===ESCOLA_ID);})
+        .sort(function(a,b){return a.aee_alunos.nome.localeCompare(b.aee_alunos.nome);});
+      if(MODO==='aee'&&VINC.length)return carregarResumoAEE();
+    });
+  }
+  // Painel do AEE: equipe e último registro de todos os alunos de uma vez.
+  function carregarResumoAEE(){
+    var ids=VINC.map(function(v){return v.aluno_id;});
+    return Promise.all([
+      cli.from('aee_vinculos').select('aluno_id,papel,nome_profissional,disciplina').in('aluno_id',ids),
+      cli.from('aee_registros').select('aluno_id,data,tipo').in('aluno_id',ids).order('data',{ascending:false}).limit(2000)
+    ]).then(function(rs){
+      EQUIPE_TODOS={};ULTIMO_REG={};
+      (rs[0].data||[]).forEach(function(v){(EQUIPE_TODOS[v.aluno_id]=EQUIPE_TODOS[v.aluno_id]||[]).push(v);});
+      (rs[1].data||[]).forEach(function(r){var u=ULTIMO_REG[r.aluno_id]=ULTIMO_REG[r.aluno_id]||{data:r.data,n:0};u.n++;});
+    });
+  }
+  function carregarDetalhe(id){
+    return Promise.all([
+      cli.from('aee_registros').select('*').eq('aluno_id',id).order('data',{ascending:false}).order('criado_em',{ascending:false}),
+      cli.from('aee_documentos').select('*').eq('aluno_id',id).order('criado_em',{ascending:false}),
+      cli.from('aee_vinculos').select('user_id,papel,nome_profissional,disciplina,criado_em').eq('aluno_id',id),
+      cli.from('aee_alunos').select('*').eq('id',id).single()
+    ]).then(function(rs){
+      rs.forEach(function(r){if(r.error)throw new Error(r.error.message);});
+      DET[id]={registros:rs[0].data||[],documentos:rs[1].data||[],equipe:rs[2].data||[]};
+      var v=VINC.filter(function(x){return x.aluno_id===id;})[0];if(v)v.aee_alunos=rs[3].data;
+      return DET[id];
+    });
+  }
+
+  // ── Abas ────────────────────────────────────────────────────────────
+  function abas(){
+    var l=[];
+    if(MODO==='aee'){
+      l.push({id:'inicio',rotulo:'📋 Alunos do AEE'});
+      ABERTOS.forEach(function(id){var a=aluno(id);if(a)l.push({id:'a-'+id,rotulo:'♿ '+nomeCurto(a.nome),fechar:id});});
+    }else{
+      if(MODO==='mediador'&&!VINC.length)l.push({id:'inicio',rotulo:'🏠 Início'});
+      VINC.forEach(function(v){l.push({id:'a-'+v.aluno_id,rotulo:'♿ '+nomeCurto(v.aee_alunos.nome)});});
+    }
+    if(MODO!=='regente')l.push({id:'novo',rotulo:'＋ Aluno'});
+    l.push({id:'ia',rotulo:'🤖 I.A'});
+    if(MODO!=='regente')l.push({id:'config',rotulo:'⚙️ Configurações'});
+    return l;
+  }
+  function desenharAbas(){
+    var nav=$('#md-tabs');
+    nav.innerHTML=abas().map(function(a,i){return (i?'<div class="sp"></div>':'')+'<button type="button" class="nb" data-aba="'+esc(a.id)+'">'+esc(a.rotulo)+(a.fechar?'<span class="x" data-fechar-aba="'+esc(a.fechar)+'" title="Fechar">✕</span>':'')+'</button>';}).join('');
+    nav.querySelectorAll('.nb').forEach(function(b){b.onclick=function(ev){
+      var x=ev.target.getAttribute('data-fechar-aba');
+      if(x){ABERTOS=ABERTOS.filter(function(i){return i!==x;});var s=document.getElementById('sec-a-'+x);if(s)s.remove();desenharAbas();irPara('inicio');return;}
+      irPara(b.getAttribute('data-aba'));
+    };});
+    nav.querySelectorAll('.nb').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-aba')===abaAtual);});
+  }
+  function irPara(id){
+    if(id.indexOf('a-')===0){abrirAluno(id.slice(2));return;}
+    if(!document.getElementById('sec-'+id))id=abas()[0].id;
+    if(id.indexOf('a-')===0){abrirAluno(id.slice(2));return;}
+    mostrar(id);
+    if(id==='ia'){var m=iaModulo();if(m&&m.aoAbrir)m.aoAbrir('ia');}
+  }
+  function mostrar(id){
+    abaAtual=id;
+    document.querySelectorAll('#md-main>.sec').forEach(function(s){s.classList.toggle('on',s.id==='sec-'+id);});
+    document.querySelectorAll('.nb[data-aba]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-aba')===id);});
+    window.scrollTo(0,0);
+  }
+
+  // ── Início (mediador sem aluno) e painel do AEE ─────────────────────
+  function desenharInicio(){
+    var sec=$('#sec-inicio');
+    if(MODO!=='aee'){
+      sec.innerHTML='<div class="th"><div class="tb gz">♿</div><div class="ti"><h2>Olá, '+esc(perfilNome().split(' ')[0])+'!</h2><p>'+esc(ESC.nome)+' · '+esc(C.ocupacao.rotulo(OCUP))+'</p></div></div>'
+        +'<div class="md-card"><h3>Nenhum aluno ainda</h3><p>Aqui cada aluno que você acompanha ganha uma aba com o nome dele: perfil, disciplinas, boletim, registros de todos os professores, PEI, documentos e o relatório individual. Cadastre o aluno ou, se outro profissional já cadastrou, entre com o código dele.</p><div style="margin-top:12px"><button type="button" class="md-btn pri" data-ir="novo">＋ Cadastrar ou vincular aluno</button></div></div>';
+      sec.querySelector('[data-ir]').onclick=function(){irPara('novo');};
+      return;
+    }
+    var todos=VINC.map(function(v){return v.aee_alunos;});
+    var series={},defs={},profs={};
+    todos.forEach(function(a){if(a.serie||a.turma)series[[a.serie,a.turma].filter(Boolean).join(' · ')]=1;(a.deficiencias||[]).forEach(function(d){defs[d]=1;});(EQUIPE_TODOS[a.id]||[]).forEach(function(v){if(v.papel!=='regente'&&v.papel!=='aee')profs[v.nome_profissional||'']=1;});});
+    var limite=new Date();limite.setDate(limite.getDate()-14);var limK=limite.toISOString().slice(0,10);
+    var semReg=todos.filter(function(a){var u=ULTIMO_REG[a.id];return !u||u.data<limK;}).length;
+    var q=FILTRO.q.toLowerCase();
+    var lista=todos.filter(function(a){
+      if(q&&(a.nome+' '+a.codigo).toLowerCase().indexOf(q)<0)return false;
+      if(FILTRO.def&&(a.deficiencias||[]).indexOf(FILTRO.def)<0)return false;
+      if(FILTRO.serie&&[a.serie,a.turma].filter(Boolean).join(' · ')!==FILTRO.serie)return false;
+      if(FILTRO.prof&&!(EQUIPE_TODOS[a.id]||[]).some(function(v){return v.nome_profissional===FILTRO.prof;}))return false;
+      return true;
+    }).sort(function(a,b){
+      if(FILTRO.ordem==='registro'){var x=(ULTIMO_REG[a.id]||{}).data||'',y=(ULTIMO_REG[b.id]||{}).data||'';return x.localeCompare(y);}
+      if(FILTRO.ordem==='serie')return ([a.serie,a.turma].join()).localeCompare([b.serie,b.turma].join());
+      return a.nome.localeCompare(b.nome);
+    });
+    var opt=function(o,sel){return Object.keys(o).filter(Boolean).sort().map(function(k){return '<option'+(k===sel?' selected':'')+'>'+esc(k)+'</option>';}).join('');};
+    sec.innerHTML='<div class="th"><div class="tb gz">📋</div><div class="ti"><h2>Alunos do AEE</h2><p>'+esc(ESC.nome)+' · perfis ligados aos registros dos mediadores, assistentes e professores</p></div><button type="button" class="md-btn pri" data-ir="novo">＋ Aluno</button></div>'
+      +'<div class="sr"><div class="sc2"><div class="n">'+todos.length+'</div><div class="l">Alunos</div></div><div class="sc2"><div class="n">'+Object.keys(defs).length+'</div><div class="l">Tipos de deficiência</div></div>'
+      +'<div class="sc2"><div class="n">'+Object.keys(profs).length+'</div><div class="l">Mediadores e assistentes</div></div><div class="sc2 al"><div class="n">'+semReg+'</div><div class="l">Sem registro há 14 dias</div></div></div>'
+      +'<div class="aee-filtros"><input class="md-in" data-f="q" placeholder="🔎 Nome ou código" value="'+esc(FILTRO.q)+'">'
+      +'<select class="md-in" data-f="def"><option value="">Todas as deficiências</option>'+opt(defs,FILTRO.def)+'</select>'
+      +'<select class="md-in" data-f="serie"><option value="">Todas as séries/turmas</option>'+opt(series,FILTRO.serie)+'</select>'
+      +'<select class="md-in" data-f="prof"><option value="">Todos os mediadores/assistentes</option>'+opt(profs,FILTRO.prof)+'</select>'
+      +'<select class="md-in" data-f="ordem"><option value="nome"'+(FILTRO.ordem==='nome'?' selected':'')+'>Ordem: nome</option><option value="serie"'+(FILTRO.ordem==='serie'?' selected':'')+'>Ordem: série</option><option value="registro"'+(FILTRO.ordem==='registro'?' selected':'')+'>Ordem: registro mais antigo</option></select></div>'
+      +(lista.length?'<div class="aee-lista">'+lista.map(function(a){
+        var u=ULTIMO_REG[a.id],eq=(EQUIPE_TODOS[a.id]||[]).filter(function(v){return v.papel==='mediador'||v.papel==='assistente';});
+        var velho=!u||u.data<limK;
+        return '<button type="button" class="aee-card" data-abrir="'+a.id+'"><div class="aee-foto">'+fotoHtml(a)+'</div><div style="min-width:0"><b>'+esc(a.nome)+'</b>'
+          +'<small>'+esc([idadeDe(a),a.serie,a.turma,a.turno].filter(Boolean).join(' · '))+'</small>'
+          +'<small>'+esc((a.deficiencias||[]).join(', ')||'—')+'</small>'
+          +'<small>'+(eq.length?'👥 '+esc(eq.map(function(v){return v.nome_profissional;}).join(', ')):'Sem mediador ou assistente')+'</small>'
+          +'<small class="'+(velho?'aee-alerta':'')+'">'+(u?'Último registro: '+dataBr(u.data)+' · '+u.n+' no total':'Nenhum registro ainda')+'</small></div></button>';
+      }).join('')+'</div>':'<div class="md-card md-vazio">'+(todos.length?'Nenhum aluno com esses filtros.':'Nenhum aluno ainda. Cadastre ou vincule pelo código em <strong>＋ Aluno</strong>.')+'</div>');
+    sec.querySelectorAll('[data-f]').forEach(function(el){el.addEventListener(el.tagName==='INPUT'?'input':'change',function(){FILTRO[el.getAttribute('data-f')]=el.value;var foco=el.tagName==='INPUT';desenharInicio();if(foco){var i=$('#sec-inicio [data-f="q"]');i.focus();i.setSelectionRange(i.value.length,i.value.length);}});});
+    sec.querySelectorAll('[data-abrir]').forEach(function(b){b.onclick=function(){abrirAluno(b.getAttribute('data-abrir'));};});
+    sec.querySelector('[data-ir]').onclick=function(){irPara('novo');};
+  }
+
+  // ── Aluno ───────────────────────────────────────────────────────────
+  function abrirAluno(id){
+    if(!aluno(id)){toast('Aluno não encontrado.');return;}
+    if(MODO==='aee'&&ABERTOS.indexOf(id)<0){ABERTOS.push(id);desenharAbas();}
+    var sec=document.getElementById('sec-a-'+id);
+    if(!sec){sec=document.createElement('section');sec.className='sec';sec.id='sec-a-'+id;$('#md-main').insertBefore(sec,$('#sec-novo'));}
+    mostrar('a-'+id);
+    if(!DET[id])sec.innerHTML='<div class="md-card md-vazio">Carregando o perfil…</div>';
+    else desenharAluno(id);
+    carregarDetalhe(id).then(function(){desenharAluno(id);}).catch(function(e){toast('Não consegui carregar: '+e.message);});
+  }
+  function desenharAluno(id){
+    var sec=document.getElementById('sec-a-'+id),a=aluno(id),d=DET[id];if(!sec||!a||!d)return;
+    var sub=subAba[id]||'perfil',ed=editor(id);
+    var SUBS=[['perfil','👤 Perfil'],['boletim','📚 Disciplinas e boletim'],['registros','📝 Registros'],['pei','🎯 PEI'],['docs','📁 Documentos'],['equipe','👥 Equipe'],['relatorio','📄 Relatório individual']];
+    sec.innerHTML='<div class="aee-cab-aluno"><div class="aee-foto">'+fotoHtml(a)+'</div><div style="flex:1;min-width:220px"><h2>'+esc(a.nome)+'</h2>'
+      +'<div class="aee-meta">'+esc([idadeDe(a),a.serie,a.turma?'Turma '+a.turma:'',a.turno,a.escola_nome].filter(Boolean).join(' · '))+'</div>'
+      +'<div class="aee-chips">'+(a.deficiencias||[]).map(function(x){return '<span class="aee-chip">'+esc(x)+'</span>';}).join('')+(a.cid?'<span class="aee-chip cid">CID '+esc(a.cid)+'</span>':'')+(a.laudo?'<span class="aee-chip cid">Com laudo</span>':'')+'</div></div>'
+      +'<div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end"><span class="aee-cod" data-copiar title="Copiar o código">🔑 '+esc(a.codigo)+' <small>copiar</small></span><span style="font-size:.74rem;color:var(--cm)">Você: '+esc(PAPEIS[meuPapel(id)]||'')+'</span></div></div>'
+      +'<div class="aee-sub">'+SUBS.map(function(s){return '<button type="button" data-sub="'+s[0]+'" class="'+(s[0]===sub?'on':'')+'">'+s[1]+'</button>';}).join('')+'</div>'
+      +'<div data-corpo></div>';
+    sec.querySelector('[data-copiar]').onclick=function(){try{navigator.clipboard.writeText(a.codigo);toast('Código copiado: '+a.codigo);}catch(e){toast(a.codigo);}};
+    sec.querySelectorAll('[data-sub]').forEach(function(b){b.onclick=function(){subAba[id]=b.getAttribute('data-sub');desenharAluno(id);};});
+    var corpo=sec.querySelector('[data-corpo]');
+    ({perfil:subPerfil,boletim:subBoletim,registros:subRegistros,pei:subPei,docs:subDocs,equipe:subEquipe,relatorio:subRelatorio})[sub](corpo,a,d,ed,id);
+  }
+
+  // Perfil
+  function subPerfil(box,a,d,ed,id){
+    var p=a.perfil||{};
+    var resp=(p.responsaveis||[]).filter(function(r){return r.nome;});
+    box.innerHTML='<div class="aee-aviso">🔒 Estes dados são sensíveis (LGPD): só os profissionais vinculados a '+esc(a.nome.split(' ')[0])+' veem. Registre apenas o necessário para o trabalho pedagógico.</div>'
+      +'<div class="md-card"><div class="th" style="margin-bottom:12px;padding-bottom:10px"><div class="ti"><h2 style="font-size:1.1rem">Dados do aluno</h2></div>'+(ed?'<button type="button" class="md-btn pri" data-editar>✏️ Editar perfil</button>':'')+'</div>'
+      +'<div class="aee-2col">'
+      +bloco('Nascimento',a.nascimento?dataBr(a.nascimento)+' ('+idadeDe(a)+')':'')+bloco('Escola',[a.escola_nome,a.municipio&&a.municipio+'/'+(a.uf||'')].filter(Boolean).join(' · '))
+      +bloco('Série / turma / turno',[a.serie,a.turma,a.turno].filter(Boolean).join(' · '))+bloco('Deficiência(s)',(a.deficiencias||[]).join(', ')+(p.deficienciaOutra?' — '+p.deficienciaOutra:''))
+      +bloco('CID e laudo',[a.cid?'CID '+a.cid:'',a.laudo===true?'Tem laudo':a.laudo===false?'Sem laudo':'',p.laudoObs||''].filter(Boolean).join(' · '))
+      +bloco('Responsáveis',resp.map(function(r){return r.nome+(r.parentesco?' ('+r.parentesco+')':'')+(r.telefone?' · '+r.telefone:'');}).join('\n'))
+      +'</div></div>'
+      +'<div class="md-card"><div class="aee-2col">'+CAMPOS_PERFIL.map(function(c){return bloco(c[1],p[c[0]]);}).join('')+'</div></div>'
+      +'<p style="font-size:.76rem;color:var(--cm)">Atualizado em '+new Date(a.atualizado_em).toLocaleString('pt-BR')+(a.atualizado_por?' por '+esc(a.atualizado_por):'')+'.</p>';
+    var b=box.querySelector('[data-editar]');if(b)b.onclick=function(){formAluno(a);};
+  }
+  function bloco(t,v){return '<div class="aee-bloco"><h4>'+esc(t)+'</h4><p class="'+(v?'':'vazio')+'">'+esc(v||'Não informado')+'</p></div>';}
+
+  // Disciplinas e boletim
+  function disciplinasDe(a,d){
+    var m={};
+    ((a.perfil||{}).disciplinas||[]).forEach(function(x){if(x.nome)m[x.nome]={nome:x.nome,professor:x.professor||''};});
+    d.equipe.forEach(function(v){if(v.papel==='regente'&&v.disciplina){m[v.disciplina]=m[v.disciplina]||{nome:v.disciplina,professor:''};if(!m[v.disciplina].professor)m[v.disciplina].professor=v.nome_profissional||'';}});
+    d.registros.forEach(function(r){if(r.disciplina&&!m[r.disciplina])m[r.disciplina]={nome:r.disciplina,professor:''};});
+    return Object.keys(m).sort().map(function(k){return m[k];});
+  }
+  function boletimDe(d){
+    var b={};
+    d.registros.filter(function(r){return r.tipo==='nota'&&r.disciplina&&r.bimestre&&r.nota!==null;}).slice().reverse().forEach(function(r){(b[r.disciplina]=b[r.disciplina]||{})[r.bimestre]=r;});
+    return b;
+  }
+  function subBoletim(box,a,d,ed,id){
+    var ds=disciplinasDe(a,d),bol=boletimDe(d);
+    var linhas=ds.map(function(x){
+      var n=[1,2,3,4].map(function(k){return bol[x.nome]&&bol[x.nome][k]?Number(bol[x.nome][k].nota):null;});
+      var val=n.filter(function(v){return v!==null;}),med=val.length?val.reduce(function(s,v){return s+v;},0)/val.length:null;
+      return '<tr><td><b>'+esc(x.nome)+'</b>'+(x.professor?'<br><span style="font-size:.74rem;color:var(--cm)">'+esc(x.professor)+'</span>':'')+'</td>'
+        +n.map(function(v){return '<td class="n">'+(v===null?'—':'<span class="'+(v>=7?'nota-b':v<5?'nota-r':'')+'">'+v.toFixed(1).replace('.',',')+'</span>')+'</td>';}).join('')
+        +'<td class="n"><b>'+(med===null?'—':med.toFixed(1).replace('.',','))+'</b></td></tr>';
+    }).join('');
+    box.innerHTML='<div class="md-card"><div class="th" style="margin-bottom:12px;padding-bottom:10px"><div class="ti"><h2 style="font-size:1.1rem">Boletim</h2><p>Notas lançadas por cada professor no perfil do aluno (a mais recente de cada bimestre vale).</p></div><button type="button" class="md-btn pri" data-nota>＋ Lançar nota</button></div>'
+      +(ds.length?'<div style="overflow-x:auto"><table class="aee-tab"><tr><th>Disciplina</th><th class="n">1º</th><th class="n">2º</th><th class="n">3º</th><th class="n">4º</th><th class="n">Média</th></tr>'+linhas+'</table></div>':'<p>Nenhuma disciplina ainda. '+(ed?'Cadastre as disciplinas em ✏️ Editar perfil, ou':'')+' lance uma nota.</p>')+'</div>'
+      +'<div class="md-card"><h3>Disciplinas que '+esc(a.nome.split(' ')[0])+' estuda</h3>'+(ds.length?'<table class="aee-tab"><tr><th>Disciplina</th><th>Professor(a)</th><th class="n">Registros</th></tr>'+ds.map(function(x){return '<tr><td>'+esc(x.nome)+'</td><td>'+esc(x.professor||'—')+'</td><td class="n">'+d.registros.filter(function(r){return r.disciplina===x.nome;}).length+'</td></tr>';}).join('')+'</table>':'<p>—</p>')
+      +'<p style="font-size:.78rem;color:var(--cm);margin-top:10px">Cada professor regente entra com o código <b>'+esc(a.codigo)+'</b> (Configurações da escola › Alunos da Educação Especial) e lança notas e registros da própria disciplina.</p></div>';
+    box.querySelector('[data-nota]').onclick=function(){formRegistro(id,{tipo:'nota'});};
+  }
+
+  // Registros
+  function subRegistros(box,a,d,ed,id){
+    var F=subAba['f-'+id]||{tipo:'',disc:'',autor:''};
+    var discs={},autores={};d.registros.forEach(function(r){if(r.disciplina)discs[r.disciplina]=1;if(r.autor)autores[r.autor]=1;});
+    var l=d.registros.filter(function(r){return (!F.tipo||r.tipo===F.tipo)&&(!F.disc||r.disciplina===F.disc)&&(!F.autor||r.autor===F.autor);});
+    var opt=function(o,sel){return Object.keys(o).sort().map(function(k){return '<option'+(k===sel?' selected':'')+'>'+esc(k)+'</option>';}).join('');};
+    box.innerHTML='<div class="md-acoes" style="margin:0 0 12px"><button type="button" class="md-btn pri" data-novo>＋ Novo registro</button><button type="button" class="md-btn" data-ia>🤖 Escrever com a I.A</button></div>'
+      +'<div class="aee-filtros"><select class="md-in" data-rf="tipo"><option value="">Todos os tipos</option>'+Object.keys(TIPOS).map(function(k){return '<option value="'+k+'"'+(k===F.tipo?' selected':'')+'>'+TIPOS[k]+'</option>';}).join('')+'</select>'
+      +'<select class="md-in" data-rf="disc"><option value="">Todas as disciplinas</option>'+opt(discs,F.disc)+'</select>'
+      +'<select class="md-in" data-rf="autor"><option value="">Todos os profissionais</option>'+opt(autores,F.autor)+'</select></div>'
+      +(l.length?l.map(function(r){
+        var meu=r.user_id===usuario.id;
+        return '<div class="aee-reg '+r.tipo+'"><div class="top"><b>'+esc(TIPOS[r.tipo]||r.tipo)+'</b><span>'+dataBr(r.data)+'</span>'+(r.disciplina?'<span>· '+esc(r.disciplina)+'</span>':'')+(r.tipo==='nota'?'<span>· '+r.bimestre+'º bim · nota '+String(r.nota).replace('.',',')+'</span>':'')
+          +'<span>· '+esc(r.autor||'')+' ('+esc(PAPEIS[r.papel]||r.papel||'')+')</span>'+(meu?'<span class="ac"><button type="button" class="md-btn mini" data-ed="'+r.id+'">Editar</button><button type="button" class="md-btn mini perigo" data-rm="'+r.id+'">Excluir</button></span>':'')+'</div>'
+          +(r.titulo?'<div style="font-weight:700;margin-top:6px">'+esc(r.titulo)+'</div>':'')+(r.texto?'<div class="tx">'+esc(r.texto)+'</div>':'')+'</div>';
+      }).join(''):'<div class="md-card md-vazio">Nenhum registro'+(F.tipo||F.disc||F.autor?' com esses filtros':' ainda')+'.</div>');
+    box.querySelectorAll('[data-rf]').forEach(function(s){s.onchange=function(){F[s.getAttribute('data-rf')]=s.value;subAba['f-'+id]=F;desenharAluno(id);};});
+    box.querySelector('[data-novo]').onclick=function(){formRegistro(id,{});};
+    box.querySelector('[data-ia]').onclick=function(){irPara('ia');if(window.MeuDiarioIA)window.MeuDiarioIA.sugerir('Escreva um registro de acompanhamento de hoje para '+codigoIA(id)+': ');};
+    box.querySelectorAll('[data-ed]').forEach(function(b){b.onclick=function(){formRegistro(id,d.registros.filter(function(r){return r.id===b.getAttribute('data-ed');})[0]);};});
+    box.querySelectorAll('[data-rm]').forEach(function(b){b.onclick=function(){
+      C.confirmarPerigo({titulo:'Excluir este registro?',texto:'O registro sai do perfil do aluno para todos os profissionais.',botao:'Sim, excluir',botaoFinal:'Excluir'}).then(function(ok){
+        if(!ok)return;cli.from('aee_registros').delete().eq('id',b.getAttribute('data-rm')).then(function(r){if(r.error)return toast(r.error.message);toast('Registro excluído.');carregarDetalhe(id).then(function(){desenharAluno(id);});});
+      });
+    };});
+  }
+  function formRegistro(id,r){
+    r=r||{};var a=aluno(id),d=DET[id],editar=!!r.id,tipo=r.tipo||'diario';
+    var meuDisc=(VINC.filter(function(v){return v.aluno_id===id;})[0]||{}).disciplina||'';
+    var discs=disciplinasDe(a,d).map(function(x){return x.nome;});
+    abrirOverlay('<h2>'+(editar?'Editar registro':tipo==='nota'?'Lançar nota':'Novo registro')+'</h2><p style="font-size:.84rem;color:var(--cm);margin:4px 0 14px">'+esc(a.nome)+' · todos os profissionais vinculados veem este registro.</p>'
+      +'<div class="md-grid"><div class="md-f"><label>Tipo</label><select data-r="tipo">'+Object.keys(TIPOS).map(function(k){return '<option value="'+k+'"'+(k===tipo?' selected':'')+'>'+TIPOS[k]+'</option>';}).join('')+'</select></div>'
+      +'<div class="md-f"><label>Data</label><input type="date" data-r="data" value="'+esc(r.data||hoje())+'"></div>'
+      +'<div class="md-f"><label>Disciplina</label><input data-r="disciplina" list="aee-discs" value="'+esc(r.disciplina||meuDisc)+'" placeholder="(opcional)"><datalist id="aee-discs">'+discs.map(function(n){return '<option>'+esc(n)+'</option>';}).join('')+'</datalist></div></div>'
+      +'<div class="md-grid" data-so-nota><div class="md-f"><label>Bimestre</label><select data-r="bimestre">'+[1,2,3,4].map(function(b){return '<option'+(b===(r.bimestre||1)?' selected':'')+'>'+b+'</option>';}).join('')+'</select></div>'
+      +'<div class="md-f"><label>Nota (0 a 10)</label><input type="number" min="0" max="10" step="0.1" data-r="nota" value="'+(r.nota!=null?r.nota:'')+'"></div></div>'
+      +'<div class="md-f"><label>Título</label><input data-r="titulo" value="'+esc(r.titulo||'')+'" placeholder="Resumo em poucas palavras"></div>'
+      +'<div class="md-f"><label>Registro</label><textarea data-r="texto" placeholder="O que aconteceu, como o aluno respondeu, o que foi adaptado, próximos passos…" style="min-height:150px">'+esc(r.texto||'')+'</textarea></div>'
+      +'<div class="md-noprint" style="display:flex;gap:10px;justify-content:flex-end"><button type="button" class="md-btn" data-fechar>Cancelar</button><button type="button" class="md-btn pri" data-salvar>Salvar</button></div>',function(ov){
+        var v=function(k){return ov.querySelector('[data-r="'+k+'"]').value.trim();};
+        var sn=function(){ov.querySelector('[data-so-nota]').style.display=v('tipo')==='nota'?'':'none';};sn();
+        ov.querySelector('[data-r="tipo"]').onchange=sn;
+        ov.querySelector('[data-salvar]').onclick=function(){
+          var dados={tipo:v('tipo'),data:v('data')||hoje(),disciplina:v('disciplina')||null,titulo:v('titulo')||null,texto:v('texto')||null,bimestre:null,nota:null};
+          if(dados.tipo==='nota'){
+            dados.bimestre=parseInt(v('bimestre'),10);dados.nota=parseFloat(v('nota').replace(',','.'));
+            if(!dados.disciplina)return toast('Informe a disciplina da nota.');
+            if(isNaN(dados.nota)||dados.nota<0||dados.nota>10)return toast('A nota vai de 0 a 10.');
+          }else if(!dados.texto&&!dados.titulo)return toast('Escreva o registro.');
+          salvarRegistro(id,dados,r.id).then(function(ok){if(ok)ov.remove();});
+        };
+      });
+  }
+  function salvarRegistro(id,dados,regId){
+    var q=regId?cli.from('aee_registros').update(dados).eq('id',regId)
+      :cli.from('aee_registros').insert(Object.assign({aluno_id:id,user_id:usuario.id,autor:perfilNome(),papel:meuPapel(id)},dados));
+    return q.then(function(r){
+      if(r.error){toast('Não salvou: '+r.error.message);return false;}
+      toast('Registro salvo.');carregarDetalhe(id).then(function(){desenharAluno(id);});return true;
+    });
+  }
+
+  // PEI
+  function subPei(box,a,d,ed,id){
+    var pei=(a.perfil||{}).pei||{metas:[]},metas=pei.metas||[];
+    var at=metas.filter(function(m){return m.status==='atingida';}).length;
+    box.innerHTML='<div class="md-card"><div class="th" style="margin-bottom:12px;padding-bottom:10px"><div class="ti"><h2 style="font-size:1.1rem">🎯 Plano Educacional Individualizado (PEI)</h2><p>Metas, estratégias e critérios de acompanhamento. '+(pei.revisadoEm?'Revisado em '+dataBr(pei.revisadoEm)+'.':'')+'</p></div>'+(ed?'<button type="button" class="md-btn pri" data-meta>＋ Meta</button>':'')+'</div>'
+      +(ed?'<div class="md-f"><label>Objetivo geral</label><textarea data-obj style="min-height:70px">'+esc(pei.objetivo||'')+'</textarea></div><button type="button" class="md-btn mini" data-salvar-obj>Salvar objetivo</button>':bloco('Objetivo geral',pei.objetivo))
+      +(metas.length?'<div class="md-lbl" style="margin-top:14px"><span>Metas atingidas</span><span>'+at+'/'+metas.length+'</span></div><div class="md-bar"><i style="width:'+(at/metas.length*100)+'%"></i></div>':'')+'</div>'
+      +(metas.length?metas.map(function(m,i){
+        return '<div class="aee-meta-pei"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="st st-'+(m.status||'nao_iniciada')+'">'+ST_PEI[m.status||'nao_iniciada']+'</span><b>'+esc(m.meta)+'</b><span style="font-size:.76rem;color:var(--cm)">'+esc([m.area,m.prazo?'até '+dataBr(m.prazo):''].filter(Boolean).join(' · '))+'</span>'
+          +(ed?'<span style="margin-left:auto;display:flex;gap:6px"><button type="button" class="md-btn mini" data-em="'+i+'">Editar</button><button type="button" class="md-btn mini perigo" data-xm="'+i+'">✕</button></span>':'')+'</div>'
+          +(m.estrategias?'<div style="font-size:.84rem;margin-top:6px"><b>Estratégias:</b> '+esc(m.estrategias)+'</div>':'')+(m.criterio?'<div style="font-size:.84rem;margin-top:4px"><b>Como avaliar:</b> '+esc(m.criterio)+'</div>':'')+'</div>';
+      }).join(''):'<div class="md-card md-vazio">Nenhuma meta ainda.'+(ed?' Toque em ＋ Meta ou peça à 🤖 I.A para sugerir metas a partir do perfil.':'')+'</div>');
+    if(!ed)return;
+    box.querySelector('[data-meta]').onclick=function(){formMeta(id,-1);};
+    box.querySelector('[data-salvar-obj]').onclick=function(){pei.objetivo=box.querySelector('[data-obj]').value.trim();salvarPei(id,pei);};
+    box.querySelectorAll('[data-em]').forEach(function(b){b.onclick=function(){formMeta(id,+b.getAttribute('data-em'));};});
+    box.querySelectorAll('[data-xm]').forEach(function(b){b.onclick=function(){
+      C.confirmarPerigo({titulo:'Excluir esta meta do PEI?',texto:esc(metas[+b.getAttribute('data-xm')].meta),botao:'Sim, excluir',botaoFinal:'Excluir'}).then(function(ok){if(!ok)return;metas.splice(+b.getAttribute('data-xm'),1);pei.metas=metas;salvarPei(id,pei);});
+    };});
+  }
+  function formMeta(id,i){
+    var a=aluno(id),pei=JSON.parse(JSON.stringify((a.perfil||{}).pei||{metas:[]}));pei.metas=pei.metas||[];
+    var m=i>=0?pei.metas[i]:{status:'nao_iniciada'};
+    abrirOverlay('<h2>'+(i>=0?'Editar meta':'Nova meta do PEI')+'</h2>'
+      +'<div class="md-f" style="margin-top:12px"><label>Meta</label><input data-m="meta" value="'+esc(m.meta||'')+'" placeholder="Ex.: Ler palavras simples com apoio visual"></div>'
+      +'<div class="md-grid"><div class="md-f"><label>Área</label><input data-m="area" list="aee-areas" value="'+esc(m.area||'')+'"><datalist id="aee-areas"><option>Comunicação</option><option>Leitura e escrita</option><option>Matemática</option><option>Autonomia</option><option>Socialização</option><option>Comportamento</option><option>Motora</option><option>Atenção e memória</option></datalist></div>'
+      +'<div class="md-f"><label>Prazo</label><input type="date" data-m="prazo" value="'+esc(m.prazo||'')+'"></div>'
+      +'<div class="md-f"><label>Situação</label><select data-m="status">'+Object.keys(ST_PEI).map(function(k){return '<option value="'+k+'"'+(k===m.status?' selected':'')+'>'+ST_PEI[k]+'</option>';}).join('')+'</select></div></div>'
+      +'<div class="md-f"><label>Estratégias e recursos</label><textarea data-m="estrategias" style="min-height:70px">'+esc(m.estrategias||'')+'</textarea></div>'
+      +'<div class="md-f"><label>Como avaliar</label><textarea data-m="criterio" style="min-height:60px">'+esc(m.criterio||'')+'</textarea></div>'
+      +'<div style="display:flex;gap:10px;justify-content:flex-end"><button type="button" class="md-btn" data-fechar>Cancelar</button><button type="button" class="md-btn pri" data-salvar>Salvar</button></div>',function(ov){
+        ov.querySelector('[data-salvar]').onclick=function(){
+          var n={};['meta','area','prazo','status','estrategias','criterio'].forEach(function(k){n[k]=ov.querySelector('[data-m="'+k+'"]').value.trim();});
+          if(!n.meta)return toast('Escreva a meta.');
+          n.id=m.id||('m'+Date.now().toString(36));
+          if(i>=0)pei.metas[i]=n;else pei.metas.push(n);
+          salvarPei(id,pei).then(function(){ov.remove();});
+        };
+      });
+  }
+  function salvarPei(id,pei){
+    var a=aluno(id),perfil=Object.assign({},a.perfil||{});pei.revisadoEm=hoje();perfil.pei=pei;
+    return atualizarAluno(id,{perfil:perfil}).then(function(ok){if(ok){toast('PEI salvo.');desenharAluno(id);}});
+  }
+  function atualizarAluno(id,campos){
+    campos.atualizado_por=perfilNome();
+    return cli.from('aee_alunos').update(campos).eq('id',id).select().single().then(function(r){
+      if(r.error){toast('Não salvou: '+r.error.message);return false;}
+      var v=VINC.filter(function(x){return x.aluno_id===id;})[0];if(v)v.aee_alunos=r.data;
+      return true;
+    });
+  }
+
+  // Documentos
+  function subDocs(box,a,d,ed,id){
+    box.innerHTML='<div class="md-card"><h3>📁 Documentos de '+esc(a.nome.split(' ')[0])+'</h3><p>Laudos, relatórios, atividades adaptadas, PEI… Arquivos de até 15 MB (PDF, Word, Excel, imagens, áudio ou vídeo curto). Todos os profissionais vinculados abrem os documentos; só quem enviou ou a equipe de apoio pode excluir.</p></div>'
+      +'<div class="aee-pastas">'+PASTAS.map(function(p){
+        var docs=d.documentos.filter(function(x){return x.pasta===p;});
+        return '<div class="aee-pasta"><h4>📂 '+esc(p)+' <span style="font-size:.72rem;color:var(--cm);font-weight:400">('+docs.length+')</span></h4>'
+          +docs.map(function(x){return '<div class="aee-doc"><span title="'+esc(x.nome)+' · '+esc(x.autor||'')+' · '+new Date(x.criado_em).toLocaleDateString('pt-BR')+'">'+esc(x.nome)+'</span><button type="button" data-abrir="'+x.id+'" title="Abrir">👁️</button>'+(x.user_id===usuario.id||ed?'<button type="button" data-apagar="'+x.id+'" title="Excluir">🗑️</button>':'')+'</div>';}).join('')
+          +'<label class="md-btn mini" style="cursor:pointer;margin-top:8px;display:inline-block">＋ Enviar<input type="file" multiple hidden data-pasta="'+esc(p)+'"></label></div>';
+      }).join('')+'</div>';
+    box.querySelectorAll('[data-pasta]').forEach(function(inp){inp.onchange=function(){enviarDocs(id,inp.getAttribute('data-pasta'),inp.files);};});
+    box.querySelectorAll('[data-abrir]').forEach(function(b){b.onclick=function(){
+      var x=d.documentos.filter(function(y){return y.id===b.getAttribute('data-abrir');})[0],j=window.open('','_blank');
+      cli.storage.from('aee-arquivos').createSignedUrl(x.caminho,300).then(function(r){if(r.error){if(j)j.close();return toast(r.error.message);}if(j)j.location.href=r.data.signedUrl;else location.href=r.data.signedUrl;});
+    };});
+    box.querySelectorAll('[data-apagar]').forEach(function(b){b.onclick=function(){
+      var x=d.documentos.filter(function(y){return y.id===b.getAttribute('data-apagar');})[0];
+      C.confirmarPerigo({titulo:'Excluir o documento?',texto:'"'+esc(x.nome)+'" sai da pasta do aluno para todos.',botao:'Sim, excluir',botaoFinal:'Excluir'}).then(function(ok){
+        if(!ok)return;
+        cli.storage.from('aee-arquivos').remove([x.caminho]).then(function(){return cli.from('aee_documentos').delete().eq('id',x.id);}).then(function(r){
+          if(r.error)return toast(r.error.message);toast('Documento excluído.');carregarDetalhe(id).then(function(){desenharAluno(id);});
+        });
+      });
+    };});
+  }
+  function enviarDocs(id,pasta,arqs){
+    var l=[].slice.call(arqs||[]);if(!l.length)return;
+    var grandes=l.filter(function(f){return f.size>15728640;});if(grandes.length)return toast('Acima de 15 MB: '+grandes.map(function(f){return f.name;}).join(', '));
+    toast('Enviando '+l.length+' arquivo(s)…');
+    l.reduce(function(p,f){return p.then(function(){
+      var limpo=f.name.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w.-]+/g,'_').slice(-80);
+      var cam=id+'/'+pasta.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w]+/g,'-').toLowerCase()+'/'+Date.now()+'-'+limpo;
+      return cli.storage.from('aee-arquivos').upload(cam,f,{contentType:f.type||'application/octet-stream'}).then(function(r){
+        if(r.error)throw new Error(f.name+': '+r.error.message);
+        return cli.from('aee_documentos').insert({aluno_id:id,pasta:pasta,nome:f.name,caminho:cam,tipo:f.type,tamanho:f.size,user_id:usuario.id,autor:perfilNome()});
+      }).then(function(r){if(r&&r.error)throw new Error(r.error.message);});
+    });},Promise.resolve()).then(function(){toast('Enviado.');}).catch(function(e){toast('Falha: '+e.message);})
+      .then(function(){carregarDetalhe(id).then(function(){desenharAluno(id);});});
+  }
+
+  // Equipe
+  function subEquipe(box,a,d,ed,id){
+    box.innerHTML='<div class="md-card"><h3>👥 Profissionais ligados a '+esc(a.nome.split(' ')[0])+'</h3><table class="aee-tab"><tr><th>Nome</th><th>Função</th><th>Disciplina</th><th>Desde</th><th></th></tr>'
+      +d.equipe.map(function(v){var eu=v.user_id===usuario.id;return '<tr><td>'+esc(v.nome_profissional||'—')+(eu?' <b>(você)</b>':'')+'</td><td>'+esc(PAPEIS[v.papel]||v.papel)+'</td><td>'+esc(v.disciplina||'—')+'</td><td>'+new Date(v.criado_em).toLocaleDateString('pt-BR')+'</td><td>'+(!eu&&ed?'<button type="button" class="md-btn mini perigo" data-tirar="'+v.user_id+'">Remover</button>':'')+'</td></tr>';}).join('')+'</table></div>'
+      +'<div class="md-card"><h3>🔑 Código do aluno</h3><p>Todos os professores de '+esc(a.nome.split(' ')[0])+' acessam o mesmo perfil com o código abaixo. O professor regente vincula-se em <b>⚙️ Configurações da escola › Alunos da Educação Especial</b>; mediadores, assistentes e AEE, em <b>＋ Aluno › Vincular pelo código</b>. Compartilhe só com quem trabalha com o aluno.</p>'
+      +'<div style="margin-top:12px"><span class="aee-cod" data-copiar>🔑 '+esc(a.codigo)+' <small>copiar</small></span></div>'
+      +'<p style="font-size:.78rem;color:var(--cm);margin-top:10px">Quando a escola usar o Conex-ED (gestão escolar), todos os alunos terão código de usuário cadastrado pela gestão.</p></div>';
+    box.querySelector('[data-copiar]').onclick=function(){try{navigator.clipboard.writeText(a.codigo);toast('Código copiado.');}catch(e){toast(a.codigo);}};
+    box.querySelectorAll('[data-tirar]').forEach(function(b){b.onclick=function(){
+      var v=d.equipe.filter(function(x){return x.user_id===b.getAttribute('data-tirar');})[0];
+      C.confirmarPerigo({titulo:'Remover '+(v.nome_profissional||'o profissional')+' do perfil?',texto:'A pessoa deixa de ver o perfil, os registros e os documentos de '+esc(a.nome)+'. Os registros que ela escreveu continuam.',botao:'Sim, remover',botaoFinal:'Remover'}).then(function(ok){
+        if(!ok)return;cli.from('aee_vinculos').delete().eq('aluno_id',id).eq('user_id',v.user_id).then(function(r){if(r.error)return toast(r.error.message);toast('Removido.');carregarDetalhe(id).then(function(){desenharAluno(id);});});
+      });
+    };});
+  }
+
+  // Relatório individual
+  function subRelatorio(box,a,d,ed,id){
+    var ano=new Date().getFullYear();
+    box.innerHTML='<div class="md-card"><h3>📄 Relatório individual</h3><p>Reúne identificação, perfil, PEI, boletim e os registros de todos os profissionais no período escolhido. Abre numa janela própria para imprimir ou salvar em PDF.</p>'
+      +'<div class="md-grid" style="margin-top:12px"><div class="md-f"><label>De</label><input type="date" data-de value="'+ano+'-01-01"></div><div class="md-f"><label>Até</label><input type="date" data-ate value="'+hoje()+'"></div>'
+      +'<div class="md-f"><label>Registros</label><select data-tipos><option value="">Todos os tipos (menos notas)</option>'+Object.keys(TIPOS).filter(function(k){return k!=='nota';}).map(function(k){return '<option value="'+k+'">Só '+TIPOS[k]+'</option>';}).join('')+'</select></div></div>'
+      +'<div class="md-f"><label>Parecer / considerações finais (opcional)</label><textarea data-parecer placeholder="Síntese do desenvolvimento no período, avanços, desafios e encaminhamentos."></textarea></div>'
+      +'<button type="button" class="md-btn pri" data-gerar>🖨️ Gerar relatório</button> <button type="button" class="md-btn" data-ia>🤖 Pedir parecer à I.A</button></div>';
+    box.querySelector('[data-ia]').onclick=function(){irPara('ia');if(window.MeuDiarioIA)window.MeuDiarioIA.sugerir('Escreva um parecer descritivo do desenvolvimento de '+codigoIA(id)+' neste bimestre, a partir do perfil, do PEI e dos registros da equipe.');};
+    box.querySelector('[data-gerar]').onclick=function(){
+      var de=box.querySelector('[data-de]').value,ate=box.querySelector('[data-ate]').value,tipo=box.querySelector('[data-tipos]').value,parecer=box.querySelector('[data-parecer]').value.trim();
+      gerarRelatorio(a,d,de,ate,tipo,parecer);
+    };
+  }
+  function gerarRelatorio(a,d,de,ate,tipo,parecer){
+    var p=a.perfil||{},pei=p.pei||{metas:[]},ds=disciplinasDe(a,d),bol=boletimDe(d);
+    var regs=d.registros.filter(function(r){return r.tipo!=='nota'&&(!tipo||r.tipo===tipo)&&(!de||r.data>=de)&&(!ate||r.data<=ate);}).slice().reverse();
+    var e=function(v){return esc(v||'—');};
+    var html='<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Relatório individual — '+esc(a.nome)+'</title><style>'
+      +'@page{size:A4;margin:15mm}body{font-family:"Times New Roman",serif;font-size:12pt;color:#111;margin:0 auto;max-width:180mm;line-height:1.45}'
+      +'h1{font-size:15pt;text-align:center;margin:0 0 2mm}h2{font-size:12.5pt;border-bottom:1.5px solid #333;margin:7mm 0 3mm;padding-bottom:1mm}'
+      +'.sub{text-align:center;font-size:10.5pt;color:#444}table{width:100%;border-collapse:collapse;font-size:10.5pt;margin:2mm 0}td,th{border:1px solid #888;padding:1.8mm;vertical-align:top;text-align:left}th{background:#eee}'
+      +'.reg{margin:0 0 3mm;page-break-inside:avoid}.reg b{font-size:10.5pt}.pre{white-space:pre-wrap}.ass{display:flex;gap:10mm;margin-top:18mm}.ass div{flex:1;border-top:1px solid #333;text-align:center;font-size:10pt;padding-top:1mm}'
+      +'.bar{position:fixed;top:0;left:0;right:0;background:#1a3a2a;color:#fff;padding:8px;text-align:center;font-family:sans-serif}.bar button{font-size:14px;padding:6px 14px;cursor:pointer}@media print{.bar{display:none}body{margin-top:0}}'
+      +'</style></head><body><div class="bar"><button onclick="window.print()">🖨️ Imprimir / Salvar PDF</button></div><div style="height:48px"></div>'
+      +'<h1>RELATÓRIO INDIVIDUAL — EDUCAÇÃO ESPECIAL</h1><div class="sub">'+esc(a.escola_nome||ESC.nome)+(ESC.inep?' · INEP '+ESC.inep.codigo:'')+'<br>Período: '+(de?dataBr(de):'início')+' a '+(ate?dataBr(ate):'hoje')+' · Emitido em '+new Date().toLocaleDateString('pt-BR')+'</div>'
+      +'<h2>1. Identificação</h2><table><tr><th>Aluno(a)</th><td>'+e(a.nome)+'</td><th>Código</th><td>'+e(a.codigo)+'</td></tr><tr><th>Nascimento</th><td>'+(a.nascimento?dataBr(a.nascimento)+' ('+idadeDe(a)+')':'—')+'</td><th>Série/turma/turno</th><td>'+e([a.serie,a.turma,a.turno].filter(Boolean).join(' · '))+'</td></tr>'
+      +'<tr><th>Deficiência(s)</th><td colspan="3">'+e((a.deficiencias||[]).join(', ')+(p.deficienciaOutra?' — '+p.deficienciaOutra:''))+(a.cid?' · CID '+esc(a.cid):'')+'</td></tr></table>'
+      +'<h2>2. Perfil pedagógico</h2><table>'+CAMPOS_PERFIL.filter(function(c){return p[c[0]];}).map(function(c){return '<tr><th style="width:32%">'+esc(c[1])+'</th><td class="pre">'+esc(p[c[0]])+'</td></tr>';}).join('')+'</table>'
+      +'<h2>3. Plano Educacional Individualizado</h2>'+(pei.objetivo?'<p><b>Objetivo geral:</b> '+esc(pei.objetivo)+'</p>':'')
+      +((pei.metas||[]).length?'<table><tr><th>Meta</th><th>Área</th><th>Estratégias</th><th>Situação</th></tr>'+pei.metas.map(function(m){return '<tr><td>'+e(m.meta)+'</td><td>'+e(m.area)+'</td><td>'+e(m.estrategias)+'</td><td>'+e(ST_PEI[m.status||'nao_iniciada'])+'</td></tr>';}).join('')+'</table>':'<p>Sem metas cadastradas.</p>')
+      +'<h2>4. Boletim</h2>'+(ds.length?'<table><tr><th>Disciplina</th><th>Professor(a)</th><th>1º</th><th>2º</th><th>3º</th><th>4º</th></tr>'+ds.map(function(x){return '<tr><td>'+e(x.nome)+'</td><td>'+e(x.professor)+'</td>'+[1,2,3,4].map(function(k){var r=bol[x.nome]&&bol[x.nome][k];return '<td>'+(r?String(r.nota).replace('.',','):'—')+'</td>';}).join('')+'</tr>';}).join('')+'</table>':'<p>Sem notas lançadas.</p>')
+      +'<h2>5. Registros da equipe ('+regs.length+')</h2>'+(regs.length?regs.map(function(r){return '<div class="reg"><b>'+dataBr(r.data)+' · '+esc((TIPOS[r.tipo]||r.tipo).replace(/^\S+\s/,''))+(r.disciplina?' · '+esc(r.disciplina):'')+' — '+esc(r.autor||'')+' ('+esc(PAPEIS[r.papel]||'')+')</b>'+(r.titulo?'<div><i>'+esc(r.titulo)+'</i></div>':'')+'<div class="pre">'+esc(r.texto||'')+'</div></div>';}).join(''):'<p>Nenhum registro no período.</p>')
+      +(parecer?'<h2>6. Parecer</h2><p class="pre">'+esc(parecer)+'</p>':'')
+      +'<div class="ass"><div>'+esc(perfilNome())+'<br>'+esc(PAPEIS[meuPapel(a.id)]||'')+'</div><div>Coordenação / Gestão</div><div>Responsável</div></div></body></html>';
+    var j=window.open('','_blank');if(!j)return toast('Permita janelas pop-up para gerar o relatório.');
+    j.document.open();j.document.write(html);j.document.close();
+  }
+
+  // ── Cadastro / edição do aluno ──────────────────────────────────────
+  function formAlunoHtml(a){
+    a=a||{};var p=a.perfil||{},resp=(p.responsaveis||[]).concat([{},{}]).slice(0,2);
+    return '<div class="md-grid"><div class="md-f"><label>Nome completo *</label><input data-a="nome" value="'+esc(a.nome||'')+'"></div>'
+      +'<div class="md-f"><label>Data de nascimento</label><input type="date" data-a="nascimento" value="'+esc(a.nascimento||'')+'"></div></div>'
+      +'<div class="md-grid"><div class="md-f"><label>Série / ano</label><input data-a="serie" value="'+esc(a.serie||'')+'" placeholder="Ex.: 7º Ano"></div><div class="md-f"><label>Turma</label><input data-a="turma" value="'+esc(a.turma||'')+'" placeholder="Ex.: A"></div>'
+      +'<div class="md-f"><label>Turno</label><select data-a="turno">'+['','Manhã','Tarde','Noite','Integral'].map(function(t){return '<option'+(t===(a.turno||'')?' selected':'')+'>'+t+'</option>';}).join('')+'</select></div></div>'
+      +'<div class="md-f"><label>Deficiência(s) / condição *</label><div class="aee-def">'+DEFICIENCIAS.map(function(x){return '<label><input type="checkbox" data-def value="'+esc(x)+'"'+((a.deficiencias||[]).indexOf(x)>=0?' checked':'')+'> '+esc(x)+'</label>';}).join('')+'</div></div>'
+      +'<div class="md-grid"><div class="md-f"><label>Outra / detalhes</label><input data-p="deficienciaOutra" value="'+esc(p.deficienciaOutra||'')+'"></div><div class="md-f"><label>CID (opcional)</label><input data-a="cid" value="'+esc(a.cid||'')+'"></div>'
+      +'<div class="md-f"><label>Laudo</label><select data-a="laudo"><option value="">Não informado</option><option value="true"'+(a.laudo===true?' selected':'')+'>Tem laudo</option><option value="false"'+(a.laudo===false?' selected':'')+'>Sem laudo / em avaliação</option></select></div></div>'
+      +CAMPOS_PERFIL.map(function(c){return '<div class="md-f"><label>'+esc(c[1])+'</label><textarea data-p="'+c[0]+'" style="min-height:70px" placeholder="'+esc(c[2])+'">'+esc(p[c[0]]||'')+'</textarea></div>';}).join('')
+      +'<div class="md-f"><label>Disciplinas que estuda (uma por linha: Disciplina — Professor)</label><textarea data-disc style="min-height:90px" placeholder="Língua Portuguesa — Prof. Paulo&#10;Matemática — Profa. Ana">'+esc((p.disciplinas||[]).map(function(x){return x.nome+(x.professor?' — '+x.professor:'');}).join('\n'))+'</textarea></div>'
+      +'<div class="md-f"><label>Responsáveis</label>'+resp.map(function(r,i){return '<div class="md-row"><input class="md-in" data-resp="'+i+'" data-k="nome" placeholder="Nome" value="'+esc(r.nome||'')+'"><input class="md-in" data-resp="'+i+'" data-k="parentesco" placeholder="Parentesco" value="'+esc(r.parentesco||'')+'" style="max-width:140px"><input class="md-in" data-resp="'+i+'" data-k="telefone" placeholder="Telefone" value="'+esc(r.telefone||'')+'" style="max-width:170px"></div>';}).join('')+'</div>'
+      +'<div class="md-f"><label>Foto (opcional)</label><input type="file" accept="image/*" data-foto></div>';
+  }
+  function lerFormAluno(box,a){
+    var v=function(s){var el=box.querySelector(s);return el?el.value.trim():'';};
+    var perfil=Object.assign({},(a&&a.perfil)||{});
+    box.querySelectorAll('[data-p]').forEach(function(el){perfil[el.getAttribute('data-p')]=el.value.trim();});
+    perfil.disciplinas=v('[data-disc]').split('\n').map(function(l){var p=l.split(/\s+[—–-]\s+/);return{nome:(p[0]||'').trim(),professor:(p[1]||'').trim()};}).filter(function(x){return x.nome;});
+    var resp=[{},{}];box.querySelectorAll('[data-resp]').forEach(function(el){resp[+el.getAttribute('data-resp')][el.getAttribute('data-k')]=el.value.trim();});
+    perfil.responsaveis=resp.filter(function(r){return r.nome;});
+    var lau=v('[data-a="laudo"]');
+    return {nome:v('[data-a="nome"]'),nascimento:v('[data-a="nascimento"]')||null,serie:v('[data-a="serie"]'),turma:v('[data-a="turma"]'),turno:v('[data-a="turno"]'),
+      deficiencias:[].slice.call(box.querySelectorAll('[data-def]:checked')).map(function(i){return i.value;}),cid:v('[data-a="cid"]')||null,laudo:lau===''?null:lau==='true',perfil:perfil};
+  }
+  function lerFoto(box){var f=box.querySelector('[data-foto]');return f&&f.files[0]?C.reduzirImagem(f.files[0],240,.8):Promise.resolve(null);}
+  function formAluno(a){
+    abrirOverlay('<h2>✏️ Editar perfil — '+esc(a.nome)+'</h2><p style="font-size:.84rem;color:var(--cm);margin:4px 0 14px">As mudanças aparecem para todos os profissionais vinculados.</p><div data-form>'+formAlunoHtml(a)+'</div>'
+      +'<div style="display:flex;gap:10px;justify-content:flex-end"><button type="button" class="md-btn" data-fechar>Cancelar</button><button type="button" class="md-btn pri" data-salvar>Salvar</button></div>',function(ov){
+        ov.querySelector('[data-salvar]').onclick=function(){
+          var box=ov.querySelector('[data-form]'),d=lerFormAluno(box,a);
+          if(!d.nome)return toast('Informe o nome.');if(!d.deficiencias.length)return toast('Marque ao menos uma deficiência ou condição.');
+          lerFoto(box).then(function(foto){if(foto)d.foto=foto;return atualizarAluno(a.id,d);}).then(function(ok){if(ok){ov.remove();toast('Perfil salvo.');desenharAluno(a.id);desenharAbas();}});
+        };
+      });
+  }
+  function desenharNovo(){
+    var sec=$('#sec-novo'),papeis=OCUP.filter(function(o){return o!=='regente';});
+    var selPapel='<select data-papel>'+papeis.map(function(p){return '<option value="'+p+'"'+(p===papelPadrao()?' selected':'')+'>'+PAPEIS[p]+'</option>';}).join('')+'</select>';
+    sec.innerHTML='<div class="th"><div class="tb gz">＋</div><div class="ti"><h2>Aluno</h2><p>Cadastre um aluno novo ou entre no perfil que outro profissional já criou.</p></div></div>'
+      +'<div class="md-card"><h3>🔑 Já tem o código do aluno?</h3><p>Se o aluno já foi cadastrado por outro mediador, assistente ou professor do AEE, use o código dele. Vocês passam a ver e atualizar o mesmo perfil.</p>'
+      +'<div class="md-row" style="flex-wrap:wrap;margin-top:10px"><input class="md-in" data-cod placeholder="AEE-XXXX-XXXX" style="max-width:220px;text-transform:uppercase"><div class="md-f" style="margin:0">'+selPapel+'</div><button type="button" class="md-btn pri" data-vincular>Vincular</button></div></div>'
+      +'<div class="md-card"><h3>Cadastrar aluno novo</h3><div class="aee-aviso">🔒 Dados de deficiência e saúde são sensíveis. Ficam visíveis só para os profissionais que você autorizar pelo código. Registre apenas o necessário.</div><div data-form>'+formAlunoHtml({})+'</div>'
+      +'<div class="md-row"><span style="font-size:.8rem;color:var(--cm)">Você entra como</span><div class="md-f" style="margin:0" data-papel-novo>'+selPapel+'</div><span style="flex:1"></span><button type="button" class="md-btn pri" data-criar>Cadastrar aluno</button></div></div>';
+    sec.querySelector('[data-vincular]').onclick=function(){
+      var cod=sec.querySelector('[data-cod]').value.trim().toUpperCase();if(!cod)return toast('Informe o código.');
+      cli.rpc('aee_vincular',{p_codigo:cod,p_papel:sec.querySelector('[data-papel]').value,p_escola_local:ESCOLA_ID,p_nome_profissional:perfilNome()}).then(function(r){
+        if(r.error)return toast(r.error.message);
+        toast('Vinculado a '+r.data.nome+'.');recarregar(r.data.id);
+      });
+    };
+    sec.querySelector('[data-criar]').onclick=function(){
+      var box=sec.querySelector('[data-form]'),d=lerFormAluno(box,null);
+      if(!d.nome)return toast('Informe o nome do aluno.');if(!d.deficiencias.length)return toast('Marque ao menos uma deficiência ou condição.');
+      var b=this;b.disabled=true;
+      lerFoto(box).then(function(foto){
+        d.foto=foto;d.escola_inep=ESC.inep?ESC.inep.codigo:null;d.escola_nome=ESC.nome;d.municipio=ESC.inep?ESC.inep.municipio:(ESC.municipio||null);d.uf=ESC.inep?ESC.inep.uf:null;
+        return cli.rpc('aee_criar_aluno',{p_dados:d,p_papel:sec.querySelector('[data-papel-novo] select').value,p_escola_local:ESCOLA_ID,p_nome_profissional:perfilNome()});
+      }).then(function(r){
+        b.disabled=false;
+        if(r.error)return toast('Não cadastrou: '+r.error.message);
+        toast('Aluno cadastrado. Código: '+r.data.codigo);recarregar(r.data.id);
+      }).catch(function(e){b.disabled=false;toast(e.message);});
+    };
+  }
+  function recarregar(abrirId){
+    return carregarVinculos().then(function(){desenharAbas();desenharInicio();desenharNovo();desenharConfig();if(abrirId)abrirAluno(abrirId);});
+  }
+
+  // ── Configurações ───────────────────────────────────────────────────
+  function desenharConfig(){
+    var sec=$('#sec-config');
+    var editaveis=VINC.filter(function(v){return v.papel==='mediador'||v.papel==='aee';});
+    sec.innerHTML='<div class="th"><div class="tb gz">⚙️</div><div class="ti"><h2>Configurações</h2><p>'+esc(ESC.nome)+'</p></div></div>'
+      +'<div class="md-card"><h3>🏫 Escola</h3><p><b>'+esc(ESC.nome)+'</b>'+(ESC.inep?' · INEP '+ESC.inep.codigo+' · '+esc(ESC.inep.municipio)+'/'+esc(ESC.inep.uf):'')+'</p>'
+      +'<p style="margin-top:8px">Sua ocupação: <b>'+esc(C.ocupacao.rotulo(OCUP))+'</b> <button type="button" class="md-btn mini" data-ocup>Trocar</button></p>'
+      +(OCUP.indexOf('regente')>=0?'<p style="margin-top:8px"><a class="md-btn mini" style="text-decoration:none" href="'+esc(C.ocupacao.destino(ESC,ESC.fixa))+'">🔀 Ir para o painel de regente</a></p>':'')+'</div>'
+      +'<div class="md-card"><h3>👤 Seu perfil</h3><p>Nome, foto e documentos ficam no seu perfil. <a href="perfil.html">Abrir meu perfil</a></p></div>'
+      +'<div class="md-card md-perigo"><h3>⚠️ Zona de perigo</h3><p>Cada ação pede confirmação e a senha da sua conta.</p>'
+      +(VINC.length?'<div class="md-perigo-l"><div><b>Sair do perfil de um aluno</b><span>Você deixa de ver o aluno. O perfil e os registros continuam para a equipe.</span></div><div class="md-row"><select class="md-in" data-pg="sair-aluno">'+VINC.map(function(v){return '<option value="'+v.aluno_id+'">'+esc(v.aee_alunos.nome)+'</option>';}).join('')+'</select><button type="button" class="md-btn perigo" data-pg="sair">Sair do perfil</button></div></div>':'')
+      +(editaveis.length?'<div class="md-perigo-l"><div><b>Excluir um aluno</b><span>Apaga o perfil, o PEI, os registros de todos os profissionais e os documentos. Só o mediador ou o professor do AEE podem.</span></div><div class="md-row"><select class="md-in" data-pg="excluir-aluno">'+editaveis.map(function(v){return '<option value="'+v.aluno_id+'">'+esc(v.aee_alunos.nome)+'</option>';}).join('')+'</select><button type="button" class="md-btn perigo" data-pg="excluir">Excluir aluno</button></div></div>':'')
+      +(!ESC.fixa?'<div class="md-perigo-l"><div><b>Excluir a escola</b><span>Tira a escola da sua conta'+(OCUP.indexOf('regente')>=0?' (as turmas e diários de regente também)':'')+' e você sai do perfil dos alunos dela. Os perfis dos alunos continuam para a equipe.</span></div><button type="button" class="md-btn perigo" data-pg="escola">Excluir escola</button></div>':'')
+      +'</div>';
+    sec.querySelector('[data-ocup]').onclick=function(){
+      if(ESC.fixa){toast('Troque a ocupação desta escola na tela Escolas.');return;}
+      C.ocupacao.escolher(ESC.nome,OCUP).then(function(l){if(!l)return;ESC.ocupacoes=l;salvarE().then(function(){location.replace(C.ocupacao.destino(ESC));});});
+    };
+    var bs=sec.querySelector('[data-pg="sair"]');
+    if(bs)bs.onclick=function(){
+      var id=sec.querySelector('[data-pg="sair-aluno"]').value,a=aluno(id);
+      C.confirmarPerigo({titulo:'Sair do perfil de '+a.nome+'?',texto:'Para voltar, você vai precisar do código '+esc(a.codigo)+'.',botao:'Sim, sair'}).then(function(ok){
+        if(!ok)return;cli.from('aee_vinculos').delete().eq('aluno_id',id).eq('user_id',usuario.id).then(function(r){if(r.error)return toast(r.error.message);ABERTOS=ABERTOS.filter(function(x){return x!==id;});var s=document.getElementById('sec-a-'+id);if(s)s.remove();toast('Você saiu do perfil.');recarregar();});
+      });
+    };
+    var be=sec.querySelector('[data-pg="excluir"]');
+    if(be)be.onclick=function(){
+      var id=sec.querySelector('[data-pg="excluir-aluno"]').value,a=aluno(id);
+      C.confirmarPerigo({titulo:'Excluir '+a.nome+'?',texto:'O perfil, o PEI, TODOS os registros (de todos os profissionais) e os documentos serão apagados para todos. Não tem volta.',botao:'Sim, excluir o aluno',botaoFinal:'Excluir definitivamente'}).then(function(senha){
+        if(!senha)return;toast('Excluindo…');
+        cli.from('aee_documentos').select('caminho').eq('aluno_id',id).then(function(r){var l=(r.data||[]).map(function(x){return x.caminho;});return l.length?cli.storage.from('aee-arquivos').remove(l):null;})
+          .then(function(){return C.verificarSenha('');})
+          .then(function(tem){return cli.rpc('aee_excluir_aluno',{p_aluno:id,p_senha:tem===null?'':senha,p_confirmacao:tem===null?senha:''});})
+          .then(function(r){if(r.error)return toast(r.error.message);ABERTOS=ABERTOS.filter(function(x){return x!==id;});var s=document.getElementById('sec-a-'+id);if(s)s.remove();delete DET[id];toast('Aluno excluído.');recarregar();});
+      });
+    };
+    var bx=sec.querySelector('[data-pg="escola"]');
+    if(bx)bx.onclick=function(){
+      C.confirmarPerigo({titulo:'Excluir a escola "'+ESC.nome+'"?',texto:'A escola sai da sua conta e você deixa de ver os '+VINC.length+' aluno(s) dela.'+(OCUP.indexOf('regente')>=0?' As turmas e diários de regente dessa escola também são apagados.':''),botao:'Sim, excluir a escola'}).then(function(ok){
+        if(!ok)return;toast('Excluindo a escola…');
+        var ids=(E.turmas||[]).filter(function(t){return t.escolaId===ESCOLA_ID;}).map(function(t){return t.id;});
+        E.turmas=(E.turmas||[]).filter(function(t){return t.escolaId!==ESCOLA_ID;});
+        E.escolas=(E.escolas||[]).filter(function(x){return x.id!==ESCOLA_ID;});
+        Promise.all([salvarE(),cli.from('aee_vinculos').delete().eq('user_id',usuario.id).in('aluno_id',VINC.map(function(v){return v.aluno_id;}).concat(['00000000-0000-0000-0000-000000000000'])),C.desvincularEscola(ESCOLA_ID)])
+          .then(function(){setTimeout(function(){location.replace('escolas.html');},1000);});
+        if(ids.length)toast('As turmas de regente desta escola saem da lista. Os diários antigos continuam no backup do banco.');
+      });
+    };
+  }
+
+  // ── Assistente de I.A do AEE ────────────────────────────────────────
+  function iaModulo(){return (window.MD_MODULOS||[]).filter(function(m){return m.nome==='ia';})[0];}
+  function codigoIA(id){var i=VINC.map(function(v){return v.aluno_id;}).indexOf(id);return '«T1.'+(i+1)+'»';}
+  function alunoDaAcao(x){
+    var m=/(\d+)\s*\.\s*(\d+)/.exec(String(x||''))||/^(\d+)$/.exec(String(x||''));
+    var n=m?parseInt(m[2]||m[1],10):0,v=VINC[n-1];
+    if(!v)throw new Error('Aluno não encontrado: '+x+'.');
+    return v;
+  }
+  function apiIA(){
+    var M={
+      contexto:'aee-'+ESCOLA_ID,
+      nomePlataforma:'do Painel da Educação Especial (AEE)',
+      acoes:['registro_aee','meta_pei','atualizar_perfil_aee'],
+      boasVindas:'👋 Olá! Sou o assistente da <strong>Educação Especial</strong>. Ajudo a escrever <strong>registros de acompanhamento</strong>, <strong>metas do PEI</strong>, <strong>adaptações de atividades</strong>, <strong>pareceres descritivos</strong> e mensagens para a família, a partir do perfil e dos registros da equipe. Os nomes dos alunos vão sempre como código. Nada muda no perfil sem a sua confirmação.',
+      sugestoes:[
+        ['📝 Registrar o dia','Registre o acompanhamento de hoje de «T1.1»: '],
+        ['🎯 Sugerir metas do PEI','Sugira 4 metas de PEI para «T1.1» com estratégias e como avaliar, a partir do perfil dele.'],
+        ['✂️ Adaptar uma atividade','Adapte esta atividade de  para «T1.1», considerando o perfil e as estratégias que funcionam: '],
+        ['📄 Parecer do bimestre','Escreva um parecer descritivo do bimestre de «T1.1» a partir dos registros da equipe.'],
+        ['✉️ Mensagem para a família','Escreva uma mensagem acolhedora para a família de «T1.1» sobre ']
+      ],
+      esc:esc,toast:toast,slug:function(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'');},
+      dataBr:dataBr,MESES:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+      usuario:function(){return usuario;},
+      estrutura:function(){return{perfil:{nome:perfilNome()},escolas:[{id:ESCOLA_ID,nome:ESC.nome}],turmas:[{id:'aee',nome:'Alunos acompanhados',escolaId:ESCOLA_ID,alunos:VINC.map(function(v,i){return{n:i+1,nm:v.aee_alunos.nome};}),disciplinas:[]}]};},
+      turma:function(){return M.estrutura().turmas[0];},escola:function(){return{id:ESCOLA_ID,nome:ESC.nome};},
+      diarios:function(){return [];},status:function(){},sync:function(){return S;},
+      sistema:function(F){
+        var ps=function(t){return F.pseudonimizar(t);};
+        var dados=VINC.map(function(v,i){
+          var a=v.aee_alunos,p=a.perfil||{},d=DET[a.id],o={codigo:'«T1.'+(i+1)+'»',idade:idadeDe(a),serie:a.serie,turma:a.turma,deficiencias:a.deficiencias,meu_papel:PAPEIS[v.papel]};
+          if(!F.ocultarNomes())o.nome=a.nome;
+          CAMPOS_PERFIL.forEach(function(c){if(p[c[0]])o[c[0]]=ps(String(p[c[0]]).slice(0,600));});
+          o.disciplinas=(p.disciplinas||[]).map(function(x){return x.nome;});
+          o.pei={objetivo:ps((p.pei||{}).objetivo||''),metas:((p.pei||{}).metas||[]).map(function(m,k){return{n:k+1,meta:ps(m.meta),area:m.area,situacao:ST_PEI[m.status||'nao_iniciada']};})};
+          if(d)o.registros_recentes=d.registros.slice(0,15).map(function(r){return{data:r.data,tipo:r.tipo,disciplina:r.disciplina,autor_papel:PAPEIS[r.papel],nota:r.tipo==='nota'?r.nota:undefined,bimestre:r.bimestre||undefined,texto:ps(String((r.titulo?r.titulo+'. ':'')+(r.texto||'')).slice(0,500))};});
+          else o.registros_recentes='(abra a aba do aluno para carregar os registros)';
+          return o;
+        });
+        return [
+          'Você é o assistente de I.A '+M.nomePlataforma+' do RELATORIO SKIN, trabalhando com '+perfilNome()+' ('+C.ocupacao.rotulo(OCUP)+') na escola '+ESC.nome+'. Responda sempre em português do Brasil.',
+          'HOJE: '+F.hoje()+'.',
+          '',
+          'ESPECIALIDADE',
+          '- Educação inclusiva e Atendimento Educacional Especializado (AEE): PEI, adaptação curricular e de atividades, acessibilidade, comunicação alternativa, rotina e previsibilidade, manejo de crises, relatórios descritivos e parceria com a família.',
+          '- Base: Política Nacional de Educação Especial na Perspectiva da Educação Inclusiva, LBI (Lei 13.146/2015), BNCC e Desenho Universal para a Aprendizagem.',
+          '- Foque nas potencialidades e nas barreiras do ambiente, não na "falta". Use linguagem respeitosa e não capacitista (ex.: "aluno com deficiência", "estudante autista" quando a família usa).',
+          '- Nunca faça diagnóstico, nunca sugira medicação nem mude condutas de saúde: oriente a buscar a família e os profissionais de saúde.',
+          '- Registros e relatórios: descritivos, objetivos, com fatos observados (o que fez, com qual apoio, como respondeu) e próximos passos. Sem julgamentos.',
+          '- Seja prático: estratégias concretas que caibam na sala de aula real.',
+          '',
+          'REGRAS',
+          '- Use só os DADOS e o que o professor informar. Não invente fatos, notas ou registros.',
+          F.ocultarNomes()?'- Os nomes estão ocultos: cada aluno aparece como «T1.n». Use esses códigos no texto.':'- Pode usar o nome do aluno.',
+          '- Dados de saúde e deficiência são sensíveis: mencione só o necessário.',
+          '',
+          'COMO PROPOR AÇÕES',
+          'No FINAL da resposta, e só quando houver algo para gravar, um único bloco:',
+          '```acoes','[{"tipo":"...", ...}]','```',
+          'O professor confirma cada ação antes de gravar.',
+          '',
+          'TIPOS DE AÇÃO',
+          '1. registro_aee — grava um registro no perfil do aluno: {"tipo":"registro_aee","aluno":"«T1.1»","categoria":"diario|atendimento|avaliacao|ocorrencia|comunicado|relatorio","data":"AAAA-MM-DD","disciplina":"(opcional)","titulo":"resumo curto","texto":"registro completo"}',
+          '2. meta_pei — acrescenta uma meta ao PEI (só mediador, assistente ou AEE): {"tipo":"meta_pei","aluno":"«T1.1»","meta":"","area":"Comunicação|Leitura e escrita|Matemática|Autonomia|Socialização|Comportamento|Motora|Atenção e memória","estrategias":"","criterio":"como avaliar","prazo":"AAAA-MM-DD"}',
+          '3. atualizar_perfil_aee — atualiza um campo de texto do perfil (só mediador, assistente ou AEE): {"tipo":"atualizar_perfil_aee","aluno":"«T1.1»","campo":"comunicacao|necessidades|potencialidades|estrategias|cuidados|crise|observacoes","texto":"novo texto completo do campo"}',
+          '',
+          'DADOS DOS ALUNOS (JSON):',
+          JSON.stringify({escola:ESC.nome,alunos:dados})
+        ].join('\n');
+      },
+      aplicarAcao:function(a,F){
+        if(['registro_aee','meta_pei','atualizar_perfil_aee'].indexOf(a.tipo)<0)return undefined;
+        var v=alunoDaAcao(a.aluno),id=v.aluno_id,al=v.aee_alunos;
+        if(a.tipo==='registro_aee'){
+          var cat=TIPOS[a.categoria]&&a.categoria!=='nota'?a.categoria:'diario';
+          return salvarRegistro(id,{tipo:cat,data:/^\d{4}-\d{2}-\d{2}$/.test(a.data||'')?a.data:hoje(),disciplina:a.disciplina||null,titulo:F.restaurar(a.titulo||'',true)||null,texto:F.restaurar(a.texto||'',true)||null}).then(function(ok){if(!ok)throw new Error('Não consegui salvar o registro.');return 'Registro gravado no perfil de '+al.nome+'.';});
+        }
+        if(!editor(id))throw new Error('Só mediador, assistente ou AEE alteram o perfil e o PEI.');
+        if(a.tipo==='meta_pei'){
+          var pei=JSON.parse(JSON.stringify((al.perfil||{}).pei||{metas:[]}));pei.metas=pei.metas||[];
+          pei.metas.push({id:'m'+Date.now().toString(36)+pei.metas.length,meta:F.restaurar(a.meta||'',true),area:a.area||'',estrategias:F.restaurar(a.estrategias||'',true),criterio:F.restaurar(a.criterio||'',true),prazo:/^\d{4}-\d{2}-\d{2}$/.test(a.prazo||'')?a.prazo:'',status:'nao_iniciada'});
+          var perfil=Object.assign({},al.perfil||{});pei.revisadoEm=hoje();perfil.pei=pei;
+          return atualizarAluno(id,{perfil:perfil}).then(function(ok){if(!ok)throw new Error('Não consegui salvar a meta.');if(DET[id])desenharAluno(id);return 'Meta acrescentada ao PEI de '+al.nome+'.';});
+        }
+        var campos=CAMPOS_PERFIL.map(function(c){return c[0];});
+        if(campos.indexOf(a.campo)<0)throw new Error('Campo do perfil desconhecido: '+a.campo+'.');
+        var pf=Object.assign({},al.perfil||{});pf[a.campo]=F.restaurar(a.texto||'',true);
+        return atualizarAluno(id,{perfil:pf}).then(function(ok){if(!ok)throw new Error('Não consegui atualizar o perfil.');if(DET[id])desenharAluno(id);return 'Perfil de '+al.nome+' atualizado ('+a.campo+').';});
+      },
+      descreverAcao:function(a,F){
+        var nome=function(){try{return alunoDaAcao(a.aluno).aee_alunos.nome;}catch(e){return a.aluno;}};
+        if(a.tipo==='registro_aee')return{ic:'📝',t:'Registro ('+(TIPOS[a.categoria]||a.categoria||'acompanhamento')+') — '+nome(),d:F.restaurar(a.titulo||String(a.texto||'').slice(0,90))};
+        if(a.tipo==='meta_pei')return{ic:'🎯',t:'Meta do PEI — '+nome(),d:F.restaurar(a.meta||'')};
+        if(a.tipo==='atualizar_perfil_aee')return{ic:'👤',t:'Atualizar perfil ('+a.campo+') — '+nome(),d:F.restaurar(String(a.texto||'').slice(0,100))};
+        return null;
+      }
+    };
+    return M;
+  }
+
+  // ── Início da página ────────────────────────────────────────────────
+  function desenharCabecalho(){
+    $('#md-titulo').textContent=MODO==='aee'?'Painel do AEE':MODO==='mediador'?'Mediação e apoio':'Educação Especial';
+    $('#md-escolas').textContent=ESC.nome+(ESC.inep?' · INEP '+ESC.inep.codigo:'');
+    $('#md-quem').textContent='✦ '+perfilNome()+' · '+C.ocupacao.rotulo(OCUP)+' ✦';
+    var av=$('#md-avatar');if(ESC.imagem)av.innerHTML='<img src="'+esc(ESC.imagem)+'" alt="">';else av.textContent=ESC.icone||'♿';
+    $('#md-rodape').textContent=ESC.nome+' · '+perfilNome()+' · Educação Especial';
+    document.title=(MODO==='aee'?'Painel AEE':'Educação Especial')+' — '+ESC.nome;
+    var pn=$('#md-painel');
+    if(OCUP.indexOf('regente')>=0){pn.hidden=false;pn.href=C.ocupacao.destino(ESC,ESC.fixa);}
+  }
+  function iniciar(){
+    S=window.RelatorioSupabaseSync;C=window.ContaSkin;cli=S.getClient();usuario=S.auth.currentUser();
+    if(!ESCOLA_ID){location.replace('escolas.html');return;}
+    C.perfil.iniciar();C.chip($('#md-chip'));
+    $('#md-sair').onclick=function(){if(confirm('Sair da conta neste aparelho?'))S.auth.signOut();};
+    E=lerLocal();
+    syncE=S.createScopeSync({perUser:true,scope:SCOPE,source:'aee',debounceMs:250,getLocalPayload:function(){return E;},
+      onRemotePayload:function(p){if(!p||!Array.isArray(p.turmas))return;if(String(p.atualizadoEm||'')<String(E.atualizadoEm||'')){syncE.schedulePush('local-mais-novo');return;}E=p;try{localStorage.setItem(lsKey(),JSON.stringify(E));}catch(x){}}});
+    syncE.start().then(function(){
+      carregado=true;
+      if(!resolverEscola()){location.replace('escolas.html');return;}
+      if(!OCUP.length){
+        return C.ocupacao.escolher(ESC.nome,[]).then(function(l){if(!l){location.replace('escolas.html');return;}ESC.ocupacoes=OCUP=l;return salvarE().then(comecar);});
+      }
+      comecar();
+    });
+  }
+  function comecar(){
+    definirModo();
+    if(MODO==='regente'&&!ALUNO_INICIAL){location.replace(C.ocupacao.destino(ESC,ESC.fixa));return;}
+    desenharCabecalho();
+    carregarVinculos().then(function(){
+      desenharAbas();desenharInicio();desenharNovo();desenharConfig();
+      var m=iaModulo();if(m){m.iniciar(apiIA());m.desenhar();}
+      var alvo=ALUNO_INICIAL&&aluno(ALUNO_INICIAL)?ALUNO_INICIAL:(MODO==='mediador'&&VINC.length?VINC[0].aluno_id:'');
+      if(alvo)abrirAluno(alvo);else irPara(MODO==='regente'?'ia':'inicio');
+      if(MODO==='regente'&&ALUNO_INICIAL&&!aluno(ALUNO_INICIAL))toast('Você não está vinculado a este aluno.');
+    }).catch(function(e){$('#sec-inicio').innerHTML='<div class="md-card md-vazio">Não consegui carregar: '+esc(e.message)+'</div>';});
+    document.addEventListener('visibilitychange',function(){
+      if(document.visibilityState!=='visible')return;
+      var id=abaAtual.indexOf('a-')===0?abaAtual.slice(2):'';
+      if(id)carregarDetalhe(id).then(function(){desenharAluno(id);}).catch(function(){});
+    });
+  }
+  function quandoPronto(){
+    if(!window.RelatorioSupabaseSync||!window.ContaSkin){setTimeout(quandoPronto,50);return;}
+    window.RelatorioSupabaseSync.auth.whenAuthorized().then(function(){if(!usuario)iniciar();});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',quandoPronto);else quandoPronto();
+})();
+</script>
+</body>
+</html>
