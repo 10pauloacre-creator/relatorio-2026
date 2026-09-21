@@ -489,6 +489,10 @@ Toda página que carrega `supabase-report-sync.js` exige conta. O tipo de acesso
 
 **Segurança corrigida junto (o cadastro já estava aberto):** gatilho `profiles_trava_role` impede que uma conta se promova a `role='admin'` (o `private.is_admin()` confia nessa coluna); `alunos` só é lida pelo professor (`bdm_e_professor()`). SQL em `supabase/2026-09-19-etapa9-contas-de-professores.sql`.
 
+## 21. BARRA LATERAL DE FERRAMENTAS (21/09/2026)
+
+`assets/js/barra-lateral.js` (Casavequia, Hermínio, Meu Diário e AEE): na aba de cima (`.nav-w .nav-i`) ficam só Geral/Início e as turmas (ou alunos). Os botões das ferramentas (alvos `plano`, `cal`, `cont`, `livros`, `sequencias`/`seq`, `ia`, `config`, `cron`, `claude`, `jogos`, `novo` e os `#btn-editar*`) são **movidos** para `<aside class="rs-lateral" data-runtime-ui>` à esquerda — os mesmos elementos, então `aba()` e os cliques continuam valendo. Um MutationObserver move de novo quando a página redesenha as abas (Meu Diário/AEE). O editor de layout só grava o `<main>`, então a mudança não vai para o layout salvo. Desktop: aberta por padrão, recolhe no «, estado em `localStorage "rs-lateral"`; celular (≤ 900 px): gaveta pelo "☰ Ferramentas". Ferramenta nova: acrescente o alvo em `FERRAMENTAS`. Código que insere botão antes de outro na `.nav-i` precisa conferir se o outro ainda está lá (ex.: `escola-ia.js`).
+
 ## 20. MARCA RELATORIO SKIN E SITE PÚBLICO (20/09/2026)
 
 O site passou a se chamar **RELATORIO SKIN** ("RELATORIO" pequeno, "SKIN" em destaque; assinatura "Gestão docente inteligente"). A AXION PROEDUQ continua como marca-mãe, no rodapé.
