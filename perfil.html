@@ -21,7 +21,7 @@
 <script defer src="assets/js/dark-mode-2026.js?v=20260921a"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260921b"></script>
-<script defer src="assets/js/conta-skin.js?v=20260921c"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921d"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--ou:#c9a84c;--os:#f5e6be;--ce:#2b2b2b;--cm:#5a5a5a;--ra:#c0392b;--rs:#fdecea;
   --sup:#fff;--sup2:#faf8f2;--sup3:#f5f3ee;--linha:#e8e5de;--titulo:#1a3a2a;--acento:#2d6147;--acento-txt:#fff;--fundo:#faf8f2;--ss:0 4px 24px rgba(26,58,42,.10)}
@@ -36,6 +36,14 @@ html.dark-2026 .cab{background:linear-gradient(135deg,#15181b,#1d2024)!important
 .cab-i{max-width:900px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .cab-i h1{font-family:'Playfair Display',serif;font-size:1.3rem;flex:1}
 .pill{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.8rem;cursor:pointer;text-decoration:none;white-space:nowrap}
+#modo-btns{display:flex;gap:6px}
+#modo-btns button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+#modo-btns .btn-claro{background:#fff;border-color:#e8e5de;color:#c9a84c}
+#modo-btns .btn-escuro{background:#1a3a2a;border-color:#4a9467;color:#c9a84c}
+#modo-btns button.ativo{transform:scale(1.12);box-shadow:0 4px 14px rgba(0,0,0,.35);border-color:#c9a84c}
+html.dark-2026 #modo-btns .btn-claro{background:#272b30;border-color:#383d43}
+html.dark-2026 #modo-btns .btn-escuro{background:#202327;border-color:#383d43}
+html.dark-2026 #modo-btns button.ativo{border-color:#ffa65b}
 main{max-width:900px;margin:0 auto;padding:26px 20px 60px}
 /* Foto */
 .topo{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin-bottom:22px}
@@ -106,7 +114,10 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
 <header class="cab"><div class="cab-i">
   <a class="pill" href="escolas.html">← Escolas</a>
   <h1>Meu perfil</h1>
-  <button type="button" class="pill" id="sair">Sair</button>
+  <div id="modo-btns">
+    <button type="button" class="btn-claro" id="modo-claro-btn" title="Modo claro" aria-label="Modo claro">☀️</button>
+    <button type="button" class="btn-escuro" id="modo-escuro-btn" title="Modo escuro" aria-label="Modo escuro">🌙</button>
+  </div>
 </div></header>
 
 <main id="main">
@@ -161,6 +172,14 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
   </section>
 
   <div class="salvar"><button type="button" class="btn pri" id="salvar">💾 Salvar perfil</button></div>
+
+  <section class="card">
+    <h3>🚪 Conta</h3>
+    <div class="pg">
+      <div><b>Sair da conta</b><span>Encerra a sessão neste aparelho. Seus dados continuam guardados na conta.</span></div>
+      <button type="button" class="btn" id="sair">Sair</button>
+    </div>
+  </section>
 
   <section class="card perigo">
     <h3>⚠️ Zona de perigo</h3>
@@ -406,6 +425,19 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', quandoPronto); else quandoPronto();
 })();
+</script>
+<script>
+// Tema claro / escuro (mesma chave "modo-tema" das outras páginas).
+function setModo(modo){
+  document.documentElement.classList.toggle('dark-2026',modo==='escuro');
+  try{localStorage.setItem('modo-tema',modo);}catch(e){}
+  document.getElementById('modo-claro-btn').classList.toggle('ativo',modo==='claro');
+  document.getElementById('modo-escuro-btn').classList.toggle('ativo',modo==='escuro');
+  if(window.Relatorio2026Theme)window.Relatorio2026Theme.refresh();
+}
+setModo(window.MD_TEMA_INICIAL||'claro');
+document.getElementById('modo-claro-btn').onclick=function(){setModo('claro');};
+document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');};
 </script>
 </body>
 </html>

@@ -393,6 +393,59 @@
     if (l.indexOf("regente") >= 0) return fixa ? fixa.href : "meu-diario.html?escola=" + encodeURIComponent(e.id);
     return "aee.html?escola=" + encodeURIComponent(fixa ? fixa.id : e.id);
   }
+  // Botão "🔀 Mudar painel": só com 2 ou mais ocupações na escola. Ao clicar,
+  // lista as ocupações; a escolhida abre o painel dela (regente → diário,
+  // mediador/assistente/AEE → painel da Educação Especial).
+  function botaoPainel(el, e, atual) {
+    if (!el) return;
+    var l = (e && e.ocupacoes) || [];
+    el.hidden = l.length < 2;
+    if (el.hidden) return;
+    if (!document.getElementById("ck-painel-style")) {
+      var s = document.createElement("style");
+      s.id = "ck-painel-style";
+      s.textContent = ".ck-painel-menu{position:absolute;z-index:3000;min-width:250px;max-width:calc(100vw - 24px);background:#fff;color:#2b2b2b;border:1px solid #e8e5de;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.28);padding:6px;font-family:'DM Sans',sans-serif}" +
+        ".ck-painel-menu .t{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#7a7a7a;padding:6px 10px 4px}" +
+        ".ck-painel-menu button{display:block;width:100%;background:none;border:none;text-align:left;padding:8px 10px;border-radius:8px;font:inherit;cursor:pointer;color:inherit}" +
+        ".ck-painel-menu button:hover:not(:disabled){background:#f5f3ee}.ck-painel-menu button:disabled{cursor:default;opacity:.75}" +
+        ".ck-painel-menu b{display:block;font-size:.88rem}.ck-painel-menu small{display:block;font-size:.74rem;color:#6a6a6a;margin-top:2px}" +
+        ".ck-painel-menu .aqui{font-size:.66rem;font-weight:700;color:#2d6147;margin-left:6px;text-transform:uppercase}" +
+        "html.dark-2026 .ck-painel-menu{background:#191c1f;color:#f4f5f6;border-color:#383d43}html.dark-2026 .ck-painel-menu button:hover:not(:disabled){background:#272b30}" +
+        "html.dark-2026 .ck-painel-menu small{color:#aeb4bd}html.dark-2026 .ck-painel-menu .aqui{color:#ffa65b}";
+      document.head.appendChild(s);
+    }
+    el.textContent = "🔀 Mudar painel";
+    el.removeAttribute("href");
+    el.setAttribute("role", "button");
+    el.setAttribute("aria-haspopup", "true");
+    el.title = "Escolher o painel";
+    el.onclick = function (ev) {
+      ev.preventDefault(); ev.stopPropagation();
+      var velho = document.getElementById("ck-painel-menu");
+      if (velho) { velho.remove(); return; }
+      var fixa = e.fixa;
+      var m = document.createElement("div");
+      m.id = "ck-painel-menu"; m.className = "ck-painel-menu"; m.setAttribute("role", "menu");
+      m.innerHTML = '<div class="t">Abrir o painel de</div>' + l.map(function (k) {
+        var o = OCUPACOES.filter(function (x) { return x[0] === k; })[0] || [k, k, ""];
+        var painel = k === "regente" ? "regente" : "aee";
+        var href = painel === "regente" ? (fixa ? fixa.href : "meu-diario.html?escola=" + encodeURIComponent(e.id))
+          : "aee.html?escola=" + encodeURIComponent(fixa ? fixa.id : e.id);
+        var aqui = painel === atual;
+        return '<button type="button" role="menuitem" data-href="' + esc(href) + '"' + (aqui ? " disabled" : "") + "><b>" + esc(o[1]) +
+          (aqui ? '<span class="aqui">aberto</span>' : "") + "</b><small>" + esc(o[2]) + "</small></button>";
+      }).join("");
+      document.body.appendChild(m);
+      var r = el.getBoundingClientRect();
+      var esq = Math.min(r.left, window.innerWidth - m.offsetWidth - 12);
+      m.style.top = (r.bottom + window.scrollY + 6) + "px";
+      m.style.left = (Math.max(12, esq) + window.scrollX) + "px";
+      m.onclick = function (x) { var b = x.target.closest("[data-href]"); if (b && !b.disabled) window.location.href = b.getAttribute("data-href"); };
+      setTimeout(function () {
+        document.addEventListener("click", function fora(x) { if (!m.contains(x.target)) { m.remove(); document.removeEventListener("click", fora); } });
+      }, 0);
+    };
+  }
   function camposOcupacao(atual) {
     estilo();
     atual = atual || [];
@@ -434,7 +487,7 @@
     nomeEm: nomeEm,
     inep: { municipios: municipios, buscar: buscarEscolas, escola: escolaInep, resumo: resumoInep, nomeBonito: nomeBonito, linha: linhaInep, qedu: linkQedu },
     seletorInep: seletorInep,
-    ocupacao: { lista: OCUPACOES, rotulo: rotuloOcupacoes, temAEE: temAEE, destino: destinoEscola, campos: camposOcupacao, ler: lerOcupacao, escolher: escolherOcupacao },
+    ocupacao: { lista: OCUPACOES, rotulo: rotuloOcupacoes, temAEE: temAEE, destino: destinoEscola, botaoPainel: botaoPainel, campos: camposOcupacao, ler: lerOcupacao, escolher: escolherOcupacao },
     FIXAS: FIXAS,
     vincularEscola: vincularEscola,
     desvincularEscola: desvincularEscola

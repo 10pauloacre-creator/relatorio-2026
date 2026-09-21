@@ -21,7 +21,7 @@
 <script defer src="assets/js/dark-mode-2026.js?v=20260921a"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260921b"></script>
-<script defer src="assets/js/conta-skin.js?v=20260921c"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921d"></script>
 <script defer src="assets/js/meu-diario-ia.js?v=20260921b"></script>
 <style>
 /* Base visual do Meu Diário (copiada de meu-diario.html) */
@@ -36,7 +36,9 @@ a{color:var(--md-destaque)}
 /* ── Cabeçalho e abas (mesmo desenho da Casavequia) ── */
 .cab{background:linear-gradient(135deg,var(--vd),var(--vm) 60%,var(--vc));color:#fff;position:relative;overflow:hidden}
 .cab::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:rgba(201,168,76,.15)}
-.cab-i{max-width:1200px;margin:0 auto;padding:30px 40px 24px;position:relative;z-index:1;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.cab-barra{max-width:1200px;margin:0 auto;padding:14px 40px 0;position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px}
+@media(max-width:760px){.cab-barra{padding:12px 16px 0}}
+.cab-i{max-width:1200px;margin:0 auto;padding:14px 40px 24px;position:relative;z-index:1;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
 .md-avatar{width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(201,168,76,.7);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:#f5e6be;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.25)}
 .cab-t{flex:1;min-width:220px}
 .cab-t h1{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;line-height:1.2}
@@ -301,22 +303,21 @@ html.dark-2026 .aee-sub button.on{background:linear-gradient(135deg,var(--dark-a
 </style>
 </head>
 <body>
-<header class="cab"><div class="cab-i">
+<header class="cab"><div class="cab-barra">
+  <a class="md-sair md-voltar" href="escolas.html" title="Voltar para as escolas">← Escolas</a>
+  <div id="modo-btns">
+      <button type="button" class="btn-claro" id="modo-claro-btn" title="Modo claro" aria-label="Modo claro">☀️</button>
+      <button type="button" class="btn-escuro" id="modo-escuro-btn" title="Modo escuro" aria-label="Modo escuro">🌙</button>
+    </div>
+</div><div class="cab-i">
   <div class="md-avatar" id="md-avatar" aria-hidden="true">♿</div>
   <div class="cab-t">
     <h1 id="md-titulo">Painel da Educação Especial</h1>
     <div class="sub" id="md-escolas">Carregando…</div>
-    <div class="prof" id="md-quem">✦ … ✦</div>
   </div>
   <div class="md-cab-acoes">
-    <div id="modo-btns">
-      <button type="button" class="btn-claro" id="modo-claro-btn" title="Modo claro" aria-label="Modo claro">☀️</button>
-      <button type="button" class="btn-escuro" id="modo-escuro-btn" title="Modo escuro" aria-label="Modo escuro">🌙</button>
-    </div>
-    <a class="md-sair md-voltar" href="escolas.html">← Escolas</a>
-    <a class="md-sair md-voltar" id="md-painel" href="#" hidden>🔀 Mudar painel: Regente</a>
+    <a class="md-sair md-voltar" id="md-painel" href="#" hidden>🔀 Mudar painel</a>
     <a id="md-chip" href="perfil.html"></a>
-    <button type="button" class="md-sair" id="md-sair">Sair</button>
   </div>
 </div></header>
 <nav class="nav-w"><div class="nav-i" id="md-tabs"></div></nav>
@@ -1043,18 +1044,16 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   function desenharCabecalho(){
     $('#md-titulo').textContent=MODO==='aee'?'Painel do AEE':MODO==='mediador'?'Mediação e apoio':'Educação Especial';
     $('#md-escolas').textContent=ESC.nome+(ESC.inep?' · INEP '+ESC.inep.codigo:'');
-    $('#md-quem').textContent='✦ '+(C.nomeExibicao()?C.nomeExibicao()+' · ':'')+C.ocupacao.rotulo(OCUP)+' ✦';
     var av=$('#md-avatar');if(ESC.imagem)av.innerHTML='<img src="'+esc(ESC.imagem)+'" alt="">';else av.textContent=ESC.icone||'♿';
     $('#md-rodape').textContent=ESC.nome+' · '+(C.nomeExibicao()?C.nomeExibicao()+' · ':'')+'Educação Especial';
     document.title=(MODO==='aee'?'Painel AEE':'Educação Especial')+' — '+ESC.nome;
     var pn=$('#md-painel');
-    if(OCUP.indexOf('regente')>=0){pn.hidden=false;pn.href=C.ocupacao.destino(ESC,ESC.fixa);}
+    C.ocupacao.botaoPainel(pn,ESC,'aee');
   }
   function iniciar(){
     S=window.RelatorioSupabaseSync;C=window.ContaSkin;cli=S.getClient();usuario=S.auth.currentUser();
     if(!ESCOLA_ID){location.replace('escolas.html');return;}
     C.perfil.iniciar();C.chip($('#md-chip'));
-    $('#md-sair').onclick=function(){if(confirm('Sair da conta neste aparelho?'))S.auth.signOut();};
     E=lerLocal();
     syncE=S.createScopeSync({perUser:true,scope:SCOPE,source:'aee',debounceMs:250,getLocalPayload:function(){return E;},
       onRemotePayload:function(p){if(!p||!Array.isArray(p.turmas))return;if(String(p.atualizadoEm||'')<String(E.atualizadoEm||'')){syncE.schedulePush('local-mais-novo');return;}E=p;try{localStorage.setItem(lsKey(),JSON.stringify(E));}catch(x){}}});
