@@ -1,13 +1,13 @@
 {
-  "name": "Relatórios 2026 — Prof. Paulo Roberto",
-  "short_name": "Relatórios",
-  "description": "Diário escolar digital do Prof. Paulo Roberto Ramalho Magalhães — Senador Guiomard, AC",
+  "name": "RELATORIO SKIN — gestão docente",
+  "short_name": "RELATORIO SKIN",
+  "description": "Turmas, diários de aula, frequência, atividades, plano de aulas, calendário e relatórios do professor em uma única plataforma.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0f2318",
-  "theme_color": "#0f2318",
+  "background_color": "#0D0E0D",
+  "theme_color": "#0D0E0D",
   "lang": "pt-BR",
   "icons": [
     {
