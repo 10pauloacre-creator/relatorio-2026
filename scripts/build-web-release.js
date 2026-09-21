@@ -38,6 +38,7 @@ const rootFileAllowlist = new Set([
   "iconv2.png",
   "index.html",
   "meu-diario.html",
+  "aee.html",
   "perfil.html",
   "manifest.json",
   "maskable-icon-512.png",

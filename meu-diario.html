@@ -23,9 +23,9 @@ window.NOVO_DIARIO_MANUAL = true;
 <script defer src="assets/js/dark-mode-2026.js?v=20260921a"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260921b"></script>
-<script defer src="assets/js/conta-skin.js?v=20260921a"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921b"></script>
 <script defer src="assets/js/meu-diario-recursos.js?v=20260921a"></script>
-<script defer src="assets/js/meu-diario-ia.js?v=20260921a"></script>
+<script defer src="assets/js/meu-diario-ia.js?v=20260921b"></script>
 <script defer src="assets/js/novo-diario.js?v=20260921c"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--og:#876020;--card:#fff;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px;
@@ -254,6 +254,7 @@ html.dark-2026 .itab.on{color:var(--dark-accent)!important;border-bottom-color:v
     </div>
     <span class="md-sync" id="md-sync">☁️ Conectando…</span>
     <a class="md-sair md-voltar" href="escolas.html" title="Voltar para as escolas">← Escolas</a>
+    <a class="md-sair md-voltar" id="md-painel" href="#" hidden title="Trocar para o painel dos alunos da Educação Especial">🔀 Mudar painel: AEE</a>
     <a id="md-chip" href="perfil.html"></a>
     <button type="button" class="md-sair" id="md-sair">Sair</button>
   </div>
@@ -714,6 +715,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       +'<div class="md-f"><label>Ícone do botão</label><div class="md-icones">'+ICONES.map(function(x){return '<button type="button" data-icone="'+x+'"'+((e.icone||'🏫')===x&&!e.imagem?' class="on"':'')+'>'+x+'</button>';}).join('')+'</div></div>'
       +'<div class="md-f"><label>Imagem do botão (substitui o ícone)</label><div class="md-row" style="flex-wrap:wrap"><label class="md-btn mini" style="cursor:pointer">🖼️ Escolher imagem<input type="file" accept="image/*" data-esc="imagem" hidden></label>'
       +(e.imagem?'<button type="button" class="md-btn mini" data-esc="sem-imagem">Remover imagem</button>':'')+'</div></div>'
+      +'<div class="md-f"><label>Sua ocupação nesta escola</label><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-size:.88rem">'+esc(C().ocupacao.rotulo(e.ocupacoes)||'—')+'</span><button type="button" class="md-btn mini" data-esc="ocupacao">Trocar</button></div></div>'
       +'<button type="button" class="md-btn pri" data-esc="salvar">💾 Salvar</button></div></div>'
       +'<div class="md-inep">'+(i
         ?'<div><b>🏛️ INEP '+i.codigo+'</b> — '+esc(i.nome)+'<br><span>'+esc(i.municipio)+'/'+esc(i.uf)+(i.rede?' · '+esc(i.rede):'')+(i.localizacao?' · '+esc(i.localizacao):'')+(i.etapas?' · '+esc(i.etapas):'')+'</span>'+(i.endereco?'<br><span>'+esc([i.endereco,i.bairro].filter(Boolean).join(' · '))+'</span>':'')+'</div>'
@@ -731,6 +733,12 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     };
     var sem=sec.querySelector('[data-esc="sem-imagem"]');if(sem)sem.onclick=function(){delete e.imagem;salvar('escola');};
     sec.querySelector('[data-esc="inep"]').onclick=function(){vincularInep();};
+    sec.querySelector('[data-esc="ocupacao"]').onclick=function(){
+      C().ocupacao.escolher(e.nome,e.ocupacoes||[]).then(function(l){
+        if(!l)return;e.ocupacoes=l;
+        salvar('ocupacao').then(function(){if(l.indexOf('regente')<0)location.replace(C().ocupacao.destino(e));else toast('Ocupação salva.');});
+      });
+    };
   }
   function vincularInep(){
     var e=escolaAtual(),atual=e.inep;
@@ -804,6 +812,10 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       +'<button type="button" class="md-btn" data-cfg="exportar">⬇️ Baixar cópia dos dados</button></div>'
       +blocoEscola()
       +'<div class="md-card"><h3>👤 Seu perfil</h3><p>Nome, foto, disciplinas que você leciona e documentos ficam no seu perfil.</p><div style="margin-top:10px"><a class="md-btn" style="text-decoration:none;display:inline-block" href="perfil.html">Abrir meu perfil</a></div></div>'
+      +'<div class="md-card" id="md-aee-card"><h3>♿ Alunos da Educação Especial</h3><p>Tem aluno com deficiência acompanhado por mediador, assistente ou professor do AEE? Peça o <strong>código do aluno</strong> (ex.: AEE-7K3M-Q9TX) e vincule-se: você vê o perfil, as orientações e os documentos dele, e lança notas e registros da sua disciplina no mesmo perfil que a equipe usa.</p>'
+      +'<div class="md-row" style="flex-wrap:wrap;margin-top:10px"><input class="md-in" data-aee="codigo" placeholder="Código do aluno" style="max-width:220px;text-transform:uppercase"><input class="md-in" data-aee="disc" list="md-aee-discs" placeholder="Sua disciplina com ele" style="max-width:240px"><button type="button" class="md-btn pri" data-aee="vincular">Vincular</button></div>'
+      +'<datalist id="md-aee-discs">'+(function(){var m={};vis.forEach(function(t){t.disciplinas.forEach(function(d){m[d.nome]=1;});});return Object.keys(m).map(function(n){return '<option>'+esc(n)+'</option>';}).join('');})()+'</datalist>'
+      +'<div data-aee="lista" style="margin-top:10px"></div></div>'
       +'<h3 class="md-h3">Turmas de '+ANO+'</h3>'
       +vis.map(function(t){
         return '<details class="md-turma" data-t="'+t.id+'"><summary>'+esc(t.nome)+' — '+t.alunos.length+' alunos, '+t.disciplinas.length+' disciplinas</summary>'
@@ -822,6 +834,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     ligarOpcoesCadastro(sec);
     ligarFormTurma(sec.querySelector('#md-nova-turma'));
     ligarBlocoPerigo(sec);
+    ligarAEE(sec);
     sec.querySelector('[data-cfg="exportar"]').onclick=exportar;
     sec.querySelectorAll('details.md-turma').forEach(function(box){
       var t=turma(box.getAttribute('data-t'));
@@ -852,6 +865,32 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       };});
     });
   }
+  // ── Alunos do AEE (Etapa 15): o regente se vincula pelo código ───────
+  var AEE_CACHE=null;
+  function carregarAEE(){
+    var cli=window.RelatorioSupabaseSync.getClient();
+    return cli.from('aee_vinculos').select('aluno_id,papel,disciplina,escola_local,aee_alunos(id,nome,codigo,turma,serie,deficiencias,nascimento)').eq('user_id',usuario.id)
+      .then(function(r){AEE_CACHE=(r.data||[]).filter(function(v){return v.aee_alunos&&(!v.escola_local||v.escola_local===ESCOLA_ID);});return AEE_CACHE;});
+  }
+  function desenharListaAEE(box){
+    var l=AEE_CACHE||[];
+    box.innerHTML=l.length?l.map(function(v){var a=v.aee_alunos;return '<div class="md-row" style="border-top:1px solid var(--md-linha);padding-top:8px"><span style="flex:1"><b>'+esc(a.nome)+'</b> <span style="font-size:.78rem;color:var(--cm)">'+esc([a.serie,a.turma].filter(Boolean).join(' · '))+' · '+esc((a.deficiencias||[]).join(', '))+(v.disciplina?' · você: '+esc(v.disciplina):'')+'</span></span><a class="md-btn mini" style="text-decoration:none" href="aee.html?escola='+encodeURIComponent(ESCOLA_ID)+'&aluno='+a.id+'">Abrir perfil</a></div>';}).join('')
+      :'<p style="font-size:.8rem;color:var(--cm)">Nenhum aluno vinculado nesta escola.</p>';
+  }
+  function ligarAEE(sec){
+    var box=sec.querySelector('[data-aee="lista"]');if(!box)return;
+    if(AEE_CACHE)desenharListaAEE(box);else carregarAEE().then(function(){var b=document.querySelector('#sec-config [data-aee="lista"]');if(b)desenharListaAEE(b);});
+    sec.querySelector('[data-aee="vincular"]').onclick=function(){
+      var cod=sec.querySelector('[data-aee="codigo"]').value.trim().toUpperCase(),disc=sec.querySelector('[data-aee="disc"]').value.trim();
+      if(!cod)return toast('Informe o código do aluno.');
+      window.RelatorioSupabaseSync.getClient().rpc('aee_vincular',{p_codigo:cod,p_papel:'regente',p_escola_local:ESCOLA_ID,p_nome_profissional:perfilNome()||usuario.email,p_disciplina:disc||null}).then(function(r){
+        if(r.error)return toast(r.error.message);
+        toast('Vinculado a '+r.data.nome+'.');sec.querySelector('[data-aee="codigo"]').value='';
+        carregarAEE().then(function(){var b=document.querySelector('#sec-config [data-aee="lista"]');if(b)desenharListaAEE(b);});
+      });
+    };
+  }
+
   // Acrescenta alunos no fim da chamada (sem salvar). Ignora nomes repetidos.
   function adicionarAlunos(t,nomes,permitirRepetido){
     var prox=t.alunos.reduce(function(m,a){return Math.max(m,a.n);},0),novos=[];
@@ -931,6 +970,21 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     if(e&&e.imagem)av.innerHTML='<img src="'+esc(e.imagem)+'" alt="">';else av.textContent=(e&&e.icone)||'🏫';
     document.getElementById('md-rodape').textContent=(e?e.nome+' · ':'')+(nome||usuario.email)+' · Ano Letivo '+ANO;
     if(e)document.title=e.nome+' — Meu Diário';
+    var pn=document.getElementById('md-painel');
+    if(pn){pn.hidden=!(e&&C().ocupacao.temAEE(e.ocupacoes));pn.href='aee.html?escola='+encodeURIComponent(ESCOLA_ID);}
+  }
+  // Ocupação obrigatória (Etapa 15). Sem "regente", esta escola abre no painel do AEE.
+  function conferirOcupacao(){
+    var e=escolaAtual();if(!e)return true;
+    if(!(e.ocupacoes||[]).length){
+      C().ocupacao.escolher(e.nome,[]).then(function(l){
+        if(!l){location.replace('escolas.html');return;}
+        e.ocupacoes=l;salvar('ocupacao').then(function(){if(l.indexOf('regente')<0)location.replace(C().ocupacao.destino(e));});
+      });
+      return true;
+    }
+    if(e.ocupacoes.indexOf('regente')<0){location.replace(C().ocupacao.destino(e));return false;}
+    return true;
   }
   function desenharTudo(){
     desenharCabecalho();
@@ -1017,6 +1071,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     syncE.start().then(function(){
       carregado=true;
       if(!escolaAtual()){location.replace('escolas.html');return;}
+      if(!conferirOcupacao())return;
       desenharTudo();
       if(window.NovoDiario)window.NovoDiario.renderizar();
     });

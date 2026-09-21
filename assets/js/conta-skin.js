@@ -58,7 +58,12 @@
       ".ck-res button:hover,.ck-res button:focus-visible{border-color:var(--ck-acento);transform:translateY(-1px)}" +
       ".ck-res b{display:block;font-size:.95rem}.ck-res small{display:block;color:var(--ck-mudo);font-size:.78rem;margin-top:3px;line-height:1.45}" +
       ".ck-tag{display:inline-block;font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--ck-sup2);border:1px solid var(--ck-linha);margin-right:4px}" +
-      ".ck-aviso{font-size:.84rem;color:var(--ck-mudo);padding:10px 2px}";
+      ".ck-aviso{font-size:.84rem;color:var(--ck-mudo);padding:10px 2px}" +
+      ".ck-ocup{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin:6px 0}" +
+      ".ck-ocup label{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--ck-linha);background:var(--ck-sup2);border-radius:12px;padding:11px 12px;cursor:pointer;color:var(--ck-txt)}" +
+      ".ck-ocup label:has(input:checked){border-color:var(--ck-acento);box-shadow:0 0 0 1px var(--ck-acento) inset}" +
+      ".ck-ocup input{margin-top:3px;accent-color:var(--ck-acento);width:auto;padding:0}" +
+      ".ck-ocup b{display:block;font-size:.88rem}.ck-ocup small{display:block;font-size:.74rem;color:var(--ck-mudo);margin-top:2px;line-height:1.35}";
     document.head.appendChild(s);
   }
 
@@ -343,6 +348,58 @@
     return c.from("professor_escolas").delete().eq("user_id", u.id).eq("escola_local", escolaLocal).then(function (r) { return !r.error; });
   }
 
+  // ── Ocupação do professor em cada escola (Etapa 15) ──────────────────
+  // Regente abre o diário (meu-diario.html); mediador, assistente e AEE abrem
+  // o painel dos alunos da Educação Especial (aee.html). Quem é regente e
+  // também outra coisa entra pelo diário e troca pelo botão "Mudar painel".
+  var OCUPACOES = [
+    ["regente", "Professor regente", "Diário das turmas: aulas, presença, notas, plano e contador."],
+    ["mediador", "Professor mediador", "Acompanha de perto um ou mais alunos com deficiência."],
+    ["assistente", "Assistente Educacional", "Apoia o aluno nas atividades e na rotina escolar."],
+    ["aee", "Professor AEE", "Atendimento Educacional Especializado: gestão de vários alunos."]
+  ];
+  // Escolas fixas do administrador (páginas próprias).
+  var FIXAS = [
+    { id: "casavequia", href: "casavequia.html", img: "botao-casavequia.png", nome: "Escola Padre Carlos Casavequia" },
+    { id: "herminio", href: "herminio.html", img: "botao-herminio.png", nome: "Escola Raimundo Hermínio de Melo" }
+  ];
+  function rotuloOcupacoes(l) {
+    return (l || []).map(function (k) { var o = OCUPACOES.filter(function (x) { return x[0] === k; })[0]; return o ? o[1] : k; }).join(" · ");
+  }
+  function temAEE(l) { return (l || []).some(function (k) { return k !== "regente"; }); }
+  // Página que a escola abre para a ocupação informada ("" = falta informar).
+  function destinoEscola(e, fixa) {
+    var l = (e && e.ocupacoes) || [];
+    if (!l.length) return "";
+    if (l.indexOf("regente") >= 0) return fixa ? fixa.href : "meu-diario.html?escola=" + encodeURIComponent(e.id);
+    return "aee.html?escola=" + encodeURIComponent(fixa ? fixa.id : e.id);
+  }
+  function camposOcupacao(atual) {
+    estilo();
+    atual = atual || [];
+    return '<div class="ck-ocup">' + OCUPACOES.map(function (o) {
+      return '<label><input type="checkbox" value="' + o[0] + '"' + (atual.indexOf(o[0]) >= 0 ? " checked" : "") + "><span><b>" + o[1] + "</b><small>" + o[2] + "</small></span></label>";
+    }).join("") + "</div>";
+  }
+  function lerOcupacao(box) { return [].slice.call(box.querySelectorAll(".ck-ocup input:checked")).map(function (i) { return i.value; }); }
+  // Janela obrigatória: resolve com a lista escolhida ou null se desistir.
+  function escolherOcupacao(nomeEscola, atual) {
+    return new Promise(function (resolve) {
+      var feito = false;
+      janela("<h3>🧑‍🏫 Sua ocupação nesta escola</h3><p>Em <strong>" + esc(nomeEscola) + "</strong> você atua como… (marque uma ou mais)</p>" + camposOcupacao(atual)
+        + '<div class="ck-erro" data-erro></div><div class="ck-acoes"><button type="button" class="ck-btn" data-n>Cancelar</button><button type="button" class="ck-btn pri" data-s>Salvar</button></div>',
+        function (ov, fechar) {
+          ov.querySelector("[data-n]").onclick = function () { fechar(); if (!feito) { feito = true; resolve(null); } };
+          ov.addEventListener("mousedown", function (e) { if (e.target === ov && !feito) { feito = true; resolve(null); } });
+          ov.querySelector("[data-s]").onclick = function () {
+            var l = lerOcupacao(ov);
+            if (!l.length) { ov.querySelector("[data-erro]").textContent = "Marque ao menos uma ocupação."; return; }
+            feito = true; fechar(); resolve(l);
+          };
+        });
+    });
+  }
+
   window.ContaSkin = {
     esc: esc, iniciais: iniciais, janela: janela, estilo: estilo, UFS: UFS,
     verificarSenha: verificarSenha, confirmarPerigo: confirmarPerigo, reduzirImagem: reduzirImagem,
@@ -356,6 +413,8 @@
     chip: chip,
     inep: { municipios: municipios, buscar: buscarEscolas, escola: escolaInep, resumo: resumoInep, nomeBonito: nomeBonito, linha: linhaInep, qedu: linkQedu },
     seletorInep: seletorInep,
+    ocupacao: { lista: OCUPACOES, rotulo: rotuloOcupacoes, temAEE: temAEE, destino: destinoEscola, campos: camposOcupacao, ler: lerOcupacao, escolher: escolherOcupacao },
+    FIXAS: FIXAS,
     vincularEscola: vincularEscola,
     desvincularEscola: desvincularEscola
   };
