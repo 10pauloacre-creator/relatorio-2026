@@ -1,0 +1,54 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   mobile-2026.css — ajustes globais para celular (21/09/2026)
+   Carregado em todas as páginas com conta por supabase-report-sync.js e,
+   à mão, nas páginas públicas. Só regras gerais e seguras: cada página
+   continua com o próprio layout responsivo.
+   ═══════════════════════════════════════════════════════════════════════ */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+img, video, canvas, iframe, svg { max-width: 100%; }
+select { max-width: 100%; }
+
+@media (max-width: 760px) {
+  /* iPhone dá zoom sozinho em campo com fonte menor que 16 px (a tela fica
+     desalinhada depois de digitar). */
+  input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=file]),
+  select, textarea { font-size: 16px !important; }
+
+  /* Toque mais fácil e sem o atraso do duplo toque. */
+  a, button, label, select, summary, [role=button] { touch-action: manipulation; }
+  button, .md-btn, .btn, .nb, .itab, .ck-btn { -webkit-tap-highlight-color: rgba(0,0,0,.08); }
+
+  /* Textos longos (e-mails, links, códigos) quebram em vez de vazar. */
+  p, li, td, th, dd, .md-card, .aee-bloco, .ct, .od { overflow-wrap: anywhere; }
+
+  /* Tabelas largas rolam dentro do próprio bloco. */
+  .md-tabela, .aee-tab, .md-rel table, .tabela { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .md-tabela tbody, .aee-tab tbody, .md-rel table tbody { display: table; width: 100%; }
+
+  /* Janelas (modais) ocupam a tela toda com rolagem confortável. */
+  .md-ov, .ck-ov { padding: 8px !important; align-items: flex-end !important; }
+  .md-rel, .ck-jan { max-height: 92vh !important; border-radius: 16px !important; padding: 18px 16px !important; }
+
+  /* Escolas do administrador: o "← Início" fixo cobria o logo do cabeçalho e
+     o conteúdo ao rolar. No celular ele fica no topo da página e o cabeçalho
+     ganha espaço para ele. */
+  body > a[href="escolas.html"][style*="position:fixed"] {
+    position: absolute !important; top: 10px !important; left: 10px !important;
+    padding: 5px 11px !important; font-size: .78rem !important;
+  }
+  body > #modo-btns { position: absolute !important; top: 8px !important; right: 10px !important; }
+  body:has(> a[href="escolas.html"][style*="position:fixed"]) .cab-i { padding-top: 58px !important; }
+  body:has(> a[href="escolas.html"][style*="position:fixed"]) .cab-i > .escu { margin: 0 auto; }
+
+  /* Barras de abas: rolam de lado com dica de que há mais. */
+  .nav-i { scroll-snap-type: x proximity; -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
+  .nav-i .nb { scroll-snap-align: start; }
+
+  /* Linhas de formulário com vários campos quebram em vez de esmagar. */
+  .md-row { flex-wrap: wrap; }
+  .md-row > .md-in { min-width: 0; flex: 1 1 160px; max-width: none !important; }
+}
+
+@media (max-width: 400px) {
+  .main { padding-left: 12px !important; padding-right: 12px !important; }
+}
