@@ -21,7 +21,7 @@
 <script defer src="assets/js/dark-mode-2026.js?v=20260921a"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260921b"></script>
-<script defer src="assets/js/conta-skin.js?v=20260921b"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921c"></script>
 <script defer src="assets/js/meu-diario-ia.js?v=20260921b"></script>
 <style>
 /* Base visual do Meu Diário (copiada de meu-diario.html) */
@@ -490,7 +490,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   function desenharInicio(){
     var sec=$('#sec-inicio');
     if(MODO!=='aee'){
-      sec.innerHTML='<div class="th"><div class="tb gz">♿</div><div class="ti"><h2>Olá, '+esc(perfilNome().split(' ')[0])+'!</h2><p>'+esc(ESC.nome)+' · '+esc(C.ocupacao.rotulo(OCUP))+'</p></div></div>'
+      sec.innerHTML='<div class="th"><div class="tb gz">♿</div><div class="ti"><h2>Olá'+(C.nomeExibicao()?', '+esc(C.nomeExibicao().split(' ')[0]):'')+'!</h2><p>'+esc(ESC.nome)+' · '+esc(C.ocupacao.rotulo(OCUP))+'</p></div></div>'
         +'<div class="md-card"><h3>Nenhum aluno ainda</h3><p>Aqui cada aluno que você acompanha ganha uma aba com o nome dele: perfil, disciplinas, boletim, registros de todos os professores, PEI, documentos e o relatório individual. Cadastre o aluno ou, se outro profissional já cadastrou, entre com o código dele.</p><div style="margin-top:12px"><button type="button" class="md-btn pri" data-ir="novo">＋ Cadastrar ou vincular aluno</button></div></div>';
       sec.querySelector('[data-ir]').onclick=function(){irPara('novo');};
       return;
@@ -1043,9 +1043,9 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   function desenharCabecalho(){
     $('#md-titulo').textContent=MODO==='aee'?'Painel do AEE':MODO==='mediador'?'Mediação e apoio':'Educação Especial';
     $('#md-escolas').textContent=ESC.nome+(ESC.inep?' · INEP '+ESC.inep.codigo:'');
-    $('#md-quem').textContent='✦ '+perfilNome()+' · '+C.ocupacao.rotulo(OCUP)+' ✦';
+    $('#md-quem').textContent='✦ '+(C.nomeExibicao()?C.nomeExibicao()+' · ':'')+C.ocupacao.rotulo(OCUP)+' ✦';
     var av=$('#md-avatar');if(ESC.imagem)av.innerHTML='<img src="'+esc(ESC.imagem)+'" alt="">';else av.textContent=ESC.icone||'♿';
-    $('#md-rodape').textContent=ESC.nome+' · '+perfilNome()+' · Educação Especial';
+    $('#md-rodape').textContent=ESC.nome+' · '+(C.nomeExibicao()?C.nomeExibicao()+' · ':'')+'Educação Especial';
     document.title=(MODO==='aee'?'Painel AEE':'Educação Especial')+' — '+ESC.nome;
     var pn=$('#md-painel');
     if(OCUP.indexOf('regente')>=0){pn.hidden=false;pn.href=C.ocupacao.destino(ESC,ESC.fixa);}

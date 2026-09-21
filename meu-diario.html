@@ -23,7 +23,7 @@ window.NOVO_DIARIO_MANUAL = true;
 <script defer src="assets/js/dark-mode-2026.js?v=20260921a"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260921b"></script>
-<script defer src="assets/js/conta-skin.js?v=20260921b"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921c"></script>
 <script defer src="assets/js/meu-diario-recursos.js?v=20260921a"></script>
 <script defer src="assets/js/meu-diario-ia.js?v=20260921b"></script>
 <script defer src="assets/js/novo-diario.js?v=20260921c"></script>
@@ -965,10 +965,10 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     var nome=perfilNome(),e=escolaAtual();
     document.getElementById('md-titulo').textContent='Diário de Aulas '+ANO;
     document.getElementById('md-escolas').textContent=e?e.nome+(e.inep?' · INEP '+e.inep.codigo:''):'Carregando…';
-    document.getElementById('md-quem').textContent='✦ '+(nome?nome+' · ':'')+usuario.email+' ✦';
+    document.getElementById('md-quem').textContent=nome?'✦ '+nome+' ✦':'';
     var av=document.getElementById('md-avatar');
     if(e&&e.imagem)av.innerHTML='<img src="'+esc(e.imagem)+'" alt="">';else av.textContent=(e&&e.icone)||'🏫';
-    document.getElementById('md-rodape').textContent=(e?e.nome+' · ':'')+(nome||usuario.email)+' · Ano Letivo '+ANO;
+    document.getElementById('md-rodape').textContent=(e?e.nome+' · ':'')+(nome?nome+' · ':'')+'Ano Letivo '+ANO;
     if(e)document.title=e.nome+' — Meu Diário';
     var pn=document.getElementById('md-painel');
     if(pn){pn.hidden=!(e&&C().ocupacao.temAEE(e.ocupacoes));pn.href='aee.html?escola='+encodeURIComponent(ESCOLA_ID);}

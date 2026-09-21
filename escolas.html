@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260921b"></script>
-<script defer src="assets/js/conta-skin.js?v=20260921b"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921c"></script>
 <title>Escolas — RELATORIO SKIN</title>
 <style>
 :root{--fundo:#0D0E0D;--sup:#131512;--sup2:#181B17;--sup3:#20231E;--linha:#30352D;--txt:#F3F1E9;--txt2:#B6B7AE;--mudo:#7E8279;--marca:#A7B58A;--marca2:#C2CE9E;--areia:#D6CBB8;--ouro:#B89B69;--rel-trava-bg:#0D0E0D}
@@ -29,7 +29,7 @@ button{font:inherit}
 .topo .marca-mini img{width:30px;height:30px;border-radius:8px}
 .topo .marca-mini b{color:var(--marca2);font-size:.95rem;letter-spacing:.08em}
 .topo .esp{flex:1}
-.topo .email{font-size:.78rem;color:var(--txt2);max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topo .email{font-size:.86rem;font-weight:600;color:var(--txt);max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .topo .sair{background:rgba(255,255,255,.06);color:var(--txt);border:1px solid var(--linha);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.8rem;cursor:pointer}
 .topo .sair:hover{border-color:var(--marca)}
 .topo .ck-chip{border-color:var(--marca);color:var(--marca2);background:var(--sup3)}
@@ -100,7 +100,7 @@ a.selo{text-decoration:none}
 .marca-prop{font-size:.66rem;letter-spacing:.22em;font-weight:700;color:var(--ouro)}
 .legal{font-size:.7rem;color:var(--mudo)}
 .legal a{color:inherit;text-decoration:none}.legal a:hover{text-decoration:underline}
-@media(max-width:560px){.topo{padding:12px 14px}.topo .email{display:none}.vista,.cad{padding-left:16px;padding-right:16px}.painel{padding:16px}}
+@media(max-width:560px){.topo{padding:12px 14px}.topo .email{max-width:46vw;font-size:.74rem}.vista,.cad{padding-left:16px;padding-right:16px}.painel{padding:16px}}
 @media(prefers-reduced-motion:reduce){.card,.card:hover{transition:none;transform:none}.item.novoitem .card{animation:none}}
 </style>
 </head>
@@ -341,10 +341,10 @@ a.selo{text-decoration:none}
     S = window.RelatorioSupabaseSync; C = window.ContaSkin; FIXAS = C.FIXAS;
     usuario = S.auth.currentUser();
     admin = S.auth.isAdmin();
-    document.getElementById('conta-email').textContent = usuario.email || '';
     document.getElementById('conta-sair').onclick = function () { if (confirm('Sair da conta neste aparelho?')) S.auth.signOut(); };
     C.perfil.iniciar();
     C.chip(document.getElementById('conta-chip'));
+    C.nomeEm(document.getElementById('conta-email'), { prefixo: 'Bem-vindo, ' });
     E = lerLocal();
     if (E.atualizadoEm || admin) desenhar();
     sync = S.createScopeSync({

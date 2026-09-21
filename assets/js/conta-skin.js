@@ -216,13 +216,32 @@
     return a >= 0 && a < 130 ? a : null;
   }
 
+  // Nome de cadastro para exibir (perfil → conta). Nunca mostra o e-mail.
+  function nomeExibicao(p) {
+    p = p || perfilDados;
+    return String((p && p.nome) || usuario().nome || "").trim();
+  }
+  // Escreve o nome no elemento e acompanha as mudanças do perfil.
+  // opcoes.prefixo: texto antes do nome (ex.: "Bem-vindo, ").
+  function nomeEm(el, opcoes) {
+    if (!el) return;
+    opcoes = opcoes || {};
+    function desenhar(p) {
+      var nome = nomeExibicao(p);
+      el.textContent = opcoes.prefixo ? (nome ? opcoes.prefixo + nome : opcoes.prefixo.replace(/[,\s]+$/, "")) : nome;
+      el.title = nome;
+    }
+    desenhar(perfilDados);
+    perfilOuvintes.push(desenhar);
+  }
+
   // Botão redondo do perfil (cabeçalhos).
   function chip(el, opcoes) {
     if (!el) return;
     estilo();
     opcoes = opcoes || {};
     function desenhar(p) {
-      var nome = (p && p.nome) || usuario().nome || usuario().email || "";
+      var nome = nomeExibicao(p);
       el.className = "ck-chip" + (opcoes.classe ? " " + opcoes.classe : "");
       el.title = "Meu perfil";
       el.setAttribute("aria-label", "Abrir meu perfil");
@@ -411,6 +430,8 @@
       idade: idade
     },
     chip: chip,
+    nomeExibicao: nomeExibicao,
+    nomeEm: nomeEm,
     inep: { municipios: municipios, buscar: buscarEscolas, escola: escolaInep, resumo: resumoInep, nomeBonito: nomeBonito, linha: linhaInep, qedu: linkQedu },
     seletorInep: seletorInep,
     ocupacao: { lista: OCUPACOES, rotulo: rotuloOcupacoes, temAEE: temAEE, destino: destinoEscola, campos: camposOcupacao, ler: lerOcupacao, escolher: escolherOcupacao },
