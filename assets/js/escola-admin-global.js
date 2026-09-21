@@ -119,9 +119,10 @@
       + '<datalist id="eg-discs">' + (herminio ? ["Língua Portuguesa", "Língua Inglesa", "Língua Espanhola", "Arte", "Redação"] : ["Língua Portuguesa", "Tecnologia e Linguagens", "Tecnologia e Ciências Humanas", "Arte"]).map(function (d) { return "<option>" + d + "</option>"; }).join("") + "</datalist>"
       + '<div data-eg="lista" style="margin-top:10px"><p>Carregando…</p></div></div>'
       + '<div class="eg-card"><h3>👤 Seu perfil</h3><p>Nome, foto, disciplinas, documentos restritos, troca de senha e o botão Sair ficam no seu perfil.</p><div class="eg-row"><a class="eg-btn" href="perfil.html">Abrir meu perfil</a><a class="eg-btn" href="escolas.html">← Todas as escolas</a></div></div>'
-      + '<div class="eg-card eg-perigo"><h3>⚠️ Zona de perigo</h3><p>Esta é uma escola fixa da conta do administrador: turmas, relatos e alunos vêm da própria página e do banco da escola, por isso não há "excluir escola" ou "excluir turma" aqui.</p>'
+      + '<div class="eg-card eg-perigo"><h3>⚠️ Zona de perigo</h3><p>Cada ação pede confirmação e a senha da sua conta.</p>'
       + '<div class="eg-pl"><div><b>Remover o vínculo com o INEP</b><span>A escola continua; só deixa de estar ligada ao cadastro oficial.</span></div><button type="button" class="eg-btn perigo" data-eg="tirar-inep"' + (i ? "" : " disabled") + ">Remover vínculo</button></div>"
       + '<div class="eg-pl"><div><b>Sair do perfil de um aluno da Educação Especial</b><span>Você deixa de ver o aluno; o perfil continua para a equipe.</span></div><div class="eg-row" style="margin:0"><select class="eg-in" data-eg="sair-aluno"></select><button type="button" class="eg-btn perigo" data-eg="sair">Sair do perfil</button></div></div>'
+      + '<div class="eg-pl"><div><b>Excluir a escola</b><span>Apaga do banco TODOS os registros de ' + esc(FIXA.nome) + ': aulas, presenças, atividades, notas lançadas, ocorrências, observações, chamada, turmas, metas e o estado sincronizado das páginas. Uma cópia fica na lixeira permanente. A escola sai da sua conta e a página deixa de publicar no banco. Os relatos escritos no código da página continuam lá até serem removidos num commit.</span></div><button type="button" class="eg-btn perigo" data-eg="excluir-escola">Excluir escola</button></div>'
       + "</div>";
     ligar(sec);
     (AEE ? Promise.resolve(AEE) : carregarAEE()).then(function () { desenharAEE(sec); });
@@ -164,6 +165,7 @@
         salvar().then(function () { C.vincularEscola(ID, { nome: FIXA.nome }); toast("Vínculo removido."); desenharConfig(); });
       });
     };
+    sec.querySelector('[data-eg="excluir-escola"]').onclick = excluirEscola;
     sec.querySelector('[data-eg="sair"]').onclick = function () {
       var id = sec.querySelector('[data-eg="sair-aluno"]').value; if (!id) return;
       var v = AEE.filter(function (x) { return x.aluno_id === id; })[0];
@@ -176,6 +178,47 @@
       });
     };
   }
+  // Exclui a escola (Etapa 16): tudo do banco, com cópia na lixeira permanente.
+  function excluirEscola() {
+    if (!pronto) return toast("Aguarde: sincronizando…");
+    C.confirmarPerigo({
+      titulo: "Excluir " + FIXA.nome + "?",
+      texto: "<b>Todos os registros desta escola serão apagados do banco</b>: aulas, presenças, atividades, notas lançadas, ocorrências, observações, chamada, turmas, metas e o estado das páginas. Os boletins da Biblioteca ligados a esta escola ficam sem esses dados. Uma cópia fica na lixeira permanente do banco.",
+      botao: "Sim, excluir a escola", botaoFinal: "Excluir a escola e todos os registros"
+    }).then(function (senha) {
+      if (!senha) return;
+      toast("Excluindo a escola…");
+      C.verificarSenha("").then(function (tem) {
+        return cli.rpc("relatorio_excluir_escola_admin", { p_escola: ID, p_senha: tem === null ? "" : senha, p_confirmacao: tem === null ? senha : "" });
+      }).then(function (r) {
+        if (r.error) throw new Error(r.error.message);
+        var c = r.data || {};
+        vinc().excluida = { em: new Date().toISOString(), contagem: c };
+        delete vinc().inep;
+        return Promise.all([salvar(), C.desvincularEscola(ID)]).then(function () {
+          alert("Escola excluída.\n\n" + (c.aulas || 0) + " aulas, " + (c.lancamentos || 0) + " lançamentos, " + (c.ocorrencias || 0) + " ocorrências, " + (c.observacoes || 0) + " observações e " + (c.estados || 0) + " estados apagados (cópia na lixeira permanente).");
+          location.replace("escolas.html");
+        });
+      }).catch(function (e) { toast("Não foi possível excluir: " + (e.message || e)); });
+    });
+  }
+  // Escola já excluída: a página não é mais usada (nada volta ao banco).
+  function avisarExcluida(quando) {
+    if (document.getElementById("eg-excluida")) return;
+    var ov = document.createElement("div");
+    ov.id = "eg-excluida"; ov.setAttribute("data-runtime-ui", "escola-global");
+    ov.style.cssText = "position:fixed;inset:0;z-index:50000;background:rgba(10,12,10,.92);display:flex;align-items:center;justify-content:center;padding:20px;font-family:'DM Sans',sans-serif";
+    ov.innerHTML = '<div style="background:#fff;color:#2b2b2b;border-radius:16px;max-width:440px;padding:24px;text-align:center"><div style="font-size:2rem">🗑️</div><h3 style="margin:8px 0">' + esc(FIXA.nome) + " foi excluída</h3><p style=\"font-size:.9rem;color:#5a5a5a;line-height:1.5\">Os registros desta escola foram apagados do banco" + (quando ? " em " + new Date(quando).toLocaleDateString("pt-BR") : "") + ". Uma cópia está na lixeira permanente.</p><a href=\"escolas.html\" style=\"display:inline-block;margin-top:14px;background:#2d6147;color:#fff;border-radius:10px;padding:10px 18px;font-weight:700;text-decoration:none\">← Voltar para as escolas</a></div>";
+    document.body.appendChild(ov);
+  }
+  function conferirExcluida() {
+    cli.from("relatorio_escolas_excluidas").select("excluida_em,slug").then(function (r) {
+      var slug = herminio ? "raimundo-herminio-de-melo-2" : "padre-carlos-casavequia";
+      var x = (r.data || []).filter(function (e) { return e.slug === slug; })[0];
+      if (x) avisarExcluida(x.excluida_em);
+    });
+  }
+
   function vincularInep() {
     var atual = vinc().inep;
     C.janela('<h3>🔗 Vincular ao INEP</h3><p>Encontre <strong>' + esc(FIXA.nome) + "</strong> no catálogo oficial.</p><div data-sel></div><div class=\"ck-acoes\"><button type=\"button\" class=\"ck-btn\" data-fechar>Fechar</button></div>", function (ov, fechar) {
@@ -220,7 +263,8 @@
           var sec = document.getElementById("sec-cfgglobal"); if (sec && sec.classList.contains("on")) desenharConfig();
         }
       });
-      sync.start().then(function () { pronto = true; atualizarPainel(); desenharConfig(); });
+      sync.start().then(function () { pronto = true; atualizarPainel(); desenharConfig(); if (vinc().excluida) avisarExcluida(vinc().excluida.em); });
+      conferirExcluida();
     });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", iniciar);
