@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-acesso="professor" data-auth-voltar="index.html">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a3a2a">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<title>Meu perfil</title>
+<script>
+(function(){var m='';try{m=localStorage.getItem('modo-tema')||'';}catch(e){}
+  if(!m)m=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'escuro':'claro';
+  window.MD_TEMA_INICIAL=m;
+  if(m==='escuro')document.documentElement.classList.add('dark-2026');})();
+</script>
+<script defer src="assets/js/dark-mode-2026.js?v=20260921a"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="assets/js/supabase-report-sync.js?v=20260921b"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921a"></script>
+<style>
+:root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--ou:#c9a84c;--os:#f5e6be;--ce:#2b2b2b;--cm:#5a5a5a;--ra:#c0392b;--rs:#fdecea;
+  --sup:#fff;--sup2:#faf8f2;--sup3:#f5f3ee;--linha:#e8e5de;--titulo:#1a3a2a;--acento:#2d6147;--acento-txt:#fff;--fundo:#faf8f2;--ss:0 4px 24px rgba(26,58,42,.10)}
+html.dark-2026{--sup:#191c1f;--sup2:#202327;--sup3:#272b30;--linha:#383d43;--titulo:#f4f5f6;--acento:#ffa65b;--acento-txt:#1b130b;--fundo:#111315;--ce:#e9eaec;--cm:#a9adb3;--ra:#ef8a80;--rs:rgba(185,99,93,.14)}
+*{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none!important}
+body{font-family:'DM Sans',sans-serif;background:var(--fundo);color:var(--ce);min-height:100vh}
+button,input,textarea,select{font-family:inherit}
+a{color:var(--acento)}
+.cab{background:linear-gradient(135deg,var(--vd),var(--vm) 60%,var(--vc));color:#fff}
+html.dark-2026 .cab{background:linear-gradient(135deg,#15181b,#1d2024)!important;border-bottom:1px solid var(--linha)}
+.cab-i{max-width:900px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cab-i h1{font-family:'Playfair Display',serif;font-size:1.3rem;flex:1}
+.pill{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.8rem;cursor:pointer;text-decoration:none;white-space:nowrap}
+main{max-width:900px;margin:0 auto;padding:26px 20px 60px}
+/* Foto */
+.topo{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin-bottom:22px}
+.foto{position:relative;width:156px;height:156px}
+.foto .img{width:100%;height:100%;border-radius:50%;background:var(--sup3);border:4px solid var(--ou);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:3rem;font-weight:700;color:var(--acento);overflow:hidden;box-shadow:var(--ss)}
+.foto .img img{width:100%;height:100%;object-fit:cover}
+.foto label{position:absolute;right:4px;bottom:4px;width:44px;height:44px;border-radius:50%;background:var(--acento);color:var(--acento-txt);display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;border:3px solid var(--fundo);box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.topo h2{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--titulo)}
+.topo .sub{font-size:.88rem;color:var(--cm)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.chip{background:var(--sup3);border:1px solid var(--linha);border-radius:999px;padding:4px 11px;font-size:.78rem}
+.foto-acoes{display:flex;gap:8px}
+/* Cartões */
+.card{background:var(--sup);border-radius:14px;box-shadow:var(--ss);padding:20px 22px;margin-bottom:18px;border:1px solid transparent}
+html.dark-2026 .card{border-color:var(--linha)}
+.card h3{font-family:'Playfair Display',serif;color:var(--titulo);font-size:1.15rem;margin-bottom:4px}
+.card>p.exp{font-size:.84rem;color:var(--cm);line-height:1.55;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px 16px}
+.f{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.f.full{grid-column:1/-1}
+.f label{font-size:.7rem;font-weight:700;color:var(--acento);text-transform:uppercase;letter-spacing:.05em}
+.f input,.f textarea,.f select{padding:10px 12px;border:2px solid var(--linha);border-radius:10px;font-size:.92rem;color:var(--ce);background:var(--sup2);width:100%}
+.f textarea{min-height:96px;resize:vertical}
+.f .dica{font-size:.74rem;color:var(--cm)}
+.linha{display:flex;gap:8px;align-items:center}
+.linha input{flex:1}
+.btn{border:1px solid var(--linha);border-radius:10px;padding:10px 16px;font-weight:700;font-size:.86rem;cursor:pointer;background:var(--sup3);color:var(--ce);text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn.pri{background:var(--acento);color:var(--acento-txt);border-color:var(--acento)}
+.btn.perigo{background:var(--rs);color:var(--ra);border-color:rgba(192,57,43,.35)}
+.btn.mini{padding:6px 10px;font-size:.76rem;border-radius:8px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.disc{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.disc span{display:inline-flex;align-items:center;gap:6px;background:var(--sup3);border:1px solid var(--linha);border-radius:999px;padding:4px 6px 4px 11px;font-size:.82rem}
+.disc button{border:none;background:none;color:var(--ra);cursor:pointer;font-size:.9rem}
+.restrito{border-left:4px solid var(--ou)}
+.cadeado{display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:rgba(201,168,76,.18);color:#8a6a1c;border:1px solid rgba(201,168,76,.5);border-radius:6px;padding:2px 8px;margin-left:6px;vertical-align:middle}
+html.dark-2026 .cadeado{color:#e6c677}
+.cert{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--linha);font-size:.86rem}
+.cert .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cert small{color:var(--cm)}
+.escolas{display:flex;flex-direction:column;gap:8px}
+.escolas a{display:flex;gap:10px;align-items:center;text-decoration:none;color:var(--ce);background:var(--sup2);border:1px solid var(--linha);border-radius:12px;padding:10px 12px;font-size:.88rem}
+.escolas small{color:var(--cm);display:block}
+.salvar{position:sticky;bottom:14px;display:flex;justify-content:center;gap:10px;margin:8px 0 22px;z-index:5}
+.salvar .btn{box-shadow:0 10px 30px rgba(0,0,0,.25);padding:12px 22px}
+.perigo{border:2px solid rgba(192,57,43,.45)}
+.perigo h3{color:var(--ra)}
+.pg{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--linha)}
+.pg>div:first-child{flex:1;min-width:230px}
+.pg b{display:block;font-size:.92rem}.pg span{font-size:.8rem;color:var(--cm)}
+.senha{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;width:100%;margin-top:8px}
+.senha input{padding:10px 12px;border:2px solid var(--linha);border-radius:10px;font-size:.9rem;color:var(--ce);background:var(--sup2)}
+.msg{font-size:.82rem;margin-top:6px;min-height:1em}
+.msg.erro{color:var(--ra)}.msg.ok{color:#2f8a55}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1a3a2a;color:#fff;padding:10px 18px;border-radius:999px;font-size:.84rem;z-index:40000;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:92vw;text-align:center}
+html.dark-2026 .toast{background:#272b30;border:1px solid #383d43}
+footer{text-align:center;padding:18px 20px;font-size:.76rem;color:var(--cm)}
+.f label.btn{text-transform:none;letter-spacing:0;font-size:.76rem;color:var(--ce)}
+html.dark-2026 .perigo{border-color:#7a3530!important}
+html.dark-2026 .perigo h3{color:#ef8a80!important}
+html.dark-2026 .btn.perigo{background:rgba(185,99,93,.16)!important;color:#ef8a80!important;border-color:#7a3530!important}
+html.dark-2026 .btn.pri{background:linear-gradient(135deg,#ffa65b,#ff8f3a)!important;color:#151719!important;border-color:#ffa65b!important}
+html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;color:var(--ce)!important;border-color:var(--linha)!important}
+@media(max-width:560px){main{padding:20px 14px 50px}.card{padding:16px}}
+</style>
+</head>
+<body>
+<header class="cab"><div class="cab-i">
+  <a class="pill" href="escolas.html">← Escolas</a>
+  <h1>Meu perfil</h1>
+  <button type="button" class="pill" id="sair">Sair</button>
+</div></header>
+
+<main id="main">
+  <section class="topo">
+    <div class="foto"><div class="img" id="foto-img">👤</div><label title="Trocar foto" aria-label="Trocar foto">📷<input type="file" accept="image/*" id="foto-arq" hidden></label></div>
+    <div class="foto-acoes"><button type="button" class="btn mini" id="foto-tirar" hidden>Remover foto</button></div>
+    <h2 id="topo-nome">…</h2>
+    <div class="sub" id="topo-sub"></div>
+    <div class="chips" id="topo-disc"></div>
+  </section>
+
+  <section class="card">
+    <h3>Dados públicos</h3>
+    <p class="exp">Poderão aparecer para as escolas e colegas quando a plataforma da escola estiver ligada ao RELATORIO SKIN. Hoje, só você vê.</p>
+    <div class="grid">
+      <div class="f full"><label for="p-nome">Nome completo</label><input id="p-nome" autocomplete="name"></div>
+      <div class="f"><label for="p-nasc">Data de nascimento</label><input id="p-nasc" type="date"><span class="dica" id="p-idade"></span></div>
+      <div class="f"><label for="p-formacao">Formação</label><input id="p-formacao" placeholder="Ex.: Licenciatura em Letras — UFAC"></div>
+      <div class="f full"><label for="p-disc-in">Disciplinas que leciona</label>
+        <div class="linha"><input id="p-disc-in" list="lista-disc" placeholder="Digite e toque em Adicionar (ou Enter)"><button type="button" class="btn mini" id="p-disc-add">+ Adicionar</button></div>
+        <div class="disc" id="p-disc"></div>
+        <datalist id="lista-disc"><option>Língua Portuguesa</option><option>Matemática</option><option>História</option><option>Geografia</option><option>Ciências</option><option>Biologia</option><option>Física</option><option>Química</option><option>Arte</option><option>Educação Física</option><option>Língua Inglesa</option><option>Língua Espanhola</option><option>Filosofia</option><option>Sociologia</option><option>Ensino Religioso</option><option>Redação</option><option>Projeto de Vida</option><option>Literatura</option><option>Tecnologia e Computação</option><option>Educação Infantil</option><option>Anos Iniciais (polivalente)</option></datalist>
+      </div>
+      <div class="f"><label for="p-cidade">Cidade</label><input id="p-cidade"></div>
+      <div class="f"><label for="p-uf">Estado</label><select id="p-uf"><option value="">—</option></select></div>
+      <div class="f"><label for="p-email">E-mail de contato</label><input id="p-email" type="email" autocomplete="email"></div>
+      <div class="f"><label for="p-tel">Telefone / WhatsApp</label><input id="p-tel" type="tel" autocomplete="tel" placeholder="(68) 9 9999-9999"></div>
+      <div class="f full"><label for="p-lattes">Currículo Lattes ou portfólio (link)</label><input id="p-lattes" type="url" placeholder="https://lattes.cnpq.br/…"></div>
+      <div class="f full"><label for="p-sobre">Sobre mim</label><textarea id="p-sobre" placeholder="Sua trajetória, áreas de interesse, projetos…"></textarea></div>
+    </div>
+  </section>
+
+  <section class="card restrito">
+    <h3>🔒 Restritos <span class="cadeado">Só você e a gestão</span></h3>
+    <p class="exp">Documentos e informações que só <strong>você</strong> e a <strong>gestão das escolas em que você atua</strong> poderão acessar — nunca colegas, alunos ou responsáveis. A gestão só terá acesso quando a plataforma da escola estiver ligada ao RELATORIO SKIN; até lá, apenas você vê. Os arquivos ficam numa pasta privada da sua conta.</p>
+    <div class="grid">
+      <div class="f"><label for="r-mat">Matrícula (funcional)</label><input id="r-mat" autocomplete="off"></div>
+      <div class="f full"><label>Certificados (PDF ou Word, até 10 MB cada)</label>
+        <div><label class="btn mini" style="cursor:pointer">📎 Enviar certificado<input type="file" id="r-cert-arq" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple hidden></label> <span class="dica" id="r-cert-msg"></span></div>
+        <div id="r-certs"></div>
+      </div>
+      <div class="f full"><label for="r-planos">Google Drive — Planos de curso</label><div class="linha"><input id="r-planos" type="url" placeholder="https://drive.google.com/…"><a class="btn mini" data-abrir="r-planos" target="_blank" rel="noopener">Abrir ↗</a></div></div>
+      <div class="f full"><label for="r-seq">Google Drive — Sequências didáticas</label><div class="linha"><input id="r-seq" type="url" placeholder="https://drive.google.com/…"><a class="btn mini" data-abrir="r-seq" target="_blank" rel="noopener">Abrir ↗</a></div></div>
+      <div class="f full"><label for="r-rel">Google Drive — Relatórios</label><div class="linha"><input id="r-rel" type="url" placeholder="https://drive.google.com/…"><a class="btn mini" data-abrir="r-rel" target="_blank" rel="noopener">Abrir ↗</a></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>🏫 Minhas escolas</h3>
+    <p class="exp">Escolas ligadas à sua conta. Para cadastrar outra, volte para <a href="escolas.html">Escolas</a>.</p>
+    <div class="escolas" id="escolas"></div>
+  </section>
+
+  <div class="salvar"><button type="button" class="btn pri" id="salvar">💾 Salvar perfil</button></div>
+
+  <section class="card perigo">
+    <h3>⚠️ Zona de perigo</h3>
+    <div class="pg">
+      <div><b id="senha-tit">Mudar senha</b><span id="senha-exp">Digite a senha atual e a nova (8 ou mais caracteres, com letras e números).</span>
+        <div class="senha"><input type="password" id="s-atual" placeholder="Senha atual" autocomplete="current-password"><input type="password" id="s-nova" placeholder="Nova senha" autocomplete="new-password"><input type="password" id="s-conf" placeholder="Repita a nova senha" autocomplete="new-password"></div>
+        <div class="msg" id="s-msg"></div>
+      </div>
+      <button type="button" class="btn" id="s-trocar">Trocar senha</button>
+    </div>
+    <div class="pg">
+      <div><b>Excluir conta</b><span id="excluir-exp">Apaga a conta e todos os dados: escolas, turmas, alunos, diários, plano de aulas, sequências, livros, calendário, perfil e certificados. Não tem volta — baixe antes uma cópia em ⚙️ Configurações de cada escola.</span></div>
+      <button type="button" class="btn perigo" id="excluir">Excluir minha conta</button>
+    </div>
+  </section>
+</main>
+<footer><a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   Perfil do professor (Etapa 14, 21/09/2026). Dados em professor_dados,
+   escopo "meu-diario:perfil:v1" (ContaSkin.perfil). Certificados no bucket
+   privado "professor-arquivos", pasta <user_id>/certificados/.
+   ═══════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  var S, C, u, P, sujo = false, temSenha = true;
+  var BUCKET = 'professor-arquivos';
+  function $(id) { return document.getElementById(id); }
+  function esc(v) { return C.esc(v); }
+  function toast(m) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3200); }
+  function sb() { return S.getClient(); }
+  var CAMPOS = { 'p-nome': 'nome', 'p-nasc': 'nascimento', 'p-formacao': 'formacao', 'p-cidade': 'cidade', 'p-uf': 'uf', 'p-email': 'emailContato', 'p-tel': 'telefone', 'p-lattes': 'lattes', 'p-sobre': 'sobre' };
+  var RESTRITOS = { 'r-mat': 'matricula', 'r-planos': 'linkPlanos', 'r-seq': 'linkSequencias', 'r-rel': 'linkRelatorios' };
+
+  function marcarSujo() { sujo = true; $('salvar').textContent = '💾 Salvar alterações'; }
+  function preencher() {
+    P = C.perfil.dados();
+    Object.keys(CAMPOS).forEach(function (id) { $(id).value = P[CAMPOS[id]] || ''; });
+    Object.keys(RESTRITOS).forEach(function (id) { $(id).value = P.restrito[RESTRITOS[id]] || ''; });
+    desenharTopo(); desenharDisc(); desenharCerts(); desenharLinks();
+  }
+  function lerFormulario() {
+    // Se chegou uma versão do banco durante a edição, o que está na tela vence
+    // e os certificados das duas versões ficam.
+    var atual = C.perfil.dados();
+    if (atual !== P) {
+      var vistos = {};
+      atual.restrito.certificados = atual.restrito.certificados.concat(P.restrito.certificados).filter(function (c) { if (vistos[c.caminho]) return false; vistos[c.caminho] = 1; return true; });
+      atual.disciplinas = P.disciplinas; atual.foto = P.foto;
+      P = atual;
+    }
+    Object.keys(CAMPOS).forEach(function (id) { P[CAMPOS[id]] = $(id).value.trim(); });
+    Object.keys(RESTRITOS).forEach(function (id) { P.restrito[RESTRITOS[id]] = $(id).value.trim(); });
+  }
+  function desenharTopo() {
+    var nome = $('p-nome').value.trim() || u.email;
+    $('foto-img').innerHTML = P.foto ? '<img src="' + esc(P.foto) + '" alt="Foto de perfil">' : esc(C.iniciais(nome));
+    $('foto-tirar').hidden = !P.foto;
+    $('topo-nome').textContent = nome;
+    var idade = C.perfil.idade($('p-nasc').value);
+    $('p-idade').textContent = idade !== null ? idade + ' anos' : '';
+    $('topo-sub').textContent = [idade !== null ? idade + ' anos' : '', [$('p-cidade').value.trim(), $('p-uf').value].filter(Boolean).join('/'), u.email].filter(Boolean).join(' · ');
+    $('topo-disc').innerHTML = P.disciplinas.map(function (d) { return '<span class="chip">' + esc(d) + '</span>'; }).join('');
+  }
+  function desenharDisc() {
+    $('p-disc').innerHTML = P.disciplinas.map(function (d, i) { return '<span>' + esc(d) + '<button type="button" data-rm="' + i + '" aria-label="Remover ' + esc(d) + '">✕</button></span>'; }).join('') || '<span style="border:none;background:none;color:var(--cm)">Nenhuma ainda.</span>';
+    $('p-disc').querySelectorAll('[data-rm]').forEach(function (b) { b.onclick = function () { P.disciplinas.splice(+b.getAttribute('data-rm'), 1); marcarSujo(); desenharDisc(); desenharTopo(); }; });
+  }
+  function addDisc() {
+    var v = $('p-disc-in').value.trim();
+    if (!v) return;
+    if (!P.disciplinas.some(function (d) { return d.toLowerCase() === v.toLowerCase(); })) P.disciplinas.push(v);
+    $('p-disc-in').value = ''; marcarSujo(); desenharDisc(); desenharTopo();
+  }
+  function desenharLinks() {
+    document.querySelectorAll('[data-abrir]').forEach(function (a) {
+      var v = $(a.getAttribute('data-abrir')).value.trim(), ok = /^https?:\/\//i.test(v);
+      a.hidden = !ok; if (ok) a.href = v;
+    });
+  }
+  function tamanho(b) { return b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+  function desenharCerts() {
+    var l = P.restrito.certificados;
+    $('r-certs').innerHTML = l.length ? l.map(function (c, i) {
+      return '<div class="cert"><span>' + (/\.pdf$/i.test(c.nome) ? '📕' : '📘') + '</span><div class="nm">' + esc(c.nome) + '<br><small>' + tamanho(c.tamanho || 0) + ' · enviado em ' + esc((c.enviadoEm || '').slice(0, 10).split('-').reverse().join('/')) + '</small></div>'
+        + '<button type="button" class="btn mini" data-ver="' + i + '">Abrir</button><button type="button" class="btn mini perigo" data-apagar="' + i + '">Excluir</button></div>';
+    }).join('') : '<p class="dica" style="font-size:.8rem;color:var(--cm);margin-top:8px">Nenhum certificado enviado.</p>';
+    $('r-certs').querySelectorAll('[data-ver]').forEach(function (b) { b.onclick = function () { abrirCert(l[+b.getAttribute('data-ver')]); }; });
+    $('r-certs').querySelectorAll('[data-apagar]').forEach(function (b) { b.onclick = function () { apagarCert(+b.getAttribute('data-apagar')); }; });
+  }
+  function abrirCert(c) {
+    var janela = window.open('', '_blank');
+    sb().storage.from(BUCKET).createSignedUrl(c.caminho, 300).then(function (r) {
+      if (r.error) { if (janela) janela.close(); return toast('Não consegui abrir: ' + r.error.message); }
+      if (janela) janela.location.href = r.data.signedUrl; else window.location.href = r.data.signedUrl;
+    });
+  }
+  function apagarCert(i) {
+    var c = P.restrito.certificados[i];
+    C.confirmarPerigo({ titulo: 'Excluir o certificado?', texto: '"' + esc(c.nome) + '" será apagado da sua pasta.', botao: 'Sim, excluir', botaoFinal: 'Excluir' }).then(function (ok) {
+      if (!ok) return;
+      sb().storage.from(BUCKET).remove([c.caminho]).then(function (r) {
+        if (r.error) return toast('Não consegui excluir: ' + r.error.message);
+        P.restrito.certificados.splice(i, 1);
+        lerFormulario(); C.perfil.salvar(); desenharCerts(); toast('Certificado excluído.');
+      });
+    });
+  }
+  function enviarCerts(arquivos) {
+    var lista = Array.prototype.slice.call(arquivos || []), msg = $('r-cert-msg');
+    if (!lista.length) return;
+    var ruins = lista.filter(function (f) { return !/\.(pdf|docx?)$/i.test(f.name) || f.size > 10485760; });
+    if (ruins.length) { toast('Envie só PDF ou Word, até 10 MB: ' + ruins.map(function (f) { return f.name; }).join(', ')); return; }
+    msg.textContent = 'Enviando…';
+    var feitos = 0;
+    lista.reduce(function (p, f) {
+      return p.then(function () {
+        var limpo = f.name.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w.-]+/g, '_').slice(-80);
+        var caminho = u.id + '/certificados/' + Date.now() + '-' + limpo;
+        var tipo = f.type || (/\.pdf$/i.test(f.name) ? 'application/pdf' : /\.docx$/i.test(f.name) ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'application/msword');
+        return sb().storage.from(BUCKET).upload(caminho, f, { contentType: tipo, upsert: false }).then(function (r) {
+          if (r.error) throw new Error(f.name + ': ' + r.error.message);
+          P.restrito.certificados.push({ nome: f.name, caminho: caminho, tipo: tipo, tamanho: f.size, enviadoEm: new Date().toISOString() });
+          feitos++;
+        });
+      });
+    }, Promise.resolve()).then(function () {
+      msg.textContent = ''; toast(feitos + ' certificado(s) enviado(s).');
+    }).catch(function (e) { msg.textContent = ''; toast('Falha no envio — ' + e.message); })
+      .then(function () { lerFormulario(); C.perfil.salvar(); desenharCerts(); $('r-cert-arq').value = ''; });
+  }
+  function desenharEscolas() {
+    var e = null;
+    try { e = JSON.parse(localStorage.getItem('md_estrutura_' + u.id) || 'null'); } catch (x) {}
+    var lista = (e && e.escolas) || [], fixas = (e && e.fixas) || {};
+    var html = lista.map(function (x) {
+      return '<a href="meu-diario.html?escola=' + encodeURIComponent(x.id) + '"><span style="font-size:1.4rem">' + esc(x.icone || '🏫') + '</span><div>' + esc(x.nome) + '<small>' + (x.inep ? 'INEP ' + x.inep.codigo + ' · ' + esc(x.inep.municipio) + '/' + esc(x.inep.uf) : 'Sem vínculo com o INEP') + '</small></div></a>';
+    });
+    if (S.auth.isAdmin()) [['casavequia', 'Escola Padre Carlos Casavequia'], ['herminio', 'Escola Raimundo Hermínio de Melo']].forEach(function (f) {
+      var v = fixas[f[0]] && fixas[f[0]].inep;
+      html.unshift('<a href="' + f[0] + '.html"><span style="font-size:1.4rem">🏛️</span><div>' + f[1] + '<small>' + (v ? 'INEP ' + v.codigo : 'Sem vínculo com o INEP') + '</small></div></a>');
+    });
+    $('escolas').innerHTML = html.join('') || '<p style="font-size:.86rem;color:var(--cm)">Nenhuma escola ainda. <a href="escolas.html#cadastrar">Cadastrar escola</a></p>';
+  }
+
+  // ── Senha ─────────────────────────────────────────────────────────────
+  function prepararSenha() {
+    C.verificarSenha('').then(function (r) {
+      temSenha = r !== null;
+      if (!temSenha) {
+        $('senha-tit').textContent = 'Criar uma senha';
+        $('senha-exp').textContent = 'Sua conta entra pelo Google. Crie uma senha para entrar também com e-mail e senha (8 ou mais caracteres, com letras e números).';
+        $('s-atual').hidden = true;
+        $('s-trocar').textContent = 'Criar senha';
+      }
+    }).catch(function () {});
+  }
+  function trocarSenha() {
+    var msg = $('s-msg'), atual = $('s-atual').value, nova = $('s-nova').value, conf = $('s-conf').value;
+    msg.className = 'msg erro';
+    if (temSenha && !atual) { msg.textContent = 'Digite a senha atual.'; return; }
+    if (nova.length < 8 || !/[a-z]/i.test(nova) || !/\d/.test(nova)) { msg.textContent = 'A nova senha precisa de 8 ou mais caracteres, com letras e números.'; return; }
+    if (nova !== conf) { msg.textContent = 'As duas senhas novas não são iguais.'; return; }
+    $('s-trocar').disabled = true; msg.className = 'msg'; msg.textContent = 'Conferindo…';
+    (temSenha ? C.verificarSenha(atual) : Promise.resolve(true)).then(function (ok) {
+      if (!ok) throw new Error('Senha atual incorreta.');
+      return sb().auth.updateUser({ password: nova });
+    }).then(function (r) {
+      if (r && r.error) {
+        var m = r.error.message || '';
+        if (/different from the old|same password/i.test(m)) throw new Error('A nova senha precisa ser diferente da atual.');
+        if (/reauthentication|recent/i.test(m)) throw new Error('Por segurança, saia e entre de novo na conta antes de trocar a senha.');
+        if (/weak|at least|should be/i.test(m)) throw new Error('Senha fraca: use 8 ou mais caracteres, com letras e números.');
+        throw new Error(m);
+      }
+      msg.className = 'msg ok'; msg.textContent = temSenha ? 'Senha trocada.' : 'Senha criada. Agora você também entra com e-mail e senha.';
+      $('s-atual').value = $('s-nova').value = $('s-conf').value = '';
+      if (!temSenha) prepararSenha();
+    }).catch(function (e) { msg.className = 'msg erro'; msg.textContent = e.message || 'Não foi possível trocar agora.'; })
+      .then(function () { $('s-trocar').disabled = false; });
+  }
+
+  // ── Excluir conta ─────────────────────────────────────────────────────
+  function excluirConta() {
+    C.confirmarPerigo({ titulo: 'Excluir a sua conta?', texto: 'Todas as escolas, turmas, alunos, diários, planos, sequências, livros, calendário, perfil e certificados serão apagados para sempre. Esta ação não pode ser desfeita.', botao: 'Sim, excluir a minha conta', botaoFinal: 'Excluir a conta' }).then(function (senha) {
+      if (!senha) return;
+      toast('Excluindo a conta…');
+      var st = sb().storage.from(BUCKET);
+      st.list(u.id + '/certificados', { limit: 1000 }).then(function (r) {
+        var nomes = ((r && r.data) || []).map(function (o) { return u.id + '/certificados/' + o.name; });
+        return nomes.length ? st.remove(nomes) : null;
+      }).catch(function () {}).then(function () {
+        return sb().rpc('conta_excluir', { p_senha: temSenha ? senha : '', p_confirmacao: temSenha ? '' : senha });
+      }).then(function (r) {
+        if (r.error) throw new Error(r.error.message);
+        try { Object.keys(localStorage).forEach(function (k) { if (k.indexOf(u.id) >= 0) localStorage.removeItem(k); }); } catch (x) {}
+        alert('Sua conta foi excluída. Obrigado por usar o RELATORIO SKIN.');
+        return sb().auth.signOut().catch(function () {});
+      }).then(function () { window.location.replace('index.html'); })
+        .catch(function (e) { alert('Não foi possível excluir: ' + (e.message || e)); });
+    });
+  }
+
+  function iniciar() {
+    S = window.RelatorioSupabaseSync; C = window.ContaSkin;
+    u = S.auth.currentUser();
+    var sel = $('p-uf'); sel.innerHTML += C.UFS.map(function (x) { return '<option value="' + x[0] + '">' + x[1] + '</option>'; }).join('');
+    C.perfil.iniciar();
+    C.perfil.aoMudar(function () { if (!sujo) preencher(); });
+    desenharEscolas();
+    prepararSenha();
+    if (S.auth.isAdmin()) { $('excluir').disabled = true; $('excluir-exp').textContent = 'A conta do administrador não pode ser excluída por aqui.'; }
+    document.querySelectorAll('#main input:not([type=file]),#main textarea,#main select').forEach(function (el) {
+      if (/^s-/.test(el.id) || el.id === 'p-disc-in') return;
+      el.addEventListener('input', function () { marcarSujo(); desenharTopo(); desenharLinks(); });
+    });
+    $('p-disc-add').onclick = addDisc;
+    $('p-disc-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addDisc(); } });
+    $('foto-arq').onchange = function () {
+      var f = this.files[0]; if (!f) return;
+      C.reduzirImagem(f, 360).then(function (url) { lerFormulario(); P.foto = url; C.perfil.salvar(); desenharTopo(); toast('Foto atualizada.'); }).catch(function (e) { toast(e.message); });
+      this.value = '';
+    };
+    $('foto-tirar').onclick = function () { lerFormulario(); P.foto = ''; C.perfil.salvar(); desenharTopo(); };
+    $('r-cert-arq').onchange = function () { enviarCerts(this.files); };
+    $('salvar').onclick = function () {
+      lerFormulario();
+      if (!P.nome) return toast('Informe o seu nome.');
+      ['lattes'].forEach(function (k) { if (P[k] && !/^https?:\/\//i.test(P[k])) P[k] = 'https://' + P[k]; });
+      ['linkPlanos', 'linkSequencias', 'linkRelatorios'].forEach(function (k) { if (P.restrito[k] && !/^https?:\/\//i.test(P.restrito[k])) P.restrito[k] = 'https://' + P.restrito[k]; });
+      C.perfil.salvar().then(function () { sujo = false; $('salvar').textContent = '💾 Salvar perfil'; preencher(); toast('Perfil salvo.'); });
+    };
+    $('s-trocar').onclick = trocarSenha;
+    $('excluir').onclick = excluirConta;
+    $('sair').onclick = function () { if (confirm('Sair da conta neste aparelho?')) S.auth.signOut(); };
+    window.addEventListener('beforeunload', function (e) { if (sujo) { e.preventDefault(); e.returnValue = ''; } });
+    preencher();
+  }
+  function quandoPronto() {
+    if (!window.RelatorioSupabaseSync || !window.ContaSkin) { setTimeout(quandoPronto, 50); return; }
+    window.RelatorioSupabaseSync.auth.whenAuthorized().then(function () { if (!u) iniciar(); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', quandoPronto); else quandoPronto();
+})();
+</script>
+</body>
+</html>

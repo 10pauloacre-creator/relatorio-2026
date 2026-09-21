@@ -251,7 +251,7 @@
       "TIPOS DE AÇÃO",
       '1. criar_diario — registra uma aula: {"tipo":"criar_diario","turma":"<id>","disciplina":"<nome>","data":"AAAA-MM-DD","inicio":"HH:MM","fim":"HH:MM","horas":2,"assunto":"tema curto da aula","conteudo":"o que foi trabalhado","faltaram":[n],"faltas_justificadas":[n],"atividade":{"houve":true,"titulo":"","descricao":"","fez":[n],"nao_fez":[n]},"comportamento":[{"alunos":[n],"tipo":"advertencia|grave|destaque","texto":""}],"lembrete":{"titulo":"","texto":""}}',
       '2. editar_diario — altera um diário existente; só os campos enviados mudam e as listas enviadas substituem as antigas: {"tipo":"editar_diario","id":"<id do diário>", ...campos de criar_diario}',
-      '3. criar_turma — {"tipo":"criar_turma","escola":"nome da escola","nome":"7º Ano A","disciplinas":[{"nome":"Ciências","meta_bimestre":10,"total_ano":40}],"alunos":["Nome Completo", "..."]}',
+      '3. criar_turma — {"tipo":"criar_turma","nome":"7º Ano A","disciplinas":[{"nome":"Ciências","meta_bimestre":10,"total_ano":40}],"alunos":["Nome Completo", "..."]}',
       '4. adicionar_alunos — no fim da chamada: {"tipo":"adicionar_alunos","turma":"<id>","nomes":["..."]}',
       '5. transferir_aluno — {"tipo":"transferir_aluno","turma":"<id>","aluno":n}',
       '6. adicionar_disciplina — {"tipo":"adicionar_disciplina","turma":"<id>","nome":"...","meta_bimestre":10,"total_ano":40}',
@@ -595,7 +595,7 @@
     if (d) return d;
     var c = t.disciplinas.filter(function (x) { return n && (norm(x.nome).indexOf(n) >= 0 || n.indexOf(norm(x.nome)) >= 0); });
     if (c.length === 1) return c[0];
-    throw new Error("A disciplina \"" + (ref || "?") + "\" não existe em " + t.nome + ". Cadastre-a em ⚙️ Turmas e alunos (ou peça à I.A para adicionar).");
+    throw new Error("A disciplina \"" + (ref || "?") + "\" não existe em " + t.nome + ". Cadastre-a em ⚙️ Configurações (ou peça à I.A para adicionar).");
   }
   function alunoDe(t, ref) {
     if (typeof ref === "number" || /^\s*\d+\s*$/.test(String(ref))) {

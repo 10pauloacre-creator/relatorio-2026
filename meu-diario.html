@@ -22,10 +22,11 @@ window.NOVO_DIARIO_MANUAL = true;
 </script>
 <script defer src="assets/js/dark-mode-2026.js?v=20260921a"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="assets/js/supabase-report-sync.js?v=20260921a"></script>
-<script defer src="assets/js/meu-diario-recursos.js?v=20260919a"></script>
-<script defer src="assets/js/meu-diario-ia.js?v=20260920c"></script>
-<script defer src="assets/js/novo-diario.js?v=20260921b"></script>
+<script defer src="assets/js/supabase-report-sync.js?v=20260921b"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921a"></script>
+<script defer src="assets/js/meu-diario-recursos.js?v=20260921a"></script>
+<script defer src="assets/js/meu-diario-ia.js?v=20260921a"></script>
+<script defer src="assets/js/novo-diario.js?v=20260921c"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--og:#876020;--card:#fff;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px;
   /* Tokens próprios do Meu Diário (redefinidos no modo escuro). */
@@ -47,6 +48,8 @@ a{color:var(--md-destaque)}
 .md-cab-acoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .md-sync{font-size:.74rem;background:rgba(255,255,255,.14);border-radius:999px;padding:6px 12px;white-space:nowrap}
 .md-sair{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.8rem;cursor:pointer}
+.md-voltar{text-decoration:none;white-space:nowrap}
+.md-avatar{overflow:hidden}.md-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 #modo-btns{display:flex;gap:6px}
 #modo-btns button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 #modo-btns .btn-claro{background:#fff;border-color:#e8e5de;color:#c9a84c}
@@ -167,6 +170,33 @@ details.md-turma[open]>summary{border-bottom:1px solid var(--md-linha);margin-bo
 .md-m.pr,.md-m.fz{background:#e6f6ec;color:#1f6b43}.md-m.fa,.md-m.nf{background:#fde2df;color:#a4291d}.md-m.fj{background:#fff4d6;color:#7a5c10}
 .md-m.tr{opacity:.45;cursor:default}
 .md-ajuda{font-size:.74rem;color:var(--cm);margin-bottom:8px}
+/* ── Escola, ano letivo e cadastro de turmas (Etapa 14) ── */
+.md-ano{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;color:var(--md-destaque);background:var(--md-sup);border:1px solid var(--md-linha);border-radius:999px;padding:5px 6px 5px 14px}
+.md-ano select{border:none;background:var(--md-sup3);color:var(--ce);border-radius:999px;padding:6px 10px;font:inherit;font-weight:700;cursor:pointer}
+.md-opcoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:14px}
+.md-opcao{display:flex;flex-direction:column;gap:5px;text-align:left;border:1px solid var(--md-linha);background:var(--md-sup2);color:var(--ce);border-radius:14px;padding:16px;cursor:pointer;transition:border-color .15s,transform .15s}
+.md-opcao:hover{border-color:var(--md-destaque);transform:translateY(-2px)}
+.md-opcao span{font-size:1.6rem}.md-opcao b{font-size:.95rem;color:var(--md-titulo)}.md-opcao small{font-size:.78rem;color:var(--cm);line-height:1.45}
+.md-escola{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.md-escola-face{width:132px;height:132px;border-radius:22px;background:linear-gradient(160deg,#2a3324,#141712);display:flex;align-items:center;justify-content:center;font-size:3.6rem;overflow:hidden;flex-shrink:0;box-shadow:var(--sc)}
+.md-escola-face img{width:100%;height:100%;object-fit:cover}
+.md-icones{display:flex;flex-wrap:wrap;gap:6px}
+.md-icones button{width:40px;height:40px;border-radius:10px;border:2px solid var(--md-linha);background:var(--md-sup2);font-size:1.25rem;cursor:pointer}
+.md-icones button.on{border-color:var(--md-destaque)}
+.md-inep{margin-top:16px;padding:14px 16px;border-radius:12px;background:var(--md-sup2);border:1px solid var(--md-linha);font-size:.86rem;line-height:1.55}
+.md-inep span{color:var(--cm);font-size:.8rem}
+.md-perigo{border:2px solid rgba(192,57,43,.45)}
+.md-perigo h3{color:var(--ra)!important}
+.md-perigo-l{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--md-linha)}
+.md-perigo-l>div:first-child{flex:1;min-width:220px}
+.md-perigo-l b{display:block;font-size:.9rem;color:var(--ce)}.md-perigo-l span{font-size:.78rem;color:var(--cm)}
+.md-imp{border:1px solid var(--md-linha);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.md-imp small{color:var(--cm);font-weight:400}
+.md-checks{display:flex;flex-direction:column;gap:6px;font-size:.86rem}
+.md-f label.md-btn{text-transform:none;letter-spacing:0;color:var(--ce);display:inline-block}
+html.dark-2026 .md-perigo{border-color:#7a3530}
+html.dark-2026 .md-perigo h3{color:var(--dark-negative)!important}
+html.dark-2026 .md-ano select{background:var(--md-sup3);color:var(--dark-text)}
 /* ── Janelas (relatório do aluno e módulos) ── */
 .md-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:center;justify-content:center;padding:14px}
 .md-rel{background:var(--md-sup);color:var(--ce);border-radius:16px;max-width:760px;width:100%;max-height:94vh;overflow-y:auto;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.4)}
@@ -211,7 +241,7 @@ html.dark-2026 .itab.on{color:var(--dark-accent)!important;border-bottom-color:v
 </head>
 <body>
 <header class="cab"><div class="cab-i">
-  <div class="md-avatar" id="md-avatar" aria-hidden="true">📘</div>
+  <div class="md-avatar" id="md-avatar" aria-hidden="true">🏫</div>
   <div class="cab-t">
     <h1 id="md-titulo">Diário de Aulas</h1>
     <div class="sub" id="md-escolas">Meu Diário</div>
@@ -223,6 +253,8 @@ html.dark-2026 .itab.on{color:var(--dark-accent)!important;border-bottom-color:v
       <button type="button" class="btn-escuro" id="modo-escuro-btn" title="Modo escuro" aria-label="Modo escuro">🌙</button>
     </div>
     <span class="md-sync" id="md-sync">☁️ Conectando…</span>
+    <a class="md-sair md-voltar" href="escolas.html" title="Voltar para as escolas">← Escolas</a>
+    <a id="md-chip" href="perfil.html"></a>
     <button type="button" class="md-sair" id="md-sair">Sair</button>
   </div>
 </div></header>
@@ -274,30 +306,64 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   var MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   var usuario=null, E=null, syncE=null, PRES={}, ATV={};
   var STATUS={};
+  // Página de UMA escola (Etapa 14): meu-diario.html?escola=<id>. Turmas,
+  // alunos, disciplinas, diários e contador valem por ano letivo.
+  var ESCOLA_ID=new URLSearchParams(location.search).get('escola')||'';
+  var ANO_LEGADO=2026; // turmas de antes da Etapa 14 (sem "ano") são de 2026
+  var ANO=0, carregado=false;
+  var ICONES=['🏫','🏛️','📚','📖','🎓','✏️','🌳','🌻','🌎','⭐','🔬','🎨','⚽','🎵','🧮','💡','🦉','🚀'];
 
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function agora(){return new Date().toISOString();}
   function novoId(p){return p+Math.random().toString(36).slice(2,7)+Date.now().toString(36).slice(-3);}
   function slug(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,10)||'d';}
-  function toast(msg){var t=document.createElement('div');t.className='md-toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},2800);}
+  function toast(msg){var t=document.createElement('div');t.className='md-toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},3000);}
   function lsKey(){return 'md_estrutura_'+usuario.id;}
   function turma(id){return (E.turmas||[]).filter(function(t){return t.id===id;})[0]||null;}
   function escola(id){return (E.escolas||[]).filter(function(e){return e.id===id;})[0]||null;}
-  function diarios(){return window.NovoDiario?window.NovoDiario.diarios():[];}
   function dataBr(k){return k.slice(8,10)+'/'+k.slice(5,7)+'/'+k.slice(0,4);}
   function modulos(){return window.MD_MODULOS||[];}
   function cadaModulo(metodo,arg){var out=[];modulos().forEach(function(m){if(typeof m[metodo]==='function'){try{out.push(m[metodo](arg));}catch(e){console.warn('[MeuDiario]',m.nome,metodo,e);}}});return out;}
   function rotuloCurto(nome){var m=/^\s*(\d+\s*[ºª°]?)/.exec(nome||'');return m?m[1].replace(/\s+/g,''):(String(nome||'?').trim().slice(0,2)||'?');}
+  function C(){return window.ContaSkin;}
+
+  // ── Escola e ano letivo abertos ─────────────────────────────────────
+  function anoDe(t){return parseInt(t.ano,10)||ANO_LEGADO;}
+  function escolaAtual(){return escola(ESCOLA_ID);}
+  function turmasDaEscola(){return (E.turmas||[]).filter(function(t){return t.escolaId===ESCOLA_ID;});}
+  function turmasVis(){return turmasDaEscola().filter(function(t){return anoDe(t)===ANO;});}
+  function anosComTurmas(){var m={};turmasDaEscola().forEach(function(t){m[anoDe(t)]=1;});return Object.keys(m).map(Number).sort(function(a,b){return a-b;});}
+  function anosDaEscola(){var m={};m[new Date().getFullYear()]=1;m[ANO]=1;anosComTurmas().forEach(function(a){m[a]=1;});return Object.keys(m).map(Number).sort(function(a,b){return a-b;});}
+  // O ano escolhido vale só nesta sessão: ao abrir de novo, volta ao ano corrente.
+  function anoInicial(){var a=0;try{a=parseInt(sessionStorage.getItem('md_ano_'+ESCOLA_ID),10)||0;}catch(x){}return a||new Date().getFullYear();}
+  function mudarAno(a){
+    ANO=a;try{sessionStorage.setItem('md_ano_'+ESCOLA_ID,String(a));}catch(x){}
+    desenharTudo();
+    if(window.NovoDiario)window.NovoDiario.renderizar();
+    irPara('inicio');
+  }
+  function diarios(){
+    if(!window.NovoDiario)return[];
+    var ids={};turmasVis().forEach(function(t){ids[t.id]=1;});
+    return window.NovoDiario.diarios().filter(function(d){return ids[d.turma];});
+  }
+  function perfilNome(){var p=C()&&C().perfil.dados();return (p&&p.nome)||(E.perfil&&E.perfil.nome)||usuario.nome||'';}
+  // O que os módulos (recursos e I.A) enxergam: só a escola e o ano abertos.
+  function vista(){var e=escolaAtual();return{versao:E.versao,perfil:{nome:perfilNome()},escolas:e?[e]:[],turmas:turmasVis(),atualizadoEm:E.atualizadoEm,ano:ANO};}
 
   // ── Estrutura: local + banco ─────────────────────────────────────────
   function vazia(){return{versao:1,perfil:{nome:(usuario&&usuario.nome)||''},escolas:[],turmas:[],atualizadoEm:''};}
   function lerLocal(){try{var e=JSON.parse(localStorage.getItem(lsKey())||'null');if(e&&Array.isArray(e.turmas))return e;}catch(x){}return vazia();}
   function salvar(motivo){
+    // Nada é gravado antes de ler o banco: um aparelho desatualizado não
+    // sobrescreve o que foi feito em outro.
+    if(!carregado){toast('Aguarde: sincronizando os seus dados…');return Promise.resolve(false);}
     E.atualizadoEm=agora();
     try{localStorage.setItem(lsKey(),JSON.stringify(E));}catch(x){}
-    if(syncE)syncE.pushNow('force');
+    var p=syncE?syncE.pushNow('force'):Promise.resolve(false);
     desenharTudo();
     if(window.NovoDiario)window.NovoDiario.renderizar();
+    return p;
   }
   function aplicarRemotoEstrutura(payload){
     if(!payload||!Array.isArray(payload.turmas))return;
@@ -305,6 +371,8 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       {if(syncE)syncE.schedulePush('local-mais-novo');return;}
     E=payload;
     try{localStorage.setItem(lsKey(),JSON.stringify(E));}catch(x){}
+    if(!carregado)return;
+    if(!escolaAtual()){location.replace('escolas.html');return;}
     desenharTudo();
     if(window.NovoDiario)window.NovoDiario.renderizar();
   }
@@ -326,8 +394,8 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   var abaAtual='';
   function abas(){
     return [{id:'inicio',rotulo:'🏠 Início'}]
-      .concat((E.turmas||[]).map(function(t){return{id:t.id,rotulo:t.nome};}))
-      .concat([{id:'plano',rotulo:'📚 Plano de Aulas'},{id:'seq',rotulo:'🗂 Sequências'},{id:'livros',rotulo:'📖 Livros'},{id:'cal',rotulo:'📆 Calendário'},{id:'cont',rotulo:'📊 Contador'},{id:'ia',rotulo:'🤖 I.A'},{id:'config',rotulo:'⚙️ Turmas e alunos'}]);
+      .concat(turmasVis().map(function(t){return{id:t.id,rotulo:t.nome};}))
+      .concat([{id:'plano',rotulo:'📚 Plano de Aulas'},{id:'seq',rotulo:'🗂 Sequências'},{id:'livros',rotulo:'📖 Livros'},{id:'cal',rotulo:'📆 Calendário'},{id:'cont',rotulo:'📊 Contador'},{id:'ia',rotulo:'🤖 I.A'},{id:'config',rotulo:'⚙️ Configurações'}]);
   }
   function irPara(id){
     if(!document.getElementById('sec-'+id))id='inicio';
@@ -346,9 +414,9 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   // ── Seções das turmas (os cards entram pelo novo-diario.js) ─────────
   function garantirSecoes(){
     var main=document.getElementById('md-main'),ref=document.getElementById('sec-plano');
-    var ids=(E.turmas||[]).map(function(t){return t.id;});
+    var vis=turmasVis(),ids=vis.map(function(t){return t.id;});
     main.querySelectorAll('section[data-turma]').forEach(function(s){if(ids.indexOf(s.getAttribute('data-turma'))<0)s.remove();});
-    (E.turmas||[]).forEach(function(t){
+    vis.forEach(function(t){
       var sec=document.getElementById('sec-'+t.id);
       if(!sec){
         sec=document.createElement('section');sec.className='sec';sec.id='sec-'+t.id;sec.setAttribute('data-turma',t.id);
@@ -356,13 +424,13 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
         main.insertBefore(sec,ref);
       }
       var esc1=escola(t.escolaId);
-      sec.querySelector('.th').innerHTML='<div class="tb">'+esc(rotuloCurto(t.nome))+'</div><div class="ti"><h2>'+esc(t.nome)+'</h2><p>'+esc(esc1?esc1.nome:'Sem escola')+' · '+t.alunos.filter(function(a){return!a.tr;}).length+' alunos · '+esc(t.disciplinas.map(function(d){return d.nome;}).join(', ')||'sem disciplinas')+'</p></div>';
+      sec.querySelector('.th').innerHTML='<div class="tb">'+esc(rotuloCurto(t.nome))+'</div><div class="ti"><h2>'+esc(t.nome)+'</h2><p>'+esc(esc1?esc1.nome:'Sem escola')+' · '+anoDe(t)+' · '+t.alunos.filter(function(a){return!a.tr;}).length+' alunos · '+esc(t.disciplinas.map(function(d){return d.nome;}).join(', ')||'sem disciplinas')+'</p></div>';
       sec.querySelector('.md-acoes').innerHTML='<button type="button" class="md-btn pri" data-acao="novo">+ Novo Diário</button>'
         +'<button type="button" class="md-btn" data-acao="alunos">👥 Relatório dos alunos</button>'
         +'<button type="button" class="md-btn" data-acao="ia">🤖 Registrar com a I.A</button>';
       sec.querySelector('[data-acao="novo"]').onclick=function(){
-        if(!t.disciplinas.length){toast('Cadastre ao menos uma disciplina na aba ⚙️ Turmas e alunos.');irPara('config');return;}
-        if(!t.alunos.length){toast('Cadastre os alunos da turma na aba ⚙️ Turmas e alunos.');irPara('config');return;}
+        if(!t.disciplinas.length){toast('Cadastre ao menos uma disciplina em ⚙️ Configurações.');irPara('config');return;}
+        if(!t.alunos.length){toast('Cadastre os alunos da turma em ⚙️ Configurações.');irPara('config');return;}
         window.novoDiarioAbrir(t.id);
       };
       sec.querySelector('[data-acao="alunos"]').onclick=function(){abrirListaAlunos(t.id);};
@@ -381,7 +449,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
 
   function desenharEstatisticasTurmas(){
     var soma=somaHoras();
-    (E.turmas||[]).forEach(function(t){
+    turmasVis().forEach(function(t){
       var sec=document.getElementById('sec-'+t.id);if(!sec)return;
       var ds=diarios().filter(function(d){return d.turma===t.id;});
       var horas=t.disciplinas.reduce(function(s,d){return s+(soma[t.id+'|'+d.id]||0);},0);
@@ -442,10 +510,10 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
 
   // ── Contador ────────────────────────────────────────────────────────
   function desenharContador(){
-    var sec=document.getElementById('sec-cont'),soma=somaHoras();
-    var cab='<div class="th"><div class="tb gz">📊</div><div class="ti"><h2>Contador de h/aula</h2><p>O bimestre fecha pela soma de aulas: com meta de 10 h/aula, o 1º termina na 10ª, o 2º na 20ª…</p></div></div>';
-    if(!(E.turmas||[]).length){sec.innerHTML=cab+'<div class="md-card"><div class="md-vazio">Crie uma turma para acompanhar as h/aula.</div></div>';return;}
-    sec.innerHTML=cab+(E.turmas||[]).map(function(t){
+    var sec=document.getElementById('sec-cont'),soma=somaHoras(),vis=turmasVis();
+    var cab='<div class="th"><div class="tb gz">📊</div><div class="ti"><h2>Contador de h/aula — '+ANO+'</h2><p>O bimestre fecha pela soma de aulas: com meta de 10 h/aula, o 1º termina na 10ª, o 2º na 20ª…</p></div></div>';
+    if(!vis.length){sec.innerHTML=cab+'<div class="md-card"><div class="md-vazio">Crie uma turma em '+ANO+' para acompanhar as h/aula.</div></div>';return;}
+    sec.innerHTML=cab+vis.map(function(t){
         if(!t.disciplinas.length)return '';
         return '<h3 class="md-h3">'+esc(t.nome)+'</h3><div class="md-cont">'+t.disciplinas.map(function(d){
           var feitas=soma[t.id+'|'+d.id]||0,meta=Math.max(1,d.metaBim||10),total=Math.max(meta,d.total||meta*4);
@@ -459,61 +527,120 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       }).join('');
   }
 
+  // Redesenha uma seção sem perder o que o professor está digitando: a
+  // sincronização (outro aparelho, diários) redesenha a página a qualquer hora.
+  function chaveCampo(el){
+    var dono=el.closest('[data-t],[data-disc],[data-aluno],.md-form-turma,[data-esc]');
+    var a=[].slice.call(el.attributes).filter(function(x){return /^data-/.test(x.name);}).map(function(x){return x.name+'='+x.value;}).join(',');
+    var p=el.closest('details[data-t]');
+    return (p?p.getAttribute('data-t'):'')+'|'+(dono?(dono.getAttribute('data-disc')||dono.getAttribute('data-aluno')||dono.id||dono.className):'')+'|'+a;
+  }
+  function preservar(sec,desenhar){
+    var val={},abertos={},foco=null,campos=sec.querySelectorAll('input:not([type=file]),textarea,select');
+    campos.forEach(function(el){
+      var mudou=el.type==='checkbox'?el.checked!==el.defaultChecked:el.tagName==='SELECT'?[].some.call(el.options,function(o){return o.selected!==o.defaultSelected;}):el.value!==el.defaultValue;
+      if(mudou)val[chaveCampo(el)]=el.type==='checkbox'?el.checked:el.value;
+      if(el===document.activeElement)foco={k:chaveCampo(el),i:el.selectionStart,f:el.selectionEnd};
+    });
+    sec.querySelectorAll('details[data-t][open]').forEach(function(d){abertos[d.getAttribute('data-t')]=1;});
+    desenhar();
+    sec.querySelectorAll('details[data-t]').forEach(function(d){if(abertos[d.getAttribute('data-t')])d.open=true;});
+    sec.querySelectorAll('input:not([type=file]),textarea,select').forEach(function(el){
+      var k=chaveCampo(el);
+      if(k in val){if(el.type==='checkbox')el.checked=val[k];else el.value=val[k];}
+      if(foco&&foco.k===k){el.focus();try{el.setSelectionRange(foco.i,foco.f);}catch(x){}}
+    });
+  }
+
   // ── Início ──────────────────────────────────────────────────────────
-  function desenharInicio(){
+  function seletorAno(){
+    var anos=anosDaEscola(),prox=anos[anos.length-1]+1;
+    return '<label class="md-ano">📅 Ano letivo <select data-ano>'+anos.map(function(a){return '<option value="'+a+'"'+(a===ANO?' selected':'')+'>'+a+'</option>';}).join('')
+      +'<option value="'+prox+'">+ Iniciar '+prox+'</option></select></label>';
+  }
+  function ligarSeletorAno(box){
+    var s=box.querySelector('[data-ano]');
+    if(s)s.onchange=function(){var a=parseInt(s.value,10);if(a&&a!==ANO)mudarAno(a);};
+  }
+  function anoAnteriorComTurmas(){return anosComTurmas().filter(function(a){return a<ANO;}).pop()||0;}
+  function opcoesCadastro(){
+    var ant=anoAnteriorComTurmas();
+    return '<div class="md-opcoes">'
+      +'<button type="button" class="md-opcao" data-op="manual"><span>✍️</span><b>Cadastrar manualmente</b><small>Nome da turma, disciplinas e a lista de alunos.</small></button>'
+      +'<button type="button" class="md-opcao" data-op="ia"><span>🤖</span><b>Cadastrar com a I.A</b><small>Envie a foto, o PDF ou a planilha da chamada: a I.A monta a turma com os alunos.</small></button>'
+      +(ant?'<button type="button" class="md-opcao" data-op="importar"><span>📥</span><b>Importar turmas de '+ant+'</b><small>Turmas, alunos, plano de aula e sequências. Diários e notas começam em branco.</small></button>':'')
+      +'</div>';
+  }
+  function ligarOpcoesCadastro(box){
+    box.querySelectorAll('[data-op]').forEach(function(b){b.onclick=function(){
+      var op=b.getAttribute('data-op');
+      if(op==='manual'){var f=box.querySelector('.md-form-turma')||document.querySelector('#md-nova-turma');if(f){f.closest('.md-card').hidden=false;f.scrollIntoView({behavior:'smooth',block:'center'});var i=f.querySelector('[data-f="turma"]');if(i)i.focus();}}
+      else if(op==='ia')cadastrarComIA();
+      else if(op==='importar')abrirImportacao();
+    };});
+  }
+  function cadastrarComIA(){
+    irPara('ia');
+    if(window.MeuDiarioIA)window.MeuDiarioIA.sugerir('Vou anexar a lista de alunos. Crie a turma (ano letivo '+ANO+') com os alunos na ordem da chamada. Nome da turma: ___ · Disciplinas que eu leciono nela: ___ · H/aula por bimestre: ___');
+    toast('Anexe a lista (foto, PDF ou planilha) com o 📎 e complete a mensagem.');
+  }
+  function desenharInicio(){var sec=document.getElementById('sec-inicio');preservar(sec,desenharInicio0);}
+  function desenharInicio0(){
     var sec=document.getElementById('sec-inicio');
-    var nome=(E.perfil&&E.perfil.nome)||usuario.nome||'';
-    var cab='<div class="th"><div class="tb gz">🏠</div><div class="ti"><h2>Olá'+(nome?', '+esc(nome.split(' ')[0]):'')+'!</h2><p>Resumo das suas turmas, próximos eventos e últimos registros</p></div></div>';
-    if(!(E.turmas||[]).length){
-      sec.innerHTML=cab+'<div class="md-card"><h3>Bem-vindo'+(nome?', '+esc(nome.split(' ')[0]):'')+'! 👋</h3><p>Sua plataforma está pronta. Comece criando a primeira turma: você poderá registrar diários (à mão ou com a 🤖 I.A), marcar presença e atividades, montar o plano de aulas, as sequências e os livros, organizar o calendário, acompanhar o contador de h/aula e gerar o relatório de cada aluno. Só você vê os seus dados, em qualquer aparelho em que entrar.</p></div>'
-        +'<div class="md-card"><h3>Criar a primeira turma</h3>'+formTurma()+'</div>';
-      ligarFormTurma(sec);
+    var nome=perfilNome(),e=escolaAtual(),vis=turmasVis();
+    var cab='<div class="th"><div class="tb gz">🏠</div><div class="ti"><h2>Olá'+(nome?', '+esc(nome.split(' ')[0]):'')+'!</h2><p>'+esc(e?e.nome:'')+(e&&e.inep?' · INEP '+e.inep.codigo:'')+'</p></div>'+seletorAno()+'</div>';
+    if(!vis.length){
+      sec.innerHTML=cab+'<div class="md-card"><h3>Ano letivo '+ANO+(anosComTurmas().length?' — nenhuma turma ainda':'')+'</h3><p>'
+        +(anosComTurmas().length?'Cada ano letivo começa em branco: turmas, alunos, disciplinas, diários e contador. Os anos anteriores continuam guardados no seletor acima.'
+          :'Sua escola está pronta. Cadastre a primeira turma: depois você registra diários (à mão ou com a 🤖 I.A), marca presença e atividades, monta o plano de aulas, as sequências e os livros, organiza o calendário e acompanha o contador de h/aula. Só você vê os seus dados.')
+        +'</p>'+opcoesCadastro()+'</div>'
+        +'<div class="md-card"><h3>Nova turma</h3><div class="md-form-turma">'+formTurma()+'</div></div>';
+      ligarSeletorAno(sec);ligarOpcoesCadastro(sec);ligarFormTurma(sec.querySelector('.md-form-turma'));
       return;
     }
     var ds=diarios().slice().sort(function(a,b){return (b.dateKey+b.ini).localeCompare(a.dateKey+a.ini);});
     var soma=somaHoras(),horas=Object.keys(soma).reduce(function(s,k){return s+soma[k];},0);
     sec.innerHTML=cab
-      +'<div class="sr"><div class="sc2"><div class="n">'+E.turmas.length+'</div><div class="l">Turmas</div></div><div class="sc2"><div class="n">'+ds.length+'</div><div class="l">Diários</div></div><div class="sc2"><div class="n">'+horas+'</div><div class="l">H/aula dadas</div></div>'
-      +'<div class="sc2"><div class="n">'+E.turmas.reduce(function(s,t){return s+t.alunos.filter(function(a){return!a.tr;}).length;},0)+'</div><div class="l">Alunos</div></div></div>'
+      +'<div class="sr"><div class="sc2"><div class="n">'+vis.length+'</div><div class="l">Turmas</div></div><div class="sc2"><div class="n">'+ds.length+'</div><div class="l">Diários</div></div><div class="sc2"><div class="n">'+horas+'</div><div class="l">H/aula dadas</div></div>'
+      +'<div class="sc2"><div class="n">'+vis.reduce(function(s,t){return s+t.alunos.filter(function(a){return!a.tr;}).length;},0)+'</div><div class="l">Alunos</div></div></div>'
       +cadaModulo('inicioHtml').join('')
       +'<div class="md-card"><h3>Últimos registros</h3>'+(ds.length?'<table class="md-tabela">'+ds.slice(0,8).map(function(d){var t=turma(d.turma);return '<tr><td style="white-space:nowrap">'+dataBr(d.dateKey).slice(0,5)+'</td><td>'+esc(t?t.nome:'')+'</td><td>'+esc(d.discNome)+'</td><td style="color:var(--cm)">'+esc(d.assunto)+'</td></tr>';}).join('')+'</table>':'<p>Nenhum diário ainda. Abra uma turma e toque em + Novo Diário.</p>')+'</div>'
-      +'<div class="md-card"><h3>Suas turmas</h3><div class="md-alunos">'+E.turmas.map(function(t){return '<button type="button" data-ir="'+t.id+'">'+esc(t.nome)+'</button>';}).join('')+'</div></div>';
+      +'<div class="md-card"><h3>Suas turmas em '+ANO+'</h3><div class="md-alunos">'+vis.map(function(t){return '<button type="button" data-ir="'+t.id+'">'+esc(t.nome)+'</button>';}).join('')+'<button type="button" data-ir="config">+ Nova turma</button></div></div>';
+    ligarSeletorAno(sec);
     sec.querySelectorAll('[data-ir]').forEach(function(b){b.onclick=function(){irPara(b.getAttribute('data-ir'));};});
     sec.querySelectorAll('[data-ir-aba]').forEach(function(b){b.onclick=function(){irPara(b.getAttribute('data-ir-aba'));};});
   }
 
   // ── Formulário de turma (criação) ───────────────────────────────────
   function formTurma(){
-    var escolas=(E.escolas||[]);
     return '<div class="md-grid">'
-      +'<div class="md-f"><label>Escola</label>'+(escolas.length?'<select data-f="escola">'+escolas.map(function(e){return '<option value="'+e.id+'">'+esc(e.nome)+'</option>';}).join('')+'<option value="__nova">+ Nova escola…</option></select>':'')+'<input type="text" data-f="escolaNova" placeholder="Nome da escola"'+(escolas.length?' hidden':'')+'></div>'
       +'<div class="md-f"><label>Turma</label><input type="text" data-f="turma" placeholder="Ex.: 7º Ano A"></div>'
       +'<div class="md-f"><label>H/aula por bimestre (cada disciplina)</label><input type="number" data-f="meta" min="1" value="10"></div></div>'
       +'<div class="md-f"><label>Disciplinas (separe por vírgula)</label><input type="text" data-f="disc" placeholder="Ex.: Língua Portuguesa, Artes"></div>'
       +'<div class="md-f"><label>Alunos (um por linha, na ordem da chamada)</label><textarea data-f="alunos" placeholder="Ana Clara Souza&#10;Bruno Lima&#10;…"></textarea></div>'
-      +'<button type="button" class="md-btn pri" data-f="criar">Criar turma</button>';
+      +'<div class="md-row" style="flex-wrap:wrap"><button type="button" class="md-btn pri" data-f="criar">Criar turma em '+ANO+'</button><span style="font-size:.78rem;color:var(--cm)">Tem a chamada em foto, PDF ou planilha? <a href="#" data-f="ia">Use a 🤖 I.A</a>.</span></div>';
   }
   function ligarFormTurma(box){
-    var sel=box.querySelector('[data-f="escola"]'),nova=box.querySelector('[data-f="escolaNova"]');
-    if(sel)sel.onchange=function(){nova.hidden=sel.value!=='__nova';};
+    if(!box)return;
+    var ia=box.querySelector('[data-f="ia"]');if(ia)ia.onclick=function(ev){ev.preventDefault();cadastrarComIA();};
     box.querySelector('[data-f="criar"]').onclick=function(){
       var v=function(k){var el=box.querySelector('[data-f="'+k+'"]');return el?el.value.trim():'';};
-      var r=criarTurma({escolaId:sel&&sel.value!=='__nova'?sel.value:'',escolaNova:v('escolaNova'),nome:v('turma'),meta:v('meta'),disciplinas:v('disc').split(','),alunos:v('alunos').split(/\n/)});
-      if(r.erro)return toast(r.erro);
+      var dados={nome:v('turma'),meta:v('meta'),disciplinas:v('disc').split(','),alunos:v('alunos').split(/\n/)};
+      if(!dados.nome)return toast('Informe o nome da turma.');
+      // Limpa antes de salvar: o redesenho preserva o que ainda está digitado.
+      var campos=box.querySelectorAll('[data-f="turma"],[data-f="disc"],[data-f="alunos"]'),antes=[].map.call(campos,function(c){return c.value;});
+      campos.forEach(function(c){c.value='';});
+      var r=criarTurma(dados);
+      if(r.erro){campos.forEach(function(c,i){c.value=antes[i];});return toast(r.erro);}
       toast('Turma criada.');
       irPara(r.turma.id);
     };
   }
-  // Usada pelo formulário e pela I.A. Devolve {turma} ou {erro}.
+  // Usada pelo formulário e pela I.A. A turma nasce na escola e no ano abertos.
+  // Devolve {turma} ou {erro}.
   function criarTurma(o){
-    var escolaId=o.escolaId||'';
-    if(!escolaId&&o.escolaNova){
-      var existente=(E.escolas||[]).filter(function(e){return slug(e.nome)===slug(o.escolaNova)&&e.nome.toLowerCase()===String(o.escolaNova).trim().toLowerCase();})[0];
-      if(existente)escolaId=existente.id;
-      else{escolaId=novoId('e');E.escolas.push({id:escolaId,nome:String(o.escolaNova).trim()});}
-    }
-    if(!escolaId&&(E.escolas||[]).length===1)escolaId=E.escolas[0].id;
-    if(!escolaId)return{erro:'Informe o nome da escola.'};
+    if(!carregado)return{erro:'Aguarde: sincronizando os seus dados.'};
+    if(!escolaAtual())return{erro:'Abra uma escola para criar turmas.'};
     if(!String(o.nome||'').trim())return{erro:'Informe o nome da turma.'};
     var meta=Math.max(1,parseInt(o.meta,10)||10);
     var vistos={};
@@ -523,54 +650,206 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       return{id:id,nome:nome,metaBim:mb,total:Math.max(mb,parseInt(d.total,10)||mb*4)};
     });
     var alunos=(o.alunos||[]).map(function(s){return String(s||'').replace(/^\s*\d+[\s.)-]*/,'').trim();}).filter(Boolean).map(function(nm,i){return{n:i+1,nm:nm};});
-    var t={id:novoId('t'),nome:String(o.nome).trim(),escolaId:escolaId,alunos:alunos,disciplinas:disciplinas};
+    var t={id:novoId('t'),nome:String(o.nome).trim(),escolaId:ESCOLA_ID,ano:parseInt(o.ano,10)||ANO,alunos:alunos,disciplinas:disciplinas};
     E.turmas.push(t);
     salvar('turma');
     return{turma:t};
   }
 
-  // ── Configuração ────────────────────────────────────────────────────
-  function desenharConfig(){
+  // ── Importar turmas do ano anterior ─────────────────────────────────
+  // Nome da turma no ano seguinte: "7º Ano A" → "8º Ano A", "1ª Série" → "2ª Série".
+  function nomeAvancado(nome){
+    return String(nome).replace(/^(\s*)(\d+)(\s*[ºª°]?\s*)(ano|série|serie|s[ée]rie)?/i,function(m,sp,n,sep,tipo){
+      var x=parseInt(n,10),lim=/s[ée]rie/i.test(tipo||'')?3:9;
+      return sp+(x<lim?x+1:x)+sep+(tipo||'');
+    });
+  }
+  function abrirImportacao(){
+    var anos=anosComTurmas().filter(function(a){return a<ANO;}).reverse();
+    if(!anos.length)return toast('Não há turmas de anos anteriores nesta escola.');
+    var origem=anos[0];
+    function turmasDe(a){return turmasDaEscola().filter(function(t){return anoDe(t)===a;});}
+    function lista(){
+      return turmasDe(origem).map(function(t){
+        var ativos=t.alunos.filter(function(a){return!a.tr;}).length;
+        return '<div class="md-imp" data-de="'+t.id+'"><label><input type="checkbox" data-sel checked> <b>'+esc(t.nome)+'</b> <small>'+ativos+' alunos · '+t.disciplinas.length+' disciplina(s)</small></label>'
+          +'<div class="md-row"><span style="font-size:.74rem;color:var(--cm);white-space:nowrap">Nome em '+ANO+':</span><input class="md-in" data-nome value="'+esc(nomeAvancado(t.nome))+'"></div></div>';
+      }).join('');
+    }
+    abrirOverlay('<h2>📥 Importar turmas para '+ANO+'</h2><p style="font-size:.86rem;color:var(--cm);margin:6px 0 14px">Traz a lista de turmas, os alunos, as disciplinas com as metas, o plano de aula e as sequências. <strong>Diários, presença, atividades, notas e contador começam em branco</strong> — é um novo ano letivo.</p>'
+      +'<div class="md-f"><label>Importar de</label><select data-origem>'+anos.map(function(a){return '<option value="'+a+'">'+a+'</option>';}).join('')+'</select></div>'
+      +'<div data-lista>'+lista()+'</div>'
+      +'<h4>O que trazer</h4><div class="md-checks"><label><input type="checkbox" data-o="alunos" checked> Alunos (sem os transferidos, renumerados)</label><label><input type="checkbox" data-o="plano" checked> Plano de aulas</label><label><input type="checkbox" data-o="seq" checked> Sequências didáticas</label><label><input type="checkbox" data-o="livros"> Livros</label></div>'
+      +'<p style="font-size:.78rem;color:var(--cm);margin-top:8px">Confira os nomes: a série já vem avançada (7º → 8º). As turmas de '+origem+' continuam guardadas como estão.</p>'
+      +'<div class="md-noprint" style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end"><button type="button" class="md-btn" data-fechar>Cancelar</button><button type="button" class="md-btn pri" data-importar>Importar</button></div>',function(ov){
+        ov.querySelector('[data-origem]').onchange=function(){origem=parseInt(this.value,10);ov.querySelector('[data-lista]').innerHTML=lista();};
+        ov.querySelector('[data-importar]').onclick=function(){
+          var op={};ov.querySelectorAll('[data-o]').forEach(function(c){op[c.getAttribute('data-o')]=c.checked;});
+          var escolhidas=[];ov.querySelectorAll('.md-imp').forEach(function(r){if(r.querySelector('[data-sel]').checked)escolhidas.push({de:turma(r.getAttribute('data-de')),nome:r.querySelector('[data-nome]').value.trim()});});
+          if(!escolhidas.length)return toast('Marque ao menos uma turma.');
+          if(!carregado)return toast('Aguarde: sincronizando os seus dados…');
+          var R=window.MeuDiarioRecursos,copias=[];
+          escolhidas.forEach(function(x){
+            var t={id:novoId('t'),nome:x.nome||x.de.nome,escolaId:ESCOLA_ID,ano:ANO,importadaDe:x.de.id,
+              alunos:op.alunos?x.de.alunos.filter(function(a){return!a.tr;}).map(function(a,i){return{n:i+1,nm:a.nm};}):[],
+              disciplinas:JSON.parse(JSON.stringify(x.de.disciplinas||[]))};
+            E.turmas.push(t);copias.push([x.de.id,t.id]);
+          });
+          salvar('importar');
+          if(R&&(op.plano||op.seq||op.livros))copias.forEach(function(c,i){R.copiarTurma(c[0],c[1],{plano:op.plano,seq:op.seq,livros:op.livros,semSalvar:i<copias.length-1});});
+          ov.remove();
+          toast(copias.length+' turma(s) importada(s) para '+ANO+'.');
+          irPara('inicio');
+        };
+      });
+  }
+
+  // ── Configurações ───────────────────────────────────────────────────
+  function blocoEscola(){
+    var e=escolaAtual(),i=e.inep;
+    var face=e.imagem?'<img src="'+esc(e.imagem)+'" alt="">':'<span>'+esc(e.icone||'🏫')+'</span>';
+    return '<div class="md-card"><h3>🏫 Informações da escola</h3><div class="md-escola">'
+      +'<div class="md-escola-face">'+face+'</div><div style="flex:1;min-width:220px">'
+      +'<div class="md-f"><label>Nome da escola (aparece no botão)</label><input data-esc="nome" value="'+esc(e.nome)+'"></div>'
+      +'<div class="md-f"><label>Ícone do botão</label><div class="md-icones">'+ICONES.map(function(x){return '<button type="button" data-icone="'+x+'"'+((e.icone||'🏫')===x&&!e.imagem?' class="on"':'')+'>'+x+'</button>';}).join('')+'</div></div>'
+      +'<div class="md-f"><label>Imagem do botão (substitui o ícone)</label><div class="md-row" style="flex-wrap:wrap"><label class="md-btn mini" style="cursor:pointer">🖼️ Escolher imagem<input type="file" accept="image/*" data-esc="imagem" hidden></label>'
+      +(e.imagem?'<button type="button" class="md-btn mini" data-esc="sem-imagem">Remover imagem</button>':'')+'</div></div>'
+      +'<button type="button" class="md-btn pri" data-esc="salvar">💾 Salvar</button></div></div>'
+      +'<div class="md-inep">'+(i
+        ?'<div><b>🏛️ INEP '+i.codigo+'</b> — '+esc(i.nome)+'<br><span>'+esc(i.municipio)+'/'+esc(i.uf)+(i.rede?' · '+esc(i.rede):'')+(i.localizacao?' · '+esc(i.localizacao):'')+(i.etapas?' · '+esc(i.etapas):'')+'</span>'+(i.endereco?'<br><span>'+esc([i.endereco,i.bairro].filter(Boolean).join(' · '))+'</span>':'')+'</div>'
+          +'<div class="md-row" style="flex-wrap:wrap;margin-top:8px"><button type="button" class="md-btn mini" data-esc="inep">Trocar vínculo</button><a class="md-btn mini" style="text-decoration:none" href="'+C().inep.qedu(i.codigo)+'" target="_blank" rel="noopener">Ver no QEdu ↗</a></div>'
+        :'<div><b>🔗 Esta escola ainda não está ligada ao INEP.</b><br><span>O código INEP identifica a escola no país e prepara a ligação com a plataforma da escola.</span></div><div style="margin-top:8px"><button type="button" class="md-btn mini pri" data-esc="inep">Vincular ao INEP</button></div>')
+      +'</div></div>';
+  }
+  function ligarBlocoEscola(sec){
+    var e=escolaAtual();
+    sec.querySelectorAll('[data-icone]').forEach(function(b){b.onclick=function(){e.icone=b.getAttribute('data-icone');delete e.imagem;salvar('escola');toast('Ícone atualizado.');};});
+    sec.querySelector('[data-esc="salvar"]').onclick=function(){var n=sec.querySelector('[data-esc="nome"]').value.trim();if(!n)return toast('Informe o nome.');e.nome=n;salvar('escola');C().vincularEscola(e.id,e);toast('Escola salva.');};
+    sec.querySelector('[data-esc="imagem"]').onchange=function(){
+      var f=this.files[0];if(!f)return;
+      C().reduzirImagem(f,400).then(function(url){e.imagem=url;salvar('escola');toast('Imagem salva.');}).catch(function(x){toast(x.message);});
+    };
+    var sem=sec.querySelector('[data-esc="sem-imagem"]');if(sem)sem.onclick=function(){delete e.imagem;salvar('escola');};
+    sec.querySelector('[data-esc="inep"]').onclick=function(){vincularInep();};
+  }
+  function vincularInep(){
+    var e=escolaAtual(),atual=e.inep;
+    C().janela('<h3>🔗 Vincular ao INEP</h3><p>Encontre <strong>'+esc(e.nome)+'</strong> no catálogo oficial.</p><div data-sel></div><div class="ck-acoes">'+(atual?'<button type="button" class="ck-btn" data-tirar>Remover vínculo</button>':'')+'<button type="button" class="ck-btn" data-fechar>Fechar</button></div>',function(ov,fechar){
+      ov.querySelector('.ck-jan').style.maxWidth='720px';
+      ov.querySelector('[data-fechar]').onclick=fechar;
+      var tirar=ov.querySelector('[data-tirar]');
+      if(tirar)tirar.onclick=function(){delete e.inep;salvar('inep');C().vincularEscola(e.id,e);fechar();toast('Vínculo removido.');};
+      C().seletorInep(ov.querySelector('[data-sel]'),{uf:atual&&atual.uf,municipio:atual&&atual.municipioCodigo,aoEscolher:function(x){
+        var r=C().inep.resumo(x);
+        var dono=(E.escolas||[]).filter(function(o){return o.id!==e.id&&o.inep&&o.inep.codigo===r.codigo;})[0];
+        if(dono)return toast('Esta escola do INEP já está cadastrada como "'+dono.nome+'".');
+        e.inep=r;salvar('inep');C().vincularEscola(e.id,e);fechar();toast('Escola ligada ao INEP '+r.codigo+'.');
+      }});
+    });
+  }
+  function blocoPerigo(){
+    var vis=turmasVis();
+    return '<div class="md-card md-perigo"><h3>⚠️ Zona de perigo</h3><p>Exclusões não têm volta. Cada uma pede confirmação e a senha da sua conta.</p>'
+      +'<div class="md-perigo-l"><div><b>Excluir uma turma</b><span>Some com os alunos, os diários, o plano, as sequências e os livros da turma.</span></div>'
+      +(vis.length?'<div class="md-row"><select class="md-in" data-pg="turma">'+vis.map(function(t){return '<option value="'+t.id+'">'+esc(t.nome)+'</option>';}).join('')+'</select><button type="button" class="md-btn perigo" data-pg="excluir-turma">Excluir turma</button></div>':'<span style="font-size:.8rem;color:var(--cm)">Nenhuma turma em '+ANO+'.</span>')+'</div>'
+      +(vis.length>1?'<div class="md-perigo-l"><div><b>Excluir todas as turmas de '+ANO+'</b><span>Apaga as '+vis.length+' turmas deste ano letivo e tudo o que está ligado a elas. Os outros anos ficam.</span></div><button type="button" class="md-btn perigo" data-pg="excluir-ano">Excluir turmas de '+ANO+'</button></div>':'')
+      +'<div class="md-perigo-l"><div><b>Excluir a escola</b><span>Apaga a escola, as '+turmasDaEscola().length+' turma(s) de todos os anos, os diários, o plano, as sequências, os livros e os eventos do calendário dela.</span></div><button type="button" class="md-btn perigo" data-pg="excluir-escola">Excluir escola</button></div>'
+      +'</div>';
+  }
+  function excluirTurmas(ids){
+    E.turmas=E.turmas.filter(function(t){return ids.indexOf(t.id)<0;});
+    if(window.NovoDiario)window.NovoDiario.removerTurmas(ids);
+    if(window.MeuDiarioRecursos)window.MeuDiarioRecursos.removerTurmas(ids);
+    return salvar('excluir');
+  }
+  function ligarBlocoPerigo(sec){
+    var bt=sec.querySelector('[data-pg="excluir-turma"]');
+    if(bt)bt.onclick=function(){
+      var t=turma(sec.querySelector('[data-pg="turma"]').value);if(!t)return;
+      C().confirmarPerigo({titulo:'Excluir a turma "'+t.nome+'"?',texto:'Os '+t.alunos.length+' alunos, os diários, a presença, as atividades, o plano, as sequências e os livros desta turma serão apagados.',botao:'Sim, excluir a turma'}).then(function(ok){
+        if(!ok)return;excluirTurmas([t.id]);toast('Turma excluída.');irPara('config');
+      });
+    };
+    var ba=sec.querySelector('[data-pg="excluir-ano"]');
+    if(ba)ba.onclick=function(){
+      var ids=turmasVis().map(function(t){return t.id;});
+      C().confirmarPerigo({titulo:'Excluir todas as turmas de '+ANO+'?',texto:'As '+ids.length+' turmas deste ano letivo e tudo o que está ligado a elas serão apagados.',botao:'Sim, excluir '+ids.length+' turmas'}).then(function(ok){
+        if(!ok)return;excluirTurmas(ids);toast('Turmas de '+ANO+' excluídas.');irPara('inicio');
+      });
+    };
+    sec.querySelector('[data-pg="excluir-escola"]').onclick=function(){
+      var e=escolaAtual();
+      C().confirmarPerigo({titulo:'Excluir a escola "'+e.nome+'"?',texto:'Todas as turmas (de todos os anos), alunos, diários, plano de aulas, sequências, livros e eventos desta escola serão apagados. As outras escolas não mudam.',botao:'Sim, excluir a escola'}).then(function(ok){
+        if(!ok)return;
+        var ids=turmasDaEscola().map(function(t){return t.id;});
+        if(window.NovoDiario)window.NovoDiario.removerTurmas(ids);
+        if(window.MeuDiarioRecursos)window.MeuDiarioRecursos.removerTurmas(ids,ESCOLA_ID);
+        E.turmas=E.turmas.filter(function(t){return ids.indexOf(t.id)<0;});
+        E.escolas=E.escolas.filter(function(x){return x.id!==ESCOLA_ID;});
+        toast('Excluindo a escola…');
+        E.atualizadoEm=agora();
+        try{localStorage.setItem(lsKey(),JSON.stringify(E));}catch(x){}
+        Promise.all([syncE.pushNow('force'),C().desvincularEscola(ESCOLA_ID)]).then(function(){
+          setTimeout(function(){location.replace('escolas.html');},1200);
+        });
+      });
+    };
+  }
+  function desenharConfig(){var sec=document.getElementById('sec-config');preservar(sec,desenharConfig0);}
+  function desenharConfig0(){
     var sec=document.getElementById('sec-config');
-    var html='<div class="th"><div class="tb gz">⚙️</div><div class="ti"><h2>Turmas e alunos</h2><p>Escolas, turmas, chamada e disciplinas. Alterações sincronizam na hora.</p></div>'
+    if(!escolaAtual()){sec.innerHTML='';return;}
+    var vis=turmasVis();
+    var html='<div class="th"><div class="tb gz">⚙️</div><div class="ti"><h2>Configurações</h2><p>Escola, turmas, chamada e disciplinas de '+ANO+'. Alterações sincronizam na hora.</p></div>'
       +'<button type="button" class="md-btn" data-cfg="exportar">⬇️ Baixar cópia dos dados</button></div>'
-      +'<div class="md-card"><h3>Seu nome</h3><div class="md-row"><input class="md-in" data-cfg="nome" value="'+esc((E.perfil&&E.perfil.nome)||'')+'"><button type="button" class="md-btn mini pri" data-cfg="salvar-nome">Salvar</button></div></div>'
-      +'<div class="md-card"><h3>Escolas</h3>'+((E.escolas||[]).map(function(e){return '<div class="md-row"><input class="md-in" data-escola="'+e.id+'" value="'+esc(e.nome)+'"><button type="button" class="md-x" data-rm-escola="'+e.id+'" title="Remover">✕</button></div>';}).join('')||'<p>Nenhuma escola.</p>')
-      +'<button type="button" class="md-btn mini" data-cfg="salvar-escolas">Salvar nomes</button></div>'
-      +(E.turmas||[]).map(function(t){
+      +blocoEscola()
+      +'<div class="md-card"><h3>👤 Seu perfil</h3><p>Nome, foto, disciplinas que você leciona e documentos ficam no seu perfil.</p><div style="margin-top:10px"><a class="md-btn" style="text-decoration:none;display:inline-block" href="perfil.html">Abrir meu perfil</a></div></div>'
+      +'<h3 class="md-h3">Turmas de '+ANO+'</h3>'
+      +vis.map(function(t){
         return '<details class="md-turma" data-t="'+t.id+'"><summary>'+esc(t.nome)+' — '+t.alunos.length+' alunos, '+t.disciplinas.length+' disciplinas</summary>'
-          +'<div class="md-grid"><div class="md-f"><label>Nome da turma</label><input data-tf="nome" value="'+esc(t.nome)+'"></div>'
-          +'<div class="md-f"><label>Escola</label><select data-tf="escola">'+(E.escolas||[]).map(function(e){return '<option value="'+e.id+'"'+(e.id===t.escolaId?' selected':'')+'>'+esc(e.nome)+'</option>';}).join('')+'</select></div></div>'
+          +'<div class="md-grid"><div class="md-f"><label>Nome da turma</label><input data-tf="nome" value="'+esc(t.nome)+'"></div></div>'
           +'<div class="md-f"><label>Disciplinas</label>'+t.disciplinas.map(function(d){return '<div class="md-row" data-disc="'+d.id+'"><input class="md-in" data-df="nome" value="'+esc(d.nome)+'"><label>Meta/bim <input class="md-in" style="width:70px" type="number" min="1" data-df="meta" value="'+d.metaBim+'"></label><label>Ano <input class="md-in" style="width:76px" type="number" min="1" data-df="total" value="'+d.total+'"></label><button type="button" class="md-x" data-rm-disc="'+d.id+'" title="Remover">✕</button></div>';}).join('')
           +'<div class="md-row"><input class="md-in" data-df-nova placeholder="Nova disciplina"><button type="button" class="md-btn mini" data-add-disc>+ Adicionar</button></div></div>'
           +'<div class="md-f"><label>Chamada</label>'+t.alunos.map(function(a){return '<div class="md-row" data-aluno="'+a.n+'"><span class="n">'+a.n+'</span><input class="md-in" data-af="nm" value="'+esc(a.nm)+'"><label><input type="checkbox" data-af="tr"'+(a.tr?' checked':'')+'> Transferido</label><button type="button" class="md-x" data-rm-aluno="'+a.n+'" title="Remover">✕</button></div>';}).join('')
           +'<textarea class="md-in" data-novos placeholder="Adicionar alunos: um por linha (entram no fim da chamada)" style="min-height:70px;margin-top:6px"></textarea></div>'
-          +'<div class="md-row"><button type="button" class="md-btn pri" data-salvar-turma>💾 Salvar turma</button><span style="flex:1"></span><button type="button" class="md-btn perigo" data-rm-turma>Excluir turma</button></div></details>';
+          +'<div class="md-row"><button type="button" class="md-btn pri" data-salvar-turma>💾 Salvar turma</button></div></details>';
       }).join('')
-      +'<div class="md-card"><h3>Nova turma</h3><div id="md-nova-turma">'+formTurma()+'</div></div>';
+      +(vis.length?'':'<p style="font-size:.86rem;color:var(--cm);margin-bottom:14px">Nenhuma turma em '+ANO+'.</p>')
+      +'<div class="md-card"><h3>Cadastrar turma</h3>'+opcoesCadastro()+'<div id="md-nova-turma" class="md-form-turma" style="margin-top:14px">'+formTurma()+'</div></div>'
+      +blocoPerigo();
     sec.innerHTML=html;
+    ligarBlocoEscola(sec);
+    ligarOpcoesCadastro(sec);
     ligarFormTurma(sec.querySelector('#md-nova-turma'));
-    sec.querySelector('[data-cfg="salvar-nome"]').onclick=function(){E.perfil=E.perfil||{};E.perfil.nome=sec.querySelector('[data-cfg="nome"]').value.trim();salvar('perfil');toast('Nome salvo.');};
-    sec.querySelector('[data-cfg="salvar-escolas"]').onclick=function(){sec.querySelectorAll('[data-escola]').forEach(function(i){var e=escola(i.getAttribute('data-escola'));if(e&&i.value.trim())e.nome=i.value.trim();});salvar('escolas');toast('Escolas salvas.');};
-    sec.querySelectorAll('[data-rm-escola]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-rm-escola');if(E.turmas.some(function(t){return t.escolaId===id;}))return toast('Há turmas nesta escola. Mude a escola delas antes.');E.escolas=E.escolas.filter(function(e){return e.id!==id;});salvar('escolas');};});
+    ligarBlocoPerigo(sec);
     sec.querySelector('[data-cfg="exportar"]').onclick=exportar;
     sec.querySelectorAll('details.md-turma').forEach(function(box){
       var t=turma(box.getAttribute('data-t'));
       box.querySelector('[data-salvar-turma]').onclick=function(){
         t.nome=box.querySelector('[data-tf="nome"]').value.trim()||t.nome;
-        t.escolaId=box.querySelector('[data-tf="escola"]').value||t.escolaId;
         box.querySelectorAll('[data-disc]').forEach(function(r){var d=t.disciplinas.filter(function(x){return x.id===r.getAttribute('data-disc');})[0];if(!d)return;d.nome=r.querySelector('[data-df="nome"]').value.trim()||d.nome;d.metaBim=Math.max(1,parseInt(r.querySelector('[data-df="meta"]').value,10)||d.metaBim);d.total=Math.max(d.metaBim,parseInt(r.querySelector('[data-df="total"]').value,10)||d.total);});
         box.querySelectorAll('[data-aluno]').forEach(function(r){var a=t.alunos.filter(function(x){return x.n===parseInt(r.getAttribute('data-aluno'),10);})[0];if(!a)return;a.nm=r.querySelector('[data-af="nm"]').value.trim()||a.nm;if(r.querySelector('[data-af="tr"]').checked)a.tr=true;else delete a.tr;});
-        adicionarAlunos(t,box.querySelector('[data-novos]').value.split(/\n/),true);
+        var novos=box.querySelector('[data-novos]');
+        adicionarAlunos(t,novos.value.split(/\n/),true);novos.value='';
         salvar('turma');toast('Turma salva.');
       };
       box.querySelector('[data-add-disc]').onclick=function(){
-        var nome=box.querySelector('[data-df-nova]').value.trim();if(!nome)return;
-        adicionarDisciplina(t,{nome:nome});salvar('disc');
+        var campo=box.querySelector('[data-df-nova]'),nome=campo.value.trim();if(!nome)return;
+        campo.value='';adicionarDisciplina(t,{nome:nome});salvar('disc');
       };
-      box.querySelectorAll('[data-rm-disc]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-rm-disc');var usados=diarios().filter(function(d){return d.turma===t.id&&d.disc===id;}).length;if(!confirm(usados?'Esta disciplina tem '+usados+' diário(s). Eles continuam salvos, mas saem do contador. Remover?':'Remover a disciplina?'))return;t.disciplinas=t.disciplinas.filter(function(d){return d.id!==id;});salvar('disc');};});
-      box.querySelectorAll('[data-rm-aluno]').forEach(function(b){b.onclick=function(){if(!confirm('Remover este aluno da chamada? (Para quem saiu da escola, prefira marcar "Transferido".)'))return;var n=parseInt(b.getAttribute('data-rm-aluno'),10);t.alunos=t.alunos.filter(function(a){return a.n!==n;});salvar('aluno');};});
-      box.querySelector('[data-rm-turma]').onclick=function(){if(!confirm('Excluir a turma "'+t.nome+'"? Os diários dela deixam de aparecer.'))return;E.turmas=E.turmas.filter(function(x){return x.id!==t.id;});salvar('turma');irPara('config');};
+      box.querySelectorAll('[data-rm-disc]').forEach(function(b){b.onclick=function(){
+        var id=b.getAttribute('data-rm-disc'),d=t.disciplinas.filter(function(x){return x.id===id;})[0];
+        var usados=diarios().filter(function(x){return x.turma===t.id&&x.disc===id;}).length;
+        C().confirmarPerigo({titulo:'Remover a disciplina "'+(d?d.nome:'')+'"?',texto:usados?'Ela tem '+usados+' diário(s). Eles continuam salvos, mas saem do contador.':'A disciplina sai da turma e do contador.',botao:'Sim, remover',botaoFinal:'Remover'}).then(function(ok){
+          if(!ok)return;t.disciplinas=t.disciplinas.filter(function(x){return x.id!==id;});salvar('disc');
+        });
+      };});
+      box.querySelectorAll('[data-rm-aluno]').forEach(function(b){b.onclick=function(){
+        var n=parseInt(b.getAttribute('data-rm-aluno'),10),a=t.alunos.filter(function(x){return x.n===n;})[0];
+        C().confirmarPerigo({titulo:'Remover '+(a?a.nm:'o aluno')+' da chamada?',texto:'Para quem saiu da escola, prefira marcar "Transferido": o histórico fica. Remover tira o aluno da chamada.',botao:'Sim, remover',botaoFinal:'Remover'}).then(function(ok){
+          if(!ok)return;t.alunos=t.alunos.filter(function(x){return x.n!==n;});salvar('aluno');
+        });
+      };});
     });
   }
   // Acrescenta alunos no fim da chamada (sem salvar). Ignora nomes repetidos.
@@ -593,7 +872,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   }
 
   function exportar(){
-    var dados={exportadoEm:agora(),conta:usuario.email,estrutura:E,diarios:diarios()};
+    var dados={exportadoEm:agora(),conta:usuario.email,estrutura:E,diarios:window.NovoDiario?window.NovoDiario.diarios():[]};
     cadaModulo('exportar').forEach(function(x){if(x)Object.keys(x).forEach(function(k){dados[k]=x[k];});});
     var blob=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
     var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='meu-diario-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();
@@ -622,7 +901,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     });
     var linhas=Object.keys(porDisc).map(function(k){var p=porDisc[k];var freq=p.aulas?Math.round((p.aulas-p.falt)/p.aulas*100):100;return '<tr><td>'+esc(k)+'</td><td>'+p.aulas+'</td><td>'+p.falt+'</td><td><strong>'+freq+'%</strong></td><td>'+p.fz+' / '+(p.fz+p.nf)+'</td></tr>';}).join('');
     var esc1=escola(t.escolaId);
-    abrirOverlay('<h2>'+esc(a.nm)+'</h2><p style="font-size:.86rem;color:var(--cm);margin-top:4px">'+esc(t.nome)+' · Nº '+a.n+(esc1?' · '+esc(esc1.nome):'')+' · Professor(a): '+esc((E.perfil&&E.perfil.nome)||usuario.email)+' · Emitido em '+new Date().toLocaleDateString('pt-BR')+'</p>'
+    abrirOverlay('<h2>'+esc(a.nm)+'</h2><p style="font-size:.86rem;color:var(--cm);margin-top:4px">'+esc(t.nome)+' · '+anoDe(t)+' · Nº '+a.n+(esc1?' · '+esc(esc1.nome):'')+(esc1&&esc1.inep?' (INEP '+esc1.inep.codigo+')':'')+' · Professor(a): '+esc(perfilNome()||usuario.email)+' · Emitido em '+new Date().toLocaleDateString('pt-BR')+'</p>'
       +'<h4>Frequência e atividades por disciplina</h4>'+(linhas?'<table><tr><th>Disciplina</th><th>H/aula</th><th>Faltas (h)</th><th>Frequência</th><th>Atividades feitas</th></tr>'+linhas+'</table>':'<p>Nenhum diário registrado.</p>')
       +'<h4>Faltas</h4>'+(faltas.length?'<table>'+faltas.map(function(f){return '<tr><td>'+dataBr(f.d.dateKey)+'</td><td>'+esc(f.d.discNome)+'</td><td>'+(f.s==='fj'?'Justificada':'Falta')+'</td><td>'+esc(f.d.assunto)+'</td></tr>';}).join('')+'</table>':'<p>Nenhuma falta.</p>')
       +'<h4>Atividades</h4>'+(atvs.length?'<table>'+atvs.map(function(x){return '<tr><td>'+dataBr(x.d.dateKey)+'</td><td>'+esc(x.d.discNome)+'</td><td>'+esc(x.d.rel.atividade.titulo||x.d.assunto)+'</td><td>'+({fz:'Fez',nf:'Não fez',au:'Sem marcação'})[x.s]+'</td></tr>';}).join('')+'</table>':'<p>Nenhuma atividade registrada.</p>')
@@ -644,28 +923,29 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
 
   // ── Desenho geral ───────────────────────────────────────────────────
   function desenharCabecalho(){
-    var nome=(E.perfil&&E.perfil.nome)||usuario.nome||'';
-    var ano=new Date().getFullYear();
-    document.getElementById('md-titulo').textContent='Diário de Aulas '+ano;
-    document.getElementById('md-escolas').textContent=(E.escolas||[]).map(function(e){return e.nome;}).join(' · ')||'Meu Diário';
+    var nome=perfilNome(),e=escolaAtual();
+    document.getElementById('md-titulo').textContent='Diário de Aulas '+ANO;
+    document.getElementById('md-escolas').textContent=e?e.nome+(e.inep?' · INEP '+e.inep.codigo:''):'Carregando…';
     document.getElementById('md-quem').textContent='✦ '+(nome?nome+' · ':'')+usuario.email+' ✦';
-    var ini=nome.split(/\s+/).filter(Boolean);
-    document.getElementById('md-avatar').textContent=ini.length?(ini[0][0]+(ini.length>1?ini[ini.length-1][0]:'')).toUpperCase():'📘';
-    document.getElementById('md-rodape').textContent='Meu Diário · '+(nome||usuario.email)+' · Ano Letivo '+ano;
+    var av=document.getElementById('md-avatar');
+    if(e&&e.imagem)av.innerHTML='<img src="'+esc(e.imagem)+'" alt="">';else av.textContent=(e&&e.icone)||'🏫';
+    document.getElementById('md-rodape').textContent=(e?e.nome+' · ':'')+(nome||usuario.email)+' · Ano Letivo '+ANO;
+    if(e)document.title=e.nome+' — Meu Diário';
   }
   function desenharTudo(){
     desenharCabecalho();
+    if(!escolaAtual()){desenharAbas();return;}
     desenharAbas();garantirSecoes();desenharInicio();desenharConfig();desenharContador();desenharEstatisticasTurmas();
     cadaModulo('desenhar');
     irPara(abaAtual||(function(){try{return localStorage.getItem('md_aba');}catch(x){return '';}})()||'inicio');
   }
-  function aposRenderDiarios(){desenharMarcacoes();desenharEstatisticasTurmas();desenharContador();if(abaAtual==='inicio')desenharInicio();cadaModulo('aposDiarios');}
+  function aposRenderDiarios(){if(!escolaAtual())return;desenharMarcacoes();desenharEstatisticasTurmas();desenharContador();if(abaAtual==='inicio')desenharInicio();cadaModulo('aposDiarios');}
 
   // ── Adaptador do novo-diario.js ─────────────────────────────────────
   function adaptador(){
     return {
       chave:'md', perUser:true, scope:'meu-diario:diarios:v1', lsKey:'md_diarios_'+usuario.id, schoolSlug:'meu-diario',
-      turmas:function(){return (E.turmas||[]).map(function(t){return t.id;});},
+      turmas:function(){return turmasVis().map(function(t){return t.id;});},
       comHoras:true, presencaNeutra:false,
       rotulo:function(t){var x=turma(t);return x?x.nome:t;},
       alunos:function(t){var x=turma(t);return x?x.alunos:[];},
@@ -676,7 +956,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       discDoTitulo:function(){return '';},
       novoId:function(t,dateKey,discNome,ignorar){
         var base=t+'-'+dateKey.slice(5,7)+dateKey.slice(8,10)+this.codigoDisc(discNome,t);
-        var usados={};diarios().forEach(function(d){usados[d.id]=1;});
+        var usados={};window.NovoDiario.diarios().forEach(function(d){usados[d.id]=1;});
         var letras=['','a','b','c','d','e','f','g','h'];
         for(var i=0;i<letras.length;i++){var id=base+letras[i];if(id===ignorar||(!usados[id]&&!document.getElementById('r-'+id)))return id;}
         return '';
@@ -706,10 +986,11 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   // ── API para os módulos (recursos e I.A) ────────────────────────────
   window.MeuDiario={
     esc:esc, toast:toast, novoId:novoId, slug:slug, agora:agora, dataBr:dataBr, MESES:MESES,
-    usuario:function(){return usuario;}, estrutura:function(){return E;},
+    usuario:function(){return usuario;}, estrutura:vista,
     turma:turma, escola:escola, diarios:diarios, somaHoras:somaHoras,
     salvarEstrutura:salvar, criarTurma:criarTurma, adicionarAlunos:adicionarAlunos, adicionarDisciplina:adicionarDisciplina,
     irPara:irPara, abaAtual:function(){return abaAtual;}, abrirOverlay:abrirOverlay, status:status,
+    escolaAtual:function(){return ESCOLA_ID;}, ano:function(){return ANO;},
     sync:function(){return window.RelatorioSupabaseSync;}
   };
 
@@ -717,10 +998,15 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   function iniciar(){
     var S=window.RelatorioSupabaseSync;
     usuario=S.auth.currentUser();
+    if(!ESCOLA_ID){location.replace('escolas.html');return;}
+    ANO=anoInicial();
     E=lerLocal();
     if(!E.perfil||!E.perfil.nome){E.perfil=E.perfil||{};E.perfil.nome=usuario.nome||'';}
+    C().perfil.iniciar();
+    C().chip(document.getElementById('md-chip'));
+    C().perfil.aoMudar(function(){if(E)desenharCabecalho();});
     cadaModulo('iniciar',window.MeuDiario);
-    desenharTudo();
+    if(escolaAtual())desenharTudo();else document.getElementById('sec-inicio').innerHTML='<div class="md-card md-vazio">Carregando a escola…</div>',document.getElementById('sec-inicio').classList.add('on');
     document.getElementById('md-sair').onclick=function(){if(confirm('Sair da conta neste aparelho?'))S.auth.signOut();};
     syncE=S.createScopeSync({
       perUser:true, scope:SCOPE_ESTRUTURA, source:'meu-diario', debounceMs:250,
@@ -729,15 +1015,17 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       onStatus:function(s){status('estrutura',s);}
     });
     syncE.start().then(function(){
-      // Conta nova: a primeira gravação cria o registro no banco.
-      if(!E.atualizadoEm){E.atualizadoEm=agora();syncE.pushNow('force');}
+      carregado=true;
+      if(!escolaAtual()){location.replace('escolas.html');return;}
+      desenharTudo();
+      if(window.NovoDiario)window.NovoDiario.renderizar();
     });
     window.NovoDiario.iniciar(adaptador());
     window.addEventListener('online',mostrarStatus);window.addEventListener('offline',mostrarStatus);
   }
   function quandoPronto(){
     var S=window.RelatorioSupabaseSync;
-    if(!S||!window.NovoDiario){setTimeout(quandoPronto,50);return;}
+    if(!S||!window.NovoDiario||!window.ContaSkin){setTimeout(quandoPronto,50);return;}
     S.auth.whenAuthorized().then(function(){if(!usuario)iniciar();});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',quandoPronto);else quandoPronto();

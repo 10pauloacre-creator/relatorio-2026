@@ -49,6 +49,12 @@
   function disc(t, id) { return (t && t.disciplinas || []).filter(function (d) { return d.id === id; })[0] || null; }
   function corDisc(t, id) { var i = (t.disciplinas || []).map(function (d) { return d.id; }).indexOf(id); return CORES[(i < 0 ? 0 : i) % CORES.length]; }
   function chave() { return Array.prototype.slice.call(arguments).join("|"); }
+  // Escola aberta no Meu Diário (cada escola tem a própria página).
+  function escolaAtual() { return M && M.escolaAtual ? M.escolaAtual() : ""; }
+  // Eventos da escola aberta + os antigos, que não têm escola.
+  function eventos() { var eid = escolaAtual(); return R.cal.eventos.filter(function (e) { return !e.escolaId || !eid || e.escolaId === eid; }); }
+  // Chave "turma|disciplina|..." de uma turma visível (escola e ano letivo abertos).
+  function daVista(k) { var tid = String(k).split("|")[0]; return turmas().some(function (t) { return t.id === tid; }); }
   function modal(html, ligar) { return M.abrirOverlay(html, ligar); }
 
   // ── dados: local + banco ───────────────────────────────────────────
@@ -166,7 +172,7 @@
     if (!sec) return;
     var cab = '<div class="th"><div class="tb gz">📚</div><div class="ti"><h2>Plano de Aulas</h2><p>Planejamento anual por turma, disciplina e bimestre · a aula fica riscada quando é registrada no diário ou marcada como aplicada</p></div></div>';
     var ts = turmas().filter(function (t) { return (t.disciplinas || []).length; });
-    if (!ts.length) { sec.innerHTML = cab + '<div class="md-card"><div class="md-vazio">Cadastre uma turma com disciplinas na aba ⚙️ Turmas e alunos para montar o plano.</div></div>'; return; }
+    if (!ts.length) { sec.innerHTML = cab + '<div class="md-card"><div class="md-vazio">Cadastre uma turma com disciplinas na aba ⚙️ Configurações para montar o plano.</div></div>'; return; }
     if (!ts.some(function (t) { return t.id === ui.pl.t; })) { ui.pl.t = ts[0].id; ui.pl.d = ""; }
     var t = M.turma(ui.pl.t);
     if (!disc(t, ui.pl.d)) { ui.pl.d = t.disciplinas[0].id; }
@@ -320,7 +326,7 @@
       ? '<div class="th"><div class="tb mr">🗂</div><div class="ti"><h2>Sequências Didáticas</h2><p>Acompanhamento das sequências por turma, disciplina e bimestre</p></div></div>'
       : '<div class="th"><div class="tb ou">📖</div><div class="ti"><h2>Livros e materiais digitais</h2><p>Produção e acompanhamento dos livros, apostilas e materiais por disciplina e bimestre</p></div></div>';
     var ts = turmas().filter(function (t) { return (t.disciplinas || []).length; });
-    if (!ts.length) { sec.innerHTML = cab + '<div class="md-card"><div class="md-vazio">Cadastre uma turma com disciplinas na aba ⚙️ Turmas e alunos.</div></div>'; return; }
+    if (!ts.length) { sec.innerHTML = cab + '<div class="md-card"><div class="md-vazio">Cadastre uma turma com disciplinas na aba ⚙️ Configurações.</div></div>'; return; }
     var atual = ui[tipo === "seq" ? "seq" : "liv"];
     if (!ts.some(function (t) { return t.id === atual; })) atual = ts[0].id;
     ui[tipo === "seq" ? "seq" : "liv"] = atual;
@@ -433,7 +439,7 @@
 
   // ═══════════════════════════ 📆 CALENDÁRIO ═══════════════════════════
   function eventosDoDia(k) {
-    return R.cal.eventos.filter(function (e) { return e.ini <= k && (e.fim || e.ini) >= k; });
+    return eventos().filter(function (e) { return e.ini <= k && (e.fim || e.ini) >= k; });
   }
   function diariosPorDia() {
     var m = {};
@@ -479,7 +485,7 @@
         evs.slice(0, 3).map(function (e) { return '<span class="cal-ev" style="background:' + (TIPOS_CAL[e.tipo] || TIPOS_CAL.outro).cor + '">' + esc(e.titulo) + "</span>"; }).join("") +
         (evs.length > 3 ? '<span class="cal-mais">+' + (evs.length - 3) + "</span>" : "") + "</button>";
     }
-    var doMes = R.cal.eventos.filter(function (e) { return (e.ini || "").slice(0, 7) <= ui.cal && (e.fim || e.ini || "").slice(0, 7) >= ui.cal; })
+    var doMes = eventos().filter(function (e) { return (e.ini || "").slice(0, 7) <= ui.cal && (e.fim || e.ini || "").slice(0, 7) >= ui.cal; })
       .sort(function (a, b) { return a.ini.localeCompare(b.ini); });
     sec.innerHTML = '<div class="th"><div class="tb gz">📆</div><div class="ti"><h2>Calendário Escolar</h2><p>Feriados, recessos, avaliações, reuniões e eventos · os dias com diário mostram 📘</p></div></div>' + estiloCal() +
       '<div class="md-card"><div class="cal-bar"><button type="button" class="md-btn mini" data-c="ant">‹ Anterior</button><button type="button" class="md-btn mini pri" data-c="hoje">Hoje</button><button type="button" class="md-btn mini" data-c="prox">Próximo ›</button>' +
@@ -518,7 +524,7 @@
       });
   }
   function editarEvento(id, dia) {
-    var e = id ? R.cal.eventos.filter(function (x) { return x.id === id; })[0] : null;
+    var e = id ? eventos().filter(function (x) { return x.id === id; })[0] : null;
     e = e || { ini: dia || hojeKey(), fim: "", titulo: "", tipo: "evento", desc: "" };
     modal("<h2>" + (id ? "✏️ Editar evento" : "+ Novo evento") + "</h2>" +
       '<div class="md-grid" style="margin-top:12px"><div class="md-f"><label>Data</label><input type="date" data-e="ini" value="' + esc(e.ini) + '"></div><div class="md-f"><label>Até (opcional)</label><input type="date" data-e="fim" value="' + esc(e.fim || "") + '"></div>' +
@@ -540,7 +546,11 @@
   }
   function adicionarEvento(o) {
     var fim = o.fim && o.fim > o.ini ? o.fim : "";
+    var velho = o.id ? R.cal.eventos.filter(function (x) { return x.id === o.id; })[0] : null;
     var ev = { id: o.id || M.novoId("ev"), ini: o.ini, fim: fim, tipo: TIPOS_CAL[o.tipo] ? o.tipo : "outro", titulo: o.titulo, desc: o.desc || "" };
+    // Cada evento pertence à escola aberta (os antigos, sem escola, aparecem em todas).
+    var eid = velho ? velho.escolaId : escolaAtual();
+    if (eid) ev.escolaId = eid;
     R.cal.eventos = R.cal.eventos.filter(function (x) { return x.id !== ev.id; });
     R.cal.eventos.push(ev);
     return ev.id;
@@ -555,9 +565,9 @@
   function inicioHtml() {
     var hoje = hojeKey(), lim = new Date(); lim.setDate(lim.getDate() + 21);
     var limK = lim.getFullYear() + "-" + dois(lim.getMonth() + 1) + "-" + dois(lim.getDate());
-    var prox = R.cal.eventos.filter(function (e) { return (e.fim || e.ini) >= hoje && e.ini <= limK; }).sort(function (a, b) { return a.ini.localeCompare(b.ini); }).slice(0, 6);
+    var prox = eventos().filter(function (e) { return (e.fim || e.ini) >= hoje && e.ini <= limK; }).sort(function (a, b) { return a.ini.localeCompare(b.ini); }).slice(0, 6);
     var pl = 0, feitas = 0, idx = indiceDiarios();
-    Object.keys(R.plano).forEach(function (k) {
+    Object.keys(R.plano).filter(daVista).forEach(function (k) {
       Object.keys(R.plano[k].bims || {}).forEach(function (b) { (R.plano[k].bims[b].aulas || []).forEach(function (a) { pl++; if (a.st === "ap" || aulaDada(idx[k], a.t)) feitas++; }); });
     });
     return '<div class="md-card"><h3>📆 Próximos eventos</h3>' + (prox.length ? prox.map(linhaEvento).join("") : '<p>Nada nas próximas três semanas. <button type="button" class="md-btn mini" data-ir-aba="cal">Abrir calendário</button></p>') + "</div>" +
@@ -567,7 +577,7 @@
   // ── resumo para a I.A ───────────────────────────────────────────────
   function resumo() {
     var plano = {};
-    Object.keys(R.plano).forEach(function (k) {
+    Object.keys(R.plano).filter(daVista).forEach(function (k) {
       var bims = R.plano[k].bims || {}, idx = indiceDiarios()[k];
       Object.keys(bims).forEach(function (b) {
         if (!(bims[b].aulas || []).length && !bims[b].titulo) return;
@@ -575,8 +585,8 @@
         plano[k][b] = { tema: bims[b].titulo || "", aulas: (bims[b].aulas || []).map(function (a, i) { return (i + 1) + ". " + a.t + ((a.st === "ap" || aulaDada(idx, a.t)) ? " [dada]" : a.st === "pu" ? " [pulada]" : ""); }) };
       });
     });
-    var cards = function (dados) { var o = {}; Object.keys(dados).forEach(function (k) { var x = dados[k]; if (x.titulo || x.st) o[k] = { titulo: x.titulo || "", status: x.st || "" }; }); return o; };
-    return { plano: plano, sequencias: cards(R.seq), livros: cards(R.livros), eventos: R.cal.eventos.slice().sort(function (a, b) { return a.ini.localeCompare(b.ini); }).map(function (e) { return { id: e.id, data: e.ini, ate: e.fim || undefined, titulo: e.titulo, tipo: e.tipo }; }) };
+    var cards = function (dados) { var o = {}; Object.keys(dados).filter(daVista).forEach(function (k) { var x = dados[k]; if (x.titulo || x.st) o[k] = { titulo: x.titulo || "", status: x.st || "" }; }); return o; };
+    return { plano: plano, sequencias: cards(R.seq), livros: cards(R.livros), eventos: eventos().slice().sort(function (a, b) { return a.ini.localeCompare(b.ini); }).map(function (e) { return { id: e.id, data: e.ini, ate: e.fim || undefined, titulo: e.titulo, tipo: e.tipo }; }) };
   }
 
   // ── desenho geral e registro no Meu Diário ──────────────────────────
@@ -602,7 +612,39 @@
     salvarLivro: function (tid, did, b, campos) { var k = salvarCard("liv", tid, did, b, campos); salvar(); return k; },
     adicionarEvento: function (o) { var id = adicionarEvento(o); salvar(); return id; },
     removerEvento: function (id) { var ok = removerEvento(id); if (ok) salvar(); return ok; },
-    resumo: resumo
+    resumo: resumo,
+    // Importação do ano anterior: copia plano, sequências e livros de uma turma
+    // para a nova. O conteúdo vem junto; os status (aplicada, concluída…) zeram.
+    copiarTurma: function (de, para, o) {
+      o = o || {};
+      var n = 0;
+      function copiar(dados, limparStatus) {
+        Object.keys(dados).forEach(function (k) {
+          var p = k.split("|");
+          if (p[0] !== de) return;
+          p[0] = para;
+          var c = JSON.parse(JSON.stringify(dados[k]));
+          limparStatus(c);
+          dados[p.join("|")] = c; n++;
+        });
+      }
+      if (o.plano) copiar(R.plano, function (c) { Object.keys(c.bims || {}).forEach(function (b) { (c.bims[b].aulas || []).forEach(function (a) { a.st = ""; a.sm = false; }); }); });
+      var zerar = function (c) { if (c.titulo) c.st = "criando"; else delete c.st; delete c.concluidoEm; };
+      if (o.seq) copiar(R.seq, zerar);
+      if (o.livros) copiar(R.livros, zerar);
+      if (n && !o.semSalvar) salvar();
+      return n;
+    },
+    // Exclusão de turmas ou da escola: tira plano, sequências e livros delas
+    // (e os eventos da escola, quando informada).
+    removerTurmas: function (ids, escolaId) {
+      var alvo = {}, n = 0;
+      (ids || []).forEach(function (t) { alvo[t] = 1; });
+      [R.plano, R.seq, R.livros].forEach(function (dados) { Object.keys(dados).forEach(function (k) { if (alvo[k.split("|")[0]]) { delete dados[k]; n++; } }); });
+      if (escolaId) { var antes = R.cal.eventos.length; R.cal.eventos = R.cal.eventos.filter(function (e) { return e.escolaId !== escolaId; }); n += antes - R.cal.eventos.length; }
+      if (n) salvar();
+      return n;
+    }
   };
 
   (window.MD_MODULOS = window.MD_MODULOS || []).push({

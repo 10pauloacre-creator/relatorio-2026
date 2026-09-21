@@ -1275,6 +1275,15 @@
     },
     diarios: function () { return estado.diarios.filter(function (d) { return !d.excluido; }); },
     renderizar: function () { if (A) renderTodos(); },
+    // Apaga os diários das turmas informadas (exclusão de turma ou escola no
+    // Meu Diário). Devolve quantos saíram.
+    removerTurmas: function (ids) {
+      var alvo = {}, n = 0;
+      (ids || []).forEach(function (t) { alvo[t] = 1; });
+      estado.diarios.slice().forEach(function (d) { if (alvo[d.turma]) { removerDiario(d.id); n++; } });
+      if (n) persistir();
+      return n;
+    },
     // Visão só de leitura da escola atual (assistente de I.A das escolas).
     adaptador: function () {
       if (!A) return null;

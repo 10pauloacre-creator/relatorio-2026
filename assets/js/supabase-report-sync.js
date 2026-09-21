@@ -7,8 +7,8 @@ window.RELATORIO_SUPABASE_CONFIG = {
   // Dono dos relatórios da Casavequia e da Hermínio (mesma conta da Biblioteca).
   adminEmail: "10pauloacre@gmail.com",
   authStorageKey: "relatorio-2026-admin-auth",
-  // Página de cada professor (conta que não é a do administrador).
-  professorHome: "meu-diario.html"
+  // Tela inicial de toda conta (Etapa 14): a lista de escolas do professor.
+  professorHome: "escolas.html"
 };
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -17,10 +17,9 @@ window.RELATORIO_SUPABASE_CONFIG = {
 // Toda página que carrega este arquivo exige uma conta. O tipo de acesso vem
 // de <html data-acesso="...">:
 //   (vazio)     página das escolas do administrador (Casavequia, Hermínio…):
-//               só a conta do administrador; outra conta vai para Meu Diário.
-//   "inicio"    tela inicial: qualquer conta; o administrador vê as escolas e
-//               os demais professores seguem para Meu Diário.
-//   "professor" Meu Diário: qualquer conta, com os próprios dados.
+//               só a conta do administrador; outra conta vai para escolas.html.
+//   "inicio"    tela inicial: qualquer conta; todos seguem para escolas.html.
+//   "professor" escolas, Meu Diário e perfil: qualquer conta, com os próprios dados.
 // Os dados ficam protegidos no banco (RLS). Esconder a página até entrar é só
 // cortesia visual: o conteúdo escrito no HTML público continua no código-fonte.
 // ═══════════════════════════════════════════════════════════════════════
@@ -150,7 +149,7 @@ window.RelatorioSupabaseSync = (function () {
   }
 
   function paginaDoProfessor() {
-    return config.professorHome || "meu-diario.html";
+    return config.professorHome || "escolas.html";
   }
 
   // Decide o que a página mostra para a conta atual.

@@ -1,140 +1,349 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-acesso="inicio" data-auth-voltar="index.html">
+<html lang="pt-BR" data-acesso="professor" data-auth-voltar="index.html" data-ck-tema="escuro">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#040303">
+<meta name="theme-color" content="#0D0E0D">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="assets/css/dark-mode-2026.css?v=20260916a">
-<script defer src="assets/js/dark-mode-2026.js?v=20260921a"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="assets/js/supabase-report-sync.js?v=20260921a"></script>
-<title>Escolas — RELATORIO SKIN</title> <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  min-height: 100vh;
-  background: #0b1e12;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 32px;
-  padding: 20px;
-  font-family: "Segoe UI", Tahoma, sans-serif;
-}
-
-a {
-  display: block;
-  border-radius: 24px;
-  overflow: hidden;
-  flex-shrink: 0;
-  transition: transform .22s cubic-bezier(.34,1.4,.64,1), box-shadow .22s ease;
-}
-
-a:hover {
-  transform: scale(1.04);
-  box-shadow: 0 28px 64px rgba(0,0,0,.6);
-}
-
-.projetos-pessoais {
-  width: 82vw;
-  height: 82vw;
-  max-width: 340px;
-  max-height: 340px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-.projetos-pessoais .pp-button-icon {
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  filter: none;
-}
-
-.projetos-pessoais > :not(.pp-button-icon) { display: none; }
-
-a:not(.projetos-pessoais) > img {
-  width: 82vw;
-  height: 82vw;
-  max-width: 340px;
-  max-height: 340px;
-  object-fit: contain;
-  display: block;
-}
-
-@media (min-width: 900px) {
-  body { flex-direction: row; flex-wrap: wrap; gap: 60px; padding: 24px; }
-  a:not(.projetos-pessoais) > img, .projetos-pessoais { width: 320px; height: 320px; max-width: none; max-height: none; }
-  a:hover { transform: translateY(-8px) scale(1.05); }
-}
-.conta-barra { position: fixed; top: 12px; right: 12px; display: flex; gap: 8px; align-items: center; z-index: 10;
-  font-size: .78rem; color: #a9c4b2; }
-.conta-barra button { background: rgba(255,255,255,.08); color: #e9f3ec; border: 1px solid rgba(255,255,255,.2);
-  border-radius: 999px; padding: 6px 12px; font-weight: 700; cursor: pointer; }
-/* Rodapé da marca: linha própria, depois dos botões das escolas. */
-.marca { flex-basis: 100%; order: 99; display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 8px; text-align: center; }
-.marca a { border-radius: 0; overflow: visible; }
-.marca a:hover { transform: none; box-shadow: none; }
-.marca .marca-logo > img { width: 230px; height: auto; max-width: none; max-height: none; opacity: 1; transition: transform .2s; }
-.marca .marca-logo:hover > img { transform: scale(1.03); }
-.marca-prop { font-size: .66rem; letter-spacing: .22em; font-weight: 700; color: #8fb4d9; }
-.legal { font-size: .7rem; color: #6f8a78; opacity: .75; }
-.legal a { display: inline; color: inherit; text-decoration: none; }
-.legal a:hover { text-decoration: underline; }
-.legal:hover { opacity: 1; }
-@media (min-width: 900px) { .marca { margin-top: -20px; } }
+<script defer src="assets/js/supabase-report-sync.js?v=20260921b"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921a"></script>
+<title>Escolas — RELATORIO SKIN</title>
+<style>
+:root{--fundo:#0D0E0D;--sup:#131512;--sup2:#181B17;--sup3:#20231E;--linha:#30352D;--txt:#F3F1E9;--txt2:#B6B7AE;--mudo:#7E8279;--marca:#A7B58A;--marca2:#C2CE9E;--areia:#D6CBB8;--ouro:#B89B69;--rel-trava-bg:#0D0E0D}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{background:var(--fundo)}
+body{min-height:100vh;background:radial-gradient(1100px 520px at 50% -180px,rgba(167,181,138,.09),transparent 70%),var(--fundo);color:var(--txt);font-family:Inter,"Segoe UI",sans-serif;overflow-x:hidden}
+button{font:inherit}
+/* ── Barra da conta ── */
+.topo{display:flex;align-items:center;gap:12px;padding:14px 22px;max-width:1280px;margin:0 auto}
+.topo .marca-mini{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--txt2);font-family:Manrope,sans-serif;font-weight:800;letter-spacing:.14em;font-size:.72rem}
+.topo .marca-mini img{width:30px;height:30px;border-radius:8px}
+.topo .marca-mini b{color:var(--marca2);font-size:.95rem;letter-spacing:.08em}
+.topo .esp{flex:1}
+.topo .email{font-size:.78rem;color:var(--txt2);max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topo .sair{background:rgba(255,255,255,.06);color:var(--txt);border:1px solid var(--linha);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.8rem;cursor:pointer}
+.topo .sair:hover{border-color:var(--marca)}
+.topo .ck-chip{border-color:var(--marca);color:var(--marca2);background:var(--sup3)}
+/* ── Grade de escolas ── */
+.vista{max-width:1280px;margin:0 auto;padding:10px 22px 30px}
+.titulo{text-align:center;margin:18px 0 34px}
+.titulo h1{font-family:Manrope,sans-serif;font-size:clamp(1.4rem,3vw,2rem);font-weight:800;letter-spacing:-.01em}
+.titulo p{color:var(--txt2);font-size:.92rem;margin-top:6px}
+.grade{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(24px,4vw,56px)}
+.item{display:flex;flex-direction:column;align-items:center;gap:10px;width:min(82vw,320px)}
+.card{position:relative;display:block;width:100%;aspect-ratio:1;border-radius:24px;overflow:hidden;text-decoration:none;color:var(--txt);cursor:pointer;border:none;background:transparent;
+  transition:transform .22s cubic-bezier(.34,1.4,.64,1),box-shadow .22s ease}
+.card:hover,.card:focus-visible{transform:translateY(-8px) scale(1.04);box-shadow:0 28px 64px rgba(0,0,0,.6);outline:none}
+.card>img{width:100%;height:100%;object-fit:cover;display:block}
+.card.fixa>img{object-fit:contain}
+.card.gerado{background:linear-gradient(160deg,var(--c1,#2a3324),var(--c2,#141712));border:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px 22px;gap:10px}
+.card.gerado .ic{font-size:clamp(3.4rem,9vw,5rem);line-height:1;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35))}
+.card.gerado .rot{font-family:Manrope,sans-serif;font-size:.72rem;letter-spacing:.34em;color:var(--marca2);font-weight:800;display:flex;align-items:center;gap:10px}
+.card.gerado .rot::before,.card.gerado .rot::after{content:"";width:28px;height:1px;background:currentColor;opacity:.6}
+.card.gerado .nm{font-family:Manrope,sans-serif;font-weight:800;font-size:clamp(1.05rem,2.6vw,1.45rem);line-height:1.15;text-transform:uppercase;letter-spacing:.02em;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card.gerado .lc{font-size:.78rem;color:var(--txt2)}
+.card.novo{border:2px dashed rgba(167,181,138,.55);background:rgba(167,181,138,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:var(--marca2)}
+.card.novo:hover{background:rgba(167,181,138,.09);border-color:var(--marca2)}
+.card.novo .mais{width:86px;height:86px;border-radius:50%;background:var(--marca);color:#12140f;font-size:3rem;font-weight:300;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 34px rgba(167,181,138,.25)}
+.card.novo .tx{font-family:Manrope,sans-serif;font-weight:800;letter-spacing:.08em;font-size:1.15rem;text-align:center;line-height:1.3}
+.card.novo .tx small{display:block;font-family:Inter,sans-serif;font-weight:500;letter-spacing:0;font-size:.8rem;color:var(--txt2);margin-top:6px}
+.card.novo.grande{border-width:2px}
+.selo{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;color:var(--txt2);background:var(--sup2);border:1px solid var(--linha);border-radius:999px;padding:5px 11px;cursor:pointer}
+.selo:hover{border-color:var(--marca);color:var(--txt)}
+.selo.falta{color:#e2c48c;border-color:rgba(194,154,91,.5)}
+.item.novoitem .card{animation:pulsa 1.4s ease 2}
+@keyframes pulsa{50%{box-shadow:0 0 0 10px rgba(167,181,138,.25)}}
+.carregando{text-align:center;color:var(--txt2);padding:60px 0}
+/* ── Cadastro ── */
+.cad{max-width:880px;margin:0 auto;padding:6px 22px 40px}
+.voltar{background:none;border:none;color:var(--txt2);cursor:pointer;font-size:.86rem;padding:6px 0;margin-bottom:10px}
+.voltar:hover{color:var(--txt)}
+.cad h1{font-family:Manrope,sans-serif;font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:800}
+.cad .lead{color:var(--txt2);margin:8px 0 22px;line-height:1.6;font-size:.94rem}
+.painel{background:var(--sup);border:1px solid var(--linha);border-radius:18px;padding:22px}
+.painel+.painel{margin-top:16px}
+.passos{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.passos span{font-size:.72rem;font-weight:700;letter-spacing:.04em;padding:5px 11px;border-radius:999px;background:var(--sup3);color:var(--txt2);border:1px solid var(--linha)}
+.escolhida h2{font-family:Manrope,sans-serif;font-size:1.3rem;margin-bottom:4px}
+.escolhida .inep{display:inline-block;background:rgba(167,181,138,.14);color:var(--marca2);border:1px solid rgba(167,181,138,.4);border-radius:8px;padding:3px 10px;font-weight:800;font-size:.82rem;letter-spacing:.05em;margin:6px 0 12px}
+.dados{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 18px;font-size:.86rem;margin:6px 0 16px}
+.dados div{color:var(--txt2)}.dados b{display:block;color:var(--txt);font-weight:600;margin-top:2px}
+.campo label{display:block;font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--marca);margin-bottom:5px}
+.campo input,.campo select{width:100%;padding:11px 12px;border-radius:11px;border:2px solid var(--linha);background:var(--sup2);color:var(--txt);font:inherit;font-size:.95rem}
+.campo{margin-bottom:12px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.btn{border:1px solid var(--linha);background:var(--sup3);color:var(--txt);border-radius:9px;padding:11px 18px;font-weight:700;font-size:.9rem;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--marca)}
+.btn.pri{background:var(--marca);border-color:var(--marca);color:#12140f}
+.btn.pri:hover{background:#D2DBB3}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.link-sutil{background:none;border:none;color:var(--txt2);text-decoration:underline;cursor:pointer;font-size:.84rem;margin-top:14px}
+.nota{font-size:.8rem;color:var(--mudo);margin-top:12px;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--sup3);border:1px solid var(--linha);color:var(--txt);padding:11px 18px;border-radius:999px;font-size:.86rem;z-index:40000;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:92vw;text-align:center}
+/* ── Rodapé da marca ── */
+.marca{display:flex;flex-direction:column;align-items:center;gap:6px;margin:30px 0 26px;text-align:center}
+.marca .marca-logo>img{width:230px;height:auto;display:block;transition:transform .2s}
+.marca .marca-logo:hover>img{transform:scale(1.03)}
+.marca-prop{font-size:.66rem;letter-spacing:.22em;font-weight:700;color:var(--ouro)}
+.legal{font-size:.7rem;color:var(--mudo)}
+.legal a{color:inherit;text-decoration:none}.legal a:hover{text-decoration:underline}
+@media(max-width:560px){.topo{padding:12px 14px}.topo .email{display:none}.vista,.cad{padding-left:16px;padding-right:16px}.painel{padding:16px}}
+@media(prefers-reduced-motion:reduce){.card,.card:hover{transition:none;transform:none}.item.novoitem .card{animation:none}}
 </style>
 </head>
-<body class="dark-page">
+<body>
+<header class="topo">
+  <a class="marca-mini" href="index.html" aria-label="RELATORIO SKIN — site"><img src="assets/marca/skin-simbolo.webp" alt="" width="30" height="30"><span>RELATORIO <b>SKIN</b></span></a>
+  <span class="esp"></span>
+  <span class="email" id="conta-email"></span>
+  <a id="conta-chip" href="perfil.html"></a>
+  <button type="button" class="sair" id="conta-sair">Sair</button>
+</header>
 
-<a href="casavequia.html">
-  <img src="botao-casavequia.png" alt="Pe. Carlos Casavequia">
-</a>
+<main>
+  <section class="vista" id="vista-escolas">
+    <div class="titulo" id="titulo" hidden><h1>Suas escolas</h1><p>Toque na escola para abrir o diário, as turmas e o planejamento.</p></div>
+    <div class="grade" id="grade"><div class="carregando">Carregando suas escolas…</div></div>
+  </section>
 
-<a class="h2" href="herminio.html">
-  <img src="botao-herminio.png" alt="Raimundo Hermínio de Melo">
-</a>
+  <section class="cad" id="vista-cadastro" hidden>
+    <button type="button" class="voltar" data-voltar>← Voltar para as escolas</button>
+    <h1>Cadastre sua escola</h1>
+    <p class="lead">Encontre a escola no catálogo oficial do INEP (Censo Escolar). O <strong>código INEP</strong> identifica a escola em todo o país e liga o seu diário ao perfil oficial dela.</p>
+    <div class="painel" id="cad-busca">
+      <div class="passos"><span>1 · Estado</span><span>2 · Município</span><span>3 · Escola</span></div>
+      <div id="cad-seletor"></div>
+      <button type="button" class="link-sutil" id="cad-manual-abrir">Não encontrou a escola? Cadastrar sem código INEP</button>
+    </div>
+    <div class="painel escolhida" id="cad-escolhida" hidden></div>
+    <div class="painel" id="cad-manual" hidden>
+      <h2 style="font-family:Manrope,sans-serif;font-size:1.15rem;margin-bottom:10px">Escola sem código INEP</h2>
+      <div class="campo"><label for="man-nome">Nome da escola</label><input id="man-nome" placeholder="Ex.: Escola Estadual Nova Esperança"></div>
+      <div class="campo"><label for="man-mun">Município / UF</label><input id="man-mun" placeholder="Ex.: Senador Guiomard / AC"></div>
+      <div class="btns"><button type="button" class="btn pri" id="man-salvar">✓ Cadastrar escola</button><button type="button" class="btn" id="man-cancelar">Cancelar</button></div>
+      <p class="nota">Use só para escolas novas que ainda não aparecem no Censo. Depois você pode ligá-la ao INEP nas configurações da escola.</p>
+    </div>
+  </section>
 
-<a class="projetos-pessoais" href="projetos-pessoais.html" aria-label="Abrir Projetos pessoais">
-  <img class="pp-button-icon" src="botão_projetos.png" alt="">
-  <span class="pp-icon">✦</span>
-  <strong>Projetos<br>pessoais</strong>
-  <span>Ideias, projetos, ferramentas e I.As em um só lugar.</span>
-</a>
+  <div class="marca" role="contentinfo">
+    <a class="marca-logo" href="axion-proeduq.html" aria-label="Conheça a AXION PROEDUQ"><img src="assets/marca/axion-escuro-sm.webp" alt="AXION PROEDUQ. Tecnologia que move a educação." width="560" height="148"></a>
+    <div class="marca-prop">PROPRIEDADE DA AXION PROEDUQ</div>
+    <div class="legal"><a href="index.html">Site</a> · <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></div>
+  </div>
+</main>
 
-<div class="marca" role="contentinfo">
-  <a class="marca-logo" href="axion-proeduq.html" aria-label="Conheça a AXION PROEDUQ"><img src="assets/marca/axion-escuro-sm.webp" alt="AXION PROEDUQ. Tecnologia que move a educação." width="560" height="148"></a>
-  <div class="marca-prop">PROPRIEDADE DA AXION PROEDUQ</div>
-  <div class="legal"><a href="index.html">Site</a> · <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></div>
-</div>
-
-<div class="conta-barra" id="conta-barra" hidden><span id="conta-email"></span><button type="button" id="conta-sair">Sair</button></div>
 <script>
-// Tela inicial (Etapa 9): as escolas são da conta do administrador; qualquer
-// outra conta segue para o Meu Diário, com os próprios dados.
-document.addEventListener('DOMContentLoaded', function () {
-  var S = window.RelatorioSupabaseSync;
-  if (!S) return;
-  S.auth.whenAuthorized().then(function () {
-    if (!S.auth.isAdmin()) { window.location.replace(window.RELATORIO_SUPABASE_CONFIG.professorHome); return; }
-    var barra = document.getElementById('conta-barra');
-    document.getElementById('conta-email').textContent = (S.auth.currentUser() || {}).email || '';
+/* ═══════════════════════════════════════════════════════════════════════
+   Escolas (Etapa 14, 21/09/2026) — tela inicial de TODAS as contas.
+   - Conta nova: só o botão "CADASTRE SUA ESCOLA".
+   - Cada escola cadastrada vira um botão (imagem ou ícone escolhidos na
+     página da escola) que abre meu-diario.html?escola=<id>.
+   - Administrador: Casavequia, Hermínio e Projetos pessoais continuam fixos;
+     as duas escolas podem ser ligadas ao INEP (E.fixas).
+   Dados: professor_dados, escopo "meu-diario:estrutura:v1" (o mesmo do
+   Meu Diário). Nada é gravado antes de ler o que já está no banco.
+   ═══════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  var SCOPE = 'meu-diario:estrutura:v1';
+  var FIXAS = [
+    { id: 'casavequia', href: 'casavequia.html', img: 'botao-casavequia.png', nome: 'Escola Padre Carlos Casavequia' },
+    { id: 'herminio', href: 'herminio.html', img: 'botao-herminio.png', nome: 'Escola Raimundo Hermínio de Melo' }
+  ];
+  var CORES = [['#2a3324', '#141712'], ['#34291c', '#15120d'], ['#1f2d2a', '#101614'], ['#33262a', '#161012'], ['#2c2f1f', '#13140d'], ['#262a33', '#111317']];
+  var S, C, usuario, E = null, sync = null, pronto = false, admin = false, destaque = '';
+
+  function esc(v) { return C.esc(v); }
+  function toast(m) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3200); }
+  function novoId() { return 'e' + Math.random().toString(36).slice(2, 7) + Date.now().toString(36).slice(-3); }
+  function lsKey() { return 'md_estrutura_' + usuario.id; }
+  function vazia() { return { versao: 1, perfil: { nome: usuario.nome || '' }, escolas: [], turmas: [], atualizadoEm: '' }; }
+  function lerLocal() { try { var e = JSON.parse(localStorage.getItem(lsKey()) || 'null'); if (e && Array.isArray(e.turmas)) return e; } catch (x) {} return vazia(); }
+  function salvar() {
+    if (!pronto) { toast('Aguarde: carregando seus dados…'); return false; }
+    E.atualizadoEm = new Date().toISOString();
+    try { localStorage.setItem(lsKey(), JSON.stringify(E)); } catch (x) {}
+    sync.pushNow('force');
+    desenhar();
+    return true;
+  }
+  function turmasDa(id) { return (E.turmas || []).filter(function (t) { return t.escolaId === id; }); }
+
+  // ── Grade ─────────────────────────────────────────────────────────────
+  function cardEscola(e, i) {
+    var cor = CORES[i % CORES.length], inep = e.inep, n = turmasDa(e.id).length;
+    var face = e.imagem
+      ? '<img src="' + esc(e.imagem) + '" alt="">'
+      : '<span class="ic">' + esc(e.icone || '🏫') + '</span><span class="rot">ESCOLA</span><span class="nm">' + esc(e.nome) + '</span>'
+        + '<span class="lc">' + (inep ? esc(inep.municipio) + '/' + esc(inep.uf) : (e.municipio ? esc(e.municipio) : '')) + '</span>';
+    return '<div class="item' + (destaque === e.id ? ' novoitem' : '') + '">'
+      + '<a class="card' + (e.imagem ? '' : ' gerado') + '" style="--c1:' + cor[0] + ';--c2:' + cor[1] + '" href="meu-diario.html?escola=' + encodeURIComponent(e.id) + '" aria-label="Abrir ' + esc(e.nome) + '">' + face + '</a>'
+      + (inep ? '<span class="selo" title="' + esc(inep.nome) + '">🏛️ INEP ' + inep.codigo + ' · ' + n + ' turma' + (n === 1 ? '' : 's') + '</span>'
+              : '<button type="button" class="selo falta" data-vincular="' + esc(e.id) + '">🔗 Vincular ao INEP</button>')
+      + '</div>';
+  }
+  function cardFixa(f) {
+    var v = (E.fixas || {})[f.id], inep = v && v.inep;
+    return '<div class="item"><a class="card fixa" href="' + f.href + '"><img src="' + f.img + '" alt="' + esc(f.nome) + '"></a>'
+      + (inep ? '<button type="button" class="selo" data-fixa="' + f.id + '" title="' + esc(inep.nome) + ' — trocar vínculo">🏛️ INEP ' + inep.codigo + '</button>'
+              : '<button type="button" class="selo falta" data-fixa="' + f.id + '">🔗 Vincular ao INEP</button>') + '</div>';
+  }
+  function desenhar() {
+    var grade = document.getElementById('grade'), escolas = E.escolas || [];
+    var html = '';
+    if (admin) html += FIXAS.map(cardFixa).join('');
+    html += escolas.map(cardEscola).join('');
+    var vazio = !admin && !escolas.length;
+    html += '<div class="item"><button type="button" class="card novo' + (vazio ? ' grande' : '') + '" data-cadastrar>'
+      + '<span class="mais">+</span><span class="tx">CADASTRE SUA ESCOLA' + (vazio ? '<small>Busque pelo nome ou código INEP</small>' : '') + '</span></button></div>';
+    if (admin) html += '<div class="item"><a class="card fixa" href="projetos-pessoais.html" aria-label="Abrir Projetos pessoais"><img src="botão_projetos.png" alt=""></a></div>';
+    grade.innerHTML = html;
+    document.getElementById('titulo').hidden = vazio;
+    grade.querySelectorAll('[data-cadastrar]').forEach(function (b) { b.onclick = function () { location.hash = 'cadastrar'; }; });
+    grade.querySelectorAll('[data-vincular]').forEach(function (b) { b.onclick = function () { vincularInep(b.getAttribute('data-vincular'), false); }; });
+    grade.querySelectorAll('[data-fixa]').forEach(function (b) { b.onclick = function () { vincularInep(b.getAttribute('data-fixa'), true); }; });
+    destaque = '';
+  }
+
+  // Liga uma escola já existente (do professor ou fixa do administrador) ao INEP.
+  function vincularInep(id, fixa) {
+    if (!pronto) return toast('Aguarde: carregando seus dados…');
+    var alvo = fixa ? FIXAS.filter(function (f) { return f.id === id; })[0] : (E.escolas || []).filter(function (e) { return e.id === id; })[0];
+    if (!alvo) return;
+    var atual = fixa ? ((E.fixas || {})[id] || {}).inep : alvo.inep;
+    C.janela('<h3>🔗 Vincular ao INEP</h3><p><strong>' + esc(alvo.nome) + '</strong>' + (atual ? '<br>Hoje: INEP ' + atual.codigo + ' — ' + esc(atual.nome) : '') + '</p><div data-sel></div>'
+      + '<div class="ck-acoes">' + (atual ? '<button type="button" class="ck-btn" data-tirar>Remover vínculo</button>' : '') + '<button type="button" class="ck-btn" data-fechar>Fechar</button></div>',
+      function (ov, fechar) {
+        ov.querySelector('.ck-jan').style.maxWidth = '720px';
+        ov.querySelector('[data-fechar]').onclick = fechar;
+        var tirar = ov.querySelector('[data-tirar]');
+        if (tirar) tirar.onclick = function () {
+          if (fixa) { if (E.fixas) delete E.fixas[id]; } else delete alvo.inep;
+          salvar(); C.vincularEscola(id, fixa ? { nome: alvo.nome } : alvo); fechar(); toast('Vínculo removido.');
+        };
+        C.seletorInep(ov.querySelector('[data-sel]'), {
+          uf: atual && atual.uf, municipio: atual && atual.municipioCodigo,
+          aoEscolher: function (x) {
+            var r = C.inep.resumo(x);
+            var dono = (E.escolas || []).filter(function (e) { return e.id !== id && e.inep && e.inep.codigo === r.codigo; })[0];
+            if (dono) return toast('Esta escola do INEP já está cadastrada como "' + dono.nome + '".');
+            if (fixa) { E.fixas = E.fixas || {}; E.fixas[id] = { inep: r, ligadoEm: new Date().toISOString() }; }
+            else { alvo.inep = r; }
+            salvar();
+            C.vincularEscola(id, fixa ? { nome: alvo.nome, inep: r } : alvo);
+            fechar();
+            toast('Escola ligada ao INEP ' + r.codigo + '.');
+          }
+        });
+      });
+  }
+
+  // ── Cadastro ──────────────────────────────────────────────────────────
+  function mostrarVista() {
+    var cad = location.hash === '#cadastrar';
+    document.getElementById('vista-escolas').hidden = cad;
+    document.getElementById('vista-cadastro').hidden = !cad;
+    if (cad) abrirCadastro();
+    window.scrollTo(0, 0);
+  }
+  function abrirCadastro() {
+    document.getElementById('cad-busca').hidden = false;
+    document.getElementById('cad-escolhida').hidden = true;
+    document.getElementById('cad-manual').hidden = true;
+    C.seletorInep(document.getElementById('cad-seletor'), { aoEscolher: mostrarEscolhida });
+  }
+  function mostrarEscolhida(x) {
+    var r = C.inep.resumo(x), box = document.getElementById('cad-escolhida');
+    var ja = (E.escolas || []).filter(function (e) { return e.inep && e.inep.codigo === r.codigo; })[0];
+    var fixa = admin && FIXAS.filter(function (f) { var v = (E.fixas || {})[f.id]; return v && v.inep && v.inep.codigo === r.codigo; })[0];
+    box.innerHTML = '<h2>' + esc(C.inep.nomeBonito(r.nome)) + '</h2><div class="inep">CÓDIGO INEP ' + r.codigo + '</div>'
+      + '<div class="dados"><div>Município<b>' + esc(r.municipio) + ' / ' + esc(r.uf) + '</b></div><div>Rede<b>' + esc(r.rede || '—') + '</b></div>'
+      + '<div>Localização<b>' + esc(r.localizacao || '—') + '</b></div><div>Etapas<b>' + esc(r.etapas || '—') + '</b></div>'
+      + '<div>Endereço<b>' + esc([r.endereco, r.bairro].filter(Boolean).join(' · ') || '—') + '</b></div><div>Matrículas (Censo ' + (r.anoCenso || '') + ')<b>' + (r.matriculas || '—') + '</b></div></div>'
+      + (ja || fixa ? '<p class="nota" style="color:#e2c48c">Esta escola já está cadastrada na sua conta' + (ja ? ' como "' + esc(ja.nome) + '"' : '') + '.</p>'
+        : '<div class="campo"><label for="cad-nome">Como a escola aparece no seu botão</label><input id="cad-nome" value="' + esc(C.inep.nomeBonito(r.nome)) + '"></div>')
+      + '<div class="btns">' + (ja || fixa ? (ja ? '<a class="btn pri" href="meu-diario.html?escola=' + encodeURIComponent(ja.id) + '">Abrir a escola</a>' : '')
+        : '<button type="button" class="btn pri" id="cad-confirmar">✓ Cadastrar esta escola</button>')
+      + '<button type="button" class="btn" id="cad-outra">← Escolher outra</button>'
+      + '<a class="btn" href="' + C.inep.qedu(r.codigo) + '" target="_blank" rel="noopener">Ver no QEdu ↗</a></div>'
+      + '<p class="nota">Dados do Censo Escolar ' + (r.anoCenso || '') + ' (INEP, microdados abertos).</p>';
+    document.getElementById('cad-busca').hidden = true;
+    box.hidden = false;
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('cad-outra').onclick = function () { box.hidden = true; document.getElementById('cad-busca').hidden = false; };
+    var ok = document.getElementById('cad-confirmar');
+    if (ok) ok.onclick = function () {
+      var nome = document.getElementById('cad-nome').value.trim() || C.inep.nomeBonito(r.nome);
+      cadastrar({ nome: nome, inep: r });
+    };
+  }
+  function cadastrar(dados) {
+    if (!pronto) return toast('Aguarde: carregando seus dados…');
+    var e = { id: novoId(), nome: dados.nome, icone: '🏫', imagem: '', criadoEm: new Date().toISOString() };
+    if (dados.inep) e.inep = dados.inep;
+    if (dados.municipio) e.municipio = dados.municipio;
+    E.escolas = E.escolas || [];
+    E.escolas.push(e);
+    destaque = e.id;
+    if (!salvar()) return;
+    C.vincularEscola(e.id, e);
+    location.hash = '';
+    toast('Escola cadastrada! Toque nela para cadastrar as suas turmas.');
+  }
+
+  // ── Início ────────────────────────────────────────────────────────────
+  function iniciar() {
+    S = window.RelatorioSupabaseSync; C = window.ContaSkin;
+    usuario = S.auth.currentUser();
+    admin = S.auth.isAdmin();
+    document.getElementById('conta-email').textContent = usuario.email || '';
     document.getElementById('conta-sair').onclick = function () { if (confirm('Sair da conta neste aparelho?')) S.auth.signOut(); };
-    barra.hidden = false;
-  });
-});
+    C.perfil.iniciar();
+    C.chip(document.getElementById('conta-chip'));
+    E = lerLocal();
+    if (E.atualizadoEm || admin) desenhar();
+    sync = S.createScopeSync({
+      perUser: true, scope: SCOPE, source: 'escolas', debounceMs: 250,
+      getLocalPayload: function () { return E; },
+      onRemotePayload: function (p) {
+        if (!p || !Array.isArray(p.turmas)) return;
+        if (String(p.atualizadoEm || '') < String(E.atualizadoEm || '')) { sync.schedulePush('local-mais-novo'); return; }
+        E = p;
+        try { localStorage.setItem(lsKey(), JSON.stringify(E)); } catch (x) {}
+        if (location.hash !== '#cadastrar') desenhar();
+      }
+    });
+    sync.start().then(function () {
+      pronto = true;
+      if (!E.escolas) E.escolas = [];
+      desenhar();
+    });
+    document.querySelectorAll('[data-voltar]').forEach(function (b) { b.onclick = function () { location.hash = ''; }; });
+    document.getElementById('cad-manual-abrir').onclick = function () { document.getElementById('cad-busca').hidden = true; document.getElementById('cad-manual').hidden = false; document.getElementById('man-nome').focus(); };
+    document.getElementById('man-cancelar').onclick = function () { document.getElementById('cad-manual').hidden = true; document.getElementById('cad-busca').hidden = false; };
+    document.getElementById('man-salvar').onclick = function () {
+      var nome = document.getElementById('man-nome').value.trim();
+      if (!nome) return toast('Informe o nome da escola.');
+      cadastrar({ nome: nome, municipio: document.getElementById('man-mun').value.trim() });
+    };
+    window.addEventListener('hashchange', mostrarVista);
+    mostrarVista();
+  }
+  function quandoPronto() {
+    if (!window.RelatorioSupabaseSync || !window.ContaSkin) { setTimeout(quandoPronto, 50); return; }
+    window.RelatorioSupabaseSync.auth.whenAuthorized().then(function () { if (!usuario) iniciar(); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', quandoPronto); else quandoPronto();
+})();
 </script>
 <script defer src="assets/app-build.js?v=20260717a"></script>
 <script defer src="assets/js/app-update.js?v=20260717c"></script>
