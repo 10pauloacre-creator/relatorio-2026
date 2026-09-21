@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const rootDir = path.resolve(__dirname, "..");
-const sourcePath = "C:/Users/PAULO ROBERTO/biblioteca-digital-medieval-1/docs/alunos-ids.md";
+const sourcePath = path.join(rootDir, "..", "BIBLIOTECA-DIGITAL", "docs", "alunos-ids.md");
 
 const targets = [
   { file: "casavequia-alunos-1serie.html", type: "config", schoolCode: "PCC", seriesCodes: ["1"] },

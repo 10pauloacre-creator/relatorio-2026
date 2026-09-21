@@ -24,7 +24,7 @@ const ARQUIVOS = [
 const TEXTO = /\.(js|html|css|json)$/i;
 
 const biblioteca = process.env.BIBLIOTECA_DIR
-  || path.join("C:", "Users", "PAULO ROBERTO", "biblioteca-digital-medieval-1");
+  || path.join(__dirname, "..", "..", "BIBLIOTECA-DIGITAL");
 
 function hash(arquivo) {
   // Texto: ignora CRLF/LF, porque o Git no Windows converte finais de linha.

@@ -19,7 +19,7 @@ Plataforma **RELATORIO SKIN** (relatorio.skin): site público de apresentação 
 ## 2. REPOSITÓRIO E ARQUIVOS
 
 ```
-C:\Downloads\relatorio-2026\
+C:\Projetos\AXION PROEDUQ\RELATORIO-SKIN\
 ├── index.html          ← Site de apresentação RELATORIO SKIN (público)
 ├── entrar.html         ← Tela de conta (login/cadastro)
 ├── escolas.html        ← Escolas do administrador (antigo index)
@@ -340,7 +340,7 @@ Backup atual: `backup/backup-20260424.json`
 
 ## 15. NOTAS BIMESTRAIS ↔ BIBLIOTECA DIGITAL (Supabase compartilhado)
 
-O Relatório e a Biblioteca Digital (`C:\Users\PAULO ROBERTO\biblioteca-digital-medieval-1`) usam o **mesmo projeto Supabase** (`vgceathgwvtmjxbdpecr`). A integração é feita por tabelas e funções nesse banco. Os SQL ficam em `supabase/2026-09-16-etapa*.sql`.
+O Relatório e a Biblioteca Digital (`C:\Projetos\AXION PROEDUQ\BIBLIOTECA-DIGITAL`) usam o **mesmo projeto Supabase** (`vgceathgwvtmjxbdpecr`). A integração é feita por tabelas e funções nesse banco. Os SQL ficam em `supabase/2026-09-16-etapa*.sql`.
 
 **Decisões do professor:** nota do bimestre = média entre trabalhos (0–10) e prova (0–10). Comportamento **desconta nota** desde 17/09/2026 (Etapa 8B; antes só era registrado). A integração vale para as duas escolas. O 6º Ano fica fora da Biblioteca.
 
