@@ -5,7 +5,7 @@
 
 ## 1. OBJETIVO DO PROJETO
 
-Plataforma **RELATORIO SKIN** (relatorio.skin): site público de apresentação (`index.html`), tela de conta (`entrar.html`), o diário do administrador (`casavequia.html`, `herminio.html`) e o **Meu Diário** de cada professor (`meu-diario.html`). O diário escolar digital contém:
+Plataforma **RELATORIO SKIN** (relatorio.skin): site público de apresentação (`index.html`), tela de conta (`entrar.html`), a tela **Escolas** de toda conta (`escolas.html`), o diário do administrador (`casavequia.html`, `herminio.html`), a página de cada escola do professor (`meu-diario.html?escola=<id>`) e o perfil (`perfil.html`). O diário escolar digital contém:
 - Relatos diários de aula organizados por turma (1ª, 2ª, 3ª Série, 6º Ano)
 - Presença, atividades e ocorrências comportamentais por aluno
 - Contador de h/aulas por disciplina com barra de progresso
@@ -22,10 +22,11 @@ Plataforma **RELATORIO SKIN** (relatorio.skin): site público de apresentação 
 C:\Projetos\AXION PROEDUQ\RELATORIO-SKIN\
 ├── index.html          ← Site de apresentação RELATORIO SKIN (público)
 ├── entrar.html         ← Tela de conta (login/cadastro)
-├── escolas.html        ← Escolas do administrador (antigo index)
+├── escolas.html        ← Escolas de toda conta (Etapa 14): cadastro pelo INEP
+├── perfil.html         ← Perfil do professor (foto, Restritos, zona de perigo)
 ├── casavequia.html     ← DIÁRIO PRINCIPAL do administrador (~1,1 MB)
 ├── herminio.html       ← Diário da 2ª escola
-├── meu-diario.html     ← Plataforma de cada professor
+├── meu-diario.html     ← Página de UMA escola do professor (?escola=<id>)
 ├── CLAUDE.md           ← Este arquivo
 ├── manifest.json       ← PWA manifest
 ├── sw.js               ← Service worker (cache offline)
@@ -495,8 +496,8 @@ O site passou a se chamar **RELATORIO SKIN** ("RELATORIO" pequeno, "SKIN" em des
 | Página | O que é | Acesso |
 |---|---|---|
 | `index.html` | Site de apresentação (hero, problema, vitrine, módulos, demonstração, fluxo, segurança, sobre, CTA, rodapé legal) | público, sem login |
-| `entrar.html` | Tela de conta, com abertura da marca na primeira visita do aparelho (`localStorage: skin-abertura`). `?modo=criar` abre na aba Criar conta. Depois de entrar: administrador → `escolas.html`, professor → `meu-diario.html` | `data-acesso="inicio"` |
-| `escolas.html` | O antigo `index.html` (botões Casavequia, Hermínio e Projetos pessoais) | só o administrador |
+| `entrar.html` | Tela de conta, com abertura da marca na primeira visita do aparelho (`localStorage: skin-abertura`). `?modo=criar` abre na aba Criar conta. Depois de entrar: todos → `escolas.html` | `data-acesso="inicio"` |
+| `escolas.html` | Escolas da conta (seção 21). Administrador: Casavequia, Hermínio e Projetos pessoais fixos + escolas cadastradas | qualquer conta |
 
 O "← Início" da Casavequia e da Hermínio aponta para `escolas.html`. O `manifest.json` abre o app em `entrar.html`.
 
@@ -552,3 +553,23 @@ O "← Início" da Casavequia e da Hermínio aponta para `escolas.html`. O `mani
 - **Onde aparece:** rodapé da página inicial (`.marca`, com "PROPRIEDADE DA AXION PROEDUQ" e os links legais), rodapé da tela de login (`.rel-auth-marca`, em `supabase-report-sync.js`) e, na Biblioteca, rodapé da tela de abertura (`#splash-marca`) e dos painéis (`.marca-axion` nos `.content-footer`).
 - **Cópia idêntica nos dois repositórios:** a página e as imagens de `assets/marca/` estão em `scripts/check-copias-compartilhadas.js`. Alterou aqui, rode `node scripts/check-copias-compartilhadas.js --copiar` e faça commit nos dois.
 - Na página inicial, a regra global `a:not(.projetos-pessoais) > img` dá 320 px às imagens; a logo usa seletor mais específico. O rodapé é `<div>` e não `<footer>`, porque `dark-mode-2026.css` pinta `footer`.
+
+---
+
+## 21. ESCOLAS PELO INEP, ANO LETIVO E PERFIL (Etapa 14, 21/09/2026)
+
+**Fluxo de toda conta:** login → `escolas.html`. Conta nova vê só "CADASTRE SUA ESCOLA". O cadastro busca no catálogo do INEP (Estado › Município › Escola, ou o código INEP de 8 dígitos) e mostra os dados do Censo e o link do QEdu. Cada escola vira um botão (ícone ou imagem escolhidos em ⚙️ Configurações da escola) que abre `meu-diario.html?escola=<id>`. Sem `?escola` ou com escola inexistente, o Meu Diário volta para `escolas.html`. `professorHome` = `escolas.html`.
+
+**Catálogo do INEP (banco):** `inep_escolas` (≈212 mil escolas em atividade ou paralisadas, Censo Escolar 2024) e `inep_municipios`, lidas só pelas funções `inep_municipios_da_uf(uf)`, `inep_buscar_escolas(municipio, termo)` e `inep_escola(codigo)` (conta logada). Carga: `node scripts/importar-escolas-inep.js <microdados_ed_basica_AAAA.csv> --aplicar` (baixar o zip em download.inep.gov.br/dados_abertos/microdados_censo_escolar_AAAA.zip; lotes de 2000 linhas, `INEP_LOTE` muda; lote maior derruba a CLI). Rodar de novo com o Censo novo substitui tudo. SQL em `supabase/2026-09-21-etapa14-escolas-inep-perfil.sql`. Casavequia = INEP 12014877.
+
+**Dados da escola:** continuam no escopo `meu-diario:estrutura:v1`. Cada escola: `{id, nome, icone, imagem (data URL 400px), inep:{codigo, nome, uf, municipio, municipioCodigo, rede, localizacao, endereco, …}}`. `professor_escolas` guarda o vínculo conta ↔ INEP no banco (para a futura plataforma da escola oferecer turmas e alunos). Administrador: o vínculo da Casavequia e da Hermínio fica em `E.fixas.{casavequia|herminio}.inep` (selo "🔗 Vincular ao INEP" abaixo do botão).
+
+**Ano letivo:** cada turma tem `ano`; turma sem `ano` (anterior à Etapa 14) = 2026 (`ANO_LEGADO`). A página da escola abre no ano corrente (a escolha do seletor "📅 Ano letivo" vale só na sessão) e mostra só as turmas daquele ano: abas, contador, diários, plano, sequências e livros. `MeuDiario.estrutura()` devolve essa **vista** (escola + ano), então os módulos (recursos e I.A) já enxergam só ela; `MeuDiario.escolaAtual()` e `.ano()`. Eventos do calendário ganham `escolaId` (os antigos, sem escola, aparecem em todas). **Importar do ano anterior:** copia turmas (nome com a série avançada, 7º → 8º), alunos (sem transferidos, renumerados), disciplinas e metas, e — por `MeuDiarioRecursos.copiarTurma` — plano de aulas e sequências (livros opcional), com os status zerados. Diários, presença, atividades, notas e contador começam em branco. **Nunca gravar antes do primeiro fetch** (`carregado`/`pronto`): um aparelho desatualizado apagaria o que foi feito em outro.
+
+**Cadastro de turma:** manual (formulário) ou 🤖 I.A (a aba I.A abre com a mensagem pronta; o professor anexa a foto/PDF/planilha da chamada e a ação `criar_turma` cria na escola e no ano abertos).
+
+**Zona de perigo** (fim de ⚙️ Configurações da escola): excluir turma, todas as turmas do ano, a escola; também remover aluno e disciplina. Tudo passa por `ContaSkin.confirmarPerigo` (confirmação + senha, conferida no banco por `conta_verificar_senha`; conta só do Google digita o e-mail). Excluir apaga os diários (`NovoDiario.removerTurmas`) e plano/sequências/livros/eventos (`MeuDiarioRecursos.removerTurmas`).
+
+**Perfil (`perfil.html`, escopo `meu-diario:perfil:v1`):** foto redonda (data URL 360px), nome, nascimento (idade), disciplinas, formação, cidade/UF, contato, Lattes, sobre. **Restritos:** matrícula, certificados (bucket privado `professor-arquivos`, pasta `<user_id>/certificados/`, PDF/Word até 10 MB, link assinado de 5 min) e links do Drive (planos de curso, sequências, relatórios) — hoje só o dono vê; a gestão da escola verá quando a plataforma da escola estiver ligada. **Zona de perigo:** trocar senha (ou criar, em conta do Google) e excluir conta (`conta_excluir`: apaga arquivos pela página e a conta em cascata; a conta do administrador não se exclui). O botão redondo do perfil (`ContaSkin.chip`) fica no topo de `escolas.html` e da página da escola.
+
+**Módulo compartilhado:** `assets/js/conta-skin.js` (`window.ContaSkin`): perfil, chip, seletor do INEP, confirmação com senha, redução de imagem, vínculo em `professor_escolas`.

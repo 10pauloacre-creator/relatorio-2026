@@ -96,7 +96,7 @@ body::after{width:680px;height:680px;right:-240px;bottom:-260px;background:rgba(
     S.auth.whenAuthorized().then(function () {
       document.getElementById('voltando').hidden = false;
       var cfg = window.RELATORIO_SUPABASE_CONFIG || {};
-      var destino = S.auth.isAdmin() ? 'escolas.html' : (cfg.professorHome || 'meu-diario.html');
+      var destino = cfg.professorHome || 'escolas.html';
       window.location.replace(destino);
     });
   }
