@@ -71,7 +71,7 @@
 
   // ── configuração (só neste aparelho) ────────────────────────────────
   function cfgKey() { return "md_ia_" + uid(); }
-  function chatKey() { return "md_ia_chat_" + uid(); }
+  function chatKey() { return "md_ia_chat_" + uid() + (M && M.contexto ? "_" + M.contexto : ""); }
   function lerCfg() {
     var c = null;
     try { c = JSON.parse(localStorage.getItem(cfgKey()) || "null"); } catch (e) {}
@@ -171,14 +171,14 @@
 
   // ── retrato dos dados para a I.A ────────────────────────────────────
   function retrato() {
-    var E = M.estrutura(), soma = M.somaHoras(), mapa = mapaAlunos();
+    var E = M.estrutura(), soma = M.somaHoras ? M.somaHoras() : null, mapa = mapaAlunos();
     var R = window.MeuDiarioRecursos;
     var turmas = (E.turmas || []).map(function (t, i) {
       var esc1 = M.escola(t.escolaId);
       return {
         id: t.id, codigo: "T" + (i + 1), nome: t.nome, escola: esc1 ? esc1.nome : "",
         disciplinas: t.disciplinas.map(function (d) {
-          return { nome: d.nome, meta_bimestre: d.metaBim, total_ano: d.total, bimestres: R ? R.numBims(d) : 4, h_aula_dadas: soma[t.id + "|" + d.id] || 0 };
+          return { nome: d.nome, meta_bimestre: d.metaBim, total_ano: d.total, bimestres: R ? R.numBims(d) : 4, h_aula_dadas: soma ? (soma[t.id + "|" + d.id] || 0) : undefined };
         }),
         alunos: t.alunos.map(function (a) {
           var o = { n: a.n };
@@ -214,14 +214,15 @@
     return JSON.stringify({
       professor: (E.perfil && E.perfil.nome) || "", escolas: (E.escolas || []).map(function (e) { return e.nome; }),
       turmas: turmas, total_diarios: M.diarios().length, diarios_recentes: ds,
+      relatos_da_pagina: M.resumoExtra ? M.resumoExtra(function (x) { return pseudonimizar(x, mapa); }) : undefined,
       plano_de_aulas: plano, sequencias: cards(extra.sequencias), livros: cards(extra.livros), calendario: (extra.eventos || []).slice(-80)
     });
   }
 
   function sistema() {
     var d = new Date(), E = M.estrutura();
-    return [
-      'Você é o assistente de I.A do "Meu Diário", o diário escolar digital do(a) professor(a) ' + (((E.perfil && E.perfil.nome) || "").trim() || "usuário") + ". Responda sempre em português do Brasil, com clareza e sem rodeios.",
+    return filtrarAcoes([
+      'Você é o assistente de I.A ' + (M.nomePlataforma || 'do "Meu Diário"') + ', o diário escolar digital do(a) professor(a) ' + (((E.perfil && E.perfil.nome) || "").trim() || "usuário") + ". Responda sempre em português do Brasil, com clareza e sem rodeios.",
       "",
       "HOJE: " + hojeKey() + " (" + DIAS[d.getDay()] + "). Hora: " + dois(d.getHours()) + ":" + dois(d.getMinutes()) + ".",
       "",
@@ -261,9 +262,15 @@
       '11. evento_calendario — {"tipo":"evento_calendario","data":"AAAA-MM-DD","ate":"AAAA-MM-DD","titulo":"","categoria":"letivo|feriado|recesso|avaliacao|reuniao|evento|planejamento|outro","descricao":""}',
       '12. remover_evento — {"tipo":"remover_evento","id":"<id do evento>"}',
       "",
+      (M.notaDados || ""),
       "DADOS DO PROFESSOR (JSON):",
       retrato()
-    ].join("\n");
+    ]).join("\n");
+  }
+  // Nas escolas do administrador só existem as ações de diário.
+  function acaoPermitida(tipo) { return !M.acoes || M.acoes.indexOf(tipo) >= 0; }
+  function filtrarAcoes(linhas) {
+    return linhas.filter(function (l) { var m = /^\d+\. (\w+) —/.exec(l); return !m || acaoPermitida(m[1]); });
   }
 
   // ── anexos ─────────────────────────────────────────────────────────
@@ -671,6 +678,8 @@
   // Aplica uma ação. Devolve a mensagem de sucesso ou lança o erro.
   async function aplicar(a, origem) {
     var R = window.MeuDiarioRecursos, perdidos = [], t, d, msg;
+    if (!acaoPermitida(a.tipo)) throw new Error("Esta ação não existe aqui: " + a.tipo + ". Nesta página a I.A registra e altera diários.");
+    if (!R && ["plano_bimestre", "plano_status", "sequencia", "livro", "evento_calendario", "remover_evento"].indexOf(a.tipo) >= 0) throw new Error("Esta ação só existe no Meu Diário.");
     var aviso = function (m) { return perdidos.length ? m + " ⚠️ Não encontrei: " + perdidos.join(", ") + "." : m; };
     switch (a.tipo) {
       case "criar_diario": {
@@ -942,6 +951,7 @@
       '<label class="ia-chk"><input type="checkbox" data-ia="auto"' + (cfg.auto ? " checked" : "") + '><span><strong>Aplicar as mudanças automaticamente</strong>, sem pedir confirmação. Deixe desligado para revisar cada ação antes.</span></label>' +
       '<div class="ia-nota">🔒 Nesta opção os nomes dos alunos são <strong>sempre</strong> trocados por códigos antes de sair do seu aparelho. As mensagens passam pelos servidores da plataforma e são processadas pelos serviços de IA do projeto (Google Gemini, Groq ou OpenRouter). Fotos e documentos seguem como estão.<br>✨ <strong>Em breve:</strong> planos de IA com limites maiores.</div></details>';
   }
+  function sugestoes() { return (M && M.sugestoes) || SUGESTOES; }
   var SUGESTOES = [
     ["📝 Registrar a aula de hoje", "Registre a aula de hoje: turma , disciplina , das  às . Conteúdo: . Faltaram: ."],
     ["📷 Ler lista de chamada", "Leia a foto da lista de chamada e cadastre os alunos na turma "],
@@ -952,7 +962,7 @@
   ];
   function desenharChat(pensando) {
     var box = $(".ia-msgs"); if (!box) return;
-    var html = chat.length ? "" : '<div class="ia-vazio">👋 Olá! Sou o seu assistente. Posso <strong>registrar aulas</strong>, <strong>ler fotos da chamada</strong>, <strong>montar o plano de aulas</strong>, organizar o <strong>calendário</strong> e responder dúvidas sobre as suas turmas.<br>Escreva abaixo, envie um arquivo 📎 ou tire uma foto 📷. Nada muda no diário sem a sua confirmação.</div>';
+    var html = chat.length ? "" : (M.boasVindas ? '<div class="ia-vazio">' + M.boasVindas + '</div>' : '') || '<div class="ia-vazio">👋 Olá! Sou o seu assistente. Posso <strong>registrar aulas</strong>, <strong>ler fotos da chamada</strong>, <strong>montar o plano de aulas</strong>, organizar o <strong>calendário</strong> e responder dúvidas sobre as suas turmas.<br>Escreva abaixo, envie um arquivo 📎 ou tire uma foto 📷. Nada muda no diário sem a sua confirmação.</div>';
     chat.forEach(function (m, mi) {
       if (m.role === "user") {
         html += '<div class="ia-m u">' + esc(m.texto || "") + ((m.anexos || []).length ? '<div class="ia-anx-u">' + m.anexos.map(function (a) { return "<span>📎 " + esc(a.nome) + "</span>"; }).join("") + "</div>" : "") + "</div>";
@@ -996,7 +1006,7 @@
       '<div class="ia-wrap">' + desenharConfigHtml() +
       '<div class="md-card ia-chat"><div class="ia-chat-h"><b>🤖 Assistente</b><small>' + esc(rotuloCabecalho()) + '</small><button type="button" data-ia="limpar">🗑 Nova conversa</button></div>' +
       '<div class="ia-msgs"></div>' +
-      '<div class="ia-sug">' + SUGESTOES.map(function (s, i) { return '<button type="button" data-sug="' + i + '">' + esc(s[0]) + "</button>"; }).join("") + "</div>" +
+      '<div class="ia-sug">' + sugestoes().map(function (s, i) { return '<button type="button" data-sug="' + i + '">' + esc(s[0]) + "</button>"; }).join("") + "</div>" +
       '<div class="ia-anexos" hidden></div>' +
       '<div class="ia-in"><button type="button" class="ib" data-ia="anexar" title="Anexar arquivo (foto, PDF, Word, planilha, texto)">📎</button><button type="button" class="ib" data-ia="camera" title="Tirar foto">📷</button>' +
       '<textarea class="ia-txt" rows="1" placeholder="Escreva aqui…" title="Enter envia · Shift+Enter quebra a linha"></textarea><button type="button" class="ib env">Enviar ➤</button></div>' +
@@ -1050,7 +1060,7 @@
       if (fs.length) { e.preventDefault(); adicionarAnexos(fs); }
     });
     q(".env").onclick = enviar;
-    sec.querySelectorAll("[data-sug]").forEach(function (b) { b.onclick = function () { sugerir(SUGESTOES[+b.getAttribute("data-sug")][1]); }; });
+    sec.querySelectorAll("[data-sug]").forEach(function (b) { b.onclick = function () { sugerir(sugestoes()[+b.getAttribute("data-sug")][1]); }; });
     var chatBox = q(".ia-chat");
     ["dragenter", "dragover"].forEach(function (ev) { chatBox.addEventListener(ev, function (e) { e.preventDefault(); chatBox.classList.add("ia-arr"); }); });
     ["dragleave", "drop"].forEach(function (ev) { chatBox.addEventListener(ev, function (e) { e.preventDefault(); chatBox.classList.remove("ia-arr"); }); });
