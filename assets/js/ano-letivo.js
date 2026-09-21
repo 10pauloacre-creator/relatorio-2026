@@ -9,6 +9,13 @@
 // A página informa a escola e o ano em <html data-escola-slug data-ano-letivo>.
 // As páginas de arquivo (scripts/arquivar-ano-letivo.js) têm também
 // data-arquivo-ate e abrem só para leitura.
+//
+// Modo local (Meu Diário dos professores): a página chama
+// RelatorioAnoLetivo.configurar(fonte) e os anos vêm dela, não do banco:
+//   fonte.atual()   → ano aberto na página
+//   fonte.anos()    → [{ano, aulas, dias, horas, turmas, alunos, ocorrencias, primeira, ultima}]
+//   fonte.abrir(a)  → troca a página para o ano a (inclui "Iniciar" um ano novo)
+//   fonte.baixar(a) → baixa os dados do ano a
 window.RelatorioAnoLetivo = (function () {
   var REGISTRO_URL = "arquivo/anos-letivos.json";
   var root = document.documentElement;
@@ -56,10 +63,13 @@ window.RelatorioAnoLetivo = (function () {
     + "html.dark-2026 .al-acao{background:#202327;border-color:#383d43;color:#f4f5f6}"
     + "html.dark-2026 .al-acao.pri{background:#2f9e5f;border-color:#2f9e5f;color:#fff}"
     + "html.dark-2026 .al-nota{background:#202327;color:#c9ced4}"
+    + ".al-btn.local{margin-left:0}"
+    + ".al-novo{margin-top:4px}"
     + "html.dark-2026 .al-faixa{background:#3a2e12;color:#ffd98a;border-color:#5a4718}";
 
   var fundo = null;
   var registro = null;
+  var fonte = null;
 
   function esc(v) {
     return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
@@ -103,6 +113,7 @@ window.RelatorioAnoLetivo = (function () {
   }
 
   function montarBotao() {
+    if (!escolaSlug && !fonte && !arquivoAte) return;
     var alvo = document.querySelector("header.cab .cab-t");
     if (!alvo || document.getElementById("al-btn")) return;
     if (!document.getElementById("al-style")) {
@@ -118,6 +129,7 @@ window.RelatorioAnoLetivo = (function () {
     btn.className = "al-btn";
     btn.setAttribute("data-runtime-ui", "ano-letivo");
     btn.setAttribute("aria-haspopup", "dialog");
+    if (fonte) btn.classList.add("local");
     btn.textContent = (arquivoAte ? "📦 Arquivo " : "📅 Ano letivo ") + anoPagina + " ▾";
     btn.addEventListener("click", abrir);
     var prof = alvo.querySelector(".prof");
@@ -173,6 +185,11 @@ window.RelatorioAnoLetivo = (function () {
   async function carregar() {
     var lista = fundo && fundo.querySelector(".al-lista");
     if (!lista) return;
+    if (fonte) {
+      var nota = fundo.querySelector(".al-nota");
+      if (nota) nota.innerHTML = "🔒 <strong>Nada se perde.</strong> Cada alteração fica guardada por dia na sua conta, e as turmas de cada ano continuam lá quando você troca de ano. Os anos anteriores podem ser abertos ou baixados a qualquer momento.";
+      return carregarLocal(lista);
+    }
     var reg = await lerRegistro();
     var anos = [];
     var erro = null;
@@ -247,6 +264,57 @@ window.RelatorioAnoLetivo = (function () {
       + "</div>";
   }
 
+  // ── modo local ─────────────────────────────────────────────────
+  function carregarLocal(lista) {
+    var atual = fonte.atual(), hoje = new Date().getFullYear();
+    var anos = (fonte.anos() || []).slice();
+    if (!anos.some(function (a) { return a.ano === atual; })) anos.push({ ano: atual });
+    anos.sort(function (a, b) { return b.ano - a.ano; });
+    var prox = Math.max(hoje, anos[0].ano) + 1;
+    lista.innerHTML = anos.map(function (a) {
+      var aqui = a.ano === atual;
+      var tag = a.ano === hoje ? '<span class="al-tag atual">Em andamento</span>'
+        : a.ano > hoje ? '<span class="al-tag">Próximo</span>' : '<span class="al-tag">Encerrado</span>';
+      if (aqui) tag += '<span class="al-tag">Você está aqui</span>';
+      var vazio = !a.turmas && !a.aulas;
+      var numeros = vazio
+        ? '<p class="al-num">Nenhuma turma neste ano ainda.</p>'
+        : '<p class="al-num">' + [
+            plural(a.aulas, "aula", "aulas"),
+            plural(a.dias, "dia letivo", "dias letivos"),
+            plural(a.horas, "h/aula", "h/aula"),
+            plural(a.turmas, "turma", "turmas"),
+            plural(a.alunos, "aluno", "alunos"),
+            plural(a.ocorrencias, "ocorrência", "ocorrências")
+          ].join(" · ") + "</p>"
+          + (a.primeira ? '<p class="al-det">Relatos de ' + dataBr(a.primeira) + " a " + dataBr(a.ultima) + ".</p>" : "");
+      var abrirBtn = aqui ? '<button type="button" class="al-acao" disabled>Página aberta</button>'
+        : '<button type="button" class="al-acao pri" data-al-ir="' + a.ano + '">Abrir ' + a.ano + "</button>";
+      var baixarBtn = vazio ? "" : '<button type="button" class="al-acao" data-al-baixar-local="' + a.ano + '">⬇️ Baixar todos os dados</button>';
+      return '<div class="al-ano' + (aqui ? " on" : "") + '"><div class="al-ano-cab"><strong>' + a.ano + "</strong>" + tag + "</div>"
+        + numeros + '<div class="al-acoes">' + abrirBtn + baixarBtn + "</div></div>";
+    }).join("") + '<div class="al-acoes al-novo"><button type="button" class="al-acao" data-al-ir="' + prox + '">+ Iniciar o ano letivo ' + prox + "</button></div>";
+    lista.querySelectorAll("[data-al-ir]").forEach(function (b) {
+      b.addEventListener("click", function () { var a = parseInt(b.getAttribute("data-al-ir"), 10); fechar(); fonte.abrir(a); });
+    });
+    lista.querySelectorAll("[data-al-baixar-local]").forEach(function (b) {
+      b.addEventListener("click", function () { fonte.baixar(parseInt(b.getAttribute("data-al-baixar-local"), 10)); });
+    });
+  }
+  function configurar(f) {
+    fonte = f;
+    anoPagina = f.atual();
+    atualizar();
+  }
+  // Redesenha o botão com o ano atual da página (o cabeçalho pode ser refeito).
+  function atualizar() {
+    if (fonte) anoPagina = fonte.atual();
+    var btn = document.getElementById("al-btn");
+    if (btn && !btn.isConnected) btn = null;
+    if (btn) btn.textContent = "📅 Ano letivo " + anoPagina + " ▾";
+    else montarBotao();
+  }
+
   async function baixar(ano, botao) {
     var client = cliente();
     if (!client) return;
@@ -279,5 +347,5 @@ window.RelatorioAnoLetivo = (function () {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", montarBotao);
   else montarBotao();
 
-  return { abrir: abrir, anoPagina: anoPagina };
+  return { abrir: abrir, anoPagina: anoPagina, configurar: configurar, atualizar: atualizar };
 })();
