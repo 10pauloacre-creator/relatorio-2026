@@ -72,7 +72,7 @@
     cab.appendChild(box);
     C.chip(document.getElementById("eg-chip"));
     // O "← Início" fixo leva à tela Escolas.
-    var voltar = document.querySelector('body > a[href="escolas.html"]');
+    var voltar = document.querySelector('body > a[href="escolas.html"], .rs-topo > a[href="escolas.html"]');
     if (voltar && /Início/.test(voltar.textContent)) voltar.innerHTML = "&#8592; Escolas";
   }
   function atualizarPainel() {
