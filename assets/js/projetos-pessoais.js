@@ -317,6 +317,258 @@
       ['Contrato e SLA revisados', 'Disponibilidade prometida, prazo de resposta e penalidade compatíveis com o que a infraestrutura realmente aguenta.', 'Planos contratados.']
     ] }
   ];
+  var CONEX_PHASES = [
+    { id: 'f01', title: 'Conceito, marca e escopo do produto', summary: 'Fechar o que o CONEX-ED é, o que ele não é e o que entra na primeira versão, antes de qualquer tela ou tabela. Tudo o que vier depois copia daqui.', tasks: [
+      ['Conceito do produto registrado', 'Sistema operacional digital da escola: plataforma multi-institucional de gestão, comunicação, documentos, pedagógico e inteligência, com um ambiente isolado por escola. As 92 seções da ideia original estão no mapa mental deste projeto.', 'Nenhuma. É o primeiro bloco.', true],
+      ['Nome, assinatura e slogan escolhidos', 'CONEX-ED · Comunidade Organizada em Rede e Extensão Escolar · Plataforma Integrada de Gestão, Comunicação e Inteligência Escolar · by AXION PROEDUQ. Slogan: Toda a escola conectada, organizada e inteligente.', 'Conceito registrado.', true],
+      ['Encaixe na arquitetura de marca da AXION', 'Produto com nome próprio e selo uma plataforma AXION PROEDUQ, igual à Biblioteca e ao Relatório. CONEX-ED substitui o nome reservado Conecta; atualizar a lista de nomes reservados do projeto AXION.', 'Nome escolhido.'],
+      ['Busca de anterioridade no INPI', 'Pesquisar CONEX, CONEX-ED e CONEXED nas classes 9, 35, 41 e 42. Conex é palavra comum no mercado; se houver conflito forte, ajustar o nome agora, antes de gastar com arte e domínio.', 'Nome escolhido.'],
+      ['Domínio verificado e registrado', 'Conferir conexed.com.br, conex-ed.com.br e conexed.app no Registro.br. Registrar em nome da companhia, com renovação automática. O hífen dificulta ditar o endereço; preferir a grafia sem hífen para o domínio.', 'Busca no INPI sem conflito.'],
+      ['Frase de posicionamento comercial', 'O CONEX-ED é a plataforma institucional da AXION PROEDUQ para gestão, comunicação, documentação, colaboração e inteligência escolar. Linha de apoio: Gestão. Comunicação. Documentos. Pedagógico. Inteligência. Um único ambiente.', 'Nome escolhido.'],
+      ['Papel do CONEX-ED no ecossistema', 'Relatório cuida da rotina do professor, Biblioteca da aprendizagem do aluno, SIMAED dos dados de avaliação e o CONEX-ED é a camada institucional que conecta tudo. Escrever isso em uma página e usar em todo material.', 'Posicionamento definido.'],
+      ['Escopo do MVP travado', 'Fase 1 do plano: Axion ID, cadastro de escolas, usuários, cargos, permissões, perfis, avisos com ciência, documentos com pastas, calendário, logs e painel básico. Todo o resto espera o piloto.', 'Conceito registrado.'],
+      ['Lista do que NÃO entra no MVP', 'Mensagens, finanças, patrimônio, IA, SIMAED, app nativo e portais. Deixar escrito evita o erro que a própria ideia aponta: lançar um sistema gigantesco de uma vez.', 'Escopo do MVP travado.'],
+      ['Métricas de sucesso do piloto', 'Exemplos: 80% da equipe da escola com conta ativa, avisos com ciência substituindo o grupo de WhatsApp, nenhum documento oficial circulando fora da plataforma em 60 dias.', 'Escopo do MVP travado.']
+    ] },
+    { id: 'f02', title: 'Descoberta com a escola e requisitos', summary: 'Ouvir direção, coordenação, secretaria e professores antes de desenhar. O CONEX-ED precisa resolver a rotina real da escola, não a imaginada.', tasks: [
+      ['Escola piloto definida', 'E.E. Rural Pe. Carlos Casavequia como primeira escola: já usa o Relatório e a Biblioteca, então testa a integração desde o início.', 'Escopo do MVP travado.'],
+      ['Autorização formal da direção', 'Termo simples dizendo que a escola aceita testar a plataforma, quem é o responsável e que os dados continuam da escola.', 'Escola piloto definida.'],
+      ['Entrevistas por função', 'Direção, coordenação, secretaria, dois professores e um mediador. Perguntar como avisam, onde guardam documentos, o que se perde e o que mais toma tempo.', 'Autorização da direção.'],
+      ['Mapa dos processos atuais', 'Desenhar como hoje funcionam aviso, entrega de plano, pedido de material, declaração, ata e calendário. Marcar onde há papel, WhatsApp e e-mail pessoal.', 'Entrevistas feitas.'],
+      ['Lista oficial de cargos e setores', 'Levantar os cargos reais da escola e da rede estadual (direção, coordenação, secretaria, professores, mediadores, assistentes, apoio) para virar a semente de cargos padrão.', 'Entrevistas feitas.'],
+      ['Estrutura de pastas usada hoje', 'Como a escola organiza documentos (Gestão, Coordenação, Secretaria, Pedagógico, Financeiro, Projetos, Professores, Atas, Relatórios). Vira o modelo de pastas criado para cada escola nova.', 'Mapa dos processos.'],
+      ['Tipos de documento e classificação', 'Listar cada tipo de documento e a classificação dele: público institucional, interno, restrito ou confidencial. É a base das permissões automáticas.', 'Estrutura de pastas levantada.'],
+      ['Histórias de usuário do MVP', 'Uma frase por necessidade: como coordenação, quero publicar aviso só para professores da 2ª série e ver quem confirmou ciência. Priorizar em deve, deveria e poderia.', 'Mapa dos processos.'],
+      ['Protótipo navegável em papel ou Figma', 'Central, Comunidade, Avisos, Documentos e Calendário. Mostrar para a coordenação e para um professor e corrigir antes de programar.', 'Histórias priorizadas.'],
+      ['Requisitos não funcionais', 'Funcionar em celular simples e internet rural instável, carregar a central em menos de 3 segundos em 4G, acessibilidade básica e modo escuro.', 'Entrevistas feitas.']
+    ] },
+    { id: 'f03', title: 'Arquitetura técnica e decisões', summary: 'Decidir as fundações que não podem mudar depois: isolamento entre escolas, conta única, permissões e onde cada coisa roda.', tasks: [
+      ['Registro de decisões técnicas (ADR)', 'Pasta docs/decisoes/ no repositório, um arquivo por decisão com contexto, opções e escolha. Preserva o porquê para quem vier depois.', 'Escopo do MVP travado.'],
+      ['Stack definida', 'Manter o padrão do ecossistema: HTML e JavaScript sem framework, módulos em assets/js, build simples para dist/ e Supabase no navegador. Reaproveita supabase-report-sync.js, a tela de conta e a experiência já testada no Relatório.', 'ADR criado.'],
+      ['Supabase compartilhado para o Axion ID', 'Usar o mesmo projeto vgceathgwvtmjxbdpecr do Relatório e da Biblioteca, para que uma conta só entre nos três produtos. Tabelas do produto em um schema próprio (conex), sem misturar com relatorio_* e alunos.', 'Stack definida.'],
+      ['Modelo multi-tenant desde o primeiro dia', 'Toda tabela do CONEX-ED tem escola_id obrigatório, índice por escola_id e RLS que só libera linhas das escolas em que o usuário tem vínculo ativo. Nenhuma consulta sem escola.', 'Supabase escolhido.'],
+      ['Modelo de permissões RBAC + granular', 'Três níveis visuais (operacional, administrativo, gestão) sobre um catálogo de permissões (visualizar_financas, publicar_avisos, aprovar_planos, gerenciar_usuarios, visualizar_auditoria...). Cargo agrupa permissões; o vínculo aceita permissão extra ou retirada.', 'Modelo multi-tenant definido.'],
+      ['Função única de autorização', 'private.conex_pode(escola_id, permissao) usada por toda RLS, Edge Function e pela IA. Uma regra em um só lugar evita brecha entre telas.', 'Modelo de permissões definido.'],
+      ['Separação perfil profissional x institucional', 'Perfil profissional acompanha a pessoa (formação, áreas, certificações escolhidas); perfil institucional existe só dentro da escola (cargo, setor, turmas, horários, documentos). Tabelas distintas.', 'Modelo multi-tenant definido.'],
+      ['Diagrama do banco da Fase 1', 'escolas, escola_config, setores, cargos, cargo_permissoes, vinculos, vinculo_permissoes, perfis_profissionais, avisos, aviso_destinatarios, aviso_ciencia, pastas, documentos, documento_versoes, eventos, auditoria.', 'Permissões e perfis definidos.'],
+      ['Armazenamento de arquivos', 'Supabase Storage com bucket privado e caminho escola_id/pasta/arquivo, políticas de Storage usando a mesma função de autorização. Conferir limites do plano (1 GB grátis) e custo do plano Pro para documentos.', 'Diagrama do banco.'],
+      ['Axion API desenhada', 'Camada de Edge Functions que expõe só dados autorizados entre produtos (Relatório → CONEX-ED, Biblioteca → CONEX-ED). Nenhum produto lê tabela do outro diretamente.', 'Supabase escolhido.'],
+      ['Estratégia de login entre domínios', 'Sessão do Supabase é por domínio. Opção 1: mesma conta, login em cada site. Opção 2: tela central em conta.axionproeduq.com.br que devolve a sessão por redirecionamento. Começar pela opção 1 e deixar a 2 para depois do piloto.', 'Supabase escolhido.'],
+      ['Plano de custos da infraestrutura', 'Somar Supabase, Vercel, domínio, e-mail transacional e IA por escola. Lembrar que o plano Hobby da Vercel proíbe uso comercial: a troca para Pro vem antes da primeira escola pagante.', 'Stack e armazenamento definidos.']
+    ] },
+    { id: 'f04', title: 'Repositório, ambientes e Vercel', summary: 'Montar a esteira que leva o código do computador ao ar com segurança: repositório, prévia por alteração e produção no domínio próprio.', tasks: [
+      ['Repositório conex-ed criado', 'Na organização axion-proeduq do GitHub (ou na conta atual até a transferência), com README, licença proprietária, .gitignore e .editorconfig.', 'Stack definida.'],
+      ['Estrutura de pastas inicial', 'index.html (site), entrar.html, app/ (páginas logadas), assets/js, assets/css, assets/marca, supabase/ (SQL numerado por etapa), scripts/ e docs/.', 'Repositório criado.'],
+      ['Proteção da branch main', 'Commits diretos permitidos como no Relatório, mas com checagem automática obrigatória antes do deploy de produção.', 'Repositório criado.'],
+      ['Script de build para dist/', 'Igual ao scripts/build-web-release.js do Relatório: lista explícita do que é publicado. Página nova só vai ao ar se entrar na lista.', 'Estrutura de pastas.'],
+      ['Projeto na Vercel ligado ao GitHub', 'Novo projeto conex-ed no time da companhia, com build npm run build e saída dist/. Cada push na main publica; cada branch ganha prévia.', 'Build pronto.'],
+      ['vercel.json ou vercel.ts com cabeçalhos', 'Content-Security-Policy, X-Frame-Options, Referrer-Policy, Permissions-Policy e cache longo para assets versionados. Sem cache para HTML.', 'Projeto na Vercel.'],
+      ['Variáveis de ambiente por ambiente', 'URL e chave pública do Supabase em Production e Preview. Chave service_role nunca vai para o navegador nem para a Vercel; fica só nos segredos das Edge Functions.', 'Projeto na Vercel.'],
+      ['Domínio próprio conectado', 'Apontar o domínio escolhido para a Vercel, com www redirecionando para a raiz e certificado automático. Conferir DNS em um painel só.', 'Domínio registrado.'],
+      ['Ambiente de teste separado', 'Escola fictícia Escola Demonstração com dados inventados, usada em prévias, capturas de tela e demonstrações. Nenhum nome real de aluno ou servidor.', 'Projeto na Vercel.'],
+      ['Checagem automática no push', 'GitHub Action com lint, verificação de sintaxe dos JS e teste das políticas RLS antes do deploy de produção.', 'Repositório e testes RLS existentes.']
+    ] },
+    { id: 'f05', title: 'Supabase: fundação do banco multi-tenant', summary: 'Criar o núcleo do banco com isolamento entre escolas testado. Esta é a fase que mais protege a companhia: um vazamento entre escolas acaba com o produto.', tasks: [
+      ['Schema conex criado', 'CREATE SCHEMA conex, com permissões explícitas para authenticated e nada para anon. Expor o schema na API do Supabase.', 'Arquitetura aprovada.'],
+      ['Tabelas de instituição', 'escolas (nome, slug, cidade, UF, INEP, identidade visual), escola_config e setores. SQL em supabase/AAAA-MM-DD-conex-etapa1.sql, como no Relatório.', 'Schema criado.'],
+      ['Cargos e catálogo de permissões', 'permissoes (catálogo fixo), cargos por escola com nível 1, 2 ou 3, cargo_permissoes. Semente com os cargos padrão levantados na descoberta.', 'Tabelas de instituição.'],
+      ['Vínculos com permissões independentes', 'vinculos (user_id, escola_id, cargo_id, setor, início, fim, ativo) e vinculo_permissoes (concedida ou retirada). A mesma pessoa pode ter vínculos em várias escolas.', 'Cargos criados.'],
+      ['Função private.conex_pode', 'SECURITY DEFINER, search_path fixo, resultado estável por requisição. Verifica vínculo ativo, cargo e exceções do vínculo.', 'Vínculos criados.'],
+      ['RLS em todas as tabelas', 'Ativar RLS e escrever políticas de select, insert, update e delete usando conex_pode. Nenhuma tabela do schema sem política.', 'Função de autorização.'],
+      ['Testes de isolamento entre escolas', 'Criar duas escolas de teste e provar que usuário da Escola A não lê, não altera e não descobre nem a existência de dados da Escola B. Rodar a cada alteração de SQL.', 'RLS escrita.'],
+      ['Tabela de auditoria só de inclusão', 'conex.auditoria (quem, escola, ação, alvo, antes, depois, quando, IP). Sem UPDATE nem DELETE para ninguém, como a relatorio_lixeira.', 'Schema criado.'],
+      ['Gatilhos de auditoria', 'Gatilho genérico nas tabelas sensíveis registrando cada alteração de vínculo, permissão, documento e aviso.', 'Tabela de auditoria.'],
+      ['Lixeira e histórico permanentes', 'Mesma regra da Etapa 10 do Relatório: nada é apagado de verdade; toda linha removida vai antes para a lixeira do produto.', 'Tabela de auditoria.'],
+      ['Índices e desempenho', 'Índice em escola_id e nas chaves usadas pela RLS. Conferir com EXPLAIN que as consultas da central não fazem varredura completa.', 'RLS escrita.'],
+      ['Security Advisor do Supabase limpo', 'Rodar o verificador de segurança e desempenho do painel e zerar os alertas antes de seguir.', 'Todas as tabelas com RLS.']
+    ] },
+    { id: 'f06', title: 'Axion ID: conta única do ecossistema', summary: 'Uma conta só para CONEX-ED, Relatório, Biblioteca e produtos futuros, com cada vínculo institucional separado da vida profissional.', tasks: [
+      ['Conta Axion sobre o auth do Supabase', 'Aproveitar auth.users e profiles já usados pelo Relatório e pela Biblioteca. Nenhuma tabela nova de senha.', 'Supabase compartilhado decidido.'],
+      ['Perfil profissional', 'conex.perfis_profissionais: nome de exibição, foto, formação, áreas, disciplinas, experiência e certificações que a própria pessoa escolher mostrar.', 'Conta Axion definida.'],
+      ['Tela de conta reaproveitada', 'Entrar, criar conta, esqueci a senha e Google, com a identidade do CONEX-ED. Mesma trava de segurança do profiles_trava_role, para ninguém se promover a admin.', 'Perfil profissional.'],
+      ['Seletor de escola', 'Depois do login, lista os vínculos ativos (Escola Pe. Carlos Casavequia · Professor). Com um vínculo só, entra direto. A escola escolhida vai para a URL e para a sessão.', 'Vínculos criados.'],
+      ['Convite por e-mail', 'Gestão convida por e-mail com cargo pré-definido; quem já tem Conta Axion só aceita o vínculo, sem criar outra conta.', 'Seletor de escola.'],
+      ['Autenticação em dois fatores', 'MFA por aplicativo autenticador, obrigatório para nível 3 e para quem tem permissão financeira ou de usuários.', 'Tela de conta.'],
+      ['Sessões e dispositivos', 'Lista de sessões ativas com botão de encerrar, tempo máximo de sessão e saída que apaga as cópias locais do aparelho, como no Meu Diário.', 'Tela de conta.'],
+      ['Redirect URLs cadastradas', 'Incluir o domínio do CONEX-ED e as prévias da Vercel em Authentication, URL Configuration do Supabase, sem remover as do Relatório e da Biblioteca.', 'Domínio conectado.'],
+      ['Menu Meus produtos AXION', 'No avatar do usuário, atalhos para CONEX-ED, Relatório e Biblioteca, aparecendo só o que a conta pode usar.', 'Seletor de escola.'],
+      ['Encerramento de vínculo', 'Quando a pessoa sai da escola, o vínculo é encerrado com data, o acesso some na hora e o histórico institucional continua com a escola.', 'Vínculos criados.']
+    ] },
+    { id: 'f07', title: 'Site público e identidade visual do CONEX-ED', summary: 'A vitrine que apresenta o produto a diretores e secretarias, no mesmo nível de acabamento do RELATORIO SKIN.', tasks: [
+      ['Paleta e tipografia próprias', 'Identidade distinta do RELATORIO SKIN e da Biblioteca, mas da mesma família AXION. Contraste mínimo de 4.5:1 e versão para modo escuro.', 'Marca aprovada.'],
+      ['Logotipo e ícone', 'Logo horizontal, símbolo quadrado, favicon, apple-touch-icon, ícones PWA 192/512 e maskable, em webp e png para o hub de projetos.', 'Paleta definida.'],
+      ['Hero do site', 'CONEX-ED, slogan, parágrafo de posicionamento e dois botões: Conhecer a plataforma e Solicitar demonstração.', 'Logo pronto.'],
+      ['Seções dos módulos', 'Comunidade, Avisos e ciência, CONEX Arquivos, Pedagógico, Calendário e Intelligence, cada uma com captura da Escola Demonstração.', 'Hero pronto.'],
+      ['Seção Ecossistema AXION', 'Diagrama AXION ID ligando CONEX-ED (escola), Relatório (professor), Biblioteca (aluno) e SIMAED (avaliação), com o fluxo ideal do ciclo pedagógico.', 'Papel no ecossistema escrito.'],
+      ['Seção Segurança e LGPD', 'Isolamento entre escolas, permissões, auditoria, dados no Brasil ou onde estiverem, e a regra de que a IA só vê o que o usuário pode ver.', 'Arquitetura de segurança pronta.'],
+      ['Formulário de demonstração', 'Nome, escola, cargo, cidade e e-mail, com proteção antispam, gravando em tabela própria e avisando o e-mail comercial.', 'Supabase pronto.'],
+      ['Política de Privacidade e Termos', 'Documentos próprios do CONEX-ED no padrão dos do Relatório, com o papel da escola como controladora e da AXION como operadora.', 'LGPD mapeada.'],
+      ['SEO e compartilhamento', 'title, description, Open Graph com imagem, sitemap.xml, robots.txt e página rápida (Lighthouse acima de 90).', 'Site montado.'],
+      ['Animações com moderação', 'Revelação na rolagem e transições respeitando prefers-reduced-motion, como no site do RELATORIO SKIN.', 'Site montado.']
+    ] },
+    { id: 'f08', title: 'Integração ao ecossistema AXION PROEDUQ', summary: 'Fazer o CONEX-ED aparecer como irmão da Biblioteca e do Relatório: mesma companhia, mesma conta, mesmo cuidado.', tasks: [
+      ['Cartão na página institucional', 'Adicionar o CONEX-ED em axion-proeduq.html na seção Plataformas, com logo, uma linha e situação em breve. Rodar node scripts/check-copias-compartilhadas.js --copiar e fazer commit nos dois repositórios.', 'Logo pronto.'],
+      ['Selo uma plataforma AXION PROEDUQ', 'Rodapé do site e do app com a marca AXION, visível no site e discreta dentro do app, como no Relatório.', 'Site montado.'],
+      ['Link cruzado com Relatório e Biblioteca', 'Menu Meus produtos e rodapés apontando para relatorio.skin e biblioteca-ac.com, e os dois apontando de volta.', 'Menu Meus produtos pronto.'],
+      ['Mesmas regras legais', 'Política e Termos da companhia citando o CONEX-ED como produto, e a seção de serviços terceiros atualizada quando entrar IA ou e-mail transacional.', 'Documentos legais prontos.'],
+      ['E-mails transacionais com a marca', 'Convite, confirmação de conta e recuperação de senha com o cabeçalho do CONEX-ED e a logo AXION, no mesmo modelo de e-mail já usado.', 'Tela de conta pronta.'],
+      ['Documentação no CLAUDE.md do produto', 'CLAUDE.md próprio do repositório conex-ed com arquitetura, tabelas, regras fixas e fluxo de publicação, e uma seção curta no CLAUDE.md do Relatório sobre a integração.', 'Repositório criado.'],
+      ['Projeto atualizado no hub pessoal', 'Trocar o status deste projeto de Ideia para Desenvolvimento, preencher links de GitHub, Supabase e Vercel e o domínio definitivo.', 'Repositório e Vercel prontos.'],
+      ['Inventário de contas da companhia', 'Registrar domínio, projeto Vercel, buckets e custos do CONEX-ED na planilha de contas da AXION.', 'Infraestrutura criada.']
+    ] },
+    { id: 'f09', title: 'Fase 1 do app: escola, pessoas e permissões', summary: 'O núcleo administrativo: cadastrar a escola, a equipe, os cargos e mostrar a cada pessoa uma central diferente.', tasks: [
+      ['Cadastro de escola (onboarding)', 'Assistente em passos: dados da escola, identidade visual, setores, cargos padrão e primeiro gestor. Cria as pastas modelo automaticamente.', 'Fundação do banco pronta.'],
+      ['Gestão de usuários', 'Lista da equipe com filtros, convite, troca de cargo, suspensão e encerramento de vínculo, tudo auditado.', 'Convite por e-mail pronto.'],
+      ['Editor de cargos e permissões', 'Tela da gestão para criar cargo, escolher nível e marcar permissões, com prévia do que o cargo passa a ver.', 'Catálogo de permissões.'],
+      ['Permissão pontual por pessoa', 'Conceder uma permissão específica sem mudar o cargo (professor responsável por projeto financeiro), com prazo opcional.', 'Editor de cargos.'],
+      ['Central personalizada', 'Boa tarde, Paulo. Escola selecionada, e cartões do dia: avisos novos, documentos para ciência, eventos próximos, pendências. Cada cargo vê indicadores próprios.', 'Avisos e documentos com dados.'],
+      ['Comunidade', 'Diretório da equipe com filtros por Direção, Coordenação, Secretaria, Professores, Mediadores, Assistentes e Apoio. Perfil com cargo, disciplinas, contato institucional e produções públicas.', 'Perfis prontos.'],
+      ['Organograma digital', 'Gerado a partir de setores e cargos, com cada setor clicável levando às pessoas dele.', 'Comunidade pronta.'],
+      ['Identidade visual da escola', 'Logo e cor de destaque da escola aplicadas no cabeçalho do ambiente dela, sem alterar a marca do CONEX-ED.', 'Onboarding pronto.'],
+      ['Modo escuro e responsivo', 'Tokens de cor com versão escura e telas testadas em 360 px de largura.', 'Telas básicas prontas.']
+    ] },
+    { id: 'f10', title: 'Fase 1 do app: avisos, ciência e calendário', summary: 'Substituir o grupo informal de mensagens por comunicação oficial com destinatário certo e confirmação registrada.', tasks: [
+      ['Publicação de aviso', 'Título, texto, anexos, prioridade e validade. Só quem tem publicar_avisos vê o botão; a RLS confere de novo no banco.', 'Permissões prontas.'],
+      ['Seleção de destinatários', 'Marcar por cargo, setor, etapa, série, disciplina ou pessoas específicas (apenas professores da 2ª série; só coordenação e direção). Mostrar quantas pessoas vão receber antes de enviar.', 'Publicação de aviso.'],
+      ['Confirmação de ciência', 'Botão Li e estou ciente com data e hora gravadas e imutáveis. Painel: 51 destinatários, 48 visualizaram, 43 confirmaram, lista de quem falta.', 'Destinatários prontos.'],
+      ['Lembrete para quem não confirmou', 'Botão de reenviar lembrete só para os pendentes, com limite de frequência.', 'Confirmação de ciência.'],
+      ['Feed institucional', 'Linha do tempo com avisos, documentos publicados e eventos, com finalidade profissional. Comentários ficam para a Fase 2.', 'Avisos publicados.'],
+      ['Calendários por camada', 'Minha agenda, Meu setor, Pedagógico, Administrativo e Institucional, cada evento com visibilidade própria.', 'Permissões prontas.'],
+      ['Tipos de evento', 'Provas, reuniões, conselhos, planejamentos, feriados, eventos, entrega de notas e projetos, com cor e ícone.', 'Calendários criados.'],
+      ['Tempo real', 'Realtime do Supabase para aviso novo e ciência chegarem sem recarregar, reaproveitando o padrão de aviso leve do Relatório (só o sinal, sem dados).', 'Avisos publicados.'],
+      ['Notificação por e-mail', 'Resumo diário opcional dos avisos não lidos, com link direto. Push fica para a fase do app.', 'E-mails transacionais prontos.']
+    ] },
+    { id: 'f11', title: 'Fase 1 do app: CONEX Arquivos', summary: 'O drive institucional com classificação, versões e registro de quem viu, que faz a escola parar de pedir o mesmo arquivo várias vezes.', tasks: [
+      ['Árvore de pastas por escola', 'Pastas modelo (Gestão, Coordenação, Secretaria, Pedagógico, Financeiro, Projetos, Professores, Atas, Relatórios), com criação, renomeação e movimentação.', 'Storage configurado.'],
+      ['Envio de arquivos', 'Arrastar e soltar, vários arquivos, barra de progresso e limite de tamanho por plano. Arquivo vai para escola_id/pasta no bucket privado.', 'Árvore de pastas.'],
+      ['Classificação obrigatória', 'Público institucional, interno, restrito ou confidencial, com a permissão calculada a partir dela e da pasta. Confidencial exige permissão explícita.', 'Envio de arquivos.'],
+      ['Metadados do documento', 'Proprietário, autor, versão, data, última alteração, responsáveis e permissões visíveis em um painel lateral.', 'Envio de arquivos.'],
+      ['Histórico de versões', 'Nunca sobrescrever: cada envio vira nova versão (v1 04/03, v2 17/04). Visualizar, restaurar e ver o autor de cada uma.', 'Metadados prontos.'],
+      ['Links temporários', 'Download por URL assinada de curta duração. Nenhum arquivo com link público permanente, salvo os marcados como públicos.', 'Classificação pronta.'],
+      ['Registro de visualização e download', 'Cada abertura e download entra na auditoria. O dono vê quem acessou.', 'Auditoria pronta.'],
+      ['Busca por nome e metadados', 'Busca tradicional com filtros por pasta, tipo, classificação e data. A busca semântica chega na fase de IA.', 'Metadados prontos.'],
+      ['Pré-visualização', 'PDF e imagens abrem no navegador sem baixar; DOCX e planilhas mostram prévia simples.', 'Envio de arquivos.']
+    ] },
+    { id: 'f12', title: 'Segurança, auditoria e LGPD antes do piloto', summary: 'Nada vai para uma escola real sem esta fase. O CONEX-ED guarda dado funcional de servidores e, depois, de alunos.', tasks: [
+      ['Tela de auditoria', 'Filtros por pessoa, ação, período e documento: Maria alterou Plano 2026 às 13:42. Só quem tem visualizar_auditoria entra, e ninguém apaga.', 'Gatilhos de auditoria.'],
+      ['Limite de requisições', 'Rate limiting em login, convite, envio de arquivo e formulário de demonstração, para barrar abuso e força bruta.', 'Telas prontas.'],
+      ['Política de senhas e recuperação', 'Mínimo de 8 com letras e números (como no Relatório), bloqueio progressivo após erros e recuperação só pelo e-mail cadastrado.', 'Tela de conta.'],
+      ['Teste de invasão entre escolas', 'Tentar pela chave pública e pelo console do navegador ler dados de outra escola, trocar escola_id em requisições e acessar arquivos por caminho. Registrar o resultado.', 'RLS e Storage prontos.'],
+      ['Backup e restauração testados', 'Conferir o backup diário do Supabase e fazer uma restauração de teste. Backup que nunca foi restaurado não conta.', 'Banco com dados de teste.'],
+      ['Inventário de dados pessoais', 'Para cada dado: finalidade, base legal, quem acessa, tempo de guarda e onde fica. Privacy by design, como a ideia pede.', 'Diagrama do banco.'],
+      ['Acordo de tratamento com a escola', 'Documento em que a escola é controladora e a AXION operadora, com obrigações, subprocessadores (Supabase, Vercel) e incidente.', 'Inventário de dados.'],
+      ['Direitos do titular', 'Servidor pode ver e baixar os próprios dados e pedir correção. Exclusão respeitando a guarda obrigatória de documentos públicos.', 'Inventário de dados.'],
+      ['Plano de resposta a incidente', 'Quem avisa quem, em quanto tempo, e o texto-modelo para a escola e para a ANPD.', 'Acordo de tratamento.'],
+      ['Monitoramento de erros', 'Captura de erro no navegador e nas Edge Functions com aviso por e-mail, sem registrar dados pessoais no log.', 'App publicado em prévia.']
+    ] },
+    { id: 'f13', title: 'Piloto na escola e lançamento do MVP', summary: 'Colocar a Fase 1 na mão da equipe da Casavequia, medir, corrigir e só então abrir para outras escolas.', tasks: [
+      ['Carga inicial da escola', 'Cadastrar setores, cargos e convidar a equipe. Subir os documentos principais já classificados.', 'Fase 1 pronta e segurança aprovada.'],
+      ['Treinamento curto por função', 'Encontro de 30 minutos com gestão e outro com professores, mais um vídeo de 3 minutos por módulo.', 'Carga inicial feita.'],
+      ['Guia rápido em uma página', 'Como entrar, confirmar ciência, achar um documento e ver o calendário. PDF e página dentro do app.', 'Treinamento preparado.'],
+      ['Canal de suporte do piloto', 'E-mail de suporte e formulário dentro do app, com prazo de resposta combinado.', 'E-mail comercial pronto.'],
+      ['Primeiro aviso oficial pela plataforma', 'Direção publica um comunicado real com ciência obrigatória. Marco do início do piloto.', 'Equipe com conta.'],
+      ['Acompanhamento semanal', 'Medir contas ativas, avisos, ciências, documentos e dúvidas. Conversa de 15 minutos com a coordenação toda semana.', 'Piloto iniciado.'],
+      ['Correções do piloto', 'Lista priorizada do que atrapalhou o uso, resolvida antes de qualquer módulo novo.', 'Acompanhamento semanal.'],
+      ['Avaliação de 60 dias', 'Comparar com as métricas de sucesso definidas no começo e decidir: seguir para a Fase 2, ajustar ou repensar.', 'Correções feitas.'],
+      ['Depoimento e caso de uso', 'Com autorização da direção, registrar o resultado do piloto para o site e para a proposta a outras escolas.', 'Avaliação positiva.']
+    ] },
+    { id: 'f14', title: 'Fase 2: colaboração e processos', summary: 'Com a fundação validada, entram mensagens, tarefas, aprovações, protocolos e formulários, transformando o CONEX-ED em plataforma de rotina.', tasks: [
+      ['Mensagens internas', 'Conversas individuais, por setor, grupo, turma, projeto e comissão, com Realtime, anexos e confirmação de leitura.', 'Piloto aprovado.'],
+      ['Comentários em avisos e documentos', 'Discussão no próprio item, com menção de pessoas e notificação.', 'Mensagens prontas.'],
+      ['Tarefas e quadros', 'Tarefa com responsável, prazo e prioridade; quadros A fazer, Em andamento, Revisão, Concluído por projeto.', 'Piloto aprovado.'],
+      ['Fluxos de aprovação de documentos', 'Professor envia, coordenação revisa, aprova e arquiva, com cada etapa registrada e a versão aprovada travada.', 'Versões de documento.'],
+      ['Protocolos numerados', 'CONEX-AAAA-00000 por escola, com status Recebido, Em análise, Aprovado, Concluído. Tipos: manutenção, compras, documentos, materiais, declarações.', 'Fluxos de aprovação.'],
+      ['Formulários sem programação', 'A escola monta formulários (solicitação de material: nome, setor, item, quantidade, justificativa) e escolhe o fluxo que segue depois do envio.', 'Protocolos prontos.'],
+      ['Construtor de fluxos básico', 'Quando formulário X for enviado: enviar para coordenação, se aprovado enviar para direção, notificar solicitante.', 'Formulários prontos.'],
+      ['Assinatura interna e ciência', 'Aprovação e validação internas com registro. Deixar claro na tela que não equivale a assinatura digital ICP-Brasil.', 'Fluxos de aprovação.'],
+      ['Reuniões e Livro de Decisões', 'Página por reunião (pauta, participantes, documentos, ata, decisões, tarefas) e registro permanente das decisões institucionais com responsável e origem.', 'Tarefas prontas.'],
+      ['Automações simples', 'Documento perto de vencer avisa o responsável; plano enviado avisa a coordenação; aprovado arquiva sozinho.', 'Construtor de fluxos.']
+    ] },
+    { id: 'f15', title: 'Fase 3: pedagógico e integração com Relatório e Biblioteca', summary: 'Ligar o CONEX-ED aos outros produtos pela Axion API, sempre com o professor decidindo o que compartilha.', tasks: [
+      ['CONEX Pedagógico', 'Planos de curso, planos de aula compartilhados, sequências, matrizes curriculares, habilidades, componentes, turmas, projetos e avaliações da escola.', 'Fase 2 estável.'],
+      ['Axion API: primeira Edge Function', 'Função relatorio-para-conex que devolve só os dados autorizados do professor para a escola do vínculo, conferindo conex_pode e o consentimento.', 'Axion API desenhada.'],
+      ['Consentimento do professor', 'No Relatório (Meu Diário e contas do admin), tela para escolher o que a escola pode ver: contador, planos, sequências, relatórios, certificados. Revogável a qualquer momento.', 'Primeira Edge Function.'],
+      ['Contador de aulas na coordenação', 'Previstas, ministradas, restantes, média semanal e projeção de conclusão por professor e disciplina, lidos do Relatório sem acessar a conta privada.', 'Consentimento pronto.'],
+      ['Currículo x aulas realizadas', 'Comparar conteúdos planejados com os registrados nos relatos: currículo estimado 74%, carga horária 71%, 24 de 32 conteúdos trabalhados.', 'Contador integrado.'],
+      ['Documentos pedagógicos no perfil', 'Planos e sequências compartilhados pelo professor aparecem no perfil dele no CONEX-ED, sem pedir o arquivo de novo.', 'Consentimento pronto.'],
+      ['Webhooks entre produtos', 'Plano aprovado no CONEX-ED chega ao Relatório; relato publicado atualiza o painel da coordenação. Eventos com assinatura e nova tentativa.', 'Axion API ativa.'],
+      ['Biblioteca Digital recomendando conteúdos', 'Para o plano da semana, sugerir livros, atividades e quizzes da Biblioteca ligados à habilidade. O professor escolhe usar ou não.', 'Currículo integrado.'],
+      ['Progresso agregado dos alunos', 'Só dados agregados por turma (acessos, tempo médio, média de quiz), nunca o aluno individual para quem não é professor dele.', 'Integração com a Biblioteca.'],
+      ['Turmas em comum', 'Ligar as turmas do CONEX-ED a relatorio_turmas e às turmas da Biblioteca, na mesma lógica de vínculo por escola e série já usada.', 'CONEX Pedagógico pronto.']
+    ] },
+    { id: 'f16', title: 'Fase 4: CONEX Intelligence (IA)', summary: 'IA que pergunta, analisa e automatiza, sempre citando a fonte e nunca enxergando além das permissões do usuário.', tasks: [
+      ['Regra de ouro da IA', 'Usuário → permissões → dados autorizados → IA. Toda busca de contexto passa por conex_pode antes de chegar ao modelo. Nunca IA com acesso ao banco inteiro.', 'Fase 3 estável.'],
+      ['Extração de texto dos documentos', 'PDF, DOCX e planilhas convertidos em texto por página no envio, guardados com escola_id e classificação.', 'CONEX Arquivos pronto.'],
+      ['Pesquisa semântica com pgvector', 'Embeddings por trecho em tabela com RLS por escola. Documento que fala sobre recuperação no terceiro bimestre acha o arquivo mesmo sem essas palavras no título.', 'Extração de texto.'],
+      ['Rastreabilidade obrigatória', 'Toda resposta mostra a fonte: Plano de Curso 2026, página 42. Sem fonte, a IA diz que não encontrou.', 'Pesquisa semântica.'],
+      ['Assistente CONEX IA', 'Chat que responde quem ainda não enviou o plano de setembro, qual documento define o calendário de avaliações, resumo das três últimas atas.', 'Rastreabilidade pronta.'],
+      ['Planos de curso inteligentes', 'A coordenação envia um documento de 180 páginas; a IA separa por componente, série e bimestre e entrega a cada professor só as páginas dele, com aviso automático.', 'Extração de texto.'],
+      ['IA para documentos', 'Resumir, comparar versões, extrair prazos e responsáveis, sugerir pasta e classificação, achar duplicidades. Documento oficial continua com validação humana.', 'Assistente pronto.'],
+      ['Atas a partir de áudio', 'Reunião autorizada: áudio, transcrição, ata preliminar com participantes, decisões, responsáveis e prazos. Alguém revisa antes de publicar.', 'Reuniões prontas.'],
+      ['Resumo semanal e alertas', 'Toda segunda, resumo para direção e coordenação; alertas de vencimento, orçamento e execução curricular, sempre com a origem do dado.', 'Assistente pronto.'],
+      ['Provedores e cotas', 'Reaproveitar a fila de chaves de _comum/ia.ts da Biblioteca e a cota diária por conta (ia_consumir_cota), com limite por escola e por plano.', 'Regra de ouro definida.'],
+      ['Privacidade no envio à IA', 'Pseudonimizar nomes antes de enviar ao modelo, como já feito nas ocorrências do Relatório, e registrar na política quais provedores recebem texto.', 'Provedores definidos.'],
+      ['IA não julga pessoas', 'A IA apresenta evidências e indicadores; não classifica professor como bom ou ruim. Escrever isso no prompt e na política.', 'Assistente pronto.']
+    ] },
+    { id: 'f17', title: 'Fase 5: integração com o SIMAED', summary: 'Só depois de confirmar o caminho oficial de acesso aos dados. Aqui nasce o ciclo completo: avaliação, currículo, intervenção e nova medida.', tasks: [
+      ['Levantamento oficial do SIMAED', 'Consultar a Secretaria de Educação sobre API, exportação ou importação autorizada. Não fazer raspagem de tela nem usar credencial de outra pessoa.', 'Fase 4 estável.'],
+      ['Autorização por escrito', 'Documento da rede autorizando o uso dos dados de avaliação no CONEX-ED, com finalidade e escopo.', 'Levantamento feito.'],
+      ['Importação inicial por arquivo', 'Enquanto não houver API, importar a exportação oficial (CSV ou planilha) com validação de colunas e registro de quem importou.', 'Autorização obtida.'],
+      ['Modelo de dados de avaliação', 'Avaliações, turmas, componentes, habilidades, resultados agregados e evolução temporal, sempre com escola_id e RLS.', 'Importação definida.'],
+      ['Painel SIMAED', 'Por série e componente: média atual, evolução, habilidades críticas e comparação entre avaliações, sem abrir outro sistema.', 'Dados importados.'],
+      ['Cruzamento com o currículo', 'Habilidade crítica no SIMAED → prevista no plano curricular → aulas registradas no Relatório → conteúdos da Biblioteca.', 'Painel e Fase 3 prontos.'],
+      ['Plano de intervenção', 'Coordenação cria o plano (habilidade, origem SIMAED, professores, prazo de 4 semanas) e acompanha até a próxima avaliação.', 'Cruzamento pronto.'],
+      ['Alerta pedagógico automático', 'Nova habilidade marcada como crítica cria alerta para a coordenação, com a fonte do dado.', 'Plano de intervenção.'],
+      ['Perguntas à IA sobre avaliação', 'Quais habilidades caíram, quais turmas evoluíram, que conteúdos correspondem às dificuldades, com citação da avaliação de origem.', 'CONEX IA pronta.']
+    ] },
+    { id: 'f18', title: 'Fase 6: administração avançada', summary: 'Finanças, compras, patrimônio, manutenção e reservas, para quando a escola já vive a rotina na plataforma.', tasks: [
+      ['CONEX Finanças administrativo', 'Contas, comprovantes, fornecedores, notas, orçamento, previsões e centros de custo, só para quem tem visualizar_financas.', 'Fase 2 estável.'],
+      ['Orçamento por projeto', 'Previsto, executado e disponível em tempo real (Feira Cultural: R$ 8.000 previstos, R$ 6.730 executados).', 'Finanças prontas.'],
+      ['Solicitação de compra', 'Professor pede, coordenação, administração e direção aprovam, compra registrada, tudo pelo fluxo de protocolos.', 'Protocolos e finanças.'],
+      ['CONEX Patrimônio', 'Itens com número patrimonial, localização, responsável, estado e histórico de manutenção, com etiqueta QR.', 'Fase 2 estável.'],
+      ['Chamados de manutenção', 'Registro com foto, sala, gravidade e descrição; status Aberto, Em análise, Serviço solicitado, Resolvido.', 'Patrimônio pronto.'],
+      ['Reserva de recursos', 'Projetor, laboratório, auditório, sala multimídia e transporte, com bloqueio de conflito de horário.', 'Calendário pronto.'],
+      ['Gestão de projetos escolares', 'Feira, campeonato, formatura: equipe, orçamento, tarefas, calendário, documentos, fornecedores e relatório final.', 'Tarefas e orçamento.'],
+      ['Transparência pública', 'Página opcional da escola com projetos, despesas autorizadas, calendário e prestação de contas, sem expor nada interno.', 'Finanças prontas.'],
+      ['Relatórios gerenciais', 'Exportação em PDF, Excel e CSV de financeiro, pedagógico, patrimônio, processos, documentos, aulas, SIMAED e projetos.', 'Módulos com dados.'],
+      ['Painéis por função', 'Direção, coordenação e secretaria com widgets escolhidos pelo usuário (dashboards personalizáveis).', 'Módulos com dados.']
+    ] },
+    { id: 'f19', title: 'App móvel, PWA, offline e notificações', summary: 'O celular faz o essencial muito bem; a administração complexa continua no computador.', tasks: [
+      ['PWA instalável', 'manifest.json, ícones e service worker com cache só de ativos versionados. HTML nunca pré-cacheado, lição do bug de relatos sumindo no Relatório.', 'Site e app publicados.'],
+      ['Foco do app no essencial', 'Avisos, mensagens, calendário, documentos, aprovações, notificações, perfil e tarefas. Nada de finanças ou configuração no celular.', 'PWA pronta.'],
+      ['Notificações push', 'Novo aviso da direção, plano aprovado, documento vence em 5 dias, reunião amanhã. Com preferências por tipo e horário silencioso.', 'PWA pronta.'],
+      ['Modo offline', 'Documentos marcados, agenda, avisos e formulários simples guardados no aparelho; envios na fila sincronizam quando a internet volta.', 'PWA pronta.'],
+      ['Sincronia ao voltar', 'Ao ganhar foco ou voltar a conexão, buscar de novo e reenviar pendências, como o recuperarTudo do Relatório.', 'Modo offline.'],
+      ['Empacotamento para lojas', 'Avaliar TWA ou Capacitor para Google Play depois que a PWA estiver estável, com assinatura e política de privacidade da loja.', 'PWA estável.'],
+      ['Testes em aparelhos simples', 'Celular Android de entrada, tela pequena e 3G. Se funciona lá, funciona em todo lugar.', 'App pronto.']
+    ] },
+    { id: 'f20', title: 'Portais e extensão (futuro)', summary: 'Abrir o CONEX-ED para família, estudantes e parceiros, cada um com acesso mínimo e sem tocar no ambiente administrativo.', tasks: [
+      ['Portal da Família', 'Comunicados, documentos públicos, eventos, autorizações, projetos e calendário, com login próprio e sem ver nada administrativo.', 'Fase 6 estável.'],
+      ['Autorizações digitais', 'Responsável autoriza passeio ou participação em projeto com registro de data e hora.', 'Portal da Família.'],
+      ['Portal do Estudante', 'Conteúdos, avisos, calendário, projetos e ponte direta para a Biblioteca Digital, usando a sessão de aluno já existente.', 'Integração com a Biblioteca.'],
+      ['CONEX Extensão', 'Projetos comunitários (oficinas, eventos, esporte, cultura, projetos sociais) com inscrições, participantes e resultados.', 'Portal do Estudante.'],
+      ['Parceiros externos', 'Universidade, associação, empresa ou órgão público vê só o projeto ligado a ele.', 'CONEX Extensão.'],
+      ['Linha do tempo e memória institucional', 'Arquivo por ano letivo, histórico de quem ocupou cada função e linha do tempo da escola, que sobrevivem às trocas de gestão.', 'Auditoria e lixeira permanentes.'],
+      ['Base de conhecimento', 'Perguntas recorrentes (como solicitar material, onde está o calendário) respondidas pela IA com base nos documentos oficiais da própria escola.', 'CONEX IA pronta.']
+    ] },
+    { id: 'f21', title: 'Integrações externas', summary: 'Conversar com as ferramentas que a escola já usa, sem depender de um só fornecedor.', tasks: [
+      ['Google Drive e Calendar', 'Coordenação cola link do Drive, o CONEX-ED importa metadados e a IA analisa; eventos sincronizam com o Google Calendar do usuário.', 'CONEX IA pronta.'],
+      ['Microsoft 365', 'OneDrive, Word, Excel e Outlook pelos mesmos caminhos, para não construir o produto preso ao Google.', 'Google integrado.'],
+      ['Webhooks para terceiros', 'Escola configura envio de eventos (documento aprovado, protocolo concluído) para outro sistema, com segredo por escola.', 'Webhooks internos prontos.'],
+      ['Assinatura eletrônica externa', 'Integrar um provedor reconhecido para documentos juridicamente sensíveis, deixando a aprovação interna para o resto.', 'Fluxos de aprovação.'],
+      ['Documentação da Axion API', 'Referência pública das rotas liberadas a parceiros, com autenticação, limites e exemplos.', 'Axion API estável.']
+    ] },
+    { id: 'f22', title: 'CONEX Rede, comercialização e escala', summary: 'Levar o CONEX-ED de uma escola para uma rede inteira, com planos, contrato e infraestrutura paga no momento certo.', tasks: [
+      ['CONEX Rede', 'Secretaria ou mantenedora gerencia várias escolas, com indicadores consolidados e sem misturar documentos internos de cada uma.', 'Várias escolas em uso.'],
+      ['Planos e preços', 'Gratuito para piloto, plano por escola e plano para rede, com limites de armazenamento, IA e usuários.', 'Custos por escola conhecidos.'],
+      ['Supabase Pro e Vercel Pro', 'Contratar antes da primeira escola pagante: backup diário com restauração por ponto, mais armazenamento e uso comercial permitido.', 'Planos e preços definidos.'],
+      ['Cobrança e contrato', 'Contrato de licença, acordo de tratamento de dados, SLA de disponibilidade e prazo de suporte compatíveis com a infraestrutura.', 'Planos contratados.'],
+      ['Onboarding de escola nova sem intervenção', 'Cadastro, convite e pastas modelo em menos de 30 minutos, sem precisar do desenvolvedor.', 'Onboarding estável.'],
+      ['Proposta para a rede estadual', 'Usar o caso da escola piloto, os dados de segurança e a integração com Relatório, Biblioteca e SIMAED como diferencial na proposta da AXION.', 'Depoimento do piloto.'],
+      ['Monitoramento de custos por escola', 'Painel de armazenamento, IA e requisições por escola para ajustar preço e limite a cada semestre.', 'Várias escolas em uso.'],
+      ['Status do CONEX-ED no hub', 'Mudar o status deste projeto para Operacional com ajustes quando a primeira escola usar todo dia, e para Operacional efetivo quando houver escola pagante.', 'Uso diário comprovado.']
+    ] }
+  ];
 
   var state = emptyState();
   var sync = null;
@@ -561,25 +813,27 @@
     return Boolean(rural);
   }
   function axionPhaseNumber(index) { return (index + 1 < 10 ? '0' : '') + (index + 1); }
-  function axionChecklistSeed() {
+  function phasedChecklistSeed(prefix, phases) {
     var stamp = SEED_TIMESTAMP;
-    return AXION_PHASES.map(function (phase, index) {
+    return phases.map(function (phase, index) {
       var children = phase.tasks.map(function (task, taskIndex) {
-        return { id: 'chk-axion-' + phase.id + '-' + (taskIndex + 1), text: task[0] + ' — ' + task[1], done: task[3] === true, children: [], createdAt: stamp, updatedAt: stamp };
+        return { id: 'chk-' + prefix + '-' + phase.id + '-' + (taskIndex + 1), text: task[0] + ' — ' + task[1], done: task[3] === true, children: [], createdAt: stamp, updatedAt: stamp };
       });
       var complete = children.length > 0 && children.every(function (child) { return child.done; });
-      return { id: 'chk-axion-' + phase.id, text: axionPhaseNumber(index) + '. ' + phase.title, done: complete, children: children, createdAt: stamp, updatedAt: stamp };
+      return { id: 'chk-' + prefix + '-' + phase.id, text: axionPhaseNumber(index) + '. ' + phase.title, done: complete, children: children, createdAt: stamp, updatedAt: stamp };
     });
   }
+  function phasedMindMapDetails(phase) {
+    var pending = phase.tasks.filter(function (task) { return task[3] !== true; }).length;
+    return phase.summary + '\n\nSituação: ' + (phase.tasks.length - pending) + ' de ' + phase.tasks.length + ' passos concluídos.\n\nPassos desta fase:\n' + phase.tasks.map(function (task, index) {
+      return (index + 1) + '. ' + (task[3] === true ? '[feito] ' : '') + task[0] + ' — ' + task[1] + '\nDependência: ' + task[2];
+    }).join('\n\n');
+  }
+  function countPhaseTasks(phases) { return phases.reduce(function (total, phase) { return total + phase.tasks.length; }, 0); }
   function axionMindMapSeed(project) {
     var stamp = SEED_TIMESTAMP;
     var root = 'map-root-' + project.id;
-    function phaseDetails(phase) {
-      var pending = phase.tasks.filter(function (task) { return task[3] !== true; }).length;
-      return phase.summary + '\n\nSituação: ' + (phase.tasks.length - pending) + ' de ' + phase.tasks.length + ' passos concluídos.\n\nPassos desta fase:\n' + phase.tasks.map(function (task, index) {
-        return (index + 1) + '. ' + (task[3] === true ? '[feito] ' : '') + task[0] + ' — ' + task[1] + '\nDependência: ' + task[2];
-      }).join('\n\n');
-    }
+    var phaseDetails = phasedMindMapDetails;
     var nodes = [
       { id: root, parentId: null, title: 'AXION PROEDUQ', description: 'Companhia de tecnologia educacional que abriga a Biblioteca Digital, o Relatório e os produtos futuros.\n\nSlogan institucional: Tecnologia que move a educação.\nAssinatura publicitária: Ensinar. Aprender. Evoluir.\n\nO plano de organização tem ' + AXION_PHASES.length + ' fases e ' + AXION_PHASES.reduce(function (total, phase) { return total + phase.tasks.length; }, 0) + ' passos, do domínio à proposta para a rede estadual de ensino.', kind: 'root', order: 0, createdAt: stamp, updatedAt: stamp },
       { id: 'map-axion-identidade', parentId: root, title: 'Identidade verbal aprovada', description: 'Descritor curto:\nAXION PROEDUQ é uma companhia de tecnologia educacional dedicada ao desenvolvimento de plataformas, aplicativos e experiências digitais que ampliam as possibilidades de ensinar e aprender.\n\nDescritor institucional forte:\nCriamos tecnologia para transformar a maneira como professores ensinam, alunos aprendem e escolas desenvolvem novas experiências educacionais.\n\nPosicionamento do site:\nTecnologia criada para quem ensina e para quem aprende.\n\nPilares: Inovação, Autonomia, Simplicidade, Evolução e Acesso.\n\nPersonalidade: tecnológica, inteligente, moderna, organizada, confiável e jovem. A companhia é séria; os produtos podem ser lúdicos.', kind: 'rule', order: 1, createdAt: stamp, updatedAt: stamp },
@@ -611,7 +865,7 @@
           { id: 'tool-axion-dominio', provider: 'Outra', label: 'Registro.br — axionproeduq.com.br', url: 'https://registro.br/', createdAt: stamp, updatedAt: stamp },
           { id: 'tool-axion-claude', provider: 'Claude', label: 'Claude', url: 'https://claude.ai/', createdAt: stamp, updatedAt: stamp }
         ],
-        checklist: axionChecklistSeed(),
+        checklist: phasedChecklistSeed('axion', AXION_PHASES),
         relatedProjectIds: [], createdAt: stamp, updatedAt: stamp
       };
       axion.mindMap = axionMindMapSeed(axion);
@@ -633,6 +887,66 @@
     }
     state.migrations.axionProeduqV1 = { addedAt: stamp, projectId: axion.id, phases: AXION_PHASES.length, tasks: AXION_PHASES.reduce(function (total, phase) { return total + phase.tasks.length; }, 0) };
     if (changed) persist('axion-proeduq-add'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
+    return changed;
+  }
+  function conexMindMapSeed(project) {
+    var stamp = SEED_TIMESTAMP;
+    var root = 'map-root-' + project.id;
+    var nodes = [
+      { id: root, parentId: null, title: 'CONEX-ED', description: 'Comunidade Organizada em Rede e Extensão Escolar.\nPlataforma Integrada de Gestão, Comunicação e Inteligência Escolar, by AXION PROEDUQ.\n\nSlogan: Toda a escola conectada, organizada e inteligente.\nLinha de apoio: Gestão. Comunicação. Documentos. Pedagógico. Inteligência. Um único ambiente.\n\nO plano de realização tem ' + CONEX_PHASES.length + ' fases e ' + countPhaseTasks(CONEX_PHASES) + ' passos, do conceito à CONEX Rede.', kind: 'root', order: 0, createdAt: stamp, updatedAt: stamp },
+      { id: 'map-conex-visao', parentId: root, title: 'Visão e papel no ecossistema', description: 'O sistema operacional digital da escola. Plataforma multi-institucional: cada escola recebe um ambiente próprio, completamente separado das demais (identidade visual, usuários, setores, cargos, documentos, comunicação, calendário, finanças, pedagógico, processos, relatórios, integrações, IA e histórico).\n\nRelatório cuida da rotina individual do professor. Biblioteca Digital cuida da aprendizagem do aluno. SIMAED fornece dados de avaliação quando houver integração oficial. O CONEX-ED transforma tudo isso em uma estrutura institucional única.\n\nAXION PROEDUQ\n└ AXION ID\n  ├ CONEX-ED (escola)\n  ├ Relatório (professor)\n  ├ Biblioteca Digital (aluno)\n  └ SIMAED (avaliação e dados)', kind: 'note', order: 1, createdAt: stamp, updatedAt: stamp },
+      { id: 'map-conex-conta', parentId: root, title: 'Axion ID e perfis', description: 'Uma conta só para CONEX-ED, Relatório, Biblioteca e produtos futuros, sobre o auth do Supabase compartilhado (vgceathgwvtmjxbdpecr).\n\nPerfil profissional: acompanha a pessoa (nome, foto, formação, áreas, certificações escolhidas, disciplinas, experiência).\nPerfil institucional: existe só dentro da escola (cargo, setor, vínculo, turmas, horários, permissões, documentos, histórico).\n\nA mesma pessoa pode trabalhar em várias escolas; cada vínculo tem permissões independentes.', kind: 'note', order: 2, createdAt: stamp, updatedAt: stamp },
+      { id: 'map-conex-permissoes', parentId: root, title: 'Níveis e permissões', description: 'Nível 1 — Operacional/pedagógico: professores, mediadores, assistentes.\nNível 2 — Administrativo: secretaria e apoio administrativo.\nNível 3 — Gestão: direção, coordenação e gestores autorizados.\n\nPor trás dos níveis, RBAC + permissões granulares: visualizar_financas, editar_financas, publicar_avisos, aprovar_planos, visualizar_documentos_funcionais, gerenciar_usuarios, visualizar_auditoria, baixar_relatorios.\n\nUma função só no banco (private.conex_pode) decide tudo: RLS, Edge Functions e IA.', kind: 'note', order: 3, createdAt: stamp, updatedAt: stamp },
+      { id: 'map-conex-modulos', parentId: root, title: 'Módulos do produto', description: 'Central personalizada · Comunidade · Organograma · Feed institucional · Avisos com ciência · Mensagens · CONEX Arquivos (classificação, versões, auditoria) · Fluxos de aprovação · Protocolos · Assinatura interna · CONEX Pedagógico · Planos de curso inteligentes · CONEX IA · Pesquisa semântica · Atas por áudio · Reuniões e Livro de Decisões · Calendário · Tarefas e projetos · CONEX Finanças · Orçamentos e compras · CONEX Patrimônio · Manutenção · Reservas · Formulários e construtor de fluxos · Automações · CONEX Intelligence · Painéis por função · Transparência · Portal da Família · Portal do Estudante · CONEX Extensão · Parceiros · CONEX Rede.', kind: 'note', order: 4, createdAt: stamp, updatedAt: stamp },
+      { id: 'map-conex-seguranca', parentId: root, title: 'Segurança, LGPD e IA', description: 'Multi-tenant desde o primeiro dia: escola_id em toda tabela e RLS por vínculo ativo. Auditoria só de inclusão, lixeira permanente, MFA para gestão, rate limiting, sessões controladas e backups testados.\n\nPrivacy by design: cada dado tem finalidade, responsável, permissão, retenção e histórico. Cargo alto não dá acesso automático a dado pessoal.\n\nIA: Usuário → Permissões → Dados autorizados → IA. Nunca Usuário → IA → banco inteiro. Toda resposta cita a fonte (documento e página). A IA apresenta evidências e não julga professores.', kind: 'note', order: 5, createdAt: stamp, updatedAt: stamp },
+      { id: 'map-conex-ciclo', parentId: root, title: 'Ciclo pedagógico completo', description: 'Coordenação publica currículo no CONEX-ED → CONEX IA interpreta → cada professor recebe no Relatório só os seus conteúdos → professor planeja → Biblioteca Digital sugere conteúdos → professor ministra e registra → Relatório atualiza o contador → CONEX-ED acompanha a execução → SIMAED mede resultados → CONEX Intelligence cruza os indicadores → coordenação identifica necessidades → novo ciclo começa.', kind: 'note', order: 6, createdAt: stamp, updatedAt: stamp }
+    ];
+    CONEX_PHASES.forEach(function (phase, index) {
+      nodes.push({ id: 'map-conex-' + phase.id, parentId: root, title: axionPhaseNumber(index) + '. ' + phase.title, description: phasedMindMapDetails(phase), kind: 'folder', order: index + 7, createdAt: stamp, updatedAt: stamp });
+    });
+    return createMindMap(project, nodes);
+  }
+  function ensureConexProject() {
+    if (state.migrations.conexEdV1) return false;
+    var stamp = SEED_TIMESTAMP;
+    var conex = coreProjectByName('CONEX-ED', 'project-conex-ed');
+    var changed = false;
+    if (!conex) {
+      conex = {
+        id: 'project-conex-ed',
+        name: 'CONEX-ED',
+        description: 'Projeto futuro da AXION PROEDUQ: plataforma multi-institucional de gestão, comunicação, documentos, pedagógico e inteligência escolar, com um ambiente isolado por escola e conta única Axion ID ligando CONEX-ED, Relatório e Biblioteca Digital. Toda a escola conectada, organizada e inteligente.',
+        status: 'Ideia', type: 'Site', url: '', logo: '',
+        tools: [
+          { id: 'tool-conex-github', provider: 'GitHub', label: 'GitHub — repositório conex-ed a criar', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-conex-supabase', provider: 'Supabase', label: 'Supabase — schema conex no projeto compartilhado', url: 'https://supabase.com/dashboard/project/vgceathgwvtmjxbdpecr', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-conex-vercel', provider: 'Vercel', label: 'Vercel — projeto a criar', url: '', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-conex-dominio', provider: 'Outra', label: 'Registro.br — domínio a verificar', url: 'https://registro.br/', createdAt: stamp, updatedAt: stamp },
+          { id: 'tool-conex-claude', provider: 'Claude', label: 'Claude', url: 'https://claude.ai/', createdAt: stamp, updatedAt: stamp }
+        ],
+        checklist: phasedChecklistSeed('conex', CONEX_PHASES),
+        relatedProjectIds: [], createdAt: stamp, updatedAt: stamp
+      };
+      conex.mindMap = conexMindMapSeed(conex);
+      state.projects.push(conex); changed = true;
+    }
+    [
+      coreProjectByName('AXION PROEDUQ', 'project-axion-proeduq'),
+      coreProjectByName('Biblioteca digital', 'project-biblioteca-digital'),
+      coreProjectByName('Relatórios diários', 'project-relatorios-diarios')
+    ].forEach(function (irmao) {
+      if (!irmao) return;
+      var doIrmao = Array.isArray(irmao.relatedProjectIds) ? irmao.relatedProjectIds : [];
+      if (doIrmao.indexOf(conex.id) < 0) { irmao.relatedProjectIds = doIrmao.concat(conex.id); irmao.updatedAt = stamp; changed = true; }
+      var doConex = Array.isArray(conex.relatedProjectIds) ? conex.relatedProjectIds : [];
+      if (doConex.indexOf(irmao.id) < 0) { conex.relatedProjectIds = doConex.concat(irmao.id); conex.updatedAt = stamp; changed = true; }
+    });
+    if (!state.activities.some(function (activity) { return activity.id === 'activity-conex-ed-add'; })) {
+      state.activities.push({ id: 'activity-conex-ed-add', projectId: conex.id, title: 'CONEX-ED adicionado como projeto futuro', details: 'Plano de realização com ' + CONEX_PHASES.length + ' fases e ' + countPhaseTasks(CONEX_PHASES) + ' passos: conceito, descoberta, arquitetura, Vercel, Supabase multi-tenant, Axion ID, site, ecossistema AXION, Fase 1 do app, piloto, colaboração, integração com Relatório e Biblioteca, IA, SIMAED, administração, app, portais, integrações e CONEX Rede.', occurredAt: stamp, source: 'Manual', externalUrl: '', idempotencyKey: 'activity-conex-ed-add', createdAt: stamp, updatedAt: stamp });
+      changed = true;
+    }
+    state.migrations.conexEdV1 = { addedAt: stamp, projectId: conex.id, phases: CONEX_PHASES.length, tasks: countPhaseTasks(CONEX_PHASES) };
+    if (changed) persist('conex-ed-add'); else { try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (error) {} }
     return changed;
   }
   function libraryDocumentationBlueprint() {
@@ -774,10 +1088,11 @@
     if (project.id === 'project-biblioteca-digital') return libraryMindMapSeed(project);
     if (project.id === 'project-rural-manager') return ruralManagerMindMapSeed(project);
     if (project.id === 'project-axion-proeduq') return axionMindMapSeed(project);
+    if (project.id === 'project-conex-ed') return conexMindMapSeed(project);
     return createMindMap(project);
   }
   function isSeedMindMapProject(project) {
-    return project.id === 'project-biblioteca-digital' || project.id === 'project-rural-manager' || project.id === 'project-axion-proeduq';
+    return project.id === 'project-biblioteca-digital' || project.id === 'project-rural-manager' || project.id === 'project-axion-proeduq' || project.id === 'project-conex-ed';
   }
   function ensureProjectMindMaps() {
     var changed = false;
@@ -1860,7 +2175,7 @@
     }
   }
   function boot() {
-    loadCache(); ensureCoreProjects(); ensureReportsProjectIcon(); ensureLibraryProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureAxionProject(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache(); ensureCoreProjects(); ensureReportsProjectIcon(); ensureLibraryProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureAxionProject(); ensureConexProject(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
