@@ -1494,19 +1494,16 @@ if (main && !main.dataset.build) main.dataset.build = '20260819c';
 }
 function rhGarantirEditorPersistente() {
 if (window._rhEditorBootstrapDone) return;
-var btn = rhPrepararBotaoEditor();
-if (!btn) return;
+// Sem botão "Editar" (21/09/2026): o editor só reaplica o layout já salvo.
 window._rhEditorBootstrapDone = true;
 rhConfigurarEditorPersistente();
-rhGarantirCssEditor();
-rhGarantirToolbarEditor();
 if (typeof window.initEditor === 'function') {
 window.initEditor();
 return;
 }
 if (document.querySelector('script[data-rh-editor-loader="1"]')) return;
 var script = document.createElement('script');
-script.src = 'assets/js/editor.js?v=20260919a';
+script.src = 'assets/js/editor.js?v=20260921a';
 script.async = false;
 script.setAttribute('data-rh-editor-loader', '1');
 script.onload = function() {

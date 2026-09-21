@@ -62,9 +62,10 @@ function initEditor() {
   _editorLimparSnapshotsLegados();
   _editorAgendarRestauracao();
   _editorIniciarSyncRemoto();
-  configurarBtnEditar();
-  criarPainelEditor();
-  configurarToolbarTexto();
+  // O layout não é mais editado pelo usuário (21/09/2026): sem botão, sem
+  // modo de edição, sem painel. Só o layout já salvo continua sendo aplicado.
+  var antigo = _editorGetToggleButton();
+  if (antigo) antigo.remove();
 }
 
 function _editorEnsureNodeIds(root) {
@@ -1183,7 +1184,7 @@ function _rgbToHex(rgb) {
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
-  if (_editorGetToggleButton()) {
+  if (document.querySelector('.main')) {
     initEditor();
   }
   // Carrega contas Claude salvas (única coisa que persiste entre sessões)
