@@ -3,6 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+// Celular e tablet abrem esta página no formato de computador (21/09/2026):
+// a versão estreita deformava a grade e as tabelas das projeções.
+// Aba própria: o viewport passa a ter 1280 px (dá para ampliar com os dedos).
+// Dentro do Contador (iframe), o viewport não vale: a página fica com 1280 px
+// e é reduzida para caber na largura do quadro.
+(function(){
+  var LARG=1280;
+  var toque=window.matchMedia&&matchMedia('(pointer: coarse)').matches;
+  var celular=toque&&Math.min(screen.width,screen.height)<1024;
+  if(!celular)return;
+  var html=document.documentElement;
+  html.classList.add('forcar-desktop');
+  if(window.top===window.self){
+    document.querySelector('meta[name=viewport]').setAttribute('content','width='+LARG);
+    return;
+  }
+  function ajustar(){html.style.zoom=Math.min(1,(window.innerWidth||LARG)/LARG);}
+  ajustar();
+  window.addEventListener('resize',ajustar);
+})();
+</script>
 <title>Projeções de aulas 2026</title> <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -922,19 +944,22 @@
   .embedded .hero{padding:22px;margin-bottom:16px}
   .embedded .shell{grid-template-columns:1fr}
   .embedded .sidebar{position:static}
+  /* Formato de computador forçado no celular: largura fixa e sem as regras estreitas abaixo. */
+  html.forcar-desktop{width:1280px}
+  html.forcar-desktop body{min-width:1280px}
   @media (max-width:1180px){
-    .shell{grid-template-columns:1fr}
-    .sidebar{position:static}
-    .hero-inner,.panel-hero{grid-template-columns:1fr}
+    html:not(.forcar-desktop) .shell{grid-template-columns:1fr}
+    html:not(.forcar-desktop) .sidebar{position:static}
+    html:not(.forcar-desktop) .hero-inner,html:not(.forcar-desktop) .panel-hero{grid-template-columns:1fr}
   }
   @media (max-width:760px){
-    .wrap{padding:16px 12px 46px}
-    .hero,.discipline-panel{padding:18px}
-    .hero-side,.hero-kpis{grid-template-columns:1fr}
-    .tabs{padding:12px}
-    .content{padding:0 12px 12px}
-    .cards{grid-template-columns:1fr}
-    .c-event{width:auto}
+    html:not(.forcar-desktop) .wrap{padding:16px 12px 46px}
+    html:not(.forcar-desktop) .hero,html:not(.forcar-desktop) .discipline-panel{padding:18px}
+    html:not(.forcar-desktop) .hero-side,html:not(.forcar-desktop) .hero-kpis{grid-template-columns:1fr}
+    html:not(.forcar-desktop) .tabs{padding:12px}
+    html:not(.forcar-desktop) .content{padding:0 12px 12px}
+    html:not(.forcar-desktop) .cards{grid-template-columns:1fr}
+    html:not(.forcar-desktop) .c-event{width:auto}
   }
   @media print{
     body{background:#fff}
@@ -945,7 +970,7 @@
     *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   }
 </style>
-<link rel="stylesheet" href="assets/css/mobile-dimension-fixes.css?v=20260717b">
+<link rel="stylesheet" href="assets/css/mobile-dimension-fixes.css?v=20260717b"><script>if(document.documentElement.classList.contains("forcar-desktop"))document.currentScript.previousElementSibling.disabled=true;</script>
 </head>
 <body>
 <div class="wrap">
