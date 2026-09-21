@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D0E0D">
+<title>RELATORIO SKIN — Gestão docente organizada em uma única plataforma</title>
+<meta name="description" content="RELATORIO SKIN reúne turmas, alunos, diários de aula, frequência, atividades, ocorrências, plano de aulas, calendário e relatórios em uma só plataforma, criada por um professor para professores.">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta property="og:title" content="RELATORIO SKIN — gestão docente inteligente">
+<meta property="og:description" content="Turmas, diários, frequência, atividades, plano de aulas, calendário e relatórios do professor em um único lugar.">
+<meta property="og:image" content="https://relatorio.skin/icon-512.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://relatorio.skin/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════ RELATORIO SKIN — identidade ═══════════════ */
+:root{
+  --bg:#0D0E0D; --bg2:#131512; --card:#181B17; --elev:#20231E; --line:#30352D; --line2:#3C4237;
+  --tx:#F3F1E9; --tx2:#B6B7AE; --tx3:#7E8279;
+  --brand:#A7B58A; --brand2:#C2CE9E; --hover:#D2DBB3; --sand:#D6CBB8; --gold:#B89B69;
+  --ok:#6F9B71; --warn:#C29A5B; --err:#B9635D;
+  --r-btn:9px; --r-card:14px; --r-panel:18px; --r-campo:9px;
+  --sombra:0 24px 60px rgba(0,0,0,.45);
+  --largura:1180px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+body{background:var(--bg);color:var(--tx);font-family:Inter,system-ui,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,h4,.marca-txt{font-family:Manrope,Inter,sans-serif;letter-spacing:-.02em;line-height:1.12}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%;height:auto}
+::selection{background:rgba(167,181,138,.3)}
+.env{width:100%;max-width:var(--largura);margin:0 auto;padding:0 28px}
+.olho{font-size:.72rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--brand)}
+.sub{color:var(--tx2);font-size:1.05rem;max-width:62ch}
+section{position:relative}
+.linha-topo{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,var(--brand),var(--brand2));z-index:1200;transition:width .12s linear}
+
+/* ── Cabeçalho ── */
+header.topo{position:fixed;top:0;left:0;right:0;z-index:1100;height:84px;display:flex;align-items:center;
+  background:rgba(13,14,13,.6);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid transparent;transition:height .25s ease,background .25s ease,border-color .25s ease}
+header.topo.rolou{height:66px;background:rgba(13,14,13,.94);border-bottom-color:var(--line)}
+.topo-i{display:flex;align-items:center;gap:26px;width:100%;max-width:var(--largura);margin:0 auto;padding:0 28px}
+.marca{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.marca img{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);object-fit:cover;background:#0a0b0a}
+.marca-txt{display:flex;flex-direction:column;line-height:1}
+.marca-txt small{font-size:.58rem;letter-spacing:.34em;color:var(--tx3);font-weight:600}
+.marca-txt b{font-size:1.06rem;letter-spacing:.06em;font-weight:800;color:var(--tx)}
+nav.menu{display:flex;gap:4px;margin-left:auto}
+nav.menu a{padding:9px 13px;border-radius:var(--r-btn);font-size:.88rem;font-weight:500;color:var(--tx2);transition:color .18s,background .18s}
+nav.menu a:hover{color:var(--tx);background:rgba(255,255,255,.045)}
+.topo-acoes{display:flex;align-items:center;gap:10px;margin-left:auto}
+nav.menu+.topo-acoes{margin-left:0}
+.bt{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line2);background:transparent;color:var(--tx);
+  border-radius:var(--r-btn);padding:11px 18px;font:600 .88rem Inter,sans-serif;cursor:pointer;transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease}
+.bt:hover{transform:translateY(-1px);border-color:#5A6450;background:rgba(255,255,255,.04)}
+.bt.pri{background:var(--brand);border-color:var(--brand);color:#141710;font-weight:700}
+.bt.pri:hover{background:var(--hover);border-color:var(--hover);box-shadow:0 8px 26px rgba(167,181,138,.22)}
+.bt.g{padding:15px 26px;font-size:.98rem}
+.bt.txt{border-color:transparent;padding-left:6px;padding-right:6px;color:var(--brand2)}
+.bt.txt:hover{background:transparent;color:var(--hover)}
+.menu-bt{display:none;width:42px;height:42px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:var(--r-btn);background:transparent;cursor:pointer}
+.menu-bt span{display:block;width:17px;height:1.6px;background:var(--tx);position:relative;transition:transform .2s}
+.menu-bt span::before,.menu-bt span::after{content:'';position:absolute;left:0;width:17px;height:1.6px;background:var(--tx);transition:transform .2s,top .2s}
+.menu-bt span::before{top:-5.5px}.menu-bt span::after{top:5.5px}
+.menu-mob{position:fixed;inset:0;z-index:1150;background:var(--bg);display:none;flex-direction:column;padding:96px 28px 40px;gap:6px;
+  opacity:0;transform:translateX(12px);transition:opacity .28s ease,transform .28s ease}
+.menu-mob.on{display:flex;opacity:1;transform:none}
+.menu-mob a{font-family:Manrope,sans-serif;font-size:1.6rem;font-weight:600;padding:12px 0;border-bottom:1px solid var(--line);color:var(--tx2)}
+.menu-mob a:last-of-type{border-bottom:0}
+.menu-mob .bt{margin-top:16px;justify-content:center}
+
+/* ── Hero ── */
+.hero{min-height:92vh;display:flex;align-items:center;padding:150px 0 90px;overflow:hidden}
+.hero::before,.hero::after{content:'';position:absolute;border-radius:50%;pointer-events:none;filter:blur(90px)}
+.hero::before{width:780px;height:780px;top:-320px;left:-180px;background:rgba(167,181,138,.09)}
+.hero::after{width:640px;height:640px;right:-200px;top:40px;background:rgba(214,203,184,.045)}
+.malha{position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 60% at 50% 20%,#000 30%,transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 20%,#000 30%,transparent 78%)}
+.hero-i{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);gap:56px;align-items:center;width:100%;max-width:var(--largura);margin:0 auto;padding:0 28px}
+.hero h1{font-size:clamp(2.2rem,4.9vw,4.1rem);font-weight:800;margin:18px 0 20px}
+.hero h1 em{font-style:normal;color:var(--brand2)}
+.hero .sub{font-size:1.1rem;max-width:52ch}
+.hero-bts{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.hero-nota{margin-top:22px;font-size:.82rem;color:var(--tx3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hero-nota b{color:var(--brand);font-weight:600}
+.an{opacity:0;transform:translateY(18px)}
+.pronto .an{opacity:1;transform:none;transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+.pronto .a1{transition-delay:.02s}.pronto .a2{transition-delay:.12s}.pronto .a3{transition-delay:.22s}
+.pronto .a4{transition-delay:.32s}.pronto .a5{transition-delay:.42s}.pronto .a6{transition-delay:.5s}
+
+/* ── Painel (mock da plataforma) ── */
+.palco{perspective:1400px}
+.painel{background:linear-gradient(160deg,#1A1D18,#141613);border:1px solid var(--line);border-radius:var(--r-panel);box-shadow:var(--sombra);overflow:hidden;
+  transform:rotateX(3deg) rotateY(-6deg);transition:transform .5s cubic-bezier(.22,1,.36,1);will-change:transform}
+.painel-barra{display:flex;align-items:center;gap:8px;padding:11px 14px;background:rgba(255,255,255,.028);border-bottom:1px solid var(--line)}
+.painel-barra i{width:9px;height:9px;border-radius:50%;background:#33382E;display:block}
+.painel-barra span{margin-left:8px;font-size:.7rem;color:var(--tx3);letter-spacing:.08em}
+.painel-corpo{display:grid;grid-template-columns:132px minmax(0,1fr);min-height:330px}
+.painel-lado{border-right:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:3px;background:rgba(0,0,0,.14)}
+.painel-lado b{font-size:.6rem;letter-spacing:.18em;color:var(--tx3);padding:0 8px 8px}
+.painel-lado a{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:7px;font-size:.76rem;color:var(--tx2);white-space:nowrap}
+.painel-lado a.on{background:rgba(167,181,138,.13);color:var(--brand2);font-weight:600}
+.painel-lado a i{width:5px;height:5px;border-radius:2px;background:currentColor;opacity:.65}
+.painel-main{padding:16px 18px;display:flex;flex-direction:column;gap:13px}
+.painel-tit{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.painel-tit h4{font-size:.95rem}
+.painel-tit small{font-size:.72rem;color:var(--tx3)}
+.selo{font-size:.66rem;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(167,181,138,.14);color:var(--brand2);border:1px solid rgba(167,181,138,.24)}
+.nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.num{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 11px}
+.num b{display:block;font-family:Manrope,sans-serif;font-size:1.3rem;font-weight:700;color:var(--tx)}
+.num span{display:block;font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.faixa{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 13px;display:flex;flex-direction:column;gap:9px}
+.faixa-l{display:flex;align-items:center;gap:9px;font-size:.78rem;color:var(--tx2)}
+.faixa-l b{color:var(--tx);font-weight:600;font-size:.8rem}
+.faixa-l .dia{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:7px;padding:4px 8px;font-size:.68rem;font-family:Manrope,sans-serif;color:var(--tx2);text-align:center;min-width:44px}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{font-size:.66rem;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--tx2);background:rgba(255,255,255,.03)}
+.chip.v{color:var(--brand2);border-color:rgba(167,181,138,.3);background:rgba(167,181,138,.1)}
+.chip.a{color:var(--warn);border-color:rgba(194,154,91,.3);background:rgba(194,154,91,.1)}
+.barras{display:flex;align-items:flex-end;gap:6px;height:66px}
+.barras i{flex:1;background:linear-gradient(180deg,rgba(167,181,138,.75),rgba(167,181,138,.22));border-radius:4px 4px 2px 2px;display:block;transition:height .8s cubic-bezier(.22,1,.36,1)}
+.alunos-mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:5px}
+.alunos-mini span{font-size:.64rem;padding:5px 7px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alunos-mini span.f{color:var(--err);border-color:rgba(185,99,93,.32);background:rgba(185,99,93,.1)}
+.alunos-mini span.j{color:var(--warn);border-color:rgba(194,154,91,.3);background:rgba(194,154,91,.1)}
+.linhas{display:flex;flex-direction:column;gap:6px}
+.linha{display:flex;align-items:center;gap:9px;font-size:.74rem;color:var(--tx2);padding:7px 9px;border-radius:8px;background:rgba(255,255,255,.028);border:1px solid var(--line)}
+.linha b{width:20px;height:20px;border-radius:50%;background:rgba(167,181,138,.16);color:var(--brand2);display:flex;align-items:center;justify-content:center;font-size:.62rem;flex-shrink:0}
+.linha.ok{opacity:.5;text-decoration:line-through}
+.prog{height:6px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));transition:width 1s cubic-bezier(.22,1,.36,1)}
+
+/* ── Faixa de confiança ── */
+.confia{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2);padding:30px 0}
+.confia p{text-align:center;color:var(--tx2);font-size:.95rem;margin-bottom:18px}
+.esteira{overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.esteira-i{display:flex;gap:12px;width:max-content;animation:desliza 46s linear infinite}
+.esteira:hover .esteira-i{animation-play-state:paused}
+.esteira span{border:1px solid var(--line);border-radius:999px;padding:9px 18px;font-size:.84rem;color:var(--tx2);white-space:nowrap;background:var(--card)}
+@keyframes desliza{to{transform:translateX(-50%)}}
+
+/* ── Blocos ── */
+.bloco{padding:110px 0}
+.bloco.escuro{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.bloco h2{font-size:clamp(1.85rem,3.4vw,3rem);font-weight:700;margin:14px 0 16px;max-width:20ch}
+.bloco h2.largo{max-width:26ch}
+.rev{opacity:0;transform:translateY(24px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1)}
+.rev.ver{opacity:1;transform:none}
+.dores{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin:38px 0 46px}
+.dor{border:1px solid var(--line);border-left:2px solid var(--err);border-radius:var(--r-card);padding:16px 18px;background:var(--card);color:var(--tx2);font-size:.92rem}
+.solucao{display:flex;align-items:flex-start;gap:16px;border:1px solid rgba(167,181,138,.28);background:linear-gradient(120deg,rgba(167,181,138,.09),rgba(167,181,138,.02));border-radius:var(--r-panel);padding:26px 28px}
+.solucao h3{font-size:1.35rem;margin-bottom:8px}
+.solucao p{color:var(--tx2);max-width:64ch}
+
+/* ── Vitrine grudada ── */
+.vitrine{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);gap:54px;align-items:start;margin-top:44px}
+.vitrine-txt{position:sticky;top:120px}
+.passo{padding:18px 0 18px 20px;border-left:2px solid var(--line);opacity:.45;transition:opacity .35s ease,border-color .35s ease}
+.passo.on{opacity:1;border-left-color:var(--brand)}
+.passo h3{font-size:1.28rem;margin-bottom:6px}
+.passo p{color:var(--tx2);font-size:.95rem;max-width:44ch}
+.vitrine-tela{position:sticky;top:120px;min-height:400px}
+.vitrine-tela .painel{position:absolute;inset:0;transform:none;opacity:0;scale:.98;transition:opacity .42s ease,scale .42s ease;pointer-events:none}
+.vitrine-tela .painel.on{opacity:1;scale:1;pointer-events:auto;position:relative}
+
+/* ── Módulos ── */
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:14px;margin-top:44px}
+.mod{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:24px 22px;overflow:hidden;
+  transition:transform .22s ease,border-color .22s ease,background .22s ease}
+.mod::after{content:'';position:absolute;inset:0;opacity:0;transition:opacity .25s ease;pointer-events:none;
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(167,181,138,.09),transparent 65%)}
+.mod:hover{transform:translateY(-4px);border-color:#667156}
+.mods .mod:last-child{grid-column:1/-1;background:linear-gradient(120deg,rgba(167,181,138,.07),var(--card))}
+.mod:hover::after{opacity:1}
+.mod-ic{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+  color:var(--brand);transition:transform .25s ease,color .25s ease,border-color .25s ease}
+.mod:hover .mod-ic{transform:translateY(-2px);color:var(--brand2);border-color:rgba(167,181,138,.4)}
+.mod-ic svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.mod b{display:block;font-family:Manrope,sans-serif;font-size:1.06rem;font-weight:700;margin-bottom:6px}
+.mod small{display:block;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tx3);margin-bottom:10px}
+.mod p{color:var(--tx2);font-size:.9rem}
+
+/* ── Demonstração com seletores ── */
+.demo{display:grid;grid-template-columns:230px minmax(0,1fr);gap:34px;margin-top:44px;align-items:start}
+.demo-menu{position:relative;display:flex;flex-direction:column;gap:2px;padding-left:2px;border-left:1px solid var(--line)}
+.demo-menu button{position:relative;text-align:left;background:transparent;border:0;color:var(--tx3);font:600 .92rem Inter,sans-serif;padding:13px 16px;cursor:pointer;border-radius:0 var(--r-btn) var(--r-btn) 0;transition:color .2s,background .2s}
+.demo-menu button.on{color:var(--tx);background:rgba(255,255,255,.04)}
+.demo-marca{position:absolute;left:-1px;width:2px;background:var(--brand);border-radius:2px;transition:top .35s cubic-bezier(.22,1,.36,1),height .35s cubic-bezier(.22,1,.36,1)}
+.demo-telas{position:relative;min-height:390px}
+.demo-telas .painel{position:absolute;inset:0;transform:none;opacity:0;scale:.985;transition:opacity .4s ease,scale .4s ease}
+.demo-telas .painel.on{opacity:1;scale:1;position:relative}
+
+/* ── Fluxo ── */
+.fluxo{position:relative;margin-top:52px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.fluxo::before{content:'';position:absolute;left:0;right:0;top:19px;height:2px;background:var(--line)}
+.fluxo-linha{position:absolute;left:0;top:19px;height:2px;width:0;background:linear-gradient(90deg,var(--brand),var(--brand2));transition:width .4s linear}
+.etapa{position:relative;text-align:center}
+.etapa i{position:relative;z-index:2;width:40px;height:40px;margin:0 auto 12px;border-radius:50%;border:1px solid var(--line);background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:.85rem;color:var(--tx3);font-style:normal;transition:all .3s ease}
+.etapa.on i{border-color:var(--brand);color:#141710;background:var(--brand);box-shadow:0 0 0 6px rgba(167,181,138,.12)}
+.etapa b{display:block;font-size:.92rem;font-family:Manrope,sans-serif;margin-bottom:3px}
+.etapa span{font-size:.78rem;color:var(--tx3)}
+
+/* ── Segurança / sobre ── */
+.grade4{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:14px;margin-top:40px}
+.item{border:1px solid var(--line);border-radius:var(--r-card);padding:22px;background:var(--card)}
+.item b{display:block;font-family:Manrope,sans-serif;font-size:1.02rem;margin-bottom:7px}
+.item p{color:var(--tx2);font-size:.89rem}
+.sobre{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:48px;align-items:center}
+.sobre p{color:var(--tx2);margin-bottom:14px}
+.sobre .cartao{border:1px solid var(--line);border-radius:var(--r-panel);padding:28px;background:linear-gradient(150deg,var(--card),#141612)}
+.sobre .cartao ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+.sobre .cartao li{display:flex;gap:11px;font-size:.92rem;color:var(--tx2)}
+.sobre .cartao li b{color:var(--tx);font-weight:600;font-family:Inter,sans-serif}
+.sobre .cartao li::before{content:'';flex-shrink:0;width:7px;height:7px;margin-top:8px;border-radius:2px;background:var(--brand)}
+
+/* ── CTA final ── */
+.cta{text-align:center;padding:120px 0;position:relative;overflow:hidden}
+.cta::before{content:'';position:absolute;width:760px;height:560px;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,rgba(167,181,138,.12),transparent 66%);filter:blur(60px);pointer-events:none}
+.cta h2{margin:16px auto 18px;max-width:22ch}
+.cta .sub{margin:0 auto}
+.cta-bts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:34px;position:relative;z-index:2}
+
+/* ── Rodapé ── */
+footer{border-top:1px solid var(--line);background:#0A0B0A;padding:64px 0 28px}
+.rodape{display:grid;grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,1fr));gap:36px}
+.rodape h5{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:14px;font-family:Inter,sans-serif;font-weight:700}
+.rodape ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.rodape a{color:var(--tx2);font-size:.9rem;transition:color .18s}
+.rodape a:hover{color:var(--brand2)}
+.rodape-marca img{width:148px;border-radius:10px;border:1px solid var(--line);margin-bottom:14px}
+.rodape-marca p{color:var(--tx3);font-size:.88rem;max-width:34ch}
+.rodape-axion{display:inline-flex;align-items:center;gap:8px;margin-top:20px;font-size:.7rem;letter-spacing:.14em;color:var(--tx3)}
+.rodape-axion img{width:210px;border-radius:0;border:0;margin:0;opacity:1;transition:transform .2s}
+.rodape-axion:hover img{transform:scale(1.03)}
+.rodape-prop{font-size:.66rem;letter-spacing:.2em;color:var(--tx2);margin-top:8px;font-weight:600}
+.rodape-fim{margin-top:48px;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  font-size:.78rem;color:var(--tx3)}
+.rodape-fim a{color:var(--tx3)}
+.rodape-fim a:hover{color:var(--tx2);text-decoration:underline}
+.aviso{margin-top:14px;font-size:.76rem;color:var(--tx3);max-width:78ch;line-height:1.6}
+
+@media(max-width:1020px){
+  nav.menu{display:none}
+  .menu-bt{display:flex}
+  .topo-acoes .bt.entrar{display:inline-flex}
+  .hero-i{grid-template-columns:1fr;gap:44px}
+  .painel{transform:none!important}
+  .vitrine,.sobre{grid-template-columns:1fr;gap:28px}
+  .vitrine-txt,.vitrine-tela{position:static}
+  .vitrine-tela .painel{position:relative;opacity:1;scale:1;margin-bottom:14px}
+  .demo{grid-template-columns:1fr;gap:20px}
+  .demo-menu{flex-direction:row;overflow-x:auto;border-left:0;border-bottom:1px solid var(--line);padding-bottom:2px}
+  .demo-marca{display:none}
+  .demo-menu button.on{border-bottom:2px solid var(--brand)}
+  .fluxo{grid-template-columns:1fr;gap:20px;padding-left:20px}
+  .fluxo::before,.fluxo-linha{left:19px;right:auto;top:0;bottom:0;width:2px;height:auto}
+  .fluxo-linha{height:0;width:2px;transition:height .4s linear}
+  .etapa{display:flex;align-items:center;gap:14px;text-align:left}
+  .etapa i{margin:0}
+  .rodape{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+}
+@media(max-width:640px){
+  .env,.topo-i,.hero-i{padding:0 18px}
+  .bloco{padding:76px 0}
+  .hero{padding:124px 0 70px;min-height:auto}
+  .nums{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .painel-corpo{grid-template-columns:1fr}
+  .painel-lado{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .painel-lado b{display:none}
+  .rodape{grid-template-columns:1fr}
+  .topo-acoes .bt.cadastrar{display:none}
+  .menu-mob .bt{display:flex}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .an,.rev{opacity:1!important;transform:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<div class="linha-topo" id="linha-topo"></div>
+
+<header class="topo" id="topo">
+  <div class="topo-i">
+    <a class="marca" href="#inicio" aria-label="RELATORIO SKIN — início">
+      <img src="assets/marca/skin-simbolo.webp" alt="" width="38" height="38">
+      <span class="marca-txt"><small>RELATORIO</small><b>SKIN</b></span>
+    </a>
+    <nav class="menu" aria-label="Seções">
+      <a href="#produto">Produto</a>
+      <a href="#modulos">Recursos</a>
+      <a href="#demo">Soluções</a>
+      <a href="#seguranca">Segurança</a>
+      <a href="#sobre">Sobre</a>
+    </nav>
+    <div class="topo-acoes">
+      <a class="bt entrar" href="entrar.html">Entrar</a>
+      <a class="bt pri cadastrar" href="entrar.html?modo=criar">Cadastrar</a>
+      <button class="menu-bt" id="menu-bt" aria-label="Abrir menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="menu-mob" id="menu-mob">
+  <a href="#produto">Produto</a>
+  <a href="#modulos">Recursos</a>
+  <a href="#demo">Soluções</a>
+  <a href="#seguranca">Segurança</a>
+  <a href="#sobre">Sobre</a>
+  <a class="bt" href="entrar.html">Entrar</a>
+  <a class="bt pri" href="entrar.html?modo=criar">Criar minha conta</a>
+</div>
+
+<!-- ══ 1. HERO ══ -->
+<section class="hero" id="inicio">
+  <div class="malha"></div>
+  <div class="hero-i">
+    <div>
+      <div class="olho an a1">Plataforma de gestão docente</div>
+      <h1 class="an a2">Sua rotina docente.<br><em>Organizada em um só lugar.</em></h1>
+      <p class="sub an a3">Centralize turmas, alunos, diários de aula, frequência, atividades, ocorrências, plano de aulas, calendário e relatórios em uma única plataforma — criada por um professor, no chão da sala de aula.</p>
+      <div class="hero-bts an a4">
+        <a class="bt pri g" href="entrar.html?modo=criar" data-ima>Criar minha conta</a>
+        <a class="bt g" href="#produto">Ver como funciona →</a>
+      </div>
+      <div class="hero-nota an a5"><b>Grátis para começar.</b> <span>Sua conta nasce vazia, com todas as ferramentas — e só você vê os seus dados.</span></div>
+    </div>
+    <div class="palco an a6">
+      <div class="painel" id="painel-hero">
+        <div class="painel-barra"><i></i><i></i><i></i><span>relatorio.skin · meu diário</span></div>
+        <div class="painel-corpo">
+          <div class="painel-lado">
+            <b>MENU</b>
+            <a class="on"><i></i>Início</a>
+            <a><i></i>8º ano</a>
+            <a><i></i>7º ano</a>
+            <a><i></i>Plano de Aulas</a>
+            <a><i></i>Calendário</a>
+            <a><i></i>Contador</a>
+            <a><i></i>I.A</a>
+          </div>
+          <div class="painel-main">
+            <div class="painel-tit"><div><h4>8º ano · Ciências</h4><small>E.E. Padre Carlos Casavequia · 28 alunos</small></div><span class="selo">Sincronizado</span></div>
+            <div class="nums">
+              <div class="num"><b data-conta="32">0</b><span>Diários</span></div>
+              <div class="num"><b data-conta="64">0</b><span>H/aula</span></div>
+              <div class="num"><b data-conta="28">0</b><span>Alunos</span></div>
+              <div class="num"><b data-conta="94" data-sufixo="%">0</b><span>Frequência</span></div>
+            </div>
+            <div class="faixa">
+              <div class="faixa-l"><span class="dia">19<br>SET</span><b>Procriação animal</b><span>2 h/aula</span></div>
+              <div class="chips"><span class="chip v">07:00–09:00</span><span class="chip">25 presentes</span><span class="chip a">3 faltas</span><span class="chip">Atividade entregue</span></div>
+            </div>
+            <div class="faixa"><div class="faixa-l"><b>H/aula por bimestre</b><span>3º bimestre · 8/10</span></div><div class="prog"><i style="width:80%"></i></div><div class="barras" aria-hidden="true"><i style="height:46%"></i><i style="height:66%"></i><i style="height:38%"></i><i style="height:82%"></i><i style="height:57%"></i><i style="height:71%"></i><i style="height:94%"></i><i style="height:62%"></i></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 2. FAIXA DE CONFIANÇA ══ -->
+<section class="confia">
+  <div class="env">
+    <p>Criado para professores que precisam organizar muito mais do que aulas.</p>
+    <div class="esteira"><div class="esteira-i" id="esteira">
+      <span>Turmas</span><span>Alunos</span><span>Diários de aula</span><span>Frequência</span><span>Atividades</span><span>Ocorrências</span><span>Plano de aulas</span><span>Sequências didáticas</span><span>Livros e materiais</span><span>Calendário escolar</span><span>Contador de h/aula</span><span>Relatórios do aluno</span><span>Assistente de I.A</span>
+    </div></div>
+  </div>
+</section>
+
+<!-- ══ 3. PROBLEMA E PROPOSTA ══ -->
+<section class="bloco" id="produto">
+  <div class="env">
+    <div class="olho rev">O problema</div>
+    <h2 class="rev largo">Ser professor envolve muito mais do que ensinar.</h2>
+    <p class="sub rev">Entre uma aula e outra, o trabalho continua: registrar, comprovar, lembrar, preencher. E quase sempre em lugares diferentes.</p>
+    <div class="dores">
+      <div class="dor rev">Atividades e anotações espalhadas em cadernos, fotos e grupos de mensagem.</div>
+      <div class="dor rev">Faltas e presenças registradas duas vezes: no papel e no sistema da escola.</div>
+      <div class="dor rev">Relatórios refeitos do zero toda vez que a coordenação pede.</div>
+      <div class="dor rev">Plano de aulas em um arquivo que ninguém abre depois de março.</div>
+      <div class="dor rev">Ocorrências de comportamento lembradas de memória no conselho de classe.</div>
+    </div>
+    <div class="solucao rev">
+      <div>
+        <h3>O RELATORIO SKIN centraliza esse processo.</h3>
+        <p>Você registra a aula uma vez — conteúdo, presença, atividade e ocorrências — e a plataforma cuida do resto: o contador de h/aula anda sozinho, o plano de aulas se marca, o calendário se preenche e o relatório de cada aluno fica pronto para imprimir a qualquer momento.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 4. VITRINE ══ -->
+<section class="bloco escuro" id="visao">
+  <div class="env">
+    <div class="olho rev">Visão geral</div>
+    <h2 class="rev">Um registro só, e tudo se atualiza.</h2>
+    <div class="vitrine">
+      <div class="vitrine-txt" id="vitrine-txt">
+        <div class="passo on" data-passo="0"><h3>Diário do dia</h3><p>Data, disciplina, horário, conteúdo e observações. Escreva do seu jeito, ou dite o rascunho e deixe a I.A organizar.</p></div>
+        <div class="passo" data-passo="1"><h3>Presença e atividades</h3><p>Toque no nome do aluno para trocar entre presente, falta e falta justificada. O mesmo vale para quem entregou a atividade.</p></div>
+        <div class="passo" data-passo="2"><h3>Plano de aulas</h3><p>Suas aulas por bimestre, com status de planejada, aplicada ou pulada. A aula é riscada sozinha quando entra no diário.</p></div>
+        <div class="passo" data-passo="3"><h3>Contador de h/aula</h3><p>O bimestre fecha pela soma das aulas dadas, não pelo calendário. Você vê quanto falta para cumprir a carga do ano.</p></div>
+        <div class="passo" data-passo="4"><h3>Relatório do aluno</h3><p>Frequência, atividades e ocorrências de cada estudante, prontos para imprimir ou salvar em PDF.</p></div>
+      </div>
+      <div class="vitrine-tela" id="vitrine-tela">
+        <div class="painel on">
+          <div class="painel-barra"><i></i><i></i><i></i><span>novo diário</span></div>
+          <div class="painel-main">
+            <div class="painel-tit"><div><h4>Registrar aula</h4><small>8º ano · Ciências · 19/09</small></div><span class="selo">Rascunho</span></div>
+            <div class="faixa"><div class="faixa-l"><b>Conteúdo</b></div><p style="font-size:.82rem;color:var(--tx2)">Procriação animal: reprodução sexuada e assexuada, com exemplos do cotidiano e atividade no caderno.</p></div>
+            <div class="faixa"><div class="faixa-l"><b>Observações</b></div><div class="chips"><span class="chip a">2 advertências</span><span class="chip v">1 destaque</span></div></div>
+            <div class="chips"><span class="chip">07:00–09:00</span><span class="chip">2 h/aula</span><span class="chip v">Salvo na nuvem</span></div>
+          </div>
+        </div>
+        <div class="painel">
+          <div class="painel-barra"><i></i><i></i><i></i><span>presença</span></div>
+          <div class="painel-main">
+            <div class="painel-tit"><div><h4>Chamada</h4><small>Toque no aluno para mudar o estado</small></div><span class="selo">25 presentes</span></div>
+            <div class="alunos-mini">
+              <span>1. Ana C.</span><span class="f">2. Bruno L.</span><span>3. Carlos E.</span><span class="j">4. Daniela M.</span><span>5. Eduardo S.</span><span>6. Fabiana R.</span><span>7. Gabriel T.</span><span>8. Helena V.</span><span class="f">9. Igor P.</span><span>10. Júlia A.</span><span>11. Kaio M.</span><span>12. Lara F.</span>
+            </div>
+            <div class="chips"><span class="chip v">✓ 25 presentes</span><span class="chip a">2 faltas</span><span class="chip">1 justificada</span></div>
+          </div>
+        </div>
+        <div class="painel">
+          <div class="painel-barra"><i></i><i></i><i></i><span>plano de aulas</span></div>
+          <div class="painel-main">
+            <div class="painel-tit"><div><h4>3º bimestre · Ciências</h4><small>12 aulas planejadas · 8 dadas</small></div><span class="selo">67%</span></div>
+            <div class="linhas">
+              <div class="linha ok"><b>1</b>Reprodução dos seres vivos</div>
+              <div class="linha ok"><b>2</b>Procriação animal</div>
+              <div class="linha"><b>3</b>Sistema reprodutor humano</div>
+              <div class="linha"><b>4</b>Avaliação bimestral</div>
+            </div>
+            <div class="prog"><i style="width:67%"></i></div>
+          </div>
+        </div>
+        <div class="painel">
+          <div class="painel-barra"><i></i><i></i><i></i><span>contador</span></div>
+          <div class="painel-main">
+            <div class="painel-tit"><div><h4>Contador de h/aula</h4><small>O bimestre fecha pela soma das aulas</small></div><span class="selo">3º bimestre</span></div>
+            <div class="faixa"><div class="faixa-l"><b>Ciências · 8º ano</b><span>24 de 40 h/aula no ano</span></div><div class="prog"><i style="width:60%"></i></div><div class="chips"><span class="chip v">1º ✓</span><span class="chip v">2º ✓</span><span class="chip a">3º em curso</span><span class="chip">4º</span></div></div>
+            <div class="faixa"><div class="faixa-l"><b>Ciências · 7º ano</b><span>18 de 40 h/aula no ano</span></div><div class="prog"><i style="width:45%"></i></div></div>
+          </div>
+        </div>
+        <div class="painel">
+          <div class="painel-barra"><i></i><i></i><i></i><span>relatório do aluno</span></div>
+          <div class="painel-main">
+            <div class="painel-tit"><div><h4>Ana Clara Souza</h4><small>8º ano · Nº 1 · emitido hoje</small></div><span class="selo">Pronto para PDF</span></div>
+            <div class="nums">
+              <div class="num"><b>32</b><span>H/aula</span></div>
+              <div class="num"><b>2</b><span>Faltas</span></div>
+              <div class="num"><b>94%</b><span>Frequência</span></div>
+              <div class="num"><b>9/10</b><span>Atividades</span></div>
+            </div>
+            <div class="linhas"><div class="linha"><b>✓</b>Sem ocorrências no bimestre</div><div class="linha"><b>★</b>Destaque na apresentação do trabalho</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 5. MÓDULOS ══ -->
+<section class="bloco" id="modulos">
+  <div class="env">
+    <div class="olho rev">Módulos</div>
+    <h2 class="rev">Tudo o que o seu dia pede, no mesmo ambiente.</h2>
+    <p class="sub rev">Cada módulo funciona sozinho e conversa com os outros. Você usa o que precisa, na ordem que quiser.</p>
+    <div class="mods">
+      <article class="mod rev"><div class="mod-ic"><svg viewBox="0 0 24 24"><path d="M3 7h18M3 12h18M3 17h18"/></svg></div><small>SKIN Class</small><b>Turmas e alunos</b><p>Escolas, turmas, disciplinas e chamada. Cada aluno tem número, histórico e situação.</p></article>
+      <article class="mod rev"><div class="mod-ic"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h5"/></svg></div><small>SKIN Docs</small><b>Diário de aula</b><p>Conteúdo, horário, h/aula, observações de comportamento e lembretes — no formato de um diário de verdade.</p></article>
+      <article class="mod rev"><div class="mod-ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h9"/><circle cx="19" cy="18" r="2"/></svg></div><small>SKIN Class</small><b>Frequência</b><p>Presença, falta e falta justificada com um toque. O cálculo do percentual sai pronto.</p></article>
+      <article class="mod rev"><div class="mod-ic"><svg viewBox="0 0 24 24"><path d="M9 11l2 2 4-4"/><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div><small>SKIN Class</small><b>Atividades</b><p>Quem entregou, quem não entregou, quem está pendente — por aula e por aluno.</p></article>
+      <article class="mod rev"><div class="mod-ic"><svg viewBox="0 0 24 24"><path d="M12 4l8 4-8 4-8-4 8-4z"/><path d="M4 12l8 4 8-4"/></svg></div><small>SKIN Planner</small><b>Plano de aulas</b><p>Planejamento anual por bimestre, com status de cada aula e marcação automática do que já foi dado.</p></article>
+      <article class="mod rev"><div class="mod-ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div><small>SKIN Planner</small><b>Calendário escolar</b><p>Feriados, recessos, avaliações, reuniões e eventos. Os dias com aula registrada aparecem marcados.</p></article>
+      <article class="mod rev"><div class="mod-ic"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"/><path d="M8 16V9M12 16v-4M16 16v-7"/></svg></div><small>SKIN Analytics</small><b>Contador de h/aula</b><p>Carga horária por disciplina e bimestre, medida pela soma das aulas dadas — não pelo calendário.</p></article>
+      <article class="mod rev"><div class="mod-ic"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h6M9 16h4M9 8h3"/></svg></div><small>SKIN Reports</small><b>Relatórios do aluno</b><p>Frequência, atividades e ocorrências de cada estudante, prontos para imprimir ou salvar em PDF.</p></article>
+      <article class="mod rev"><div class="mod-ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9z"/></svg></div><small>SKIN Docs</small><b>Sequências e livros</b><p>Sequências didáticas e materiais digitais por bimestre, com status, links e histórico do que já foi produzido.</p></article>
+      <article class="mod rev"><div class="mod-ic"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M3 12h3M18 12h3M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3.4"/></svg></div><small>SKIN AI</small><b>Assistente de I.A</b><p>Converse, envie fotos da chamada, PDFs e documentos. A I.A propõe o registro e você confirma. Grátis para começar (20 mensagens e 4 diários por dia) ou sem limite com a sua própria chave de API.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 6. DEMONSTRAÇÃO ══ -->
+<section class="bloco escuro" id="demo">
+  <div class="env">
+    <div class="olho rev">Demonstração</div>
+    <h2 class="rev">Veja sua rotina de outra forma.</h2>
+    <div class="demo">
+      <div class="demo-menu" id="demo-menu">
+        <div class="demo-marca" id="demo-marca"></div>
+        <button class="on" data-demo="0">Visão geral</button>
+        <button data-demo="1">Alunos</button>
+        <button data-demo="2">Relatórios</button>
+        <button data-demo="3">Planejamento</button>
+        <button data-demo="4">Assistente de I.A</button>
+      </div>
+      <div class="demo-telas" id="demo-telas">
+        <div class="painel on">
+          <div class="painel-barra"><i></i><i></i><i></i><span>visão geral</span></div>
+          <div class="painel-main">
+            <div class="painel-tit"><div><h4>Olá, professora</h4><small>Resumo das suas turmas</small></div><span class="selo">Hoje</span></div>
+            <div class="nums">
+              <div class="num"><b data-conta="4">0</b><span>Turmas</span></div>
+              <div class="num"><b data-conta="147">0</b><span>Alunos</span></div>
+              <div class="num"><b data-conta="86">0</b><span>Diários</span></div>
+              <div class="num"><b data-conta="12">0</b><span>Eventos</span></div>
+            </div>
+            <div class="faixa"><div class="faixa-l"><b>Últimos registros</b></div><div class="linhas">
+              <div class="linha"><b>19</b>8º ano · Ciências · Procriação animal</div>
+              <div class="linha"><b>18</b>7º ano · Ciências · Cadeia alimentar</div>
+              <div class="linha"><b>17</b>8º ano · Ciências · Revisão para a prova</div>
+            </div></div>
+          </div>
+        </div>
+        <div class="painel">
+          <div class="painel-barra"><i></i><i></i><i></i><span>alunos</span></div>
+          <div class="painel-main">
+            <div class="painel-tit"><div><h4>8º ano</h4><small>28 alunos · frequência média de 94%</small></div><span class="selo">Chamada</span></div>
+            <div class="alunos-mini">
+              <span>1. Ana C.</span><span>2. Bruno L.</span><span class="f">3. Carlos E.</span><span>4. Daniela M.</span><span>5. Eduardo S.</span><span>6. Fabiana R.</span><span class="j">7. Gabriel T.</span><span>8. Helena V.</span><span>9. Igor P.</span><span>10. Júlia A.</span><span>11. Kaio M.</span><span>12. Lara F.</span>
+            </div>
+            <div class="faixa"><div class="faixa-l"><b>Ana Clara Souza</b><span>Nº 1 · 94% de frequência</span></div><div class="chips"><span class="chip v">9 de 10 atividades</span><span class="chip">2 faltas</span><span class="chip v">1 destaque</span></div></div>
+          </div>
+        </div>
+        <div class="painel">
+          <div class="painel-barra"><i></i><i></i><i></i><span>relatórios</span></div>
+          <div class="painel-main">
+            <div class="painel-tit"><div><h4>Relatórios</h4><small>Do diário para o papel, sem digitar de novo</small></div><span class="selo">PDF</span></div>
+            <div class="linhas">
+              <div class="linha"><b>1</b>Relatório individual do aluno · frequência, atividades e ocorrências</div>
+              <div class="linha"><b>2</b>Resumo da turma por bimestre</div>
+              <div class="linha"><b>3</b>Cópia completa dos seus dados em arquivo</div>
+            </div>
+            <div class="nums"><div class="num"><b data-conta="28">0</b><span>Relatórios</span></div><div class="num"><b data-conta="4">0</b><span>Turmas</span></div><div class="num"><b data-conta="100" data-sufixo="%">0</b><span>Prontos</span></div><div class="num"><b>A4</b><span>Impressão</span></div></div>
+          </div>
+        </div>
+        <div class="painel">
+          <div class="painel-barra"><i></i><i></i><i></i><span>planejamento</span></div>
+          <div class="painel-main">
+            <div class="painel-tit"><div><h4>Planejamento anual</h4><small>Plano, sequências, livros e calendário</small></div><span class="selo">4 bimestres</span></div>
+            <div class="linhas">
+              <div class="linha ok"><b>1</b>Reprodução dos seres vivos · dada em 12/09</div>
+              <div class="linha ok"><b>2</b>Procriação animal · dada em 19/09</div>
+              <div class="linha"><b>3</b>Sistema reprodutor humano</div>
+            </div>
+            <div class="chips"><span class="chip v">Planejada</span><span class="chip v">Aplicada</span><span class="chip a">Pulada</span><span class="chip">Lançada no sistema da escola</span></div>
+          </div>
+        </div>
+        <div class="painel">
+          <div class="painel-barra"><i></i><i></i><i></i><span>assistente de i.a</span></div>
+          <div class="painel-main">
+            <div class="painel-tit"><div><h4>Assistente</h4><small>IA grátis da plataforma ou a sua chave</small></div><span class="selo">Você confirma</span></div>
+            <div class="faixa"><div class="faixa-l"><b>Você</b></div><p style="font-size:.82rem;color:var(--tx2)">“Registre a aula de hoje do 8º ano. Faltaram a Ana e o Bruno. Foto da chamada em anexo.”</p></div>
+            <div class="faixa"><div class="faixa-l"><b>Assistente</b></div><p style="font-size:.82rem;color:var(--tx2)">Li a foto e preparei o registro da aula, com 2 faltas e a atividade entregue por 24 alunos.</p>
+              <div class="linhas"><div class="linha"><b>✓</b>Registrar diário — 8º ano · Ciências · hoje</div></div>
+              <div class="chips"><span class="chip v">Aplicar</span><span class="chip">Descartar</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7. FLUXO ══ -->
+<section class="bloco" id="fluxo">
+  <div class="env">
+    <div class="olho rev">Como funciona</div>
+    <h2 class="rev">Da aula ao relatório.</h2>
+    <p class="sub rev">O mesmo registro alimenta tudo o que vem depois. Você escreve uma vez.</p>
+    <div class="fluxo" id="fluxo">
+      <div class="fluxo-linha" id="fluxo-linha"></div>
+      <div class="etapa" data-etapa><i>1</i><b>Turma</b><span>Cadastre alunos e disciplinas</span></div>
+      <div class="etapa" data-etapa><i>2</i><b>Aula</b><span>Data, horário e conteúdo</span></div>
+      <div class="etapa" data-etapa><i>3</i><b>Chamada</b><span>Presenças e faltas</span></div>
+      <div class="etapa" data-etapa><i>4</i><b>Atividade</b><span>Quem entregou</span></div>
+      <div class="etapa" data-etapa><i>5</i><b>Registro</b><span>Tudo salvo e sincronizado</span></div>
+      <div class="etapa" data-etapa><i>6</i><b>Relatório</b><span>Pronto para imprimir</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 8. SEGURANÇA E ORGANIZAÇÃO ══ -->
+<section class="bloco escuro" id="seguranca">
+  <div class="env">
+    <div class="olho rev">Organização e segurança</div>
+    <h2 class="rev largo">Seus registros precisam permanecer organizados.</h2>
+    <p class="sub rev">O trabalho de um ano inteiro não pode depender de um caderno esquecido ou de um aparelho que quebrou.</p>
+    <div class="grade4">
+      <div class="item rev"><b>Conta individual</b><p>Cada professor entra com o próprio e-mail e senha. O banco de dados só entrega a uma conta os dados dela.</p></div>
+      <div class="item rev"><b>Em todos os aparelhos</b><p>O que você escreve no computador aparece no celular em segundos. Sem internet, o registro fica salvo no aparelho e sobe quando a conexão voltar.</p></div>
+      <div class="item rev"><b>Guardado por ano letivo</b><p>Os dados ficam arquivados por ano, com histórico diário das alterações e lixeira permanente. Nada se perde na virada do ano.</p></div>
+      <div class="item rev"><b>Seus dados são seus</b><p>Você baixa uma cópia completa em arquivo quando quiser e pode pedir a exclusão da conta. Tratamento conforme a LGPD.</p></div>
+      <div class="item rev"><b>I.A sob o seu controle</b><p>Use a I.A gratuita da plataforma ou a chave de API da sua própria conta. Na gratuita, os nomes dos alunos são sempre trocados por códigos antes de sair do aparelho.</p></div>
+      <div class="item rev"><b>Você confirma, sempre</b><p>Nenhuma sugestão da I.A entra no diário sozinha. A decisão pedagógica continua sendo do professor.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 9. SOBRE O PROJETO ══ -->
+<section class="bloco" id="sobre">
+  <div class="env">
+    <div class="sobre">
+      <div>
+        <div class="olho rev">Sobre o projeto</div>
+        <h2 class="rev">Nascido na sala de aula, não num escritório.</h2>
+        <p class="rev">O RELATORIO SKIN começou como o diário digital de um professor da rede pública do Acre, feito para resolver um problema real: registrar o que acontece em várias turmas, em várias disciplinas, sem perder tempo nem informação.</p>
+        <p class="rev">Depois de um ano letivo inteiro em uso diário em duas escolas — com milhares de registros de aula, presença e ocorrências — a plataforma foi aberta para outros professores, cada um com a própria conta e os próprios dados.</p>
+        <p class="rev">É um projeto independente de apoio ao trabalho docente. Não é um sistema oficial de secretaria de educação, e não substitui o sistema que a sua escola exige: ele organiza o seu trabalho para que preencher o oficial seja rápido.</p>
+        <div class="hero-bts rev"><a class="bt pri" href="entrar.html?modo=criar">Começar agora</a><a class="bt" href="axion-proeduq.html">Conhecer a AXION PROEDUQ</a></div>
+      </div>
+      <div class="cartao rev">
+        <ul>
+          <li><b>Feito por quem usa.</b> Cada tela nasceu de uma necessidade real de sala de aula.</li>
+          <li><b>Funciona no celular.</b> A chamada é feita com o polegar, em pé, na porta da sala.</li>
+          <li><b>Escrita livre.</b> Você registra com as suas palavras; a plataforma organiza o resto.</li>
+          <li><b>Sem instalar nada.</b> Abre no navegador e pode ser fixado na tela inicial do celular.</li>
+          <li><b>Grátis para começar.</b> A conta nasce vazia, com todas as ferramentas disponíveis.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 10. CTA FINAL ══ -->
+<section class="cta">
+  <div class="env">
+    <div class="olho rev">Comece hoje</div>
+    <h2 class="rev">Sua rotina docente pode ser mais simples de administrar.</h2>
+    <p class="sub rev">Reúna os registros do seu trabalho em uma plataforma desenvolvida para acompanhar a realidade do professor.</p>
+    <div class="cta-bts rev">
+      <a class="bt pri g" href="entrar.html?modo=criar" data-ima>Criar minha conta</a>
+      <a class="bt g" href="entrar.html">Entrar na plataforma</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 11. RODAPÉ ══ -->
+<footer>
+  <div class="env">
+    <div class="rodape">
+      <div class="rodape-marca">
+        <img src="assets/marca/skin-marca-sm.webp" alt="RELATORIO SKIN" width="520" height="261">
+        <p>Gestão docente organizada em uma única plataforma.</p>
+        <a class="rodape-axion" href="axion-proeduq.html"><img src="assets/marca/axion-escuro-sm.webp" alt="AXION PROEDUQ" width="560" height="148"></a>
+        <div class="rodape-prop">PROPRIEDADE DA AXION PROEDUQ</div>
+      </div>
+      <div>
+        <h5>Produto</h5>
+        <ul>
+          <li><a href="#produto">Como funciona</a></li>
+          <li><a href="#modulos">Módulos</a></li>
+          <li><a href="#demo">Demonstração</a></li>
+          <li><a href="#fluxo">Da aula ao relatório</a></li>
+          <li><a href="entrar.html?modo=criar">Criar conta</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Plataforma</h5>
+        <ul>
+          <li><a href="entrar.html">Entrar</a></li>
+          <li><a href="#seguranca">Segurança</a></li>
+          <li><a href="#sobre">Sobre o projeto</a></li>
+          <li><a href="axion-proeduq.html">AXION PROEDUQ</a></li>
+          <li><a href="mailto:10pauloacre@gmail.com">Suporte e contato</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="privacidade.html">Política de Privacidade</a></li>
+          <li><a href="termos.html">Termos de Serviço</a></li>
+          <li><a href="privacidade.html#cookies">Cookies e dados no aparelho</a></li>
+          <li><a href="privacidade.html#direitos">Seus direitos (LGPD)</a></li>
+          <li><a href="mailto:10pauloacre@gmail.com">Encarregado de dados</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="aviso">O RELATORIO SKIN é um projeto independente de apoio ao trabalho docente, mantido por Paulo Roberto Ramalho Magalhães (Senador Guiomard – AC). Não é um sistema oficial de secretaria de educação nem de qualquer escola. O professor é responsável pelos dados de alunos que registra na plataforma, conforme a Lei nº 13.709/2018 (LGPD) e as regras da sua escola.</p>
+    <div class="rodape-fim">
+      <span>© 2026 RELATORIO SKIN · AXION PROEDUQ</span>
+      <span><a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a> · <a href="mailto:10pauloacre@gmail.com">10pauloacre@gmail.com</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  var pouco = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Entrada do hero.
+  requestAnimationFrame(function(){ document.body.classList.add('pronto'); });
+
+  // Cabeçalho + linha de progresso.
+  var topo = document.getElementById('topo'), linha = document.getElementById('linha-topo');
+  function aoRolar(){
+    var y = window.scrollY || 0;
+    topo.classList.toggle('rolou', y > 60);
+    var alt = document.documentElement.scrollHeight - window.innerHeight;
+    linha.style.width = (alt > 0 ? Math.min(100, y / alt * 100) : 0) + '%';
+  }
+  aoRolar();
+  window.addEventListener('scroll', aoRolar, { passive: true });
+
+  // Menu do celular.
+  var mbt = document.getElementById('menu-bt'), mmob = document.getElementById('menu-mob');
+  mbt.addEventListener('click', function(){
+    var abrir = !mmob.classList.contains('on');
+    mmob.classList.toggle('on', abrir);
+    mbt.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+    document.body.style.overflow = abrir ? 'hidden' : '';
+  });
+  mmob.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ mmob.classList.remove('on'); mbt.setAttribute('aria-expanded','false'); document.body.style.overflow=''; });
+  });
+
+  // Entrada dos blocos.
+  var obs = new IntersectionObserver(function(itens){
+    itens.forEach(function(i){
+      if (!i.isIntersecting) return;
+      var alvos = [i.target];
+      i.target.classList.add('ver');
+      obs.unobserve(i.target);
+      alvos.forEach(function(){});
+    });
+  }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+  var atraso = 0, ultimoPai = null;
+  document.querySelectorAll('.rev').forEach(function(el){
+    var pai = el.parentElement;
+    if (pai !== ultimoPai) { atraso = 0; ultimoPai = pai; } else { atraso = Math.min(atraso + 60, 300); }
+    el.style.transitionDelay = atraso + 'ms';
+    obs.observe(el);
+  });
+
+  // Números que contam.
+  function contar(el){
+    var alvo = parseInt(el.getAttribute('data-conta'), 10) || 0, suf = el.getAttribute('data-sufixo') || '';
+    if (pouco) { el.textContent = alvo + suf; return; }
+    var ini = performance.now(), dur = 900;
+    function passo(t){
+      var p = Math.min(1, (t - ini) / dur), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(alvo * e) + suf;
+      if (p < 1) requestAnimationFrame(passo);
+    }
+    requestAnimationFrame(passo);
+  }
+  var obsNum = new IntersectionObserver(function(itens){
+    itens.forEach(function(i){ if (i.isIntersecting) { contar(i.target); obsNum.unobserve(i.target); } });
+  }, { threshold: 0.6 });
+  document.querySelectorAll('[data-conta]').forEach(function(el){ obsNum.observe(el); });
+
+  // Esteira: duplica os itens para o laço ficar contínuo.
+  var esteira = document.getElementById('esteira');
+  esteira.innerHTML += esteira.innerHTML;
+
+  // Painel do hero acompanha o cursor.
+  var painel = document.getElementById('painel-hero');
+  if (!pouco && window.matchMedia('(min-width: 1021px)').matches) {
+    window.addEventListener('mousemove', function(e){
+      var x = (e.clientX / window.innerWidth - .5), y = (e.clientY / window.innerHeight - .5);
+      painel.style.transform = 'rotateX(' + (3 - y * 4).toFixed(2) + 'deg) rotateY(' + (-6 + x * 5).toFixed(2) + 'deg)';
+    }, { passive: true });
+  }
+
+  // Vitrine grudada: o passo muda conforme a rolagem.
+  var passos = Array.prototype.slice.call(document.querySelectorAll('#vitrine-txt .passo'));
+  var telas = Array.prototype.slice.call(document.querySelectorAll('#vitrine-tela .painel'));
+  if (passos.length && window.matchMedia('(min-width: 1021px)').matches) {
+    var obsPasso = new IntersectionObserver(function(itens){
+      itens.forEach(function(i){
+        if (!i.isIntersecting) return;
+        var n = parseInt(i.target.getAttribute('data-passo'), 10);
+        passos.forEach(function(p, k){ p.classList.toggle('on', k === n); });
+        telas.forEach(function(t, k){ t.classList.toggle('on', k === n); });
+      });
+    }, { threshold: 0.6, rootMargin: '-20% 0px -30% 0px' });
+    passos.forEach(function(p){ obsPasso.observe(p); });
+  }
+
+  // Demonstração com seletores.
+  var menu = document.getElementById('demo-menu'), marca = document.getElementById('demo-marca');
+  var botoes = Array.prototype.slice.call(menu.querySelectorAll('button'));
+  var demos = Array.prototype.slice.call(document.querySelectorAll('#demo-telas .painel'));
+  function moverMarca(bt){
+    if (!bt) return;
+    marca.style.top = bt.offsetTop + 'px';
+    marca.style.height = bt.offsetHeight + 'px';
+  }
+  function trocarDemo(n){
+    botoes.forEach(function(b, k){ b.classList.toggle('on', k === n); });
+    demos.forEach(function(d, k){ d.classList.toggle('on', k === n); });
+    moverMarca(botoes[n]);
+    demos[n].querySelectorAll('[data-conta]').forEach(contar);
+  }
+  botoes.forEach(function(b, n){ b.addEventListener('click', function(){ trocarDemo(n); }); });
+  window.addEventListener('load', function(){ moverMarca(botoes[0]); });
+  window.addEventListener('resize', function(){ moverMarca(menu.querySelector('button.on')); });
+
+  // Fluxo: a linha enche conforme a rolagem.
+  var fluxo = document.getElementById('fluxo'), fl = document.getElementById('fluxo-linha');
+  var etapas = Array.prototype.slice.call(fluxo.querySelectorAll('[data-etapa]'));
+  function pintarFluxo(){
+    var r = fluxo.getBoundingClientRect(), h = window.innerHeight;
+    var p = Math.max(0, Math.min(1, (h * 0.82 - r.top) / (r.height + h * 0.3)));
+    var vertical = window.matchMedia('(max-width: 1020px)').matches;
+    if (vertical) fl.style.height = (p * 100) + '%'; else fl.style.width = (p * 100) + '%';
+    etapas.forEach(function(e, k){ e.classList.toggle('on', p >= (k + 0.35) / etapas.length); });
+  }
+  pintarFluxo();
+  window.addEventListener('scroll', pintarFluxo, { passive: true });
+  window.addEventListener('resize', pintarFluxo);
+
+  // Brilho que segue o cursor nos cards.
+  document.querySelectorAll('.mod').forEach(function(card){
+    card.addEventListener('mousemove', function(e){
+      var r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  });
+
+  // Botões com leve atração pelo cursor.
+  if (!pouco && window.matchMedia('(pointer: fine)').matches) {
+    document.querySelectorAll('[data-ima]').forEach(function(bt){
+      bt.addEventListener('mousemove', function(e){
+        var r = bt.getBoundingClientRect();
+        bt.style.transform = 'translate(' + ((e.clientX - r.left - r.width / 2) * .08).toFixed(1) + 'px,' + ((e.clientY - r.top - r.height / 2) * .12 - 1).toFixed(1) + 'px)';
+      });
+      bt.addEventListener('mouseleave', function(){ bt.style.transform = ''; });
+    });
+  }
+})();
+</script>
+</body>
+</html>
