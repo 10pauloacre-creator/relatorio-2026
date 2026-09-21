@@ -24,6 +24,17 @@ window.RELATORIO_SUPABASE_CONFIG = {
 // cortesia visual: o conteúdo escrito no HTML público continua no código-fonte.
 // ═══════════════════════════════════════════════════════════════════════
 window.RelatorioSupabaseSync = (function () {
+  // Ajustes globais para celular (assets/css/mobile-2026.css) em toda página com conta.
+  (function cssMobile() {
+    try {
+      if (document.getElementById("rel-mobile-css")) return;
+      var atual = document.currentScript && document.currentScript.src;
+      var href = atual ? atual.replace(/js\/supabase-report-sync\.js.*$/, "css/mobile-2026.css?v=20260921a") : "assets/css/mobile-2026.css?v=20260921a";
+      var l = document.createElement("link");
+      l.id = "rel-mobile-css"; l.rel = "stylesheet"; l.href = href;
+      (document.head || document.documentElement).appendChild(l);
+    } catch (e) {}
+  })();
   var config = window.RELATORIO_SUPABASE_CONFIG || {};
   var clientInstance = null;
   var syncInstanceCounter = 0;
