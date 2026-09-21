@@ -5,7 +5,7 @@
 
 ## 1. OBJETIVO DO PROJETO
 
-Site estático (único `index.html`) que funciona como **diário escolar digital** do professor. Contém:
+Plataforma **RELATORIO SKIN** (relatorio.skin): site público de apresentação (`index.html`), tela de conta (`entrar.html`), o diário do administrador (`casavequia.html`, `herminio.html`) e o **Meu Diário** de cada professor (`meu-diario.html`). O diário escolar digital contém:
 - Relatos diários de aula organizados por turma (1ª, 2ª, 3ª Série, 6º Ano)
 - Presença, atividades e ocorrências comportamentais por aluno
 - Contador de h/aulas por disciplina com barra de progresso
@@ -20,7 +20,12 @@ Site estático (único `index.html`) que funciona como **diário escolar digital
 
 ```
 C:\Downloads\relatorio-2026\
-├── index.html          ← ARQUIVO PRINCIPAL (6.500+ linhas, ~1.7MB)
+├── index.html          ← Site de apresentação RELATORIO SKIN (público)
+├── entrar.html         ← Tela de conta (login/cadastro)
+├── escolas.html        ← Escolas do administrador (antigo index)
+├── casavequia.html     ← DIÁRIO PRINCIPAL do administrador (~1,1 MB)
+├── herminio.html       ← Diário da 2ª escola
+├── meu-diario.html     ← Plataforma de cada professor
 ├── CLAUDE.md           ← Este arquivo
 ├── manifest.json       ← PWA manifest
 ├── sw.js               ← Service worker (cache offline)
@@ -468,7 +473,30 @@ Toda página que carrega `supabase-report-sync.js` exige conta. O tipo de acesso
 
 **Segurança corrigida junto (o cadastro já estava aberto):** gatilho `profiles_trava_role` impede que uma conta se promova a `role='admin'` (o `private.is_admin()` confia nessa coluna); `alunos` só é lida pelo professor (`bdm_e_professor()`). SQL em `supabase/2026-09-19-etapa9-contas-de-professores.sql`.
 
-**Páginas públicas (19/09/2026):** `privacidade.html` (Política de Privacidade, LGPD) e `termos.html` (Termos de Serviço) NÃO carregam `supabase-report-sync.js`, então abrem sem conta. Links discretos "Privacidade · Termos" no rodapé do `index.html` (`.legal`) e na tela de login (`.rel-auth-legal`, em todas as páginas trancadas). Estão em `scripts/build-web-release.js`, que o GitHub Pages usa: página nova só é publicada se entrar nessa lista. Ao ligar um serviço novo (IA, hospedagem, analytics), atualize a seção 6 da política. A seção 9 (prazo de guarda) promete guarda por tempo indeterminado, por ano letivo (seção 18 abaixo).
+## 20. MARCA RELATORIO SKIN E SITE PÚBLICO (20/09/2026)
+
+O site passou a se chamar **RELATORIO SKIN** ("RELATORIO" pequeno, "SKIN" em destaque; assinatura "Gestão docente inteligente"). A AXION PROEDUQ continua como marca-mãe, no rodapé.
+
+**Páginas:**
+| Página | O que é | Acesso |
+|---|---|---|
+| `index.html` | Site de apresentação (hero, problema, vitrine, módulos, demonstração, fluxo, segurança, sobre, CTA, rodapé legal) | público, sem login |
+| `entrar.html` | Tela de conta, com abertura da marca na primeira visita do aparelho (`localStorage: skin-abertura`). `?modo=criar` abre na aba Criar conta. Depois de entrar: administrador → `escolas.html`, professor → `meu-diario.html` | `data-acesso="inicio"` |
+| `escolas.html` | O antigo `index.html` (botões Casavequia, Hermínio e Projetos pessoais) | só o administrador |
+
+O "← Início" da Casavequia e da Hermínio aponta para `escolas.html`. O `manifest.json` abre o app em `entrar.html`.
+
+**Paleta (sem nenhum tom azulado):** fundo `#0D0E0D`, superfícies `#131512`/`#181B17`/`#20231E`, bordas `#30352D`; texto `#F3F1E9`/`#B6B7AE`/`#7E8279`; marca verde-sálvia `#A7B58A`, destaque `#C2CE9E`, hover `#D2DBB3`; areia `#D6CBB8`, dourado `#B89B69`; sucesso `#6F9B71`, aviso `#C29A5B`, erro `#B9635D`. Tipografia: Manrope (títulos) + Inter (texto). Raios: botão 9px, card 14px, painel 18px.
+
+**Animações (todas respeitam `prefers-reduced-motion`):** entrada em sequência do hero, linha de progresso de 2px no topo, revelação por `IntersectionObserver`, esteira de recursos que pausa no hover, painel do hero que acompanha o cursor, vitrine grudada que troca de tela na rolagem, seletores da demonstração com marcador deslizante e números que contam, linha do fluxo que enche, brilho que segue o cursor nos cards e leve atração magnética nos botões principais.
+
+**Tela de conta (`supabase-report-sync.js`):** mesma identidade (grafite + sálvia), logo no topo do cartão, entrada animada do cartão e dos campos, e link "← Voltar ao site" nas páginas com `<html data-auth-voltar="index.html">` (`entrar.html`, `meu-diario.html`, `escolas.html`). `auth.showLogin(mensagem, modo)` aceita "criar" e "esqueci". O fundo da trava usa `--rel-trava-bg` (padrão `#0D0E0D`), que a página pode redefinir.
+
+**Ícones:** gerados a partir de `assets/icons/icon-relatorio.skin.png` (quadrado) e `assets/icons/logo-relatorio.skin.png` (horizontal) — `icon-192/512`, `maskable-icon-512` (13% de folga), `apple-touch-icon`, `favicon-16/32`, `favicon.ico`, `iconv2.png` e os `mipmap-*` do Android (`ic_launcher`, `_round`, `_foreground`). As versões web da marca ficam em `assets/marca/skin-marca[-sm].webp`, `skin-icone[-sm].webp` e `skin-simbolo.webp` (o "S" sozinho, usado no cabeçalho do site).
+
+**Regra:** nada de azul, roxo azulado, neon ou ilustração escolar infantil nas páginas da marca. O verde é cor de ação e destaque, nunca o fundo.
+
+**Páginas públicas (20/09/2026):** `index.html` (site de apresentação), `privacidade.html` (Política de Privacidade, LGPD) e `termos.html` (Termos de Serviço) NÃO carregam `supabase-report-sync.js`, então abrem sem conta. Links legais completos no rodapé do `index.html` (Privacidade, Termos, Cookies e LGPD, com âncoras `#cookies` e `#direitos`) e na tela de login (`.rel-auth-legal`, em todas as páginas trancadas). Estão em `scripts/build-web-release.js`, que o GitHub Pages usa: página nova só é publicada se entrar nessa lista. Ao ligar um serviço novo (IA, hospedagem, analytics), atualize a seção 6 da política. A seção 9 (prazo de guarda) promete guarda por tempo indeterminado, por ano letivo (seção 18 abaixo).
 
 **Pendências do professor (painel do Supabase):** ligar o Google (Authentication → Providers, com Client ID/Secret do Google Cloud) e incluir `https://relatorio.skin/**` e `https://10pauloacre-creator.github.io/relatorio-2026/**` em Authentication → URL Configuration → Redirect URLs (a URL da Biblioteca que já está lá fica). No Google Cloud, a origem autorizada é `https://relatorio.skin`. O repositório é **público**: os relatos escritos no HTML (com nomes de alunos) continuam legíveis no código-fonte, mesmo com a página trancada.
 

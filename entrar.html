@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-acesso="inicio" data-auth-voltar="index.html">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D0E0D">
+<title>Entrar — RELATORIO SKIN</title>
+<meta name="description" content="Entre na sua conta do RELATORIO SKIN ou crie uma conta gratuita de professor.">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="assets/js/supabase-report-sync.js?v=20260920a"></script>
+<style>
+:root{--bg:#0D0E0D;--card:#181B17;--line:#30352D;--tx:#F3F1E9;--tx2:#B6B7AE;--tx3:#7E8279;--brand:#A7B58A;--brand2:#C2CE9E;
+  /* Fundo que a trava da conta usa enquanto a página está fechada. */
+  --rel-trava-bg:#0D0E0D}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--tx);font-family:Inter,system-ui,sans-serif;overflow-x:hidden;
+  background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);
+  background-size:64px 64px}
+/* Os brilhos ficam em pseudo-elementos: continuam visíveis enquanto a conta não entra. */
+body::before,body::after{content:'';position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0}
+body::before{width:820px;height:820px;top:-300px;left:-220px;background:rgba(167,181,138,.11);animation:respira 14s ease-in-out infinite}
+body::after{width:680px;height:680px;right:-240px;bottom:-260px;background:rgba(214,203,184,.06);animation:respira 18s ease-in-out infinite reverse}
+@keyframes respira{0%,100%{transform:translate3d(0,0,0) scale(1);opacity:.85}50%{transform:translate3d(24px,26px,0) scale(1.08);opacity:1}}
+/* Abertura da marca — só na primeira visita deste aparelho. */
+#abertura{position:fixed;inset:0;z-index:2147483600!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  background:#0A0B0A;animation:saiAbertura .7s ease 2.1s forwards}
+#abertura img{width:min(360px,74vw);border-radius:16px;opacity:0;transform:translateY(14px) scale(.97);animation:entraMarca .9s cubic-bezier(.22,1,.36,1) .15s forwards}
+#abertura .traco{width:min(360px,74vw);height:2px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+#abertura .traco i{display:block;height:100%;width:0;background:linear-gradient(90deg,#A7B58A,#C2CE9E);animation:enche 1.5s cubic-bezier(.4,0,.2,1) .45s forwards}
+#abertura span{font-size:.7rem;letter-spacing:.3em;color:#7E8279;opacity:0;animation:entraMarca .7s ease .8s forwards}
+@keyframes entraMarca{to{opacity:1;transform:none}}
+@keyframes enche{to{width:100%}}
+@keyframes saiAbertura{to{opacity:0;visibility:hidden}}
+.voltando{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:var(--tx2);font-size:.9rem;z-index:1}
+@media(prefers-reduced-motion:reduce){
+  #abertura{animation-delay:.4s}
+  #abertura img,#abertura span{animation-duration:.01s}
+  #abertura .traco i{animation-duration:.3s}
+  body::before,body::after{animation:none}
+}
+</style>
+</head>
+<body>
+<!-- A abertura leva a classe da tela de conta para continuar visível enquanto a página está trancada. -->
+<div class="abertura rel-auth-gate" id="abertura" hidden>
+  <img src="assets/marca/skin-marca-sm.webp" alt="RELATORIO SKIN" width="520" height="261">
+  <div class="traco"><i></i></div>
+  <span>GESTÃO DOCENTE INTELIGENTE</span>
+</div>
+<div class="voltando" id="voltando" hidden>Abrindo a sua plataforma…</div>
+
+<script>
+(function () {
+  // Abertura da marca: uma vez por aparelho, e nunca para quem já tem sessão.
+  var jaViu = false;
+  try { jaViu = localStorage.getItem('skin-abertura') === '1'; } catch (e) {}
+  var temSessao = false;
+  try {
+    var chave = (window.RELATORIO_SUPABASE_CONFIG || {}).authStorageKey || 'relatorio-2026-admin-auth';
+    temSessao = !!localStorage.getItem(chave);
+  } catch (e) {}
+  if (!jaViu && !temSessao) {
+    document.getElementById('abertura').hidden = false;
+    try { localStorage.setItem('skin-abertura', '1'); } catch (e) {}
+    window.setTimeout(function () {
+      var a = document.getElementById('abertura');
+      if (a && a.parentNode) a.parentNode.removeChild(a);
+    }, 3000);
+  }
+
+  function pronto() {
+    var S = window.RelatorioSupabaseSync;
+    if (!S) { window.setTimeout(pronto, 60); return; }
+    // ?modo=criar abre direto na aba "Criar conta".
+    var modo = /modo=criar|criar=1/.test(window.location.search) ? 'criar' : '';
+    if (modo && !S.auth.hasSession()) S.auth.showLogin('', 'criar');
+    S.auth.whenAuthorized().then(function () {
+      document.getElementById('voltando').hidden = false;
+      var cfg = window.RELATORIO_SUPABASE_CONFIG || {};
+      var destino = S.auth.isAdmin() ? 'escolas.html' : (cfg.professorHome || 'meu-diario.html');
+      window.location.replace(destino);
+    });
+  }
+  pronto();
+})();
+</script>
+</body>
+</html>
