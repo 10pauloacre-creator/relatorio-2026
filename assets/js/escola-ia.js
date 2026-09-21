@@ -62,6 +62,8 @@
     document.head.appendChild(st);
     var nav = document.querySelector(".nav-i");
     var alvo = document.getElementById(herminio ? "btn-editar-rh" : "btn-editar");
+    // O "Editar" pode já estar na barra lateral de ferramentas (barra-lateral.js).
+    if (alvo && nav && alvo.parentNode !== nav) alvo = null;
     var bt = document.createElement("button");
     bt.className = "nb"; bt.type = "button"; bt.textContent = "🤖 I.A";
     bt.setAttribute("onclick", herminio ? "aba('sec-ia',this)" : "aba('ia',this)");
