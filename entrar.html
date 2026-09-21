@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="assets/js/supabase-report-sync.js?v=20260920a"></script>
+<script defer src="assets/js/supabase-report-sync.js?v=20260921a"></script>
 <style>
 :root{--bg:#0D0E0D;--card:#181B17;--line:#30352D;--tx:#F3F1E9;--tx2:#B6B7AE;--tx3:#7E8279;--brand:#A7B58A;--brand2:#C2CE9E;
   /* Fundo que a trava da conta usa enquanto a página está fechada. */
@@ -30,7 +30,11 @@ body::before{width:820px;height:820px;top:-300px;left:-220px;background:rgba(167
 body::after{width:680px;height:680px;right:-240px;bottom:-260px;background:rgba(214,203,184,.06);animation:respira 18s ease-in-out infinite reverse}
 @keyframes respira{0%,100%{transform:translate3d(0,0,0) scale(1);opacity:.85}50%{transform:translate3d(24px,26px,0) scale(1.08);opacity:1}}
 /* Abertura da marca — só na primeira visita deste aparelho. */
-#abertura{position:fixed;inset:0;z-index:2147483600!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+/* A classe .rel-auth-gate traz display:flex, que vencia o atributo hidden: a abertura
+   ficava invisível por cima da tela de conta e engolia cliques e digitação.
+   [hidden] precisa vencer, e pointer-events:none garante que ela nunca bloqueie nada. */
+[hidden]{display:none!important}
+#abertura{position:fixed;inset:0;z-index:2147483600!important;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
   background:#0A0B0A;animation:saiAbertura .7s ease 2.1s forwards}
 #abertura img{width:min(360px,74vw);height:auto;border-radius:16px;opacity:0;transform:translateY(14px) scale(.97);animation:entraMarca .9s cubic-bezier(.22,1,.36,1) .15s forwards}
 #abertura .traco{width:min(360px,74vw);height:2px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
@@ -67,13 +71,20 @@ body::after{width:680px;height:680px;right:-240px;bottom:-260px;background:rgba(
     var chave = (window.RELATORIO_SUPABASE_CONFIG || {}).authStorageKey || 'relatorio-2026-admin-auth';
     temSessao = !!localStorage.getItem(chave);
   } catch (e) {}
-  if (!jaViu && !temSessao) {
+  var abertura = document.getElementById('abertura');
+  if (jaViu || temSessao) {
+    abertura.parentNode.removeChild(abertura);
+  } else {
     document.getElementById('abertura').hidden = false;
     try { localStorage.setItem('skin-abertura', '1'); } catch (e) {}
-    window.setTimeout(function () {
+    var tirar = function () {
       var a = document.getElementById('abertura');
       if (a && a.parentNode) a.parentNode.removeChild(a);
-    }, 3000);
+    };
+    document.getElementById('abertura').addEventListener('animationend', function (e) {
+      if (e.animationName === 'saiAbertura') tirar();
+    });
+    window.setTimeout(tirar, 3000);
   }
 
   function pronto() {

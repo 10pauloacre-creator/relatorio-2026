@@ -367,12 +367,17 @@ window.RelatorioSupabaseSync = (function () {
     + "@keyframes relGateEntra{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}"
     + "@keyframes relGateItem{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}"
     + "@keyframes relGateFundo{0%,100%{opacity:.85;transform:scale(1)}50%{opacity:1;transform:scale(1.07)}}"
-    + ".rel-auth-gate{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;"
-    + "background:rgba(13,14,13,.93);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);visibility:visible!important;"
+    // Trava contra tela presa: só rolagem vertical, sem backdrop-filter (pesado e
+    // inútil sobre fundo quase opaco) e brilhos em position:fixed, que não
+    // aumentam a área de rolagem. Conferido por scripts/check-tela-login.js.
+    + ".rel-auth-gate{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:flex-start;justify-content:center;padding:16px;"
+    + "overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;"
+    + "background:rgba(13,14,13,.96);visibility:visible!important;"
     + "font-family:Inter,'Segoe UI',Tahoma,sans-serif;color:#F3F1E9}"
-    + ".rel-auth-gate::before{content:'';position:absolute;width:760px;height:760px;top:-280px;left:-200px;border-radius:50%;pointer-events:none;"
+    + ".rel-auth-gate[hidden]{display:none!important}"
+    + ".rel-auth-gate::before{content:'';position:fixed;width:760px;height:760px;top:-280px;left:-200px;border-radius:50%;pointer-events:none;"
     + "background:radial-gradient(circle,rgba(167,181,138,.14),transparent 66%);filter:blur(60px);animation:relGateFundo 14s ease-in-out infinite}"
-    + ".rel-auth-gate::after{content:'';position:absolute;width:620px;height:620px;right:-220px;bottom:-240px;border-radius:50%;pointer-events:none;"
+    + ".rel-auth-gate::after{content:'';position:fixed;width:620px;height:620px;right:-220px;bottom:-240px;border-radius:50%;pointer-events:none;"
     + "background:radial-gradient(circle,rgba(214,203,184,.08),transparent 66%);filter:blur(60px);animation:relGateFundo 18s ease-in-out infinite reverse}"
     + ".rel-auth-card{position:relative;width:100%;max-width:404px;margin:auto;border-radius:18px;padding:24px 22px 20px;background:#181B17;color:#F3F1E9;"
     + "border:1px solid #30352D;box-shadow:0 30px 80px rgba(0,0,0,.6);animation:relGateEntra .55s cubic-bezier(.22,1,.36,1) both}"
@@ -416,6 +421,10 @@ window.RelatorioSupabaseSync = (function () {
     + ".rel-auth-marca a{display:block;border-radius:0;overflow:visible}.rel-auth-marca a:hover{transform:none;box-shadow:none}"
     + ".rel-auth-gate .rel-auth-marca a>img{width:172px;height:auto;max-width:none;max-height:none;opacity:1}"
     + ".rel-auth-marca span{font-size:.6rem;letter-spacing:.2em;font-weight:700;color:#B6B7AE}"
+    // Telas baixas (notebook com zoom, celular deitado): cartão compacto.
+    + "@media(max-height:860px){.rel-auth-card{padding:18px 20px 16px}.rel-auth-logo{width:150px;margin-bottom:12px}"
+    + ".rel-auth-card p{margin-bottom:12px}.rel-auth-tabs{margin-bottom:12px}.rel-auth-card input{min-height:42px;margin-bottom:10px}"
+    + ".rel-auth-sep{margin:12px 0}.rel-auth-gate .rel-auth-marca a>img{width:140px}}"
     + "@media(prefers-reduced-motion:reduce){.rel-auth-card,.rel-auth-card>*{animation-duration:.01s}.rel-auth-gate::before,.rel-auth-gate::after{animation:none}}";
 
   var GOOGLE_SVG = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 38.2 44 33 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
