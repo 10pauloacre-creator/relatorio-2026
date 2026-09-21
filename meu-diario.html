@@ -22,7 +22,8 @@ window.NOVO_DIARIO_MANUAL = true;
 </script>
 <script defer src="assets/js/dark-mode-2026.js?v=20260921a"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="assets/js/supabase-report-sync.js?v=20260921b"></script>
+<script defer src="assets/js/supabase-report-sync.js?v=20260921m"></script>
+<script defer src="assets/js/ano-letivo.js?v=20260921a"></script>
 <script defer src="assets/js/conta-skin.js?v=20260921d"></script>
 <script defer src="assets/js/meu-diario-recursos.js?v=20260921a"></script>
 <script defer src="assets/js/meu-diario-ia.js?v=20260921b"></script>
@@ -46,19 +47,6 @@ a{color:var(--md-destaque)}
 .cab-t .sub{font-size:.8rem;opacity:.82;margin-top:4px;font-weight:300;letter-spacing:.04em;text-transform:uppercase}
 .cab-t .prof{margin-top:9px;display:inline-flex;align-items:center;gap:7px;background:rgba(201,168,76,.25);border:1px solid rgba(201,168,76,.5);border-radius:20px;padding:4px 13px;font-size:.8rem;font-weight:500;color:var(--os);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cab-barra{max-width:1200px;margin:0 auto;padding:14px 40px 0;position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.md-ano-btn{font:inherit;color:inherit;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:0 10px;cursor:pointer;line-height:1.25}
-.md-ano-btn span{font-size:.7em;opacity:.8}
-.md-ano-btn:hover{background:rgba(255,255,255,.22)}
-.md-ano-menu{position:absolute;z-index:3000;min-width:170px;background:#fff;color:#2b2b2b;border:1px solid #e8e5de;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.28);padding:6px;display:flex;flex-direction:column;gap:2px;font-family:'DM Sans',sans-serif}
-.md-ano-tit{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#7a7a7a;padding:6px 10px 4px}
-.md-ano-menu button{background:none;border:none;text-align:left;padding:8px 10px;border-radius:8px;font:inherit;font-size:.9rem;cursor:pointer;color:inherit}
-.md-ano-menu button:hover{background:#f5f3ee}
-.md-ano-menu button.on{font-weight:700;color:#2d6147}
-.md-ano-menu button.novo{border-top:1px solid #e8e5de;border-radius:0 0 8px 8px;margin-top:2px;color:#2d6147}
-html.dark-2026 .md-ano-menu{background:#191c1f;color:#f4f5f6;border-color:#383d43}
-html.dark-2026 .md-ano-menu button:hover{background:#272b30}
-html.dark-2026 .md-ano-menu button.on,html.dark-2026 .md-ano-menu button.novo{color:#ffa65b}
-html.dark-2026 .md-ano-menu button.novo{border-top-color:#383d43}
 @media(max-width:760px){.cab-barra{padding:12px 16px 0}}
 .md-cab-acoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .md-sync{font-size:.74rem;background:rgba(255,255,255,.14);border-radius:999px;padding:6px 12px;white-space:nowrap}
@@ -577,22 +565,31 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     var s=box.querySelector('[data-ano]');
     if(s)s.onchange=function(){var a=parseInt(s.value,10);if(a&&a!==ANO)mudarAno(a);};
   }
-  // Botão do ano no título: lista os anos letivos da escola e "+ Iniciar" o próximo.
-  function abrirMenuAno(ev){
-    if(ev)ev.stopPropagation();
-    var velho=document.getElementById('md-ano-menu');
-    if(velho){velho.remove();return;}
-    var btn=document.getElementById('md-ano-btn'),anos=anosDaEscola(),prox=anos[anos.length-1]+1;
-    var m=document.createElement('div');
-    m.id='md-ano-menu';m.className='md-ano-menu';m.setAttribute('role','menu');
-    m.innerHTML='<div class="md-ano-tit">Ano letivo</div>'+anos.slice().reverse().map(function(a){
-      return '<button type="button" role="menuitem" data-a="'+a+'"'+(a===ANO?' class="on"':'')+'>'+a+(a===ANO?' ✓':'')+'</button>';
-    }).join('')+'<button type="button" role="menuitem" data-a="'+prox+'" class="novo">+ Iniciar '+prox+'</button>';
-    var r=btn.getBoundingClientRect();
-    m.style.top=(r.bottom+window.scrollY+6)+'px';m.style.left=(r.left+window.scrollX)+'px';
-    document.body.appendChild(m);
-    m.onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;var a=parseInt(b.getAttribute('data-a'),10);m.remove();if(a&&a!==ANO)mudarAno(a);};
-    setTimeout(function(){document.addEventListener('click',function fora(e){if(!m.contains(e.target)){m.remove();document.removeEventListener('click',fora);}});},0);
+  // Seletor "📅 Ano letivo" abaixo do nome da escola (mesmo modal das escolas do administrador).
+  function numerosDoAno(a){
+    var ts=turmasDaEscola().filter(function(t){return anoDe(t)===a;}),ids={},alunos=0;
+    ts.forEach(function(t){ids[t.id]=1;alunos+=(t.alunos||[]).filter(function(x){return !x.tr;}).length;});
+    var ds=(window.NovoDiario?window.NovoDiario.diarios():[]).filter(function(d){return ids[d.turma];});
+    var dias={},horas=0,oc=0,datas=[];
+    ds.forEach(function(d){dias[d.dateKey]=1;horas+=parseInt(d.horas,10)||0;datas.push(d.dateKey);
+      oc+=((d.rel&&d.rel.comportamento)||[]).filter(function(c){return c.tipo!=='destaque';}).length;});
+    datas.sort();
+    return{ano:a,aulas:ds.length,dias:Object.keys(dias).length,horas:horas,turmas:ts.length,alunos:alunos,ocorrencias:oc,primeira:datas[0]||'',ultima:datas[datas.length-1]||'',_turmas:ts,_diarios:ds};
+  }
+  function baixarAno(a){
+    var n=numerosDoAno(a),e=escolaAtual();
+    var dados={exportadoEm:agora(),anoLetivo:a,escola:e||null,turmas:n._turmas,diarios:n._diarios};
+    var blob=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
+    var x=document.createElement('a');x.href=URL.createObjectURL(blob);x.download='meu-diario-'+slug((e&&e.nome)||'escola')+'-'+a+'.json';document.body.appendChild(x);x.click();x.remove();
+  }
+  function ligarAnoLetivo(){
+    if(!window.RelatorioAnoLetivo)return;
+    window.RelatorioAnoLetivo.configurar({
+      atual:function(){return ANO;},
+      anos:function(){return anosComTurmas().map(numerosDoAno);},
+      abrir:function(a){if(a&&a!==ANO)mudarAno(a);},
+      baixar:baixarAno
+    });
   }
   function anoAnteriorComTurmas(){return anosComTurmas().filter(function(a){return a<ANO;}).pop()||0;}
   function opcoesCadastro(){
@@ -994,8 +991,8 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   // ── Desenho geral ───────────────────────────────────────────────────
   function desenharCabecalho(){
     var nome=perfilNome(),e=escolaAtual();
-    document.getElementById('md-titulo').innerHTML='Diário de Aulas <button type="button" class="md-ano-btn" id="md-ano-btn" aria-haspopup="true" title="Escolher o ano letivo">'+ANO+' <span aria-hidden="true">▾</span></button>';
-    document.getElementById('md-ano-btn').onclick=abrirMenuAno;
+    document.getElementById('md-titulo').textContent='Diário de Aulas '+ANO;
+    if(window.RelatorioAnoLetivo)window.RelatorioAnoLetivo.atualizar();
     document.getElementById('md-escolas').textContent=e?e.nome+(e.inep?' · INEP '+e.inep.codigo:''):'Carregando…';
     var av=document.getElementById('md-avatar');
     if(e&&e.imagem)av.innerHTML='<img src="'+esc(e.imagem)+'" alt="">';else av.textContent=(e&&e.icone)||'🏫';
@@ -1089,6 +1086,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     if(!E.perfil||!E.perfil.nome){E.perfil=E.perfil||{};E.perfil.nome=usuario.nome||'';}
     C().perfil.iniciar();
     C().chip(document.getElementById('md-chip'));
+    ligarAnoLetivo();
     C().perfil.aoMudar(function(){if(E)desenharCabecalho();});
     cadaModulo('iniciar',window.MeuDiario);
     if(escolaAtual())desenharTudo();else document.getElementById('sec-inicio').innerHTML='<div class="md-card md-vazio">Carregando a escola…</div>',document.getElementById('sec-inicio').classList.add('on');
