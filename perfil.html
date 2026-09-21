@@ -21,7 +21,7 @@
 <script defer src="assets/js/dark-mode-2026.js?v=20260921b"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260921m"></script>
-<script defer src="assets/js/conta-skin.js?v=20260921d"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921e"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--ou:#c9a84c;--os:#f5e6be;--ce:#2b2b2b;--cm:#5a5a5a;--ra:#c0392b;--rs:#fdecea;
   --sup:#fff;--sup2:#faf8f2;--sup3:#f5f3ee;--linha:#e8e5de;--titulo:#1a3a2a;--acento:#2d6147;--acento-txt:#fff;--fundo:#faf8f2;--ss:0 4px 24px rgba(26,58,42,.10)}
@@ -401,7 +401,8 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
     $('p-disc-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addDisc(); } });
     $('foto-arq').onchange = function () {
       var f = this.files[0]; if (!f) return;
-      C.reduzirImagem(f, 360).then(function (url) { lerFormulario(); P.foto = url; C.perfil.salvar(); desenharTopo(); toast('Foto atualizada.'); }).catch(function (e) { toast(e.message); });
+      // Abre o ajuste (arrastar e zoom, como no Instagram) antes de salvar.
+      C.recortarImagem(f, 360).then(function (url) { if (!url) return; lerFormulario(); P.foto = url; C.perfil.salvar(); desenharTopo(); toast('Foto atualizada.'); }).catch(function (e) { toast(e.message); });
       this.value = '';
     };
     $('foto-tirar').onclick = function () { lerFormulario(); P.foto = ''; C.perfil.salvar(); desenharTopo(); };

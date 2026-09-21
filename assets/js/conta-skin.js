@@ -141,6 +141,129 @@
 
   // ── Imagens ───────────────────────────────────────────────────────────
   // Recorta no centro (quadrado) e reduz para `lado` px. Devolve data URL.
+  // Recorte da foto (como no Instagram): arrastar para reposicionar, zoom pelo
+  // controle, pela rodinha ou com dois dedos. Resolve com a imagem quadrada
+  // (lado × lado) ou null se o usuário cancelar.
+  function recortarImagem(arquivo, lado, qualidade) {
+    lado = lado || 360;
+    return new Promise(function (resolve, reject) {
+      if (!arquivo || !/^image\//.test(arquivo.type)) { reject(new Error("Escolha uma imagem (JPG, PNG ou WEBP).")); return; }
+      var url = URL.createObjectURL(arquivo);
+      var img = new Image();
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error("Imagem inválida.")); };
+      img.onload = function () { abrir(); };
+      img.src = url;
+
+      function abrir() {
+        if (!document.getElementById("ck-recorte-style")) {
+          var st = document.createElement("style");
+          st.id = "ck-recorte-style";
+          st.textContent = ".ck-rec-ov{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:16px;font-family:'DM Sans',sans-serif}" +
+            ".ck-rec{background:#191c1f;color:#f4f5f6;border:1px solid #383d43;border-radius:18px;padding:18px;width:min(400px,100%);box-shadow:0 24px 70px rgba(0,0,0,.55)}" +
+            ".ck-rec h3{margin:0 0 4px;font-size:1.05rem}.ck-rec p{margin:0 0 14px;font-size:.8rem;color:#aeb4bd}" +
+            ".ck-rec-area{position:relative;margin:0 auto;overflow:hidden;border-radius:12px;background:#000;touch-action:none;cursor:grab;user-select:none}" +
+            ".ck-rec-area.arrastando{cursor:grabbing}" +
+            ".ck-rec-area img{position:absolute;left:0;top:0;max-width:none;pointer-events:none;-webkit-user-drag:none}" +
+            ".ck-rec-mascara{position:absolute;inset:0;pointer-events:none;border-radius:50%;box-shadow:0 0 0 9999px rgba(0,0,0,.55);outline:2px solid rgba(255,255,255,.85);outline-offset:-2px}" +
+            ".ck-rec-grade{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .15s;background:linear-gradient(to right,transparent 33.2%,rgba(255,255,255,.35) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.35) 66.6%,transparent 66.8%),linear-gradient(to bottom,transparent 33.2%,rgba(255,255,255,.35) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.35) 66.6%,transparent 66.8%)}" +
+            ".ck-rec-area.arrastando .ck-rec-grade{opacity:1}" +
+            ".ck-rec-zoom{display:flex;align-items:center;gap:10px;margin:14px 2px 4px;font-size:.9rem}.ck-rec-zoom input{flex:1;accent-color:#ffa65b}" +
+            ".ck-rec-acoes{display:flex;gap:10px;margin-top:14px}.ck-rec-acoes button{flex:1;border-radius:10px;padding:10px 12px;font:700 .86rem 'DM Sans',sans-serif;cursor:pointer;border:1px solid #383d43;background:#272b30;color:#f4f5f6}" +
+            ".ck-rec-acoes button.pri{background:#ffa65b;border-color:#ffa65b;color:#151719}";
+          document.head.appendChild(st);
+        }
+        var V = Math.min(320, window.innerWidth - 80);
+        var ov = document.createElement("div");
+        ov.className = "ck-rec-ov";
+        ov.innerHTML = '<div class="ck-rec" role="dialog" aria-modal="true" aria-labelledby="ck-rec-t"><h3 id="ck-rec-t">Ajustar foto</h3>' +
+          "<p>Arraste para posicionar e use o zoom para cortar.</p>" +
+          '<div class="ck-rec-area" style="width:' + V + "px;height:" + V + 'px"><img alt=""><div class="ck-rec-grade"></div><div class="ck-rec-mascara"></div></div>' +
+          '<label class="ck-rec-zoom"><span aria-hidden="true">➖</span><input type="range" min="1" max="4" step="0.01" value="1" aria-label="Zoom"><span aria-hidden="true">➕</span></label>' +
+          '<div class="ck-rec-acoes"><button type="button" data-rec="cancelar">Cancelar</button><button type="button" class="pri" data-rec="usar">Usar foto</button></div></div>';
+        document.body.appendChild(ov);
+        var area = ov.querySelector(".ck-rec-area"), el = ov.querySelector("img"), faixa = ov.querySelector("input[type=range]");
+        el.src = url;
+        var base = V / Math.min(img.width, img.height); // "cobrir" a área com zoom 1
+        var z = 1, x = 0, y = 0;
+        function tam() { return { w: img.width * base * z, h: img.height * base * z }; }
+        function limitar() { var t = tam(); x = Math.min(0, Math.max(V - t.w, x)); y = Math.min(0, Math.max(V - t.h, y)); }
+        function desenhar() { var t = tam(); el.style.width = t.w + "px"; el.style.height = t.h + "px"; el.style.transform = "translate(" + x + "px," + y + "px)"; }
+        // Zoom mantendo fixo o ponto (px, py) da área.
+        function zoom(novo, px, py) {
+          novo = Math.min(4, Math.max(1, novo));
+          if (px == null) { px = V / 2; py = V / 2; }
+          var k = novo / z;
+          x = px - (px - x) * k; y = py - (py - y) * k; z = novo;
+          limitar(); desenhar(); faixa.value = z;
+        }
+        var t0 = tam(); x = (V - t0.w) / 2; y = (V - t0.h) / 2; desenhar();
+
+        var ponteiros = {}, ultimo = null, distInicial = 0, zInicial = 1;
+        function pontos() { return Object.keys(ponteiros).map(function (k) { return ponteiros[k]; }); }
+        area.addEventListener("pointerdown", function (e) {
+          area.setPointerCapture(e.pointerId);
+          ponteiros[e.pointerId] = { x: e.clientX, y: e.clientY };
+          area.classList.add("arrastando");
+          var p = pontos();
+          if (p.length === 2) { distInicial = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y); zInicial = z; }
+          ultimo = { x: e.clientX, y: e.clientY };
+        });
+        area.addEventListener("pointermove", function (e) {
+          if (!ponteiros[e.pointerId]) return;
+          ponteiros[e.pointerId] = { x: e.clientX, y: e.clientY };
+          var p = pontos();
+          if (p.length >= 2) {
+            var r = area.getBoundingClientRect();
+            var d = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+            if (distInicial) zoom(zInicial * d / distInicial, (p[0].x + p[1].x) / 2 - r.left, (p[0].y + p[1].y) / 2 - r.top);
+            return;
+          }
+          x += e.clientX - ultimo.x; y += e.clientY - ultimo.y; ultimo = { x: e.clientX, y: e.clientY };
+          limitar(); desenhar();
+        });
+        function soltar(e) {
+          delete ponteiros[e.pointerId];
+          var p = pontos();
+          if (p.length === 1) ultimo = { x: p[0].x, y: p[0].y };
+          if (!p.length) area.classList.remove("arrastando");
+          distInicial = 0;
+        }
+        area.addEventListener("pointerup", soltar);
+        area.addEventListener("pointercancel", soltar);
+        area.addEventListener("wheel", function (e) {
+          e.preventDefault();
+          var r = area.getBoundingClientRect();
+          zoom(z * (e.deltaY < 0 ? 1.08 : 1 / 1.08), e.clientX - r.left, e.clientY - r.top);
+        }, { passive: false });
+        faixa.addEventListener("input", function () { zoom(parseFloat(faixa.value)); });
+
+        function fim(valor) {
+          ov.remove(); URL.revokeObjectURL(url);
+          document.removeEventListener("keydown", tecla);
+          resolve(valor);
+        }
+        function tecla(e) {
+          if (e.key === "Escape") fim(null);
+          else if (e.key === "Enter") usar();
+        }
+        document.addEventListener("keydown", tecla);
+        function usar() {
+          var s = base * z, cv = document.createElement("canvas");
+          cv.width = cv.height = lado;
+          var ctx = cv.getContext("2d");
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(img, -x / s, -y / s, V / s, V / s, 0, 0, lado, lado);
+          var out = cv.toDataURL("image/webp", qualidade || 0.85);
+          if (out.indexOf("data:image/webp") !== 0) out = cv.toDataURL("image/jpeg", qualidade || 0.85);
+          fim(out);
+        }
+        ov.querySelector('[data-rec="cancelar"]').onclick = function () { fim(null); };
+        ov.querySelector('[data-rec="usar"]').onclick = usar;
+        ov.querySelector('[data-rec="usar"]').focus();
+      }
+    });
+  }
+
   function reduzirImagem(arquivo, lado, qualidade) {
     lado = lado || 320;
     return new Promise(function (resolve, reject) {
@@ -474,7 +597,7 @@
 
   window.ContaSkin = {
     esc: esc, iniciais: iniciais, janela: janela, estilo: estilo, UFS: UFS,
-    verificarSenha: verificarSenha, confirmarPerigo: confirmarPerigo, reduzirImagem: reduzirImagem,
+    verificarSenha: verificarSenha, confirmarPerigo: confirmarPerigo, reduzirImagem: reduzirImagem, recortarImagem: recortarImagem,
     perfil: {
       iniciar: iniciarPerfil,
       dados: function () { return perfilDados; },
