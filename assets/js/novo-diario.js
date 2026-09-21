@@ -448,8 +448,77 @@
         });
       }
     });
+    renderGeral();
     decorar();
     if (!semEcossistema) A.sincronizar();
+  }
+
+  // ── aba Geral: um card por dia com as aulas lançadas pelo Novo Diário ──
+  // A Geral do HTML é escrita à mão; sem isso, a aula lançada só aparecia na
+  // aba da turma. Diários que editam um relato do HTML (origem) já estão lá.
+  var DIAS_SEMANA = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+  function linhaGeral(d) {
+    var r = d.rel || {};
+    var detalhe = d.assunto ? esc(d.assunto) : (r.conteudo ? esc(r.conteudo.split("\n")[0].slice(0, 160)) : "<em>Conteúdo não informado.</em>");
+    return "<strong>" + esc(A.rotulo(d.turma)) + (d.ini && d.fim ? " (" + esc(d.ini) + "–" + esc(d.fim) + ")" : "") +
+      " — " + esc(d.discNome) + ":</strong> " + detalhe;
+  }
+  function horasDe(d) { return d.horas || Math.round((d.minutos || 0) / 60) || 1; }
+  function turmasCurtas(ts) {
+    var rot = ts.map(function (t) { return A.rotulo(t); });
+    // "1ª Série · 2ª Série" vira "1ª · 2ª Série", como nos cards do HTML.
+    return rot.map(function (x, i) { return i < rot.length - 1 && / Série$/.test(rot[rot.length - 1]) ? x.replace(/ Série$/, "") : x; }).join(" · ");
+  }
+  function renderGeral() {
+    var secAll = document.getElementById("sec-all");
+    if (!secAll) return;
+    var ordem = turmasDe();
+    var porDia = {};
+    estado.diarios.forEach(function (d) {
+      if (d.excluido || d.origem || ordem.indexOf(d.turma) < 0 || !d.dateKey) return;
+      (porDia[d.dateKey] = porDia[d.dateKey] || []).push(d);
+    });
+    var estaticos = {};
+    Array.prototype.forEach.call(secAll.querySelectorAll(".ea:not([data-novo-diario])"), function (c) {
+      var k = chaveDoCard(c).slice(0, 10);
+      if (k && !estaticos[k]) estaticos[k] = c;
+    });
+    Object.keys(porDia).forEach(function (dia) {
+      var lista = porDia[dia].sort(function (a, b) {
+        return (a.ini || "").localeCompare(b.ini || "") || ordem.indexOf(a.turma) - ordem.indexOf(b.turma);
+      });
+      var linhas = lista.map(linhaGeral).join("<br>");
+      var fixo = estaticos[dia];
+      if (fixo) {
+        // O dia já tem card no HTML: as aulas novas entram no fim do relato dele.
+        var ct = fixo.querySelector(".ct") || fixo.querySelector(".ipane");
+        if (ct) ct.insertAdjacentHTML("beforeend", '<span data-novo-diario="geral-' + dia + '" data-runtime-ui="novo-diario"><br>' + linhas + "</span>");
+        return;
+      }
+      var dt = new Date(dia + "T12:00:00");
+      var ts = ordem.filter(function (t) { return lista.some(function (d) { return d.turma === t; }); });
+      var discs = [];
+      lista.forEach(function (d) { if (discs.indexOf(d.discNome) < 0) discs.push(d.discNome); });
+      var assuntos = [];
+      lista.forEach(function (d) { if (d.assunto && assuntos.indexOf(d.assunto) < 0) assuntos.push(d.assunto); });
+      var inis = lista.map(function (d) { return d.ini; }).filter(Boolean).sort();
+      var fins = lista.map(function (d) { return d.fim; }).filter(Boolean).sort();
+      var horas = lista.reduce(function (s, d) { return s + horasDe(d); }, 0);
+      var ddmm = dia.slice(8, 10) + "/" + dia.slice(5, 7);
+      var html = '<div class="ea" data-novo-diario="geral-' + dia + '" data-runtime-ui="novo-diario">' +
+        '<div class="eh" onclick="tog(this)"><div class="edb"><div class="d">' + dia.slice(8, 10) + '</div><div class="my">' +
+        MESES[dt.getMonth()] + " " + dt.getFullYear() + '</div></div><div class="em"><div class="ed">' +
+        esc(DIAS_SEMANA[dt.getDay()] + " · " + turmasCurtas(ts) + " · " + discs.join(" · ") + " · " + horas + "h/aula") + '</div><div class="ec">' +
+        (inis.length ? '<span class="ch ch-h">⏰ ' + esc(inis[0]) + "–" + esc(fins[fins.length - 1] || inis[0]) + "</span>" : "") +
+        '<span class="ch ch-p">👥 Aulas regulares</span>' +
+        (assuntos.length ? '<span class="ch ch-i">📖 ' + esc(assuntos.join(" · ").slice(0, 120)) + "</span>" : "") +
+        '</div></div><div class="et">▾</div></div>' +
+        '<div class="ec2"><div class="ipane on" style="padding:16px 22px"><div class="st">Relato do Dia — ' + ddmm + " (" + DIAS_SEMANA[dt.getDay()] + ')</div><div class="ct">' +
+        linhas + "</div></div></div></div>";
+      var holder = document.createElement("div");
+      holder.innerHTML = html;
+      inserirCard(secAll, holder.firstElementChild, dia + "T" + (inis[0] || "00:00"));
+    });
   }
 
   // ── caneta ✏️ em todos os cards das abas de turma ─────────────
