@@ -1,10 +1,15 @@
 // ═══════════════════════════════════════════════════════════════════════
 // meu-diario-ia.js — aba 🤖 I.A do Meu Diário (contas dos professores).
 //
-// Chatbot com a CHAVE DE API DO PRÓPRIO PROFESSOR (Google Gemini, OpenAI,
-// Anthropic Claude ou Groq). O navegador fala direto com o provedor: a chave
-// e as mensagens não passam pelos servidores do Meu Diário. A chave fica só
-// no localStorage deste aparelho.
+// Duas formas de usar:
+//   • IA DA PLATAFORMA (padrão): as chaves grátis do projeto, pela Edge
+//     Function "assistente-ia" (repositório da Biblioteca). Sem chave e sem
+//     custo, com limite diário por conta: 20 mensagens e 4 diários criados
+//     (cota no banco: ia_consumir_cota "assistente" e "diarios"). Planos com
+//     limite maior entram por private.ia_plano. Nomes sempre ocultos.
+//   • CHAVE PRÓPRIA (Google Gemini, OpenAI, Anthropic Claude ou Groq): o
+//     navegador fala direto com o provedor, sem limite da plataforma. A chave
+//     fica só no localStorage deste aparelho.
 //
 // Lê texto, fotos (câmera, galeria, colar), PDF, Word (.docx), planilhas
 // (.xlsx/.xls/.ods/.csv) e arquivos de texto. Recebe um retrato dos dados do
@@ -21,6 +26,7 @@
   "use strict";
 
   var PROV = {
+    plataforma: { nome: "IA da plataforma", sub: "grátis · sem chave · limite diário", link: "", pdf: true, padrao: "automático" },
     gemini: { nome: "Google Gemini", sub: "grátis para começar", link: "https://aistudio.google.com/apikey", pdf: true, padrao: "gemini-2.5-flash" },
     openai: { nome: "OpenAI (ChatGPT)", sub: "pago por uso", link: "https://platform.openai.com/api-keys", pdf: true, padrao: "gpt-4o-mini" },
     anthropic: { nome: "Anthropic (Claude)", sub: "pago por uso", link: "https://console.anthropic.com/settings/keys", pdf: true, padrao: "claude-sonnet-5" },
@@ -34,8 +40,11 @@
   };
   var DIAS = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
   var MAX_ANEXOS = 6, MAX_BYTES = 20 * 1024 * 1024, MAX_TEXTO = 60000, MAX_HIST = 16;
+  // IA da plataforma: mesmos tetos da Edge Function "assistente-ia".
+  var LIMITE_MENSAGENS = 20, LIMITE_DIARIOS = 4, MAX_ANEXOS_PLAT = 4, MAX_BYTES_PLAT = 7 * 1024 * 1024;
 
   var M = null, cfg = null, chat = [], anexos = [], ocupado = false;
+  var saldo = null, ultimoModelo = "";
 
   // ── utilidades ─────────────────────────────────────────────────────
   function esc(v) { return M.esc(v); }
@@ -67,8 +76,8 @@
     var c = null;
     try { c = JSON.parse(localStorage.getItem(cfgKey()) || "null"); } catch (e) {}
     c = c || {};
-    c.prov = PROV[c.prov] ? c.prov : "gemini";
     c.chaves = c.chaves || {}; c.modelos = c.modelos || {}; c.listas = c.listas || {};
+    if (!PROV[c.prov] || (c.prov !== "plataforma" && !c.chaves[c.prov])) c.prov = "plataforma";
     if (c.ocultar === undefined) c.ocultar = true;
     c.auto = !!c.auto;
     return c;
@@ -80,7 +89,33 @@
     try { localStorage.setItem(chatKey(), JSON.stringify(chat)); } catch (e) {}
   }
   function chaveAtual() { return (cfg.chaves[cfg.prov] || "").trim(); }
-  function modeloAtual() { return (cfg.modelos[cfg.prov] || PROV[cfg.prov].padrao).trim(); }
+  function modeloAtual() { return naPlataforma() ? "automático" : (cfg.modelos[cfg.prov] || PROV[cfg.prov].padrao).trim(); }
+  function naPlataforma() { return cfg.prov === "plataforma"; }
+  function pronto() { return naPlataforma() || !!chaveAtual(); }
+  // Na IA da plataforma os nomes vão SEMPRE como código (política de privacidade).
+  function ocultarNomes() { return naPlataforma() || !!cfg.ocultar; }
+
+  // ── saldo da IA da plataforma ──────────────────────────────────────
+  function cliente() { var S = window.RelatorioSupabaseSync; return S && S.getClient ? S.getClient() : null; }
+  function textoSaldo() {
+    if (!saldo) return "grátis · " + LIMITE_MENSAGENS + " mensagens por dia";
+    if (saldo.ilimitado) return "sem limite (administrador)";
+    return saldo.restante > 0 ? "restam " + saldo.restante + " de " + saldo.limite + " mensagens hoje" : "limite de hoje atingido · renova à meia-noite";
+  }
+  function rotuloCabecalho() {
+    if (naPlataforma()) return PROV.plataforma.nome + " · " + textoSaldo();
+    return chaveAtual() ? PROV[cfg.prov].nome + " · " + modeloAtual() : "configure a chave de API para começar";
+  }
+  function mostrarSaldo() {
+    var h = document.querySelector("#sec-ia .ia-chat-h small"); if (h) h.textContent = rotuloCabecalho();
+    var b = document.querySelector('#sec-ia [data-ia="saldo"]'); if (b) b.textContent = textoSaldo();
+    var st = document.querySelector("#sec-ia .ia-cfg summary .ia-st"); if (st && naPlataforma()) st.textContent = "✓ " + textoSaldo();
+  }
+  function atualizarSaldo(c) { if (c) { saldo = c; mostrarSaldo(); } }
+  async function buscarSaldo() {
+    var cli = cliente(); if (!cli || !cli.functions || !naPlataforma()) return;
+    try { var r = await cli.functions.invoke("assistente-ia", { body: { saldo: true } }); if (r.data && r.data.cota) atualizarSaldo(r.data.cota); } catch (e) {}
+  }
 
   // ── nomes dos alunos ↔ códigos «T1.7» ───────────────────────────────
   var ACENTOS = { a: "[aáàâãä]", e: "[eéèêë]", i: "[iíìîï]", o: "[oóòôõö]", u: "[uúùûü]", c: "[cç]", n: "[nñ]" };
@@ -115,7 +150,7 @@
     return { todos: todos, dict: dict, re: re };
   }
   function pseudonimizar(texto, mapa) {
-    if (!cfg.ocultar || !texto) return texto;
+    if (!ocultarNomes() || !texto) return texto;
     mapa = mapa || mapaAlunos();
     if (!mapa.re) return texto;
     return String(texto).replace(mapa.re, function (tudo, antes, nome) { return antes + (mapa.dict[norm(nome)] || nome); });
@@ -147,7 +182,7 @@
         }),
         alunos: t.alunos.map(function (a) {
           var o = { n: a.n };
-          if (cfg.ocultar) o.codigo = "«T" + (i + 1) + "." + a.n + "»"; else o.nome = a.nm;
+          if (ocultarNomes()) o.codigo = "«T" + (i + 1) + "." + a.n + "»"; else o.nome = a.nm;
           if (a.tr) o.transferido = true;
           return o;
         })
@@ -199,7 +234,7 @@
       "- Use só o que o professor informou ou o que está nos DADOS. Nunca invente alunos, datas, faltas, notas ou conteúdos.",
       "- Se faltar algo essencial (turma, data, disciplina), pergunte antes de propor a ação. \"Hoje\" = data de hoje; \"ontem\" = dia anterior.",
       "- Presença: todos estão presentes, a menos que o professor diga quem faltou. Liste só as faltas.",
-      "- Alunos nas ações: pelo número de chamada \"n\" da turma." + (cfg.ocultar ? " Os nomes estão ocultos: cada aluno aparece como «T1.7» (turma de código T1, nº 7). Use esses códigos no texto. Se você ler nomes numa foto ou documento, pode colocar o nome escrito nas listas das ações que o sistema encontra o aluno." : " Nas listas das ações você também pode usar o nome do aluno."),
+      "- Alunos nas ações: pelo número de chamada \"n\" da turma." + (ocultarNomes() ? " Os nomes estão ocultos: cada aluno aparece como «T1.7» (turma de código T1, nº 7). Use esses códigos no texto. Se você ler nomes numa foto ou documento, pode colocar o nome escrito nas listas das ações que o sistema encontra o aluno." : " Nas listas das ações você também pode usar o nome do aluno."),
       "- Turma nas ações: o \"id\" da turma. Disciplina: o nome exato que está nos DADOS.",
       "- Datas AAAA-MM-DD; horários HH:MM; \"horas\" = número inteiro de h/aula.",
       "- Não existe ação para apagar diários: oriente o professor a usar o botão ✏️ do diário.",
@@ -336,7 +371,30 @@
   }
   function textoPartes(partes) { return partes.filter(function (p) { return p.tipo === "texto"; }).map(function (p) { return p.texto; }).join("\n\n"); }
 
+  async function chamarPlataforma(sis, msgs) {
+    var cli = cliente();
+    if (!cli || !cli.functions) throw new Error("Sem conexão com a plataforma. Verifique a internet.");
+    var corpo = {
+      sistema: sis,
+      mensagens: msgs.map(function (m) {
+        return { papel: m.role, partes: m.partes.map(function (x) { return x.tipo === "texto" ? { texto: x.texto } : { midia: { mime: x.mime, dados: x.base64 } }; }) };
+      })
+    };
+    var r = await cli.functions.invoke("assistente-ia", { body: corpo });
+    if (r.error) {
+      var d = {};
+      try { d = await r.error.context.json(); } catch (e) {}
+      atualizarSaldo(d.cota);
+      throw new Error(d.erro || "A IA da plataforma não respondeu agora. Tente de novo em instantes.");
+    }
+    atualizarSaldo(r.data && r.data.cota);
+    if (!r.data || !r.data.texto) throw new Error((r.data && r.data.erro) || "A IA devolveu uma resposta vazia. Tente de novo.");
+    ultimoModelo = r.data.modelo || "";
+    return r.data.texto;
+  }
+
   async function chamar(sis, msgs) {
+    if (naPlataforma()) return chamarPlataforma(sis, msgs);
     var prov = cfg.prov, chave = chaveAtual(), modelo = modeloAtual();
     if (prov === "gemini") {
       var jg = await pedir("https://generativelanguage.googleapis.com/v1beta/models/" + modelo.replace(/^models\//, "") + ":generateContent", {
@@ -468,7 +526,16 @@
     if (ocupado) return;
     var campo = $(".ia-txt"), texto = (campo.value || "").trim();
     if (!texto && !anexos.length) return;
-    if (!chaveAtual()) { abrirConfig(true); return M.toast("Primeiro, cole a sua chave de API."); }
+    if (!pronto()) { abrirConfig(true); return M.toast("Escolha a IA da plataforma ou cole a sua chave de API."); }
+    if (naPlataforma()) {
+      if (saldo && !saldo.ilimitado && saldo.restante <= 0) {
+        chat.push({ role: "erro", texto: "Você usou as " + saldo.limite + " mensagens gratuitas de hoje. A cota renova à meia-noite (horário do Acre). Para continuar agora, cole a sua própria chave de API em 🔑 Configurar." });
+        gravarChat(); return desenharChat();
+      }
+      if (anexos.length > MAX_ANEXOS_PLAT) return M.toast("Na IA da plataforma, envie até " + MAX_ANEXOS_PLAT + " arquivos por mensagem.");
+      var pesados = anexos.filter(function (a) { return a.tipo === "pdf" && a.arquivo.size > 5 * 1024 * 1024; });
+      if (pesados.length) return M.toast("PDF acima de 5 MB não vai pela IA gratuita. Envie menos páginas ou use a sua própria chave.");
+    }
     var envio = anexos.slice();
     var msg = { role: "user", texto: texto, anexos: envio.map(function (a) { return { nome: a.nome, tipo: a.tipo }; }), em: new Date().toISOString() };
     chat.push(msg);
@@ -489,9 +556,10 @@
       if (!texto) atual.partes[0].texto = "(Veja os arquivos enviados.)" + atual.partes[0].texto.replace(/^…/, "");
       var bruto = await chamar(sistema(), msgs);
       var r = extrairAcoes(bruto);
-      var resp = { role: "assistant", texto: r.texto, bruto: bruto, acoes: r.acoes, estados: {}, modelo: PROV[cfg.prov].nome + " · " + modeloAtual(), em: new Date().toISOString() };
+      var resp = { role: "assistant", texto: r.texto, bruto: bruto, acoes: r.acoes, estados: {}, prov: cfg.prov,
+        modelo: naPlataforma() ? PROV.plataforma.nome + (ultimoModelo ? " · " + ultimoModelo : "") : PROV[cfg.prov].nome + " · " + modeloAtual(), em: new Date().toISOString() };
       chat.push(resp);
-      if (cfg.auto && r.acoes.length) aplicarTodas(chat.length - 1, true);
+      if (cfg.auto && r.acoes.length) await aplicarTodas(chat.length - 1, true);
     } catch (e) {
       chat.push({ role: "erro", texto: String((e && e.message) || e) });
     }
@@ -589,8 +657,19 @@
     return padrao || 1;
   }
 
+  // Diário criado por uma resposta da IA da plataforma conta no limite do dia.
+  async function consumirDiario() {
+    var cli = cliente();
+    if (!cli) throw new Error("Sem conexão com a plataforma.");
+    var r = await cli.rpc("ia_consumir_cota", { p_tipo: "diarios", p_limite: LIMITE_DIARIOS });
+    if (r.error) throw new Error("Não consegui conferir o limite de diários agora. Tente de novo.");
+    if (!r.data || !r.data.ok) {
+      throw new Error("A IA gratuita cria até " + ((r.data && r.data.limite) || LIMITE_DIARIOS) + " diários por dia, e esse limite já foi usado hoje. Registre à mão com + Novo Diário ou use a sua própria chave de API.");
+    }
+  }
+
   // Aplica uma ação. Devolve a mensagem de sucesso ou lança o erro.
-  function aplicar(a) {
+  async function aplicar(a, origem) {
     var R = window.MeuDiarioRecursos, perdidos = [], t, d, msg;
     var aviso = function (m) { return perdidos.length ? m + " ⚠️ Não encontrei: " + perdidos.join(", ") + "." : m; };
     switch (a.tipo) {
@@ -600,6 +679,7 @@
         var ini = hora(a.inicio), fim = hora(a.fim);
         var rel = relDaAcao(t, Object.assign({ conteudo: "", faltaram: [], faltas_justificadas: [], comportamento: [], atividade: { houve: false } }, a), perdidos);
         var assunto = txt(a.assunto) || String(rel.conteudo || "").split(/[.\n]/)[0].slice(0, 80) || "Aula";
+        if (origem === "plataforma") await consumirDiario();
         var id = window.NovoDiario.salvar({ turma: t.id, dateKey: a.data, discNome: d.nome, assunto: assunto, ini: ini, fim: fim, horas: horasDe(a, ini, fim, 1), rel: rel });
         if (!id) throw new Error("Não consegui criar o diário (já há registros demais nesta data para esta turma?).");
         msg = "Diário criado: " + t.nome + " · " + d.nome + " · " + M.dataBr(a.data) + ((rel.faltaram || []).length ? " · faltas: " + nomesDe(t, rel.faltaram) : "") + ".";
@@ -707,16 +787,19 @@
     }
     return { ic: "❔", t: a.tipo, d: "" };
   }
-  function aplicarUma(mi, ai) {
+  async function aplicarUma(mi, ai) {
     var m = chat[mi]; if (!m || !m.acoes[ai]) return;
     m.estados = m.estados || {};
     if (m.estados[ai] && m.estados[ai].ok) return;
-    try { m.estados[ai] = { ok: true, msg: aplicar(m.acoes[ai]) }; }
+    try { m.estados[ai] = { ok: true, msg: await aplicar(m.acoes[ai], m.prov) }; }
     catch (e) { m.estados[ai] = { ok: false, msg: String((e && e.message) || e) }; }
   }
-  function aplicarTodas(mi, semDesenhar) {
+  async function aplicarTodas(mi, semDesenhar) {
     var m = chat[mi]; if (!m) return;
-    (m.acoes || []).forEach(function (a, i) { var e = (m.estados || {})[i]; if (!e || (!e.ok && !e.descartada)) aplicarUma(mi, i); });
+    for (var i = 0; i < (m.acoes || []).length; i++) {
+      var e = (m.estados || {})[i];
+      if (!e || (!e.ok && !e.descartada)) await aplicarUma(mi, i);
+    }
     gravarChat();
     if (!semDesenhar) desenharChat();
     var erros = (m.acoes || []).filter(function (a, i) { return m.estados[i] && !m.estados[i].ok && !m.estados[i].descartada; }).length;
@@ -772,6 +855,10 @@
       ".ia-prov{border:2px solid var(--md-linha);border-radius:12px;padding:10px 12px;cursor:pointer;background:var(--md-sup2);text-align:left;color:var(--ce)}" +
       ".ia-prov b{display:block;font-size:.86rem}.ia-prov small{font-size:.72rem;color:var(--cm)}" +
       ".ia-prov.on{border-color:var(--md-destaque);box-shadow:0 0 0 3px color-mix(in srgb,var(--md-destaque) 18%,transparent)}" +
+      ".ia-plano{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;border:1px solid var(--md-linha);border-left:3px solid var(--md-destaque);border-radius:12px;padding:12px 14px;margin:4px 0 10px;background:var(--md-sup2)}" +
+      ".ia-plano>div{display:flex;flex-direction:column;min-width:170px}.ia-plano>div b{font-size:.9rem;color:var(--md-titulo)}.ia-plano>div span{font-size:.8rem;color:var(--md-destaque);font-weight:700}" +
+      ".ia-plano ul{flex:1;min-width:220px;margin:0 0 0 18px;font-size:.8rem;color:var(--cm);line-height:1.6}" +
+      ".ia-prov.gratis b{color:var(--md-destaque)}" +
       ".ia-nota{font-size:.76rem;color:var(--cm);line-height:1.55;background:var(--md-sup2);border:1px dashed var(--md-linha);border-radius:10px;padding:9px 12px;margin-top:10px}" +
       ".ia-chk{display:flex;gap:8px;align-items:flex-start;font-size:.82rem;margin:8px 0;color:var(--ce)}.ia-chk input{margin-top:3px}" +
       ".ia-chat{display:flex;flex-direction:column;padding:0;overflow:hidden}" +
@@ -824,19 +911,36 @@
       "</style>";
   }
   function desenharConfigHtml() {
+    if (naPlataforma()) return configPlataformaHtml();
     var tem = !!chaveAtual(), p = PROV[cfg.prov];
     var lista = cfg.listas[cfg.prov] || [];
     var mod = modeloAtual();
     if (lista.length && lista.indexOf(mod) < 0) lista = [mod].concat(lista);
     return '<details class="md-card ia-cfg"' + (tem ? "" : " open") + '><summary>🔑 Chave de API <span class="ia-st ' + (tem ? "ok" : "no") + '">' + (tem ? "✓ " + esc(p.nome) + " · " + esc(mod) : "Não configurada") + '</span><span style="flex:1"></span><span style="font-size:.74rem;color:var(--cm);font-weight:500">Configurar ▾</span></summary>' +
-      '<p style="margin-top:12px">Use a sua própria conta de IA. Escolha o serviço, crie uma chave no site dele e cole abaixo. <strong>A chave fica guardada só neste aparelho</strong> e as mensagens vão direto do seu navegador para o serviço escolhido — não passam pelos servidores do Meu Diário.</p>' +
-      '<div class="ia-provs">' + Object.keys(PROV).map(function (k) { return '<button type="button" class="ia-prov' + (k === cfg.prov ? " on" : "") + '" data-prov="' + k + '"><b>' + esc(PROV[k].nome) + "</b><small>" + esc(PROV[k].sub) + (cfg.chaves[k] ? " · ✓ chave salva" : "") + "</small></button>"; }).join("") + "</div>" +
+      '<p style="margin-top:12px">Use a sua própria conta de IA, sem o limite diário da plataforma. Escolha o serviço, crie uma chave no site dele e cole abaixo. <strong>A chave fica guardada só neste aparelho</strong> e as mensagens vão direto do seu navegador para o serviço escolhido — não passam pelos servidores do Meu Diário.</p>' +
+      cartoesProvedores() +
       '<div class="md-grid"><div class="md-f"><label>Chave de API — ' + esc(p.nome) + ' · <a href="' + p.link + '" target="_blank" rel="noopener">criar chave ↗</a></label><div class="md-row" style="margin:0"><input type="password" class="md-in" data-ia="chave" value="' + esc(cfg.chaves[cfg.prov] || "") + '" placeholder="Cole a chave aqui" autocomplete="off" spellcheck="false"><button type="button" class="md-btn mini" data-ia="ver" title="Mostrar/ocultar">👁</button></div></div>' +
       '<div class="md-f"><label>Modelo</label>' + (lista.length ? '<select data-ia="modelo">' + lista.map(function (id) { return '<option value="' + esc(id) + '"' + (id === mod ? " selected" : "") + ">" + esc(id) + "</option>"; }).join("") + "</select>" : '<input type="text" data-ia="modelo" value="' + esc(mod) + '">') + "</div></div>" +
       '<label class="ia-chk"><input type="checkbox" data-ia="ocultar"' + (cfg.ocultar ? " checked" : "") + '><span><strong>Ocultar os nomes dos alunos no texto enviado à IA</strong> (recomendado). Cada aluno vai como «T1.7» e a resposta volta com o nome. Fotos e documentos seguem como estão.</span></label>' +
       '<label class="ia-chk"><input type="checkbox" data-ia="auto"' + (cfg.auto ? " checked" : "") + '><span><strong>Aplicar as mudanças automaticamente</strong>, sem pedir confirmação. Deixe desligado para revisar cada ação antes.</span></label>' +
       '<div class="md-row" style="flex-wrap:wrap;margin-top:6px"><button type="button" class="md-btn pri" data-ia="testar">🔌 Testar e salvar</button>' + (tem ? '<button type="button" class="md-btn perigo" data-ia="remover">Remover chave</button>' : "") + '<span data-ia="msg" style="font-size:.8rem;color:var(--cm)"></span></div>' +
       '<div class="ia-nota">💡 <strong>Qual escolher?</strong> O <strong>Google Gemini</strong> tem uso gratuito e lê fotos e PDFs — bom para começar. OpenAI e Claude cobram por uso, na conta do próprio professor. O Groq é gratuito com limites e lê fotos (PDF só com texto). O uso e os custos da chave são responsabilidade do titular da conta no serviço de IA.</div></details>';
+  }
+  function cartoesProvedores() {
+    return '<div class="ia-provs">' + Object.keys(PROV).map(function (k) {
+      var extra = k === "plataforma" ? "" : (cfg.chaves[k] ? " · ✓ chave salva" : "");
+      return '<button type="button" class="ia-prov' + (k === cfg.prov ? " on" : "") + (k === "plataforma" ? " gratis" : "") + '" data-prov="' + k + '"><b>' + (k === "plataforma" ? "⚡ " : "") + esc(PROV[k].nome) + "</b><small>" + esc(PROV[k].sub) + extra + "</small></button>";
+    }).join("") + "</div>";
+  }
+  function configPlataformaHtml() {
+    return '<details class="md-card ia-cfg"><summary>🤖 IA da plataforma <span class="ia-st ok">✓ ' + esc(textoSaldo()) + '</span><span style="flex:1"></span><span style="font-size:.74rem;color:var(--cm);font-weight:500">Trocar ▾</span></summary>' +
+      '<p style="margin-top:12px">Você está usando a <strong>IA gratuita do RELATORIO SKIN</strong>: não precisa de chave nem de conta em outro serviço. Para usar sem limite, escolha um serviço abaixo e cole a sua própria chave.</p>' +
+      cartoesProvedores() +
+      '<div class="ia-plano"><div><b>Plano gratuito</b><span data-ia="saldo">' + esc(textoSaldo()) + '</span></div>' +
+      '<ul><li><strong>' + LIMITE_MENSAGENS + ' mensagens por dia</strong> ao assistente</li><li><strong>' + LIMITE_DIARIOS + ' diários por dia</strong> criados pela IA</li><li>Renova à meia-noite (horário do Acre)</li><li>Lê fotos e PDFs (até ' + MAX_ANEXOS_PLAT + ' arquivos, 7 MB por mensagem)</li></ul>' +
+      '<button type="button" class="md-btn mini" data-ia="atualizar">↻ Atualizar saldo</button></div>' +
+      '<label class="ia-chk"><input type="checkbox" data-ia="auto"' + (cfg.auto ? " checked" : "") + '><span><strong>Aplicar as mudanças automaticamente</strong>, sem pedir confirmação. Deixe desligado para revisar cada ação antes.</span></label>' +
+      '<div class="ia-nota">🔒 Nesta opção os nomes dos alunos são <strong>sempre</strong> trocados por códigos antes de sair do seu aparelho. As mensagens passam pelos servidores da plataforma e são processadas pelos serviços de IA do projeto (Google Gemini, Groq ou OpenRouter). Fotos e documentos seguem como estão.<br>✨ <strong>Em breve:</strong> planos de IA com limites maiores.</div></details>';
   }
   var SUGESTOES = [
     ["📝 Registrar a aula de hoje", "Registre a aula de hoje: turma , disciplina , das  às . Conteúdo: . Faltaram: ."],
@@ -872,7 +976,7 @@
     if (pensando) html += '<div class="ia-pensa">🤖 Pensando <i></i><i></i><i></i></div>';
     box.innerHTML = html;
     box.scrollTop = box.scrollHeight;
-    box.querySelectorAll("[data-ap]").forEach(function (b) { b.onclick = function () { var p = b.getAttribute("data-ap").split(":"); aplicarUma(+p[0], +p[1]); gravarChat(); desenharChat(); }; });
+    box.querySelectorAll("[data-ap]").forEach(function (b) { b.onclick = function () { var p = b.getAttribute("data-ap").split(":"); b.disabled = true; aplicarUma(+p[0], +p[1]).then(function () { gravarChat(); desenharChat(); }); }; });
     box.querySelectorAll("[data-ds]").forEach(function (b) { b.onclick = function () { var p = b.getAttribute("data-ds").split(":"), m = chat[+p[0]]; m.estados = m.estados || {}; m.estados[+p[1]] = { ok: false, descartada: true }; gravarChat(); desenharChat(); }; });
     box.querySelectorAll("[data-apt]").forEach(function (b) { b.onclick = function () { aplicarTodas(+b.getAttribute("data-apt")); }; });
     box.querySelectorAll("[data-dst]").forEach(function (b) { b.onclick = function () { var m = chat[+b.getAttribute("data-dst")]; m.estados = m.estados || {}; m.acoes.forEach(function (a, i) { if (!m.estados[i] || !m.estados[i].ok) m.estados[i] = { ok: false, descartada: true }; }); gravarChat(); desenharChat(); }; });
@@ -890,7 +994,7 @@
     var cfgAberta = sec.querySelector(".ia-cfg") ? sec.querySelector(".ia-cfg").open : null;
     sec.innerHTML = '<div class="th"><div class="tb ia">🤖</div><div class="ti"><h2>Assistente de I.A</h2><p>Converse, envie fotos, PDFs, planilhas e documentos · a I.A propõe as mudanças no diário e você confirma</p></div></div>' + estilo() +
       '<div class="ia-wrap">' + desenharConfigHtml() +
-      '<div class="md-card ia-chat"><div class="ia-chat-h"><b>🤖 Assistente</b><small>' + (chaveAtual() ? esc(PROV[cfg.prov].nome + " · " + modeloAtual()) : "configure a chave de API para começar") + '</small><button type="button" data-ia="limpar">🗑 Nova conversa</button></div>' +
+      '<div class="md-card ia-chat"><div class="ia-chat-h"><b>🤖 Assistente</b><small>' + esc(rotuloCabecalho()) + '</small><button type="button" data-ia="limpar">🗑 Nova conversa</button></div>' +
       '<div class="ia-msgs"></div>' +
       '<div class="ia-sug">' + SUGESTOES.map(function (s, i) { return '<button type="button" data-sug="' + i + '">' + esc(s[0]) + "</button>"; }).join("") + "</div>" +
       '<div class="ia-anexos" hidden></div>' +
@@ -898,7 +1002,7 @@
       '<textarea class="ia-txt" rows="1" placeholder="Escreva aqui…" title="Enter envia · Shift+Enter quebra a linha"></textarea><button type="button" class="ib env">Enviar ➤</button></div>' +
       '<input type="file" data-ia="arq" multiple hidden accept="image/*,.pdf,.docx,.xlsx,.xls,.ods,.csv,.tsv,.txt,.md,.json,.html,.htm,.xml">' +
       '<input type="file" data-ia="cam" hidden accept="image/*" capture="environment"></div></div>';
-    if (cfgAberta !== null) sec.querySelector(".ia-cfg").open = cfgAberta || !chaveAtual();
+    if (cfgAberta !== null) sec.querySelector(".ia-cfg").open = cfgAberta || !pronto();
     ligar(sec);
     var t = sec.querySelector(".ia-txt"); t.value = rascunho; ajustarAltura(t);
     desenharChat(ocupado);
@@ -906,12 +1010,14 @@
   }
   function ligar(sec) {
     var q = function (s) { return sec.querySelector(s); };
-    sec.querySelectorAll("[data-prov]").forEach(function (b) { b.onclick = function () { cfg.prov = b.getAttribute("data-prov"); gravarCfg(); desenhar(); abrirConfig(); }; });
-    q('[data-ia="ver"]').onclick = function () { var c = q('[data-ia="chave"]'); c.type = c.type === "password" ? "text" : "password"; };
-    q('[data-ia="ocultar"]').onchange = function () { cfg.ocultar = this.checked; gravarCfg(); };
-    q('[data-ia="auto"]').onchange = function () { cfg.auto = this.checked; gravarCfg(); };
-    q('[data-ia="modelo"]').onchange = function () { cfg.modelos[cfg.prov] = this.value.trim(); gravarCfg(); desenhar(); };
-    q('[data-ia="testar"]').onclick = async function () {
+    sec.querySelectorAll("[data-prov]").forEach(function (b) { b.onclick = function () { cfg.prov = b.getAttribute("data-prov"); gravarCfg(); desenhar(); abrirConfig(); if (naPlataforma()) buscarSaldo(); }; });
+    var liga = function (sel, ev, fn) { var el = q(sel); if (el) el[ev] = fn; };
+    liga('[data-ia="ver"]', "onclick", function () { var c = q('[data-ia="chave"]'); c.type = c.type === "password" ? "text" : "password"; });
+    liga('[data-ia="ocultar"]', "onchange", function () { cfg.ocultar = this.checked; gravarCfg(); });
+    liga('[data-ia="auto"]', "onchange", function () { cfg.auto = this.checked; gravarCfg(); });
+    liga('[data-ia="modelo"]', "onchange", function () { cfg.modelos[cfg.prov] = this.value.trim(); gravarCfg(); desenhar(); });
+    liga('[data-ia="atualizar"]', "onclick", function () { buscarSaldo(); M.toast("Saldo atualizado."); });
+    liga('[data-ia="testar"]', "onclick", async function () {
       var btn = this, msg = q('[data-ia="msg"]'), chave = q('[data-ia="chave"]').value.trim();
       if (!chave) { msg.textContent = "Cole a chave primeiro."; return; }
       btn.disabled = true; msg.textContent = "Testando…";
@@ -928,7 +1034,7 @@
       } catch (e) {
         btn.disabled = false; msg.textContent = "✖ " + ((e && e.message) || e);
       }
-    };
+    });
     var rm = q('[data-ia="remover"]');
     if (rm) rm.onclick = function () { if (!confirm("Remover a chave do " + PROV[cfg.prov].nome + " deste aparelho?")) return; delete cfg.chaves[cfg.prov]; delete cfg.listas[cfg.prov]; gravarCfg(); desenhar(); };
     q('[data-ia="limpar"]').onclick = function () { if (chat.length && !confirm("Começar uma nova conversa? As mensagens desta conversa somem deste aparelho (o que já foi aplicado no diário continua).")) return; chat = []; gravarChat(); desenharChat(); };
@@ -962,7 +1068,7 @@
   (window.MD_MODULOS = window.MD_MODULOS || []).push({
     nome: "ia",
     iniciar: function (api) { M = api; cfg = lerCfg(); chat = lerChat(); },
-    desenhar: function () { if (!document.querySelector("#sec-ia .ia-wrap")) desenhar(); else { var h = document.querySelector("#sec-ia .ia-chat-h small"); if (h) h.textContent = chaveAtual() ? PROV[cfg.prov].nome + " · " + modeloAtual() : "configure a chave de API para começar"; } },
-    aoAbrir: function (id) { if (id === "ia") { var t = $(".ia-txt"); if (t && !("ontouchstart" in window)) setTimeout(function () { t.focus(); }, 60); } }
+    desenhar: function () { if (!document.querySelector("#sec-ia .ia-wrap")) desenhar(); else mostrarSaldo(); },
+    aoAbrir: function (id) { if (id === "ia") { buscarSaldo(); var t = $(".ia-txt"); if (t && !("ontouchstart" in window)) setTimeout(function () { t.focus(); }, 60); } }
   });
 })();
