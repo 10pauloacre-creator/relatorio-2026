@@ -21,7 +21,7 @@
 <script defer src="assets/js/dark-mode-2026.js?v=20260921b"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260921m"></script>
-<script defer src="assets/js/conta-skin.js?v=20260921e"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921f"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--ou:#c9a84c;--os:#f5e6be;--ce:#2b2b2b;--cm:#5a5a5a;--ra:#c0392b;--rs:#fdecea;
   --sup:#fff;--sup2:#faf8f2;--sup3:#f5f3ee;--linha:#e8e5de;--titulo:#1a3a2a;--acento:#2d6147;--acento-txt:#fff;--fundo:#faf8f2;--ss:0 4px 24px rgba(26,58,42,.10)}
@@ -75,6 +75,12 @@ html.dark-2026 .card{border-color:var(--linha)}
 .btn.perigo{background:var(--rs);color:var(--ra);border-color:rgba(192,57,43,.35)}
 .btn.mini{padding:6px 10px;font-size:.76rem;border-radius:8px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
+.form-lista{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+.form-item{display:grid;grid-template-columns:170px minmax(0,1.4fr) minmax(0,1fr) 92px 34px;gap:8px;align-items:center;padding:10px;border:1px solid var(--linha);border-radius:12px;background:var(--sup2)}
+.form-item select,.form-item input{padding:9px 10px;border:2px solid var(--linha);border-radius:10px;font-size:.88rem;color:var(--ce);background:var(--sup);width:100%;min-width:0}
+.form-item .rm{width:34px;height:34px;border-radius:9px;border:1px solid var(--linha);background:none;color:var(--ra);cursor:pointer;font-size:.95rem}
+.form-vazio{font-size:.84rem;color:var(--cm)}
+@media(max-width:720px){.form-item{grid-template-columns:1fr 1fr}.form-item .curso{grid-column:1/-1;order:-1}.form-item .rm{justify-self:end}}
 .disc{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .disc span{display:inline-flex;align-items:center;gap:6px;background:var(--sup3);border:1px solid var(--linha);border-radius:999px;padding:4px 6px 4px 11px;font-size:.82rem}
 .disc button{border:none;background:none;color:var(--ra);cursor:pointer;font-size:.9rem}
@@ -135,7 +141,10 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
     <div class="grid">
       <div class="f full"><label for="p-nome">Nome completo</label><input id="p-nome" autocomplete="name"></div>
       <div class="f"><label for="p-nasc">Data de nascimento</label><input id="p-nasc" type="date"><span class="dica" id="p-idade"></span></div>
-      <div class="f"><label for="p-formacao">Formação</label><input id="p-formacao" placeholder="Ex.: Licenciatura em Letras — UFAC"></div>
+      <div class="f full"><label>Formação profissional</label>
+        <div class="form-lista" id="p-form"></div>
+        <div><button type="button" class="btn mini" id="p-form-add">+ Adicionar formação</button></div>
+      </div>
       <div class="f full"><label for="p-disc-in">Disciplinas que leciona</label>
         <div class="linha"><input id="p-disc-in" list="lista-disc" placeholder="Digite e toque em Adicionar (ou Enter)"><button type="button" class="btn mini" id="p-disc-add">+ Adicionar</button></div>
         <div class="disc" id="p-disc"></div>
@@ -212,7 +221,7 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
   function esc(v) { return C.esc(v); }
   function toast(m) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3200); }
   function sb() { return S.getClient(); }
-  var CAMPOS = { 'p-nome': 'nome', 'p-nasc': 'nascimento', 'p-formacao': 'formacao', 'p-cidade': 'cidade', 'p-uf': 'uf', 'p-email': 'emailContato', 'p-tel': 'telefone', 'p-lattes': 'lattes', 'p-sobre': 'sobre' };
+  var CAMPOS = { 'p-nome': 'nome', 'p-nasc': 'nascimento', 'p-cidade': 'cidade', 'p-uf': 'uf', 'p-email': 'emailContato', 'p-tel': 'telefone', 'p-lattes': 'lattes', 'p-sobre': 'sobre' };
   var RESTRITOS = { 'r-mat': 'matricula', 'r-planos': 'linkPlanos', 'r-seq': 'linkSequencias', 'r-rel': 'linkRelatorios' };
 
   function marcarSujo() { sujo = true; $('salvar').textContent = '💾 Salvar alterações'; }
@@ -220,7 +229,7 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
     P = C.perfil.dados();
     Object.keys(CAMPOS).forEach(function (id) { $(id).value = P[CAMPOS[id]] || ''; });
     Object.keys(RESTRITOS).forEach(function (id) { $(id).value = P.restrito[RESTRITOS[id]] || ''; });
-    desenharTopo(); desenharDisc(); desenharCerts(); desenharLinks();
+    desenharTopo(); desenharDisc(); desenharFormacoes(formacoesDe(P)); desenharCerts(); desenharLinks();
   }
   function lerFormulario() {
     // Se chegou uma versão do banco durante a edição, o que está na tela vence
@@ -234,6 +243,39 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
     }
     Object.keys(CAMPOS).forEach(function (id) { P[CAMPOS[id]] = $(id).value.trim(); });
     Object.keys(RESTRITOS).forEach(function (id) { P.restrito[RESTRITOS[id]] = $(id).value.trim(); });
+    P.formacoes = lerFormacoes().filter(function (f) { return f.curso || f.instituicao; });
+    // Resumo em texto no campo antigo, para quem ainda lê "formacao".
+    P.formacao = P.formacoes.map(resumoFormacao).join('; ');
+  }
+
+  // ── Formação profissional (várias) ────────────────────────────────────
+  var NIVEIS = ['', 'Técnico', 'Licenciatura', 'Bacharelado', 'Tecnólogo', 'Especialização', 'MBA', 'Mestrado', 'Doutorado', 'Pós-doutorado', 'Outro'];
+  // Perfis antigos têm só o texto "formacao": vira o primeiro item.
+  function formacoesDe(p) {
+    if (Array.isArray(p.formacoes) && p.formacoes.length) return p.formacoes.slice();
+    return p.formacao ? [{ nivel: '', curso: p.formacao, instituicao: '', ano: '' }] : [];
+  }
+  function resumoFormacao(f) {
+    var curso = [f.nivel, f.curso].filter(Boolean).join(' em ');
+    return curso + (f.instituicao ? ' — ' + f.instituicao : '') + (f.ano ? ' (' + f.ano + ')' : '');
+  }
+  function lerFormacoes() {
+    return Array.prototype.map.call($('p-form').querySelectorAll('.form-item'), function (el) {
+      var v = function (k) { return el.querySelector('[data-f="' + k + '"]').value.trim(); };
+      return { nivel: v('nivel'), curso: v('curso'), instituicao: v('instituicao'), ano: v('ano') };
+    });
+  }
+  function desenharFormacoes(lista) {
+    if (!lista.length) lista = [{ nivel: '', curso: '', instituicao: '', ano: '' }];
+    $('p-form').innerHTML = lista.map(function (f, i) {
+      return '<div class="form-item">'
+        + '<select data-f="nivel" aria-label="Nível">' + NIVEIS.map(function (n) { return '<option value="' + esc(n) + '"' + (n === (f.nivel || '') ? ' selected' : '') + '>' + (n || 'Nível…') + '</option>'; }).join('') + '</select>'
+        + '<input class="curso" data-f="curso" placeholder="Curso (ex.: Letras — Português)" aria-label="Curso" value="' + esc(f.curso || '') + '">'
+        + '<input data-f="instituicao" placeholder="Instituição (ex.: UFAC)" aria-label="Instituição" value="' + esc(f.instituicao || '') + '">'
+        + '<input data-f="ano" inputmode="numeric" maxlength="4" placeholder="Ano" aria-label="Ano de conclusão" value="' + esc(f.ano || '') + '">'
+        + '<button type="button" class="rm" data-rm-form="' + i + '" title="Remover esta formação" aria-label="Remover esta formação">✕</button>'
+        + '</div>';
+    }).join('');
   }
   function desenharTopo() {
     var nome = $('p-nome').value.trim() || u.nome || 'Meu perfil';
@@ -398,6 +440,18 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
       el.addEventListener('input', function () { marcarSujo(); desenharTopo(); desenharLinks(); });
     });
     $('p-disc-add').onclick = addDisc;
+    $('p-form-add').onclick = function () {
+      var l = lerFormacoes(); l.push({ nivel: '', curso: '', instituicao: '', ano: '' });
+      desenharFormacoes(l); marcarSujo();
+      var itens = $('p-form').querySelectorAll('.form-item'); itens[itens.length - 1].querySelector('select').focus();
+    };
+    $('p-form').addEventListener('input', marcarSujo);
+    $('p-form').addEventListener('change', marcarSujo);
+    $('p-form').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-rm-form]'); if (!b) return;
+      var l = lerFormacoes(); l.splice(+b.getAttribute('data-rm-form'), 1);
+      desenharFormacoes(l); marcarSujo();
+    });
     $('p-disc-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addDisc(); } });
     $('foto-arq').onchange = function () {
       var f = this.files[0]; if (!f) return;

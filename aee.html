@@ -21,7 +21,7 @@
 <script defer src="assets/js/dark-mode-2026.js?v=20260921b"></script><script defer src="assets/js/barra-lateral.js?v=20260921c"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260921m"></script>
-<script defer src="assets/js/conta-skin.js?v=20260921e"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921f"></script>
 <script defer src="assets/js/meu-diario-ia.js?v=20260921b"></script>
 <style>
 /* Base visual do Meu Diário (copiada de meu-diario.html) */
@@ -927,14 +927,13 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     };
     var bx=sec.querySelector('[data-pg="escola"]');
     if(bx)bx.onclick=function(){
-      C.confirmarPerigo({titulo:'Excluir a escola "'+ESC.nome+'"?',texto:'A escola sai da sua conta e você deixa de ver os '+VINC.length+' aluno(s) dela.'+(OCUP.indexOf('regente')>=0?' As turmas e diários de regente dessa escola também são apagados.':''),botao:'Sim, excluir a escola'}).then(function(ok){
+      C.confirmarPerigo({titulo:'Excluir a escola "'+ESC.nome+'"?',texto:'<b>Todos os registros desta escola serão apagados</b>: alunos da Educação Especial que só você acompanha (perfil, PEI, registros e documentos)'+(OCUP.indexOf('regente')>=0?', e as turmas, diários, plano, sequências, livros e eventos de regente':'')+'. Nos alunos que têm outros profissionais, você só sai do perfil e a equipe continua.',botao:'Sim, excluir a escola',botaoFinal:'Excluir a escola e todos os registros'}).then(function(ok){
         if(!ok)return;toast('Excluindo a escola…');
         var ids=(E.turmas||[]).filter(function(t){return t.escolaId===ESCOLA_ID;}).map(function(t){return t.id;});
         E.turmas=(E.turmas||[]).filter(function(t){return t.escolaId!==ESCOLA_ID;});
         E.escolas=(E.escolas||[]).filter(function(x){return x.id!==ESCOLA_ID;});
-        Promise.all([salvarE(),cli.from('aee_vinculos').delete().eq('user_id',usuario.id).in('aluno_id',VINC.map(function(v){return v.aluno_id;}).concat(['00000000-0000-0000-0000-000000000000'])),C.desvincularEscola(ESCOLA_ID)])
+        Promise.all([salvarE(),C.desvincularEscola(ESCOLA_ID),C.limparEscola({escolaLocal:ESCOLA_ID,turmas:ids,senha:ok,diarios:true})])
           .then(function(){setTimeout(function(){location.replace('escolas.html');},1000);});
-        if(ids.length)toast('As turmas de regente desta escola saem da lista. Os diários antigos continuam no backup do banco.');
       });
     };
   }

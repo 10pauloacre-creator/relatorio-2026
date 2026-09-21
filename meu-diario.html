@@ -24,7 +24,7 @@ window.NOVO_DIARIO_MANUAL = true;
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260921m"></script>
 <script defer src="assets/js/ano-letivo.js?v=20260921a"></script>
-<script defer src="assets/js/conta-skin.js?v=20260921e"></script>
+<script defer src="assets/js/conta-skin.js?v=20260921f"></script>
 <script defer src="assets/js/meu-diario-recursos.js?v=20260921a"></script>
 <script defer src="assets/js/meu-diario-ia.js?v=20260921b"></script>
 <script defer src="assets/js/novo-diario.js?v=20260921c"></script>
@@ -815,7 +815,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     };
     sec.querySelector('[data-pg="excluir-escola"]').onclick=function(){
       var e=escolaAtual();
-      C().confirmarPerigo({titulo:'Excluir a escola "'+e.nome+'"?',texto:'Todas as turmas (de todos os anos), alunos, diários, plano de aulas, sequências, livros e eventos desta escola serão apagados. As outras escolas não mudam.',botao:'Sim, excluir a escola'}).then(function(ok){
+      C().confirmarPerigo({titulo:'Excluir a escola "'+e.nome+'"?',texto:'<b>Todos os registros desta escola serão apagados</b>: turmas (de todos os anos), alunos, diários, presença, atividades, plano de aulas, sequências, livros e eventos. Alunos da Educação Especial que só você acompanha também são apagados, com os documentos; nos que têm outros profissionais, você só sai do perfil. As outras escolas não mudam.',botao:'Sim, excluir a escola',botaoFinal:'Excluir a escola e todos os registros'}).then(function(ok){
         if(!ok)return;
         var ids=turmasDaEscola().map(function(t){return t.id;});
         if(window.NovoDiario)window.NovoDiario.removerTurmas(ids);
@@ -825,7 +825,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
         toast('Excluindo a escola…');
         E.atualizadoEm=agora();
         try{localStorage.setItem(lsKey(),JSON.stringify(E));}catch(x){}
-        Promise.all([syncE.pushNow('force'),C().desvincularEscola(ESCOLA_ID)]).then(function(){
+        Promise.all([syncE.pushNow('force'),C().desvincularEscola(ESCOLA_ID),C().limparEscola({escolaLocal:ESCOLA_ID,turmas:ids,senha:ok})]).then(function(){
           setTimeout(function(){location.replace('escolas.html');},1200);
         });
       });

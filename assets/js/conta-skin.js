@@ -292,7 +292,7 @@
   function perfilVazio() {
     var u = usuario(), nome = u.nome || "";
     try { var e = JSON.parse(localStorage.getItem("md_estrutura_" + u.id) || "null"); if (e && e.perfil && e.perfil.nome) nome = e.perfil.nome; } catch (x) {}
-    return { versao: 1, foto: "", nome: nome, nascimento: "", disciplinas: [], formacao: "", cidade: "", uf: "", sobre: "", emailContato: "", telefone: "", lattes: "",
+    return { versao: 1, foto: "", nome: nome, nascimento: "", disciplinas: [], formacao: "", formacoes: [], cidade: "", uf: "", sobre: "", emailContato: "", telefone: "", lattes: "",
       restrito: { matricula: "", certificados: [], linkPlanos: "", linkSequencias: "", linkRelatorios: "" }, atualizadoEm: "" };
   }
   function normalizarPerfil(p) {
@@ -595,7 +595,61 @@
     });
   }
 
+  // ── Excluir escola: limpeza de TODOS os registros dela (Etapa 16) ─────
+  // o.escolaLocal: id da escola na conta; o.turmas: ids das turmas dela;
+  // o.senha: o que a pessoa digitou em confirmarPerigo (senha ou e-mail).
+  // o.diarios: também limpa diários e plano/sequências/livros/eventos
+  // direto em professor_dados (quando a página não tem esses módulos).
+  // Alunos da Educação Especial: se só esta conta trabalha com o aluno, ele
+  // é apagado (com os documentos); se há outros profissionais, esta conta só
+  // sai do perfil. Devolve {alunosApagados, alunosDeixados}.
+  function limparEscola(o) {
+    var c = cliente(), u = usuario(), res = { alunosApagados: 0, alunosDeixados: 0 };
+    if (!c || !u.id) return Promise.resolve(res);
+    var tarefas = [];
+    tarefas.push(verificarSenha("").then(function (tem) {
+      return c.from("aee_vinculos").select("aluno_id,papel").eq("user_id", u.id).eq("escola_local", o.escolaLocal).then(function (r) {
+        return (r.data || []).reduce(function (p, v) {
+          return p.then(function () {
+            return c.from("aee_vinculos").select("user_id").eq("aluno_id", v.aluno_id).then(function (eq) {
+              var so = (eq.data || []).length <= 1 && (v.papel === "mediador" || v.papel === "aee");
+              if (!so) { res.alunosDeixados++; return c.from("aee_vinculos").delete().eq("aluno_id", v.aluno_id).eq("user_id", u.id); }
+              return c.from("aee_documentos").select("caminho").eq("aluno_id", v.aluno_id).then(function (d) {
+                var l = (d.data || []).map(function (x) { return x.caminho; });
+                return l.length ? c.storage.from("aee-arquivos").remove(l) : null;
+              }).then(function () {
+                return c.rpc("aee_excluir_aluno", { p_aluno: v.aluno_id, p_senha: tem === null ? "" : o.senha, p_confirmacao: tem === null ? o.senha : "" });
+              }).then(function (x) { if (!x.error) res.alunosApagados++; });
+            });
+          });
+        }, Promise.resolve());
+      });
+    }));
+    if (o.diarios && (o.turmas || []).length) {
+      var alvo = {}; o.turmas.forEach(function (t) { alvo[t] = 1; });
+      var agora = new Date().toISOString();
+      var mexer = function (scope, lsk, fn) {
+        return c.from("professor_dados").select("payload").eq("user_id", u.id).eq("scope_key", scope).maybeSingle().then(function (r) {
+          var p = r.data && r.data.payload; if (!p) return;
+          fn(p); p.atualizadoEm = agora;
+          try { localStorage.setItem(lsk + u.id, JSON.stringify(p)); } catch (e) {}
+          return c.from("professor_dados").upsert({ user_id: u.id, scope_key: scope, payload: p, updated_at: agora, source: "excluir-escola" }, { onConflict: "user_id,scope_key" });
+        });
+      };
+      tarefas.push(mexer("meu-diario:diarios:v1", "md_diarios_", function (p) {
+        p.removidos = p.removidos || [];
+        p.diarios = (p.diarios || []).filter(function (d) { if (alvo[d.turma]) { p.removidos.push({ id: d.id, em: agora }); return false; } return true; });
+      }));
+      tarefas.push(mexer("meu-diario:recursos:v1", "md_recursos_", function (p) {
+        ["plano", "seq", "livros"].forEach(function (k) { Object.keys(p[k] || {}).forEach(function (ch) { if (alvo[ch.split("|")[0]]) delete p[k][ch]; }); });
+        if (p.cal && p.cal.eventos) p.cal.eventos = p.cal.eventos.filter(function (e) { return e.escolaId !== o.escolaLocal; });
+      }));
+    }
+    return Promise.all(tarefas).then(function () { return res; }).catch(function () { return res; });
+  }
+
   window.ContaSkin = {
+    limparEscola: limparEscola,
     esc: esc, iniciais: iniciais, janela: janela, estilo: estilo, UFS: UFS,
     verificarSenha: verificarSenha, confirmarPerigo: confirmarPerigo, reduzirImagem: reduzirImagem, recortarImagem: recortarImagem,
     perfil: {
