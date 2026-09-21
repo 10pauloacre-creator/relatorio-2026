@@ -3,9 +3,12 @@
 
   var DATA = window.CASAVEQUIA_CALENDAR_DATA;
   var YEAR = 2026;
-  var STORAGE_KEY = 'pc_calendar_overrides_v1';
-  var STORAGE_TS_KEY = 'pc_calendar_overrides_ts_v1';
-  var REMOTE_SCOPE = 'casavequia:calendar-overrides:shared-v1';
+  // Outra escola (ex.: Hermínio) usa o mesmo calendário estadual com as
+  // próprias edições: window.PC_CALENDAR_CONFIG = {storageKey, remoteScope, schoolSlug, source}.
+  var CFG = window.PC_CALENDAR_CONFIG || {};
+  var STORAGE_KEY = CFG.storageKey || 'pc_calendar_overrides_v1';
+  var STORAGE_TS_KEY = STORAGE_KEY.replace(/_v1$/, '') + '_ts_v1';
+  var REMOTE_SCOPE = CFG.remoteScope || 'casavequia:calendar-overrides:shared-v1';
   var MONTH_NAMES = [
     'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
     'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
@@ -1154,9 +1157,9 @@
     }
     remoteSync = window.RelatorioSupabaseSync.createScopeSync({
       scope: REMOTE_SCOPE,
-      schoolSlug: 'padre-carlos-casavequia',
+      schoolSlug: CFG.schoolSlug || 'padre-carlos-casavequia',
       classSlug: 'calendario',
-      source: 'casavequia-calendar',
+      source: CFG.source || 'casavequia-calendar',
       debounceMs: 450,
       getLocalPayload: function () {
         return buildOverridePayload();

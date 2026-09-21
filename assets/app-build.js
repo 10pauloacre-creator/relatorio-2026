@@ -21,14 +21,14 @@ window.__RELATORIOS_APP_BUILD__ = {
   if (!hasThemeStyles) {
     var themeLink = document.createElement("link");
     themeLink.rel = "stylesheet";
-    themeLink.href = "assets/css/dark-mode-2026.css?v=20260921a";
+    themeLink.href = "assets/css/dark-mode-2026.css?v=20260921b";
     head.appendChild(themeLink);
   }
 
   if (!window.__RELATORIO_DARK_THEME_2026__ &&
       !document.querySelector('script[src*="dark-mode-2026.js"]')) {
     var themeScript = document.createElement("script");
-    themeScript.src = "assets/js/dark-mode-2026.js?v=20260921a";
+    themeScript.src = "assets/js/dark-mode-2026.js?v=20260921b";
     head.appendChild(themeScript);
   }
 })();
