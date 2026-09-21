@@ -6,6 +6,7 @@
   "scripts": {
     "build:web": "node scripts/build-web-release.js",
     "build:pages": "node scripts/build-pages-release.js",
+    "check:login": "node scripts/check-tela-login.js",
     "android:add": "npm run build:web && npx cap add android",
     "cap:copy": "npm run build:web && npx cap copy android",
     "cap:sync": "npm run build:web && npx cap sync android",
