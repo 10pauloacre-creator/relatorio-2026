@@ -749,7 +749,7 @@ html.dark-2026 body.modo-escuro #rh-plan-clone-root :is(.main-tab.active, .disc-
 }
 
 /* Calendario, contadores e caixas auxiliares seguem as mesmas superficies. */
-html.dark-2026 body.modo-escuro :is(
+html.dark-2026 body :is(
   .pc-cal-shell, .pc-cal-agenda, .pc-cal-week-section, .pc-cal-mini-month,
   .pc-cal-modal-inner, .pc-cal-edit-form, .pc-cal-grid, .pc-cal-day,
   .pc-cal-agenda-item, .pc-cal-modal-card, .pc-cal-list-empty
@@ -760,13 +760,13 @@ html.dark-2026 body.modo-escuro :is(
   box-shadow: none !important;
 }
 
-html.dark-2026 body.modo-escuro :is(.pc-cal-intro, .pc-cal-day-summary, .pres-av, .atv-tema, #plano-ultima-mod) {
+html.dark-2026 body :is(.pc-cal-intro, .pc-cal-day-summary, .pres-av, .atv-tema, #plano-ultima-mod) {
   color: var(--dark-text) !important;
   background: var(--dark-surface-2) !important;
   border-color: var(--dark-line) !important;
 }
 
-html.dark-2026 body.modo-escuro :is(.pc-cal-title, .pc-cal-day-date, .pc-cal-mini-top h3, .pc-cal-modal-date, .pc-cal-modal-top h3, .pc-cal-agenda-head h3, .pc-cal-week-section-top strong) {
+html.dark-2026 body :is(.pc-cal-title, .pc-cal-day-date, .pc-cal-mini-top h3, .pc-cal-modal-date, .pc-cal-modal-top h3, .pc-cal-agenda-head h3, .pc-cal-week-section-top strong) {
   color: var(--dark-text) !important;
 }
 

@@ -10,7 +10,7 @@ window.__RELATORIOS_APP_BUILD__ = {
   "downloadPageUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/",
   "latestJsonUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/latest.json",
   "latestScriptUrl": "https://10pauloacre-creator.github.io/relatorio-2026/downloads/latest.js",
-  "generatedAt": "2026-09-21T20:39:57.012Z"
+  "generatedAt": "2026-09-21T21:06:11.513Z"
 };
 
 (function loadRelatorio2026Theme() {
@@ -21,14 +21,14 @@ window.__RELATORIOS_APP_BUILD__ = {
   if (!hasThemeStyles) {
     var themeLink = document.createElement("link");
     themeLink.rel = "stylesheet";
-    themeLink.href = "assets/css/dark-mode-2026.css?v=20260921a";
+    themeLink.href = "assets/css/dark-mode-2026.css?v=20260921b";
     head.appendChild(themeLink);
   }
 
   if (!window.__RELATORIO_DARK_THEME_2026__ &&
       !document.querySelector('script[src*="dark-mode-2026.js"]')) {
     var themeScript = document.createElement("script");
-    themeScript.src = "assets/js/dark-mode-2026.js?v=20260921a";
+    themeScript.src = "assets/js/dark-mode-2026.js?v=20260921b";
     head.appendChild(themeScript);
   }
 })();
