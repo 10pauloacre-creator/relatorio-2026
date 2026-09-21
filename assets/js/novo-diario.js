@@ -35,6 +35,7 @@
   var ocultos = {};             // origem -> { card, ph }
   var modal = null;
   var st = null;                // rascunho do editor em edição
+  var stBase = null;            // `st` como o editor abriu (para perguntar ao fechar)
   var passo = null;             // dados do passo 1 -> IA
 
   // ── utilidades ────────────────────────────────────────────────
@@ -711,10 +712,24 @@
       ".nd-x{background:none;border:none;color:var(--ra,#c0392b);font-size:1rem;cursor:pointer}" +
       ".nd-alu>summary{font-size:.8rem;cursor:pointer;color:var(--vm,#2d6147)}.nd-chk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:3px 10px;max-height:160px;overflow-y:auto;padding:6px 0}.nd-chk label{font-size:.78rem;display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0;font-weight:400;color:var(--ce,#2b2b2b)}" +
       ".nd-mini{font-size:.76rem;padding:6px 10px;border-radius:8px;border:1px solid var(--cl,#e8e5de);background:transparent;cursor:pointer;color:var(--ce,#2b2b2b)}" +
+      ".nd-fechar{position:sticky;top:0;float:right;z-index:3;width:34px;height:34px;margin:-8px -8px 6px 10px;border-radius:50%;border:1px solid var(--cl,#e8e5de);background:var(--cr,#faf8f2);color:var(--ce,#2b2b2b);font-size:1rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}.nd-fechar:hover{background:var(--cl,#e8e5de)}" +
+      ".nd-conf{position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}" +
+      ".nd-conf-box{background:var(--cr,#faf8f2);color:var(--ce,#2b2b2b);border:1px solid var(--cl,#e8e5de);border-radius:14px;padding:20px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);font-family:'DM Sans',sans-serif}" +
+      ".nd-conf-t{font-weight:700;font-size:1.05rem;margin-bottom:6px}.nd-conf-box p{font-size:.86rem;color:var(--cm,#5a5a5a);margin:0 0 6px}" +
+      // Modo escuro: --vd/--vm viram fundo, então título, rótulos e tópicos
+      // ganham as cores de texto do tema (vale em todas as páginas).
+      "html.dark-2026 .nd-tit,html.dark-2026 .nd-sec>summary,html.dark-2026 .nd-conf-t{color:var(--dark-text,#f4f5f6)}" +
+      "html.dark-2026 .nd-sub,html.dark-2026 .nd-f label,html.dark-2026 .nd-lb,html.dark-2026 .nd-alu>summary,html.dark-2026 .nd-pr,html.dark-2026 .nd-chk label{color:var(--dark-muted,#aeb4bd)}" +
+      "html.dark-2026 .nd-prev h4{color:var(--dark-accent,#ffa65b)}" +
+      "html.dark-2026 .nd-box,html.dark-2026 .nd-conf-box{background:var(--dark-surface,#191c1f);border:1px solid var(--dark-line,#383d43)}" +
+      "html.dark-2026 .nd-box input:focus,html.dark-2026 .nd-box select:focus,html.dark-2026 .nd-box textarea:focus{border-color:var(--dark-accent,#ffa65b)!important}" +
+      "html.dark-2026 .nd-b.pri{background:var(--dark-accent,#ffa65b);color:#151719}" +
+      "html.dark-2026 .nd-b.sec,html.dark-2026 .nd-mini{background:var(--dark-surface-3,#272b30);color:var(--dark-text,#f4f5f6);border:1px solid var(--dark-line,#383d43)}" +
+      "html.dark-2026 .nd-fechar{background:var(--dark-surface-2,#202327);color:var(--dark-text,#f4f5f6);border-color:var(--dark-line,#383d43)}html.dark-2026 .nd-fechar:hover{background:var(--dark-surface-3,#272b30)}" +
       "@media(max-width:560px){.nd-grid{grid-template-columns:1fr}.nd-box{padding:16px}}";
     document.head.appendChild(s);
   }
-  function fecharModal() { if (modal) { modal.remove(); modal = null; } }
+  function fecharModal() { if (modal) { modal.remove(); modal = null; } fechamento = null; }
   function abrirCasca(html, largo) {
     injetarEstilo();
     var rolagem = modal ? modal.querySelector(".nd-box").scrollTop : 0;
@@ -722,11 +737,58 @@
     modal = document.createElement("div");
     modal.className = "nd-ov";
     modal.setAttribute("data-runtime-ui", "novo-diario-modal");
-    modal.innerHTML = '<div class="nd-box' + (largo ? " wide" : "") + '">' + html + "</div>";
+    modal.innerHTML = '<div class="nd-box' + (largo ? " wide" : "") + '"><button type="button" class="nd-fechar" aria-label="Fechar" title="Fechar">✕</button>' + html + "</div>";
     document.body.appendChild(modal);
     modal.querySelector(".nd-box").scrollTop = rolagem;
+    modal.querySelector(".nd-fechar").addEventListener("click", pedirFechar);
     return modal;
   }
+
+  // ── fechar com dados escritos: salvar ou sair sem salvar ──────
+  // Cada passo informa como salvar e, se preciso, quando está "sujo".
+  var fechamento = null;
+  function assinaturaForm() {
+    if (!modal) return "";
+    return Array.prototype.map.call(modal.querySelectorAll(".nd-box input,.nd-box select,.nd-box textarea"), function (c) {
+      return c.type === "checkbox" ? (c.checked ? "1" : "0") : c.value;
+    }).join("\u0001");
+  }
+  function prepararFechar(op) { fechamento = op || {}; fechamento.base = assinaturaForm(); }
+  function temAlteracao() {
+    if (!fechamento) return false;
+    var s = fechamento.sujo;
+    if (typeof s === "function" ? s() : s) return true;
+    return assinaturaForm() !== fechamento.base;
+  }
+  function pedirFechar() {
+    if (!modal) return;
+    if (!fechamento || !fechamento.salvar || !temAlteracao()) return fecharModal();
+    if (modal.querySelector(".nd-conf")) return;
+    var salvar = fechamento.salvar;
+    var c = document.createElement("div");
+    c.className = "nd-conf";
+    c.innerHTML = '<div class="nd-conf-box" role="alertdialog" aria-modal="true" aria-labelledby="nd-conf-t">' +
+      '<div class="nd-conf-t" id="nd-conf-t">Salvar antes de sair?</div>' +
+      "<p>Há informações escritas neste diário que ainda não foram salvas.</p>" +
+      '<div class="nd-acts"><button type="button" class="nd-b sec" data-conf="voltar">Continuar editando</button>' +
+      '<button type="button" class="nd-b perigo" data-conf="sair">Sair sem salvar</button>' +
+      '<button type="button" class="nd-b pri" data-conf="salvar">💾 Salvar</button></div></div>';
+    modal.appendChild(c);
+    c.addEventListener("click", function (ev) {
+      var b = ev.target.closest && ev.target.closest("[data-conf]");
+      if (!b) { if (ev.target === c) c.remove(); return; }
+      var a = b.getAttribute("data-conf");
+      c.remove();
+      if (a === "sair") fecharModal();
+      else if (a === "salvar") salvar();
+    });
+    c.querySelector('[data-conf="salvar"]').focus();
+  }
+  document.addEventListener("keydown", function (e) {
+    if (!modal || e.key !== "Escape") return;
+    var conf = modal.querySelector(".nd-conf");
+    if (conf) conf.remove(); else pedirFechar();
+  });
   function $(sel) { return modal ? modal.querySelector(sel) : null; }
   function mostrarMsg(texto, tipo) {
     var box = $(".nd-msgbox");
@@ -774,8 +836,20 @@
     rasc.addEventListener("input", function () { btn.textContent = rasc.value.trim() ? "🤖 Organizar com IA" : "Continuar →"; });
     atualizar();
     btn.textContent = rasc.value.trim() ? "🤖 Organizar com IA" : "Continuar →";
-    $('[data-nd="cancelar"]').addEventListener("click", fecharModal);
+    $('[data-nd="cancelar"]').addEventListener("click", pedirFechar);
     btn.addEventListener("click", function () { seguir(t); });
+    // Salvar ao fechar: grava o rascunho como texto do relato, sem passar pela IA.
+    prepararFechar({
+      sujo: !!(v.assunto || v.rascunho),
+      salvar: function () {
+        var lido = lerPasso1(t);
+        if (lido.erro) return mostrarMsg(lido.erro);
+        passo = { entrada: lido.entrada, relato: relVazio(), aviso: "", modelo: "" };
+        passo.relato.conteudo = lido.entrada.rascunho;
+        abrirEditorDoPasso();
+        salvarEditor();
+      }
+    });
   }
   function lerPasso1(t) {
     var e = {
@@ -854,6 +928,7 @@
     $('[data-nd="voltar"]').addEventListener("click", function () { abrirNovo(e.turma, e); });
     $('[data-nd="ajustar"]').addEventListener("click", abrirEditorDoPasso);
     $('[data-nd="salvar"]').addEventListener("click", function () { abrirEditorDoPasso(true); });
+    prepararFechar({ sujo: true, salvar: function () { abrirEditorDoPasso(true); } });
   }
   function abrirEditorDoPasso(salvarJa) {
     var e = passo.entrada;
@@ -864,6 +939,7 @@
     var m = mapasDeRel(e.turma, s.rel);
     s.pres = m.pres; s.atv = m.atv;
     st = s;
+    stBase = null;
     if (salvarJa) return salvarEditor(); // "Salvar diário" da revisão
     desenharEditor();
   }
@@ -891,6 +967,7 @@
     if (!base.rel.lembrete) base.rel.lembrete = { titulo: "", texto: "" };
     if (!base.rel.analise) base.rel.analise = { resumo: "", itens: [], sugestao: "" };
     st = base;
+    stBase = null;
     desenharEditor();
   }
 
@@ -970,6 +1047,12 @@
       fim.addEventListener("input", function () { if (!manual) horas.value = horasDoIntervalo(ini.value, fim.value) || ""; });
       horas.addEventListener("input", function () { manual = true; });
     }
+    // Retrato do diário como abriu: ao fechar, qualquer diferença pergunta se salva.
+    if (stBase === null) { capturar(); stBase = JSON.stringify(st); }
+    prepararFechar({
+      salvar: salvarEditor,
+      sujo: function () { capturar(); return !!st.novo || JSON.stringify(st) !== stBase; }
+    });
   }
 
   // Lê o formulário para o rascunho `st`.
@@ -1008,7 +1091,7 @@
     desenharEditor();
   }
   async function acaoEditor(acao) {
-    if (acao === "cancelar") return fecharModal();
+    if (acao === "cancelar") return pedirFechar();
     if (acao === "todos-pr") { modal.querySelectorAll("[data-pres]").forEach(function (s) { s.value = "pr"; }); return; }
     if (acao === "add-c") { capturar(); st.rel.comportamento.push({ alunos: [], extra: "", tipo: "advertencia", texto: "" }); return desenharEditor(); }
     if (acao === "add-i") { capturar(); st.rel.analise.itens.push({ alunos: [], rotulo: "", recomendacao: "" }); return desenharEditor(); }

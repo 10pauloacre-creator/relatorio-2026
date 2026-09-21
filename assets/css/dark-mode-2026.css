@@ -1030,6 +1030,115 @@ html.dark-2026 body .blank {
   color: var(--dark-faint) !important;
 }
 
+/* Calendario: feriado com titulo em vermelho e demais dados em branco.
+   A paleta clara das cores personalizadas (texto azul-escuro) nao vale no escuro. */
+html.dark-2026 body :is(.pc-cal-agenda-item, .pc-cal-modal-card).custom-color :is(.pc-cal-agenda-meta, .pc-cal-agenda-title, h4, .pc-cal-modal-card-top strong, .pc-cal-modal-pill) {
+  color: var(--dark-text) !important;
+}
+
+html.dark-2026 body :is(.pc-cal-agenda-item, .pc-cal-modal-card).custom-color :is(.pc-cal-agenda-source, p, small) {
+  color: var(--dark-muted) !important;
+}
+
+html.dark-2026 body :is(.pc-cal-agenda-item, .pc-cal-modal-card).tone-holiday :is(.pc-cal-agenda-title, .pc-cal-modal-card h4) {
+  color: var(--dark-negative) !important;
+}
+
+html.dark-2026 body .pc-cal-modal-card.custom-color .pc-cal-modal-pill {
+  background: var(--dark-surface-3) !important;
+}
+
+/* Relatorios diarios (Casavequia pc-, Herminio rh-): grafite e laranja,
+   sem a barra verde e sem a coluna creme. */
+html.dark-2026 body :is(.pc-diary-modal-inner, .rh-diary-modal-inner) {
+  color: var(--dark-text) !important;
+  background: var(--dark-canvas) !important;
+  border: 1px solid var(--dark-line) !important;
+}
+
+html.dark-2026 body :is(.pc-diary-modal-top, .rh-diary-modal-top) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-2) !important;
+  border-bottom-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body :is(.pc-diary-modal-top, .rh-diary-modal-top) h3 {
+  color: var(--dark-text) !important;
+}
+
+html.dark-2026 body :is(.pc-diary-modal-top, .rh-diary-modal-top) p {
+  color: var(--dark-muted) !important;
+}
+
+html.dark-2026 body :is(.pc-diary-action-btn, .rh-diary-action-btn).primary {
+  color: #151719 !important;
+  background: var(--dark-accent) !important;
+}
+
+html.dark-2026 body :is(.pc-diary-action-btn, .rh-diary-action-btn).ghost {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-3) !important;
+  border: 1px solid var(--dark-line) !important;
+}
+
+html.dark-2026 body :is(.pc-diary-sidebar, .rh-diary-sidebar) {
+  background: var(--dark-surface) !important;
+  border-color: var(--dark-line) !important;
+}
+
+html.dark-2026 body :is(.pc-diary-sidebar-label, .rh-diary-sidebar-label) {
+  color: var(--dark-muted) !important;
+}
+
+html.dark-2026 body :is(.pc-diary-choice, .rh-diary-choice) {
+  color: var(--dark-text) !important;
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+  box-shadow: none !important;
+}
+
+html.dark-2026 body :is(.pc-diary-choice, .rh-diary-choice):hover {
+  border-color: var(--dark-accent) !important;
+}
+
+html.dark-2026 body :is(.pc-diary-choice, .rh-diary-choice).on {
+  color: #151719 !important;
+  background: var(--dark-accent) !important;
+  border-color: var(--dark-accent) !important;
+}
+
+html.dark-2026 body :is(.pc-diary-empty, .rh-diary-empty) {
+  color: var(--dark-muted) !important;
+  background: var(--dark-surface-2) !important;
+  border: 1px dashed var(--dark-line) !important;
+  box-shadow: none !important;
+}
+
+html.dark-2026 body :is(.pc-diary-viewer, .rh-diary-viewer) {
+  background: var(--dark-canvas) !important;
+  box-shadow: none !important;
+}
+
+html.dark-2026 body :is(.pc-diary-meta-card, .rh-diary-meta-card) {
+  background: var(--dark-surface-2) !important;
+  border-color: var(--dark-line) !important;
+  box-shadow: none !important;
+}
+
+html.dark-2026 body :is(.pc-diary-meta-card, .rh-diary-meta-card) strong {
+  color: var(--dark-text) !important;
+}
+
+html.dark-2026 body :is(.pc-diary-meta-card, .rh-diary-meta-card) span {
+  color: var(--dark-muted) !important;
+}
+
+html.dark-2026 body :is(.pc-diary-frame, .rh-diary-frame) {
+  background: var(--dark-surface) !important;
+  border-color: var(--dark-line) !important;
+  box-shadow: none !important;
+}
+
 @media (max-width: 680px) {
   html.dark-2026 :where(.ea, .panel, .summary-card, .card, .modal-card) {
     box-shadow: 0 8px 24px rgba(0, 0, 0, .22) !important;
