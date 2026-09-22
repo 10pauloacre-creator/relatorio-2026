@@ -20,7 +20,7 @@
 </script>
 <script defer src="assets/js/dark-mode-2026.js?v=20260921b"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="assets/js/supabase-report-sync.js?v=20260921m"></script>
+<script defer src="assets/js/supabase-report-sync.js?v=20260922a"></script>
 <script defer src="assets/js/conta-skin.js?v=20260921f"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--ou:#c9a84c;--os:#f5e6be;--ce:#2b2b2b;--cm:#5a5a5a;--ra:#c0392b;--rs:#fdecea;
@@ -102,6 +102,14 @@ html.dark-2026 .cadeado{color:#e6c677}
 .pg b{display:block;font-size:.92rem}.pg span{font-size:.8rem;color:var(--cm)}
 .senha{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;width:100%;margin-top:8px}
 .senha input{padding:10px 12px;border:2px solid var(--linha);border-radius:10px;font-size:.9rem;color:var(--ce);background:var(--sup2)}
+/* Selo do e-mail da conta (Etapa 15): verificado ou "verificar e-mail". */
+.selo-email{display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:6px;padding:2px 8px;margin-left:6px;vertical-align:middle;border:1px solid}
+.selo-email.ok{background:rgba(47,138,85,.12);color:#2f8a55;border-color:rgba(47,138,85,.45)}
+.selo-email.pendente{background:rgba(194,154,91,.16);color:#8a5a12;border-color:rgba(194,154,91,.6)}
+html.dark-2026 .selo-email.ok{color:#8fd1a8}
+html.dark-2026 .selo-email.pendente{color:#e6c677}
+.topo .selo-email{margin:8px 0 0;cursor:pointer}
+.pg .selo-email{display:inline-block}
 .msg{font-size:.82rem;margin-top:6px;min-height:1em}
 .msg.erro{color:var(--ra)}.msg.ok{color:#2f8a55}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1a3a2a;color:#fff;padding:10px 18px;border-radius:999px;font-size:.84rem;z-index:40000;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:92vw;text-align:center}
@@ -132,6 +140,7 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
     <div class="foto-acoes"><button type="button" class="btn mini" id="foto-tirar" hidden>Remover foto</button></div>
     <h2 id="topo-nome">…</h2>
     <div class="sub" id="topo-sub"></div>
+    <span class="selo-email" id="topo-selo" hidden></span>
     <div class="chips" id="topo-disc"></div>
   </section>
 
@@ -184,6 +193,13 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
 
   <section class="card">
     <h3>🚪 Conta</h3>
+    <div class="pg" id="email-pg">
+      <div><b>E-mail da conta <span class="selo-email" id="email-selo" hidden></span></b><span id="email-exp">Conferindo…</span>
+        <div class="senha" id="email-codigo-box" hidden><input id="email-codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Código que chegou no e-mail" aria-label="Código de verificação"><button type="button" class="btn" id="email-confirmar">Confirmar código</button></div>
+        <div class="msg" id="email-msg"></div>
+      </div>
+      <button type="button" class="btn" id="email-enviar" hidden>Verificar e-mail</button>
+    </div>
     <div class="pg">
       <div><b>Sair da conta</b><span>Encerra a sessão neste aparelho. Seus dados continuam guardados na conta.</span></div>
       <button type="button" class="btn" id="sair">Sair</button>
@@ -405,6 +421,60 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
       .then(function () { $('s-trocar').disabled = false; });
   }
 
+  // ── E-mail da conta (Etapa 15) ────────────────────────────────────────
+  // A conta abre sem confirmar o e-mail. Até o dono abrir o link ou digitar o
+  // código que chega nele, o perfil mostra "verificar e-mail".
+  var esperaEnvio = 0;
+  function desenharEmail(st) {
+    var selo = $('email-selo'), topo = $('topo-selo'), exp = $('email-exp'), bt = $('email-enviar');
+    if (!st) {
+      selo.hidden = topo.hidden = true;
+      exp.textContent = (u.email || '') + ' · não foi possível conferir a verificação agora.';
+      bt.hidden = true;
+      return;
+    }
+    var ok = !!st.verificado;
+    [selo, topo].forEach(function (el) {
+      el.hidden = false;
+      el.className = 'selo-email ' + (ok ? 'ok' : 'pendente');
+      el.textContent = ok ? '✓ E-mail verificado' : '⚠ Verificar e-mail';
+    });
+    topo.title = ok ? '' : 'Clique para verificar o seu e-mail';
+    if (ok) {
+      exp.textContent = st.email + (st.metodo === 'google' ? ' · verificado pelo Google.' : ' · verificado.');
+      bt.hidden = true; $('email-codigo-box').hidden = true;
+    } else {
+      exp.textContent = st.email + ' · a conta já funciona, mas o e-mail ainda não foi verificado. Verifique para poder recuperar a senha e receber avisos: enviamos um link e um código para ele.';
+      bt.hidden = false;
+    }
+  }
+  function carregarEmail() {
+    S.auth.emailStatus().then(desenharEmail).catch(function () { desenharEmail(null); });
+  }
+  function enviarVerificacao() {
+    var msg = $('email-msg'), bt = $('email-enviar');
+    if (Date.now() < esperaEnvio) { msg.className = 'msg erro'; msg.textContent = 'Aguarde um minuto para pedir outro e-mail.'; return; }
+    bt.disabled = true; msg.className = 'msg'; msg.textContent = 'Enviando…';
+    S.auth.enviarVerificacaoEmail().then(function (email) {
+      esperaEnvio = Date.now() + 60000;
+      msg.className = 'msg ok';
+      msg.textContent = 'Enviamos para ' + email + '. Abra o link neste aparelho ou digite aqui o código do e-mail. Confira também a pasta Spam.';
+      bt.textContent = 'Enviar de novo';
+      $('email-codigo-box').hidden = false; $('email-codigo').focus();
+    }).catch(function (e) { msg.className = 'msg erro'; msg.textContent = e.message || 'Não foi possível enviar agora.'; })
+      .then(function () { bt.disabled = false; });
+  }
+  function confirmarCodigo() {
+    var msg = $('email-msg'), bt = $('email-confirmar');
+    bt.disabled = true; msg.className = 'msg'; msg.textContent = 'Conferindo…';
+    S.auth.confirmarCodigoEmail($('email-codigo').value).then(function (st) {
+      desenharEmail(st);
+      if (st && st.verificado) { msg.className = 'msg ok'; msg.textContent = 'E-mail verificado.'; $('email-codigo').value = ''; toast('E-mail verificado.'); }
+      else { msg.className = 'msg erro'; msg.textContent = 'O código foi aceito, mas a verificação não foi registrada. Tente de novo.'; }
+    }).catch(function (e) { msg.className = 'msg erro'; msg.textContent = e.message || 'Código inválido.'; })
+      .then(function () { bt.disabled = false; });
+  }
+
   // ── Excluir conta ─────────────────────────────────────────────────────
   function excluirConta() {
     C.confirmarPerigo({ titulo: 'Excluir a sua conta?', texto: 'Todas as escolas, turmas, alunos, diários, planos, sequências, livros, calendário, perfil e certificados serão apagados para sempre. Esta ação não pode ser desfeita.', botao: 'Sim, excluir a minha conta', botaoFinal: 'Excluir a conta' }).then(function (senha) {
@@ -468,6 +538,13 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
       ['linkPlanos', 'linkSequencias', 'linkRelatorios'].forEach(function (k) { if (P.restrito[k] && !/^https?:\/\//i.test(P.restrito[k])) P.restrito[k] = 'https://' + P.restrito[k]; });
       C.perfil.salvar().then(function () { sujo = false; $('salvar').textContent = '💾 Salvar perfil'; preencher(); toast('Perfil salvo.'); });
     };
+    $('email-enviar').onclick = enviarVerificacao;
+    $('email-confirmar').onclick = confirmarCodigo;
+    $('email-codigo').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); confirmarCodigo(); } });
+    $('topo-selo').onclick = function () { $('email-pg').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+    // Voltando pelo link do e-mail, a sessão nova já traz a prova: o banco marca.
+    document.addEventListener('relatorio:conta', carregarEmail);
+    carregarEmail();
     $('s-trocar').onclick = trocarSenha;
     $('excluir').onclick = excluirConta;
     $('sair').onclick = function () { if (confirm('Sair da conta neste aparelho?')) S.auth.signOut(); };
