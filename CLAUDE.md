@@ -516,7 +516,9 @@ O site passou a se chamar **RELATORIO SKIN** ("RELATORIO" pequeno, "SKIN" em des
 | `entrar.html` | Tela de conta, com abertura da marca na primeira visita do aparelho (`localStorage: skin-abertura`). `?modo=criar` abre na aba Criar conta. Depois de entrar: todos → `escolas.html` | `data-acesso="inicio"` |
 | `escolas.html` | Escolas da conta (seção 21). Administrador: Casavequia, Hermínio e Projetos pessoais fixos + escolas cadastradas | qualquer conta |
 
-O "← Início" da Casavequia e da Hermínio aponta para `escolas.html`. O `manifest.json` abre o app em `entrar.html`.
+O "← Início" da Casavequia e da Hermínio aponta para `escolas.html`.
+
+**Página inicial de quem já está logado = `escolas.html` (22/09/2026, decisão do professor).** Um script no topo do `<head>` do `index.html` lê a sessão guardada (`localStorage['relatorio-2026-admin-auth']`, a mesma chave de `authStorageKey`) e, se houver `refresh_token`, faz `location.replace('escolas.html')` antes de pintar a página. Retorno de login (`?code=`) que cair no `index.html` vai para `entrar.html`. Para ver o site mesmo logado: `index.html?site=1` (links "Site" e logo de `escolas.html`). O "← Voltar ao site" da tela de login (`data-auth-voltar`) também usa `index.html?site=1`, senão uma sessão vencida faria o vaivém site → escolas → login → site. Se trocar `authStorageKey`, troque também no `index.html`. O `manifest.json` abre o app em `entrar.html`.
 
 **Paleta (sem nenhum tom azulado):** fundo `#0D0E0D`, superfícies `#131512`/`#181B17`/`#20231E`, bordas `#30352D`; texto `#F3F1E9`/`#B6B7AE`/`#7E8279`; marca verde-sálvia `#A7B58A`, destaque `#C2CE9E`, hover `#D2DBB3`; areia `#D6CBB8`, dourado `#B89B69`; sucesso `#6F9B71`, aviso `#C29A5B`, erro `#B9635D`. Tipografia: Manrope (títulos) + Inter (texto). Raios: botão 9px, card 14px, painel 18px.
 
