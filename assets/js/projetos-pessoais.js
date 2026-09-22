@@ -591,6 +591,7 @@
       projects: [],
       ideas: [],
       activities: [],
+      bugs: [],
       timers: {},
       vault: null,
       migrations: {}
@@ -1246,6 +1247,7 @@
     normalized.projects = Array.isArray(normalized.projects) ? normalized.projects : [];
     normalized.ideas = Array.isArray(normalized.ideas) ? normalized.ideas : [];
     normalized.activities = Array.isArray(normalized.activities) ? normalized.activities : [];
+    normalized.bugs = Array.isArray(normalized.bugs) ? normalized.bugs : [];
     normalized.timers = normalized.timers && typeof normalized.timers === 'object' ? normalized.timers : {};
     normalized.migrations = normalized.migrations && typeof normalized.migrations === 'object' ? normalized.migrations : {};
     normalized.schemaVersion = 1;
@@ -1277,6 +1279,7 @@
       projects: mergeCollection(local.projects, remote.projects),
       ideas: mergeCollection(local.ideas, remote.ideas),
       activities: mergeCollection(local.activities, remote.activities),
+      bugs: mergeCollection(local.bugs, remote.bugs),
       timers: mergeTimers(local.timers, remote.timers),
       vault: local.vault && remote.vault ? latest(local.vault, remote.vault) : (local.vault || remote.vault || null),
       migrations: Object.assign({}, local.migrations || {}, remote.migrations || {})
@@ -1333,7 +1336,7 @@
     return '<div class="pp-project-list">' + projects.map(function (project) {
       return '<article class="pp-project-row" tabindex="0" role="link" data-action="goto-project" data-id="' + project.id + '">'
         + projectLogo(project) + '<div class="pp-project-copy"><h3>' + escapeHtml(project.name) + '</h3><p>' + escapeHtml(project.description || 'Sem descrição.') + '</p></div>'
-        + '<div class="pp-project-meta"><span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span>'
+        + '<div class="pp-project-meta">' + (bugsAbertos(project.id) ? '<span class="pp-bug-count" title="Bugs abertos">🐞 ' + bugsAbertos(project.id) + '</span>' : '') + '<span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span>'
         + '<button class="pp-icon-button" aria-label="Editar ' + escapeHtml(project.name) + '" title="Editar" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + '</button>'
         + '<button class="pp-icon-button" aria-label="Excluir ' + escapeHtml(project.name) + '" title="Excluir" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + '</button></div></article>';
     }).join('') + '</div>';
@@ -1341,7 +1344,7 @@
   function projectGrid(projects) {
     return '<div class="pp-project-grid">' + projects.map(function (project) {
       return '<article class="pp-project-tile" tabindex="0" role="link" aria-label="Abrir projeto ' + escapeHtml(project.name) + '" data-action="goto-project" data-id="' + project.id + '">'
-        + projectLogo(project) + '<div class="pp-tile-actions"><button aria-label="Editar" title="Editar" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + '</button><button aria-label="Excluir" title="Excluir" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + '</button></div></article>';
+        + projectLogo(project) + (bugsAbertos(project.id) ? '<span class="pp-bug-count pp-bug-tile" title="Bugs abertos">🐞 ' + bugsAbertos(project.id) + '</span>' : '') + '<div class="pp-tile-actions"><button aria-label="Editar" title="Editar" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + '</button><button aria-label="Excluir" title="Excluir" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + '</button></div></article>';
     }).join('') + '</div>';
   }
   function emptyMarkup(title, message) { return '<div class="pp-empty"><strong>' + escapeHtml(title) + '</strong><span>' + escapeHtml(message) + '</span></div>'; }
@@ -1652,7 +1655,7 @@
     var links = safeUrl(project.url) ? '<div class="pp-project-links"><a class="pp-project-link" target="_blank" rel="noopener noreferrer" href="' + escapeHtml(safeUrl(project.url)) + '">' + uiIcon('external') + 'Abrir link principal</a></div>' : '<p class="pp-form-note">Nenhum link principal cadastrado.</p>';
     return headerMarkup(project.name, 'Detalhes, ferramentas, histórico e ideias deste projeto.', 'projetos-pessoais.html#projects')
       + '<main class="pp-shell"><section class="pp-detail-top">' + projectLogo(project) + '<div><h1>' + escapeHtml(project.name) + '</h1><p>' + escapeHtml(project.description || 'Sem descrição.') + '</p><div class="pp-tags" style="margin-top:10px"><span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span><span class="pp-tag">' + escapeHtml(project.type || 'Outro') + '</span></div></div><div class="pp-detail-actions"><button class="pp-button" data-action="open-mindmap" data-id="' + project.id + '">' + uiIcon('map') + 'Mapa mental</button><button class="pp-button pp-secondary" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + 'Editar</button><button class="pp-button pp-danger" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + 'Excluir</button></div></section>' + libraryDocumentationMarkup(project)
-      + '<div class="pp-detail-grid"><div><section class="pp-panel"><div class="pp-panel-head"><h2>Linha do tempo' + (isRelatorioSkin(project) && RS_COMMITS.length ? ' <small style="font-weight:500;font-size:.72em;opacity:.7">· ' + totalEventos + ' atualizações, automáticas pelo GitHub</small>' : '') + '</h2><button class="pp-button pp-small" data-action="new-event" data-project="' + project.id + '">' + uiIcon('plus') + 'Registrar</button></div>' + (events.length ? '<div class="pp-timeline">' + events.map(eventCard).join('') + '</div>' + maisEventos : emptyMarkup('Sem atualizações ainda', 'Registre um avanço, deploy, ajuste ou qualquer passo importante.')) + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ideias vinculadas</h2><a class="pp-button pp-small pp-secondary" href="projetos-pessoais.html#ideas">Ver todas</a></div>' + (projectIdeas.length ? projectIdeas.map(ideaMini).join('') : '<p class="pp-form-note">Ainda não há ideias vinculadas a este projeto.</p>') + '</section>' + projectChecklistMarkup(project) + '</div>'
+      + '<div class="pp-detail-grid"><div>' + bugsPanelMarkup(project) + '<section class="pp-panel"><div class="pp-panel-head"><h2>Linha do tempo' + (isRelatorioSkin(project) && RS_COMMITS.length ? ' <small style="font-weight:500;font-size:.72em;opacity:.7">· ' + totalEventos + ' atualizações, automáticas pelo GitHub</small>' : '') + '</h2><button class="pp-button pp-small" data-action="new-event" data-project="' + project.id + '">' + uiIcon('plus') + 'Registrar</button></div>' + (events.length ? '<div class="pp-timeline">' + events.map(eventCard).join('') + '</div>' + maisEventos : emptyMarkup('Sem atualizações ainda', 'Registre um avanço, deploy, ajuste ou qualquer passo importante.')) + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ideias vinculadas</h2><a class="pp-button pp-small pp-secondary" href="projetos-pessoais.html#ideas">Ver todas</a></div>' + (projectIdeas.length ? projectIdeas.map(ideaMini).join('') : '<p class="pp-form-note">Ainda não há ideias vinculadas a este projeto.</p>') + '</section>' + projectChecklistMarkup(project) + '</div>'
       + '<aside>' + relatedProjectsMarkup(project) + '<section class="pp-panel"><h2>Links</h2><div style="height:12px"></div>' + links + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ferramentas</h2><button class="pp-button pp-small" data-action="edit-project" data-id="' + project.id + '">Gerenciar</button></div>' + (tools.length ? '<div class="pp-tool-list">' + tools.map(function (tool) { return '<button class="pp-tool-button" data-action="open-tool" data-project="' + project.id + '" data-tool="' + tool.id + '"><span>' + providerIcon(tool.provider) + '<span><strong>' + escapeHtml(tool.label || tool.provider) + '</strong><span>' + escapeHtml(tool.provider) + ' · acesso protegido</span></span></span><b>' + uiIcon('lock') + '</b></button>'; }).join('') + '</div>' : '<p class="pp-form-note">Adicione GitHub, Supabase, I.As ou outra ferramenta ao editar o projeto.</p>') + '</section></aside></div></main>';
   }
   function eventCard(event) {
@@ -1667,6 +1670,26 @@
   function currentTab() {
     var hash = (window.location.hash || '').replace('#', '').toLowerCase();
     return ['projects', 'ideas', 'ias'].indexOf(hash) >= 0 ? hash : 'projects';
+  }
+  // Filtros e troca rápida de status dos bugs (delegado, sobrevive ao render).
+  if (APP && !APP.__bugsLigado) {
+    APP.__bugsLigado = true;
+    APP.addEventListener('change', function (e) {
+      var st = e.target.closest && e.target.closest('[data-bug-status]');
+      if (st) { var b = active(state.bugs).find(function (x) { return x.id === st.dataset.bugStatus; }); if (b) { mudarStatusBug(b, st.value); persist('bug-status'); render(); toast((b.codigo || 'Bug') + ': ' + b.status + '.'); } return; }
+      var fl = e.target.closest && e.target.closest('[data-bug-filtro]');
+      if (fl && fl.dataset.bugFiltro !== 'q') { var f = bugFiltros[fl.dataset.project] || {}; f[fl.dataset.bugFiltro] = fl.value; bugFiltros[fl.dataset.project] = f; render(); }
+    });
+    var tBusca = null;
+    APP.addEventListener('input', function (e) {
+      var fl = e.target.closest && e.target.closest('[data-bug-filtro="q"]'); if (!fl) return;
+      var f = bugFiltros[fl.dataset.project] || {}; f.q = fl.value; bugFiltros[fl.dataset.project] = f;
+      clearTimeout(tBusca); tBusca = setTimeout(function () {
+        render();
+        var novo = APP.querySelector('[data-bug-filtro="q"][data-project="' + fl.dataset.project + '"]');
+        if (novo) { novo.focus(); novo.setSelectionRange(novo.value.length, novo.value.length); }
+      }, 250);
+    });
   }
   function render() {
     if (!APP) return;
@@ -1769,6 +1792,7 @@
     var stamp = now(); project.deletedAt = stamp; project.updatedAt = stamp;
     state.ideas.forEach(function (idea) { if (!idea.deletedAt && idea.projectId === projectId) { idea.projectId = null; idea.updatedAt = stamp; } });
     state.activities.forEach(function (event) { if (!event.deletedAt && event.projectId === projectId) { event.deletedAt = stamp; event.updatedAt = stamp; } });
+    (state.bugs || []).forEach(function (b) { if (!b.deletedAt && b.projectId === projectId) { b.deletedAt = stamp; b.updatedAt = stamp; } });
     persist('project-delete'); closeModal();
     if (PAGE === 'detail') window.location.href = 'projetos-pessoais.html#projects'; else { render(); toast('Projeto excluído.'); }
   }
@@ -1972,6 +1996,157 @@
     if (!window.confirm('Excluir a ideia "' + idea.title + '"?')) return;
     idea.deletedAt = now(); idea.updatedAt = idea.deletedAt; persist('idea-delete'); render(); toast('Ideia excluída.');
   }
+  // ── 🐞 Bugs de cada projeto (22/09/2026) ─────────────────────────────
+  // state.bugs: { id, projectId, codigo (BUG-001, por projeto), title, description,
+  // steps, expected, actual, where, device, severity, status, tags[], foundAt,
+  // fixedAt, fixNote, fixUrl, createdAt, updatedAt, deletedAt }. Sincroniza com o
+  // resto do painel. Ao virar "Corrigido", entra um evento na linha do tempo.
+  var BUG_STATUS = [
+    { v: 'Novo', c: 'novo', aberto: true, d: 'Registrado, ainda não conferido' },
+    { v: 'Confirmado', c: 'confirmado', aberto: true, d: 'Reproduzido, esperando correção' },
+    { v: 'Em correção', c: 'correcao', aberto: true, d: 'Alguém está corrigindo' },
+    { v: 'Aguardando teste', c: 'teste', aberto: true, d: 'Correção feita, falta conferir' },
+    { v: 'Corrigido', c: 'corrigido', aberto: false, d: 'Conferido e resolvido' },
+    { v: 'Não reproduz', c: 'naoreproduz', aberto: false, d: 'Não foi possível repetir o erro' },
+    { v: 'Arquivado', c: 'arquivado', aberto: false, d: 'Não será corrigido agora' }
+  ];
+  var BUG_SEVERIDADE = [
+    { v: 'Crítica', c: 'urgent', peso: 4, d: 'Trava o uso ou perde dados' },
+    { v: 'Alta', c: 'high', peso: 3, d: 'Função importante quebrada' },
+    { v: 'Média', c: 'medium', peso: 2, d: 'Atrapalha, mas há contorno' },
+    { v: 'Baixa', c: 'low', peso: 1, d: 'Visual ou detalhe' }
+  ];
+  var BUG_APARELHOS = ['Todos', 'Computador', 'Celular', 'Tablet', 'App (APK)'];
+  var bugFiltros = {};
+  function bugStatusInfo(v) { return BUG_STATUS.filter(function (x) { return x.v === v; })[0] || BUG_STATUS[0]; }
+  function bugSevInfo(v) { return BUG_SEVERIDADE.filter(function (x) { return x.v === v; })[0] || BUG_SEVERIDADE[2]; }
+  function bugsDo(projectId) { return active(state.bugs).filter(function (b) { return b.projectId === projectId; }); }
+  function bugsAbertos(projectId) { return bugsDo(projectId).filter(function (b) { return bugStatusInfo(b.status).aberto; }).length; }
+  function proximoCodigoBug(projectId) {
+    var maior = (state.bugs || []).filter(function (b) { return b.projectId === projectId; }).reduce(function (m, b) { var n = parseInt(String(b.codigo || '').replace(/\D/g, ''), 10) || 0; return Math.max(m, n); }, 0);
+    return 'BUG-' + ('00' + (maior + 1)).slice(-3);
+  }
+  function bugTagsExistentes(projectId) {
+    var m = {};
+    active(state.bugs).forEach(function (b) { if (!projectId || b.projectId === projectId) (b.tags || []).forEach(function (t) { m[t] = 1; }); });
+    return Object.keys(m).sort();
+  }
+  function bugsPanelMarkup(project) {
+    var todos = bugsDo(project.id);
+    var f = bugFiltros[project.id] || (bugFiltros[project.id] = { status: 'abertos', sev: '', tag: '', q: '' });
+    var cont = {};
+    todos.forEach(function (b) { cont[b.status] = (cont[b.status] || 0) + 1; });
+    var abertos = todos.filter(function (b) { return bugStatusInfo(b.status).aberto; }).length;
+    var q = f.q.trim().toLowerCase();
+    var lista = todos.filter(function (b) {
+      if (f.status === 'abertos' && !bugStatusInfo(b.status).aberto) return false;
+      if (f.status && f.status !== 'abertos' && f.status !== 'todos' && b.status !== f.status) return false;
+      if (f.sev && b.severity !== f.sev) return false;
+      if (f.tag && (b.tags || []).indexOf(f.tag) < 0) return false;
+      if (q && [b.codigo, b.title, b.description, b.where, (b.tags || []).join(' ')].join(' ').toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    }).sort(function (a, b) {
+      var ab = bugStatusInfo(a.status).aberto ? 1 : 0, bb = bugStatusInfo(b.status).aberto ? 1 : 0;
+      if (ab !== bb) return bb - ab;
+      var s = bugSevInfo(b.severity).peso - bugSevInfo(a.severity).peso;
+      return s || toTime(b.foundAt || b.createdAt) - toTime(a.foundAt || a.createdAt);
+    });
+    var opt = function (valor, rotulo, sel) { return '<option value="' + escapeHtml(valor) + '"' + (valor === sel ? ' selected' : '') + '>' + escapeHtml(rotulo) + '</option>'; };
+    var resumo = BUG_STATUS.filter(function (x) { return cont[x.v]; }).map(function (x) { return '<button type="button" class="pp-bug-chip pp-bug-st-' + x.c + (f.status === x.v ? ' is-on' : '') + '" data-action="bug-filtro-status" data-project="' + project.id + '" data-status="' + escapeHtml(x.v) + '">' + escapeHtml(x.v) + ' <b>' + cont[x.v] + '</b></button>'; }).join('');
+    return '<section class="pp-panel pp-bugs" id="pp-bugs-' + project.id + '"><div class="pp-panel-head"><h2>🐞 Bugs ' + (abertos ? '<span class="pp-bug-count">' + abertos + ' aberto' + (abertos === 1 ? '' : 's') + '</span>' : (todos.length ? '<span class="pp-bug-count is-ok">nenhum aberto</span>' : '')) + '</h2>'
+      + '<button class="pp-button pp-small" data-action="new-bug" data-project="' + project.id + '">' + uiIcon('plus') + 'Registrar bug</button></div>'
+      + (todos.length ? '<div class="pp-bug-resumo">' + resumo + '</div>'
+        + '<div class="pp-bug-filtros">'
+        + '<input class="pp-field" type="search" placeholder="Buscar por código, título, tela ou tag" value="' + escapeHtml(f.q) + '" data-bug-filtro="q" data-project="' + project.id + '">'
+        + '<select class="pp-field" data-bug-filtro="status" data-project="' + project.id + '">' + opt('abertos', 'Abertos', f.status) + opt('todos', 'Todos', f.status) + BUG_STATUS.map(function (x) { return opt(x.v, x.v, f.status); }).join('') + '</select>'
+        + '<select class="pp-field" data-bug-filtro="sev" data-project="' + project.id + '">' + opt('', 'Toda gravidade', f.sev) + BUG_SEVERIDADE.map(function (x) { return opt(x.v, x.v, f.sev); }).join('') + '</select>'
+        + '<select class="pp-field" data-bug-filtro="tag" data-project="' + project.id + '">' + opt('', 'Todas as tags', f.tag) + bugTagsExistentes(project.id).map(function (t) { return opt(t, '#' + t, f.tag); }).join('') + '</select></div>'
+        + (lista.length ? '<div class="pp-bug-lista">' + lista.map(bugCard).join('') + '</div>' : emptyMarkup('Nenhum bug com esses filtros', 'Troque os filtros para ver os demais.'))
+        : emptyMarkup('Nenhum bug registrado', 'Anote aqui cada erro que aparecer: onde acontece, como repetir e a gravidade. Assim nada se perde até a correção.'))
+      + '</section>';
+  }
+  function bugCard(b) {
+    var st = bugStatusInfo(b.status), sev = bugSevInfo(b.severity);
+    var datas = 'Encontrado em ' + formatDate(b.foundAt || b.createdAt) + (b.fixedAt ? ' · corrigido em ' + formatDate(b.fixedAt) : '');
+    return '<article class="pp-bug pp-bug-sev-' + sev.c + (st.aberto ? '' : ' is-fechado') + '">'
+      + '<div class="pp-bug-top"><span class="pp-bug-codigo">' + escapeHtml(b.codigo || 'BUG') + '</span><h3>' + escapeHtml(b.title) + '</h3>'
+      + '<div class="pp-toolbar"><button class="pp-icon-button" title="Editar bug" aria-label="Editar bug" data-action="edit-bug" data-id="' + b.id + '">' + uiIcon('edit') + '</button><button class="pp-icon-button" title="Excluir bug" aria-label="Excluir bug" data-action="delete-bug" data-id="' + b.id + '">' + uiIcon('trash') + '</button></div></div>'
+      + '<div class="pp-bug-meta"><span class="pp-badge pp-priority-' + sev.c + '" title="' + escapeHtml(sev.d) + '">' + escapeHtml(sev.v) + '</span>'
+      + '<select class="pp-bug-status pp-bug-st-' + st.c + '" data-bug-status="' + b.id + '" aria-label="Status do bug" title="' + escapeHtml(st.d) + '">' + BUG_STATUS.map(function (x) { return '<option' + (x.v === st.v ? ' selected' : '') + '>' + escapeHtml(x.v) + '</option>'; }).join('') + '</select>'
+      + (b.where ? '<span class="pp-tag">📍 ' + escapeHtml(b.where) + '</span>' : '') + (b.device && b.device !== 'Todos' ? '<span class="pp-tag">📱 ' + escapeHtml(b.device) + '</span>' : '')
+      + (b.tags || []).map(function (t) { return '<button type="button" class="pp-tag pp-bug-tag" data-action="bug-filtro-tag" data-project="' + b.projectId + '" data-tag="' + escapeHtml(t) + '">#' + escapeHtml(t) + '</button>'; }).join('') + '</div>'
+      + (b.description ? '<p class="pp-bug-desc">' + escapeHtml(b.description) + '</p>' : '')
+      + ((b.steps || b.expected || b.actual || b.fixNote) ? '<details class="pp-bug-mais"><summary>Detalhes</summary>'
+        + (b.steps ? '<h4>Como reproduzir</h4><p>' + escapeHtml(b.steps) + '</p>' : '')
+        + (b.expected ? '<h4>O que deveria acontecer</h4><p>' + escapeHtml(b.expected) + '</p>' : '')
+        + (b.actual ? '<h4>O que acontece</h4><p>' + escapeHtml(b.actual) + '</p>' : '')
+        + (b.fixNote ? '<h4>Correção</h4><p>' + escapeHtml(b.fixNote) + '</p>' : '')
+        + (safeUrl(b.fixUrl) ? '<p><a target="_blank" rel="noopener noreferrer" href="' + escapeHtml(safeUrl(b.fixUrl)) + '">Abrir a correção ↗</a></p>' : '') + '</details>' : '')
+      + '<time class="pp-bug-data">' + escapeHtml(datas) + '</time></article>';
+  }
+  function mudarStatusBug(b, novo) {
+    var antes = bugStatusInfo(b.status), depois = bugStatusInfo(novo), stamp = now();
+    b.status = depois.v; b.updatedAt = stamp;
+    if (depois.v === 'Corrigido' && !b.fixedAt) b.fixedAt = stamp;
+    if (depois.aberto) b.fixedAt = '';
+    if (depois.v === 'Corrigido' && antes.v !== 'Corrigido') {
+      state.activities.push({ id: id('event'), projectId: b.projectId, title: 'Bug corrigido: ' + (b.codigo || '') + ' ' + b.title, details: (b.fixNote || 'Status alterado para Corrigido.') + (b.where ? '\nOnde: ' + b.where : ''), occurredAt: stamp, source: 'Bugs', externalUrl: b.fixUrl || undefined, createdAt: stamp, updatedAt: stamp });
+    }
+  }
+  function bugForm(projectId, bug) {
+    bug = bug || { projectId: projectId, status: 'Novo', severity: 'Média', device: 'Todos', tags: [], foundAt: now() };
+    var tags = (bug.tags || []).slice();
+    var dia = new Date(bug.foundAt || now()); dia.setMinutes(dia.getMinutes() - dia.getTimezoneOffset());
+    var opcoes = function (lista, sel) { return lista.map(function (x) { var v = x.v || x; return '<option value="' + escapeHtml(v) + '"' + (v === sel ? ' selected' : '') + '>' + escapeHtml(v) + (x.d ? ' — ' + escapeHtml(x.d) : '') + '</option>'; }).join(''); };
+    var campo = function (nome, rotulo, valor, ph, area, cheio) { return '<label class="pp-form-label' + (cheio ? ' pp-full' : '') + '"><span>' + rotulo + '</span>' + (area ? '<textarea class="pp-field" name="' + nome + '" rows="3" placeholder="' + escapeHtml(ph) + '">' + escapeHtml(valor || '') + '</textarea>' : '<input class="pp-field" name="' + nome + '" value="' + escapeHtml(valor || '') + '" placeholder="' + escapeHtml(ph) + '">') + '</label>'; };
+    var modal = showModal(bug.id ? 'Editar ' + (bug.codigo || 'bug') : 'Registrar bug', 'Quanto mais detalhe, mais rápida a correção.', '<form id="pp-bug-form"><div class="pp-form-grid">'
+      + '<label class="pp-form-label pp-full"><span>Título *</span><input class="pp-field" required maxlength="160" name="title" value="' + escapeHtml(bug.title || '') + '" placeholder="Ex.: Botão Salvar não responde no celular"></label>'
+      + '<label class="pp-form-label"><span>Gravidade</span><select class="pp-field" name="severity">' + opcoes(BUG_SEVERIDADE, bug.severity) + '</select></label>'
+      + '<label class="pp-form-label"><span>Status</span><select class="pp-field" name="status">' + opcoes(BUG_STATUS, bug.status) + '</select></label>'
+      + campo('where', 'Onde acontece', bug.where, 'Página, aba ou tela (ex.: Meu Diário › Configurações)')
+      + '<label class="pp-form-label"><span>Aparelho</span><select class="pp-field" name="device">' + opcoes(BUG_APARELHOS, bug.device) + '</select></label>'
+      + '<label class="pp-form-label"><span>Encontrado em</span><input class="pp-field" type="date" name="foundAt" value="' + dia.toISOString().slice(0, 10) + '"></label>'
+      + '<label class="pp-form-label"><span>Tags</span><div class="pp-quick-add-row"><input class="pp-field" id="pp-bug-tag-in" list="pp-bug-tags" placeholder="Ex.: layout, login, dados"><button type="button" class="pp-button pp-small" id="pp-bug-tag-add">' + uiIcon('plus') + '</button></div><datalist id="pp-bug-tags">' + bugTagsExistentes(null).map(function (t) { return '<option value="' + escapeHtml(t) + '">'; }).join('') + '</datalist><div class="pp-tool-drafts" id="pp-bug-tag-drafts"></div></label>'
+      + campo('description', 'Descrição', bug.description, 'O que está errado, em poucas palavras', true, true)
+      + campo('steps', 'Como reproduzir', bug.steps, '1. Abrir…  2. Tocar em…  3. …', true, true)
+      + campo('expected', 'O que deveria acontecer', bug.expected, '', true)
+      + campo('actual', 'O que acontece', bug.actual, '', true)
+      + campo('fixNote', 'Correção (quando resolvido)', bug.fixNote, 'O que foi feito para corrigir', true)
+      + campo('fixUrl', 'Link da correção', bug.fixUrl, 'Commit, deploy ou conversa')
+      + '</div><div class="pp-error" id="pp-form-error" role="alert"></div><div class="pp-modal-actions"><button type="button" class="pp-button pp-secondary" data-action="close-modal">Cancelar</button><button class="pp-button" type="submit">' + (bug.id ? 'Salvar' : 'Registrar bug') + '</button></div></form>', { wide: true });
+    var form = modal.querySelector('#pp-bug-form'), drafts = modal.querySelector('#pp-bug-tag-drafts'), tagIn = modal.querySelector('#pp-bug-tag-in');
+    function desenharTags() {
+      drafts.innerHTML = tags.length ? tags.map(function (t, i) { return '<span class="pp-tool-draft pp-label-chip">#' + escapeHtml(t) + '<button type="button" aria-label="Remover tag" data-tag-i="' + i + '">×</button></span>'; }).join('') : '<span class="pp-form-note">Nenhuma tag.</span>';
+      drafts.querySelectorAll('[data-tag-i]').forEach(function (x) { x.addEventListener('click', function () { tags.splice(+x.dataset.tagI, 1); desenharTags(); }); });
+    }
+    function addTag() {
+      String(tagIn.value || '').split(',').map(function (t) { return t.trim().toLowerCase().replace(/^#/, ''); }).filter(Boolean).forEach(function (t) { if (tags.indexOf(t) < 0) tags.push(t); });
+      tagIn.value = ''; desenharTags();
+    }
+    modal.querySelector('#pp-bug-tag-add').addEventListener('click', addTag);
+    tagIn.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTag(); } });
+    desenharTags();
+    form.addEventListener('submit', function (event) {
+      event.preventDefault(); addTag();
+      var el = form.elements, title = el.title.value.trim();
+      if (!title) { modal.querySelector('#pp-form-error').textContent = 'Informe o título do bug.'; return; }
+      var stamp = now(), record = bug.id ? state.bugs.find(function (x) { return x.id === bug.id; }) : null;
+      if (!record) { record = { id: id('bug'), projectId: bug.projectId, codigo: proximoCodigoBug(bug.projectId), status: 'Novo', createdAt: stamp }; state.bugs.push(record); }
+      record.title = title; record.severity = el.severity.value; record.where = el.where.value.trim(); record.device = el.device.value;
+      record.foundAt = el.foundAt.value ? new Date(el.foundAt.value + 'T12:00:00').toISOString() : (record.foundAt || stamp);
+      record.tags = tags.slice(); record.description = el.description.value.trim(); record.steps = el.steps.value.trim();
+      record.expected = el.expected.value.trim(); record.actual = el.actual.value.trim(); record.fixNote = el.fixNote.value.trim(); record.fixUrl = el.fixUrl.value.trim();
+      mudarStatusBug(record, el.status.value);
+      record.updatedAt = stamp;
+      persist('bug-save'); closeModal(); render(); toast(bug.id ? 'Bug atualizado.' : record.codigo + ' registrado.');
+    });
+  }
+  function deleteBug(bugId) {
+    var b = active(state.bugs).find(function (x) { return x.id === bugId; }); if (!b) return;
+    if (!window.confirm('Excluir ' + (b.codigo || 'este bug') + '? Se ele foi resolvido, prefira o status "Corrigido" para manter o histórico.')) return;
+    b.deletedAt = now(); b.updatedAt = b.deletedAt; persist('bug-delete'); render(); toast('Bug excluído.');
+  }
+
   function eventForm(projectId, activity) {
     activity = activity || { projectId: projectId, source: 'Manual', occurredAt: now() };
     var sourceOptions = ['Manual'].concat(PROVIDERS).map(function (provider) { return '<option value="' + escapeHtml(provider) + '"' + (activity.source === provider ? ' selected' : '') + '>' + escapeHtml(provider) + '</option>'; }).join('');
@@ -2253,6 +2428,11 @@
       delChkIdeaFound.list.splice(delChkIdeaFound.index, 1); delChkIdea.updatedAt = now();
       persist('idea-checklist-delete'); render(); return;
     }
+    if (action === 'new-bug') { bugForm(target.dataset.project, null); return; }
+    if (action === 'edit-bug') { var bugEd = active(state.bugs).find(function (x) { return x.id === target.dataset.id; }); if (bugEd) bugForm(bugEd.projectId, bugEd); return; }
+    if (action === 'delete-bug') { deleteBug(target.dataset.id); return; }
+    if (action === 'bug-filtro-status') { var fs = bugFiltros[target.dataset.project] || {}; fs.status = fs.status === target.dataset.status ? 'abertos' : target.dataset.status; bugFiltros[target.dataset.project] = fs; render(); return; }
+    if (action === 'bug-filtro-tag') { var ft = bugFiltros[target.dataset.project] || {}; ft.tag = ft.tag === target.dataset.tag ? '' : target.dataset.tag; bugFiltros[target.dataset.project] = ft; render(); return; }
     if (action === 'new-event') { eventForm(target.dataset.project, null); return; }
     if (action === 'edit-event') { var activity = getEvent(target.dataset.id); if (activity) eventForm(activity.projectId, activity); return; }
     if (action === 'delete-event') { deleteEvent(target.dataset.id); return; }
