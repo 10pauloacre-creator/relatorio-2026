@@ -144,8 +144,11 @@
   // Recorte da foto (como no Instagram): arrastar para reposicionar, zoom pelo
   // controle, pela rodinha ou com dois dedos. Resolve com a imagem quadrada
   // (lado × lado) ou null se o usuário cancelar.
-  function recortarImagem(arquivo, lado, qualidade) {
+  // opcoes (opcional): { titulo, texto, botao, forma: "circulo" (padrão, foto
+  // de perfil) | "quadrado" (moldura de cantos arredondados, ex.: ícone da escola) }.
+  function recortarImagem(arquivo, lado, qualidade, opcoes) {
     lado = lado || 360;
+    opcoes = opcoes || {};
     return new Promise(function (resolve, reject) {
       if (!arquivo || !/^image\//.test(arquivo.type)) { reject(new Error("Escolha uma imagem (JPG, PNG ou WEBP).")); return; }
       var url = URL.createObjectURL(arquivo);
@@ -165,6 +168,7 @@
             ".ck-rec-area.arrastando{cursor:grabbing}" +
             ".ck-rec-area img{position:absolute;left:0;top:0;max-width:none;pointer-events:none;-webkit-user-drag:none}" +
             ".ck-rec-mascara{position:absolute;inset:0;pointer-events:none;border-radius:50%;box-shadow:0 0 0 9999px rgba(0,0,0,.55);outline:2px solid rgba(255,255,255,.85);outline-offset:-2px}" +
+            ".ck-rec-mascara.quadrado{border-radius:18%}" +
             ".ck-rec-grade{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .15s;background:linear-gradient(to right,transparent 33.2%,rgba(255,255,255,.35) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.35) 66.6%,transparent 66.8%),linear-gradient(to bottom,transparent 33.2%,rgba(255,255,255,.35) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.35) 66.6%,transparent 66.8%)}" +
             ".ck-rec-area.arrastando .ck-rec-grade{opacity:1}" +
             ".ck-rec-zoom{display:flex;align-items:center;gap:10px;margin:14px 2px 4px;font-size:.9rem}.ck-rec-zoom input{flex:1;accent-color:#ffa65b}" +
@@ -175,11 +179,12 @@
         var V = Math.min(320, window.innerWidth - 80);
         var ov = document.createElement("div");
         ov.className = "ck-rec-ov";
-        ov.innerHTML = '<div class="ck-rec" role="dialog" aria-modal="true" aria-labelledby="ck-rec-t"><h3 id="ck-rec-t">Ajustar foto</h3>' +
-          "<p>Arraste para posicionar e use o zoom para cortar.</p>" +
-          '<div class="ck-rec-area" style="width:' + V + "px;height:" + V + 'px"><img alt=""><div class="ck-rec-grade"></div><div class="ck-rec-mascara"></div></div>' +
+        var txt = function (v) { return String(v).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+        ov.innerHTML = '<div class="ck-rec" role="dialog" aria-modal="true" aria-labelledby="ck-rec-t"><h3 id="ck-rec-t">' + txt(opcoes.titulo || "Ajustar foto") + "</h3>" +
+          "<p>" + txt(opcoes.texto || "Arraste para posicionar e use o zoom para cortar.") + "</p>" +
+          '<div class="ck-rec-area" style="width:' + V + "px;height:" + V + 'px"><img alt=""><div class="ck-rec-grade"></div><div class="ck-rec-mascara' + (opcoes.forma === "quadrado" ? " quadrado" : "") + '"></div></div>' +
           '<label class="ck-rec-zoom"><span aria-hidden="true">➖</span><input type="range" min="1" max="4" step="0.01" value="1" aria-label="Zoom"><span aria-hidden="true">➕</span></label>' +
-          '<div class="ck-rec-acoes"><button type="button" data-rec="cancelar">Cancelar</button><button type="button" class="pri" data-rec="usar">Usar foto</button></div></div>';
+          '<div class="ck-rec-acoes"><button type="button" data-rec="cancelar">Cancelar</button><button type="button" class="pri" data-rec="usar">' + txt(opcoes.botao || "Usar foto") + "</button></div></div>";
         document.body.appendChild(ov);
         var area = ov.querySelector(".ck-rec-area"), el = ov.querySelector("img"), faixa = ov.querySelector("input[type=range]");
         el.src = url;
