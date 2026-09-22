@@ -1,5 +1,5 @@
 {
-  "versao": 2,
+  "versao": 3,
   "atualizadoEm": "2026-09-22",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -815,12 +815,12 @@
         {
           "id": "rs-contas-3",
           "text": "Login com Google ligado no painel do Supabase",
-          "done": false
+          "done": true
         },
         {
           "id": "rs-contas-4",
           "text": "relatorio.skin nas Redirect URLs do Supabase",
-          "done": false
+          "done": true
         },
         {
           "id": "rs-contas-5",
@@ -850,6 +850,31 @@
         {
           "id": "rs-contas-10",
           "text": "Repositório privado ou relatos fora do código público",
+          "done": false
+        },
+        {
+          "id": "rs-contas-11",
+          "text": "Conta abre na hora, sem confirmar o e-mail",
+          "done": true
+        },
+        {
+          "id": "rs-contas-12",
+          "text": "E-mail verificado só pelo código enviado (selo no perfil e aviso nas Escolas)",
+          "done": true
+        },
+        {
+          "id": "rs-contas-13",
+          "text": "Conta logada abre direto na página das Escolas",
+          "done": true
+        },
+        {
+          "id": "rs-contas-14",
+          "text": "E-mail do código sem link e sem palavras de login (contra spam)",
+          "done": true
+        },
+        {
+          "id": "rs-contas-15",
+          "text": "Envio de e-mail pelo Resend com o domínio axionproeduq.com.br verificado (DNS na Hostinger)",
           "done": false
         }
       ]
@@ -948,6 +973,11 @@
           "id": "rs-escolas-9",
           "text": "Turmas e alunos matriculados vindos da plataforma da escola (Conex-ED)",
           "done": false
+        },
+        {
+          "id": "rs-escolas-10",
+          "text": "Imagem da escola com recorte e ajuste (arrastar e zoom)",
+          "done": true
         }
       ]
     },
@@ -1107,6 +1137,16 @@
           "id": "rs-seg-5",
           "text": "Relatos do HTML removidos do código quando a escola for excluída",
           "done": false
+        },
+        {
+          "id": "rs-seg-6",
+          "text": "Porta de contas: contas do RELATORIO SKIN não entram na Biblioteca Digital",
+          "done": true
+        },
+        {
+          "id": "rs-seg-7",
+          "text": "Tela de conta testada em 7 tamanhos (npm run check:login)",
+          "done": true
         }
       ]
     },
