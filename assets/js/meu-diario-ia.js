@@ -84,9 +84,80 @@
   }
   function gravarCfg() { try { localStorage.setItem(cfgKey(), JSON.stringify(cfg)); } catch (e) {} }
   function lerChat() { try { var c = JSON.parse(localStorage.getItem(chatKey()) || "[]"); return Array.isArray(c) ? c : []; } catch (e) { return []; } }
+
+  // ── conversas (várias, como no ChatGPT; 22/09/2026) ───────────────────
+  // {atual: id, lista: [{id, titulo, tituloManual, criado, atualizado, msgs}]}
+  // Ficam neste aparelho, separadas por lugar (Meu Diário, AEE, cada escola).
+  // A conversa única antiga (md_ia_chat_*) vira a primeira da lista.
+  var MAX_CONVERSAS = 60, conversas = null;
+  function conversasKey() { return "md_ia_chats_" + uid() + (M && M.contexto ? "_" + M.contexto : ""); }
+  function novoIdConversa() { return "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function tituloDe(msgs) {
+    var u = (msgs || []).filter(function (m) { return m.role === "user"; })[0];
+    if (!u) return "Nova conversa";
+    var t = String(u.texto || "").replace(/\s+/g, " ").trim();
+    if (!t && (u.anexos || []).length) t = "📎 " + u.anexos[0].nome;
+    t = t || "Nova conversa";
+    return t.length > 52 ? t.slice(0, 50).trim() + "…" : t;
+  }
+  function lerConversas() {
+    var c = null;
+    try { c = JSON.parse(localStorage.getItem(conversasKey()) || "null"); } catch (e) {}
+    if (!c || !Array.isArray(c.lista)) {
+      var antiga = lerChat(), agora = new Date().toISOString();
+      c = { atual: "", lista: [] };
+      if (antiga.length) {
+        var quando = (antiga[antiga.length - 1] || {}).em || agora;
+        c.lista.push({ id: novoIdConversa(), titulo: tituloDe(antiga), criado: (antiga[0] || {}).em || quando, atualizado: quando, msgs: antiga });
+      }
+    }
+    c.lista = c.lista.filter(function (x) { return x && x.id && Array.isArray(x.msgs); });
+    if (!c.lista.some(function (x) { return x.id === c.atual; })) c.atual = c.lista.length ? ordenadas(c.lista)[0].id : "";
+    return c;
+  }
+  function ordenadas(lista) { return lista.slice().sort(function (a, b) { return String(b.atualizado || "").localeCompare(String(a.atualizado || "")); }); }
+  function conversaAtual() { return conversas.lista.filter(function (x) { return x.id === conversas.atual; })[0] || null; }
+  function abrirConversa(id) {
+    var c = conversas.lista.filter(function (x) { return x.id === id; })[0];
+    if (!c) return;
+    conversas.atual = c.id; chat = c.msgs;
+  }
+  // Nova conversa: se a atual ainda está vazia, reaproveita a atual.
+  function novaConversa() {
+    var atual = conversaAtual();
+    if (atual && !atual.msgs.length) { chat = atual.msgs; return; }
+    var agora = new Date().toISOString();
+    var c = { id: novoIdConversa(), titulo: "Nova conversa", criado: agora, atualizado: agora, msgs: [] };
+    conversas.lista.push(c); conversas.atual = c.id; chat = c.msgs;
+  }
+  function salvarConversas() {
+    // Conversas vazias que não estão abertas não ficam guardadas.
+    conversas.lista = conversas.lista.filter(function (x) { return x.msgs.length || x.id === conversas.atual; });
+    var lista = ordenadas(conversas.lista);
+    if (lista.length > MAX_CONVERSAS) {
+      var manter = {}; lista.slice(0, MAX_CONVERSAS).forEach(function (x) { manter[x.id] = 1; }); manter[conversas.atual] = 1;
+      conversas.lista = conversas.lista.filter(function (x) { return manter[x.id]; });
+    }
+    // Aparelho sem espaço: apaga as conversas mais antigas até caber.
+    for (var tentativa = 0; tentativa < 20; tentativa++) {
+      try { localStorage.setItem(conversasKey(), JSON.stringify(conversas)); return; } catch (e) {
+        var velhas = ordenadas(conversas.lista).filter(function (x) { return x.id !== conversas.atual; });
+        if (!velhas.length) return;
+        var fora = velhas[velhas.length - 1].id;
+        conversas.lista = conversas.lista.filter(function (x) { return x.id !== fora; });
+      }
+    }
+  }
   function gravarChat() {
-    chat = chat.slice(-60);
-    try { localStorage.setItem(chatKey(), JSON.stringify(chat)); } catch (e) {}
+    if (!conversas) return;
+    if (!conversaAtual()) novaConversa();
+    var c = conversaAtual();
+    c.msgs = chat.slice(-60); chat = c.msgs;
+    var ultima = chat[chat.length - 1];
+    c.atualizado = (ultima && ultima.em) || c.atualizado || new Date().toISOString();
+    if (!c.tituloManual) c.titulo = tituloDe(chat);
+    salvarConversas();
+    desenharLista();
   }
   function chaveAtual() { return (cfg.chaves[cfg.prov] || "").trim(); }
   function modeloAtual() { return naPlataforma() ? "automático" : (cfg.modelos[cfg.prov] || PROV[cfg.prov].padrao).trim(); }
@@ -547,8 +618,10 @@
       if (pesados.length) return M.toast("PDF acima de 5 MB não vai pela IA gratuita. Envie menos páginas ou use a sua própria chave.");
     }
     var envio = anexos.slice();
+    if (!conversaAtual()) { novaConversa(); }
     var msg = { role: "user", texto: texto, anexos: envio.map(function (a) { return { nome: a.nome, tipo: a.tipo }; }), em: new Date().toISOString() };
     chat.push(msg);
+    gravarChat();
     campo.value = ""; ajustarAltura(campo);
     anexos = []; desenharAnexos();
     ocupado = true; desenharChat(true);
@@ -880,6 +953,25 @@
       ".ia-chat-h{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--md-linha);background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff}" +
       ".ia-chat-h b{font-family:'Playfair Display',serif;font-size:1rem}.ia-chat-h small{font-size:.72rem;opacity:.7;flex:1}" +
       ".ia-chat-h button{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:5px 11px;font-size:.74rem;cursor:pointer}" +
+      ".ia-hb{width:32px;height:32px;padding:0!important;border-radius:9px!important;font-size:1rem!important}" +
+      ".ia-corpo{display:grid;grid-template-columns:250px minmax(0,1fr);position:relative}.ia-corpo.sem-lista{grid-template-columns:minmax(0,1fr)}.ia-corpo.sem-lista .ia-lista{display:none}" +
+      ".ia-princ{min-width:0;display:flex;flex-direction:column}" +
+      ".ia-lista{border-right:1px solid var(--md-linha,#e8e5de);background:var(--md-sup,#fff);display:flex;flex-direction:column;min-height:0;max-height:calc(62vh + 150px)}" +
+      ".ia-lista-top{padding:10px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--md-linha,#e8e5de)}" +
+      ".ia-lista-novo{border:1px solid var(--md-linha,#e8e5de);background:var(--md-sup2,#faf8f2);color:var(--ce,#2b2b2b);border-radius:10px;padding:8px 10px;font-family:inherit;font-weight:700;font-size:.82rem;cursor:pointer;text-align:left}" +
+      ".ia-busca{border:1px solid var(--md-linha,#e8e5de);background:var(--md-sup2,#faf8f2);color:var(--ce,#2b2b2b);border-radius:9px;padding:7px 10px;font:inherit;font-size:.82rem;width:100%;box-sizing:border-box}" +
+      ".ia-convs{overflow-y:auto;padding:6px 6px 10px;flex:1}" +
+      ".ia-conv-g{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--cm,#5a5a5a);padding:10px 8px 4px}" +
+      ".ia-conv{display:flex;align-items:center;border-radius:9px}.ia-conv:hover,.ia-conv.on{background:var(--md-sup3,#f5f3ee)}.ia-conv.on .ia-conv-t{font-weight:700}" +
+      ".ia-conv-t{flex:1;min-width:0;background:none;border:none;text-align:left;padding:8px;font:inherit;font-size:.83rem;color:var(--ce,#2b2b2b);cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
+      ".ia-conv-b{background:none;border:none;cursor:pointer;font-size:.75rem;padding:6px 4px;opacity:0;transition:opacity .15s}.ia-conv:hover .ia-conv-b,.ia-conv.on .ia-conv-b,.ia-conv-b:focus{opacity:.8}" +
+      ".ia-conv-vazio{font-size:.8rem;color:var(--cm,#5a5a5a);padding:12px 8px}" +
+      "html.dark-2026 .ia-lista{background:#15181b!important;border-right-color:#383d43!important}" +
+      "html.dark-2026 .ia-lista-top{border-bottom-color:#383d43!important}" +
+      "html.dark-2026 .ia-lista-novo,html.dark-2026 .ia-busca{background:#202327!important;border-color:#383d43!important;color:#f4f5f6!important}" +
+      "html.dark-2026 .ia-conv:hover,html.dark-2026 .ia-conv.on{background:#272b30!important}html.dark-2026 .ia-conv-t{color:#f4f5f6!important}html.dark-2026 .ia-conv-g{color:#aeb4bd!important}" +
+      "@media(max-width:760px){.ia-corpo,.ia-corpo.sem-lista{grid-template-columns:minmax(0,1fr)}.ia-corpo .ia-lista,.ia-corpo.sem-lista .ia-lista{display:none}" +
+      ".ia-corpo.lista-on .ia-lista{display:flex;position:absolute;inset:0 18% 0 0;z-index:5;max-height:none;box-shadow:8px 0 24px rgba(0,0,0,.25)}.ia-conv-b{opacity:.8}}" +
       ".ia-msgs{min-height:300px;max-height:62vh;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px;background:var(--md-sup2)}" +
       ".ia-m{max-width:88%;border-radius:14px;padding:10px 14px;font-size:.88rem;line-height:1.55;word-wrap:break-word}" +
       ".ia-m.u{align-self:flex-end;background:var(--md-acento);color:var(--md-acento-txt);border-bottom-right-radius:4px;white-space:pre-wrap}" +
@@ -1010,20 +1102,55 @@
     var cfgAberta = sec.querySelector(".ia-cfg") ? sec.querySelector(".ia-cfg").open : null;
     sec.innerHTML = '<div class="th"><div class="tb ia">🤖</div><div class="ti"><h2>Assistente de I.A</h2><p>Converse, envie fotos, PDFs, planilhas e documentos · a I.A propõe as mudanças no diário e você confirma</p></div></div>' + estilo() +
       '<div class="ia-wrap">' + desenharConfigHtml() +
-      '<div class="md-card ia-chat"><div class="ia-chat-h"><b>🤖 Assistente</b><small>' + esc(rotuloCabecalho()) + '</small><button type="button" data-ia="limpar">🗑 Nova conversa</button></div>' +
+      '<div class="md-card ia-chat"><div class="ia-chat-h"><button type="button" class="ia-hb" data-ia="lista" title="Mostrar ou ocultar as conversas" aria-label="Conversas">☰</button><b>🤖 Assistente</b><small>' + esc(rotuloCabecalho()) + '</small><button type="button" data-ia="novo" title="Começar uma conversa nova (as outras ficam guardadas)">✏️ Novo chat</button></div>' +
+      '<div class="ia-corpo' + (cfg.listaFechada ? " sem-lista" : "") + '"><aside class="ia-lista" aria-label="Conversas"><div class="ia-lista-top"><button type="button" class="ia-lista-novo" data-ia="novo2">✏️ Novo chat</button><input type="search" class="ia-busca" placeholder="Buscar nas conversas" aria-label="Buscar nas conversas"></div><div class="ia-convs"></div></aside><div class="ia-princ">' +
       '<div class="ia-msgs"></div>' +
       '<div class="ia-sug">' + sugestoes().map(function (s, i) { return '<button type="button" data-sug="' + i + '">' + esc(s[0]) + "</button>"; }).join("") + "</div>" +
       '<div class="ia-anexos" hidden></div>' +
       '<div class="ia-in"><button type="button" class="ib" data-ia="anexar" title="Anexar arquivo (foto, PDF, Word, planilha, texto)">📎</button><button type="button" class="ib" data-ia="camera" title="Tirar foto">📷</button>' +
       '<textarea class="ia-txt" rows="1" placeholder="Escreva aqui…" title="Enter envia · Shift+Enter quebra a linha"></textarea><button type="button" class="ib env">Enviar ➤</button></div>' +
       '<input type="file" data-ia="arq" multiple hidden accept="image/*,.pdf,.docx,.xlsx,.xls,.ods,.csv,.tsv,.txt,.md,.json,.html,.htm,.xml">' +
-      '<input type="file" data-ia="cam" hidden accept="image/*" capture="environment"></div></div>';
+      '<input type="file" data-ia="cam" hidden accept="image/*" capture="environment"></div></div></div></div>';
     if (cfgAberta !== null) sec.querySelector(".ia-cfg").open = cfgAberta || !pronto();
     ligar(sec);
     var t = sec.querySelector(".ia-txt"); t.value = rascunho; ajustarAltura(t);
     desenharChat(ocupado);
     desenharAnexos();
+    desenharLista();
   }
+
+  // ── lista de conversas ─────────────────────────────────────────────
+  function grupoData(iso) {
+    var d = new Date(iso || 0), hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    var dias = Math.floor((hoje - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000);
+    return dias <= 0 ? "Hoje" : dias === 1 ? "Ontem" : dias < 7 ? "Últimos 7 dias" : dias < 30 ? "Últimos 30 dias" : "Mais antigas";
+  }
+  function desenharLista() {
+    var box = $(".ia-convs"); if (!box || !conversas) return;
+    var busca = (($(".ia-busca") || {}).value || "").trim().toLowerCase();
+    var lista = ordenadas(conversas.lista).filter(function (c) { return c.msgs.length || c.id === conversas.atual; });
+    if (busca) lista = lista.filter(function (c) {
+      return String(c.titulo || "").toLowerCase().indexOf(busca) >= 0 || c.msgs.some(function (m) { return String(m.texto || "").toLowerCase().indexOf(busca) >= 0; });
+    });
+    var grupo = "", html = "";
+    lista.forEach(function (c) {
+      var g = grupoData(c.atualizado);
+      if (g !== grupo) { grupo = g; html += '<div class="ia-conv-g">' + g + "</div>"; }
+      html += '<div class="ia-conv' + (c.id === conversas.atual ? " on" : "") + '"><button type="button" class="ia-conv-t" data-abrir="' + c.id + '" title="' + esc(c.titulo || "Nova conversa") + '">' + esc(c.titulo || "Nova conversa") + "</button>" +
+        '<button type="button" class="ia-conv-b" data-ren="' + c.id + '" title="Renomear" aria-label="Renomear conversa">✏️</button>' +
+        '<button type="button" class="ia-conv-b" data-del="' + c.id + '" title="Excluir" aria-label="Excluir conversa">🗑</button></div>';
+    });
+    box.innerHTML = html || '<div class="ia-conv-vazio">' + (busca ? "Nada encontrado." : "Nenhuma conversa ainda.") + "</div>";
+  }
+  function trocarConversa(id) {
+    if (ocupado) return M.toast("Espere a resposta terminar para trocar de conversa.");
+    abrirConversa(id);
+    anexos = []; desenharAnexos();
+    desenharChat(); desenharLista();
+    fecharListaCelular();
+  }
+  function fecharListaCelular() { var c = $(".ia-corpo"); if (c) c.classList.remove("lista-on"); }
+  function celularIa() { return window.matchMedia && window.matchMedia("(max-width: 760px)").matches; }
   function ligar(sec) {
     var q = function (s) { return sec.querySelector(s); };
     sec.querySelectorAll("[data-prov]").forEach(function (b) { b.onclick = function () { cfg.prov = b.getAttribute("data-prov"); gravarCfg(); desenhar(); abrirConfig(); if (naPlataforma()) buscarSaldo(); }; });
@@ -1053,7 +1180,41 @@
     });
     var rm = q('[data-ia="remover"]');
     if (rm) rm.onclick = function () { if (!confirm("Remover a chave do " + PROV[cfg.prov].nome + " deste aparelho?")) return; delete cfg.chaves[cfg.prov]; delete cfg.listas[cfg.prov]; gravarCfg(); desenhar(); };
-    q('[data-ia="limpar"]').onclick = function () { if (chat.length && !confirm("Começar uma nova conversa? As mensagens desta conversa somem deste aparelho (o que já foi aplicado no diário continua).")) return; chat = []; gravarChat(); desenharChat(); };
+    var novoChat = function () {
+      if (ocupado) return M.toast("Espere a resposta terminar para abrir outra conversa.");
+      novaConversa(); salvarConversas(); anexos = []; desenharAnexos(); desenharChat(); desenharLista(); fecharListaCelular();
+      var t = q(".ia-txt"); if (t) t.focus();
+    };
+    q('[data-ia="novo"]').onclick = novoChat;
+    q('[data-ia="novo2"]').onclick = novoChat;
+    q('[data-ia="lista"]').onclick = function () {
+      var corpo = q(".ia-corpo");
+      if (celularIa()) { corpo.classList.toggle("lista-on"); return; }
+      cfg.listaFechada = !corpo.classList.contains("sem-lista");
+      corpo.classList.toggle("sem-lista", cfg.listaFechada); gravarCfg();
+    };
+    q(".ia-busca").addEventListener("input", desenharLista);
+    q(".ia-convs").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-abrir],[data-ren],[data-del]"); if (!b) return;
+      if (b.hasAttribute("data-abrir")) return trocarConversa(b.getAttribute("data-abrir"));
+      var id = b.getAttribute("data-ren") || b.getAttribute("data-del");
+      var c = conversas.lista.filter(function (x) { return x.id === id; })[0]; if (!c) return;
+      if (b.hasAttribute("data-ren")) {
+        var nome = window.prompt("Nome da conversa:", c.titulo || "");
+        if (nome === null) return;
+        nome = nome.trim();
+        c.titulo = nome || tituloDe(c.msgs); c.tituloManual = !!nome;
+        salvarConversas(); desenharLista(); return;
+      }
+      if (ocupado && id === conversas.atual) return M.toast("Espere a resposta terminar.");
+      if (!confirm("Excluir a conversa \u201c" + (c.titulo || "Nova conversa") + "\u201d? O que já foi aplicado no diário continua.")) return;
+      conversas.lista = conversas.lista.filter(function (x) { return x.id !== id; });
+      if (id === conversas.atual) {
+        var outra = ordenadas(conversas.lista).filter(function (x) { return x.msgs.length; })[0];
+        if (outra) abrirConversa(outra.id); else { conversas.atual = ""; novaConversa(); }
+      }
+      salvarConversas(); desenharChat(); desenharLista();
+    });
     q('[data-ia="anexar"]').onclick = function () { q('[data-ia="arq"]').click(); };
     q('[data-ia="camera"]').onclick = function () { q('[data-ia="cam"]').click(); };
     q('[data-ia="arq"]').onchange = function () { adicionarAnexos(this.files); this.value = ""; };
@@ -1083,7 +1244,7 @@
 
   (window.MD_MODULOS = window.MD_MODULOS || []).push({
     nome: "ia",
-    iniciar: function (api) { M = api; cfg = lerCfg(); chat = lerChat(); },
+    iniciar: function (api) { M = api; cfg = lerCfg(); conversas = lerConversas(); if (conversaAtual()) chat = conversaAtual().msgs; else { chat = []; novaConversa(); } },
     desenhar: function () { if (!document.querySelector("#sec-ia .ia-wrap")) desenhar(); else mostrarSaldo(); },
     aoAbrir: function (id) { if (id === "ia") { buscarSaldo(); var t = $(".ia-txt"); if (t && !("ontouchstart" in window)) setTimeout(function () { t.focus(); }, 60); } }
   });
