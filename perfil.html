@@ -458,7 +458,7 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
     S.auth.enviarVerificacaoEmail().then(function (email) {
       esperaEnvio = Date.now() + 60000;
       msg.className = 'msg ok';
-      msg.textContent = 'Enviamos para ' + email + '. Abra o link neste aparelho ou digite aqui o código do e-mail. Confira também a pasta Spam.';
+      msg.textContent = 'Enviamos um código de 8 dígitos para ' + email + '. Digite-o aqui. O assunto do e-mail começa pelo próprio código.';
       bt.textContent = 'Enviar de novo';
       $('email-codigo-box').hidden = false; $('email-codigo').focus();
     }).catch(function (e) { msg.className = 'msg erro'; msg.textContent = e.message || 'Não foi possível enviar agora.'; })
