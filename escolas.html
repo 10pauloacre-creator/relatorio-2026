@@ -45,6 +45,9 @@ button{font:inherit}
 .card:hover,.card:focus-visible{transform:translateY(-8px) scale(1.04);box-shadow:0 28px 64px rgba(0,0,0,.6);outline:none}
 .card>img{width:100%;height:100%;object-fit:cover;display:block}
 .card.fixa>img{object-fit:contain}
+.card.fixa.propria>img{object-fit:cover}
+/* Nome abaixo da imagem (opção "Mostrar o nome da escola" nas configurações). */
+.nome-escola{font-family:Manrope,sans-serif;font-weight:800;font-size:1.02rem;line-height:1.25;text-align:center;color:var(--txt);max-width:100%;overflow-wrap:anywhere}
 .card.gerado{background:linear-gradient(160deg,var(--c1,#2a3324),var(--c2,#141712));border:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px 22px;gap:10px}
 .card.gerado .ic{font-size:clamp(3.4rem,9vw,5rem);line-height:1;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35))}
 .card.gerado .rot{font-family:Manrope,sans-serif;font-size:.72rem;letter-spacing:.34em;color:var(--marca2);font-weight:800;display:flex;align-items:center;gap:10px}
@@ -198,6 +201,7 @@ a.selo{text-decoration:none}
         + '<span class="lc">' + (inep ? esc(inep.municipio) + '/' + esc(inep.uf) : (e.municipio ? esc(e.municipio) : '')) + '</span>';
     return '<div class="item' + (destaque === e.id ? ' novoitem' : '') + '">'
       + '<a class="card' + (e.imagem ? '' : ' gerado') + '" style="--c1:' + cor[0] + ';--c2:' + cor[1] + '" href="' + esc(C.ocupacao.destino(e) || '#') + '" data-abrir="' + esc(e.id) + '" aria-label="Abrir ' + esc(e.nome) + '">' + face + '</a>'
+      + (e.imagem && e.mostrarNome ? '<div class="nome-escola">' + esc(e.nome) + '</div>' : '')
       + '<div class="selos">' + (inep ? '<span class="selo" title="' + esc(inep.nome) + '">🏛️ INEP ' + inep.codigo + ' · ' + n + ' turma' + (n === 1 ? '' : 's') + '</span>'
               : '<button type="button" class="selo falta" data-vincular="' + esc(e.id) + '">🔗 Vincular ao INEP</button>')
       + seloOcupacao(e.ocupacoes, e.id, false) + '</div></div>';
@@ -205,7 +209,10 @@ a.selo{text-decoration:none}
   function cardFixa(f) {
     var v = (E.fixas || {})[f.id], inep = v && v.inep;
     var oc = (v && v.ocupacoes) || ['regente'];
-    return '<div class="item"><a class="card fixa" href="' + esc(C.ocupacao.destino({ id: f.id, ocupacoes: oc }, f)) + '"><img src="' + f.img + '" alt="' + esc(f.nome) + '"></a>'
+    // Imagem trocada pelo administrador (⚙️ Configurações da escola) ou a original.
+    var img = (v && v.imagem) || f.img;
+    return '<div class="item"><a class="card fixa' + (v && v.imagem ? ' propria' : '') + '" href="' + esc(C.ocupacao.destino({ id: f.id, ocupacoes: oc }, f)) + '"><img src="' + esc(img) + '" alt="' + esc(f.nome) + '"></a>'
+      + (v && v.mostrarNome ? '<div class="nome-escola">' + esc(f.nome) + '</div>' : '')
       + '<div class="selos">' + (inep ? '<button type="button" class="selo" data-fixa="' + f.id + '" title="' + esc(inep.nome) + ' — trocar vínculo">🏛️ INEP ' + inep.codigo + '</button>'
               : '<button type="button" class="selo falta" data-fixa="' + f.id + '">🔗 Vincular ao INEP</button>')
       + seloOcupacao(oc, f.id, true)
@@ -269,7 +276,7 @@ a.selo{text-decoration:none}
         ov.querySelector('[data-fechar]').onclick = fechar;
         var tirar = ov.querySelector('[data-tirar]');
         if (tirar) tirar.onclick = function () {
-          if (fixa) { if (E.fixas) delete E.fixas[id]; } else delete alvo.inep;
+          if (fixa) { if (E.fixas && E.fixas[id]) { delete E.fixas[id].inep; delete E.fixas[id].ligadoEm; } } else delete alvo.inep;
           salvar(); C.vincularEscola(id, fixa ? { nome: alvo.nome } : alvo); fechar(); toast('Vínculo removido.');
         };
         C.seletorInep(ov.querySelector('[data-sel]'), {
@@ -278,7 +285,7 @@ a.selo{text-decoration:none}
             var r = C.inep.resumo(x);
             var dono = (E.escolas || []).filter(function (e) { return e.id !== id && e.inep && e.inep.codigo === r.codigo; })[0];
             if (dono) return toast('Esta escola do INEP já está cadastrada como "' + dono.nome + '".');
-            if (fixa) { E.fixas = E.fixas || {}; E.fixas[id] = { inep: r, ligadoEm: new Date().toISOString() }; }
+            if (fixa) { E.fixas = E.fixas || {}; E.fixas[id] = E.fixas[id] || {}; E.fixas[id].inep = r; E.fixas[id].ligadoEm = new Date().toISOString(); }
             else { alvo.inep = r; }
             salvar();
             C.vincularEscola(id, fixa ? { nome: alvo.nome, inep: r } : alvo);

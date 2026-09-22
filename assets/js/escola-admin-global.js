@@ -52,6 +52,11 @@
     + "#sec-cfgglobal .eg-btn.perigo{background:var(--eg-pgbg);color:var(--eg-pg);border-color:rgba(192,57,43,.35)}"
     + "#sec-cfgglobal .eg-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}"
     + "#sec-cfgglobal .eg-in{padding:9px 11px;border:2px solid var(--eg-linha);border-radius:10px;font:inherit;font-size:.9rem;color:var(--eg-txt);background:var(--eg-sup2);flex:1 1 180px;min-width:0}"
+    + "#sec-cfgglobal .eg-perso{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:12px}"
+    + "#sec-cfgglobal .eg-face{width:120px;height:120px;border-radius:20px;overflow:hidden;background:#141712;flex-shrink:0;box-shadow:0 6px 20px rgba(0,0,0,.25)}"
+    + "#sec-cfgglobal .eg-face img{width:100%;height:100%;object-fit:contain;display:block}#sec-cfgglobal .eg-face.propria img{object-fit:cover}"
+    + "#sec-cfgglobal .eg-check{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:.86rem;color:var(--eg-txt);cursor:pointer}"
+    + "#sec-cfgglobal .eg-check input{width:18px;height:18px;accent-color:var(--eg-ac)}"
     + "#sec-cfgglobal .eg-inep{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--eg-sup2);border:1px solid var(--eg-linha);font-size:.86rem;line-height:1.5}"
     + "#sec-cfgglobal .eg-aluno{display:flex;gap:10px;align-items:center;border-top:1px solid var(--eg-linha);padding:9px 0;font-size:.86rem;flex-wrap:wrap}"
     + "#sec-cfgglobal .eg-aluno span{flex:1;min-width:200px}#sec-cfgglobal .eg-aluno small{color:var(--eg-mudo)}"
@@ -112,6 +117,11 @@
           + '<div class="eg-row"><button type="button" class="eg-btn" data-eg="inep">Trocar vínculo</button><a class="eg-btn" href="' + C.inep.qedu(i.codigo) + '" target="_blank" rel="noopener">Ver no QEdu ↗</a></div>'
         : "<b>🔗 Ainda não ligada ao INEP.</b><br>O código INEP identifica a escola no país e prepara a ligação com a plataforma da escola (Conex-ED)."
           + '<div class="eg-row"><button type="button" class="eg-btn pri" data-eg="inep">Vincular ao INEP</button></div>') + "</div></div>"
+      + '<div class="eg-card"><h3>🎨 Personalização</h3><p>Imagem do botão desta escola na tela Escolas. Ao trocar, você recorta e ajusta a imagem.</p>'
+      + '<div class="eg-perso"><div class="eg-face' + (vinc().imagem ? " propria" : "") + '"><img src="' + esc(vinc().imagem || FIXA.img) + '" alt=""></div><div>'
+      + '<div class="eg-row" style="margin-top:0"><label class="eg-btn pri" style="cursor:pointer">🖼️ Trocar imagem<input type="file" accept="image/*" data-eg="imagem" hidden></label>'
+      + (vinc().imagem ? '<button type="button" class="eg-btn" data-eg="imagem-original">Voltar à imagem original</button>' : "") + "</div>"
+      + '<label class="eg-check"><input type="checkbox" data-eg="mostrar-nome"' + (vinc().mostrarNome ? " checked" : "") + "> Mostrar o nome da escola abaixo da imagem, na tela Escolas</label></div></div></div>"
       + '<div class="eg-card"><h3>🧑‍🏫 Sua ocupação nesta escola</h3><p><b>' + esc(C.ocupacao.rotulo(oc)) + "</b>. Regente abre este diário; mediador, assistente ou AEE abrem o painel da Educação Especial. Com mais de uma, o botão 🔀 Mudar painel aparece no cabeçalho.</p>"
       + '<div class="eg-row"><button type="button" class="eg-btn" data-eg="ocupacao">Trocar ocupação</button>' + (C.ocupacao.temAEE(oc) ? '<a class="eg-btn" href="aee.html?escola=' + ID + '">♿ Abrir o painel AEE</a>' : "") + "</div></div>"
       + '<div class="eg-card"><h3>♿ Alunos da Educação Especial</h3><p>Tem aluno com deficiência acompanhado por mediador, assistente ou professor do AEE? Peça o <b>código do aluno</b> (ex.: AEE-7K3M-Q9TX) e vincule-se: você vê o perfil, as orientações e os documentos dele, e lança notas e registros da sua disciplina no mesmo perfil que a equipe usa.</p>'
@@ -157,6 +167,19 @@
         toast("Vinculado a " + r.data.nome + ".");
         carregarAEE().then(function () { desenharConfig(); });
       });
+    };
+    // Personalização: imagem própria (recortada) e nome abaixo da imagem.
+    sec.querySelector('[data-eg="imagem"]').onchange = function () {
+      var f = this.files[0]; this.value = ""; if (!f) return;
+      C.recortarImagem(f, 400, 0.88, { titulo: "Ajustar a imagem da escola", texto: "Arraste para posicionar e use o zoom. É assim que a escola aparece no botão da tela Escolas.", botao: "Usar imagem", forma: "quadrado" })
+        .then(function (url) { if (!url) return; vinc().imagem = url; return salvar().then(function () { toast("Imagem da escola salva."); desenharConfig(); }); })
+        .catch(function (x) { toast(x.message); });
+    };
+    var orig = sec.querySelector('[data-eg="imagem-original"]');
+    if (orig) orig.onclick = function () { delete vinc().imagem; salvar().then(function () { toast("Imagem original de volta."); desenharConfig(); }); };
+    sec.querySelector('[data-eg="mostrar-nome"]').onchange = function () {
+      var on = this.checked; if (on) vinc().mostrarNome = true; else delete vinc().mostrarNome;
+      salvar().then(function () { toast(on ? "O nome vai aparecer abaixo da imagem." : "O nome não aparece mais abaixo da imagem."); });
     };
     sec.querySelector('[data-eg="tirar-inep"]').onclick = function () {
       C.confirmarPerigo({ titulo: "Remover o vínculo com o INEP?", texto: FIXA.nome + " deixa de estar ligada ao cadastro oficial. Dá para vincular de novo quando quiser.", botao: "Sim, remover", botaoFinal: "Remover" }).then(function (ok) {

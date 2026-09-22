@@ -189,6 +189,8 @@ button.md-escola-face:focus-visible{outline:3px solid var(--md-acento,#A7B58A);o
 button.md-escola-face:hover .md-escola-cam{opacity:1}
 .md-escola-lado{display:flex;flex-direction:column;align-items:center;gap:6px}
 .md-escola-dica{font-size:.72rem;color:var(--cm)}
+.md-f label.md-check-nome{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:.86rem;font-weight:500;text-transform:none;letter-spacing:0;color:inherit;cursor:pointer}
+.md-check-nome input{width:18px;height:18px;accent-color:var(--md-acento)}
 .md-icones{display:flex;flex-wrap:wrap;gap:6px}
 .md-icones button{width:40px;height:40px;border-radius:10px;border:2px solid var(--md-linha);background:var(--md-sup2);font-size:1.25rem;cursor:pointer}
 .md-icones button.on{border-color:var(--md-destaque)}
@@ -748,7 +750,8 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       +'<div class="md-f"><label>Nome da escola (aparece no botão)</label><input data-esc="nome" value="'+esc(e.nome)+'"></div>'
       +'<div class="md-f"><label>Ícone do botão</label><div class="md-icones">'+ICONES.map(function(x){return '<button type="button" data-icone="'+x+'"'+((e.icone||'🏫')===x&&!e.imagem?' class="on"':'')+'>'+x+'</button>';}).join('')+'</div></div>'
       +'<div class="md-f"><label>Imagem da escola (perfil da escola: botão e cabeçalho do diário)</label><div class="md-row" style="flex-wrap:wrap"><label class="md-btn mini" style="cursor:pointer">🖼️ '+(e.imagem?'Trocar imagem':'Adicionar imagem')+'<input type="file" accept="image/*" data-esc="imagem" hidden></label>'
-      +(e.imagem?'<button type="button" class="md-btn mini" data-esc="sem-imagem">Remover imagem</button>':'')+'</div></div>'
+      +(e.imagem?'<button type="button" class="md-btn mini" data-esc="sem-imagem">Remover imagem</button>':'')+'</div>'
+      +'<label class="md-check-nome"><input type="checkbox" data-esc="mostrar-nome"'+(e.mostrarNome?' checked':'')+'> Mostrar o nome da escola abaixo da imagem, na tela Escolas</label></div>'
       +'<div class="md-f"><label>Sua ocupação nesta escola</label><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-size:.88rem">'+esc(C().ocupacao.rotulo(e.ocupacoes)||'—')+'</span><button type="button" class="md-btn mini" data-esc="ocupacao">Trocar</button></div></div>'
       +'<button type="button" class="md-btn pri" data-esc="salvar">💾 Salvar</button></div></div>'
       +'<div class="md-inep">'+(i
@@ -770,6 +773,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
         .catch(function(x){toast(x.message);});
     };
     sec.querySelector('[data-esc="trocar-imagem"]').onclick=function(){arq.click();};
+    sec.querySelector('[data-esc="mostrar-nome"]').onchange=function(){if(this.checked)e.mostrarNome=true;else delete e.mostrarNome;salvar('escola');toast(this.checked?'O nome vai aparecer abaixo da imagem.':'O nome não aparece mais abaixo da imagem.');};
     var sem=sec.querySelector('[data-esc="sem-imagem"]');if(sem)sem.onclick=function(){delete e.imagem;salvar('escola');};
     sec.querySelector('[data-esc="inep"]').onclick=function(){vincularInep();};
     sec.querySelector('[data-esc="ocupacao"]').onclick=function(){
