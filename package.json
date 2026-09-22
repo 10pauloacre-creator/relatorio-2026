@@ -14,7 +14,8 @@
     "apk:debug": "npm run cap:sync && node scripts/run-android-gradle.js :app:assembleDebug",
     "apk:release": "npm run cap:sync && node scripts/run-android-gradle.js :app:assembleRelease",
     "release:publish": "node scripts/publish-apk-release.js",
-    "release:debug": "npm run release:prepare && npm run apk:debug && npm run release:publish -- --apk android/app/build/outputs/apk/debug/app-debug.apk && npm run build:web"
+    "release:debug": "npm run release:prepare && npm run apk:debug && npm run release:publish -- --apk android/app/build/outputs/apk/debug/app-debug.apk && npm run build:web",
+    "linha-do-tempo": "node scripts/gerar-linha-do-tempo.js"
   },
   "devDependencies": {
     "@capacitor/android": "^7.4.2",
