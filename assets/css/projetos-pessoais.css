@@ -308,3 +308,42 @@ body { color: #f5f5f5; background: #1e1e1e; font-size: 14px; }
 @media (max-width: 560px) {
   .pp-modal-card.pp-modal-map { width: 100%; }.pp-mindmap-toolbar, .pp-map-toolbar { align-items: flex-start; flex-direction: column; }.pp-mindmap-controls, .pp-map-controls { width: 100%; }.pp-mindmap-reset, .pp-map-center { margin-left: auto; }.pp-mindmap-viewport { height: 54vh; min-height: 350px; }.pp-mindmap-help, .pp-map-toolbar-help { line-height: 1.35; }.pp-mindmap-detail { max-height: 215px; }.pp-map-page-head { align-items: stretch; flex-direction: column; }.pp-map-actions { justify-content: flex-start; }.pp-map-actions .pp-button { flex: 1; justify-content: center; }.pp-map-board { padding: 8px; }.pp-map-viewport { height: 54vh; min-height: 360px; }.pp-map-detail { max-height: 210px; }
 }
+
+/* ── 🐞 Bugs de cada projeto (22/09/2026) ── */
+.pp-bugs .pp-panel-head h2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pp-bug-count { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: .7rem; font-weight: 800; color: #ffd7d1; background: #7a1f1f; }
+.pp-bug-count.is-ok { color: #c9f1d5; background: #1d4d31; }
+.pp-project-meta .pp-bug-count { margin-right: 6px; }
+.pp-project-tile { position: relative; }
+.pp-bug-tile { position: absolute; top: 10px; left: 10px; z-index: 2; }
+.pp-bug-resumo { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; }
+.pp-bug-chip { border: 1px solid transparent; border-radius: 999px; padding: 5px 11px; font: inherit; font-size: .74rem; font-weight: 700; cursor: pointer; }
+.pp-bug-chip b { margin-left: 4px; }
+.pp-bug-chip.is-on { outline: 2px solid currentColor; outline-offset: 1px; }
+.pp-bug-filtros { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.pp-bug-lista { display: flex; flex-direction: column; gap: 10px; }
+.pp-bug { border: 1px solid var(--pp-line); border-left: 4px solid #6b6b6b; border-radius: 12px; padding: 12px 14px; background: rgba(255,255,255,.02); }
+.pp-bug-sev-urgent { border-left-color: #e05b4f; }
+.pp-bug-sev-high { border-left-color: #e0913a; }
+.pp-bug-sev-medium { border-left-color: #d4b53a; }
+.pp-bug-sev-low { border-left-color: #4f9fd4; }
+.pp-bug.is-fechado { opacity: .62; }
+.pp-bug.is-fechado h3 { text-decoration: line-through; text-decoration-thickness: 1px; }
+.pp-bug-top { display: flex; align-items: flex-start; gap: 10px; }
+.pp-bug-top h3 { flex: 1; font-size: .95rem; line-height: 1.35; margin: 0; }
+.pp-bug-codigo { font-family: ui-monospace, Consolas, monospace; font-size: .72rem; font-weight: 700; padding: 3px 7px; border-radius: 6px; background: rgba(255,255,255,.08); white-space: nowrap; }
+.pp-bug-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0 4px; }
+.pp-bug-status { border: 1px solid transparent; border-radius: 999px; padding: 3px 8px; font: inherit; font-size: .7rem; font-weight: 800; cursor: pointer; }
+.pp-bug-tag { border: none; cursor: pointer; font: inherit; font-size: .68rem; font-weight: 700; }
+.pp-bug-desc { font-size: .86rem; line-height: 1.5; margin: 6px 0; white-space: pre-line; }
+.pp-bug-mais summary { cursor: pointer; font-size: .78rem; font-weight: 700; opacity: .85; margin: 4px 0; }
+.pp-bug-mais h4 { font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; opacity: .7; margin: 10px 0 2px; }
+.pp-bug-mais p { font-size: .84rem; line-height: 1.5; white-space: pre-line; margin: 0; }
+.pp-bug-data { display: block; font-size: .72rem; opacity: .65; margin-top: 6px; }
+.pp-bug-st-novo { color: #e7e7e7; background: #4a4a4a; }
+.pp-bug-st-confirmado { color: #ffe5bf; background: #6b4519; }
+.pp-bug-st-correcao { color: #d7eaff; background: #0e4f7a; }
+.pp-bug-st-teste { color: #efe0ff; background: #56317e; }
+.pp-bug-st-corrigido { color: #c9f1d5; background: #1d5a36; }
+.pp-bug-st-naoreproduz, .pp-bug-st-arquivado { color: #cfcfcf; background: #333; }
+@media (max-width: 720px) { .pp-bug-filtros { grid-template-columns: 1fr 1fr; } .pp-bug-filtros input { grid-column: 1 / -1; } }
