@@ -1,5 +1,5 @@
 {
-  "versao": 4,
+  "versao": 5,
   "atualizadoEm": "2026-09-22",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -309,7 +309,8 @@
             "details": [
               "Assistente de I.A (chave própria de Gemini, OpenAI, Claude ou Groq, ou a IA da plataforma com cota diária).",
               "Lê fotos, PDF, Word e planilhas; propõe ações que só entram com confirmação; nomes dos alunos viram códigos.",
-              "Ganchos M.sistema/aplicarAcao/descreverAcao usados pelo painel AEE; escola-ia.js liga o mesmo assistente na Casavequia e na Hermínio."
+              "Ganchos M.sistema/aplicarAcao/descreverAcao usados pelo painel AEE; escola-ia.js liga o mesmo assistente na Casavequia e na Hermínio.",
+              "Histórico em várias conversas (22/09/2026): lista ao lado do chat, ✏️ Novo chat, título automático, renomear, excluir, busca e grupos por data; guardadas no aparelho (md_ia_chats_*)."
             ]
           },
           {
@@ -698,6 +699,26 @@
           "id": "rs-base-12",
           "text": "Marcador T6_INICIO para injeção automática no 6º Ano",
           "done": false
+        },
+        {
+          "id": "rs-base-13",
+          "text": "Aba Geral mostra as aulas lançadas pelo + Novo Diário",
+          "done": true
+        },
+        {
+          "id": "rs-base-14",
+          "text": "Cronograma da Casavequia em aba própria, com adicionar, editar e excluir aulas",
+          "done": true
+        },
+        {
+          "id": "rs-base-15",
+          "text": "Calendário escolar também na Hermínio",
+          "done": true
+        },
+        {
+          "id": "rs-base-16",
+          "text": "Hermínio: dias do rodízio editáveis nas projeções (e sábado corrigido)",
+          "done": true
         }
       ]
     },
@@ -922,6 +943,16 @@
           "id": "rs-meu-8",
           "text": "Relatório individual anual para as contas de professor",
           "done": false
+        },
+        {
+          "id": "rs-meu-9",
+          "text": "Assistente de I.A com várias conversas (Novo chat, histórico, busca)",
+          "done": true
+        },
+        {
+          "id": "rs-meu-10",
+          "text": "Seletor de ano letivo no cabeçalho, igual ao das escolas do administrador",
+          "done": true
         }
       ]
     },
@@ -1115,6 +1146,21 @@
         {
           "id": "rs-layout-7",
           "text": "Ferramentas globais também nas escolas do administrador",
+          "done": true
+        },
+        {
+          "id": "rs-layout-8",
+          "text": "Novo Diário com ✕ e pergunta de salvar antes de fechar",
+          "done": true
+        },
+        {
+          "id": "rs-layout-9",
+          "text": "Projeções de aulas no formato de computador no celular",
+          "done": true
+        },
+        {
+          "id": "rs-layout-10",
+          "text": "Layout sem edição pelo usuário (botão Editar removido)",
           "done": true
         }
       ]
