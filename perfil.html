@@ -441,10 +441,10 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
     });
     topo.title = ok ? '' : 'Clique para verificar o seu e-mail';
     if (ok) {
-      exp.textContent = st.email + (st.metodo === 'google' ? ' · verificado pelo Google.' : ' · verificado.');
+      exp.textContent = st.email + ' · verificado com o código enviado ao e-mail.';
       bt.hidden = true; $('email-codigo-box').hidden = true;
     } else {
-      exp.textContent = st.email + ' · a conta já funciona, mas o e-mail ainda não foi verificado. Verifique para poder recuperar a senha e receber avisos: enviamos um link e um código para ele.';
+      exp.textContent = st.email + ' · a conta já funciona, mas o e-mail ainda não foi verificado. Toque em "Verificar e-mail": enviamos um código para ele, e você o digita aqui.';
       bt.hidden = false;
     }
   }
@@ -545,6 +545,8 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
     // Voltando pelo link do e-mail, a sessão nova já traz a prova: o banco marca.
     document.addEventListener('relatorio:conta', carregarEmail);
     carregarEmail();
+    // Vindo do aviso da página das escolas: leva ao pedido de verificação.
+    if (location.hash === '#verificar-email') setTimeout(function () { $('email-pg').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300);
     $('s-trocar').onclick = trocarSenha;
     $('excluir').onclick = excluirConta;
     $('sair').onclick = function () { if (confirm('Sair da conta neste aparelho?')) S.auth.signOut(); };
