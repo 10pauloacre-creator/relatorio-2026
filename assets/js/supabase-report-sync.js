@@ -256,6 +256,8 @@ window.RelatorioSupabaseSync = (function () {
     if (/provider is not enabled|unsupported provider/i.test(message)) return "O login com Google ainda não foi ativado nesta plataforma.";
     if (/failed to fetch|network/i.test(message)) return "Sem internet. Conecte-se para entrar pela primeira vez.";
     if (/rate limit|too many|security purposes/i.test(message)) return "Muitas tentativas. Aguarde um minuto e tente de novo.";
+    if (/error sending|sending (confirmation|magic link|recovery)|smtp/i.test(message)) return "Não conseguimos enviar o e-mail agora. Tente de novo mais tarde.";
+    if (/token has expired|invalid token|otp.*(expired|invalid)|expired or is invalid/i.test(message)) return "Código inválido ou vencido. Peça um novo.";
     return message || "Não foi possível concluir agora.";
   }
 
@@ -281,13 +283,60 @@ window.RelatorioSupabaseSync = (function () {
       options: { data: { nome: String(nome || "").trim() }, emailRedirectTo: urlDeRetorno() }
     });
     if (response.error) throw new Error(translateAuthError(response.error));
+    // E-mail que já tem conta: o Supabase responde "sucesso" sem enviar nada
+    // (para não revelar quem existe) e devolve identities vazio.
+    var novo = response.data && response.data.user;
+    if (novo && Array.isArray(novo.identities) && novo.identities.length === 0) {
+      throw new Error("Já existe uma conta com este e-mail. Use \"Entrar\" ou \"Esqueci a senha\".");
+    }
     lembrarEmail(normalizeEmail(email));
-    // Com confirmação de e-mail ligada, a sessão só nasce depois do link.
+    // Desde 22/09/2026 a conta abre na hora (Confirm email desligado no
+    // Supabase); o e-mail é verificado depois, no perfil.
     if (response.data && response.data.session) {
       concluirEntrada();
       return { entrou: true };
     }
+    // Se a confirmação voltar a ser ligada no painel, tenta entrar mesmo assim.
+    try {
+      var entrada = await client.auth.signInWithPassword({ email: normalizeEmail(email), password: password });
+      if (!entrada.error && entrada.data && entrada.data.session) { concluirEntrada(); return { entrou: true }; }
+    } catch (e) {}
     return { entrou: false };
+  }
+
+  // ── Verificação do e-mail (Etapa 15) ─────────────────────────────────
+  // A conta abre sem confirmar o e-mail; o perfil mostra "verificar e-mail"
+  // até o dono abrir o link ou digitar o código que chega nele. O banco
+  // (conta_email_status) confere a prova no próprio token da sessão.
+  async function emailStatus() {
+    var client = getClient();
+    if (!client || !isSignedIn()) return null;
+    var r = await client.rpc("conta_email_status");
+    if (r.error) throw r.error;
+    return r.data;
+  }
+
+  async function enviarVerificacaoEmail() {
+    var client = getClient();
+    var user = currentUser();
+    if (!client || !user || !user.email) throw new Error("Entre na conta primeiro.");
+    var r = await client.auth.signInWithOtp({
+      email: user.email,
+      options: { shouldCreateUser: false, emailRedirectTo: urlDeRetorno() }
+    });
+    if (r.error) throw new Error(translateAuthError(r.error));
+    return user.email;
+  }
+
+  async function confirmarCodigoEmail(codigo) {
+    var client = getClient();
+    var user = currentUser();
+    if (!client || !user || !user.email) throw new Error("Entre na conta primeiro.");
+    var token = String(codigo || "").replace(/\D/g, "");
+    if (token.length < 6) throw new Error("Digite o código que chegou no e-mail.");
+    var r = await client.auth.verifyOtp({ email: user.email, token: token, type: "email" });
+    if (r.error) throw new Error(translateAuthError(r.error));
+    return emailStatus();
   }
 
   async function signInWithGoogle() {
@@ -582,7 +631,7 @@ window.RelatorioSupabaseSync = (function () {
             desenharGate();
             var ok = authGateEl.querySelector(".rel-auth-error");
             ok.className = "rel-auth-ok";
-            ok.textContent = "Conta criada! Enviamos um link de confirmação para " + email + ". Se não aparecer na caixa de entrada em alguns minutos, confira a pasta Spam. Depois de abrir o link, entre aqui.";
+            ok.textContent = "Conta criada! Entre com o seu e-mail e senha. Se pedir confirmação, abra o link que enviamos para " + email + " (confira também a pasta Spam).";
             oferecerReenvio(ok, email);
             return;
           }
@@ -953,6 +1002,9 @@ window.RelatorioSupabaseSync = (function () {
       whenAuthorized: whenAuthorized,
       signIn: signIn,
       signUp: signUp,
+      emailStatus: emailStatus,
+      enviarVerificacaoEmail: enviarVerificacaoEmail,
+      confirmarCodigoEmail: confirmarCodigoEmail,
       signInWithGoogle: signInWithGoogle,
       signOut: signOut,
       showLogin: function (message, modo) { showAuthGate(message, modo === "criar" || modo === "esqueci" ? modo : "entrar"); }
