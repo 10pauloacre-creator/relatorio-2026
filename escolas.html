@@ -57,6 +57,12 @@ button{font:inherit}
 .card.novo .tx{font-family:Manrope,sans-serif;font-weight:800;letter-spacing:.08em;font-size:1.15rem;text-align:center;line-height:1.3}
 .card.novo .tx small{display:block;font-family:Inter,sans-serif;font-weight:500;letter-spacing:0;font-size:.8rem;color:var(--txt2);margin-top:6px}
 .card.novo.grande{border-width:2px}
+/* Pedido de verificação do e-mail (Etapa 15B): some depois do código. */
+.aviso-email{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;max-width:1000px;margin:14px auto 4px;width:calc(100% - 32px);box-sizing:border-box;padding:14px 16px;border-radius:14px;background:rgba(194,154,91,.12);border:1px solid rgba(194,154,91,.55);color:var(--txt)}
+.aviso-email b{display:block;font-size:.92rem;color:#e6c677}
+.aviso-email span{font-size:.82rem;color:var(--txt2)}
+.aviso-email a{background:var(--marca);color:#141710;font-weight:800;font-size:.84rem;text-decoration:none;border-radius:9px;padding:9px 16px;white-space:nowrap}
+.aviso-email a:hover{background:var(--marca2)}
 .selo{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;color:var(--txt2);background:var(--sup2);border:1px solid var(--linha);border-radius:999px;padding:5px 11px;cursor:pointer}
 .selo:hover{border-color:var(--marca);color:var(--txt)}
 .selo.falta{color:#e2c48c;border-color:rgba(194,154,91,.5)}
@@ -113,6 +119,10 @@ a.selo{text-decoration:none}
 </header>
 
 <main>
+  <div class="aviso-email" id="aviso-email" role="status" hidden>
+    <div><b>⚠ Verifique o seu e-mail</b><span id="aviso-email-txt">Confirme que o e-mail da conta é seu com um código que vamos enviar para ele. Assim você pode recuperar a senha e receber avisos.</span></div>
+    <a href="perfil.html#verificar-email">Verificar agora</a>
+  </div>
   <section class="vista" id="vista-escolas">
     <div class="titulo" id="titulo" hidden><h1>Suas escolas</h1><p>Toque na escola para abrir o diário, as turmas e o planejamento.</p></div>
     <div class="grade" id="grade"><div class="carregando">Carregando suas escolas…</div></div>
@@ -377,7 +387,16 @@ a.selo{text-decoration:none}
   }
   function quandoPronto() {
     if (!window.RelatorioSupabaseSync || !window.ContaSkin) { setTimeout(quandoPronto, 50); return; }
-    window.RelatorioSupabaseSync.auth.whenAuthorized().then(function () { if (!usuario) iniciar(); });
+    window.RelatorioSupabaseSync.auth.whenAuthorized().then(function () { if (!usuario) iniciar(); pedirVerificacao(); });
+  }
+  // Conta com e-mail ainda não verificado pelo código: pede a verificação.
+  function pedirVerificacao() {
+    window.RelatorioSupabaseSync.auth.emailStatus().then(function (st) {
+      var av = document.getElementById('aviso-email');
+      if (!st || st.verificado) { av.hidden = true; return; }
+      document.getElementById('aviso-email-txt').textContent = 'Confirme que ' + st.email + ' é seu: toque em Verificar agora e digite o código que vamos enviar para ele. Assim você pode recuperar a senha e receber avisos.';
+      av.hidden = false;
+    }).catch(function () {});
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', quandoPronto); else quandoPronto();
 })();
