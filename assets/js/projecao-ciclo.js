@@ -272,5 +272,35 @@
     return { porDisc: porDisc, eventos: eventos, etapas: etapas, fimAnoLetivo: ciclo.fimAnoLetivo || '', concluidas: concluidas };
   }
 
-  root.ProjecaoCiclo = { construirDias: construirDias, simular: simular };
+  // Ajustes do professor nas horas de cada dia (21/09/2026). Chave "turma|n"
+  // (n = posição da trilha na etapa da turma) → {dia da semana: h/aula}.
+  // Mudam os dias da trilha inteira: valem para toda a fila dela.
+  function trilhaDe(ciclo, discId, turmaId) {
+    var achada = null;
+    ((ciclo && ciclo.etapas) || []).forEach(function (etapa) {
+      if (etapa.turma !== turmaId) return;
+      (etapa.trilhas || []).forEach(function (trilha, i) {
+        if (!achada && (trilha.fila || []).indexOf(discId) >= 0) achada = { chave: turmaId + '|' + i, trilha: trilha };
+      });
+    });
+    return achada;
+  }
+  function aplicarAjustes(ciclo, ajustes) {
+    if (!ciclo || !ajustes) return ciclo;
+    (ciclo.etapas || []).forEach(function (etapa) {
+      (etapa.trilhas || []).forEach(function (trilha, i) {
+        var aj = ajustes[etapa.turma + '|' + i];
+        if (!aj) return;
+        var dias = Object.assign({}, trilha.dias || {});
+        Object.keys(aj).forEach(function (d) {
+          var v = Math.max(0, inteiro(aj[d], 0));
+          if (v) dias[d] = v; else delete dias[d];
+        });
+        trilha.dias = dias;
+      });
+    });
+    return ciclo;
+  }
+
+  root.ProjecaoCiclo = { construirDias: construirDias, simular: simular, trilhaDe: trilhaDe, aplicarAjustes: aplicarAjustes };
 })(window);

@@ -850,6 +850,10 @@ function rhResolveProjectionRuntimeState(seed) {
   merged.userAnchorOverride = !!stored.userAnchorOverride;
   merged.anchorDate = merged.userAnchorOverride && stored.anchorDate ? stored.anchorDate : merged.anchorDate;
   merged.facultativoLetivo = typeof stored.facultativoLetivo === 'boolean' ? stored.facultativoLetivo : !!merged.facultativoLetivo;
+  // Horas por dia do rodízio ajustadas na página de projeções (seg–sex por trilha).
+  if (stored.cicloAjustes && merged.ciclo && window.ProjecaoCiclo && window.ProjecaoCiclo.aplicarAjustes) {
+    window.ProjecaoCiclo.aplicarAjustes(merged.ciclo, stored.cicloAjustes);
+  }
   if (stored.userCalendarOverride) {
     if (stored.recesso && stored.recesso.start && stored.recesso.end) merged.recesso = rhProjectionClone(stored.recesso);
     if (Array.isArray(stored.feriados)) merged.feriados = rhProjectionClone(stored.feriados);
