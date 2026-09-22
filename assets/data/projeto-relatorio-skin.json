@@ -1,0 +1,242 @@
+{
+  "versao": 1,
+  "atualizadoEm": "2026-09-21",
+  "projetoId": "project-relatorios-diarios",
+  "documentation": {
+    "title": "Mapa documental do RELATORIO SKIN",
+    "summary": "Tudo o que existe no projeto em 21/09/2026: páginas, scripts, estilos, banco de dados, manutenção, publicação e regras. Cada item diz para que serve, o que já está pronto e o que falta. Atualize este arquivo (assets/data/projeto-relatorio-skin.json) sempre que algo novo entrar no projeto.",
+    "stats": [
+      { "n": 24, "label": "páginas HTML" },
+      { "n": 49, "label": "scripts das páginas" },
+      { "n": 12, "label": "folhas de estilo" },
+      { "n": 16, "label": "etapas do banco" },
+      { "n": 212386, "label": "escolas do INEP" }
+    ],
+    "folders": [
+      {
+        "id": "visao", "icon": "project", "title": "01. Visão geral e propósito",
+        "description": "O que é a plataforma, para quem e como chega ao público.",
+        "children": [
+          { "id": "v-proposito", "icon": "project", "title": "Propósito e público", "status": "Concluído", "details": ["RELATORIO SKIN (relatorio.skin) é a plataforma de gestão docente da AXION PROEDUQ: diário de aulas, frequência, atividades, ocorrências, notas, plano de aulas, calendário, contador de h/aula e relatórios.", "Nasceu como o diário do Prof. Paulo Roberto (E.E. Rural Pe. Carlos Casavequia e E.E. Raimundo Hermínio de Melo) e virou plataforma aberta a qualquer professor, com conta própria.", "Público: professores regentes, mediadores, assistentes educacionais e professores do AEE."] },
+          { "id": "v-publicacao", "icon": "folder", "title": "Onde o site fica no ar", "status": "Concluído", "details": ["Repositório GitHub 10pauloacre-creator/relatorio-2026 (branch main, commits diretos).", "Cada push publica no GitHub Pages e na Vercel (projeto relatorios, domínio oficial https://relatorio.skin).", "O build (npm run build:pages → scripts/build-web-release.js) copia só os arquivos da lista para dist/. Página nova só é publicada se entrar nessa lista."] },
+          { "id": "v-stack", "icon": "code", "title": "Tecnologia", "status": "Concluído", "details": ["HTML, CSS e JavaScript puro (vanilla), sem framework — regra fixa do projeto.", "Supabase (projeto vgceathgwvtmjxbdpecr, o mesmo da Biblioteca Digital): contas, banco Postgres com RLS, Storage, Realtime e Edge Functions.", "Firebase (legado): situação do plano anual da Casavequia.", "PWA instalável e APK Android (Capacitor)."] },
+          { "id": "v-marca", "icon": "project", "title": "Marca e identidade", "status": "Concluído", "details": ["Marca RELATORIO SKIN (\"RELATORIO\" pequeno, \"SKIN\" em destaque), assinatura \"Gestão docente inteligente\"; AXION PROEDUQ é a marca-mãe.", "Paleta grafite + verde-sálvia (#0D0E0D, #A7B58A), sem azul nem neon; Manrope + Inter nas páginas da marca.", "Ícone do app: só o símbolo \"S\" (assets/app/icone-*.png), legível em 48 px."] }
+        ]
+      },
+      {
+        "id": "paginas", "icon": "folder", "title": "02. Páginas (HTML)",
+        "description": "Cada tela do site e o que ela faz.",
+        "children": [
+          { "id": "p-index", "icon": "file", "title": "index.html — site de apresentação", "status": "Concluído", "details": ["Página pública da marca: hero, problema, vitrine, módulos, demonstração, fluxo, segurança, sobre, CTA e rodapé legal.", "Não exige conta. Animações respeitam prefers-reduced-motion."] },
+          { "id": "p-entrar", "icon": "file", "title": "entrar.html — tela de conta", "status": "Concluído", "details": ["Entrar, Criar conta, Esqueci a senha e Entrar com o Google (quando ligado no Supabase).", "Abertura animada da marca na primeira visita; depois de entrar, todos vão para escolas.html.", "Conferida por npm run check:login em 7 tamanhos de tela."] },
+          { "id": "p-escolas", "icon": "file", "title": "escolas.html — escolas da conta", "status": "Concluído", "details": ["Tela inicial de toda conta. Conta nova vê só \"CADASTRE SUA ESCOLA\".", "Cadastro pelo catálogo do INEP (Estado › Município › Escola ou código INEP), com ocupação obrigatória (regente, mediador, assistente, AEE).", "Cada escola vira um botão (ícone ou imagem). Administrador: Casavequia, Hermínio e Projetos pessoais fixos, com selo de INEP e de ocupação."] },
+          { "id": "p-meudiario", "icon": "file", "title": "meu-diario.html — página de uma escola (regente)", "status": "Concluído", "details": ["meu-diario.html?escola=<id>: diário das turmas do professor regente.", "Ano letivo (cada ano começa em branco), turmas, alunos, disciplinas, Novo Diário, presença e atividades clicáveis, relatório do aluno, contador, plano, sequências, livros, calendário e I.A.", "Configurações: dados da escola, INEP, ocupação, alunos da Educação Especial pelo código, cadastro de turma (manual, I.A ou importação do ano anterior) e zona de perigo."] },
+          { "id": "p-aee", "icon": "file", "title": "aee.html — painel da Educação Especial", "status": "Concluído", "details": ["Mediador/assistente: uma aba por aluno. Professor AEE: painel com filtros e indicadores.", "Perfil compartilhado pelo código do aluno: perfil, disciplinas e boletim, registros da equipe, PEI, documentos em pastas, equipe e relatório individual para impressão.", "I.A de educação inclusiva com ações próprias."] },
+          { "id": "p-perfil", "icon": "file", "title": "perfil.html — perfil do professor", "status": "Concluído", "details": ["Foto (com ajuste de enquadramento), dados públicos, várias formações, disciplinas.", "Restritos: matrícula, certificados em pasta privada, links do Drive.", "Zona de perigo: trocar senha e excluir conta."] },
+          { "id": "p-casavequia", "icon": "file", "title": "casavequia.html — diário da E.E. Pe. Carlos Casavequia", "status": "Concluído", "details": ["Página própria do administrador (≈1 MB) com relatos escritos no HTML, presença, atividades, contador, plano anual, cronograma, calendário, livros, sequências, I.A e editor visual.", "Recebe as ferramentas globais por escola-admin-global.js (perfil, Mudar painel, Configurações, zona de perigo)."] },
+          { "id": "p-herminio", "icon": "file", "title": "herminio.html — diário da E.E. Raimundo Hermínio de Melo", "status": "Concluído", "details": ["Mesma função da Casavequia, com dados em herminio-main.js, ciclo de estudos (rodízio), regra dos 15 minutos e boletins com cálculo próprio."] },
+          { "id": "p-paineis", "icon": "file", "title": "Painéis de alunos (8 páginas)", "status": "Concluído", "details": ["casavequia-alunos-1serie/2serie/3serie/6ano.html e herminio-alunos-1serie/2serie/3serie/8-9ano.html.", "Notas bimestrais (trabalho + prova), frequência, conduta, recuperação, bônus do Ranking de Poder e Relatório Individual Anual de cada aluno."] },
+          { "id": "p-planejamento", "icon": "file", "title": "planejamento-aulas-2026.html — projeções", "status": "Concluído", "details": ["Embutida na aba Contador (iframe). Projeta aulas, datas de fim de bimestre e do ano pela grade, feriados e recesso; ?escola=herminio usa o ciclo de estudos."] },
+          { "id": "p-projetos", "icon": "file", "title": "projetos-pessoais.html, projeto-detalhes.html, mapa-mental.html, mapa-rural-manager.html", "status": "Concluído", "details": ["Hub pessoal de projetos, ideias e I.As com cofre de acessos, linha do tempo, checklist, documentação e mapa mental de cada projeto.", "É onde este mapa documental aparece."] },
+          { "id": "p-legais", "icon": "file", "title": "privacidade.html, termos.html, axion-proeduq.html", "status": "Concluído", "details": ["Política de Privacidade (LGPD, inclusive dados sensíveis da Educação Especial), Termos de Serviço e página institucional da AXION PROEDUQ. Públicas, sem conta."] }
+        ]
+      },
+      {
+        "id": "js-conta", "icon": "code", "title": "03. Scripts — conta, escolas e layout global",
+        "description": "Peças que todas as páginas com conta usam.",
+        "children": [
+          { "id": "js-sync", "icon": "code", "title": "supabase-report-sync.js", "status": "Concluído", "details": ["Contas (login, cadastro, Google, recuperação), trava das páginas por tipo de acesso (data-acesso) e sincronização por escopo (report_sync_state e professor_dados) com Realtime e recuperação ao voltar para a aba.", "Injeta a folha mobile-2026.css e a marca AXION discreta no rodapé."] },
+          { "id": "js-conta-skin", "icon": "code", "title": "conta-skin.js", "status": "Concluído", "details": ["window.ContaSkin: perfil do professor, botão do perfil, seletor do INEP, confirmação com senha, ocupação por escola (e o menu Mudar painel), redução de imagem, vínculo em professor_escolas e limparEscola (exclusão completa de uma escola)."] },
+          { "id": "js-barra", "icon": "code", "title": "barra-lateral.js", "status": "Concluído", "details": ["Leva as ferramentas (plano, calendário, contador, livros, sequências, I.A, configurações, editar) para uma barra lateral; rodapé com Meu perfil.", "No celular: cabeçalho padronizado (← Escolas, Ano letivo, tema, ☰ Ferramentas abaixo do voltar, logo à esquerda)."] },
+          { "id": "js-admin-global", "icon": "code", "title": "escola-admin-global.js", "status": "Concluído", "details": ["Ferramentas globais nas escolas do administrador: perfil, Mudar painel, aba Configurações (INEP, ocupação, alunos da Educação Especial, zona de perigo com Excluir a escola)."] },
+          { "id": "js-ano", "icon": "code", "title": "ano-letivo.js", "status": "Concluído", "details": ["Botão \"📅 Ano letivo\" com os anos guardados, abertura do arquivo do ano e download de todos os dados (relatorio_exportar_ano)."] },
+          { "id": "js-tema", "icon": "code", "title": "dark-mode-2026.js e app-update.js", "status": "Concluído", "details": ["Modo escuro grafite (html.dark-2026) sobre os estilos legados.", "Aviso de versão nova do app/APK."] }
+        ]
+      },
+      {
+        "id": "js-diario", "icon": "code", "title": "04. Scripts — diário, relatos e planejamento",
+        "description": "Registro das aulas e tudo que gira em torno delas.",
+        "children": [
+          { "id": "js-novo-diario", "icon": "code", "title": "novo-diario.js", "status": "Concluído", "details": ["+ Novo Diário e ✏️ Editar diário nas três páginas (adaptadores Casavequia, Hermínio e Meu Diário), com presença, atividade, comportamento, lembrete e sincronização com tombstones; aba Geral com as aulas do dia."] },
+          { "id": "js-recursos", "icon": "code", "title": "meu-diario-recursos.js", "status": "Concluído", "details": ["Plano de aulas, sequências, livros e calendário do Meu Diário, por escola e ano letivo; cópia de turma na importação do ano anterior."] },
+          { "id": "js-ia", "icon": "code", "title": "meu-diario-ia.js e escola-ia.js", "status": "Concluído", "details": ["Assistente de I.A (chave própria de Gemini, OpenAI, Claude ou Groq, ou a IA da plataforma com cota diária).", "Lê fotos, PDF, Word e planilhas; propõe ações que só entram com confirmação; nomes dos alunos viram códigos.", "Ganchos M.sistema/aplicarAcao/descreverAcao usados pelo painel AEE; escola-ia.js liga o mesmo assistente na Casavequia e na Hermínio."] },
+          { "id": "js-legado-diario", "icon": "code", "title": "Scripts antigos do diário", "status": "Concluído", "details": ["app.js, data.js, blocks.js, presenca.js, atividades.js, contador.js, cronograma.js, plano.js, alunos.js, editor.js (editor visual v3), firebase.js e daily-report-weekday.js: base original do diário da Casavequia.", "cronograma-semanal.js: aba Cronograma editável (21/09/2026)."] },
+          { "id": "js-calendario", "icon": "code", "title": "casavequia-calendar.js e casavequia-calendar-data.js", "status": "Concluído", "details": ["Calendário escolar estadual com feriados, recessos e edições por escola (Casavequia e Hermínio)."] },
+          { "id": "js-projecoes", "icon": "code", "title": "projecao-ciclo.js, herminio-ciclo.js, casavequia-grade-seeds.js", "status": "Concluído", "details": ["Motor das projeções por ciclo de estudos (rodízio de turmas e disciplinas) e configuração do ciclo da Hermínio."] },
+          { "id": "js-herminio", "icon": "code", "title": "herminio-main.js, herminio-regras-extras.js, herminio-books-catalog.js", "status": "Concluído", "details": ["Dados e lógica da Hermínio, regras extras (desconto por conduta, bônus, prova da Biblioteca) e catálogo de livros."] },
+          { "id": "js-outros", "icon": "code", "title": "livros-prompts.js e notificações do Claude", "status": "Concluído", "details": ["Prompts de produção dos livros; claude-native-notifications-* e legacy-claude-cleanup.js: cronômetros e avisos das sessões de trabalho com IA."] }
+        ]
+      },
+      {
+        "id": "js-notas", "icon": "code", "title": "05. Scripts — notas, boletim e relatórios",
+        "description": "Integração com a Biblioteca Digital no mesmo Supabase.",
+        "children": [
+          { "id": "js-boletim", "icon": "code", "title": "boletim-regras.js e boletim-export.js", "status": "Concluído", "details": ["Motor único das notas (cópia idêntica na Biblioteca, conferida por check-copias-compartilhadas.js): média de trabalho e prova, bimestres automáticos, recuperação semestral, desconto por conduta, bônus do Ranking de Poder."] },
+          { "id": "js-paineis-alunos", "icon": "code", "title": "casavequia-alunos-shared.js, notas-bimestrais.js", "status": "Concluído", "details": ["Painéis de alunos: escala 0–10 na tela e 0–5 no armazenamento; nota de trabalho calculada no banco; prova da Biblioteca."] },
+          { "id": "js-rel-individual", "icon": "code", "title": "relatorio-individual.js", "status": "Concluído", "details": ["Relatório Individual Anual do Aluno (cópia idêntica na Biblioteca): notas, provas, atividades, observações e assinatura, pronto para imprimir em A4."] },
+          { "id": "js-lancamentos", "icon": "code", "title": "relatorio-lancamentos.js, relatorio-ocorrencias.js, relatorio-conduta-aluno.js, relatorio-alunos-adicionados.js", "status": "Concluído", "details": ["Publicação dos lançamentos (aulas, presença, atividades, ocorrências) nas tabelas oficiais; gravidade das ocorrências pela IA; Observações; conduta no perfil do aluno; alunos novos da Biblioteca nas listas."] }
+        ]
+      },
+      {
+        "id": "css", "icon": "folder", "title": "06. Estilos (assets/css)",
+        "description": "Visual das páginas.",
+        "children": [
+          { "id": "css-lista", "icon": "file", "title": "12 folhas de estilo", "status": "Concluído", "details": ["main.css e responsive.css: base do diário legado.", "dark-mode-2026.css: modo escuro grafite.", "mobile-2026.css: ajustes globais de celular (campos com 16 px, tabelas roláveis, modais em folha inferior).", "casavequia-alunos.css, painel-alunos-escuro.css: painéis de alunos.", "calendario-escolar.css, plano.css, editor.css, projetos-pessoais.css, mobile-dimension-fixes.css e local-font-aliases.css."] }
+        ]
+      },
+      {
+        "id": "banco", "icon": "code", "title": "07. Banco de dados (Supabase)",
+        "description": "Etapas SQL em supabase/, aplicadas pela CLI na pasta da Biblioteca.",
+        "children": [
+          { "id": "db-1-3", "icon": "code", "title": "Etapas 1 a 3 — vínculo e lançamentos", "status": "Concluído", "details": ["Trava de escrita, vínculo painel ↔ aluno da Biblioteca, tabelas relatorio_aulas/lancamentos/ocorrências, bimestre pela soma de aulas, nota de trabalho e recuperação semestral."] },
+          { "id": "db-4-8", "icon": "code", "title": "Etapas 4 a 8 — conduta, provas e relatório individual", "status": "Concluído", "details": ["Gravidade das ocorrências pela IA e Observações, provas dos livros no boletim, alunos novos automáticos, bônus do Ranking de Poder, relatório individual, desconto por conduta, boletim_normalizado fechado, aviso em tempo real e regras da Hermínio."] },
+          { "id": "db-9-12", "icon": "code", "title": "Etapas 9 a 12 — contas, ano letivo e IA", "status": "Concluído", "details": ["Contas de professores (professor_dados com RLS), sincronia de notas, prova da Biblioteca na Hermínio, ano letivo permanente (lixeira e histórico), IA da plataforma com cota."] },
+          { "id": "db-13-16", "icon": "code", "title": "Etapas 13 a 16 — escolas, perfil, AEE e exclusão", "status": "Concluído", "details": ["13: administrador só pelo e-mail. 14: catálogo do INEP (212 mil escolas), professor_escolas, pasta privada de certificados, senha e exclusão de conta.", "15: alunos da Educação Especial compartilhados por código (aee_alunos, vínculos, registros, documentos).", "16: excluir escola do administrador com cópia na lixeira e trava contra republicação."] }
+        ]
+      },
+      {
+        "id": "manutencao", "icon": "folder", "title": "08. Scripts de manutenção e publicação",
+        "description": "Ferramentas em scripts/ (Node e PowerShell).",
+        "children": [
+          { "id": "sc-build", "icon": "code", "title": "Build e publicação", "status": "Concluído", "details": ["build-web-release.js e build-pages-release.js: montam dist/ para GitHub Pages e Vercel.", "fix-published-encoding.js e inject-early-hotfix-loader.js: correções de publicação.", "prepare-apk-release.js, publish-apk-release.js, run-android-gradle.js, release-utils.js e sync-android-launcher-icons.ps1: APK Android."] },
+          { "id": "sc-checks", "icon": "code", "title": "Conferências", "status": "Concluído", "details": ["check-tela-login.js (npm run check:login): tela de conta em 7 tamanhos.", "check-copias-compartilhadas.js: arquivos que precisam ser idênticos na Biblioteca."] },
+          { "id": "sc-dados", "icon": "code", "title": "Dados", "status": "Concluído", "details": ["importar-escolas-inep.js: carrega o Censo Escolar no banco.", "arquivar-ano-letivo.js: congela as páginas de um ano encerrado.", "apply-student-profile-ids.js, generate-herminio-1serie-report.js e export-casavequia-calendar.ps1: tarefas pontuais.", "gerar-linha-do-tempo.js: gera a linha do tempo deste projeto a partir do git."] },
+          { "id": "sc-legado", "icon": "file", "title": "Arquivos antigos na raiz", "status": "Revisar", "details": ["fix_ai2.py, fix_ai2b.py, fix_relato.py, update_all.py, temp_fix_0811_t1_art.py, __pycache__, tmp/ e output/: scripts e sobras de manutenção pontual. Podem ser apagados depois de conferidos."] }
+        ]
+      },
+      {
+        "id": "regras", "icon": "map", "title": "09. Regras e decisões do projeto",
+        "description": "O que não pode ser quebrado.",
+        "children": [
+          { "id": "r-fixas", "icon": "code", "title": "Regras fixas", "status": "Concluído", "details": ["Vanilla JS; commits diretos na main; UTF-8 sempre.", "Todo relato tem 3 abas (Relato, Presença, Atividades).", "Nunca document.querySelector dentro de laço de alunos/relatos (o DOM da Casavequia tem ~57 mil elementos).", "Nada é gravado antes do primeiro fetch do banco (um aparelho desatualizado apagaria o que foi feito em outro)."] },
+          { "id": "r-notas", "icon": "code", "title": "Decisões pedagógicas", "status": "Concluído", "details": ["Bimestre = soma de aulas, nunca calendário.", "Nota do bimestre = média de trabalho (0–10) e prova (0–10); armazenamento em 0–5.", "Comportamento desconta nota (leve 0,25 · médio 0,5 · grave 1 · muito grave 2; até 2 por bimestre).", "Todos os dados escolares ficam guardados para sempre, por ano letivo (lixeira e histórico permanentes)."] },
+          { "id": "r-privacidade", "icon": "code", "title": "Privacidade", "status": "Concluído", "details": ["Nomes dos alunos viram códigos antes de ir para a IA.", "Dados de deficiência são sensíveis (LGPD art. 11): só profissionais vinculados pelo código do aluno leem.", "Excluir escola, turma, aluno ou conta pede confirmação e senha."] }
+        ]
+      },
+      {
+        "id": "pendencias", "icon": "map", "title": "10. Pendências e próximos passos",
+        "description": "O que falta, em ordem de prioridade.",
+        "children": [
+          { "id": "pd-supabase", "icon": "project", "title": "Configurações do painel do Supabase", "status": "Prioridade alta", "details": ["Ligar o login com Google (Client ID/Secret do Google Cloud).", "Incluir https://relatorio.skin/** nas Redirect URLs do Authentication."] },
+          { "id": "pd-privacidade", "icon": "project", "title": "Relatos com nomes no código público", "status": "Prioridade alta", "details": ["O repositório é público: os relatos escritos no HTML da Casavequia e da Hermínio (com nomes de alunos) ficam legíveis no código-fonte. Tornar o repositório privado ou mover os relatos para o banco."] },
+          { "id": "pd-aee", "icon": "project", "title": "Educação Especial", "status": "Planejado", "details": ["Aprovação do mediador antes de um novo profissional entrar no perfil do aluno pelo código.", "Integração com o Conex-ED (gestão escolar cadastra todos os alunos com código)."] },
+          { "id": "pd-escola", "icon": "project", "title": "Plataforma da escola (Conex-ED)", "status": "Planejado", "details": ["Ao escolher a escola, mostrar as turmas e os alunos matriculados vindos da gestão.", "Gestão da escola acessa a área Restritos do perfil dos professores."] },
+          { "id": "pd-meu-diario", "icon": "project", "title": "Meu Diário", "status": "Planejado", "details": ["Notas e boletim nas turmas do professor comum (hoje só nas escolas do administrador).", "Relatório individual anual também para as contas de professor."] },
+          { "id": "pd-legado", "icon": "project", "title": "Limpeza e manutenção", "status": "Planejado", "details": ["Remover scripts Python e sobras da raiz.", "Marcador T6_INICIO para injeção automática no 6º Ano (legado).", "Validação do HTML gerado pela IA antes de injetar (fluxo antigo do Groq)."] }
+        ]
+      }
+    ]
+  },
+  "checklist": [
+    { "id": "rs-base", "text": "01. Diário original (Casavequia e Hermínio)", "children": [
+      { "id": "rs-base-1", "text": "Relatos diários por turma com abas Relato, Presença e Atividades", "done": true },
+      { "id": "rs-base-2", "text": "Presença, atividades e ocorrências por aluno", "done": true },
+      { "id": "rs-base-3", "text": "Contador de h/aula por disciplina com bimestre pela soma de aulas", "done": true },
+      { "id": "rs-base-4", "text": "Plano anual por disciplina e bimestre (Planj., Aplic., Pulad., SIMAED)", "done": true },
+      { "id": "rs-base-5", "text": "Cronograma semanal editável", "done": true },
+      { "id": "rs-base-6", "text": "Calendário escolar com feriados e recesso", "done": true },
+      { "id": "rs-base-7", "text": "Editor visual da página", "done": true },
+      { "id": "rs-base-8", "text": "+ Novo Diário e ✏️ Editar diário", "done": true },
+      { "id": "rs-base-9", "text": "Projeções integradas e ciclo de estudos da Hermínio", "done": true },
+      { "id": "rs-base-10", "text": "Regra dos 15 minutos da Hermínio", "done": true },
+      { "id": "rs-base-11", "text": "Correções de desempenho (índices do DOM, sem querySelector em laço)", "done": true },
+      { "id": "rs-base-12", "text": "Marcador T6_INICIO para injeção automática no 6º Ano", "done": false }
+    ] },
+    { "id": "rs-notas", "text": "02. Notas e integração com a Biblioteca Digital", "children": [
+      { "id": "rs-notas-1", "text": "Vínculo painel ↔ aluno da Biblioteca (automático)", "done": true },
+      { "id": "rs-notas-2", "text": "Lançamentos publicados nas tabelas oficiais", "done": true },
+      { "id": "rs-notas-3", "text": "Nota de trabalho calculada no banco", "done": true },
+      { "id": "rs-notas-4", "text": "Recuperação semestral e prova única", "done": true },
+      { "id": "rs-notas-5", "text": "Provas dos livros da Biblioteca no boletim", "done": true },
+      { "id": "rs-notas-6", "text": "Alunos novos da Biblioteca entram sozinhos nas listas", "done": true },
+      { "id": "rs-notas-7", "text": "Bônus do Ranking de Poder na média final", "done": true },
+      { "id": "rs-notas-8", "text": "Relatório Individual Anual do Aluno (professor e aluno)", "done": true },
+      { "id": "rs-notas-9", "text": "Desconto de nota por comportamento", "done": true },
+      { "id": "rs-notas-10", "text": "Boletim do aluno protegido (só a sessão do aluno ou o admin)", "done": true },
+      { "id": "rs-notas-11", "text": "Aviso em tempo real para o app da Biblioteca", "done": true },
+      { "id": "rs-notas-12", "text": "Regras próprias da Hermínio e prova da Biblioteca vencendo", "done": true }
+    ] },
+    { "id": "rs-conduta", "text": "03. Conduta e IA nas ocorrências", "children": [
+      { "id": "rs-conduta-1", "text": "Gravidade das ocorrências pela IA, sem confirmação, trocável pelo professor", "done": true },
+      { "id": "rs-conduta-2", "text": "Observações com envolvidos (autor, vítima, testemunha)", "done": true },
+      { "id": "rs-conduta-3", "text": "Reincidência calculada no banco", "done": true },
+      { "id": "rs-conduta-4", "text": "Nomes pseudonimizados antes da IA", "done": true },
+      { "id": "rs-conduta-5", "text": "Fila em segundo plano (pg_cron) com novas tentativas", "done": true }
+    ] },
+    { "id": "rs-contas", "text": "04. Contas, marca e site público", "children": [
+      { "id": "rs-contas-1", "text": "Contas de professores com dados particulares (RLS)", "done": true },
+      { "id": "rs-contas-2", "text": "Tela de conta (entrar, criar, esqueci, Google)", "done": true },
+      { "id": "rs-contas-3", "text": "Login com Google ligado no painel do Supabase", "done": false },
+      { "id": "rs-contas-4", "text": "relatorio.skin nas Redirect URLs do Supabase", "done": false },
+      { "id": "rs-contas-5", "text": "Marca RELATORIO SKIN e site de apresentação", "done": true },
+      { "id": "rs-contas-6", "text": "Política de Privacidade e Termos (LGPD)", "done": true },
+      { "id": "rs-contas-7", "text": "Marca AXION PROEDUQ no site e no app", "done": true },
+      { "id": "rs-contas-8", "text": "Administrador só pelo e-mail (sem promoção de conta)", "done": true },
+      { "id": "rs-contas-9", "text": "Domínio relatorio.skin na Vercel", "done": true },
+      { "id": "rs-contas-10", "text": "Repositório privado ou relatos fora do código público", "done": false }
+    ] },
+    { "id": "rs-meu", "text": "05. Meu Diário (conta de qualquer professor)", "children": [
+      { "id": "rs-meu-1", "text": "Turmas, alunos e disciplinas", "done": true },
+      { "id": "rs-meu-2", "text": "Diários com presença e atividades clicáveis", "done": true },
+      { "id": "rs-meu-3", "text": "Plano de aulas, sequências, livros e calendário", "done": true },
+      { "id": "rs-meu-4", "text": "Contador de h/aula", "done": true },
+      { "id": "rs-meu-5", "text": "Relatório do aluno com impressão", "done": true },
+      { "id": "rs-meu-6", "text": "Assistente de I.A (chave própria ou IA da plataforma com cota)", "done": true },
+      { "id": "rs-meu-7", "text": "Notas e boletim nas turmas do professor comum", "done": false },
+      { "id": "rs-meu-8", "text": "Relatório individual anual para as contas de professor", "done": false }
+    ] },
+    { "id": "rs-escolas", "text": "06. Escolas pelo INEP e ano letivo", "children": [
+      { "id": "rs-escolas-1", "text": "Catálogo do INEP no banco (212.386 escolas, 5.570 municípios)", "done": true },
+      { "id": "rs-escolas-2", "text": "Cadastro Estado › Município › Escola ou código INEP", "done": true },
+      { "id": "rs-escolas-3", "text": "Botão por escola com ícone ou imagem", "done": true },
+      { "id": "rs-escolas-4", "text": "Vincular escolas existentes (inclusive Casavequia e Hermínio) ao INEP", "done": true },
+      { "id": "rs-escolas-5", "text": "Ano letivo por escola, com ano novo em branco", "done": true },
+      { "id": "rs-escolas-6", "text": "Importar turmas, alunos, plano e sequências do ano anterior", "done": true },
+      { "id": "rs-escolas-7", "text": "Cadastro de turma pela I.A a partir da lista de alunos", "done": true },
+      { "id": "rs-escolas-8", "text": "Ano letivo permanente, arquivo do ano e download completo", "done": true },
+      { "id": "rs-escolas-9", "text": "Turmas e alunos matriculados vindos da plataforma da escola (Conex-ED)", "done": false }
+    ] },
+    { "id": "rs-perfil", "text": "07. Perfil do professor", "children": [
+      { "id": "rs-perfil-1", "text": "Foto com ajuste de enquadramento", "done": true },
+      { "id": "rs-perfil-2", "text": "Dados públicos, idade e disciplinas", "done": true },
+      { "id": "rs-perfil-3", "text": "Várias formações profissionais", "done": true },
+      { "id": "rs-perfil-4", "text": "Restritos: matrícula, certificados e links do Drive", "done": true },
+      { "id": "rs-perfil-5", "text": "Trocar senha e excluir conta", "done": true },
+      { "id": "rs-perfil-6", "text": "Gestão da escola vendo a área Restritos", "done": false }
+    ] },
+    { "id": "rs-aee", "text": "08. Ocupação e Educação Especial", "children": [
+      { "id": "rs-aee-1", "text": "Ocupação obrigatória por escola (regente, mediador, assistente, AEE)", "done": true },
+      { "id": "rs-aee-2", "text": "Mudar painel entre regente e AEE", "done": true },
+      { "id": "rs-aee-3", "text": "Aluno compartilhado por código entre contas", "done": true },
+      { "id": "rs-aee-4", "text": "Perfil, disciplinas, boletim, registros, PEI, documentos e equipe", "done": true },
+      { "id": "rs-aee-5", "text": "Relatório individual da Educação Especial para impressão", "done": true },
+      { "id": "rs-aee-6", "text": "Painel do professor AEE com filtros e alerta de 14 dias", "done": true },
+      { "id": "rs-aee-7", "text": "I.A de educação inclusiva (registros, PEI, perfil)", "done": true },
+      { "id": "rs-aee-8", "text": "Aprovação do mediador antes de novo vínculo pelo código", "done": false },
+      { "id": "rs-aee-9", "text": "Códigos dos alunos cadastrados pela gestão (Conex-ED)", "done": false }
+    ] },
+    { "id": "rs-layout", "text": "09. Layout, celular e app", "children": [
+      { "id": "rs-layout-1", "text": "Modo escuro grafite legível em todas as telas", "done": true },
+      { "id": "rs-layout-2", "text": "Barra lateral de ferramentas com Configurações e Meu perfil", "done": true },
+      { "id": "rs-layout-3", "text": "Cabeçalho mobile padronizado", "done": true },
+      { "id": "rs-layout-4", "text": "Folha mobile global (campos 16 px, tabelas roláveis)", "done": true },
+      { "id": "rs-layout-5", "text": "Ícone do app só com o símbolo S", "done": true },
+      { "id": "rs-layout-6", "text": "PWA instalável e APK Android", "done": true },
+      { "id": "rs-layout-7", "text": "Ferramentas globais também nas escolas do administrador", "done": true }
+    ] },
+    { "id": "rs-seguranca", "text": "10. Segurança e exclusões", "children": [
+      { "id": "rs-seg-1", "text": "Zona de perigo com confirmação e senha em todas as exclusões", "done": true },
+      { "id": "rs-seg-2", "text": "Excluir escola apaga todos os registros (escolas comuns)", "done": true },
+      { "id": "rs-seg-3", "text": "Excluir Casavequia/Hermínio com cópia na lixeira e trava", "done": true },
+      { "id": "rs-seg-4", "text": "Lixeira e histórico permanentes", "done": true },
+      { "id": "rs-seg-5", "text": "Relatos do HTML removidos do código quando a escola for excluída", "done": false }
+    ] },
+    { "id": "rs-doc", "text": "11. Documentação e organização", "children": [
+      { "id": "rs-doc-1", "text": "CLAUDE.md com todas as etapas e regras", "done": true },
+      { "id": "rs-doc-2", "text": "Mapa documental, checklist e linha do tempo em Projetos pessoais", "done": true },
+      { "id": "rs-doc-3", "text": "Linha do tempo automática a partir do GitHub", "done": true },
+      { "id": "rs-doc-4", "text": "Limpar scripts Python e sobras da raiz", "done": false },
+      { "id": "rs-doc-5", "text": "Validação do HTML gerado pela IA antes de injetar (fluxo antigo do Groq)", "done": false }
+    ] }
+  ]
+}

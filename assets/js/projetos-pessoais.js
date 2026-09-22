@@ -1004,6 +1004,106 @@
       ]
     };
   }
+  // ── RELATORIO SKIN: mapa documental, checklist e linha do tempo ─────────
+  // Conteúdo em assets/data/projeto-relatorio-skin.json (mapa + checklist,
+  // atualizado junto com o projeto) e assets/data/relatorio-skin-linha-do-tempo.json
+  // (um evento por commit, gerado por scripts/gerar-linha-do-tempo.js). Ao abrir,
+  // a página busca no GitHub os commits mais novos que o arquivo: tudo o que
+  // muda no projeto entra sozinho na linha do tempo.
+  var RS_ID_PADRAO = 'project-relatorios-diarios';
+  var RS_REPO = '10pauloacre-creator/relatorio-2026';
+  var RS_DOC = null, RS_COMMITS = [], RS_LIMITE = 40, rsCarregando = false;
+  function rsProjeto() {
+    var salvo = state.migrations.relatorioSkinIdentidadeV1 && state.migrations.relatorioSkinIdentidadeV1.projectId;
+    return (salvo && getProject(salvo)) || coreProjectByName('Relatórios diários', RS_ID_PADRAO) || coreProjectByName('RELATORIO SKIN', RS_ID_PADRAO);
+  }
+  function isRelatorioSkin(project) { var rs = rsProjeto(); return !!(project && rs && project.id === rs.id); }
+  function docOf(project) { return isRelatorioSkin(project) && RS_DOC ? RS_DOC.documentation : project && project.documentation; }
+  function ensureRelatorioSkinIdentity() {
+    if (state.migrations.relatorioSkinIdentidadeV1) return false;
+    var rs = rsProjeto();
+    if (!rs) return false;
+    rs.name = 'RELATORIO SKIN';
+    rs.description = 'Plataforma de gestão docente da AXION PROEDUQ (relatorio.skin): diário de aulas, frequência, atividades, notas, planejamento, Educação Especial e relatórios.';
+    rs.url = 'https://relatorio.skin';
+    rs.logo = 'assets/app/icone-192.png';
+    rs.updatedAt = now();
+    state.migrations.relatorioSkinIdentidadeV1 = { addedAt: rs.updatedAt, projectId: rs.id };
+    persist('relatorio-skin-identidade');
+    return true;
+  }
+  // Mescla o checklist do arquivo no projeto, uma vez por versão do arquivo:
+  // acrescenta itens novos (por id) e marca como feito o que o arquivo diz
+  // que ficou pronto. O que o professor acrescentou ou marcou continua.
+  function mergeRelatorioChecklist() {
+    var rs = rsProjeto();
+    if (!rs || !RS_DOC || !Array.isArray(RS_DOC.checklist)) return false;
+    var feita = Number(state.migrations.relatorioSkinChecklistVersao || 0);
+    if (feita >= Number(RS_DOC.versao || 1)) return false;
+    var stamp = now();
+    rs.checklist = Array.isArray(rs.checklist) ? rs.checklist : [];
+    RS_DOC.checklist.forEach(function (fase) {
+      var alvo = findChecklistItem(rs.checklist, fase.id);
+      var item = alvo ? alvo.item : null;
+      if (!item) { item = { id: fase.id, text: fase.text, done: false, children: [], createdAt: stamp, updatedAt: stamp }; rs.checklist.push(item); }
+      item.children = Array.isArray(item.children) ? item.children : [];
+      (fase.children || []).forEach(function (c) {
+        var achado = findChecklistItem(item.children, c.id);
+        if (!achado) item.children.push({ id: c.id, text: c.text, done: !!c.done, children: [], createdAt: stamp, updatedAt: stamp });
+        else if (c.done && !achado.item.done) { achado.item.done = true; achado.item.updatedAt = stamp; }
+      });
+      item.done = item.children.length > 0 && item.children.every(function (c) { return c.done; });
+    });
+    rs.updatedAt = stamp;
+    state.migrations.relatorioSkinChecklistVersao = Number(RS_DOC.versao || 1);
+    persist('relatorio-skin-checklist');
+    return true;
+  }
+  function rsEventoDoCommit(c) {
+    return { id: 'gh-' + c.sha, title: c.titulo, details: c.corpo || '', occurredAt: c.data, source: 'GitHub · ' + c.sha.slice(0, 7), externalUrl: 'https://github.com/' + RS_REPO + '/commit/' + c.sha, readonly: true };
+  }
+  function rsJuntarCommits(lista) {
+    var vistos = {};
+    RS_COMMITS = RS_COMMITS.concat(lista).filter(function (c) { if (!c || !c.sha || vistos[c.sha]) return false; vistos[c.sha] = 1; return true; })
+      .sort(function (a, b) { return toTime(b.data) - toTime(a.data); });
+  }
+  // Commits publicados depois do arquivo, direto do GitHub (cache de 15 min).
+  function rsBuscarNovos(desde) {
+    var CH = 'pp_rs_github_v1', cache = null;
+    try { cache = JSON.parse(localStorage.getItem(CH) || 'null'); } catch (e) {}
+    if (cache && cache.desde === desde && Date.now() - cache.em < 15 * 60 * 1000) return Promise.resolve(cache.commits || []);
+    var url = 'https://api.github.com/repos/' + RS_REPO + '/commits?per_page=100' + (desde ? '&since=' + encodeURIComponent(desde) : '');
+    return fetch(url, { headers: { Accept: 'application/vnd.github+json' } }).then(function (r) { return r.ok ? r.json() : []; }).then(function (lista) {
+      var commits = (Array.isArray(lista) ? lista : []).map(function (x) {
+        var msg = String((x.commit && x.commit.message) || ''), linhas = msg.split('\n');
+        return { sha: x.sha, data: (x.commit && x.commit.author && x.commit.author.date) || '', titulo: linhas[0], corpo: linhas.slice(1).filter(function (l) { return !/^Co-Authored-By:|^🤖 Generated/i.test(l.trim()); }).join('\n').trim().slice(0, 1200) };
+      });
+      try { localStorage.setItem(CH, JSON.stringify({ desde: desde, em: Date.now(), commits: commits })); } catch (e) {}
+      return commits;
+    }).catch(function () { return []; });
+  }
+  function carregarRelatorioSkin() {
+    if (rsCarregando || !window.fetch) return;
+    rsCarregando = true;
+    var semCache = { cache: 'no-cache' };
+    Promise.all([
+      fetch('assets/data/projeto-relatorio-skin.json', semCache).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+      fetch('assets/data/relatorio-skin-linha-do-tempo.json', semCache).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+    ]).then(function (res) {
+      RS_DOC = res[0];
+      rsJuntarCommits((res[1] && res[1].commits) || []);
+      ensureRelatorioSkinIdentity();
+      mergeRelatorioChecklist();
+      render();
+      var ultimo = RS_COMMITS[0] && RS_COMMITS[0].data;
+      return rsBuscarNovos(ultimo);
+    }).then(function (novos) {
+      var antes = RS_COMMITS.length;
+      rsJuntarCommits(novos || []);
+      if (RS_COMMITS.length !== antes) render();
+    });
+  }
+
   function ensureLibraryDocumentation() {
     if (state.migrations.bibliotecaDocumentationV1) return false;
     var library = coreProjectByName('Biblioteca digital', 'project-biblioteca-digital');
@@ -1317,7 +1417,7 @@
     }).join('') + '</div></section>';
   }
   function libraryDocItem(project, itemId) {
-    var documentation = project && project.documentation;
+    var documentation = docOf(project);
     if (!documentation || !Array.isArray(documentation.folders)) return null;
     for (var index = 0; index < documentation.folders.length; index += 1) {
       var found = (documentation.folders[index].children || []).find(function (item) { return item.id === itemId; });
@@ -1326,11 +1426,14 @@
     return null;
   }
   function libraryDocumentationMarkup(project) {
-    var documentation = project && project.documentation;
+    var documentation = docOf(project);
     if (!documentation || !Array.isArray(documentation.folders)) return '';
     var counters = documentation.counters || {};
+    var statsHtml = Array.isArray(documentation.stats)
+      ? '<div class="pp-doc-stats">' + documentation.stats.map(function (x) { return '<span><b>' + Number(x.n || 0).toLocaleString('pt-BR') + '</b> ' + escapeHtml(x.label) + '</span>'; }).join('') + '</div>'
+      : '<div class="pp-doc-stats"><span><b>' + Number(counters.available || 0) + '</b> livros disponíveis</span><span><b>' + Number(counters.pending || 0) + '</b> pendentes</span><span><b>' + Number(counters.series || 0) + '</b> séries</span><span><b>' + Number(counters.collections || 0) + '</b> coleções</span></div>';
     return '<section class="pp-library-docs"><div class="pp-library-docs-head"><div><p class="pp-doc-kicker">DOCUMENTAÇÃO DO PROJETO</p><h2>' + escapeHtml(documentation.title) + '</h2><p>' + escapeHtml(documentation.summary) + '</p></div><button class="pp-button" data-action="library-map" data-project="' + project.id + '">' + uiIcon('map') + 'Abrir mapa mental</button></div>'
-      + '<div class="pp-doc-stats"><span><b>' + Number(counters.available || 0) + '</b> livros disponíveis</span><span><b>' + Number(counters.pending || 0) + '</b> pendentes</span><span><b>' + Number(counters.series || 0) + '</b> séries</span><span><b>' + Number(counters.collections || 0) + '</b> coleções</span></div>'
+      + statsHtml
       + '<div class="pp-doc-folders">' + documentation.folders.map(function (folder, index) {
         return '<details class="pp-doc-folder"' + (index === 0 ? ' open' : '') + '><summary><span class="pp-doc-folder-icon">' + uiIcon(folder.icon || 'folder') + '</span><span><strong>' + escapeHtml(folder.title) + '</strong><small>' + escapeHtml(folder.description) + '</small></span><span class="pp-doc-folder-count">' + (folder.children || []).length + '</span></summary><div class="pp-doc-children">' + (folder.children || []).map(function (item) {
           return '<button class="pp-doc-item" data-action="library-doc" data-project="' + project.id + '" data-doc="' + escapeHtml(item.id) + '"><span class="pp-doc-item-icon">' + uiIcon(item.icon || 'project') + '</span><span><strong>' + escapeHtml(item.title) + '</strong><small>' + escapeHtml(item.status || 'Detalhes') + '</small></span>' + uiIcon('external') + '</button>';
@@ -1373,7 +1476,7 @@
     return { nodes: nodes, lines: lines };
   }
   function libraryMindMapModal(project) {
-    if (!project || !project.documentation) return;
+    if (!project || !docOf(project)) return;
     var catalog = libraryMapCatalog();
     var nodeMarkup = catalog.nodes.map(function (node) {
       return '<button type="button" class="pp-mindmap-node pp-mindmap-node-' + escapeHtml(node.kind) + '" data-map-node="' + escapeHtml(node.id) + '" style="--map-x:' + Number(node.x) + 'px;--map-y:' + Number(node.y) + 'px;--map-w:' + Number(node.w || 220) + 'px" aria-pressed="false"><span>' + escapeHtml(node.label) + '</span><small>' + escapeHtml(node.meta) + '</small></button>';
@@ -1536,16 +1639,26 @@
     if (!project) return headerMarkup('Projeto não encontrado', 'Ele pode ter sido excluído ou o endereço está incorreto.', 'projetos-pessoais.html#projects') + '<main class="pp-shell"><div class="pp-empty"><strong>Projeto não encontrado</strong><a class="pp-button" href="projetos-pessoais.html#projects">Ver projetos</a></div></main>';
     var projectIdeas = active(state.ideas).filter(function (idea) { return idea.projectId === project.id; }).sort(function (a, b) { return toTime(b.updatedAt) - toTime(a.updatedAt); });
     var events = active(state.activities).filter(function (event) { return event.projectId === project.id; }).sort(function (a, b) { return toTime(b.occurredAt) - toTime(a.occurredAt); });
+    var totalEventos = events.length, maisEventos = '';
+    if (isRelatorioSkin(project) && RS_COMMITS.length) {
+      events = events.concat(RS_COMMITS.map(rsEventoDoCommit)).sort(function (a, b) { return toTime(b.occurredAt) - toTime(a.occurredAt); });
+      totalEventos = events.length;
+      if (events.length > RS_LIMITE) {
+        maisEventos = '<div style="text-align:center;margin-top:12px"><button class="pp-button pp-secondary pp-small" data-action="rs-mais">Mostrar mais (' + (events.length - RS_LIMITE) + ' restantes)</button></div>';
+        events = events.slice(0, RS_LIMITE);
+      }
+    }
     var tools = Array.isArray(project.tools) ? project.tools : [];
     var links = safeUrl(project.url) ? '<div class="pp-project-links"><a class="pp-project-link" target="_blank" rel="noopener noreferrer" href="' + escapeHtml(safeUrl(project.url)) + '">' + uiIcon('external') + 'Abrir link principal</a></div>' : '<p class="pp-form-note">Nenhum link principal cadastrado.</p>';
     return headerMarkup(project.name, 'Detalhes, ferramentas, histórico e ideias deste projeto.', 'projetos-pessoais.html#projects')
       + '<main class="pp-shell"><section class="pp-detail-top">' + projectLogo(project) + '<div><h1>' + escapeHtml(project.name) + '</h1><p>' + escapeHtml(project.description || 'Sem descrição.') + '</p><div class="pp-tags" style="margin-top:10px"><span class="pp-badge pp-status-' + statusClass(project.status) + '">' + escapeHtml(project.status) + '</span><span class="pp-tag">' + escapeHtml(project.type || 'Outro') + '</span></div></div><div class="pp-detail-actions"><button class="pp-button" data-action="open-mindmap" data-id="' + project.id + '">' + uiIcon('map') + 'Mapa mental</button><button class="pp-button pp-secondary" data-action="edit-project" data-id="' + project.id + '">' + uiIcon('edit') + 'Editar</button><button class="pp-button pp-danger" data-action="delete-project" data-id="' + project.id + '">' + uiIcon('trash') + 'Excluir</button></div></section>' + libraryDocumentationMarkup(project)
-      + '<div class="pp-detail-grid"><div><section class="pp-panel"><div class="pp-panel-head"><h2>Linha do tempo</h2><button class="pp-button pp-small" data-action="new-event" data-project="' + project.id + '">' + uiIcon('plus') + 'Registrar</button></div>' + (events.length ? '<div class="pp-timeline">' + events.map(eventCard).join('') + '</div>' : emptyMarkup('Sem atualizações ainda', 'Registre um avanço, deploy, ajuste ou qualquer passo importante.')) + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ideias vinculadas</h2><a class="pp-button pp-small pp-secondary" href="projetos-pessoais.html#ideas">Ver todas</a></div>' + (projectIdeas.length ? projectIdeas.map(ideaMini).join('') : '<p class="pp-form-note">Ainda não há ideias vinculadas a este projeto.</p>') + '</section>' + projectChecklistMarkup(project) + '</div>'
+      + '<div class="pp-detail-grid"><div><section class="pp-panel"><div class="pp-panel-head"><h2>Linha do tempo' + (isRelatorioSkin(project) && RS_COMMITS.length ? ' <small style="font-weight:500;font-size:.72em;opacity:.7">· ' + totalEventos + ' atualizações, automáticas pelo GitHub</small>' : '') + '</h2><button class="pp-button pp-small" data-action="new-event" data-project="' + project.id + '">' + uiIcon('plus') + 'Registrar</button></div>' + (events.length ? '<div class="pp-timeline">' + events.map(eventCard).join('') + '</div>' + maisEventos : emptyMarkup('Sem atualizações ainda', 'Registre um avanço, deploy, ajuste ou qualquer passo importante.')) + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ideias vinculadas</h2><a class="pp-button pp-small pp-secondary" href="projetos-pessoais.html#ideas">Ver todas</a></div>' + (projectIdeas.length ? projectIdeas.map(ideaMini).join('') : '<p class="pp-form-note">Ainda não há ideias vinculadas a este projeto.</p>') + '</section>' + projectChecklistMarkup(project) + '</div>'
       + '<aside>' + relatedProjectsMarkup(project) + '<section class="pp-panel"><h2>Links</h2><div style="height:12px"></div>' + links + '</section><section class="pp-panel"><div class="pp-panel-head"><h2>Ferramentas</h2><button class="pp-button pp-small" data-action="edit-project" data-id="' + project.id + '">Gerenciar</button></div>' + (tools.length ? '<div class="pp-tool-list">' + tools.map(function (tool) { return '<button class="pp-tool-button" data-action="open-tool" data-project="' + project.id + '" data-tool="' + tool.id + '"><span>' + providerIcon(tool.provider) + '<span><strong>' + escapeHtml(tool.label || tool.provider) + '</strong><span>' + escapeHtml(tool.provider) + ' · acesso protegido</span></span></span><b>' + uiIcon('lock') + '</b></button>'; }).join('') + '</div>' : '<p class="pp-form-note">Adicione GitHub, Supabase, I.As ou outra ferramenta ao editar o projeto.</p>') + '</section></aside></div></main>';
   }
   function eventCard(event) {
-    var external = safeUrl(event.externalUrl) ? ' · <a target="_blank" rel="noopener noreferrer" href="' + escapeHtml(safeUrl(event.externalUrl)) + '">abrir referência</a>' : '';
-    return '<article class="pp-event"><div class="pp-event-top"><div><h3>' + escapeHtml(event.title) + '</h3><time>' + escapeHtml(formatDate(event.occurredAt)) + ' · ' + escapeHtml(event.source || 'Manual') + external + '</time></div><div class="pp-toolbar"><button class="pp-icon-button" title="Editar evento" aria-label="Editar evento" data-action="edit-event" data-id="' + event.id + '">' + uiIcon('edit') + '</button><button class="pp-icon-button" title="Excluir evento" aria-label="Excluir evento" data-action="delete-event" data-id="' + event.id + '">' + uiIcon('trash') + '</button></div></div>' + (event.details ? '<p>' + escapeHtml(event.details) + '</p>' : '') + '</article>';
+    var external = safeUrl(event.externalUrl) ? ' · <a target="_blank" rel="noopener noreferrer" href="' + escapeHtml(safeUrl(event.externalUrl)) + '">' + (event.readonly ? 'ver no GitHub' : 'abrir referência') + '</a>' : '';
+    var botoes = event.readonly ? '' : '<div class="pp-toolbar"><button class="pp-icon-button" title="Editar evento" aria-label="Editar evento" data-action="edit-event" data-id="' + event.id + '">' + uiIcon('edit') + '</button><button class="pp-icon-button" title="Excluir evento" aria-label="Excluir evento" data-action="delete-event" data-id="' + event.id + '">' + uiIcon('trash') + '</button></div>';
+    return '<article class="pp-event"><div class="pp-event-top"><div><h3>' + escapeHtml(event.title) + '</h3><time>' + escapeHtml(formatDate(event.occurredAt)) + ' · ' + escapeHtml(event.source || 'Manual') + external + '</time></div>' + botoes + '</div>' + (event.details ? '<p' + (event.readonly ? ' style="white-space:pre-line"' : '') + '>' + escapeHtml(event.details) + '</p>' : '') + '</article>';
   }
   function ideaMini(idea) {
     var stats = checklistStats(idea.checklist);
@@ -2153,6 +2266,7 @@
     if (action === 'mindmap-add') { var addProject = getProject(mindMapUi.projectId); if (addProject) mindMapNodeForm(addProject, null, mindMapUi.selectedId); return; }
     if (action === 'mindmap-edit') { var editProject = getProject(mindMapUi.projectId); var selectedNode = editProject && getMindMapNode(editProject, mindMapUi.selectedId); if (editProject && selectedNode) mindMapNodeForm(editProject, selectedNode); return; }
     if (action === 'mindmap-delete') { var deleteMapProject = getProject(mindMapUi.projectId); if (deleteMapProject) deleteMindMapNode(deleteMapProject, mindMapUi.selectedId); return; }
+    if (action === 'rs-mais') { RS_LIMITE += 60; render(); return; }
     if (action === 'library-doc') { libraryDocModal(getProject(target.dataset.project), target.dataset.doc); return; }
     if (action === 'vault-info') { vaultInfo(); return; }
     if (action === 'lock-vault') { closeModal(); lockVault(); return; }
@@ -2175,7 +2289,7 @@
     }
   }
   function boot() {
-    loadCache(); ensureCoreProjects(); ensureReportsProjectIcon(); ensureLibraryProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureAxionProject(); ensureConexProject(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache(); ensureCoreProjects(); ensureReportsProjectIcon(); ensureLibraryProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureAxionProject(); ensureConexProject(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); carregarRelatorioSkin(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
