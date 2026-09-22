@@ -3,6 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+// Conta já logada neste aparelho: a página inicial é a das escolas, não o site
+// de apresentação. Roda antes de pintar a página. Para ver o site mesmo logado,
+// use index.html?site=1 (link "Site" em escolas.html). A chave é a mesma de
+// authStorageKey em assets/js/supabase-report-sync.js.
+(function () {
+  try {
+    if (/[?&]site=1(&|$)/.test(location.search)) return;
+    // Retorno de login (Google, link de e-mail) que caiu aqui: termina na tela de conta.
+    if (/[?&](code|error_description)=/.test(location.search) || /access_token=/.test(location.hash)) {
+      location.replace('entrar.html' + location.search + location.hash); return;
+    }
+    var raw = localStorage.getItem('relatorio-2026-admin-auth');
+    if (!raw) return;
+    var s = JSON.parse(raw);
+    s = s && s.currentSession ? s.currentSession : s;
+    if (s && s.refresh_token) location.replace('escolas.html');
+  } catch (e) {}
+})();
+</script>
 <meta name="theme-color" content="#0D0E0D">
 <title>RELATORIO SKIN — Gestão docente organizada em uma única plataforma</title>
 <meta name="description" content="RELATORIO SKIN reúne turmas, alunos, diários de aula, frequência, atividades, ocorrências, plano de aulas, calendário e relatórios em uma só plataforma, criada por um professor para professores.">
