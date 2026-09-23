@@ -13,6 +13,7 @@ const crypto = require("crypto");
 const ARQUIVOS = [
   "assets/js/boletim-regras.js",
   "assets/js/relatorio-individual.js",
+  "assets/js/meu-diario-ia.js",
   "axion-proeduq.html",
   "assets/marca/axion-escuro.webp",
   "assets/marca/axion-escuro-sm.webp",
