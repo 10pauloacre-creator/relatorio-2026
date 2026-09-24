@@ -27,7 +27,7 @@ window.NOVO_DIARIO_MANUAL = true;
 <script defer src="assets/js/conta-skin.js?v=20260922a"></script>
 <script defer src="assets/js/meu-diario-recursos.js?v=20260921a"></script>
 <script defer src="assets/js/meu-diario-ia.js?v=20260922a"></script>
-<script defer src="assets/js/frequencia-diaria.js?v=20260924a"></script>
+<script defer src="assets/js/frequencia-diaria.js?v=20260925a"></script>
 <script defer src="assets/js/novo-diario.js?v=20260921c"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--og:#876020;--card:#fff;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px;
@@ -996,11 +996,18 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       escola:e?e.nome:'', professor:perfilNome(),
       registros:function(){return registrosFrequencia(tid);},
       alunos:function(){return (turma(tid)||{alunos:[]}).alunos;},
-      presenca:function(id){
-        var d=diarios().filter(function(x){return x.id===id;})[0];
-        return d?{faltaram:(d.rel&&d.rel.faltaram)||[],faltJ:(d.rel&&d.rel.faltJ)||[]}:null;
+      ordem:((turma(tid)||{}).disciplinas||[]).map(function(x){return x.nome;}),
+      // Mesma chamada do diário: faltaram/faltJ; "presença não informada" = sem chamada.
+      estado:function(id,n){
+        if(!porId){porId={};diarios().forEach(function(x){porId[x.id]=x;});}
+        var d=porId[id],r=d&&d.rel;
+        if(!r||r.presencaNI)return null;
+        if((r.faltaram||[]).indexOf(n)>=0)return 'f';
+        if((r.faltJ||[]).indexOf(n)>=0)return 'j';
+        return 'p';
       }
     });
+    var porId=null;
   }
 
   // ── Relatório do aluno ──────────────────────────────────────────────
