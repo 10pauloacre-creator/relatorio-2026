@@ -635,3 +635,21 @@ Em Projetos pessoais › **RELATORIO SKIN** (`projeto-detalhes.html?id=project-r
 - **Linha do tempo:** automática. `assets/data/relatorio-skin-linha-do-tempo.json` (gerado por `npm run linha-do-tempo`, a partir do git) + ao abrir a página, os commits mais novos vêm da API do GitHub (cache de 15 min). Todo commit entra sozinho; mensagens de commit claras viram o texto da linha do tempo. Rodar `npm run linha-do-tempo` de vez em quando deixa o arquivo completo.
 - Código em `assets/js/projetos-pessoais.js` (`carregarRelatorioSkin`, `mergeRelatorioChecklist`, `docOf`).
 - **🐞 Bugs (22/09/2026):** todo projeto (os atuais e os novos) tem o painel Bugs na página de detalhes. `state.bugs` (sincronizado com o resto do painel): código BUG-001 por projeto, status (Novo, Confirmado, Em correção, Aguardando teste, Corrigido, Não reproduz, Arquivado), gravidade (Crítica, Alta, Média, Baixa), tags, onde acontece, aparelho, passos, esperado × atual, correção e link. Filtros (abertos/todos/status, gravidade, tag, busca), troca de status direto no cartão, contador de abertos nos cartões dos projetos; ao virar "Corrigido" entra "Bug corrigido" na linha do tempo. Excluir o projeto leva os bugs juntos.
+
+## 27. FREQUÊNCIA DIÁRIA (24/09/2026)
+
+Na aba de cada turma, ao lado de "Abrir página de alunos", o botão **"Frequência Diária"** abre o modal de `assets/js/frequencia-diaria.js` (Casavequia, Hermínio e Meu Diário; `data-runtime-ui`, nada vai para o layout salvo).
+
+- **Regra da contagem: 1 hora de aula = 1 aula.** Um dia com 4 h/aula da disciplina vale 4 aulas, e quem faltou nesse dia leva 4 faltas. Cada aula é contada **uma vez só**: as fatias que a Casavequia cria quando um relato fica entre dois bimestres são unidas por `data|chave` antes de aplicar a presença (sem isso o dia contava em dobro).
+- **Filtros:** Disciplinas (uma, várias ou todas), Bimestres (idem) e Período (tempo total ou de um dia a outro). A prévia é montada na hora, antes de emitir.
+- **Tabela:** uma coluna por dia no formato `01/02`, com o selo do bimestre (`1º BIM`) no alto da coluna; verde = presente com o número de aulas do dia, vermelho = faltou com o número de faltas, âmbar = falta justificada (o toque mostra "N falta(s) de M aula(s)"). No fim, Pres., Faltas e Freq. %.
+- **Documento:** uma página por disciplina (e por bloco de 12 colunas), todas no mesmo arquivo, no modelo do professor (`docs/modelo-frequencia-diaria.html`, só referência — não é publicado). As imagens do cabeçalho, da assinatura e do rodapé ficam em `assets/img/frequencia/*.webp` (não usar base64: o modelo original tinha 560 KB embutidos). A barra do documento tem 🖨️ Imprimir/PDF, 📄 Word, 📊 Excel, 🌐 HTML e 🔗 Compartilhar.
+- **Adaptador por página** — a regra de contagem é do módulo, os dados são de cada página:
+  ```js
+  FrequenciaDiaria.abrir({ turma, rotuloTurma, escola, professor,
+    registros(),            // [{data:'AAAA-MM-DD', turma, disciplina, horas, bimestre, chave}]
+    alunos(turma),          // [{n, nm, tr}]
+    presenca(chave) })      // {faltaram:[], faltJ:[]}
+  ```
+  Casavequia: `pcAbrirFrequencia` (de `pcDiaryCollectRecords`, chave `pl-<código>`). Hermínio: `rhAbrirFrequencia`/`rhFrequenciaRegistros` (usa `rhHorasOficiaisCard`, então a regra dos 15 minutos vale aqui também, e o bimestre vem de `rhColetarMapaBimestresPanes`). Meu Diário: `abrirFrequencia`/`registrosFrequencia` (bimestre pela soma das h/aula da disciplina, igual ao Contador).
+- **Se mudar a regra de presença ou o bimestre de uma aula em uma dessas páginas, a Frequência muda junto** — ela lê as mesmas funções do Contador e dos lançamentos.

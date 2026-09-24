@@ -1,6 +1,6 @@
 {
-  "versao": 5,
-  "atualizadoEm": "2026-09-22",
+  "versao": 6,
+  "atualizadoEm": "2026-09-24",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
     "title": "Mapa documental do RELATORIO SKIN",
@@ -402,6 +402,20 @@
             "details": [
               "Publicação dos lançamentos (aulas, presença, atividades, ocorrências) nas tabelas oficiais; gravidade das ocorrências pela IA; Observações; conduta no perfil do aluno; alunos novos da Biblioteca nas listas."
             ]
+          },
+          {
+            "id": "js-frequencia",
+            "icon": "file",
+            "title": "frequencia-diaria.js — Frequência Diária",
+            "status": "Concluído",
+            "details": [
+              "Botão “Frequência Diária” na aba de cada turma (Casavequia, Hermínio e Meu Diário), ao lado de “Abrir página de alunos”.",
+              "Modal com filtros de disciplina, bimestre e período (tempo total ou de um dia a outro) e prévia da tabela antes de emitir.",
+              "1 hora de aula = 1 aula: um dia com 4h da disciplina conta 4 aulas e 4 faltas para quem faltou. A aula é contada uma vez só, mesmo quando o relato é dividido entre dois bimestres.",
+              "Uma coluna por dia (“01/02”) com selo do bimestre, verde para presença, vermelho para falta, âmbar para falta justificada, e as colunas Pres./Faltas/Freq. no fim.",
+              "Uma página de relatório por disciplina, todas no mesmo documento; sai no modelo oficial (assets/img/frequencia/) com Imprimir/PDF, Word, Excel, HTML e Compartilhar.",
+              "Cada página entrega os dados por um adaptador (registros, alunos, presenca), então a regra de contagem é a mesma nas três."
+            ]
           }
         ]
       },
@@ -784,6 +798,11 @@
         {
           "id": "rs-notas-12",
           "text": "Regras próprias da Hermínio e prova da Biblioteca vencendo",
+          "done": true
+        },
+        {
+          "id": "rs-notas-13",
+          "text": "Frequência Diária por turma (1h = 1 aula) com relatório em PDF, Word, Excel e HTML",
           "done": true
         }
       ]
