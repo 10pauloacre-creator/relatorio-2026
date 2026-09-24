@@ -358,183 +358,375 @@
   function freq(l) { return l.aulas ? Math.round((l.aulas - l.faltas) / l.aulas * 100) + "%" : "—"; }
 
   // ── Relatório (modelo do professor) ───────────────────────────────────
-  // Cada disciplina começa numa página nova e as disciplinas seguem uma após a
-  // outra. Dentro de cada uma: bloco de datas 1 (alunos 1–N, N+1–…), bloco de
-  // datas 2… A assinatura fica na última folha de cada disciplina, e todas as
-  // páginas levam "Página X de Y" do documento inteiro.
-  function paginasDaTabela(t) {
-    // As datas seguem de uma folha para a outra; Pres./Faltas/Freq. só aparecem
-    // no último bloco, depois da última aula. Sem as colunas de totais, as
-    // folhas do meio cabem mais datas (COLUNAS_SEM_TOTAIS).
-    // As datas são repartidas por igual entre as folhas (nada de uma folha
-    // final com uma data só): a última cabe até COLUNAS_POR_PAGINA.
-    var blocosCol = [], i = 0, total = t.colunas.length;
-    var nb = total <= COLUNAS_POR_PAGINA ? 1 : 1 + Math.ceil((total - COLUNAS_POR_PAGINA) / COLUNAS_SEM_TOTAIS);
-    var ultimo = Math.min(COLUNAS_POR_PAGINA, Math.ceil(total / nb));
-    var meio = nb > 1 ? total - ultimo : 0;
-    var tamanhos = [];
-    for (var b = 0; b < nb - 1; b++) tamanhos.push(Math.floor(meio / (nb - 1)) + (b < meio % (nb - 1) ? 1 : 0));
-    tamanhos.push(total - meio);
-    if (!total) blocosCol.push({ inicio: 0, cols: [] });
-    tamanhos.forEach(function (tam) {
-      if (!tam) return;
-      blocosCol.push({ inicio: i, cols: t.colunas.slice(i, i + tam) });
-      i += tam;
-    });
-    // Linhas divididas em partes iguais (nada de uma folha com 1 ou 2 alunos).
-    var n = t.linhas.length;
-    var partes = Math.max(1, Math.ceil(n / LINHAS_POR_PAGINA));
-    var porParte = Math.max(1, Math.ceil(n / partes));
-    var blocosLin = [];
-    for (var j = 0; j < Math.max(n, 1); j += porParte) blocosLin.push(t.linhas.slice(j, j + porParte));
-    var paginas = [];
-    blocosCol.forEach(function (bc, ic) {
-      blocosLin.forEach(function (linhas, il) {
-        paginas.push({
-          colunas: bc.cols, inicio: bc.inicio, linhas: linhas,
-          blocoDatas: ic + 1, totalBlocosDatas: blocosCol.length, comTotais: ic === blocosCol.length - 1,
-          blocoAlunos: il + 1, totalBlocosAlunos: blocosLin.length
-        });
-      });
-    });
-    paginas.forEach(function (pg, k) { pg.indice = k; pg.total = paginas.length; pg.ultima = k === paginas.length - 1; });
-    return paginas;
-  }
-  function faixaDatas(cols) {
-    if (!cols.length) return "";
-    return dataBr(cols[0].data) + (cols.length > 1 ? " a " + dataBr(cols[cols.length - 1].data) : "");
-  }
-  function docPagina(t, parte, meta, numero, totalDoc, numDisc) {
-    var cab = parte.colunas.map(function (c) {
-      return '<th class="date-col" data-bimester="' + esc(c.bimestre) + '"><div class="date-head"><span class="bimester-badge">'
-        + (c.bimestre ? c.bimestre + "º BIM" : "") + "</span><span>" + dataCurta(c.data) + "</span><small>" + diaSemana(c.data) + " · " + c.horas + "h</small></div></th>";
-    }).join("");
-    var corpo = parte.linhas.map(function (l) {
-      var celulas = parte.colunas.map(function (c, i) {
-        var cel = l.celulas[parte.inicio + i] || { aulas: 0, faltas: 0, justificadas: 0 };
-        var tp = tipoCelula(cel);
-        if (tp.cls === "v") return '<td class="attendance empty" title="' + tp.dica + '"></td>';
-        if (tp.cls === "p") return '<td class="attendance present">' + tp.txt + "</td>";
-        return '<td class="attendance absent' + (tp.cls === "j" ? " justified" : "") + '" title="' + tp.dica + '">' + tp.txt + (tp.cls === "j" || tp.parcialJ ? "<sup>j</sup>" : "") + "</td>";
-      }).join("");
-      return '<tr' + (l.tr ? ' class="transferido"' : "") + '><td class="num">' + l.n + '</td><td class="student">' + esc(l.nm) + (l.tr ? " <em>(transferido)</em>" : "") + "</td>"
-        + celulas
-        + (parte.comTotais ? '<td class="total">' + l.presencas + '</td><td class="total"><strong>' + l.faltas + "</strong>" + (l.justificadas ? '<small class="just">' + l.justificadas + " j</small>" : "") + '</td><td class="percent">' + freq(l) + "</td>" : "")
-        + "</tr>";
-    }).join("");
-    var datas = faixaDatas(parte.colunas);
-    var parteTxt = [];
-    if (parte.totalBlocosDatas > 1) parteTxt.push("datas " + parte.blocoDatas + "/" + parte.totalBlocosDatas);
-    if (parte.totalBlocosAlunos > 1 && parte.linhas.length) parteTxt.push("alunos " + parte.linhas[0].n + "–" + parte.linhas[parte.linhas.length - 1].n);
-    // Datas e bimestres desta folha.
-    var bimsFolha = parte.colunas.map(function (c) { return c.bimestre; }).filter(function (v, i, l) { return v && l.indexOf(v) === i; }).sort();
-    var periodo = (datas || meta.periodo) + (bimsFolha.length ? " · " + bimsFolha.join("º, ") + "º bim" : "");
-    return '<main class="page' + (parte.indice === 0 ? " inicio-disciplina" : "") + '" data-disciplina="' + esc(t.disciplina) + '">'
-      + '<header class="header"><img src="' + meta.imgCab + '" alt="Secretaria de Estado de Educação">'
-      + '<div class="header-text"><div class="main">Secretaria de Estado de<br>Educação, Cultura e Esportes</div>'
-      + '<div class="sub">Diretoria de Ensino</div><div class="sub">Departamento de Educação Básica</div><div class="sub">Divisão de Ensino</div></div></header>'
-      + '<section class="title"><h1>Relatório de Frequência Diária</h1><p>' + esc(t.disciplina)
-      + (meta.totalDisc > 1 ? " · relatório " + numDisc + " de " + meta.totalDisc : "")
-      + (parte.total > 1 ? " · folha " + (parte.indice + 1) + " de " + parte.total + (parteTxt.length ? " (" + parteTxt.join(", ") + ")" : "") : "")
-      + " · 1 hora de aula = 1 aula</p></section>"
-      + '<section class="meta">'
-      + campo("Unidade escolar", meta.escola) + campo("Professor", meta.professor) + campo("Disciplina", t.disciplina) + campo("Turma", meta.turma)
-      + campo("Turno", meta.turno) + campo("Período/Bimestre", periodo) + campo("Emitido em", dataBr(hoje())) + campo("Carga do período", t.totalAulas + " aulas em " + t.colunas.length + " dias")
-      + "</section>"
-      + '<div class="legend"><span><i class="p"></i>Presença (nº de aulas)</span><span><i class="f"></i>Falta (nº de faltas)</span><span><i class="j"></i>Falta justificada (j)</span><span><i class="v"></i>Sem chamada</span></div>'
-      + '<div class="table-wrap"><table><thead><tr><th class="num">Nº</th><th class="student">Aluno(a)</th>' + cab
-      + (parte.comTotais ? '<th class="total">Pres.</th><th class="total">Faltas</th><th class="percent">Freq.</th>' : "")
-      + "</tr></thead><tbody>" + corpo + "</tbody></table></div>"
-      + (parte.comTotais ? "" : '<p class="continua">As datas continuam na folha seguinte; os totais aparecem depois da última aula.</p>')
-      + (parte.ultima
-        ? '<section class="signature"><div class="signature-block"><img src="' + meta.imgAss + '" alt="">'
-          + '<div class="signature-line"><strong>' + esc(meta.professor) + "</strong><span>Professor</span></div></div></section>"
-: "")
-      + '<footer class="page-footer"><img src="' + meta.imgRod + '" alt="AXION PROEDUQ">'
-      + '<div class="page-footer-text"><strong>Ferramenta de apoio educacional AXION PROEDUQ.</strong><br>'
-      + "Gerado pelo RELATORIO SKIN a partir das chamadas dos diários de aula. Pres., Faltas e Freq. somam todo o período e aparecem após a última aula.</div>"
-      + '<div class="page-number">Página ' + numero + " de " + totalDoc + "</div></footer></main>";
-  }
-  function campo(rotulo, valor) {
-    return '<div class="field"><span class="label">' + esc(rotulo) + ':</span><span class="editable" contenteditable="true">' + esc(valor || "") + "</span></div>";
-  }
+  // O documento leva os dados (DADOS) e um script próprio (appDoc) que monta
+  // as folhas: cada disciplina começa numa folha nova, as datas seguem de uma
+  // folha para a outra e Pres./Faltas/Freq. só aparecem depois da última aula.
+  // Em ✏️ Editar, como no modelo do professor: clicar na célula alterna
+  // presença → falta → falta justificada → sem chamada; + Aluno, excluir
+  // aluno (✕), adicionar período de datas, definir bimestre, remover data e
+  // limpar marcações; nomes e campos do cabeçalho editáveis. Imprimir e Salvar
+  // HTML levam as edições.
   function documento(tabs) {
     var img = base() + "assets/img/frequencia/";
-    var meta = {
-      escola: A.escola || "", professor: A.professor || "", turma: A.rotuloTurma || "", turno: A.turno || "",
-      periodo: F.periodo === "intervalo" && (F.de || F.ate) ? dataBr(F.de) + " a " + dataBr(F.ate) : "Tempo total",
-      imgCab: img + "cabecalho.webp", imgAss: img + "assinatura.webp", imgRod: img + "rodape.webp",
-      totalDisc: tabs.length
+    var dados = {
+      cfg: {
+        cols: COLUNAS_POR_PAGINA, colsMeio: COLUNAS_SEM_TOTAIS, linhas: LINHAS_POR_PAGINA,
+        img: { cab: img + "cabecalho.webp", ass: img + "assinatura.webp", rod: img + "rodape.webp" }
+      },
+      meta: {
+        escola: A.escola || "", professor: A.professor || "", turma: A.rotuloTurma || "", turno: A.turno || "",
+        periodo: F.periodo === "intervalo" && (F.de || F.ate) ? dataBr(F.de) + " a " + dataBr(F.ate) : "Tempo total",
+        emitido: dataBr(hoje())
+      },
+      disc: tabs.map(function (t) {
+        return {
+          nome: t.disciplina,
+          colunas: t.colunas.map(function (c) { return { data: c.data, horas: c.horas, bim: c.bimestre || "" }; }),
+          alunos: t.linhas.map(function (l) {
+            return { n: l.n, nm: l.nm, tr: !!l.tr, cel: l.celulas.map(function (c) { return [c.aulas, c.faltas, c.justificadas]; }) };
+          })
+        };
+      })
     };
-    var planos = tabs.map(function (t) { return { t: t, paginas: paginasDaTabela(t) }; });
-    var totalDoc = planos.reduce(function (s, p) { return s + p.paginas.length; }, 0);
-    var numero = 0;
-    var paginas = planos.map(function (p, k) {
-      return p.paginas.map(function (pg) { numero++; return docPagina(p.t, pg, meta, numero, totalDoc, k + 1); }).join("\n");
-    }).join("\n");
-    var inicio = 1;
-    var indice = tabs.length > 1
-      ? '<nav class="indice"><b>' + tabs.length + " relatórios neste documento, em sequência:</b> " + planos.map(function (p) {
-          var txt = esc(p.t.disciplina) + " (pág. " + inicio + (p.paginas.length > 1 ? "–" + (inicio + p.paginas.length - 1) : "") + ")";
-          inicio += p.paginas.length;
-          return txt;
-        }).join(" · ") + "</nav>"
-      : "";
     var nome = "frequencia-" + (A.rotuloTurma || "turma").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-") + "-" + hoje();
+    var json = JSON.stringify(dados).replace(/</g, "\\u003c");
     return "<!doctype html>\n<html lang=\"pt-BR\"><head><meta charset=\"utf-8\">"
       + '<meta name="viewport" content="width=device-width, initial-scale=1">'
-      + "<title>Relatório de Frequência Diária — " + esc(meta.turma) + "</title><style>" + cssDoc() + "</style></head><body>"
-      + '<div class="toolbar"><strong>Frequência Diária · ' + esc(meta.turma) + " · " + esc(meta.periodo) + " · " + totalDoc + " página(s)</strong>"
+      + "<title>Relatório de Frequência Diária — " + esc(dados.meta.turma) + "</title><style>" + cssDoc() + "</style></head><body>"
+      + '<div class="toolbar"><strong id="titulo-barra">Frequência Diária</strong>'
       + '<button type="button" id="bt-editar" onclick="editar()">✏️ Editar</button>'
       + '<button type="button" onclick="imprimir()">🖨️ Imprimir / PDF</button>'
       + '<button type="button" onclick="baixarHtml()">🌐 Salvar HTML</button>'
       + '<button type="button" onclick="compartilhar()">🔗 Compartilhar</button></div>'
-      + '<div class="aviso-edicao" id="aviso-edicao" hidden>Modo de edição: clique em qualquer texto ou número do relatório para alterar. Imprimir/PDF e Salvar HTML levam as alterações.</div>'
-      + indice
-      + paginas
-      + "<script>var NOME=" + JSON.stringify(nome) + ";" + scriptDoc() + "<\/script></body></html>";
+      + '<div class="aviso-edicao" id="aviso-edicao" hidden>Modo de edição: clique nas células para alternar presença → falta → falta justificada → sem chamada. Clique nos nomes e nos campos do cabeçalho para editar. Imprimir/PDF e Salvar HTML levam as alterações.</div>'
+      + '<div class="barra-edicao" id="barra-edicao" hidden>'
+      + '<label>Relatório: <select id="ed-disc"></select></label>'
+      + '<button type="button" data-acao="aluno">+ Aluno</button>'
+      + '<button type="button" data-acao="periodo">Adicionar período</button>'
+      + '<button type="button" data-acao="bimestre">Definir bimestre</button>'
+      + '<button type="button" data-acao="remdata">Remover data</button>'
+      + '<button type="button" data-acao="limpar">Limpar marcações</button></div>'
+      + '<nav class="indice" id="indice" hidden></nav><div id="paginas"></div>'
+      + '<div class="painel-fundo" id="painel" hidden><section class="painel" role="dialog" aria-modal="true">'
+      + '<div class="painel-cab"><strong id="painel-titulo"></strong><button type="button" class="painel-x" data-fechar>×</button></div>'
+      + '<div id="painel-corpo"></div><div class="painel-acoes" id="painel-acoes"></div></section></div>'
+      + "<script>var NOME=" + JSON.stringify(nome) + ";var DADOS=" + json + ";(" + String(appDoc) + ")();<\/script></body></html>";
   }
-  // Script da janela do relatório: Editar, Imprimir/PDF, Salvar HTML e
-  // Compartilhar. Imprimir e salvar usam a página como está (com as edições).
-  function scriptDoc() {
-    return String(function () {
-      var editando = false;
-      window.editar = function () {
-        editando = !editando;
-        document.querySelectorAll(".page").forEach(function (p) {
-          if (editando) p.setAttribute("contenteditable", "true"); else p.removeAttribute("contenteditable");
+
+  // Script da janela do relatório. Roda lá (não usa nada deste módulo).
+  function appDoc() {
+    var D = DADOS, CFG = D.cfg, editando = false;
+    var DIAS = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
+    function $(id) { return document.getElementById(id); }
+    function esc(v) {
+      return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+    function p2(n) { return ("0" + n).slice(-2); }
+    function dataCurta(iso) { return iso.slice(8, 10) + "/" + iso.slice(5, 7); }
+    function dataBr(iso) { return iso ? iso.slice(8, 10) + "/" + iso.slice(5, 7) + "/" + iso.slice(0, 4) : ""; }
+    function diaSemana(iso) { return DIAS[new Date(iso + "T12:00:00").getDay()] || ""; }
+    function isoDe(d) { return d.getFullYear() + "-" + p2(d.getMonth() + 1) + "-" + p2(d.getDate()); }
+
+    function tipo(c) {
+      var a = c[0], f = c[1], j = c[2];
+      if (!a) return { cls: "v", txt: "", dica: "sem chamada" };
+      if (f > 0) {
+        var todas = j >= f;
+        return { cls: todas ? "j" : "f", txt: String(f), parcialJ: j > 0 && !todas,
+          dica: f + " falta(s) de " + a + " aula(s)" + (j ? " · " + j + " justificada(s)" : "") };
+      }
+      return { cls: "p", txt: String(a), dica: a + " aula(s) presente" };
+    }
+    function totais(al) {
+      var a = 0, f = 0, j = 0;
+      al.cel.forEach(function (c) { a += c[0]; f += c[1]; j += c[2]; });
+      return { pres: a - f, faltas: f, just: j, freq: a ? Math.round((a - f) / a * 100) + "%" : "—" };
+    }
+    function carga(d) { return d.colunas.reduce(function (s, c) { return s + (+c.horas || 0); }, 0); }
+
+    // Folhas de uma disciplina: blocos de datas (repartidos por igual; a última
+    // com as colunas de totais) × blocos de alunos (partes iguais).
+    function paginas(d) {
+      var total = d.colunas.length;
+      var nb = total <= CFG.cols ? 1 : 1 + Math.ceil((total - CFG.cols) / CFG.colsMeio);
+      var ultimo = Math.min(CFG.cols, Math.ceil(total / nb));
+      var meio = nb > 1 ? total - ultimo : 0, tam = [], b;
+      for (b = 0; b < nb - 1; b++) tam.push(Math.floor(meio / (nb - 1)) + (b < meio % (nb - 1) ? 1 : 0));
+      tam.push(total - meio);
+      var blocos = [], i = 0;
+      if (!total) blocos.push({ ci: 0, cn: 0 });
+      tam.forEach(function (t) { if (t) { blocos.push({ ci: i, cn: t }); i += t; } });
+      var n = d.alunos.length, partes = Math.max(1, Math.ceil(n / CFG.linhas));
+      var porParte = Math.max(1, Math.ceil(n / partes)), lin = [], k;
+      for (k = 0; k < Math.max(n, 1); k += porParte) lin.push({ ai: k, af: Math.min(n, k + porParte) });
+      var out = [];
+      blocos.forEach(function (bc, ic) {
+        lin.forEach(function (bl, il) {
+          out.push({ ci: bc.ci, cn: bc.cn, ai: bl.ai, af: bl.af, bd: ic + 1, tbd: blocos.length,
+            ba: il + 1, tba: lin.length, comTotais: ic === blocos.length - 1 });
         });
-        document.body.classList.toggle("editando", editando);
-        document.getElementById("aviso-edicao").hidden = !editando;
-        document.getElementById("bt-editar").textContent = editando ? "✓ Concluir edição" : "✏️ Editar";
-      };
-      function fecharEdicao() { if (editando) window.editar(); }
-      function limpo() {
-        var c = document.documentElement.cloneNode(true);
-        [".toolbar", ".indice", ".aviso-edicao", "script"].forEach(function (q) { c.querySelectorAll(q).forEach(function (e) { e.remove(); }); });
-        c.querySelectorAll("[contenteditable]").forEach(function (e) { e.removeAttribute("contenteditable"); });
-        var b = c.querySelector("body"); if (b) b.classList.remove("editando");
-        return "<!doctype html>" + c.outerHTML;
+      });
+      out.forEach(function (p, x) { p.indice = x; p.total = out.length; p.ultima = x === out.length - 1; });
+      return out;
+    }
+    function campo(rotulo, valor, chave) {
+      return '<div class="field"><span class="label">' + esc(rotulo) + ':</span><span class="editable"'
+        + (chave ? ' data-campo="' + chave + '"' : "") + ">" + esc(valor || "") + "</span></div>";
+    }
+    function pagina(d, di, p, numero, totalDoc) {
+      var cols = d.colunas.slice(p.ci, p.ci + p.cn);
+      var cab = cols.map(function (c) {
+        return '<th class="date-col" data-bimester="' + esc(c.bim) + '"><div class="date-head"><span class="bimester-badge">'
+          + (c.bim ? c.bim + "º BIM" : "") + "</span><span>" + dataCurta(c.data) + "</span><small>" + diaSemana(c.data) + " · " + c.horas + "h</small></div></th>";
+      }).join("");
+      var corpo = "";
+      for (var ai = p.ai; ai < p.af; ai++) {
+        var al = d.alunos[ai], tt = totais(al);
+        var celulas = cols.map(function (c, x) {
+          var ci = p.ci + x, tp = tipo(al.cel[ci] || [0, 0, 0]), ref = ' data-c="' + di + "." + ai + "." + ci + '" title="' + tp.dica + '"';
+          if (tp.cls === "v") return '<td class="attendance empty"' + ref + "></td>";
+          if (tp.cls === "p") return '<td class="attendance present"' + ref + ">" + tp.txt + "</td>";
+          return '<td class="attendance absent' + (tp.cls === "j" ? " justified" : "") + '"' + ref + ">" + tp.txt + (tp.cls === "j" || tp.parcialJ ? "<sup>j</sup>" : "") + "</td>";
+        }).join("");
+        corpo += "<tr" + (al.tr ? ' class="transferido"' : "") + '><td class="num">' + al.n + '</td><td class="student">'
+          + '<span class="nome" data-campo="nome.' + di + "." + ai + '">' + esc(al.nm) + "</span>" + (al.tr ? " <em>(transferido)</em>" : "")
+          + '<button type="button" class="rm" data-rm="' + di + "." + ai + '" title="Excluir aluno">✕</button></td>' + celulas
+          + (p.comTotais ? '<td class="total">' + tt.pres + '</td><td class="total"><strong>' + tt.faltas + "</strong>"
+            + (tt.just ? '<small class="just">' + tt.just + " j</small>" : "") + '</td><td class="percent">' + tt.freq + "</td>" : "")
+          + "</tr>";
       }
-      function baixarArquivo(txt) {
-        var b = new Blob([txt], { type: "text/html;charset=utf-8" });
-        var a = document.createElement("a");
-        a.href = URL.createObjectURL(b); a.download = NOME + ".html";
-        document.body.appendChild(a); a.click();
-        setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+      var datas = cols.length ? dataBr(cols[0].data) + (cols.length > 1 ? " a " + dataBr(cols[cols.length - 1].data) : "") : "";
+      var bims = cols.map(function (c) { return c.bim; }).filter(function (v, i, l) { return v && l.indexOf(v) === i; }).sort();
+      var parteTxt = [];
+      if (p.tbd > 1) parteTxt.push("datas " + p.bd + "/" + p.tbd);
+      if (p.tba > 1 && p.af > p.ai) parteTxt.push("alunos " + d.alunos[p.ai].n + "–" + d.alunos[p.af - 1].n);
+      return '<main class="page' + (p.indice === 0 ? " inicio-disciplina" : "") + '" data-disciplina="' + esc(d.nome) + '">'
+        + '<header class="header"><img src="' + CFG.img.cab + '" alt="Secretaria de Estado de Educação">'
+        + '<div class="header-text"><div class="main">Secretaria de Estado de<br>Educação, Cultura e Esportes</div>'
+        + '<div class="sub">Diretoria de Ensino</div><div class="sub">Departamento de Educação Básica</div><div class="sub">Divisão de Ensino</div></div></header>'
+        + '<section class="title"><h1>Relatório de Frequência Diária</h1><p>' + esc(d.nome)
+        + (D.disc.length > 1 ? " · relatório " + (di + 1) + " de " + D.disc.length : "")
+        + (p.total > 1 ? " · folha " + (p.indice + 1) + " de " + p.total + (parteTxt.length ? " (" + parteTxt.join(", ") + ")" : "") : "")
+        + " · 1 hora de aula = 1 aula</p></section>"
+        + '<section class="meta">'
+        + campo("Unidade escolar", D.meta.escola, "meta.escola") + campo("Professor", D.meta.professor, "meta.professor")
+        + campo("Disciplina", d.nome, "disc." + di) + campo("Turma", D.meta.turma, "meta.turma")
+        + campo("Turno", D.meta.turno, "meta.turno")
+        + campo("Período/Bimestre", (datas || D.meta.periodo) + (bims.length ? " · " + bims.join("º, ") + "º bim" : ""))
+        + campo("Emitido em", D.meta.emitido, "meta.emitido")
+        + campo("Carga do período", carga(d) + " aulas em " + d.colunas.length + " dias")
+        + "</section>"
+        + '<div class="legend"><span><i class="p"></i>Presença (nº de aulas)</span><span><i class="f"></i>Falta (nº de faltas)</span><span><i class="j"></i>Falta justificada (j)</span><span><i class="v"></i>Sem chamada</span></div>'
+        + '<div class="table-wrap"><table><thead><tr><th class="num">Nº</th><th class="student">Aluno(a)</th>' + cab
+        + (p.comTotais ? '<th class="total">Pres.</th><th class="total">Faltas</th><th class="percent">Freq.</th>' : "")
+        + "</tr></thead><tbody>" + corpo + "</tbody></table></div>"
+        + (p.comTotais ? "" : '<p class="continua">As datas continuam na folha seguinte; os totais aparecem depois da última aula.</p>')
+        + (p.ultima ? '<section class="signature"><div class="signature-block"><img src="' + CFG.img.ass + '" alt="">'
+          + '<div class="signature-line"><strong>' + esc(D.meta.professor) + "</strong><span>Professor</span></div></div></section>" : "")
+        + '<footer class="page-footer"><img src="' + CFG.img.rod + '" alt="AXION PROEDUQ">'
+        + '<div class="page-footer-text"><strong>Ferramenta de apoio educacional AXION PROEDUQ.</strong><br>'
+        + "Gerado pelo RELATORIO SKIN a partir das chamadas dos diários de aula. Pres., Faltas e Freq. somam todo o período e aparecem após a última aula.</div>"
+        + '<div class="page-number">Página ' + numero + " de " + totalDoc + "</div></footer></main>";
+    }
+
+    function render() {
+      var planos = D.disc.map(paginas), totalDoc = 0, html = "", numero = 0, inicio = 1, idx = [];
+      planos.forEach(function (p) { totalDoc += p.length; });
+      planos.forEach(function (ps, di) {
+        idx.push(esc(D.disc[di].nome) + " (pág. " + inicio + (ps.length > 1 ? "–" + (inicio + ps.length - 1) : "") + ")");
+        inicio += ps.length;
+        ps.forEach(function (p) { numero++; html += pagina(D.disc[di], di, p, numero, totalDoc); });
+      });
+      $("paginas").innerHTML = html;
+      $("indice").hidden = D.disc.length < 2;
+      $("indice").innerHTML = "<b>" + D.disc.length + " relatórios neste documento, em sequência:</b> " + idx.join(" · ");
+      $("titulo-barra").textContent = "Frequência Diária · " + D.meta.turma + " · " + D.meta.periodo + " · " + totalDoc + " página(s)";
+      var sel = $("ed-disc"), atual = sel.value;
+      sel.innerHTML = D.disc.map(function (d, i) { return '<option value="' + i + '">' + esc(d.nome) + "</option>"; }).join("");
+      if (atual && +atual < D.disc.length) sel.value = atual;
+      marcarEdicao();
+    }
+    function marcarEdicao() {
+      document.body.classList.toggle("editando", editando);
+      [].forEach.call(document.querySelectorAll("[data-campo]"), function (e) {
+        if (editando) e.setAttribute("contenteditable", "true"); else e.removeAttribute("contenteditable");
+      });
+      $("aviso-edicao").hidden = !editando;
+      $("barra-edicao").hidden = !editando;
+      $("bt-editar").textContent = editando ? "✓ Concluir edição" : "✏️ Editar";
+    }
+    function discAtual() { return D.disc[+$("ed-disc").value || 0]; }
+
+    // Campos editáveis: grava no DADOS e copia para as outras folhas.
+    document.addEventListener("input", function (ev) {
+      var el = ev.target.closest && ev.target.closest("[data-campo]");
+      if (!el) return;
+      var chave = el.getAttribute("data-campo"), k = chave.split("."), v = el.textContent.replace(/\s+/g, " ").trim();
+      if (k[0] === "meta") D.meta[k[1]] = v;
+      else if (k[0] === "disc") D.disc[+k[1]].nome = v;
+      else if (k[0] === "nome") D.disc[+k[1]].alunos[+k[2]].nm = v;
+      [].forEach.call(document.querySelectorAll('[data-campo="' + chave + '"]'), function (o) { if (o !== el) o.textContent = el.textContent; });
+      if (k[0] === "meta" && k[1] === "professor") [].forEach.call(document.querySelectorAll(".signature-line strong"), function (o) { o.textContent = v; });
+    });
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter" && ev.target.closest && ev.target.closest("[data-campo]")) { ev.preventDefault(); ev.target.blur(); }
+      if (ev.key === "Escape") fecharPainel();
+    });
+    document.addEventListener("click", function (ev) {
+      var t = ev.target;
+      if (t.closest("[data-fechar]") || t.id === "painel") { fecharPainel(); return; }
+      var ac = t.closest("[data-acao]");
+      if (ac) { acoes[ac.getAttribute("data-acao")](); return; }
+      if (!editando) return;
+      var rm = t.closest("[data-rm]");
+      if (rm) {
+        var r = rm.getAttribute("data-rm").split("."), d = D.disc[+r[0]], al = d.alunos[+r[1]];
+        if (confirm("Excluir " + al.n + ". " + al.nm + " deste relatório?")) { d.alunos.splice(+r[1], 1); render(); }
+        return;
       }
-      window.imprimir = function () { fecharEdicao(); setTimeout(function () { window.print(); }, 50); };
-      window.baixarHtml = function () { fecharEdicao(); baixarArquivo(limpo()); };
-      window.compartilhar = function () {
-        fecharEdicao();
-        var html = limpo();
-        var arq = new File([html], NOME + ".html", { type: "text/html" });
-        if (navigator.canShare && navigator.canShare({ files: [arq] })) return navigator.share({ files: [arq], title: document.title }).catch(function () {});
-        baixarArquivo(html);
-        alert("Este aparelho não compartilha arquivos direto. O HTML foi baixado: envie por e-mail ou WhatsApp.");
-      };
-    }).replace(/^function\s*\(\)\s*\{/, "").replace(/\}\s*$/, "");
+      var cel = t.closest("[data-c]");
+      if (cel) {
+        var c = cel.getAttribute("data-c").split("."), dd = D.disc[+c[0]], v = dd.alunos[+c[1]].cel[+c[2]], h = +dd.colunas[+c[2]].horas || 1;
+        // presença → falta → falta justificada → sem chamada → presença
+        var novo = !v[0] ? [h, 0, 0] : v[1] === 0 ? [h, h, 0] : v[2] < v[1] ? [h, h, h] : [0, 0, 0];
+        dd.alunos[+c[1]].cel[+c[2]] = novo;
+        render();
+      }
+    });
+
+    // Painel (período, bimestre, remover data).
+    function abrirPainel(titulo, corpo, botoes) {
+      $("painel-titulo").textContent = titulo;
+      $("painel-corpo").innerHTML = corpo;
+      $("painel-acoes").innerHTML = "";
+      botoes.forEach(function (b) {
+        var bt = document.createElement("button");
+        bt.type = "button"; bt.textContent = b.txt; if (b.principal) bt.className = "principal";
+        bt.onclick = function () { if (b.fn() !== false) fecharPainel(); };
+        $("painel-acoes").appendChild(bt);
+      });
+      $("painel").hidden = false;
+    }
+    function fecharPainel() { $("painel").hidden = true; }
+    function opcoesDatas(d) {
+      return d.colunas.map(function (c) { return '<option value="' + c.data + '">' + dataBr(c.data) + " (" + diaSemana(c.data) + ")</option>"; }).join("");
+    }
+    function ordenar(d) {
+      var ix = d.colunas.map(function (c, i) { return i; }).sort(function (x, y) { return d.colunas[x].data.localeCompare(d.colunas[y].data); });
+      d.colunas = ix.map(function (i) { return d.colunas[i]; });
+      d.alunos.forEach(function (al) { al.cel = ix.map(function (i) { return al.cel[i] || [0, 0, 0]; }); });
+    }
+    var BIMS = '<option value="">Sem bimestre</option><option value="1">1º bimestre</option><option value="2">2º bimestre</option><option value="3">3º bimestre</option><option value="4">4º bimestre</option>';
+    var acoes = {
+      aluno: function () {
+        var d = discAtual(), n = d.alunos.reduce(function (m, a) { return Math.max(m, +a.n || 0); }, 0) + 1;
+        d.alunos.push({ n: n, nm: "Novo aluno", tr: false, cel: d.colunas.map(function () { return [0, 0, 0]; }) });
+        render();
+        var el = document.querySelector('[data-campo="nome.' + D.disc.indexOf(d) + "." + (d.alunos.length - 1) + '"]');
+        if (el) { el.scrollIntoView({ block: "center" }); el.focus(); document.execCommand && document.execCommand("selectAll", false, null); }
+      },
+      periodo: function () {
+        var d = discAtual(), ult = d.colunas.length ? d.colunas[d.colunas.length - 1].data : isoDe(new Date());
+        abrirPainel("Adicionar período de aulas — " + d.nome,
+          '<div class="grade"><label>Data inicial<input type="date" id="p-ini" value="' + ult + '"></label>'
+          + '<label>Data final<input type="date" id="p-fim" value="' + ult + '"></label>'
+          + '<label>Aulas por dia (h/aula)<input type="number" id="p-h" min="1" max="12" value="1"></label>'
+          + '<label>Bimestre<select id="p-b">' + BIMS + "</select></label></div>"
+          + '<div class="linha"><label><input type="checkbox" id="p-sab"> Incluir sábados</label><label><input type="checkbox" id="p-dom"> Incluir domingos</label></div>'
+          + '<p class="ajuda">De segunda a sexta as datas entram automaticamente; datas que já estão na tabela ficam como estão. As células novas começam como “sem chamada”: clique nelas para marcar.</p>',
+          [{ txt: "Cancelar", fn: function () {} }, { txt: "Adicionar datas", principal: true, fn: function () {
+            var ini = $("p-ini").value, fim = $("p-fim").value, h = Math.max(1, parseInt($("p-h").value, 10) || 1), bim = $("p-b").value;
+            if (!ini || !fim || ini > fim) { alert("Confira a data inicial e a final."); return false; }
+            var a = new Date(ini + "T12:00:00"), b = new Date(fim + "T12:00:00"), novos = 0;
+            while (a <= b) {
+              var dia = a.getDay(), iso = isoDe(a);
+              var vale = (dia >= 1 && dia <= 5) || (dia === 6 && $("p-sab").checked) || (dia === 0 && $("p-dom").checked);
+              if (vale && !d.colunas.some(function (c) { return c.data === iso; })) {
+                d.colunas.push({ data: iso, horas: h, bim: bim });
+                d.alunos.forEach(function (al) { al.cel.push([0, 0, 0]); });
+                novos++;
+              }
+              a.setDate(a.getDate() + 1);
+            }
+            if (!novos) { alert("Nenhuma data nova nesse período."); return false; }
+            ordenar(d); render();
+          } }]);
+      },
+      bimestre: function () {
+        var d = discAtual();
+        if (!d.colunas.length) { alert("Adicione datas antes de definir o bimestre."); return; }
+        abrirPainel("Definir bimestre — " + d.nome,
+          '<div class="grade"><label>Data inicial<select id="b-ini">' + opcoesDatas(d) + "</select></label>"
+          + '<label>Data final<select id="b-fim">' + opcoesDatas(d) + "</select></label>"
+          + '<label>Bimestre<select id="b-b">' + BIMS.replace('<option value="">Sem bimestre</option>', "") + "</select></label></div>"
+          + '<p class="ajuda">Todas as datas entre as duas escolhidas ficam marcadas com o bimestre.</p>',
+          [{ txt: "Remover marcação", fn: function () { marcarBim(d, ""); } },
+           { txt: "Cancelar", fn: function () {} },
+           { txt: "Aplicar bimestre", principal: true, fn: function () { marcarBim(d, $("b-b").value); } }]);
+        $("b-fim").value = d.colunas[d.colunas.length - 1].data;
+      },
+      remdata: function () {
+        var d = discAtual();
+        if (!d.colunas.length) { alert("Não há datas neste relatório."); return; }
+        abrirPainel("Remover data — " + d.nome,
+          '<div class="grade"><label>Data<select id="r-d">' + opcoesDatas(d) + "</select></label></div>"
+          + '<p class="ajuda">A coluna sai do relatório, com as marcações de todos os alunos nesse dia.</p>',
+          [{ txt: "Cancelar", fn: function () {} }, { txt: "Remover", principal: true, fn: function () {
+            var iso = $("r-d").value, i = d.colunas.map(function (c) { return c.data; }).indexOf(iso);
+            if (i < 0) return;
+            d.colunas.splice(i, 1);
+            d.alunos.forEach(function (al) { al.cel.splice(i, 1); });
+            render();
+          } }]);
+        $("r-d").value = d.colunas[d.colunas.length - 1].data;
+      },
+      limpar: function () {
+        var d = discAtual();
+        if (!confirm("Apagar todas as marcações de presença e falta de " + d.nome + "?")) return;
+        d.alunos.forEach(function (al) { al.cel = al.cel.map(function () { return [0, 0, 0]; }); });
+        render();
+      }
+    };
+    function marcarBim(d, bim) {
+      var a = $("b-ini").value, b = $("b-fim").value;
+      if (a > b) { alert("A data inicial não pode ser depois da final."); return false; }
+      d.colunas.forEach(function (c) { if (c.data >= a && c.data <= b) c.bim = bim; });
+      render();
+    }
+
+    // Barra: Editar, Imprimir/PDF, Salvar HTML e Compartilhar.
+    window.editar = function () { editando = !editando; if (!editando) render(); else marcarEdicao(); };
+    function fecharEdicao() { if (editando) { editando = false; render(); } fecharPainel(); }
+    function limpo() {
+      var c = document.documentElement.cloneNode(true);
+      [".toolbar", ".indice", ".aviso-edicao", ".barra-edicao", ".painel-fundo", ".rm", "script"].forEach(function (q) {
+        [].forEach.call(c.querySelectorAll(q), function (e) { e.parentNode.removeChild(e); });
+      });
+      [].forEach.call(c.querySelectorAll("[contenteditable]"), function (e) { e.removeAttribute("contenteditable"); });
+      return "<!doctype html>" + c.outerHTML;
+    }
+    function baixarArquivo(txt) {
+      var b = new Blob([txt], { type: "text/html;charset=utf-8" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(b); a.download = NOME + ".html";
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    }
+    window.imprimir = function () { fecharEdicao(); setTimeout(function () { window.print(); }, 50); };
+    window.baixarHtml = function () { fecharEdicao(); baixarArquivo(limpo()); };
+    window.compartilhar = function () {
+      fecharEdicao();
+      var html = limpo();
+      var arq = new File([html], NOME + ".html", { type: "text/html" });
+      if (navigator.canShare && navigator.canShare({ files: [arq] })) return navigator.share({ files: [arq], title: document.title }).catch(function () {});
+      baixarArquivo(html);
+      alert("Este aparelho não compartilha arquivos direto. O HTML foi baixado: envie por e-mail ou WhatsApp.");
+    };
+    render();
   }
+
   function cssDoc() {
     return ":root{--text:#1f2937;--line:#64748b;--green:#16812a;--present-bg:#dcfce7;--present-fg:#166534;--absent-bg:#fee2e2;--absent-fg:#991b1b;--just-bg:#fef3c7;--just-fg:#92400e}"
       + "*{box-sizing:border-box}html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:#eef2f6}body{font-size:10px}"
@@ -555,7 +747,21 @@
       + ".legend .p{background:var(--present-bg)}.legend .f{background:var(--absent-bg)}.legend .j{background:var(--just-bg)}.legend .v{background:#f1f5f9}"
       + ".toolbar #bt-editar{background:#fde68a}.editando .toolbar #bt-editar{background:#86efac}"
       + ".aviso-edicao{position:sticky;top:44px;z-index:9;margin:0;padding:7px 12px;background:#fef3c7;color:#92400e;font-weight:700;text-align:center;font-size:12px}"
-      + ".editando .page{outline:2px dashed #f59e0b;outline-offset:2px}.editando .page td:hover,.editando .page .editable:hover{background:#fffbeb}"
+      + ".barra-edicao{position:sticky;top:44px;z-index:9;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:7px 12px;background:#fff7e0;border-bottom:1px solid #f0d58a;font-size:12px}"
+      + ".barra-edicao button,.barra-edicao select{border:1px solid #cbd5e1;border-radius:6px;padding:6px 9px;font:inherit;font-weight:700;background:#fff;cursor:pointer}"
+      + ".aviso-edicao{top:44px}.editando .aviso-edicao{position:static}"
+      + ".rm{display:none;margin-left:4px;border:0;background:#fee2e2;color:#991b1b;border-radius:4px;font-size:9px;font-weight:800;cursor:pointer;padding:1px 5px}"
+      + ".editando .rm{display:inline-block}.editando td.attendance{cursor:pointer}.editando td.attendance:hover{outline:2px solid #f59e0b;outline-offset:-2px}"
+      + ".editando [contenteditable]{outline:1px dashed #f59e0b;outline-offset:1px;background:#fffbeb;cursor:text}"
+      + ".painel-fundo{position:fixed;inset:0;z-index:50;background:rgba(15,23,42,.48);display:flex;align-items:center;justify-content:center;padding:20px}"
+      + ".painel{width:min(520px,96vw);background:#fff;border-radius:10px;box-shadow:0 20px 50px rgba(0,0,0,.22);padding:16px;font-size:12px}"
+      + ".painel-cab{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;font-size:14px}.painel-x{border:0;background:transparent;font-size:24px;cursor:pointer;color:#475569}"
+      + ".painel .grade{display:grid;grid-template-columns:1fr 1fr;gap:12px}.painel label{display:flex;flex-direction:column;gap:5px;font-weight:700;color:#475569}"
+      + ".painel input,.painel select{border:1px solid #cbd5e1;border-radius:6px;padding:8px 9px;font:inherit;font-size:13px;color:#111827;background:#fff}"
+      + ".painel .linha{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px}.painel .linha label{flex-direction:row;align-items:center;gap:6px}"
+      + ".painel .ajuda{margin:12px 0 0;color:#64748b;line-height:1.35}.painel-acoes{display:flex;justify-content:flex-end;gap:8px;margin-top:15px;flex-wrap:wrap}"
+      + ".painel-acoes button{border:1px solid #cbd5e1;border-radius:6px;padding:8px 11px;font-weight:700;cursor:pointer;background:#fff}.painel-acoes .principal{background:#111827;color:#fff;border-color:#111827}"
+      + "[hidden]{display:none!important}"
       + ".indice{max-width:297mm;margin:12px auto 0;padding:8px 12px;background:#fff;border-left:4px solid var(--green);font-size:12px;color:#334155}"
       + ".continua{margin:1.2mm 0 0;text-align:right;font-size:8.4px;font-style:italic;color:#475569}"
       + ".page-number{flex:0 0 auto;margin-left:auto;font-size:8px;font-weight:700;color:#334155;white-space:nowrap}"
@@ -580,7 +786,7 @@
       + "@page{size:A4 landscape;margin:7mm 7mm 18mm}"
       + "@media print{html,body{background:#fff}.toolbar{display:none!important}"
       + ".page{position:static;width:auto;min-height:auto;margin:0;padding:0 0 12mm;box-shadow:none;page-break-after:always}"
-      + ".indice,.aviso-edicao{display:none!important}.page{outline:none!important}"
+      + ".indice,.aviso-edicao,.barra-edicao,.painel-fundo,.rm{display:none!important}.page{outline:none!important}"
       + ".page:last-of-type{page-break-after:auto}.table-wrap{overflow:visible}thead{display:table-header-group}tr{break-inside:avoid;page-break-inside:avoid}"
       + ".attendance,thead th{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}"
       + ".page-footer{position:fixed!important;left:7mm;right:7mm;bottom:3mm;padding-top:1mm;min-height:9mm;background:#fff;border-top:1px solid #cbd5e1;z-index:999}"

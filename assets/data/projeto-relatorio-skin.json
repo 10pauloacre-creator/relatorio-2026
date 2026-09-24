@@ -1,5 +1,5 @@
 {
-  "versao": 7,
+  "versao": 8,
   "atualizadoEm": "2026-09-25",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -414,7 +414,8 @@
               "1 hora de aula = 1 aula: um dia com 4h vale 4 aulas e 4 faltas para quem faltou; a aula dividida entre dois bimestres conta uma vez só.",
               "Filtros de disciplina, bimestre e período, com prévia e total de faltas antes de emitir.",
               "Documento: disciplinas em sequência, datas que continuam de uma folha para a outra e Pres./Faltas/Freq. só depois da última aula; assinatura na última folha e “Página X de Y”.",
-              "Barra do documento: ✏️ Editar, 🖨️ Imprimir / PDF, 🌐 Salvar HTML e 🔗 Compartilhar (imprimir e salvar levam as edições). Word e Excel removidos em 25/09/2026."
+              "Barra do documento: ✏️ Editar, 🖨️ Imprimir / PDF, 🌐 Salvar HTML e 🔗 Compartilhar (imprimir e salvar levam as edições). Word e Excel removidos em 25/09/2026.",
+              "Editar como no modelo do professor: clicar na célula alterna presença/falta/justificada/sem chamada; + Aluno, excluir aluno, adicionar período, definir bimestre, remover data e limpar marcações; totais e folhas recalculados. Só muda o documento, não o diário."
             ]
           }
         ]
@@ -823,6 +824,11 @@
         {
           "id": "rs-notas-17",
           "text": "Documento da frequência: datas contínuas, totais só no fim, botão Editar e salvar em PDF/HTML",
+          "done": true
+        },
+        {
+          "id": "rs-notas-18",
+          "text": "Edição completa do documento da frequência (alunos, células, datas e bimestres), como no modelo",
           "done": true
         }
       ]
