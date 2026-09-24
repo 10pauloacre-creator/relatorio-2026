@@ -27,6 +27,7 @@ window.NOVO_DIARIO_MANUAL = true;
 <script defer src="assets/js/conta-skin.js?v=20260922a"></script>
 <script defer src="assets/js/meu-diario-recursos.js?v=20260921a"></script>
 <script defer src="assets/js/meu-diario-ia.js?v=20260922a"></script>
+<script defer src="assets/js/frequencia-diaria.js?v=20260924a"></script>
 <script defer src="assets/js/novo-diario.js?v=20260921c"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--og:#876020;--card:#fff;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px;
@@ -438,6 +439,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       sec.querySelector('.th').innerHTML='<div class="tb">'+esc(rotuloCurto(t.nome))+'</div><div class="ti"><h2>'+esc(t.nome)+'</h2><p>'+esc(esc1?esc1.nome:'Sem escola')+' · '+anoDe(t)+' · '+t.alunos.filter(function(a){return!a.tr;}).length+' alunos · '+esc(t.disciplinas.map(function(d){return d.nome;}).join(', ')||'sem disciplinas')+'</p></div>';
       sec.querySelector('.md-acoes').innerHTML='<button type="button" class="md-btn pri" data-acao="novo">+ Novo Diário</button>'
         +'<button type="button" class="md-btn" data-acao="alunos">👥 Relatório dos alunos</button>'
+        +'<button type="button" class="md-btn" data-acao="freq">📊 Frequência Diária</button>'
         +'<button type="button" class="md-btn" data-acao="ia">🤖 Registrar com a I.A</button>';
       sec.querySelector('[data-acao="novo"]').onclick=function(){
         if(!t.disciplinas.length){toast('Cadastre ao menos uma disciplina em ⚙️ Configurações.');irPara('config');return;}
@@ -445,6 +447,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
         window.novoDiarioAbrir(t.id);
       };
       sec.querySelector('[data-acao="alunos"]').onclick=function(){abrirListaAlunos(t.id);};
+      sec.querySelector('[data-acao="freq"]').onclick=function(){abrirFrequencia(t.id);};
       sec.querySelector('[data-acao="ia"]').onclick=function(){irPara('ia');if(window.MeuDiarioIA)window.MeuDiarioIA.sugerir('Registre a aula de hoje da turma '+t.nome+': ');};
       var lista=sec.querySelector('.md-lista');
       if(!lista.querySelector('.md-vazio'))lista.insertAdjacentHTML('afterbegin','<div class="md-card md-vazio" hidden>Nenhum diário ainda. Toque em <strong>+ Novo Diário</strong> para registrar a primeira aula — ou peça à 🤖 I.A.</div>');
@@ -958,6 +961,46 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     cadaModulo('exportar').forEach(function(x){if(x)Object.keys(x).forEach(function(k){dados[k]=x[k];});});
     var blob=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
     var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='meu-diario-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();
+  }
+
+  // ── Frequência Diária (24/09/2026) ──────────────────────────────────
+  // Uma coluna por dia de aula: 1 hora de aula = 1 aula. O bimestre de cada
+  // aula vem da soma das h/aula da disciplina (mesma regra do Contador).
+  function registrosFrequencia(tid){
+    var t=turma(tid);if(!t)return[];
+    var porDisc={};
+    diarios().filter(function(d){return d.turma===tid;}).forEach(function(d){
+      (porDisc[d.disc]=porDisc[d.disc]||[]).push(d);
+    });
+    var saida=[];
+    Object.keys(porDisc).forEach(function(discId){
+      var disc=t.disciplinas.filter(function(x){return x.id===discId;})[0];
+      var meta=Math.max(1,(disc&&disc.metaBim)||10);
+      var total=Math.max(meta,(disc&&disc.total)||meta*4);
+      var nb=Math.max(1,Math.round(total/meta));
+      var acum=0;
+      porDisc[discId].slice().sort(function(a,b){return (a.dateKey+(a.ini||'')).localeCompare(b.dateKey+(b.ini||''));}).forEach(function(d){
+        var horas=Math.max(1,parseInt(d.horas,10)||1);
+        saida.push({data:d.dateKey,turma:tid,disciplina:(disc&&disc.nome)||d.discNome||'Disciplina',
+          horas:horas,bimestre:String(Math.min(nb,Math.floor(acum/meta)+1)),chave:d.id});
+        acum+=horas;
+      });
+    });
+    return saida;
+  }
+  function abrirFrequencia(tid){
+    if(!window.FrequenciaDiaria)return toast('Recarregue a página para abrir a Frequência Diária.');
+    var t=turma(tid),e=escolaAtual();
+    window.FrequenciaDiaria.abrir({
+      turma:tid, rotuloTurma:t?t.nome:'Turma',
+      escola:e?e.nome:'', professor:perfilNome(),
+      registros:function(){return registrosFrequencia(tid);},
+      alunos:function(){return (turma(tid)||{alunos:[]}).alunos;},
+      presenca:function(id){
+        var d=diarios().filter(function(x){return x.id===id;})[0];
+        return d?{faltaram:(d.rel&&d.rel.faltaram)||[],faltJ:(d.rel&&d.rel.faltJ)||[]}:null;
+      }
+    });
   }
 
   // ── Relatório do aluno ──────────────────────────────────────────────

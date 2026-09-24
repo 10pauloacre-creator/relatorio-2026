@@ -1613,6 +1613,50 @@ function rhDiarySortDisciplinas(values) {
   });
 }
 
+// Frequência Diária (24/09/2026): cada relato da turma vira uma coluna com as
+// h/aula oficiais (regra dos 15 minutos) e o bimestre pela carga; a presença
+// sai de PRESENCA_RH['pl-<código>'].
+function rhFrequenciaRegistros(turmaId) {
+  var mapaBim = rhColetarMapaBimestresPanes() || {};
+  var registros = [];
+  var sec = document.getElementById('sec-' + turmaId);
+  if (!sec) return registros;
+  sec.querySelectorAll('.ea').forEach(function(card) {
+    if (typeof rhCardContaNoPainel === 'function' && !rhCardContaNoPainel(card)) return;
+    var pane = card.querySelector('.ipane[id^="p-"]');
+    var titulo = card.querySelector('.em .ed');
+    var infoDisc = normalizarDiscRH(titulo ? titulo.textContent : '');
+    var dataObj = parseDataCardRH(card);
+    if (!pane || !infoDisc || !dataObj) return;
+    var horas = Math.max(1, Math.round(rhHorasOficiaisCard(card, parseHorasRH(titulo ? titulo.textContent : '')) || 1));
+    var codigo = pane.id.slice(2);
+    registros.push({
+      data: rhDataChaveIso(dataObj),
+      turma: turmaId,
+      disciplina: infoDisc.disc,
+      horas: horas,
+      bimestre: mapaBim['a-' + codigo] || '',
+      chave: 'pl-' + codigo
+    });
+  });
+  return registros;
+}
+function rhAbrirFrequencia(sectionId) {
+  if (!window.FrequenciaDiaria) { alert('Recarregue a página para abrir a Frequência Diária.'); return; }
+  var turmaId = RH_SECOES_TURMA[sectionId] || sectionId.replace('sec-', '');
+  var sub = document.querySelector('.cab-t .sub');
+  var prof = document.querySelector('.cab-t .prof');
+  window.FrequenciaDiaria.abrir({
+    turma: turmaId,
+    rotuloTurma: RH_TURMA_LABELS[turmaId] || turmaId,
+    escola: sub ? sub.textContent.split('·')[0].trim() : 'E.E. Raimundo Hermínio de Melo',
+    professor: prof ? (prof.textContent.replace(/[✦]/g, '').split('·')[0] || '').replace(/^Prof\.?\s*/i, '').trim() : '',
+    registros: function() { return rhFrequenciaRegistros(turmaId); },
+    alunos: function(t) { return ALUNOS_RH[t] || []; },
+    presenca: function(chave) { return PRESENCA_RH[chave] || null; }
+  });
+}
+
 function rhDiaryCollectRecords() {
   var cutoff = rhDiaryTodayCutoff();
   var records = [];
@@ -2121,6 +2165,16 @@ function rhEnsureDiaryButtons() {
     button.textContent = 'Relat\u00f3rios Di\u00e1rios';
     rhBindDiaryButton(button, sectionId);
     actions.appendChild(button);
+    // Frequencia Diaria: so nas abas de turma.
+    if (sectionId !== 'sec-all' && !actions.querySelector('[data-rh-freq-btn="1"]')) {
+      var freq = document.createElement('button');
+      freq.type = 'button';
+      freq.className = 'rh-hero-btn ghost';
+      freq.setAttribute('data-rh-freq-btn', '1');
+      freq.textContent = 'Frequ\u00eancia Di\u00e1ria';
+      freq.onclick = function() { rhAbrirFrequencia(sectionId); };
+      actions.appendChild(freq);
+    }
   });
 }
 
