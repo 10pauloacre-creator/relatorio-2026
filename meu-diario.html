@@ -26,7 +26,10 @@ window.NOVO_DIARIO_MANUAL = true;
 <script defer src="assets/js/ano-letivo.js?v=20260921a"></script>
 <script defer src="assets/js/conta-skin.js?v=20260922a"></script>
 <script defer src="assets/js/meu-diario-recursos.js?v=20260921a"></script>
-<script defer src="assets/js/meu-diario-ia.js?v=20260922a"></script>
+<script defer src="assets/js/documentos-exportar.js?v=20260924a"></script>
+<script defer src="assets/js/meu-diario-documentos.js?v=20260924a"></script>
+<script defer src="assets/js/ia-ferramentas.js?v=20260924a"></script>
+<script defer src="assets/js/meu-diario-ia.js?v=20260924a"></script>
 <script defer src="assets/js/frequencia-diaria.js?v=20260925b"></script>
 <script defer src="assets/js/novo-diario.js?v=20260921c"></script>
 <style>
@@ -274,7 +277,7 @@ html.dark-2026 .itab.on{color:var(--dark-accent)!important;border-bottom-color:v
 <main class="main" id="md-main">
   <section class="sec" id="sec-inicio"></section>
   <section class="sec" id="sec-plano"></section>
-  <section class="sec" id="sec-seq"></section>
+  <section class="sec" id="sec-docs"></section>
   <section class="sec" id="sec-livros"></section>
   <section class="sec" id="sec-cal"></section>
   <section class="sec" id="sec-cont"></section>
@@ -289,9 +292,12 @@ html.dark-2026 .itab.on{color:var(--dark-accent)!important;border-bottom-color:v
    Dados particulares em professor_dados (RLS: só o dono), em três escopos:
      "meu-diario:estrutura:v1"  escolas, turmas, alunos e disciplinas (aqui)
      "meu-diario:diarios:v1"    diários (novo-diario.js)
-     "meu-diario:recursos:v1"   plano de aulas, sequências, livros e calendário
+     "meu-diario:recursos:v1"   plano de aulas, livros e calendário
                                 (meu-diario-recursos.js)
-   A aba 🤖 I.A (meu-diario-ia.js) usa a chave de API do próprio professor.
+     "meu-diario:documentos:v1" 📁 Documentos: sequências, planos, relatórios
+                                em pastas (meu-diario-documentos.js)
+   A aba 🤖 I.A (meu-diario-ia.js) usa a IA da plataforma ou a chave do professor;
+   o filtro 🧰 Ferramentas vem de ia-ferramentas.js.
    Os módulos entram por window.MD_MODULOS e recebem a API window.MeuDiario.
    ═══════════════════════════════════════════════════════════════════════ */
 function tog(h){var c=h.nextElementSibling,t=h.querySelector('.et'),o=c.classList.contains('on');c.classList.toggle('on',!o);if(t)t.classList.toggle('op',!o);}
@@ -407,7 +413,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   function abas(){
     return [{id:'inicio',rotulo:'🏠 Início'}]
       .concat(turmasVis().map(function(t){return{id:t.id,rotulo:t.nome};}))
-      .concat([{id:'plano',rotulo:'📚 Conteúdos'},{id:'seq',rotulo:'🗂 Sequências'},{id:'livros',rotulo:'📖 Livros'},{id:'cal',rotulo:'📆 Calendário'},{id:'cont',rotulo:'📊 Contador'},{id:'ia',rotulo:'🤖 I.A'},{id:'config',rotulo:'⚙️ Configurações'}]);
+      .concat([{id:'plano',rotulo:'📚 Conteúdos'},{id:'docs',rotulo:'📁 Documentos'},{id:'livros',rotulo:'📖 Livros'},{id:'cal',rotulo:'📆 Calendário'},{id:'cont',rotulo:'📊 Contador'},{id:'ia',rotulo:'🤖 I.A'},{id:'config',rotulo:'⚙️ Configurações'}]);
   }
   function irPara(id){
     if(!document.getElementById('sec-'+id))id='inicio';
@@ -807,20 +813,21 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       +'<div class="md-perigo-l"><div><b>Excluir uma turma</b><span>Some com os alunos, os diários, o plano, as sequências e os livros da turma.</span></div>'
       +(vis.length?'<div class="md-row"><select class="md-in" data-pg="turma">'+vis.map(function(t){return '<option value="'+t.id+'">'+esc(t.nome)+'</option>';}).join('')+'</select><button type="button" class="md-btn perigo" data-pg="excluir-turma">Excluir turma</button></div>':'<span style="font-size:.8rem;color:var(--cm)">Nenhuma turma em '+ANO+'.</span>')+'</div>'
       +(vis.length>1?'<div class="md-perigo-l"><div><b>Excluir todas as turmas de '+ANO+'</b><span>Apaga as '+vis.length+' turmas deste ano letivo e tudo o que está ligado a elas. Os outros anos ficam.</span></div><button type="button" class="md-btn perigo" data-pg="excluir-ano">Excluir turmas de '+ANO+'</button></div>':'')
-      +'<div class="md-perigo-l"><div><b>Excluir a escola</b><span>Apaga a escola, as '+turmasDaEscola().length+' turma(s) de todos os anos, os diários, o plano, as sequências, os livros e os eventos do calendário dela.</span></div><button type="button" class="md-btn perigo" data-pg="excluir-escola">Excluir escola</button></div>'
+      +'<div class="md-perigo-l"><div><b>Excluir a escola</b><span>Apaga a escola, as '+turmasDaEscola().length+' turma(s) de todos os anos, os diários, o plano, os documentos, os livros e os eventos do calendário dela.</span></div><button type="button" class="md-btn perigo" data-pg="excluir-escola">Excluir escola</button></div>'
       +'</div>';
   }
   function excluirTurmas(ids){
     E.turmas=E.turmas.filter(function(t){return ids.indexOf(t.id)<0;});
     if(window.NovoDiario)window.NovoDiario.removerTurmas(ids);
     if(window.MeuDiarioRecursos)window.MeuDiarioRecursos.removerTurmas(ids);
+    if(window.MeuDiarioDocumentos)window.MeuDiarioDocumentos.removerTurmas(ids);
     return salvar('excluir');
   }
   function ligarBlocoPerigo(sec){
     var bt=sec.querySelector('[data-pg="excluir-turma"]');
     if(bt)bt.onclick=function(){
       var t=turma(sec.querySelector('[data-pg="turma"]').value);if(!t)return;
-      C().confirmarPerigo({titulo:'Excluir a turma "'+t.nome+'"?',texto:'Os '+t.alunos.length+' alunos, os diários, a presença, as atividades, o plano, as sequências e os livros desta turma serão apagados.',botao:'Sim, excluir a turma'}).then(function(ok){
+      C().confirmarPerigo({titulo:'Excluir a turma "'+t.nome+'"?',texto:'Os '+t.alunos.length+' alunos, os diários, a presença, as atividades, o plano, os documentos e os livros desta turma serão apagados.',botao:'Sim, excluir a turma'}).then(function(ok){
         if(!ok)return;excluirTurmas([t.id]);toast('Turma excluída.');irPara('config');
       });
     };
@@ -833,11 +840,12 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
     };
     sec.querySelector('[data-pg="excluir-escola"]').onclick=function(){
       var e=escolaAtual();
-      C().confirmarPerigo({titulo:'Excluir a escola "'+e.nome+'"?',texto:'<b>Todos os registros desta escola serão apagados</b>: turmas (de todos os anos), alunos, diários, presença, atividades, plano de aulas, sequências, livros e eventos. Alunos da Educação Especial que só você acompanha também são apagados, com os documentos; nos que têm outros profissionais, você só sai do perfil. As outras escolas não mudam.',botao:'Sim, excluir a escola',botaoFinal:'Excluir a escola e todos os registros'}).then(function(ok){
+      C().confirmarPerigo({titulo:'Excluir a escola "'+e.nome+'"?',texto:'<b>Todos os registros desta escola serão apagados</b>: turmas (de todos os anos), alunos, diários, presença, atividades, plano de aulas, documentos, livros e eventos. Alunos da Educação Especial que só você acompanha também são apagados, com os documentos; nos que têm outros profissionais, você só sai do perfil. As outras escolas não mudam.',botao:'Sim, excluir a escola',botaoFinal:'Excluir a escola e todos os registros'}).then(function(ok){
         if(!ok)return;
         var ids=turmasDaEscola().map(function(t){return t.id;});
         if(window.NovoDiario)window.NovoDiario.removerTurmas(ids);
         if(window.MeuDiarioRecursos)window.MeuDiarioRecursos.removerTurmas(ids,ESCOLA_ID);
+        if(window.MeuDiarioDocumentos)window.MeuDiarioDocumentos.removerTurmas(ids,ESCOLA_ID);
         E.turmas=E.turmas.filter(function(t){return ids.indexOf(t.id)<0;});
         E.escolas=E.escolas.filter(function(x){return x.id!==ESCOLA_ID;});
         toast('Excluindo a escola…');
