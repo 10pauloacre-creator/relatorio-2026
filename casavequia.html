@@ -8493,11 +8493,32 @@ function pcMontarRetratoLancamentos(){
       }).forEach(function(item){if(item.d)retrato.ocorrencias.push(item);});
     });
   });
+  // Relato interdisciplinar ("LP (1h) + T. Linguagens (1h)"): o contador divide
+  // as horas entre as disciplinas; o banco recebe uma linha por disciplina
+  // (a 2ª com o código "<relato>-<grupo>"), senão a frequência do Relatório
+  // Individual punha as 2h numa disciplina só (corrigido em 25/09/2026).
+  var PC_GRUPO_NOME={lp:'Língua Portuguesa',tl:'Trilhas de Linguagens',tc:'Trilhas de C. Humanas',ar:'Artes'};
+  var partes={},log=pcProjectionBuildLessonLog();
+  Object.keys(log).forEach(function(g){Object.keys(log[g]).forEach(function(t){log[g][t].forEach(function(e){
+    (partes[e.entryId]=partes[e.entryId]||[]).push({disc:PC_GRUPO_NOME[g]||'',horas:e.hours});
+  });});});
+  Object.keys(aulas).forEach(function(k){
+    var aula=aulas[k],lista=partes['p-'+aula.c];
+    if(!aula.p||!lista||lista.length<2)return;
+    var principal=lista.filter(function(x){return x.disc===aula.disc;})[0]||lista[0];
+    aula.disc=principal.disc;aula.carga=principal.horas;
+    lista.forEach(function(x){
+      if(x===principal||!x.disc)return;
+      var extra=Object.assign({},aula,{c:aula.c+'-'+Object.keys(PC_GRUPO_NOME).filter(function(g){return PC_GRUPO_NOME[g]===x.disc;})[0],disc:x.disc,carga:x.horas,a:null,origem:aula.c});
+      aulas[extra.c]=extra;
+    });
+  });
   var bimestres=pcBimestresPorCarga();
   retrato.aulas=Object.keys(aulas).sort().map(function(k){
-    var aula=aulas[k];
-    aula.b=bimestres.resolver(aula.t,aula.c,aula.disc,aula.d);
-    aula.hd=bimestres.horas(aula.c,aula.disc);
+    var aula=aulas[k],cod=aula.origem||aula.c;
+    delete aula.origem;
+    aula.b=bimestres.resolver(aula.t,cod,aula.disc,aula.d);
+    aula.hd=bimestres.horas(cod,aula.disc);
     if(aula.a)aula.vp=pcAtividadeValePonto(aula.c);
     return aula;
   });
@@ -8666,7 +8687,7 @@ function pcDecorateSectionHero(sectionId,cfg){
 var PC_DIARY_SECTION_LABELS={'sec-all':'Geral','sec-t1':'1ª Série','sec-t2':'2ª Série','sec-t3':'3ª Série','sec-t6':'6º Ano'};
 // Frequência Diária (24/09/2026): usa as mesmas aulas do contador/relatórios
 // (pcDiaryCollectRecords: data, disciplina, h/aula e bimestre pela carga) e a
-// presença de cada relato (PRESENCA['pl-<código>']).
+// presença que o diário mostra (PRESENCA + cliques da aba 👥, pcResolvePresenceStatus).
 function pcFrequenciaProfessor(){
   var el=document.querySelector('.cab-t .prof');
   var txt=el?el.textContent.replace(/[✦]/g,'').trim():'';
@@ -8690,7 +8711,15 @@ function pcAbrirFrequencia(sectionId){
       });
     },
     alunos:function(t){return (typeof ALUNOS!=='undefined'&&ALUNOS[t])||[];},
-    presenca:function(chave){return (typeof PRESENCA!=='undefined'&&PRESENCA[chave])||null;}
+    ordem:PC_DIARY_DISC_ORDER,
+    // Mesma regra da aba 👥 e dos lançamentos no banco: lista do relato +
+    // cliques (_presManual); aluno que entrou depois fica sem chamada.
+    estado:function(chave,n){
+      var cfg=PRESENCA[chave];if(!cfg)return null;
+      var al=(ALUNOS[turmaId]||[]).filter(function(a){return a.n===n;})[0];
+      if(al&&pcAntesDaEntrada(al,chave))return null;
+      return PC_PRES_CODIGO[pcResolvePresenceStatus(chave,n,cfg)]||'p';
+    }
   });
 }
 var PC_DIARY_DISC_ORDER=['Língua Portuguesa','Trilhas de Linguagens','Trilhas de C. Humanas','Artes'];
@@ -9008,8 +9037,11 @@ function pcDiaryDownloadCurrentPdf(){
 }
 PC_DIARY_SECTION_LABELS={'sec-all':'Geral','sec-t1':'1ª Série','sec-t2':'2ª Série','sec-t3':'3ª Série','sec-t6':'6º Ano'};
 PC_DIARY_DISC_ORDER=['Língua Portuguesa','Trilhas de Linguagens','Trilhas de C. Humanas','Artes'];
-var PC_DIARY_REPORT_CUTOFF=new Date(2026,8,18,23,59,59,999);
-var PC_DIARY_REPORT_DATE_LABEL='18/09/2026';
+// Corte dos relatórios = hoje (até 24/09/2026 estava fixo em 18/09 e as aulas
+// seguintes sumiam do Relatório diários e da Frequência Diária).
+var PC_DIARY_REPORT_CUTOFF=(function(){var d=new Date();d.setHours(23,59,59,999);return d;})();
+var PC_DIARY_REPORT_DATE_LABEL=('0'+PC_DIARY_REPORT_CUTOFF.getDate()).slice(-2)+'/'+('0'+(PC_DIARY_REPORT_CUTOFF.getMonth()+1)).slice(-2)+'/'+PC_DIARY_REPORT_CUTOFF.getFullYear();
+var PC_DIARY_REPORT_TODAY_KEY=PC_DIARY_REPORT_CUTOFF.getFullYear()+'-'+('0'+(PC_DIARY_REPORT_CUTOFF.getMonth()+1)).slice(-2)+'-'+('0'+PC_DIARY_REPORT_CUTOFF.getDate()).slice(-2);
 var PC_DIARY_REPORT_FILE_DATE='2026-09-18';
 function pcDiaryNormalizeTurmaLabel(value){
   var clean=String(value||'').replace(/\s+/g,' ').trim();
@@ -9332,7 +9364,7 @@ function pcDiaryResolveEntryStartMinutes(entryId){
   return pcDiaryResolveStartMinutes(chip?chip.textContent:'');
 }
 function pcDiaryCollectRecords(){
-  var todayKey=PC_DIARY_REPORT_CUTOFF.toISOString().slice(0,10);
+  var todayKey=PC_DIARY_REPORT_TODAY_KEY;
   var groupLabels={lp:'Língua Portuguesa',tl:'Trilhas de Linguagens',tc:'Trilhas de C. Humanas',ar:'Artes'};
   var records=[],sortOrder=0;
   var lessonLog=pcProjectionBuildLessonLog();
@@ -11453,7 +11485,7 @@ function iniciarSyncUniversal() {
 <script src="assets/js/alunos.js"></script>
 <script src="assets/js/novo-diario.js?v=20260921b"></script>
 <script defer src="assets/js/meu-diario-ia.js?v=20260922a"></script>
-<script defer src="assets/js/frequencia-diaria.js?v=20260924a"></script>
+<script defer src="assets/js/frequencia-diaria.js?v=20260925a"></script>
 <script defer src="assets/js/escola-ia.js?v=20260921a"></script>
 <script defer src="assets/js/cronograma-semanal.js?v=20260921a"></script>
 <script defer src="assets/js/conta-skin.js?v=20260922a"></script>

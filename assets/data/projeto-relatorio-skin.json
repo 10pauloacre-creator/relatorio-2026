@@ -1,6 +1,6 @@
 {
-  "versao": 6,
-  "atualizadoEm": "2026-09-24",
+  "versao": 7,
+  "atualizadoEm": "2026-09-25",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
     "title": "Mapa documental do RELATORIO SKIN",
@@ -410,11 +410,11 @@
             "status": "Concluído",
             "details": [
               "Botão “Frequência Diária” na aba de cada turma (Casavequia, Hermínio e Meu Diário), ao lado de “Abrir página de alunos”.",
-              "Modal com filtros de disciplina, bimestre e período (tempo total ou de um dia a outro) e prévia da tabela antes de emitir.",
-              "1 hora de aula = 1 aula: um dia com 4h da disciplina conta 4 aulas e 4 faltas para quem faltou. A aula é contada uma vez só, mesmo quando o relato é dividido entre dois bimestres.",
-              "Uma coluna por dia (“01/02”) com selo do bimestre, verde para presença, vermelho para falta, âmbar para falta justificada, e as colunas Pres./Faltas/Freq. no fim.",
-              "Uma página de relatório por disciplina, todas no mesmo documento; sai no modelo oficial (assets/img/frequencia/) com Imprimir/PDF, Word, Excel, HTML e Compartilhar.",
-              "Cada página entrega os dados por um adaptador (registros, alunos, presenca), então a regra de contagem é a mesma nas três."
+              "Presença igual à do diário: a página responde aluno por aluno (estado(chave, n)) com a regra da aba 👥 e dos lançamentos no banco — lista do relato, cliques e aluno que entrou depois.",
+              "1 hora de aula = 1 aula: um dia com 4h vale 4 aulas e 4 faltas para quem faltou; a aula dividida entre dois bimestres conta uma vez só.",
+              "Filtros de disciplina, bimestre e período, com prévia e total de faltas antes de emitir.",
+              "Documento: disciplinas em sequência, datas que continuam de uma folha para a outra e Pres./Faltas/Freq. só depois da última aula; assinatura na última folha e “Página X de Y”.",
+              "Barra do documento: ✏️ Editar, 🖨️ Imprimir / PDF, 🌐 Salvar HTML e 🔗 Compartilhar (imprimir e salvar levam as edições). Word e Excel removidos em 25/09/2026."
             ]
           }
         ]
@@ -803,6 +803,26 @@
         {
           "id": "rs-notas-13",
           "text": "Frequência Diária por turma (1h = 1 aula) com relatório em PDF, Word, Excel e HTML",
+          "done": true
+        },
+        {
+          "id": "rs-notas-14",
+          "text": "Frequência Diária com a mesma presença do diário (cliques, alunos que entraram depois, chamada da Hermínio)",
+          "done": true
+        },
+        {
+          "id": "rs-notas-15",
+          "text": "Relatório diários da Casavequia até o dia de hoje (corte fixo em 18/09 removido)",
+          "done": true
+        },
+        {
+          "id": "rs-notas-16",
+          "text": "Relato interdisciplinar enviado ao banco com uma linha por disciplina",
+          "done": true
+        },
+        {
+          "id": "rs-notas-17",
+          "text": "Documento da frequência: datas contínuas, totais só no fim, botão Editar e salvar em PDF/HTML",
           "done": true
         }
       ]

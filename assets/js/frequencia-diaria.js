@@ -18,15 +18,25 @@
 //     turma, rotuloTurma, escola, professor, turno, ano,
 //     registros(): [{ data:'AAAA-MM-DD', turma, disciplina, horas, bimestre, chave }],
 //     alunos(turma): [{ n, nm, tr }],
-//     presenca(chave): { faltaram:[n], faltJ:[n] } | null
+//     estado(chave, n): 'p' | 'f' | 'j' | null,
+//     ordem: ['Língua Portuguesa', …]      (opcional: ordem das disciplinas)
 //   })
+//
+// PRESENÇA = a mesma regra que o diário mostra (25/09/2026). A página responde
+// aluno por aluno com as funções dela (lista do relato + cliques na aba 👥 +
+// aluno que entrou depois), então a Frequência mostra exatamente as faltas
+// do diário. null = sem chamada para esse aluno nessa aula (entrou depois ou
+// a aula não teve chamada): a célula fica cinza e essas aulas não contam.
+// O antigo presenca(chave) → {faltaram, faltJ} ainda funciona como reserva.
 // ═══════════════════════════════════════════════════════════════════════
 (function () {
   "use strict";
 
   var MESES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
   var DIAS = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
-  var COLUNAS_POR_PAGINA = 12;
+  var COLUNAS_POR_PAGINA = 12;   // folha com Pres./Faltas/Freq. (a última)
+  var COLUNAS_SEM_TOTAIS = 15;   // folhas do meio, sem as colunas de totais
+  var LINHAS_POR_PAGINA = 20;
   var A = null, F = null;
 
   function esc(v) {
@@ -69,28 +79,46 @@
       return true;
     });
   }
-  // Uma coluna por dia de aula da disciplina: horas do dia e faltas de cada aluno.
-  // A mesma aula pode vir repartida em dois bimestres (Casavequia); por isso as
-  // horas são somadas por aula (chave da presença) antes de contar as faltas,
-  // senão a falta do dia seria contada duas vezes.
-  function colunas(lista) {
-    var mapa = {}, aulas = {};
+  // Estado de um aluno numa aula: 'p' | 'f' | 'j' | null (sem chamada).
+  function estadoAluno(chave, n) {
+    if (typeof A.estado === "function") {
+      var e = A.estado(chave, n);
+      return e === "p" || e === "f" || e === "j" ? e : null;
+    }
+    var p = (A.presenca && A.presenca(chave)) || null;
+    if (!p) return null;
+    if ((p.faltaram || []).indexOf(n) >= 0) return "f";
+    if ((p.faltJ || []).indexOf(n) >= 0) return "j";
+    return "p";
+  }
+  // Uma coluna por dia de aula da disciplina. A mesma aula pode vir repartida
+  // em dois bimestres (Casavequia); as horas são somadas por aula (chave)
+  // antes de contar as faltas, senão a falta do dia contaria duas vezes.
+  // Cada aluno tem, por coluna: aulas com chamada, faltas e faltas justificadas.
+  function colunas(lista, turmaAlunos) {
+    var mapa = {}, aulas = {}, ordem = [];
     lista.forEach(function (r, i) {
       var id = r.data + "|" + (r.chave || "s" + i);
       var aula = aulas[id];
-      if (!aula) aula = aulas[id] = { data: r.data, chave: r.chave, horas: 0, bimestres: {} };
+      if (!aula) { aula = aulas[id] = { data: r.data, chave: r.chave, horas: 0, bimestres: {} }; ordem.push(id); }
       aula.horas += r.horas;
       aula.bimestres[r.bimestre] = (aula.bimestres[r.bimestre] || 0) + r.horas;
     });
-    Object.keys(aulas).forEach(function (id) {
+    ordem.forEach(function (id) {
       var aula = aulas[id];
       var col = mapa[aula.data];
-      if (!col) col = mapa[aula.data] = { data: aula.data, horas: 0, bimestres: {}, faltas: {}, faltasJust: {} };
+      if (!col) col = mapa[aula.data] = { data: aula.data, horas: 0, bimestres: {}, alunos: {}, relatos: 0 };
       col.horas += aula.horas;
+      col.relatos++;
       Object.keys(aula.bimestres).forEach(function (b) { col.bimestres[b] = (col.bimestres[b] || 0) + aula.bimestres[b]; });
-      var p = (A.presenca && A.presenca(aula.chave)) || null;
-      (((p || {}).faltaram) || []).forEach(function (n) { col.faltas[n] = (col.faltas[n] || 0) + aula.horas; });
-      (((p || {}).faltJ) || []).forEach(function (n) { col.faltas[n] = (col.faltas[n] || 0) + aula.horas; col.faltasJust[n] = true; });
+      turmaAlunos.forEach(function (al) {
+        var c = col.alunos[al.n] || (col.alunos[al.n] = { aulas: 0, faltas: 0, justificadas: 0 });
+        var e = aula.chave ? estadoAluno(aula.chave, al.n) : null;
+        if (!e) return;
+        c.aulas += aula.horas;
+        if (e === "f") c.faltas += aula.horas;
+        if (e === "j") { c.faltas += aula.horas; c.justificadas += aula.horas; }
+      });
     });
     return Object.keys(mapa).sort().map(function (k) {
       var col = mapa[k];
@@ -101,27 +129,36 @@
   function alunos() {
     return (A.alunos(A.turma) || []).map(function (a) { return { n: a.n, nm: a.nm, tr: !!a.tr }; });
   }
+  function ordemDisciplinas(nomes) {
+    var ref = (A.ordem || []).map(function (x) { return String(x); });
+    return nomes.sort(function (a, b) {
+      var ia = ref.indexOf(a), ib = ref.indexOf(b);
+      if (ia < 0) ia = 999; if (ib < 0) ib = 999;
+      return ia - ib || a.localeCompare(b, "pt-BR");
+    });
+  }
   // Uma tabela por disciplina (cada disciplina vira um relatório próprio).
   function tabelas() {
     var lista = filtrar(registros());
     var porDisc = {};
     lista.forEach(function (r) { (porDisc[r.disciplina] = porDisc[r.disciplina] || []).push(r); });
-    var nomes = Object.keys(porDisc).sort();
+    var nomes = ordemDisciplinas(Object.keys(porDisc));
     var turmaAlunos = alunos();
     return nomes.map(function (nome) {
-      var cols = colunas(porDisc[nome]);
+      var cols = colunas(porDisc[nome], turmaAlunos);
       var linhas = turmaAlunos.map(function (al) {
-        var faltas = 0, aulas = 0;
+        var faltas = 0, aulas = 0, just = 0;
         var celulas = cols.map(function (c) {
-          var f = c.faltas[al.n] || 0;
-          faltas += f; aulas += c.horas;
-          return { horas: c.horas, faltas: f, justificada: !!c.faltasJust[al.n] };
+          var x = c.alunos[al.n] || { aulas: 0, faltas: 0, justificadas: 0 };
+          faltas += x.faltas; aulas += x.aulas; just += x.justificadas;
+          return { horas: c.horas, aulas: x.aulas, faltas: x.faltas, justificadas: x.justificadas };
         });
-        return { n: al.n, nm: al.nm, tr: al.tr, celulas: celulas, faltas: faltas, aulas: aulas, presencas: aulas - faltas };
+        return { n: al.n, nm: al.nm, tr: al.tr, celulas: celulas, faltas: faltas, justificadas: just, aulas: aulas, presencas: aulas - faltas };
       });
       return {
         disciplina: nome, colunas: cols, linhas: linhas,
         totalAulas: cols.reduce(function (s, c) { return s + c.horas; }, 0),
+        totalFaltas: linhas.reduce(function (s, l) { return s + l.faltas; }, 0),
         bimestres: cols.map(function (c) { return c.bimestre; }).filter(function (v, i, l) { return v && l.indexOf(v) === i; }).sort()
       };
     });
@@ -280,7 +317,8 @@
     m.querySelector("#fd-resumo-copy").textContent = tabs.length
       ? totalDatas + " dia(s) de aula · " + totalAulas + " aula(s) · " + alunos().length + " alunos · "
         + (F.periodo === "intervalo" && (F.de || F.ate) ? "de " + dataBr(F.de) + " a " + dataBr(F.ate) : "tempo total")
-        + (tabs.length > 1 ? " · " + tabs.length + " relatórios (um por disciplina)" : "")
+        + (tabs.length > 1 ? " · " + tabs.length + " relatórios em sequência (um por disciplina)" : "")
+        + " · " + tabs.reduce(function (s, t) { return s + t.totalFaltas; }, 0) + " falta(s) no período"
       : "Nenhuma aula registrada com esses filtros.";
     m.querySelector("#fd-gerar").disabled = !tabs.length;
     m.querySelector("#fd-previa").innerHTML = tabs.length ? tabs.map(previaTabela).join("") : '<div class="fd-vazio">Nenhuma aula lançada com esses filtros.<br>Troque a disciplina, o bimestre ou o período.</div>';
@@ -297,58 +335,125 @@
     var corpo = t.linhas.map(function (l) {
       return '<tr class="' + (l.tr ? "tr" : "") + '"><td class="fd-al">' + l.n + ". " + esc(l.nm) + (l.tr ? " (transf.)" : "") + "</td>"
         + l.celulas.map(celula).join("")
-        + "<td>" + l.presencas + "</td><td><b>" + l.faltas + "</b></td><td>" + freq(l) + "</td></tr>";
+        + "<td>" + l.presencas + "</td><td><b>" + l.faltas + "</b>" + (l.justificadas ? ' <small title="justificadas">(' + l.justificadas + " j)</small>" : "") + "</td><td>" + freq(l) + "</td></tr>";
     }).join("");
-    return '<h4 class="fd-tabela-nome">' + esc(t.disciplina) + " — " + t.colunas.length + " dia(s), " + t.totalAulas + " aula(s)</h4>"
+    return '<h4 class="fd-tabela-nome">' + esc(t.disciplina) + " — " + t.colunas.length + " dia(s), " + t.totalAulas + " aula(s), " + t.totalFaltas + " falta(s)</h4>"
       + '<div class="fd-rolagem"><table class="fd-tab"><thead><tr><th class="fd-al">Aluno(a)</th>' + cab
       + "<th>Pres.</th><th>Faltas</th><th>Freq.</th></tr></thead><tbody>" + corpo + "</tbody></table></div>";
   }
+  // Classe e número de uma célula (prévia, documento e Excel usam a mesma regra).
+  function tipoCelula(c) {
+    if (!c.aulas) return { cls: "v", txt: "–", dica: "sem chamada para este aluno" };
+    if (c.faltas > 0) {
+      var todas = c.justificadas >= c.faltas;
+      var dica = c.faltas + " falta(s) de " + c.aulas + " aula(s)" + (c.justificadas ? " · " + c.justificadas + " justificada(s)" : "");
+      return { cls: todas ? "j" : "f", txt: String(c.faltas), dica: dica, parcialJ: !!c.justificadas && !todas };
+    }
+    return { cls: "p", txt: String(c.aulas), dica: c.aulas + " aula(s) presente" };
+  }
   function celula(c) {
-    if (!c.horas) return '<td class="v">—</td>';
-    if (c.faltas > 0) return '<td class="' + (c.justificada ? "j" : "f") + '" title="' + c.faltas + " falta(s) de " + c.horas + ' aula(s)' + (c.justificada ? " · justificada" : "") + '">' + c.faltas + "</td>";
-    return '<td class="p" title="' + c.horas + ' aula(s)">' + c.horas + "</td>";
+    var t = tipoCelula(c);
+    return '<td class="' + t.cls + '" title="' + t.dica + '">' + t.txt + (t.parcialJ ? "<sup>j</sup>" : "") + "</td>";
   }
   function freq(l) { return l.aulas ? Math.round((l.aulas - l.faltas) / l.aulas * 100) + "%" : "—"; }
 
   // ── Relatório (modelo do professor) ───────────────────────────────────
+  // Cada disciplina começa numa página nova e as disciplinas seguem uma após a
+  // outra. Dentro de cada uma: bloco de datas 1 (alunos 1–N, N+1–…), bloco de
+  // datas 2… A assinatura fica na última folha de cada disciplina, e todas as
+  // páginas levam "Página X de Y" do documento inteiro.
   function paginasDaTabela(t) {
-    var partes = [], i = 0;
-    if (!t.colunas.length) return [{ colunas: [], indice: 0, total: 1 }];
-    while (i < t.colunas.length) { partes.push(t.colunas.slice(i, i + COLUNAS_POR_PAGINA)); i += COLUNAS_POR_PAGINA; }
-    return partes.map(function (cols, idx) { return { colunas: cols, inicio: idx * COLUNAS_POR_PAGINA, indice: idx, total: partes.length }; });
+    // As datas seguem de uma folha para a outra; Pres./Faltas/Freq. só aparecem
+    // no último bloco, depois da última aula. Sem as colunas de totais, as
+    // folhas do meio cabem mais datas (COLUNAS_SEM_TOTAIS).
+    // As datas são repartidas por igual entre as folhas (nada de uma folha
+    // final com uma data só): a última cabe até COLUNAS_POR_PAGINA.
+    var blocosCol = [], i = 0, total = t.colunas.length;
+    var nb = total <= COLUNAS_POR_PAGINA ? 1 : 1 + Math.ceil((total - COLUNAS_POR_PAGINA) / COLUNAS_SEM_TOTAIS);
+    var ultimo = Math.min(COLUNAS_POR_PAGINA, Math.ceil(total / nb));
+    var meio = nb > 1 ? total - ultimo : 0;
+    var tamanhos = [];
+    for (var b = 0; b < nb - 1; b++) tamanhos.push(Math.floor(meio / (nb - 1)) + (b < meio % (nb - 1) ? 1 : 0));
+    tamanhos.push(total - meio);
+    if (!total) blocosCol.push({ inicio: 0, cols: [] });
+    tamanhos.forEach(function (tam) {
+      if (!tam) return;
+      blocosCol.push({ inicio: i, cols: t.colunas.slice(i, i + tam) });
+      i += tam;
+    });
+    // Linhas divididas em partes iguais (nada de uma folha com 1 ou 2 alunos).
+    var n = t.linhas.length;
+    var partes = Math.max(1, Math.ceil(n / LINHAS_POR_PAGINA));
+    var porParte = Math.max(1, Math.ceil(n / partes));
+    var blocosLin = [];
+    for (var j = 0; j < Math.max(n, 1); j += porParte) blocosLin.push(t.linhas.slice(j, j + porParte));
+    var paginas = [];
+    blocosCol.forEach(function (bc, ic) {
+      blocosLin.forEach(function (linhas, il) {
+        paginas.push({
+          colunas: bc.cols, inicio: bc.inicio, linhas: linhas,
+          blocoDatas: ic + 1, totalBlocosDatas: blocosCol.length, comTotais: ic === blocosCol.length - 1,
+          blocoAlunos: il + 1, totalBlocosAlunos: blocosLin.length
+        });
+      });
+    });
+    paginas.forEach(function (pg, k) { pg.indice = k; pg.total = paginas.length; pg.ultima = k === paginas.length - 1; });
+    return paginas;
   }
-  function docPagina(t, parte, meta) {
+  function faixaDatas(cols) {
+    if (!cols.length) return "";
+    return dataBr(cols[0].data) + (cols.length > 1 ? " a " + dataBr(cols[cols.length - 1].data) : "");
+  }
+  function docPagina(t, parte, meta, numero, totalDoc, numDisc) {
     var cab = parte.colunas.map(function (c) {
       return '<th class="date-col" data-bimester="' + esc(c.bimestre) + '"><div class="date-head"><span class="bimester-badge">'
         + (c.bimestre ? c.bimestre + "º BIM" : "") + "</span><span>" + dataCurta(c.data) + "</span><small>" + diaSemana(c.data) + " · " + c.horas + "h</small></div></th>";
     }).join("");
-    var corpo = t.linhas.map(function (l) {
+    var corpo = parte.linhas.map(function (l) {
       var celulas = parte.colunas.map(function (c, i) {
-        var cel = l.celulas[parte.inicio + i] || { horas: 0, faltas: 0 };
-        if (!cel.horas) return '<td class="attendance empty"></td>';
-        if (cel.faltas > 0) return '<td class="attendance absent' + (cel.justificada ? " justified" : "") + '">' + cel.faltas + (cel.justificada ? "<sup>j</sup>" : "") + "</td>";
-        return '<td class="attendance present">' + cel.horas + "</td>";
+        var cel = l.celulas[parte.inicio + i] || { aulas: 0, faltas: 0, justificadas: 0 };
+        var tp = tipoCelula(cel);
+        if (tp.cls === "v") return '<td class="attendance empty" title="' + tp.dica + '"></td>';
+        if (tp.cls === "p") return '<td class="attendance present">' + tp.txt + "</td>";
+        return '<td class="attendance absent' + (tp.cls === "j" ? " justified" : "") + '" title="' + tp.dica + '">' + tp.txt + (tp.cls === "j" || tp.parcialJ ? "<sup>j</sup>" : "") + "</td>";
       }).join("");
       return '<tr' + (l.tr ? ' class="transferido"' : "") + '><td class="num">' + l.n + '</td><td class="student">' + esc(l.nm) + (l.tr ? " <em>(transferido)</em>" : "") + "</td>"
-        + celulas + '<td class="total">' + l.presencas + '</td><td class="total"><strong>' + l.faltas + '</strong></td><td class="percent">' + freq(l) + "</td></tr>";
+        + celulas
+        + (parte.comTotais ? '<td class="total">' + l.presencas + '</td><td class="total"><strong>' + l.faltas + "</strong>" + (l.justificadas ? '<small class="just">' + l.justificadas + " j</small>" : "") + '</td><td class="percent">' + freq(l) + "</td>" : "")
+        + "</tr>";
     }).join("");
-    var periodo = meta.periodo + (parte.total > 1 ? " · página " + (parte.indice + 1) + " de " + parte.total : "");
-    return '<main class="page"><header class="header"><img src="' + meta.imgCab + '" alt="Secretaria de Estado de Educação">'
+    var datas = faixaDatas(parte.colunas);
+    var parteTxt = [];
+    if (parte.totalBlocosDatas > 1) parteTxt.push("datas " + parte.blocoDatas + "/" + parte.totalBlocosDatas);
+    if (parte.totalBlocosAlunos > 1 && parte.linhas.length) parteTxt.push("alunos " + parte.linhas[0].n + "–" + parte.linhas[parte.linhas.length - 1].n);
+    // Datas e bimestres desta folha.
+    var bimsFolha = parte.colunas.map(function (c) { return c.bimestre; }).filter(function (v, i, l) { return v && l.indexOf(v) === i; }).sort();
+    var periodo = (datas || meta.periodo) + (bimsFolha.length ? " · " + bimsFolha.join("º, ") + "º bim" : "");
+    return '<main class="page' + (parte.indice === 0 ? " inicio-disciplina" : "") + '" data-disciplina="' + esc(t.disciplina) + '">'
+      + '<header class="header"><img src="' + meta.imgCab + '" alt="Secretaria de Estado de Educação">'
       + '<div class="header-text"><div class="main">Secretaria de Estado de<br>Educação, Cultura e Esportes</div>'
       + '<div class="sub">Diretoria de Ensino</div><div class="sub">Departamento de Educação Básica</div><div class="sub">Divisão de Ensino</div></div></header>'
-      + '<section class="title"><h1>Relatório de Frequência Diária</h1><p>Controle de presença por componente curricular · 1 hora de aula = 1 aula</p></section>'
+      + '<section class="title"><h1>Relatório de Frequência Diária</h1><p>' + esc(t.disciplina)
+      + (meta.totalDisc > 1 ? " · relatório " + numDisc + " de " + meta.totalDisc : "")
+      + (parte.total > 1 ? " · folha " + (parte.indice + 1) + " de " + parte.total + (parteTxt.length ? " (" + parteTxt.join(", ") + ")" : "") : "")
+      + " · 1 hora de aula = 1 aula</p></section>"
       + '<section class="meta">'
       + campo("Unidade escolar", meta.escola) + campo("Professor", meta.professor) + campo("Disciplina", t.disciplina) + campo("Turma", meta.turma)
       + campo("Turno", meta.turno) + campo("Período/Bimestre", periodo) + campo("Emitido em", dataBr(hoje())) + campo("Carga do período", t.totalAulas + " aulas em " + t.colunas.length + " dias")
       + "</section>"
-      + '<div class="legend"><span><i class="p"></i>Presença (nº de aulas)</span><span><i class="f"></i>Falta (nº de faltas)</span><span><i class="j"></i>Falta justificada</span></div>'
+      + '<div class="legend"><span><i class="p"></i>Presença (nº de aulas)</span><span><i class="f"></i>Falta (nº de faltas)</span><span><i class="j"></i>Falta justificada (j)</span><span><i class="v"></i>Sem chamada</span></div>'
       + '<div class="table-wrap"><table><thead><tr><th class="num">Nº</th><th class="student">Aluno(a)</th>' + cab
-      + '<th class="total">Pres.</th><th class="total">Faltas</th><th class="percent">Freq.</th></tr></thead><tbody>' + corpo + "</tbody></table></div>"
-      + '<section class="signature"><div class="signature-block"><img src="' + meta.imgAss + '" alt="">'
-      + '<div class="signature-line"><strong>' + esc(meta.professor) + "</strong><span>Professor</span></div></div></section>"
+      + (parte.comTotais ? '<th class="total">Pres.</th><th class="total">Faltas</th><th class="percent">Freq.</th>' : "")
+      + "</tr></thead><tbody>" + corpo + "</tbody></table></div>"
+      + (parte.comTotais ? "" : '<p class="continua">As datas continuam na folha seguinte; os totais aparecem depois da última aula.</p>')
+      + (parte.ultima
+        ? '<section class="signature"><div class="signature-block"><img src="' + meta.imgAss + '" alt="">'
+          + '<div class="signature-line"><strong>' + esc(meta.professor) + "</strong><span>Professor</span></div></div></section>"
+: "")
       + '<footer class="page-footer"><img src="' + meta.imgRod + '" alt="AXION PROEDUQ">'
       + '<div class="page-footer-text"><strong>Ferramenta de apoio educacional AXION PROEDUQ.</strong><br>'
-      + "Relatório gerado pelo RELATORIO SKIN a partir dos diários de aula lançados. Os totais das colunas Pres., Faltas e Freq. consideram todo o período do relatório.</div></footer></main>";
+      + "Gerado pelo RELATORIO SKIN a partir das chamadas dos diários de aula. Pres., Faltas e Freq. somam todo o período e aparecem após a última aula.</div>"
+      + '<div class="page-number">Página ' + numero + " de " + totalDoc + "</div></footer></main>";
   }
   function campo(rotulo, valor) {
     return '<div class="field"><span class="label">' + esc(rotulo) + ':</span><span class="editable" contenteditable="true">' + esc(valor || "") + "</span></div>";
@@ -358,35 +463,77 @@
     var meta = {
       escola: A.escola || "", professor: A.professor || "", turma: A.rotuloTurma || "", turno: A.turno || "",
       periodo: F.periodo === "intervalo" && (F.de || F.ate) ? dataBr(F.de) + " a " + dataBr(F.ate) : "Tempo total",
-      imgCab: img + "cabecalho.webp", imgAss: img + "assinatura.webp", imgRod: img + "rodape.webp"
+      imgCab: img + "cabecalho.webp", imgAss: img + "assinatura.webp", imgRod: img + "rodape.webp",
+      totalDisc: tabs.length
     };
-    var paginas = tabs.map(function (t) {
-      return paginasDaTabela(t).map(function (p) { return docPagina(t, p, meta); }).join("\n");
+    var planos = tabs.map(function (t) { return { t: t, paginas: paginasDaTabela(t) }; });
+    var totalDoc = planos.reduce(function (s, p) { return s + p.paginas.length; }, 0);
+    var numero = 0;
+    var paginas = planos.map(function (p, k) {
+      return p.paginas.map(function (pg) { numero++; return docPagina(p.t, pg, meta, numero, totalDoc, k + 1); }).join("\n");
     }).join("\n");
-    var nome = "frequencia-" + (A.rotuloTurma || "turma").toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + hoje();
+    var inicio = 1;
+    var indice = tabs.length > 1
+      ? '<nav class="indice"><b>' + tabs.length + " relatórios neste documento, em sequência:</b> " + planos.map(function (p) {
+          var txt = esc(p.t.disciplina) + " (pág. " + inicio + (p.paginas.length > 1 ? "–" + (inicio + p.paginas.length - 1) : "") + ")";
+          inicio += p.paginas.length;
+          return txt;
+        }).join(" · ") + "</nav>"
+      : "";
+    var nome = "frequencia-" + (A.rotuloTurma || "turma").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-") + "-" + hoje();
     return "<!doctype html>\n<html lang=\"pt-BR\"><head><meta charset=\"utf-8\">"
       + '<meta name="viewport" content="width=device-width, initial-scale=1">'
       + "<title>Relatório de Frequência Diária — " + esc(meta.turma) + "</title><style>" + cssDoc() + "</style></head><body>"
-      + '<div class="toolbar"><strong>Frequência Diária · ' + esc(meta.turma) + " · " + esc(meta.periodo) + "</strong>"
-      + '<button type="button" onclick="window.print()">🖨️ Imprimir / PDF</button>'
-      + '<button type="button" onclick="baixar(\'doc\')">📄 Word</button>'
-      + '<button type="button" onclick="baixar(\'xls\')">📊 Excel</button>'
-      + '<button type="button" onclick="baixar(\'html\')">🌐 HTML</button>'
+      + '<div class="toolbar"><strong>Frequência Diária · ' + esc(meta.turma) + " · " + esc(meta.periodo) + " · " + totalDoc + " página(s)</strong>"
+      + '<button type="button" id="bt-editar" onclick="editar()">✏️ Editar</button>'
+      + '<button type="button" onclick="imprimir()">🖨️ Imprimir / PDF</button>'
+      + '<button type="button" onclick="baixarHtml()">🌐 Salvar HTML</button>'
       + '<button type="button" onclick="compartilhar()">🔗 Compartilhar</button></div>'
+      + '<div class="aviso-edicao" id="aviso-edicao" hidden>Modo de edição: clique em qualquer texto ou número do relatório para alterar. Imprimir/PDF e Salvar HTML levam as alterações.</div>'
+      + indice
       + paginas
-      + "<script>var NOME=" + JSON.stringify(nome) + ";"
-      + "function limpo(){var c=document.documentElement.cloneNode(true);var t=c.querySelector('.toolbar');if(t)t.remove();c.querySelectorAll('script').forEach(function(s){s.remove();});c.querySelectorAll('[contenteditable]').forEach(function(e){e.removeAttribute('contenteditable');});return '<!doctype html>'+c.outerHTML;}"
-      + "function baixarArquivo(txt,mime,ext){var b=new Blob(['\\ufeff'+txt],{type:mime});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=NOME+'.'+ext;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);}"
-      + "function baixar(tipo){var html=limpo();"
-      + "if(tipo==='html')return baixarArquivo(html,'text/html;charset=utf-8','html');"
-      + "if(tipo==='doc')return baixarArquivo(html.replace('<head>','<head><meta name=ProgId content=Word.Document>'),'application/msword','doc');"
-      + "var tabelas=[].map.call(document.querySelectorAll('.page'),function(p){var t=p.querySelector('table');var d=p.querySelector('.meta');return '<p>'+(d?d.innerText.replace(/\\n/g,' · '):'')+'</p>'+(t?t.outerHTML:'');}).join('<br>');"
-      + "baixarArquivo('<html xmlns:x=\"urn:schemas-microsoft-com:office:excel\"><head><meta charset=\"utf-8\"></head><body>'+tabelas+'</body></html>','application/vnd.ms-excel','xls');}"
-      + "function compartilhar(){var html=limpo();var arq=new File([html],NOME+'.html',{type:'text/html'});"
-      + "if(navigator.canShare&&navigator.canShare({files:[arq]}))return navigator.share({files:[arq],title:document.title}).catch(function(){});"
-      + "if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(location.href).then(function(){alert('Não dá para compartilhar o arquivo neste aparelho. Use Imprimir / PDF ou baixe o HTML.');});return;}"
-      + "alert('Use Imprimir / PDF ou baixe o HTML para compartilhar.');}"
-      + "<\/script></body></html>";
+      + "<script>var NOME=" + JSON.stringify(nome) + ";" + scriptDoc() + "<\/script></body></html>";
+  }
+  // Script da janela do relatório: Editar, Imprimir/PDF, Salvar HTML e
+  // Compartilhar. Imprimir e salvar usam a página como está (com as edições).
+  function scriptDoc() {
+    return String(function () {
+      var editando = false;
+      window.editar = function () {
+        editando = !editando;
+        document.querySelectorAll(".page").forEach(function (p) {
+          if (editando) p.setAttribute("contenteditable", "true"); else p.removeAttribute("contenteditable");
+        });
+        document.body.classList.toggle("editando", editando);
+        document.getElementById("aviso-edicao").hidden = !editando;
+        document.getElementById("bt-editar").textContent = editando ? "✓ Concluir edição" : "✏️ Editar";
+      };
+      function fecharEdicao() { if (editando) window.editar(); }
+      function limpo() {
+        var c = document.documentElement.cloneNode(true);
+        [".toolbar", ".indice", ".aviso-edicao", "script"].forEach(function (q) { c.querySelectorAll(q).forEach(function (e) { e.remove(); }); });
+        c.querySelectorAll("[contenteditable]").forEach(function (e) { e.removeAttribute("contenteditable"); });
+        var b = c.querySelector("body"); if (b) b.classList.remove("editando");
+        return "<!doctype html>" + c.outerHTML;
+      }
+      function baixarArquivo(txt) {
+        var b = new Blob([txt], { type: "text/html;charset=utf-8" });
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(b); a.download = NOME + ".html";
+        document.body.appendChild(a); a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+      }
+      window.imprimir = function () { fecharEdicao(); setTimeout(function () { window.print(); }, 50); };
+      window.baixarHtml = function () { fecharEdicao(); baixarArquivo(limpo()); };
+      window.compartilhar = function () {
+        fecharEdicao();
+        var html = limpo();
+        var arq = new File([html], NOME + ".html", { type: "text/html" });
+        if (navigator.canShare && navigator.canShare({ files: [arq] })) return navigator.share({ files: [arq], title: document.title }).catch(function () {});
+        baixarArquivo(html);
+        alert("Este aparelho não compartilha arquivos direto. O HTML foi baixado: envie por e-mail ou WhatsApp.");
+      };
+    }).replace(/^function\s*\(\)\s*\{/, "").replace(/\}\s*$/, "");
   }
   function cssDoc() {
     return ":root{--text:#1f2937;--line:#64748b;--green:#16812a;--present-bg:#dcfce7;--present-fg:#166534;--absent-bg:#fee2e2;--absent-fg:#991b1b;--just-bg:#fef3c7;--just-fg:#92400e}"
@@ -405,7 +552,15 @@
       + ".label{font-size:8.7px;font-weight:700;color:#475569;white-space:nowrap}.editable{flex:1;min-width:10px;outline:none;font-weight:600}"
       + ".legend{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin:0 0 1.2mm;color:#475569;font-size:8.7px}"
       + ".legend i{width:9px;height:9px;border:1px solid #94a3b8;display:inline-block;vertical-align:-1px;margin-right:3px}"
-      + ".legend .p{background:var(--present-bg)}.legend .f{background:var(--absent-bg)}.legend .j{background:var(--just-bg)}"
+      + ".legend .p{background:var(--present-bg)}.legend .f{background:var(--absent-bg)}.legend .j{background:var(--just-bg)}.legend .v{background:#f1f5f9}"
+      + ".toolbar #bt-editar{background:#fde68a}.editando .toolbar #bt-editar{background:#86efac}"
+      + ".aviso-edicao{position:sticky;top:44px;z-index:9;margin:0;padding:7px 12px;background:#fef3c7;color:#92400e;font-weight:700;text-align:center;font-size:12px}"
+      + ".editando .page{outline:2px dashed #f59e0b;outline-offset:2px}.editando .page td:hover,.editando .page .editable:hover{background:#fffbeb}"
+      + ".indice{max-width:297mm;margin:12px auto 0;padding:8px 12px;background:#fff;border-left:4px solid var(--green);font-size:12px;color:#334155}"
+      + ".continua{margin:1.2mm 0 0;text-align:right;font-size:8.4px;font-style:italic;color:#475569}"
+      + ".page-number{flex:0 0 auto;margin-left:auto;font-size:8px;font-weight:700;color:#334155;white-space:nowrap}"
+      + "td.total small.just{display:block;font-size:6.6px;color:var(--just-fg);font-weight:700}"
+      + ".attendance.empty{background:#f1f5f9}"
       + ".table-wrap{width:100%;overflow-x:auto}table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:9px}"
       + "th,td{border:1px solid var(--line);padding:.85mm .65mm;text-align:center;vertical-align:middle}thead th{background:#eef2f7;font-weight:700}"
       + "th.num,td.num{width:8mm}th.student,td.student{width:58mm;text-align:left}th.date-col{width:14mm}th.total,td.total{width:13mm}th.percent,td.percent{width:15mm}"
@@ -425,6 +580,7 @@
       + "@page{size:A4 landscape;margin:7mm 7mm 18mm}"
       + "@media print{html,body{background:#fff}.toolbar{display:none!important}"
       + ".page{position:static;width:auto;min-height:auto;margin:0;padding:0 0 12mm;box-shadow:none;page-break-after:always}"
+      + ".indice,.aviso-edicao{display:none!important}.page{outline:none!important}"
       + ".page:last-of-type{page-break-after:auto}.table-wrap{overflow:visible}thead{display:table-header-group}tr{break-inside:avoid;page-break-inside:avoid}"
       + ".attendance,thead th{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}"
       + ".page-footer{position:fixed!important;left:7mm;right:7mm;bottom:3mm;padding-top:1mm;min-height:9mm;background:#fff;border-top:1px solid #cbd5e1;z-index:999}"

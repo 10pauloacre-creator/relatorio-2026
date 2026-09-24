@@ -1613,33 +1613,25 @@ function rhDiarySortDisciplinas(values) {
   });
 }
 
-// Frequência Diária (24/09/2026): cada relato da turma vira uma coluna com as
-// h/aula oficiais (regra dos 15 minutos) e o bimestre pela carga; a presença
-// sai de PRESENCA_RH['pl-<código>'].
+// Frequência Diária: as aulas saem do MESMO retrato que vai para o banco
+// (rhMontarRetratoLancamentos): todas as abas (algumas aulas antigas da
+// 1ª Série estão no cartão da aba Geral e a aba da turma só tem a cópia de
+// 0 h), h/aula oficiais (regra dos 15 minutos) e o bimestre pela carga.
+// Até 25/09/2026 só a aba da turma era lida e essas aulas ficavam de fora.
 function rhFrequenciaRegistros(turmaId) {
-  var mapaBim = rhColetarMapaBimestresPanes() || {};
-  var registros = [];
-  var sec = document.getElementById('sec-' + turmaId);
-  if (!sec) return registros;
-  sec.querySelectorAll('.ea').forEach(function(card) {
-    if (typeof rhCardContaNoPainel === 'function' && !rhCardContaNoPainel(card)) return;
-    var pane = card.querySelector('.ipane[id^="p-"]');
-    var titulo = card.querySelector('.em .ed');
-    var infoDisc = normalizarDiscRH(titulo ? titulo.textContent : '');
-    var dataObj = parseDataCardRH(card);
-    if (!pane || !infoDisc || !dataObj) return;
-    var horas = Math.max(1, Math.round(rhHorasOficiaisCard(card, parseHorasRH(titulo ? titulo.textContent : '')) || 1));
-    var codigo = pane.id.slice(2);
-    registros.push({
-      data: rhDataChaveIso(dataObj),
+  var hoje = rhDataChaveIso(rhDiaryTodayCutoff());
+  return rhMontarRetratoLancamentos().aulas.filter(function(aula) {
+    return aula.t === turmaId && aula.p && aula.carga > 0 && aula.disc && aula.d <= hoje;
+  }).map(function(aula) {
+    return {
+      data: aula.d,
       turma: turmaId,
-      disciplina: infoDisc.disc,
-      horas: horas,
-      bimestre: mapaBim['a-' + codigo] || '',
-      chave: 'pl-' + codigo
-    });
+      disciplina: aula.disc,
+      horas: aula.carga,
+      bimestre: String(aula.b || ''),
+      chave: 'pl-' + aula.c
+    };
   });
-  return registros;
 }
 function rhAbrirFrequencia(sectionId) {
   if (!window.FrequenciaDiaria) { alert('Recarregue a página para abrir a Frequência Diária.'); return; }
@@ -1653,7 +1645,21 @@ function rhAbrirFrequencia(sectionId) {
     professor: prof ? (prof.textContent.replace(/[✦]/g, '').split('·')[0] || '').replace(/^Prof\.?\s*/i, '').trim() : '',
     registros: function() { return rhFrequenciaRegistros(turmaId); },
     alunos: function(t) { return ALUNOS_RH[t] || []; },
-    presenca: function(chave) { return PRESENCA_RH[chave] || null; }
+    ordem: ['Língua Portuguesa', 'Inglês', 'Espanhol', 'Arte', 'Redação'],
+    // Mesma regra da aba 👥 e dos lançamentos no banco (rhGetEstadoAtual:
+    // lista do relato + cliques + aluno que entrou depois). Falta justificada
+    // = a lista do relato diz justificada e ninguém clicou depois.
+    estado: function(chave, n) {
+      var codigo = String(chave).replace(/^pl-/, '');
+      var pane = document.getElementById('p-' + codigo);
+      if (!pane) return null;
+      var e = rhGetEstadoAtual('presenca', pane, n);
+      if (e === true) return 'p';
+      if (e !== false) return null;
+      var clique = (_rhPresencaCliques['p-' + codigo] || {})[n];
+      var base = PRESENCA_RH['pl-' + codigo];
+      return (clique === undefined && base && (base.faltJ || []).indexOf(n) >= 0) ? 'j' : 'f';
+    }
   });
 }
 
