@@ -649,6 +649,10 @@
         ["plano", "seq", "livros"].forEach(function (k) { Object.keys(p[k] || {}).forEach(function (ch) { if (alvo[ch.split("|")[0]]) delete p[k][ch]; }); });
         if (p.cal && p.cal.eventos) p.cal.eventos = p.cal.eventos.filter(function (e) { return e.escolaId !== o.escolaLocal; });
       }));
+      tarefas.push(mexer("meu-diario:documentos:v1", "md_documentos_", function (p) {
+        p.docs = (p.docs || []).filter(function (d) { return !alvo[d.turma] && d.escolaId !== o.escolaLocal; });
+        p.pastas = (p.pastas || []).filter(function (x) { return x.escolaId !== o.escolaLocal; });
+      }));
     }
     return Promise.all(tarefas).then(function () { return res; }).catch(function () { return res; });
   }

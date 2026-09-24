@@ -27,7 +27,7 @@
   var CHAVE = "rs-lateral";
   var LARGURA = 228;
   // Alvos de aba que são ferramentas (com e sem o prefixo "sec-").
-  var FERRAMENTAS = ["plano", "cal", "cronograma", "cont", "livros", "sequencias", "seq", "ia", "config", "cfgglobal", "cron", "claude", "jogos", "novo"];
+  var FERRAMENTAS = ["plano", "cal", "cronograma", "cont", "livros", "sequencias", "seq", "docs", "ia", "config", "cfgglobal", "cron", "claude", "jogos", "novo"];
 
   var CSS = ""
     + "html.rs-com-lateral{--rs-w:" + LARGURA + "px}"

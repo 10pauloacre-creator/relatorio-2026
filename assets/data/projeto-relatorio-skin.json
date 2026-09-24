@@ -1,5 +1,5 @@
 {
-  "versao": 8,
+  "versao": 9,
   "atualizadoEm": "2026-09-25",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -358,6 +358,37 @@
             "details": [
               "Prompts de produção dos livros; claude-native-notifications-* e legacy-claude-cleanup.js: cronômetros e avisos das sessões de trabalho com IA."
             ]
+          },
+          {
+            "id": "js-documentos",
+            "icon": "file",
+            "title": "assets/js/meu-diario-documentos.js — aba 📁 Documentos",
+            "status": "Concluído",
+            "details": [
+              "Substitui a aba Sequências do Meu Diário: abas Sequências, Planos de aula, Planos de curso e Relatórios, com pastas e subpastas.",
+              "Cada documento guarda turma, disciplina e bimestre (filtros e busca). Pasta automática Turma › Disciplina ao salvar da I.A.",
+              "Escopo meu-diario:documentos:v1 em professor_dados; as sequências antigas migram sozinhas (id seq-<chave>)."
+            ]
+          },
+          {
+            "id": "js-exportar",
+            "icon": "file",
+            "title": "assets/js/documentos-exportar.js — baixar documentos",
+            "status": "Concluído",
+            "details": [
+              "PDF (impressão), Word .docx de verdade (biblioteca docx), Excel .xlsx (cada tabela vira uma aba), HTML, Markdown e texto.",
+              "Pasta inteira em .zip com as subpastas (JSZip) ou num PDF único."
+            ]
+          },
+          {
+            "id": "js-ferramentas",
+            "icon": "file",
+            "title": "assets/js/ia-ferramentas.js — 🧰 Ferramentas da I.A",
+            "status": "Concluído",
+            "details": [
+              "26 assistentes especializados em 7 categorias (planejamento, avaliação, atividades, relatórios, inclusão, comunicação, apoio).",
+              "Cada um: descrição, como usar, campos e prompt inicial com {{campo}}; papel próprio no sistema da conversa."
+            ]
           }
         ]
       },
@@ -644,6 +675,16 @@
               "Remover scripts Python e sobras da raiz.",
               "Marcador T6_INICIO para injeção automática no 6º Ano (legado).",
               "Validação do HTML gerado pela IA antes de injetar (fluxo antigo do Groq)."
+            ]
+          },
+          {
+            "id": "pend-ia-chaves",
+            "icon": "file",
+            "title": "Ligar os provedores extras da IA da plataforma",
+            "status": "A fazer",
+            "details": [
+              "Criar as chaves grátis e gravar com supabase secrets set (pasta da Biblioteca): CEREBRAS_API_KEY, MISTRAL_API_KEY, GITHUB_MODELS_TOKEN, NVIDIA_API_KEY, SAMBANOVA_API_KEY, COHERE_API_KEY, HF_TOKEN.",
+              "Camada paga só com IA_PAGOS=1 (e créditos no OpenRouter/DeepSeek)."
             ]
           }
         ]
@@ -1283,6 +1324,57 @@
         {
           "id": "rs-doc-5",
           "text": "Validação do HTML gerado pela IA antes de injetar (fluxo antigo do Groq)",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "rs-ia",
+      "text": "12. I.A de apoio avançado e Documentos",
+      "children": [
+        {
+          "id": "rs-ia-1",
+          "text": "Fila da IA da plataforma com 11 provedores gratuitos que se trocam sozinhos no limite do dia (descanso do modelo)",
+          "done": true
+        },
+        {
+          "id": "rs-ia-2",
+          "text": "Chave própria: OpenRouter (grátis → pagos baratos), Cerebras, Mistral e DeepSeek, além de Gemini, Groq, OpenAI e Claude",
+          "done": true
+        },
+        {
+          "id": "rs-ia-3",
+          "text": "Rodízio automático entre as chaves do professor e a IA da plataforma",
+          "done": true
+        },
+        {
+          "id": "rs-ia-4",
+          "text": "Filtro 🧰 Ferramentas: 26 chatbots especializados com descrição, instruções e prompt com campos",
+          "done": true
+        },
+        {
+          "id": "rs-ia-5",
+          "text": "Aba 📁 Documentos (no lugar de Sequências) com 4 abas, pastas e subpastas",
+          "done": true
+        },
+        {
+          "id": "rs-ia-6",
+          "text": "Salvar resposta da I.A em Documentos com turma, disciplina e bimestre identificados",
+          "done": true
+        },
+        {
+          "id": "rs-ia-7",
+          "text": "Baixar documento em PDF, Word, Excel, HTML, Markdown e texto; pasta inteira em .zip",
+          "done": true
+        },
+        {
+          "id": "rs-ia-8",
+          "text": "Gravar as chaves dos provedores extras no servidor (Cerebras, Mistral, GitHub, NVIDIA, SambaNova, Cohere, Hugging Face)",
+          "done": false
+        },
+        {
+          "id": "rs-ia-9",
+          "text": "Documentos também na Casavequia e na Hermínio",
           "done": false
         }
       ]
