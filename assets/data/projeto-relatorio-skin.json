@@ -283,8 +283,9 @@
             "title": "assets/js/escolas-vivo.js + assets/css/escolas-vivo.css — tela Escolas viva",
             "status": "Concluído",
             "details": [
-              "Fundo em aurora com vagalumes, som ambiente gerado no navegador (liga/desliga no canto), cursor elástico com faíscas.",
-              "Cartões com inclinação 3D e brilho (no celular, pela inclinação do aparelho), revelação na rolagem e portal de abertura da escola."
+              "Fundo de viagem espacial: estrelas em 3D cintilando, rota seguindo o cursor, segurar acelera até a dobra.",
+              "Clique cria supernova; três cliques criam um buraco negro que engole tudo e renasce o céu.",
+              "Som ambiente gerado no navegador (motor, estrondo e ronco nos eventos), cursor elástico, cartões 3D e portal de abertura."
             ]
           },
           {
@@ -293,7 +294,7 @@
             "title": "assets/js/skin-transicao.js — chegada na escola",
             "status": "Concluído",
             "details": [
-              "Carregado sem defer no <head> das 4 páginas de escola: logo respirando enquanto carrega e íris que abre do centro."
+              "Carregado sem defer no <head> das 4 páginas de escola: véu opaco com o logo respirando até a página e a conta estarem prontas; depois, íris do centro."
             ]
           },
           {
@@ -1411,7 +1412,7 @@
       "children": [
         {
           "id": "rs-vivo-1",
-          "text": "Fundo animado (aurora e vagalumes) reagindo ao cursor, à rolagem e ao celular",
+          "text": "Fundo de viagem espacial: estrelas cintilantes em 3D, direção pelo cursor, segurar acelera até a dobra",
           "done": true
         },
         {
@@ -1442,6 +1443,21 @@
         {
           "id": "rs-vivo-7",
           "text": "Modo calmo para quem usa \"reduzir movimento\"",
+          "done": true
+        },
+        {
+          "id": "rs-vivo-8",
+          "text": "Clique no fundo cria uma supernova que fica para trás na viagem",
+          "done": true
+        },
+        {
+          "id": "rs-vivo-9",
+          "text": "Três cliques criam um buraco negro (Gargantua) que engole as estrelas e renasce o céu",
+          "done": true
+        },
+        {
+          "id": "rs-vivo-10",
+          "text": "Bug corrigido: transição de abertura mostrava a página pelo meio do véu",
           "done": true
         }
       ]

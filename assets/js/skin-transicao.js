@@ -23,7 +23,10 @@
   d.classList.add("skin-chegando");
   if (p.img && /^(https?:|data:image\/)/.test(p.img)) d.style.setProperty("--skin-img", 'url("' + p.img.replace(/"/g, "%22") + '")');
   var FUNDO = "radial-gradient(60vmax 60vmax at 50% 44%,rgba(167,181,138,.24),transparent 62%),radial-gradient(circle at 50% 44%,#1b2018,#0D0E0D 72%)";
-  var MASCARA = "radial-gradient(circle at 50% 44%,transparent var(--skin-r),#000 calc(var(--skin-r) + 16%))";
+  // Com --skin-r = 0 o véu é TODO opaco (o transparente começa 18% antes do
+  // raio). Antes (até 24/09/2026) começava com um buraco no centro: a página
+  // aparecia pelo meio e o logo sumia enquanto a escola carregava.
+  var MASCARA = "radial-gradient(circle at 50% 44%,transparent calc(var(--skin-r) - 18%),#000 var(--skin-r))";
   var css =
     "@property --skin-r{syntax:'<percentage>';inherits:false;initial-value:0%}" +
     "html.skin-chegando::after{content:'';position:fixed;inset:0;z-index:2147483600;pointer-events:none;" +
@@ -32,7 +35,7 @@
     "html.skin-chegando.skin-pronto::after{animation:" + (calmo ? "skinSome .9s ease forwards" : "skinIris 1.35s cubic-bezier(.22,.61,.36,1) forwards") + "}" +
     "@keyframes skinSome{to{opacity:0}}" +
     "@keyframes skinRespira{0%,100%{background-size:min(36vmin,170px),auto,auto}50%{background-size:min(38vmin,180px),auto,auto}}" +
-    "@keyframes skinIris{0%{--skin-r:0%;opacity:1}70%{opacity:1}100%{--skin-r:150%;opacity:0}}" +
+    "@keyframes skinIris{0%{--skin-r:0%;opacity:1}70%{opacity:1}100%{--skin-r:170%;opacity:0}}" +
     // O conteúdo sobe devagar enquanto a íris abre (só o topo, que é leve).
     (calmo ? "" : "html.skin-chegando.skin-pronto header.cab,html.skin-chegando.skin-pronto .nav-w{animation:skinSobe 1.4s cubic-bezier(.22,1,.36,1) both}") +
     "@keyframes skinSobe{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}";
@@ -51,8 +54,15 @@
       if (estilo.parentNode) estilo.parentNode.removeChild(estilo);
     }, 1600);
   }
-  // Espera o HTML (as páginas das escolas são grandes) e dá um respiro.
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(abrir, 180); });
-  else setTimeout(abrir, 180);
-  setTimeout(abrir, 5000);
+  // Espera o HTML (as páginas das escolas são grandes) e a verificação da
+  // conta (html.rel-trancado, de supabase-report-sync.js): abrir antes
+  // mostraria a tela de "Conectando…". Trava de segurança: 5 s.
+  var inicio = Date.now();
+  function quandoPronto() {
+    if (d.classList.contains("rel-trancado") && Date.now() - inicio < 5000) return setTimeout(quandoPronto, 120);
+    setTimeout(abrir, 160);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", quandoPronto);
+  else quandoPronto();
+  setTimeout(abrir, 5200);
 })();
