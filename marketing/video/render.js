@@ -6,13 +6,17 @@
    3. Chama trilha.py (Python) → saida/trilha.wav (música + efeitos).
    4. Tira os quadros um a um (window.renderAt(t)) e envia ao ffmpeg.
    5. Junta vídeo + áudio → ../RELATORIO-SKIN-video-marketing.mp4 (+ capa PNG).
+   O vídeo do site (assets/video/relatorio-skin-60s.mp4) é a EDIÇÃO DO PROFESSOR
+   (1min40, 25/09/2026): o render NÃO mexe nele. Só com --atualizar-site ou
+   --so-site ele é trocado pela versão 720p deste mestre.
 
    Uso:
      node render.js                      vídeo completo (1920×1080, 30 fps)
      node render.js --quadros 2,16.4,52  só esses quadros em PNG (saida/quadros)
      node render.js --previa             vídeo rápido em 960×540 (saida/previa.mp4)
      node render.js --so-audio           só refaz a trilha e junta com o último vídeo mudo
-     node render.js --so-site [--capa 18.66]  só refaz a versão do site (assets/video) a partir do mestre
+     node render.js --atualizar-site     vídeo completo E substitui o vídeo do site pelo mestre
+     node render.js --so-site [--capa 18.66]  só substitui a versão do site (assets/video) pelo mestre
    ===================================================================== */
 'use strict';
 const fs = require('fs');
@@ -114,10 +118,12 @@ async function main() {
   const destino = PREVIA ? path.join(SAIDA, 'previa.mp4') : FINAL;
   roda(ffmpeg, ['-y', '-loglevel', 'error', '-i', mudo, '-i', wav, '-c:v', 'copy', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-shortest', '-movflags', '+faststart', destino], 'ffmpeg (juntar áudio)');
   console.log('Pronto:', destino);
-  if (!PREVIA) versaoSite();
+  if (!PREVIA && arg('--atualizar-site')) versaoSite();
+  else if (!PREVIA) console.log('O vídeo do site (edição do professor) ficou como está. Use --atualizar-site para trocá-lo.');
 }
 
-// Versão leve para o site (720p) + capa do player, em assets/video/ (publicados com o site).
+// Versão para o site (720p) + capa do player, em assets/video/ (publicados com o site).
+// Substitui a edição do professor: só roda com --atualizar-site ou --so-site.
 function versaoSite() {
   const WEB = path.join(AQUI, '..', '..', 'assets', 'video');
   fs.mkdirSync(WEB, { recursive: true });

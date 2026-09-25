@@ -200,21 +200,24 @@ html.js .rv.in{opacity:1;transform:none}
 .hvid{position:relative;width:100%;max-width:620px;margin:0 auto;perspective:1400px}
 .hvid-luz{position:absolute;inset:-20% -14%;background:radial-gradient(closest-side,var(--glow),transparent 72%);pointer-events:none;z-index:0}
 .hvid-card{position:relative;z-index:1;display:block;width:100%;aspect-ratio:16/9;border-radius:18px;overflow:hidden;border:1px solid var(--line2);background:#0D0E0D;box-shadow:var(--shadow),0 0 0 1px rgba(167,181,138,.12);transform:rotateY(-9deg) rotateX(4deg);transition:transform .7s var(--ease),box-shadow .4s}
-.hvid-card:hover,.hvid-card:focus-visible{transform:none;box-shadow:0 40px 90px -35px var(--brand)}
+.hvid-card:hover,.hvid-card:focus-within{transform:none;box-shadow:0 40px 90px -35px var(--brand)}
 .hvid-card video{display:block;width:100%;height:100%;object-fit:cover}
-.hvid-sombra{position:absolute;inset:0;background:linear-gradient(180deg,transparent 42%,rgba(0,0,0,.62));pointer-events:none}
-.hvid-play{position:absolute;left:18px;bottom:16px;display:flex;align-items:center;gap:12px;color:#F3F1E9;text-align:left}
-.hvid-play i{width:58px;height:58px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#A7B58A,#C2CE9E);color:#141711;font-style:normal;font-size:1.05rem;padding-left:4px;box-shadow:0 10px 30px -8px #A7B58A;animation:pulso 2.4s var(--ease) infinite;transition:transform .3s var(--ease)}
+.hvid-sombra{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 42%,rgba(0,0,0,.62));pointer-events:none}
+/* o botão principal cobre o cartão inteiro: qualquer toque abre o vídeo com som */
+.hvid-play{position:absolute;inset:0;z-index:2;display:flex;align-items:flex-end;gap:12px;padding:16px 18px;color:#F3F1E9;text-align:left;border-radius:18px}
+.hvid-play:focus-visible{outline:3px solid #C2CE9E;outline-offset:-4px}
+.hvid-play i{width:58px;height:58px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#A7B58A,#C2CE9E);color:#141711;font-style:normal;font-size:1.3rem;box-shadow:0 10px 30px -8px #A7B58A;animation:pulso 2.4s var(--ease) infinite;transition:transform .3s var(--ease)}
 .hvid-card:hover .hvid-play i{transform:scale(1.08)}
 .hvid-play b{display:block;font:800 1.08rem/1.2 var(--f-title);letter-spacing:-.01em}
 .hvid-play small{display:block;font-size:.8rem;color:#D6CBB8;margin-top:2px}
-.hvid-som{position:absolute;left:12px;top:12px;padding:7px 11px;border-radius:30px;background:rgba(13,14,13,.8);border:1px solid rgba(167,181,138,.45);color:#F3F1E9;font:600 .74rem var(--f-txt)}
+.hvid-som{position:absolute;left:12px;top:12px;z-index:3;padding:7px 11px;border-radius:30px;background:rgba(13,14,13,.8);border:1px solid rgba(167,181,138,.45);color:#F3F1E9;font:600 .74rem var(--f-txt);pointer-events:none}
+.hvid-pausa{position:absolute;right:12px;top:12px;z-index:4;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(13,14,13,.8);border:1px solid rgba(167,181,138,.45);color:#F3F1E9;font:700 .78rem/1 var(--f-txt);transition:background .2s,border-color .2s}
+.hvid-pausa:hover{background:rgba(13,14,13,.95);border-color:#C2CE9E}
 .hvid-chip{position:absolute;z-index:2;padding:9px 13px;border-radius:30px;background:var(--s1);border:1px solid var(--line2);box-shadow:var(--shadow);font:700 .78rem/1 var(--f-txt);color:var(--tx);white-space:nowrap;animation:flutua 7s ease-in-out infinite;pointer-events:none}
-.hvid-chip.c1{right:-4px;top:-20px;animation-delay:-2s;color:var(--ok)}
 .hvid-chip.c2{left:-8px;bottom:-22px;animation-delay:-4.5s}
-.hvid-leg{display:none;margin-top:30px;text-align:center;font-size:.86rem;color:var(--tx2)}
+.hvid-leg{display:none;margin-top:18px;text-align:center;font-size:.86rem;color:var(--tx2)}
 .hvid-leg b{color:var(--tx)}
-@media(max-width:720px){.hvid-card{transform:none}.hvid-chip.c1{right:8px;top:-16px}.hvid-chip.c2{left:8px;bottom:-18px}.hvid-play{left:12px;bottom:12px}.hvid-play>span{display:none}.hvid-play i{width:48px;height:48px;font-size:.9rem}.hvid-chip.c2{display:none}.hvid-leg{display:block;margin-top:18px}}
+@media(max-width:720px){.hvid-card{transform:none}.hvid-play{padding:12px}.hvid-play>span{display:none}.hvid-play i{width:48px;height:48px;font-size:1.1rem}.hvid-chip.c2{display:none}.hvid-leg{display:block}}
 @media (prefers-reduced-motion:reduce){.hvid-card{transform:none}.hvid-chip,.hvid-play i{animation:none}}
 /* Modal do vídeo */
 .vmodal{border:0;padding:0;background:transparent;width:min(1120px,94vw,calc(86vh * 16 / 9));max-width:none;overflow:visible;color:#F3F1E9}
@@ -1081,17 +1084,17 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
       </div>
       <div class="hvid in-a" style="--i:3">
         <span class="hvid-luz" aria-hidden="true"></span>
-        <button class="hvid-card" type="button" id="hvid" aria-label="Assistir ao vídeo do RELATORIO SKIN: 1 minuto, com som">
-          <video id="hvid-v" muted playsinline loop preload="none" poster="assets/video/relatorio-skin-capa.jpg" tabindex="-1" aria-hidden="true">
+        <div class="hvid-card" id="hvid-card">
+          <video id="hvid-v" muted playsinline loop preload="none" poster="assets/video/relatorio-skin-capa.jpg" tabindex="-1" aria-hidden="true" data-celular="assets/video/relatorio-skin-celular.mp4">
             <source src="assets/video/relatorio-skin-60s.mp4" type="video/mp4">
           </video>
           <span class="hvid-sombra" aria-hidden="true"></span>
-          <span class="hvid-play" aria-hidden="true"><i>▶</i><span><b>Assista em 1 minuto</b><small>Do domingo à noite à conta grátis</small></span></span>
-          <span class="hvid-som" id="hvid-som" aria-hidden="true" hidden>🔇 Prévia sem som · clique para ouvir</span>
-        </button>
-        <span class="hvid-chip c1" aria-hidden="true">✓ Diário salvo · +2 h/aula</span>
+          <button class="hvid-play" type="button" id="hvid" aria-label="Assistir ao vídeo do RELATORIO SKIN com som: 1 minuto e 40 segundos"><i aria-hidden="true">🔊</i><span aria-hidden="true"><b>Assista com som</b><small>1min40 · do domingo à noite à conta grátis</small></span></button>
+          <span class="hvid-som" id="hvid-som" aria-hidden="true" hidden>🔇 Sem som · toque para ouvir</span>
+          <button class="hvid-pausa" type="button" id="hvid-pausa" aria-label="Pausar a prévia" hidden>❚❚</button>
+        </div>
         <span class="hvid-chip c2" aria-hidden="true">✧ 26 ferramentas de I.A.</span>
-        <p class="hvid-leg" aria-hidden="true">▶ <b>Toque para assistir</b> · 1 minuto, com som</p>
+        <p class="hvid-leg" aria-hidden="true">🔊 <b>Toque para ouvir</b> · 1min40</p>
       </div>
     </div>
   </section>
@@ -1333,7 +1336,7 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
 <dialog class="vmodal" id="vmodal" aria-label="Vídeo de apresentação do RELATORIO SKIN">
   <div class="vmodal-in">
     <button class="ico-btn vmodal-x" type="button" id="vmodal-x" aria-label="Fechar o vídeo">✕</button>
-    <video id="vmodal-v" controls playsinline preload="none" poster="assets/video/relatorio-skin-capa.jpg">
+    <video id="vmodal-v" controls playsinline preload="none" poster="assets/video/relatorio-skin-capa.jpg" data-celular="assets/video/relatorio-skin-celular.mp4">
       <source src="assets/video/relatorio-skin-60s.mp4" type="video/mp4">
       Seu navegador não reproduz vídeo. <a href="assets/video/relatorio-skin-60s.mp4">Baixe o vídeo</a>.
     </video>
@@ -1590,19 +1593,35 @@ if (!reduz.matches && matchMedia('(pointer: fine)').matches) {
   $$('.glow').forEach(el => el.addEventListener('pointermove', e => { const r = el.getBoundingClientRect(); el.style.setProperty('--gx', e.clientX - r.left + 'px'); el.style.setProperty('--gy', e.clientY - r.top + 'px'); }));
 }
 
-// Vídeo do hero: prévia sem som em loop (só no computador, sem "economia de
-// dados" nem "reduzir movimento"); o clique abre o vídeo com som num modal.
+// Vídeo do hero: começa sozinho, sem som, quando aparece na tela (navegador
+// nenhum deixa um site tocar com som sem um toque). Tem botão de pausa. Com
+// "economia de dados" ou conexão 2G fica só a capa. No celular usa a versão
+// leve (data-celular). O toque no cartão abre o vídeo com som no modal.
 (function videoHero() {
-  const card = $('#hvid'), prev = $('#hvid-v'), som = $('#hvid-som'), dlg = $('#vmodal'), vv = $('#vmodal-v'), fim = $('#vmodal-fim');
-  if (!card || !dlg) return;
+  const card = $('#hvid-card'), botao = $('#hvid'), prev = $('#hvid-v'), som = $('#hvid-som'), pausa = $('#hvid-pausa'), dlg = $('#vmodal'), vv = $('#vmodal-v'), fim = $('#vmodal-fim');
+  if (!card || !botao || !dlg) return;
   const rede = navigator.connection || {};
-  const previa = matchMedia('(hover: hover) and (pointer: fine)').matches && !reduz.matches && !rede.saveData && !/(^|-)2g/.test(rede.effectiveType || '');
-  if (previa) {
-    new IntersectionObserver(ents => {
-      if (ents[0].isIntersecting && !dlg.open) { prev.preload = 'auto'; const p = prev.play(); if (p) p.then(() => { som.hidden = false; }).catch(() => {}); }
-      else prev.pause();
-    }, { threshold: .35 }).observe(card);
+  const economia = !!rede.saveData || /(^|-)2g/.test(rede.effectiveType || '');
+  if (matchMedia('(max-width: 720px)').matches) [prev, vv].forEach(v => { if (v.dataset.celular) v.src = v.dataset.celular; });
+  let visivel = false, pausadoPelaPessoa = false;
+  function atualizar() {
+    const parado = prev.paused;
+    pausa.textContent = parado ? '▶' : '❚❚';
+    pausa.setAttribute('aria-label', parado ? 'Continuar a prévia sem som' : 'Pausar a prévia sem som');
   }
+  function tocar() {
+    if (economia || pausadoPelaPessoa || dlg.open || !visivel || doc.hidden) return;
+    prev.preload = 'auto';
+    const p = prev.play();
+    if (p) p.then(() => { som.hidden = false; pausa.hidden = false; atualizar(); }).catch(() => {});
+  }
+  new IntersectionObserver(ents => { visivel = ents[0].isIntersecting; if (visivel) tocar(); else prev.pause(); }, { threshold: .35 }).observe(card);
+  doc.addEventListener('visibilitychange', () => { if (doc.hidden) prev.pause(); else tocar(); });
+  prev.addEventListener('play', atualizar);
+  prev.addEventListener('pause', atualizar);
+  pausa.addEventListener('click', () => {
+    if (prev.paused) { pausadoPelaPessoa = false; tocar(); } else { pausadoPelaPessoa = true; prev.pause(); }
+  });
   function abrir() {
     prev.pause(); fim.hidden = true;
     if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
@@ -1610,10 +1629,10 @@ if (!reduz.matches && matchMedia('(pointer: fine)').matches) {
     try { vv.currentTime = 0; } catch (e) {}
     vv.muted = false; const p = vv.play(); if (p) p.catch(() => {});
   }
-  function fechar() { vv.pause(); if (dlg.open && typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open'); root.classList.remove('video-aberto'); }
-  card.addEventListener('click', abrir);
+  function fechar() { vv.pause(); if (dlg.open && typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open'); root.classList.remove('video-aberto'); tocar(); }
+  botao.addEventListener('click', abrir);
   $('#vmodal-x').addEventListener('click', fechar);
-  dlg.addEventListener('close', () => { vv.pause(); root.classList.remove('video-aberto'); });
+  dlg.addEventListener('close', () => { vv.pause(); root.classList.remove('video-aberto'); tocar(); });
   dlg.addEventListener('click', e => { if (e.target === dlg) fechar(); });
   vv.addEventListener('ended', () => { fim.hidden = false; });
   $('#vmodal-rever').addEventListener('click', () => { fim.hidden = true; vv.currentTime = 0; vv.play(); });

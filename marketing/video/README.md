@@ -5,7 +5,7 @@ Vídeo de 60 s (1920×1080, 30 fps, com trilha e efeitos sonoros) que conta o pr
 **Arquivos prontos**
 - `../RELATORIO-SKIN-video-marketing.mp4` — mestre em 1080p (fica só nesta máquina; não vai para o git).
 - `../RELATORIO-SKIN-video-capa.png` — capa (quadro da chamada final).
-- `../../assets/video/relatorio-skin-60s.mp4` e `relatorio-skin-capa.jpg` — versão leve usada no site (hero do `index.html`).
+- `../../assets/video/relatorio-skin-60s.mp4` — vídeo do site (hero do `index.html`). Desde 25/09/2026 é a **edição do professor** (1min40, 848×478), feita a partir deste mestre; não sai mais do render. `relatorio-skin-celular.mp4` é a versão leve dela para o celular (640 px, 30 fps, ~3,4 MB) e `relatorio-skin-capa.jpg` é a capa (quadro de 30,8 s da edição).
 
 ## Como é feito (uma linguagem para cada parte)
 
@@ -66,4 +66,9 @@ node render.js --previa      # versão rápida em 960×540
 
 Para ver uma cena no navegador: abra `cena.html?t=24.5` (quadro parado) ou `cena.html?tocar=1` (animação em tempo real, sem som).
 
-Para mudar um texto, edite a cena em `cena.html`; para mudar um som, o efeito correspondente em `trilha.py`. Depois de mudar o vídeo, refaça a versão do site com `.\gerar-video.ps1` (ele atualiza `assets/video/`).
+Para mudar um texto, edite a cena em `cena.html`; para mudar um som, o efeito correspondente em `trilha.py`. O render **não** mexe no vídeo do site (a edição do professor): para trocá-la pelo mestre gerado aqui, use `node render.js --atualizar-site` (ou só `--so-site`). Ao pôr outra edição no lugar de `assets/video/relatorio-skin-60s.mp4`, refaça a versão do celular e a capa (na pasta `assets/video`):
+
+```bash
+ffmpeg -y -i relatorio-skin-60s.mp4 -vf "scale=640:-2:flags=lanczos,fps=30" -c:v libx264 -preset slow -crf 27 -c:a aac -b:a 96k -ar 44100 -movflags +faststart relatorio-skin-celular.mp4
+ffmpeg -y -ss 30.8 -i relatorio-skin-60s.mp4 -frames:v 1 -q:v 3 relatorio-skin-capa.jpg
+```

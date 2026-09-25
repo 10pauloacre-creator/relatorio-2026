@@ -3,7 +3,8 @@
   1. Confere Node, Python e o Chrome/Edge.
   2. Instala o que faltar (npm: puppeteer-core + ffmpeg-static; pip: numpy + scipy).
   3. Roda render.js: cenas (HTML/CSS/JS + GLSL) → quadros → trilha (Python) → MP4.
-  4. render.js também atualiza a versão do site em assets/video/.
+  4. O vídeo do site (assets/video/) é a edição do professor: o render não mexe nele
+     (node render.js --atualizar-site troca pela versão deste mestre).
   Uso:  .\gerar-video.ps1            (vídeo completo)
         .\gerar-video.ps1 -Previa    (versão rápida em 960×540)
 #>
