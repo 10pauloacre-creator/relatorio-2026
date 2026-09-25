@@ -1,12 +1,28 @@
-<!-- Supabase → Authentication → Emails → "Magic link" (usado SÓ para o código
-     de verificação do e-mail, botão "Verificar e-mail" do perfil).
-     Assunto: {{ .Token }} é o seu código de verificação do RELATORIO SKIN
+<!-- Supabase → Authentication → Emails → "Magic link" (usado SÓ para códigos
+     de verificação). Serve as duas plataformas da AXION PROEDUQ:
+       • RELATORIO SKIN: botão "Verificar e-mail" do perfil do professor;
+       • Biblioteca Digital (25/09/2026): e-mail de recuperação de senha do
+         aluno (Edge Function aluno-email). A conta temporária do aluno tem
+         user_metadata.bdm = true, nome e recuperar (true = redefinir senha).
+     Assunto: ASSUNTO no script scripts/publicar-modelo-email.js.
      Feito para não cair no spam (22/09/2026): texto, o código e UMA logo leve
      (cabeçalho AXION PROEDUQ, PNG de 41 KB servido pelo relatorio.skin); sem
      link (o do Supabase aponta para outro domínio) e sem palavras de
-     "acesso/entrar". Publicado pela API de gestão; se editar no
-     painel, mantenha estas regras. -->
-<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#222;line-height:1.5;font-size:15px">
+     "acesso/entrar". Condição só com "if .Data.x" (chave ausente = falso);
+     nunca "eq .Data.x" (chave ausente quebra a comparação e o e-mail não
+     sai). Este comentário não vai para o Supabase e não pode ter chaves
+     duplas: o Supabase leria como comando do modelo.
+     Publicar: node scripts/publicar-modelo-email.js (testa as duas versões
+     e volta ao modelo anterior se algo falhar). -->
+{{ if .Data.bdm }}<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#222;line-height:1.5;font-size:15px">
+  <p style="margin:0 0 20px"><img src="https://relatorio.skin/assets/icons/axion-email.png" alt="AXION PROEDUQ" width="230" height="64" style="width:230px;max-width:100%;height:auto;display:block;border:0"></p>
+  <p style="margin:0 0 12px">Olá, {{ .Data.nome }}!</p>
+  {{ if .Data.recuperar }}<p style="margin:0 0 12px">Este é o código para criar uma senha nova na Biblioteca Digital:</p>{{ else }}<p style="margin:0 0 12px">Este é o código para confirmar o e-mail {{ .Email }} na Biblioteca Digital. Confirmado, ele serve para você recuperar a senha se um dia esquecer.</p>{{ end }}
+  <p style="margin:20px 0;font-size:30px;font-weight:bold;letter-spacing:6px;font-family:'Courier New',monospace;color:#222">{{ .Token }}</p>
+  {{ if .Data.recuperar }}<p style="margin:0 0 12px">Digite o código na tela da Biblioteca, em "Redefinir pelo e-mail". Ele vale por 1 hora.</p>{{ else }}<p style="margin:0 0 12px">Digite o código em Meu Perfil, na Biblioteca, onde você cadastrou o e-mail. Ele vale por 1 hora.</p>{{ end }}
+  <p style="margin:0 0 12px;color:#555;font-size:13px">Se não foi você que pediu, pode ignorar esta mensagem. Nada muda na sua conta.</p>
+  <p style="margin:24px 0 0;color:#777;font-size:12px">Biblioteca Digital, plataforma de estudos da AXION PROEDUQ.<br>Mensagem automática, enviada porque alguém pediu um código para este e-mail.</p>
+</div>{{ else }}<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#222;line-height:1.5;font-size:15px">
   <p style="margin:0 0 20px"><img src="https://relatorio.skin/assets/icons/axion-email.png" alt="AXION PROEDUQ" width="230" height="64" style="width:230px;max-width:100%;height:auto;display:block;border:0"></p>
   <p style="margin:0 0 12px">Olá,</p>
   <p style="margin:0 0 12px">Este é o código para confirmar o e-mail {{ .Email }} na sua conta do RELATORIO SKIN:</p>
@@ -14,4 +30,4 @@
   <p style="margin:0 0 12px">Digite o código na página do seu perfil, onde você pediu a verificação. Ele vale por 1 hora.</p>
   <p style="margin:0 0 12px;color:#555;font-size:13px">Se não foi você que pediu, pode ignorar esta mensagem. Nada muda na sua conta.</p>
   <p style="margin:24px 0 0;color:#777;font-size:12px">RELATORIO SKIN, plataforma de gestão docente da AXION PROEDUQ.<br>Mensagem automática, enviada porque alguém pediu a verificação deste e-mail.</p>
-</div>
+</div>{{ end }}
