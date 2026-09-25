@@ -54,23 +54,16 @@
   // OpenRouter "automático": gratuitos primeiro, na ordem (conferidos em
   // openrouter.ai/api/v1/models em 24/09/2026); pagos baratos só com a opção
   // ligada, depois de TODOS os gratuitos. ":floor" = fornecedor mais barato.
-  var OR_GRATIS = ["openrouter/free", "nvidia/nemotron-3-ultra-550b-a55b:free", "qwen/qwen3.8-27b:free", "google/gemma-4-31b-it:free", "z-ai/glm-5.2:free", "nex-agi/nex-n2.5-pro:free", "thinkingmachines/inkling:free", "nvidia/nemotron-3-super-120b-a12b:free", "google/gemma-4-26b-a4b-it:free", "nvidia/nemotron-3.5-lightning:free"];
+  var OR_GRATIS = ["openrouter/free", "nvidia/nemotron-3-ultra-550b-a55b:free", "google/gemma-4-31b-it:free", "qwen/qwen3.8-27b:free", "z-ai/glm-5.2:free", "nvidia/nemotron-3-super-120b-a12b:free", "nex-agi/nex-n2.5-pro:free", "google/gemma-4-26b-a4b-it:free", "nvidia/nemotron-3.5-lightning:free"];
   var OR_PAGOS = ["deepseek/deepseek-v4-flash:floor", "google/gemini-2.5-flash:floor", "meta-llama/llama-3.3-70b-instruct:floor"];
   var OR_VISAO = { "openrouter/free": 1, "qwen/qwen3.8-27b:free": 1, "google/gemma-4-31b-it:free": 1, "nex-agi/nex-n2.5-pro:free": 1, "thinkingmachines/inkling:free": 1, "google/gemma-4-26b-a4b-it:free": 1, "google/gemini-2.5-flash:floor": 1 };
   // Fila da IA da plataforma (Edge Function "assistente-ia"), só para mostrar
   // na tela. A ordem e os modelos de verdade estão em _comum/ia.ts (Biblioteca).
   var FILA_PLAT = [
-    { p: "gemini", nome: "Google Gemini", m: ["Gemini 3.5 Flash", "Gemini 3.6 Flash", "Gemini Flash (mais recente)", "Gemini Flash-Lite"] },
-    { p: "groq", nome: "Groq", m: ["GPT-OSS 120B", "Llama 4 Scout (lê fotos)", "Qwen 3.8 27B", "Compound mini"] },
-    { p: "cerebras", nome: "Cerebras", m: ["GPT-OSS 120B", "Llama 3.3 70B"] },
-    { p: "mistral", nome: "Mistral AI", m: ["Mistral Medium", "Mistral Small"] },
-    { p: "openrouter", nome: "OpenRouter — modelos gratuitos", m: ["Roteador grátis (openrouter/free)", "NVIDIA Nemotron 3 Ultra", "Qwen 3.8 27B", "Gemma 4 31B", "GLM 5.2", "Nex N2.5 Pro", "Inkling", "Nemotron 3 Super", "Gemma 4 26B", "Nemotron 3.5 Lightning", "Dots 3 Note"] },
-    { p: "github", nome: "GitHub Models", m: ["GPT-4.1 mini", "GPT-4o mini"] },
-    { p: "sambanova", nome: "SambaNova", m: ["Llama 3.3 70B"] },
-    { p: "nvidia", nome: "NVIDIA NIM", m: ["Llama 3.3 70B"] },
-    { p: "cohere", nome: "Cohere", m: ["Command A"] },
-    { p: "huggingface", nome: "Hugging Face", m: ["Llama 3.3 70B"] },
-    { p: "pagos", nome: "Camada paga (só depois de todas as gratuitas)", m: ["DeepSeek V4 Flash", "Gemini 2.5 Flash", "Llama 3.3 70B", "DeepSeek Chat"] }
+    { p: "openrouter", nome: "Camada 1 — OpenRouter, IAs gratuitas", m: ["Roteador automático (openrouter/free)", "NVIDIA Nemotron 3 Ultra", "Gemma 4 31B", "Qwen 3.8 27B", "GLM 5.2", "Nemotron 3 Super", "Nex N2.5 Pro", "Gemma 4 26B", "Nemotron 3.5 Lightning"] },
+    { p: "pagos", nome: "Camada 2 — OpenRouter, pagas super baratas (só se todas as gratuitas falharem)", m: ["DeepSeek V4 Flash", "Gemini 2.5 Flash", "Llama 3.3 70B"] },
+    { p: "gemini", nome: "Camada 3 — reserva direta: Google Gemini", m: ["Gemini Flash", "Gemini Flash-Lite"] },
+    { p: "groq", nome: "Camada 3 — reserva direta: Groq", m: ["GPT-OSS 120B", "Llama 4 Scout"] }
   ];
   var LIBS = {
     pdf: "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js",
@@ -1545,13 +1538,13 @@
     } catch (e) {}
   }
   function filaPlataformaHtml() {
-    return '<details class="ia-fila"><summary>📋 IAs gratuitas da fila automática — ' + FILA_PLAT.length + " grupos, trocam sozinhas quando uma atinge o limite do dia</summary><ol>" +
+    return '<details class="ia-fila"><summary>📋 IAs da fila automática — trocam sozinhas quando uma atinge o limite do dia</summary><ol>' +
       FILA_PLAT.map(function (g) {
         var st = "";
         if (ligadosPlat) st = g.p === "pagos" ? (ligadosPlat.pagos ? "on" : "off") : (ligadosPlat.provedores.indexOf(g.p) >= 0 ? "on" : "off");
-        var rot = st === "on" ? "ligada" : st === "off" ? (g.p === "pagos" ? "desligada" : "sem chave no servidor") : "";
+        var rot = st === "on" ? "ligada" : st === "off" ? "desligada" : "";
         return "<li><b>" + esc(g.nome) + "</b>" + (rot ? ' <span class="ia-fila-st ' + st + '">' + rot + "</span>" : "") + "<ul>" + g.m.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></li>";
-      }).join("") + '</ol><p>A primeira IA que responder vale. Quando uma bate o limite do dia (ou fica fora do ar), ela descansa por algumas horas e a próxima da lista assume — sem você fazer nada. A camada paga só entra se o administrador ligar e depois de todas as gratuitas.</p></details>';
+      }).join("") + '</ol><p>A primeira IA que responder vale. Quando uma bate o limite do dia (ou fica fora do ar), ela descansa por algumas horas e a próxima da lista assume — sem você fazer nada. Tudo passa pelo OpenRouter: primeiro as gratuitas, depois as pagas super baratas e, se o próprio OpenRouter cair, Gemini e Groq diretos. A plataforma nunca fica sem IA.</p></details>';
   }
   function listaOpenRouterHtml() {
     return '<details class="ia-fila"><summary>📋 Ordem do OpenRouter no modo automático</summary><ol>' +
