@@ -7583,7 +7583,7 @@ function _atvStatus(atvId,n,cfg){
   var presStatus=_atvStatusPorPresenca(atvId,n);
   if(presStatus==='pr')return'ag';
   if(presStatus==='fa'||presStatus==='fj')return'nf';
-  return cfg.parcial?'ag':'pd';
+  return 'ag';
 }
 var _atvIcons={fz:'✓',nf:'✗',pd:'–',ag:'⏳'};
 
@@ -7599,7 +7599,7 @@ function _atvAtualizarStat(atvId,statEl){
   var st=statEl||document.querySelector('[data-stat="'+atvId+'"]');if(!st)return;
   var fz=0,nf=0,ag=0;
   al.forEach(function(a){if(pcForaDaAula(a,atvId))return;var s=_atvStatus(atvId,a.n,cfg);if(s==='fz')fz++;else if(s==='nf')nf++;else ag++;});
-  st.innerHTML='<span>✓ Entregaram: <strong>'+fz+'</strong></span><span>✗ Não entregaram: <strong>'+nf+'</strong></span><span>⏳ Aguardando: <strong>'+ag+'</strong></span>';
+  st.innerHTML='<span>✓ Feito: <strong>'+fz+'</strong></span><span>✗ Não entregue: <strong>'+nf+'</strong></span><span>⏳ Aguardando: <strong>'+ag+'</strong></span>';
 }
 
 function _atvFecharMenu(){
@@ -7733,8 +7733,8 @@ function _atvAbrirMenu(cell,atvId,n,turma){
   m.setAttribute('data-n',String(n));
   m.setAttribute('data-turma',turma);
   m.innerHTML=
-    '<div class="atv-mo verde" data-action="status" data-status="fz">Entregue</div>'
-    +'<div class="atv-mo verm" data-action="status" data-status="nf">Nao entregue</div>'
+    '<div class="atv-mo verde" data-action="status" data-status="fz">Feito</div>'
+    +'<div class="atv-mo verm" data-action="status" data-status="nf">Não entregue</div>'
     +'<div class="atv-mo ag-o" data-action="status" data-status="ag">Aguardando</div>'
     +'<div class="atv-mo pfil" data-action="perfil">Ver perfil</div>';
   m.classList.add('on');
@@ -10615,7 +10615,7 @@ function abrirPerfil(turma,numAluno){
   });
 
   var fotoHTML=saved.foto?'<img class="pfm-foto-img" src="'+saved.foto+'" alt="">':'<span>👤</span>';
-  var labsAtv={fz:'Entregue',nf:'Não entregue',ag:'Aguardando',pd:'Pendente'};
+  var labsAtv={fz:'Feito',nf:'Não entregue',ag:'Aguardando',pd:'Aguardando'};
   var totalFaltas=faltas.length+faltasJ.length;
   var totalEntregas=atvH.filter(function(a){return a.s==='fz';}).length;
 
@@ -11483,11 +11483,12 @@ function iniciarSyncUniversal() {
 <script src="assets/js/casavequia-calendar.js?v=20260921a"></script>
 <script src="assets/js/editor.js?v=20260921a"></script>
 <script src="assets/js/alunos.js"></script>
-<script src="assets/js/novo-diario.js?v=20260921b"></script>
+<script src="assets/js/novo-diario.js?v=20260925c"></script>
+<script defer src="assets/js/diario-extras.js?v=20260925c"></script>
 <script defer src="assets/js/documentos-exportar.js?v=20260924a"></script>
 <script defer src="assets/js/meu-diario-documentos.js?v=20260925a"></script>
-<script defer src="assets/js/ia-ferramentas.js?v=20260924a"></script>
-<script defer src="assets/js/meu-diario-ia.js?v=20260924a"></script>
+<script defer src="assets/js/ia-ferramentas.js?v=20260925c"></script>
+<script defer src="assets/js/meu-diario-ia.js?v=20260925c"></script>
 <script defer src="assets/js/frequencia-diaria.js?v=20260925b"></script>
 <script defer src="assets/js/escola-ia.js?v=20260925a"></script>
 <script defer src="assets/js/escola-documentos.js?v=20260925a"></script>

@@ -396,7 +396,7 @@
       "Só inclua o bloco quando houver algo para registrar ou alterar.",
       "",
       "TIPOS DE AÇÃO",
-      '1. criar_diario — registra uma aula: {"tipo":"criar_diario","turma":"<id>","disciplina":"<nome>","data":"AAAA-MM-DD","inicio":"HH:MM","fim":"HH:MM","horas":2,"assunto":"tema curto da aula","conteudo":"o que foi trabalhado","faltaram":[n],"faltas_justificadas":[n],"atividade":{"houve":true,"titulo":"","descricao":"","fez":[n],"nao_fez":[n]},"comportamento":[{"alunos":[n],"tipo":"advertencia|grave|destaque","texto":""}],"lembrete":{"titulo":"","texto":""}}',
+      '1. criar_diario — registra uma aula: {"tipo":"criar_diario","turma":"<id>","disciplina":"<nome>","data":"AAAA-MM-DD","inicio":"HH:MM","fim":"HH:MM","horas":2,"assunto":"tema curto da aula","conteudo":"o que foi trabalhado","faltaram":[n],"faltas_justificadas":[n],"atividade":{"houve":true,"titulo":"","descricao":"","fez":[n],"nao_fez":[n],"prazo":{"dias":2,"horas":0}},"atividades_extras":[{"titulo":"","descricao":"","prazo":{"dias":1,"horas":0}}],"comportamento":[{"alunos":[n],"tipo":"advertencia|grave|destaque","texto":""}],"lembrete":{"titulo":"","texto":""}}. "prazo" (opcional) = prazo para entrega da atividade em dias e horas: só envie quando o professor pedir prazo; a contagem começa ao aplicar. "atividades_extras" (opcional) = outras atividades da mesma aula, cada uma com título; todos os alunos começam "aguardando".',
       '2. editar_diario — altera um diário existente; só os campos enviados mudam e as listas enviadas substituem as antigas: {"tipo":"editar_diario","id":"<id do diário>", ...campos de criar_diario}',
       '3. criar_turma — {"tipo":"criar_turma","nome":"7º Ano A","disciplinas":[{"nome":"Ciências","meta_bimestre":10,"total_ano":40}],"alunos":["Nome Completo", "..."]}',
       '4. adicionar_alunos — no fim da chamada: {"tipo":"adicionar_alunos","turma":"<id>","nomes":["..."]}',
@@ -882,6 +882,17 @@
         fez: at.fez !== undefined ? alunosDe(t, at.fez, perdidos) : (velha.fez || []),
         naoFez: at.nao_fez !== undefined ? alunosDe(t, at.nao_fez, perdidos) : (velha.naoFez || [])
       };
+      // Prazo para entrega: o novo-diario.js grava no diario-extras.js e inicia a contagem.
+      if (at.prazo !== undefined) rel.atividade.prazo = at.prazo === false || at.prazo === null ? { ativo: false } : { dias: at.prazo.dias, horas: at.prazo.horas };
+    }
+    if (a.atividades_extras !== undefined) {
+      var antigas = rel.atividadesExtras || [];
+      rel.atividadesExtras = (a.atividades_extras || []).map(function (x, i) {
+        var velhaX = antigas[i] || {};
+        var y = { id: velhaX.id, titulo: txt(x.titulo), descricao: txt(x.descricao), estados: velhaX.estados || {} };
+        if (x.prazo) y.prazo = { dias: x.prazo.dias, horas: x.prazo.horas };
+        return y;
+      }).filter(function (x) { return x.titulo || x.descricao; });
     }
     if (a.lembrete !== undefined) rel.lembrete = { titulo: txt((a.lembrete || {}).titulo), texto: txt((a.lembrete || {}).texto) };
     return rel;
@@ -1031,7 +1042,9 @@
     if (M.descreverAcao) { var x = M.descreverAcao(a, ferramentas()); if (x) return x; }
     var tn = function () { try { return turmaDe(a.turma).nome; } catch (e) { return a.turma || "?"; } };
     switch (a.tipo) {
-      case "criar_diario": return { ic: "📝", t: "Registrar diário — " + tn() + " · " + (a.disciplina || "") + " · " + (a.data ? M.dataBr(a.data) : "?"), d: [txt(a.assunto), a.horas ? a.horas + " h/aula" : "", (a.faltaram || []).length ? (a.faltaram.length + " falta(s)") : "sem faltas", a.atividade && a.atividade.houve ? "com atividade" : ""].filter(Boolean).join(" · ") };
+      case "criar_diario": return { ic: "📝", t: "Registrar diário — " + tn() + " · " + (a.disciplina || "") + " · " + (a.data ? M.dataBr(a.data) : "?"), d: [txt(a.assunto), a.horas ? a.horas + " h/aula" : "", (a.faltaram || []).length ? (a.faltaram.length + " falta(s)") : "sem faltas", a.atividade && a.atividade.houve ? "com atividade" : "",
+          a.atividade && a.atividade.prazo && (a.atividade.prazo.dias || a.atividade.prazo.horas) ? "⏰ prazo: " + (a.atividade.prazo.dias ? a.atividade.prazo.dias + " dia(s) " : "") + (a.atividade.prazo.horas ? a.atividade.prazo.horas + " hora(s)" : "") : "",
+          (a.atividades_extras || []).length ? "+" + a.atividades_extras.length + " atividade(s)" : ""].filter(Boolean).join(" · ") };
       case "editar_diario": return { ic: "✏️", t: "Alterar diário " + (a.id || ""), d: Object.keys(a).filter(function (k) { return k !== "tipo" && k !== "id"; }).join(", ") };
       case "criar_turma": return { ic: "🏫", t: "Criar turma " + (a.nome || ""), d: (a.escola || "") + " · " + (a.alunos || []).length + " alunos · " + (a.disciplinas || []).map(function (x) { return x.nome || x; }).join(", ") };
       case "adicionar_alunos": return { ic: "👥", t: "Adicionar " + (a.nomes || []).length + " aluno(s) em " + tn(), d: (a.nomes || []).map(function (x) { return restaurar(x); }).join(", ") };
