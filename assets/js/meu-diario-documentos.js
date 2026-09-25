@@ -582,6 +582,23 @@
     },
     abrir: function (id) { M.irPara("docs"); abrirDoc(id); },
     resumo: resumo,
+    pronto: function () { return pronto; },
+    // Sequências antigas das escolas do administrador: id fixo (não duplica
+    // entre aparelhos), pasta Turma › Disciplina.
+    importar: function (lista) {
+      if (!pronto) return 0;
+      var n = 0;
+      (lista || []).forEach(function (o) {
+        if (doc(o.id)) return;
+        var tipo = TIPOS[o.tipo] ? o.tipo : "seq", t = turmaQualquer(o.turma), di = t && disc(t, o.disc);
+        var pt = t ? criarPasta(tipo, t.nome, "") : null;
+        var pastaId = pt ? (di ? criarPasta(tipo, di.nome, pt.id).id : pt.id) : "";
+        criarDoc(Object.assign({}, o, { tipo: tipo, pasta: pastaId, origem: "migrado" }));
+        n++;
+      });
+      if (n) salvar();
+      return n;
+    },
     // Exclusão de turmas (ou da escola inteira, com as pastas dela).
     removerTurmas: function (ids, escolaIdExcluida) {
       var alvo = {}; (ids || []).forEach(function (t) { alvo[t] = 1; });

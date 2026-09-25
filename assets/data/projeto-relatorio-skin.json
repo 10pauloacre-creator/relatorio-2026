@@ -1,5 +1,5 @@
 {
-  "versao": 11,
+  "versao": 12,
   "atualizadoEm": "2026-09-25",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -397,7 +397,8 @@
             "details": [
               "Substitui a aba Sequências do Meu Diário: abas Sequências, Planos de aula, Planos de curso e Relatórios, com pastas e subpastas.",
               "Cada documento guarda turma, disciplina e bimestre (filtros e busca). Pasta automática Turma › Disciplina ao salvar da I.A.",
-              "Escopo meu-diario:documentos:v1 em professor_dados; as sequências antigas migram sozinhas (id seq-<chave>)."
+              "Escopo meu-diario:documentos:v1 em professor_dados; as sequências antigas migram sozinhas (id seq-<chave>).",
+              "Casavequia e Hermínio: escola-documentos.js troca o botão Sequências por Documentos e traz as sequências antigas da página (25/09/2026)."
             ]
           },
           {
@@ -1400,7 +1401,7 @@
         {
           "id": "rs-ia-9",
           "text": "Documentos também na Casavequia e na Hermínio",
-          "done": false
+          "done": true
         }
       ]
     },
