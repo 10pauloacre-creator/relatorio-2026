@@ -1,5 +1,5 @@
 {
-  "versao": 16,
+  "versao": 17,
   "atualizadoEm": "2026-09-25",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -989,6 +989,16 @@
         {
           "id": "rs-tags-soltas",
           "text": "Tags soltas em volta do vídeo do site: arrastar, jogar e segurar para estourar",
+          "done": true
+        },
+        {
+          "id": "rs-ri-compartilhar",
+          "text": "Relatório Individual: botão 🔗 Compartilhar (WhatsApp, e-mail)",
+          "done": true
+        },
+        {
+          "id": "rs-freq-celular",
+          "text": "Frequência Diária usável no celular (filtros e datas)",
           "done": true
         },
         {

@@ -171,6 +171,7 @@
     s.id = "fd-estilo";
     s.setAttribute("data-runtime-ui", "frequencia");
     s.textContent = ""
+      + ".fd-modal [hidden]{display:none!important}"
       + ".fd-modal{position:fixed;inset:0;background:rgba(7,17,12,.72);z-index:12050;display:none;align-items:center;justify-content:center;padding:20px;font-family:'DM Sans',sans-serif}"
       + ".fd-modal.on{display:flex}"
       + ".fd-inner{width:min(1180px,100%);max-height:92vh;background:#faf8f2;border-radius:24px;box-shadow:0 28px 80px rgba(0,0,0,.34);display:flex;flex-direction:column;overflow:hidden;color:#2b2b2b}"
@@ -236,7 +237,7 @@
       + "html.dark-2026 .fd-tab td.p{background:rgba(34,139,84,.28);color:#9fe3bb}"
       + "html.dark-2026 .fd-tab td.f{background:rgba(185,99,93,.3);color:#ffb4ac}"
       + "html.dark-2026 .fd-tab td.j{background:rgba(194,154,91,.28);color:#f2cf94}"
-      + "@media(max-width:980px){.fd-body{grid-template-columns:1fr}.fd-lado{border-right:none;border-bottom:1px solid #e8e5de}}"
+      + "@media(max-width:980px){.fd-body{grid-template-columns:minmax(0,1fr)}.fd-lado,.fd-visor{min-width:0}.fd-lado{border-right:none;border-bottom:1px solid #e8e5de}}"
       + "@media(max-width:720px){.fd-modal{padding:10px}.fd-top{padding:16px 14px;flex-direction:column}.fd-top-acoes{width:100%}.fd-btn{flex:1}.fd-lado,.fd-resumo,.fd-previa{padding-left:14px;padding-right:14px}}";
     document.head.appendChild(s);
   }
