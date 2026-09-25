@@ -1,5 +1,5 @@
 {
-  "versao": 13,
+  "versao": 14,
   "atualizadoEm": "2026-09-25",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -970,6 +970,11 @@
         {
           "id": "rs-video-autoplay",
           "text": "Vídeo do site: edição do professor (1min40), começa sozinho sem som, com pausa e versão leve no celular",
+          "done": true
+        },
+        {
+          "id": "rs-tags-soltas",
+          "text": "Tags soltas em volta do vídeo do site: arrastar, jogar e segurar para estourar",
           "done": true
         },
         {

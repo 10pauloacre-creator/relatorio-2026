@@ -202,23 +202,44 @@ html.js .rv.in{opacity:1;transform:none}
 .hvid-card{position:relative;z-index:1;display:block;width:100%;aspect-ratio:16/9;border-radius:18px;overflow:hidden;border:1px solid var(--line2);background:#0D0E0D;box-shadow:var(--shadow),0 0 0 1px rgba(167,181,138,.12);transform:rotateY(-9deg) rotateX(4deg);transition:transform .7s var(--ease),box-shadow .4s}
 .hvid-card:hover,.hvid-card:focus-within{transform:none;box-shadow:0 40px 90px -35px var(--brand)}
 .hvid-card video{display:block;width:100%;height:100%;object-fit:cover}
-.hvid-sombra{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 42%,rgba(0,0,0,.62));pointer-events:none}
-/* o botão principal cobre o cartão inteiro: qualquer toque abre o vídeo com som */
-.hvid-play{position:absolute;inset:0;z-index:2;display:flex;align-items:flex-end;gap:12px;padding:16px 18px;color:#F3F1E9;text-align:left;border-radius:18px}
+/* o botão cobre o cartão inteiro, sem nada desenhado: qualquer toque abre o vídeo com som */
+.hvid-play{position:absolute;inset:0;z-index:2;border-radius:18px}
 .hvid-play:focus-visible{outline:3px solid #C2CE9E;outline-offset:-4px}
-.hvid-play i{width:58px;height:58px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#A7B58A,#C2CE9E);color:#141711;font-style:normal;font-size:1.3rem;box-shadow:0 10px 30px -8px #A7B58A;animation:pulso 2.4s var(--ease) infinite;transition:transform .3s var(--ease)}
-.hvid-card:hover .hvid-play i{transform:scale(1.08)}
-.hvid-play b{display:block;font:800 1.08rem/1.2 var(--f-title);letter-spacing:-.01em}
-.hvid-play small{display:block;font-size:.8rem;color:#D6CBB8;margin-top:2px}
-.hvid-som{position:absolute;left:12px;top:12px;z-index:3;padding:7px 11px;border-radius:30px;background:rgba(13,14,13,.8);border:1px solid rgba(167,181,138,.45);color:#F3F1E9;font:600 .74rem var(--f-txt);pointer-events:none}
+.hvid-som{position:absolute;left:12px;top:12px;z-index:3;padding:7px 11px;border-radius:30px;background:rgba(13,14,13,.8);border:1px solid rgba(167,181,138,.45);color:#F3F1E9;font:600 .74rem var(--f-txt);pointer-events:none;transition:background .25s,border-color .25s}
+.hvid-card:hover .hvid-som{background:rgba(13,14,13,.94);border-color:#C2CE9E}
 .hvid-pausa{position:absolute;right:12px;top:12px;z-index:4;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(13,14,13,.8);border:1px solid rgba(167,181,138,.45);color:#F3F1E9;font:700 .78rem/1 var(--f-txt);transition:background .2s,border-color .2s}
 .hvid-pausa:hover{background:rgba(13,14,13,.95);border-color:#C2CE9E}
-.hvid-chip{position:absolute;z-index:2;padding:9px 13px;border-radius:30px;background:var(--s1);border:1px solid var(--line2);box-shadow:var(--shadow);font:700 .78rem/1 var(--f-txt);color:var(--tx);white-space:nowrap;animation:flutua 7s ease-in-out infinite;pointer-events:none}
-.hvid-chip.c2{left:-8px;bottom:-22px;animation-delay:-4.5s}
-.hvid-leg{display:none;margin-top:18px;text-align:center;font-size:.86rem;color:var(--tx2)}
-.hvid-leg b{color:var(--tx)}
-@media(max-width:720px){.hvid-card{transform:none}.hvid-play{padding:12px}.hvid-play>span{display:none}.hvid-play i{width:48px;height:48px;font-size:1.1rem}.hvid-chip.c2{display:none}.hvid-leg{display:block}}
-@media (prefers-reduced-motion:reduce){.hvid-card{transform:none}.hvid-chip,.hvid-play i{animation:none}}
+@media(max-width:720px){.hvid-card{transform:none}}
+@media (prefers-reduced-motion:reduce){.hvid-card{transform:none}}
+
+/* Tags soltas em volta do vídeo: flutuam; arrastar e soltar joga a tag pela tela;
+   segurar sem mexer enche até estourar. Ficam numa camada no fim do <body> (o hero
+   tem overflow:hidden), em coordenadas da página, abaixo do cabeçalho (z-index 100). */
+.stags{position:absolute;left:0;top:0;width:100%;height:0;z-index:90;overflow-x:clip}
+.stag{position:absolute;left:0;top:0;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;cursor:grab;will-change:transform;visibility:hidden}
+.stag.vis{visibility:visible}
+.stag.voa{z-index:2}
+.stag.pega{z-index:3;cursor:grabbing}
+html.cur-on .stag{cursor:none}
+.stag-f{display:block;animation:stag-flut var(--dur,6s) ease-in-out var(--atraso,0s) infinite}
+.stag.pega .stag-f,.stag.voa .stag-f{animation-play-state:paused}
+.stag-b{display:flex;align-items:center;gap:8px;padding:8px 14px 8px 8px;border-radius:40px;white-space:nowrap;font:700 .8rem/1.1 var(--f-txt);color:var(--tx);background:var(--s2);border:1px solid var(--line2);box-shadow:0 14px 30px -16px rgba(0,0,0,.75);transition:border-color .25s,box-shadow .25s}
+.stag-b i{width:22px;height:22px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:.8rem;line-height:1;background:var(--glow);color:var(--brand2);border:1px solid var(--line2)}
+.stag:hover .stag-b{border-color:var(--brand)}
+.stag.t-marca .stag-b{background:linear-gradient(135deg,#A7B58A,#C2CE9E);color:#141711;border-color:transparent}
+.stag.t-areia .stag-b{background:#D6CBB8;color:#1D1C17;border-color:transparent}
+.stag.t-marca .stag-b i,.stag.t-areia .stag-b i{background:rgba(20,23,17,.12);color:#141711;border-color:rgba(20,23,17,.18)}
+.stag.enche .stag-b{box-shadow:0 0 0 calc(var(--p,0) * 10px) rgba(194,206,158,.2),0 18px 44px -12px rgba(167,181,138,.75)}
+.stag.entra .stag-b{animation:stag-entra .65s var(--ease) both}
+@keyframes stag-flut{0%,100%{transform:translateY(0) rotate(var(--r0,0deg))}50%{transform:translateY(-8px) rotate(calc(var(--r0,0deg) * -.6))}}
+@keyframes stag-entra{0%{opacity:0;transform:scale(.2)}60%{opacity:1;transform:scale(1.12)}100%{opacity:1;transform:scale(1)}}
+.stag-dica{position:absolute;left:0;top:0;z-index:4;pointer-events:none;padding:6px 10px;border-radius:8px;background:rgba(13,14,13,.94);color:#F3F1E9;border:1px solid #3B4137;font:600 .72rem/1.2 var(--f-txt);white-space:nowrap;opacity:0;transition:opacity .25s}
+.stag-dica.on{opacity:1}
+.stag-fx{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:130}
+@media(max-width:720px){.stag-b{font-size:.74rem;padding:7px 12px 7px 7px;gap:7px}.stag-b i{width:20px;height:20px;font-size:.72rem}}
+/* "reduzir movimento": a flutuação fica mais lenta, não parada */
+@media (prefers-reduced-motion:reduce){.stag-f{animation-duration:calc(var(--dur,6s) * 2.2)}}
+@media print{.stags,.stag-fx{display:none}}
 /* Modal do vídeo */
 .vmodal{border:0;padding:0;background:transparent;width:min(1120px,94vw,calc(86vh * 16 / 9));max-width:none;overflow:visible;color:#F3F1E9}
 .vmodal::backdrop{background:rgba(5,6,5,.88)}
@@ -1088,13 +1109,10 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
           <video id="hvid-v" muted playsinline loop preload="none" poster="assets/video/relatorio-skin-capa.jpg" tabindex="-1" aria-hidden="true" data-celular="assets/video/relatorio-skin-celular.mp4">
             <source src="assets/video/relatorio-skin-60s.mp4" type="video/mp4">
           </video>
-          <span class="hvid-sombra" aria-hidden="true"></span>
-          <button class="hvid-play" type="button" id="hvid" aria-label="Assistir ao vídeo do RELATORIO SKIN com som: 1 minuto e 40 segundos"><i aria-hidden="true">🔊</i><span aria-hidden="true"><b>Assista com som</b><small>1min40 · do domingo à noite à conta grátis</small></span></button>
-          <span class="hvid-som" id="hvid-som" aria-hidden="true" hidden>🔇 Sem som · toque para ouvir</span>
+          <button class="hvid-play" type="button" id="hvid" aria-label="Assistir ao vídeo do RELATORIO SKIN com som: 1 minuto e 40 segundos"></button>
+          <span class="hvid-som" id="hvid-som" aria-hidden="true">🔊 Toque para assistir com som</span>
           <button class="hvid-pausa" type="button" id="hvid-pausa" aria-label="Pausar a prévia" hidden>❚❚</button>
         </div>
-        <span class="hvid-chip c2" aria-hidden="true">✧ 26 ferramentas de I.A.</span>
-        <p class="hvid-leg" aria-hidden="true">🔊 <b>Toque para ouvir</b> · 1min40</p>
       </div>
     </div>
   </section>
@@ -1577,7 +1595,7 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches && !reduz.matches) 
     if (e.pointerType !== 'mouse') return;
     x = e.clientX; y = e.clientY; dot.style.transform = 'translate(' + x + 'px,' + y + 'px)';
     const t = e.target;
-    root.classList.toggle('cur-hover', !!(t.closest && t.closest('a,button,[role=button],summary,label,.pain,input[type=range],.shield')));
+    root.classList.toggle('cur-hover', !!(t.closest && t.closest('a,button,[role=button],summary,label,.pain,input[type=range],.shield,.stag')));
     root.classList.toggle('cur-text', !!(t.closest && t.closest('input:not([type=range]),textarea,select,[contenteditable=true]')));
     root.classList.remove('cur-out');
     if (!ativo) { ativo = true; requestAnimationFrame(loop); }
@@ -1613,7 +1631,7 @@ if (!reduz.matches && matchMedia('(pointer: fine)').matches) {
     if (economia || pausadoPelaPessoa || dlg.open || !visivel || doc.hidden) return;
     prev.preload = 'auto';
     const p = prev.play();
-    if (p) p.then(() => { som.hidden = false; pausa.hidden = false; atualizar(); }).catch(() => {});
+    if (p) p.then(() => { som.textContent = '🔇 Sem som · toque para ouvir'; pausa.hidden = false; atualizar(); }).catch(() => {});
   }
   new IntersectionObserver(ents => { visivel = ents[0].isIntersecting; if (visivel) tocar(); else prev.pause(); }, { threshold: .35 }).observe(card);
   doc.addEventListener('visibilitychange', () => { if (doc.hidden) prev.pause(); else tocar(); });
@@ -1637,6 +1655,355 @@ if (!reduz.matches && matchMedia('(pointer: fine)').matches) {
   vv.addEventListener('ended', () => { fim.hidden = false; });
   $('#vmodal-rever').addEventListener('click', () => { fim.hidden = true; vv.currentTime = 0; vv.play(); });
   $$('[data-praticar]', dlg).forEach(b => b.addEventListener('click', fechar));
+})();
+
+// Tags soltas em volta do vídeo do hero. Flutuam; arrastar e soltar joga a tag
+// pela tela (bate nas bordas e nas outras tags); segurar sem mexer enche a tag
+// até estourar (confete, letras voando, estalo) e ela volta 7 s depois.
+// Enfeite: aria-hidden, fora do teclado, nada é gravado. Posições em
+// coordenadas da página; "casa" = lugar em volta do cartão (d = computador,
+// m = celular): [fração da largura do cartão, âncora da tag 0–1, 't' topo /
+// 'b' base do cartão, deslocamento vertical do centro em px].
+(function tagsSoltas() {
+  const card = $('#hvid-card'), hvid = card && card.parentElement, hero = $('.hero');
+  if (!card || !window.PointerEvent) return;
+  const TAGS = [
+    { t: '26 ferramentas de I.A. grátis', i: '✦', c: 't-marca', d: [.05, 0, 'b', 4], m: [.03, 0, 'b', 4] },
+    { t: 'Mais tempo livre', i: '☼', c: 't-areia', d: [.78, .5, 't', -128], m: [.02, 0, 'b', 58] },
+    { t: 'Sem levar trabalho para casa', i: '⌂', d: [.06, 0, 't', -74], m: [.5, .5, 'b', 112] },
+    { t: 'Plano de aula com um clique', i: '✎', d: [.98, 1, 't', -30], m: [.98, 1, 't', -12] },
+    { t: 'Sequência com um comando', i: '❖', d: [.24, .5, 't', -128] },
+    { t: 'Chamada em um toque', i: '✓', d: [.5, .5, 'b', 52], m: [.98, 1, 'b', 58] },
+    { t: 'Frequência pronta em PDF', i: '▤', d: [.97, 1, 'b', 4] },
+    { t: 'Contador de aulas automático', i: '◔', d: [.1, 0, 'b', 100] },
+    { t: 'Funciona no celular', i: '▯', c: 't-marca', d: [.9, 1, 'b', 100] }
+  ];
+  const ESPERA = 200, ENCHER = 1100, VOLTA = 7000;
+  const telaPequena = matchMedia('(max-width: 999px)');
+  const camada = doc.createElement('div'); camada.className = 'stags'; camada.setAttribute('aria-hidden', 'true');
+  const dica = doc.createElement('div'); dica.className = 'stag-dica'; dica.textContent = 'Arraste e jogue · segure para estourar';
+  camada.appendChild(dica); doc.body.appendChild(camada);
+  const fx = doc.createElement('canvas'); fx.className = 'stag-fx'; fx.setAttribute('aria-hidden', 'true'); doc.body.appendChild(fx);
+  const ctx = fx.getContext('2d');
+  const tags = TAGS.map((d, k) => {
+    const el = doc.createElement('div'); el.className = 'stag' + (d.c ? ' ' + d.c : '');
+    el.innerHTML = '<span class="stag-f"><span class="stag-b"><i></i><span></span></span></span>';
+    el.querySelector('i').textContent = d.i; el.querySelector('.stag-b span').textContent = d.t;
+    const f = el.firstChild;
+    f.style.setProperty('--dur', (5.2 + (k % 4) * .9) + 's'); f.style.setProperty('--atraso', (-k * 1.3) + 's'); f.style.setProperty('--r0', ((k % 2 ? 1 : -1) * (1 + k % 3)) + 'deg');
+    camada.appendChild(el);
+    return { d, el, b: el.querySelector('.stag-b'), x: 0, y: 0, w: 0, h: 0, vx: 0, vy: 0, est: 'fora', movido: false, p: 0, giro: 0, casa: null, hist: [] };
+  });
+  let topoLivre = 0, pronto = false, jaEstourou = false;
+  try { jaEstourou = sessionStorage.getItem('skin-tag-estourou') === '1'; } catch (e) {}
+
+  // ----- lugares -----
+  function medir() {
+    tags.forEach(T => { T.w = T.b.offsetWidth; T.h = T.b.offsetHeight; });
+    const hd = $('.hdr'); topoLivre = hd ? hd.offsetHeight : 0;
+  }
+  function limites(T) {
+    return { x0: scrollX + 6, x1: scrollX + root.clientWidth - T.w - 6, y0: scrollY + topoLivre + 6, y1: scrollY + innerHeight - T.h - 6 };
+  }
+  function casas() {
+    const r = card.getBoundingClientRect(), L = r.left + scrollX, Tp = r.top + scrollY, W = r.width, B = Tp + r.height;
+    const peq = telaPequena.matches, larg = root.clientWidth, lista = [];
+    tags.forEach(T => {
+      const a = peq ? T.d.m : T.d.d;
+      T.casa = a ? { x: L + a[0] * W - a[1] * T.w, y: (a[2] === 't' ? Tp : B) + a[3] - T.h / 2 } : null;
+      if (T.casa) lista.push(T);
+    });
+    // em telas estreitas algumas se sobrepõem: afasta e mantém dentro da página
+    for (let it = 0; it < 24; it++) {
+      let mexeu = false;
+      for (let i = 0; i < lista.length; i++) for (let j = i + 1; j < lista.length; j++) {
+        const A = lista[i], Bt = lista[j], a = A.casa, b = Bt.casa;
+        const ox = Math.min(a.x + A.w, b.x + Bt.w) - Math.max(a.x, b.x) + 8, oy = Math.min(a.y + A.h, b.y + Bt.h) - Math.max(a.y, b.y) + 6;
+        if (ox <= 0 || oy <= 0) continue;
+        mexeu = true;
+        if (ox < oy * 1.5) { const s = a.x < b.x ? 1 : -1; a.x -= s * ox / 2; b.x += s * ox / 2; }
+        else { const s = a.y < b.y ? 1 : -1; a.y -= s * oy / 2; b.y += s * oy / 2; }
+      }
+      lista.forEach(T => { T.casa.x = clamp(T.casa.x, 6, larg - T.w - 6); });
+      if (!mexeu) break;
+    }
+    // no celular elas ficam embaixo do vídeo: abre espaço no fim do hero
+    if (hvid) {
+      let fundo = B; lista.forEach(T => { fundo = Math.max(fundo, T.casa.y + T.h); });
+      const folga = hero ? parseFloat(getComputedStyle(hero).paddingBottom) || 0 : 0;
+      hvid.style.marginBottom = peq ? Math.max(0, Math.round(fundo - B + 14 - folga)) + 'px' : '';
+    }
+  }
+  function pinta(T) { T.el.style.transform = 'translate3d(' + T.x.toFixed(1) + 'px,' + T.y.toFixed(1) + 'px,0) rotate(' + T.giro.toFixed(2) + 'deg)'; }
+  function pintaEnche(T) {
+    if (T.p <= 0) { if (T.el.classList.contains('enche')) { T.b.style.transform = ''; T.el.classList.remove('enche'); } return; }
+    const k = T.p * T.p, sc = 1 + .85 * (T.p * .6 + k * .4);
+    T.b.style.transform = 'translate(' + ((Math.random() - .5) * k * 5).toFixed(1) + 'px,' + ((Math.random() - .5) * k * 5).toFixed(1) + 'px) rotate(' + ((Math.random() - .5) * k * 7).toFixed(1) + 'deg) scale(' + sc.toFixed(3) + ')';
+    T.el.style.setProperty('--p', T.p.toFixed(3)); T.el.classList.add('enche');
+  }
+  function posicionar() {
+    medir(); casas();
+    tags.forEach(T => {
+      if (T.est === 'pega' || T.est === 'voa') return;
+      if (T.est === 'estourou') { T.x = clamp(T.x, 6, root.clientWidth - T.w - 6); pinta(T); return; }
+      if (!T.movido) {
+        if (T.casa) { T.x = T.casa.x; T.y = T.casa.y; if (T.est === 'fora') { T.est = 'casa'; if (pronto) T.el.classList.add('vis', 'entra'); } }
+        else { T.est = 'fora'; T.el.classList.remove('vis'); T.x = T.y = 0; } // escondida: volta para dentro da página
+      } else T.x = clamp(T.x, 6, root.clientWidth - T.w - 6);
+      pinta(T);
+    });
+  }
+  let agendado = 0;
+  function agendar() { if (!agendado) agendado = requestAnimationFrame(() => { agendado = 0; posicionar(); if (particulas.length) ajustaFx(); }); }
+  function iniciar() {
+    if (pronto) return;
+    pronto = true; posicionar();
+    let k = 0;
+    tags.forEach(T => { if (T.est === 'casa') setTimeout(() => T.el.classList.add('vis', 'entra'), 120 + k++ * (reduz.matches ? 40 : 110)); });
+    // no celular não existe "passar o mouse": a dica aparece uma vez, quando o vídeo aparece
+    if (matchMedia('(hover: none)').matches) {
+      let vista = false; try { vista = sessionStorage.getItem('skin-tag-dica') === '1'; } catch (e) {}
+      if (!vista) new IntersectionObserver((ents, obs) => {
+        if (!ents[0].isIntersecting) return;
+        obs.disconnect(); try { sessionStorage.setItem('skin-tag-dica', '1'); } catch (e) {}
+        setTimeout(() => { const T = tags.find(t => t.est === 'casa'); if (T) mostrarDica(T, 4500); }, 1600);
+      }, { threshold: .6 }).observe(card);
+    }
+  }
+  tags.forEach(T => T.b.addEventListener('animationend', e => { if (e.animationName === 'stag-entra') T.el.classList.remove('entra'); }));
+  if (hvid) hvid.addEventListener('animationend', e => { if (e.target === hvid) iniciar(); });
+  setTimeout(iniciar, 1500);
+  addEventListener('resize', agendar);
+  if (window.ResizeObserver) new ResizeObserver(agendar).observe(card);
+  if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(agendar);
+
+  // ----- dica -----
+  let dicaT = 0;
+  function mostrarDica(T, ms) {
+    if (jaEstourou || T.est !== 'casa' && T.est !== 'solto') return;
+    dica.classList.add('on');
+    const w = dica.offsetWidth;
+    dica.style.transform = 'translate(' + clamp(T.x + T.w / 2 - w / 2, 6, root.clientWidth - w - 6) + 'px,' + (T.y - dica.offsetHeight - 12) + 'px)';
+    clearTimeout(dicaT); if (ms) dicaT = setTimeout(esconderDica, ms);
+  }
+  function esconderDica() { dica.classList.remove('on'); clearTimeout(dicaT); dicaT = setTimeout(() => { if (!dica.classList.contains('on')) dica.style.transform = ''; }, 300); }
+
+  // ----- som (Web Audio, sem arquivo; só nasce no toque da pessoa) -----
+  let audio = null;
+  function somCtx() {
+    if (!audio) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; try { audio = new AC(); } catch (e) { return null; } }
+    if (audio.state === 'suspended') audio.resume();
+    return audio;
+  }
+  function somEncher(T) {
+    const a = somCtx(); if (!a) return;
+    const o = a.createOscillator(), f = a.createBiquadFilter(), g = a.createGain();
+    o.type = 'triangle'; o.frequency.value = 200; f.type = 'lowpass'; f.frequency.value = 1600; g.gain.value = 0;
+    o.connect(f); f.connect(g); g.connect(a.destination); o.start();
+    g.gain.setTargetAtTime(.035, a.currentTime, .08);
+    T.som = { o, g, a };
+  }
+  function somEncherPasso(T) { if (T.som) T.som.o.frequency.setTargetAtTime(200 + T.p * T.p * 640 + Math.sin(performance.now() / 45) * 12 * T.p, T.som.a.currentTime, .03); }
+  function somEncherPara(T) {
+    if (!T.som) return;
+    const { o, g, a } = T.som; T.som = null;
+    g.gain.setTargetAtTime(0, a.currentTime, .04); o.stop(a.currentTime + .3);
+  }
+  function somEstouro() {
+    const a = somCtx(); if (!a) return;
+    const t = a.currentTime, n = Math.floor(a.sampleRate * .18), buf = a.createBuffer(1, n, a.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 4);
+    const s = a.createBufferSource(), hp = a.createBiquadFilter(), g = a.createGain();
+    s.buffer = buf; hp.type = 'highpass'; hp.frequency.value = 700; g.gain.value = .4;
+    s.connect(hp); hp.connect(g); g.connect(a.destination); s.start(t);
+    const o = a.createOscillator(), og = a.createGain();
+    o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(45, t + .16);
+    og.gain.setValueAtTime(.35, t); og.gain.exponentialRampToValueAtTime(.001, t + .2);
+    o.connect(og); og.connect(a.destination); o.start(t); o.stop(t + .22);
+  }
+
+  // ----- arrastar, jogar, segurar -----
+  function velocidade(T) {
+    const h = T.hist; if (h.length < 2) return [0, 0];
+    const a = h[0], z = h[h.length - 1], dt = Math.max(16, z[0] - a[0]) / 1000;
+    return [(z[1] - a[1]) / dt, (z[2] - a[2]) / dt];
+  }
+  function voar(T) { if (T.est !== 'voa') { T.est = 'voa'; T.movido = true; T.el.classList.add('voa'); } }
+  tags.forEach(T => {
+    const el = T.el;
+    el.addEventListener('contextmenu', e => e.preventDefault());
+    el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse' && T.est !== 'pega') mostrarDica(T); });
+    el.addEventListener('pointerleave', esconderDica);
+    el.addEventListener('pointerdown', e => {
+      if (e.button > 0 || T.est === 'estourou' || T.est === 'fora' || T.est === 'pega') return;
+      e.preventDefault();
+      try { el.setPointerCapture(e.pointerId); } catch (_) {}
+      const agora = performance.now();
+      T.est = 'pega'; T.arrastou = false; T.t0 = agora; T.px0 = e.pageX; T.py0 = e.pageY; T.ox = e.pageX - T.x; T.oy = e.pageY - T.y;
+      T.vx = T.vy = 0; T.hist = [[agora, e.pageX, e.pageY]];
+      el.classList.remove('entra', 'voa'); el.classList.add('pega'); esconderDica(); somCtx();
+      anda();
+    });
+    el.addEventListener('pointermove', e => {
+      if (T.est !== 'pega') return;
+      const agora = performance.now();
+      if (!T.arrastou && Math.hypot(e.pageX - T.px0, e.pageY - T.py0) > 7) { T.arrastou = true; T.movido = true; somEncherPara(T); }
+      if (!T.arrastou) return;
+      const L = limites(T);
+      T.x = clamp(e.pageX - T.ox, L.x0, L.x1); T.y = clamp(e.pageY - T.oy, L.y0, L.y1);
+      T.hist.push([agora, e.pageX, e.pageY]);
+      while (T.hist.length > 2 && agora - T.hist[0][0] > 100) T.hist.shift();
+    });
+    const soltar = () => {
+      if (T.est !== 'pega') return;
+      el.classList.remove('pega'); somEncherPara(T);
+      if (T.arrastou) {
+        let [vx, vy] = velocidade(T);
+        const v = Math.hypot(vx, vy), max = 2800;
+        if (v > max) { vx *= max / v; vy *= max / v; }
+        if (performance.now() - T.hist[T.hist.length - 1][0] > 90) vx = vy = 0; // parou antes de soltar
+        T.vx = vx; T.vy = vy; T.est = 'solto'; voar(T);
+      } else {
+        T.est = T.movido ? 'solto' : 'casa';
+        if (T.p < .05 && T.b.animate) T.b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.14,.86)' }, { transform: 'scale(.95,1.06)' }, { transform: 'scale(1)' }], { duration: 380, easing: 'ease-out' });
+      }
+      anda();
+    };
+    el.addEventListener('pointerup', soltar);
+    el.addEventListener('pointercancel', soltar);
+    el.addEventListener('lostpointercapture', soltar);
+  });
+
+  // ----- colisões (caixa com caixa; a tag segurada empurra as outras) -----
+  function colisoes() {
+    const vivas = tags.filter(T => T.est !== 'fora' && T.est !== 'estourou');
+    for (let i = 0; i < vivas.length; i++) for (let j = i + 1; j < vivas.length; j++) {
+      let A = vivas[i], B = vivas[j];
+      const aMexe = A.est === 'voa' || A.est === 'pega' && A.arrastou, bMexe = B.est === 'voa' || B.est === 'pega' && B.arrastou;
+      if (!aMexe && !bMexe) continue;
+      const ox = Math.min(A.x + A.w, B.x + B.w) - Math.max(A.x, B.x), oy = Math.min(A.y + A.h, B.y + B.h) - Math.max(A.y, B.y);
+      if (ox <= 0 || oy <= 0) continue;
+      if (B.est === 'pega') { if (A.est === 'pega') continue; const t = A; A = B; B = t; }
+      const eixoX = ox < oy;
+      const s = eixoX ? (A.x + A.w / 2 < B.x + B.w / 2 ? 1 : -1) : (A.y + A.h / 2 < B.y + B.h / 2 ? 1 : -1);
+      if (A.est === 'pega') {
+        const v = velocidade(A);
+        if (eixoX) { B.x += s * ox; B.vx = s * Math.max(Math.abs(v[0]) * 1.1, 220); } else { B.y += s * oy; B.vy = s * Math.max(Math.abs(v[1]) * 1.1, 220); }
+      } else if (eixoX) {
+        A.x -= s * ox / 2; B.x += s * ox / 2;
+        const va = A.vx, vb = B.vx; if ((va - vb) * s > 0) { A.vx = vb * .9; B.vx = va * .9; }
+      } else {
+        A.y -= s * oy / 2; B.y += s * oy / 2;
+        const va = A.vy, vb = B.vy; if ((va - vb) * s > 0) { A.vy = vb * .9; B.vy = va * .9; }
+      }
+      if (A.est !== 'pega') voar(A);
+      voar(B);
+    }
+  }
+
+  // ----- estouro -----
+  const CORES = ['#A7B58A', '#C2CE9E', '#D2DBB3', '#D6CBB8', '#B89B69', '#F3F1E9', '#6F9B71'];
+  let particulas = [], dpr = 1;
+  function ajustaFx() { dpr = Math.min(2, devicePixelRatio || 1); fx.width = Math.round(innerWidth * dpr); fx.height = Math.round(innerHeight * dpr); }
+  function estourar(T) {
+    somEncherPara(T); somEstouro();
+    const r = T.b.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const estilo = getComputedStyle(T.b), fundo = /rgba?\(0, 0, 0, 0\)|transparent/.test(estilo.backgroundColor) ? '#A7B58A' : estilo.backgroundColor;
+    T.est = 'estourou'; T.p = 0; T.b.style.transform = ''; T.el.classList.remove('vis', 'pega', 'enche', 'voa');
+    try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {}
+    ajustaFx();
+    const q = reduz.matches ? .5 : 1;
+    particulas.push({ tipo: 'flash', x: cx, y: cy, vida: 0, max: .3 });
+    particulas.push({ tipo: 'anel', x: cx, y: cy, vida: 0, max: .6, r0: r.width * .35 });
+    for (let i = 0; i < Math.round(48 * q); i++) {
+      const a = Math.random() * Math.PI * 2, v = 260 + Math.random() * 640;
+      particulas.push({ tipo: 'conf', x: cx + Math.cos(a) * r.width * .3, y: cy + Math.sin(a) * r.height * .3, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 180, vida: 0, max: .9 + Math.random() * .8, cor: CORES[i % CORES.length], w: 4 + Math.random() * 6, h: 3 + Math.random() * 4, rot: Math.random() * 6, vr: (Math.random() - .5) * 18 });
+    }
+    for (let i = 0; i < Math.round(12 * q); i++) {
+      const a = Math.random() * Math.PI * 2, v = 180 + Math.random() * 380;
+      particulas.push({ tipo: 'caco', x: cx + (Math.random() - .5) * r.width * .8, y: cy + (Math.random() - .5) * r.height * .6, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 120, vida: 0, max: .8 + Math.random() * .5, cor: fundo, w: 8 + Math.random() * 14, h: 5 + Math.random() * 8, rot: Math.random() * 6, vr: (Math.random() - .5) * 10 });
+    }
+    // as letras da tag voam cada uma para um lado
+    const cor = getComputedStyle(root).getPropertyValue('--tx').trim() || '#F3F1E9', letras = [...T.d.t], passo = r.width * .8 / Math.max(1, letras.length);
+    letras.forEach((c, k) => {
+      if (!c.trim()) return;
+      const lx = cx - r.width * .4 + k * passo;
+      particulas.push({ tipo: 'letra', c, x: lx, y: cy, vx: (lx - cx) * 3.2 + (Math.random() - .5) * 160, vy: -220 - Math.random() * 380, vida: 0, max: 1.1 + Math.random() * .5, cor, fonte: '800 ' + Math.round(13 * Math.min(1.6, r.height / 34)) + 'px Inter, system-ui, sans-serif', rot: 0, vr: (Math.random() - .5) * 9 });
+    });
+    // o sopro empurra as tags vizinhas
+    const px = cx + scrollX, py = cy + scrollY;
+    tags.forEach(O => {
+      if (O === T || O.est === 'fora' || O.est === 'estourou' || O.est === 'pega') return;
+      const dx = O.x + O.w / 2 - px, dy = O.y + O.h / 2 - py, dd = Math.hypot(dx, dy) || 1;
+      if (dd > 300) return;
+      const imp = (1 - dd / 300) * 1300; O.vx += dx / dd * imp; O.vy += dy / dd * imp; voar(O);
+    });
+    if (!jaEstourou) { jaEstourou = true; try { sessionStorage.setItem('skin-tag-estourou', '1'); } catch (e) {} }
+    setTimeout(() => {
+      if (T.est !== 'estourou') return;
+      T.movido = false; T.giro = 0; T.vx = T.vy = 0;
+      if (!T.casa) { T.est = 'fora'; return; }
+      T.x = T.casa.x; T.y = T.casa.y; T.est = 'casa'; pinta(T); T.el.classList.add('vis', 'entra');
+    }, VOLTA);
+  }
+  function desenhaFx(dt) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, innerWidth, innerHeight);
+    particulas = particulas.filter(p => (p.vida += dt) < p.max);
+    for (const p of particulas) {
+      const k = p.vida / p.max;
+      if (p.tipo === 'flash') {
+        const raio = 30 + k * 130, g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, raio);
+        g.addColorStop(0, 'rgba(243,241,233,' + (.85 * (1 - k)) + ')'); g.addColorStop(.4, 'rgba(194,206,158,' + (.45 * (1 - k)) + ')'); g.addColorStop(1, 'rgba(194,206,158,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, raio, 0, 7); ctx.fill(); continue;
+      }
+      if (p.tipo === 'anel') {
+        ctx.strokeStyle = 'rgba(194,206,158,' + (1 - k) + ')'; ctx.lineWidth = 3 * (1 - k) + .5;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r0 + (1 - Math.pow(1 - k, 3)) * 160, 0, 7); ctx.stroke(); continue;
+      }
+      const atr = Math.exp(-1.6 * dt);
+      p.vy += (p.tipo === 'letra' ? 900 : 1150) * dt; p.vx *= atr; p.vy *= atr; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+      ctx.globalAlpha = Math.min(1, (1 - k) * 1.6);
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.cor;
+      if (p.tipo === 'letra') { ctx.font = p.fonte; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(p.c, 0, 0); }
+      else ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.tipo === 'conf' ? p.h * (Math.abs(Math.cos(p.rot * 1.3)) + .2) : p.h);
+      ctx.restore(); ctx.globalAlpha = 1;
+    }
+    if (!particulas.length) ctx.clearRect(0, 0, innerWidth, innerHeight);
+  }
+
+  // ----- laço (só roda enquanto algo se mexe) -----
+  let rodando = false, tAnt = 0;
+  function anda() { if (!rodando) { rodando = true; tAnt = performance.now(); requestAnimationFrame(passo); } }
+  function passo(agora) {
+    const dt = Math.min(.034, Math.max(0, (agora - tAnt) / 1000)); tAnt = agora;
+    let ativo = false;
+    for (const T of tags) {
+      if (T.est === 'pega' && !T.arrastou) {
+        const seg = agora - T.t0;
+        if (seg > ESPERA) {
+          if (!T.som) somEncher(T);
+          T.p = Math.min(1, (seg - ESPERA) / ENCHER); somEncherPasso(T);
+          if (T.p >= 1) { estourar(T); continue; }
+        }
+        ativo = true;
+      } else if (T.p > 0) { T.p = Math.max(0, T.p - dt * 3.2); ativo = true; }
+      if (T.est === 'pega' && T.arrastou) {
+        T.giro += (clamp(velocidade(T)[0] * .012, -16, 16) - T.giro) * .2; ativo = true;
+      } else if (T.est === 'voa') {
+        T.x += T.vx * dt; T.y += T.vy * dt;
+        const atr = Math.exp(-2.1 * dt); T.vx *= atr; T.vy *= atr;
+        const L = limites(T);
+        if (T.x < L.x0) { T.x = L.x0; T.vx = Math.abs(T.vx) * .72; } else if (T.x > L.x1) { T.x = L.x1; T.vx = -Math.abs(T.vx) * .72; }
+        if (T.y < L.y0) { T.y = L.y0; T.vy = Math.abs(T.vy) * .72; } else if (T.y > L.y1) { T.y = L.y1; T.vy = -Math.abs(T.vy) * .72; }
+        T.giro += (clamp(T.vx * .01, -14, 14) - T.giro) * .15;
+        if (Math.hypot(T.vx, T.vy) < 14) { T.vx = T.vy = 0; T.est = 'solto'; T.el.classList.remove('voa'); } else ativo = true;
+      } else if (Math.abs(T.giro) > .05) { T.giro *= .85; ativo = true; } else T.giro = 0;
+    }
+    colisoes();
+    tags.forEach(T => { if (T.est !== 'fora' && T.est !== 'estourou') { pinta(T); pintaEnche(T); } });
+    if (particulas.length) { desenhaFx(dt); ativo = true; }
+    if (ativo || tags.some(T => T.est === 'voa' || T.est === 'pega')) requestAnimationFrame(passo); else rodando = false;
+  }
 })();
 
 // Esteira com as 26 ferramentas da I.A.
