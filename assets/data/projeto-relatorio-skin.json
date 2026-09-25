@@ -1,5 +1,5 @@
 {
-  "versao": 9,
+  "versao": 10,
   "atualizadoEm": "2026-09-25",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -676,16 +676,6 @@
               "Marcador T6_INICIO para injeção automática no 6º Ano (legado).",
               "Validação do HTML gerado pela IA antes de injetar (fluxo antigo do Groq)."
             ]
-          },
-          {
-            "id": "pend-ia-chaves",
-            "icon": "file",
-            "title": "Ligar os provedores extras da IA da plataforma",
-            "status": "A fazer",
-            "details": [
-              "Criar as chaves grátis e gravar com supabase secrets set (pasta da Biblioteca): CEREBRAS_API_KEY, MISTRAL_API_KEY, GITHUB_MODELS_TOKEN, NVIDIA_API_KEY, SAMBANOVA_API_KEY, COHERE_API_KEY, HF_TOKEN.",
-              "Camada paga só com IA_PAGOS=1 (e créditos no OpenRouter/DeepSeek)."
-            ]
           }
         ]
       }
@@ -1334,7 +1324,7 @@
       "children": [
         {
           "id": "rs-ia-1",
-          "text": "Fila da IA da plataforma com 11 provedores gratuitos que se trocam sozinhos no limite do dia (descanso do modelo)",
+          "text": "IA da plataforma toda pelo OpenRouter: gratuitas → pagas baratas → Gemini/Groq diretos; troca sozinha no limite e nunca fica sem IA",
           "done": true
         },
         {
@@ -1369,8 +1359,8 @@
         },
         {
           "id": "rs-ia-8",
-          "text": "Gravar as chaves dos provedores extras no servidor (Cerebras, Mistral, GitHub, NVIDIA, SambaNova, Cohere, Hugging Face)",
-          "done": false
+          "text": "Chave nova do OpenRouter no servidor e rede de segurança em todas as funções de IA",
+          "done": true
         },
         {
           "id": "rs-ia-9",
