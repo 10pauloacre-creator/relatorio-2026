@@ -6,9 +6,20 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── Camadas do fundo ── */
-.sk-aurora,.sk-vaga{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0}
-.sk-aurora{filter:saturate(1.1);opacity:.95}
-.sk-vinheta{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(120% 90% at 50% 40%,transparent 55%,rgba(0,0,0,.55))}
+/* Universo: canvas das estrelas (sk-ceu), clarão das explosões e vinheta. */
+html.sk-vivo,html.sk-vivo body{background:#020302}
+.sk-ceu{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0;background:#020302}
+.sk-clarao{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0;
+  background:radial-gradient(circle at var(--cx,50%) var(--cy,50%),rgba(255,246,228,var(--forca,.5)),rgba(255,210,150,calc(var(--forca,.5) * .35)) 22%,transparent 62%)}
+.sk-clarao.on{animation:skClarao 1.1s cubic-bezier(.22,.61,.36,1)}
+@keyframes skClarao{0%{opacity:1}100%{opacity:0}}
+.sk-vinheta{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(125% 95% at 50% 45%,transparent 58%,rgba(0,0,0,.6))}
+/* Buraco negro: a página esmaece e é puxada para ele; volta no colapso. */
+html.sk-vivo #vista-escolas,html.sk-vivo .topo,html.sk-vivo .aviso-email,html.sk-vivo .marca{transition:opacity 1.2s ease,transform 2.8s cubic-bezier(.22,1,.36,1),filter 1.2s ease}
+html.sk-buraco #vista-escolas{opacity:.22;transform:translate(var(--sk-bhx,0),var(--sk-bhy,0)) scale(.96);filter:blur(1.5px)}
+html.sk-buraco .topo,html.sk-buraco .aviso-email,html.sk-buraco .marca{opacity:.3}
+/* Segurar para acelerar não seleciona texto nem abre o menu do toque. */
+html.sk-vivo #vista-escolas,html.sk-vivo .topo,html.sk-vivo .marca{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 html.sk-vivo .topo,html.sk-vivo main{position:relative;z-index:1}
 .sk-prog{position:fixed;left:0;top:0;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(var(--sk-p,0));background:linear-gradient(90deg,#6F9B71,#C2CE9E,#D6CBB8);z-index:30;pointer-events:none;box-shadow:0 0 12px rgba(194,206,158,.5)}
 
