@@ -1,5 +1,5 @@
 {
-  "versao": 15,
+  "versao": 16,
   "atualizadoEm": "2026-09-25",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -604,10 +604,13 @@
           {
             "id": "sc-legado",
             "icon": "file",
-            "title": "Arquivos antigos na raiz",
-            "status": "Revisar",
+            "title": "Limpeza do repositório (25/09/2026)",
+            "status": "Concluído",
             "details": [
-              "fix_ai2.py, fix_ai2b.py, fix_relato.py, update_all.py, temp_fix_0811_t1_art.py, __pycache__, tmp/ e output/: scripts e sobras de manutenção pontual. Podem ser apagados depois de conferidos."
+              "Apagados: scripts Python avulsos (fix_*.py, update_all.py, temp_fix_*.py), APKs 1.0.0 a 1.0.11 (~200 MB), output/, skin-email.jpg e a chamada .docx com nomes de alunos.",
+              "tmp/ saiu do GitHub (tinha um perfil do Chrome) e entrou no .gitignore junto com output/ e .chrome-*/.",
+              "Originais da marca movidos para fontes/marca/ (não publicado); imagens dos botões e ícones reduzidas para 512 px (11 MB → 2,2 MB); vídeo do site de 14,4 MB para 6,1 MB.",
+              "Backup de tudo em C:ProjetosAXION PROEDUQ_backup-limpeza-relatorio-skin-2026-09-25."
             ]
           }
         ]
@@ -1378,6 +1381,16 @@
         {
           "id": "rs-doc-5",
           "text": "Validação do HTML gerado pela IA antes de injetar (fluxo antigo do Groq)",
+          "done": false
+        },
+        {
+          "id": "rs-doc-limpeza",
+          "text": "Limpeza do repositório: lixo removido, tmp/ fora do GitHub, mídias reduzidas",
+          "done": true
+        },
+        {
+          "id": "rs-doc-historico",
+          "text": "Limpar o histórico do GitHub (APKs antigos, perfil do Chrome e .docx ainda estão nos commits antigos)",
           "done": false
         }
       ]

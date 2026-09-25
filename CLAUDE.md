@@ -27,20 +27,30 @@ C:\Projetos\AXION PROEDUQ\RELATORIO-SKIN\
 ├── casavequia.html     ← DIÁRIO PRINCIPAL do administrador (~1,1 MB)
 ├── herminio.html       ← Diário da 2ª escola
 ├── meu-diario.html     ← Página de UMA escola do professor (?escola=<id>)
+├── *-alunos-*.html     ← Painéis de alunos de cada turma (Casavequia e Hermínio)
+├── aee.html, projetos-pessoais.html, projeto-detalhes.html, planejamento-aulas-2026.html, mapa-*.html
+├── privacidade.html, termos.html, axion-proeduq.html  ← páginas públicas
 ├── CLAUDE.md           ← Este arquivo
-├── manifest.json       ← PWA manifest
-├── sw.js               ← Service worker (cache offline)
-├── icon-192.png
-├── icon-512.png
-├── assets/             ← Imagens e recursos estáticos
-├── firebase-config.js  ← Config Firebase (Firestore para status do plano anual)
-└── *.py                ← Scripts Python de manutenção (podem ser deletados)
+├── manifest.json, sw.js, favicon*, icon-*.png, apple-touch-icon.png ← PWA (ficam na raiz)
+├── botao-*.png, botão_projetos.png, iconv2.png ← imagens dos botões (na raiz: caminho gravado nos dados)
+├── assets/             ← Tudo que o site usa: js/, css/, img/, icons/, marca/, video/, data/, app/
+├── downloads/          ← Página do APK + as 2 versões mais novas (publish-apk-release.js apaga as antigas)
+├── livros/ · arquivo/  ← Livros digitais e arquivo dos anos letivos (publicados)
+├── fontes/marca/       ← Originais da marca (logo e ícones grandes). NÃO publicado
+├── docs/               ← Modelos e guias de referência (não publicado)
+├── marketing/video/    ← Código-fonte do vídeo do site (saídas no .gitignore)
+├── supabase/           ← SQL das etapas, Edge Functions e modelos de e-mail
+├── scripts/            ← Build, releases, checagens e importações (Node)
+├── android/            ← Projeto Capacitor do APK
+└── firebase-config.js  ← Config Firebase (fora do git; ver firebase-config.example.js)
 ```
+
+**Organização (limpeza de 25/09/2026):** só as pastas `arquivo`, `assets`, `downloads` e `livros` e os arquivos listados em `scripts/build-web-release.js` vão para o site; o resto fica só no repositório. **Não mover páginas `.html` nem as imagens da raiz** — os endereços (relatorio.skin/casavequia.html, favoritos, PWA, dados gravados com `botao-*.png`) dependem deles. Rascunhos e saídas geradas vão em `tmp/` e `output/`, que estão no `.gitignore` (nunca subir perfil de Chrome: guarda cookies e senhas). Imagem nova: no máximo ~512 px no lado maior para ícones e botões (a limpeza reduziu 11 MB de PNG para 2,2 MB); vídeo do site em H.264 CRF 26 com `-movflags +faststart` (o ffmpeg está em `marketing/video/node_modules/ffmpeg-static`). Os originais antes da redução ficaram em `C:\Projetos\AXION PROEDUQ\_backup-limpeza-relatorio-skin-2026-09-25\` (fora do git).
 
 **GitHub:** `https://github.com/10pauloacre-creator/relatorio-2026`
 **Vercel:** projeto `relatorios` na conta `10pauloacre-creator` (equipe `10pauloacre-creators-projects`), ligado ao GitHub desde 19/09/2026 → domínio oficial **`https://relatorio.skin`** (o `relatorios-ten-pi.vercel.app` foi removido em 19/09/2026; `www.relatorio.skin` não existe). Cada push na `main` publica nos dois lugares (GitHub Pages e Vercel). O `vercel.json` roda `npm run build:pages` e serve só `dist/` (a mesma lista de `scripts/build-web-release.js`). O branch `gh-pages` também gera uma prévia no Vercel, sem efeito.
 **Branch:** `main`
-**Último commit:** `f5dc531` — relatos 09-10/04, contador e plano LGG renovados
+**Último commit:** veja `git log` (a linha do tempo do projeto também mostra)
 
 ---
 
@@ -537,7 +547,7 @@ O "← Início" da Casavequia e da Hermínio aponta para `escolas.html`.
 
 **Tela de conta (`supabase-report-sync.js`):** mesma identidade (grafite + sálvia), logo no topo do cartão, entrada animada do cartão e dos campos, e link "← Voltar ao site" nas páginas com `<html data-auth-voltar="index.html">` (`entrar.html`, `meu-diario.html`, `escolas.html`). `auth.showLogin(mensagem, modo)` aceita "criar" e "esqueci". O fundo da trava usa `--rel-trava-bg` (padrão `#0D0E0D`), que a página pode redefinir.
 
-**Ícone do app (21/09/2026):** só o símbolo "S" (sem texto, legível em 48 px) sobre fundo grafite com brilho verde, recortado de `assets/icons/icon-relatorio.skin.png`. O manifest usa `assets/app/icone-{192,512}.png` e `icone-maskable-{192,512}.png` (símbolo em 52%, dentro da área segura). Nomes novos forçam a troca do ícone nos celulares com o app instalado: ao mudar o ícone de novo, use outro nome de arquivo. `icon-192/512.png`, `maskable-icon-512.png`, `apple-touch-icon.png`, `favicon-16/32x32.png` e `favicon.ico` (16/32/48) têm a mesma arte. **Ícones antigos:** gerados a partir de `assets/icons/icon-relatorio.skin.png` (quadrado) e `assets/icons/logo-relatorio.skin.png` (horizontal) — `icon-192/512`, `maskable-icon-512` (13% de folga), `apple-touch-icon`, `favicon-16/32`, `favicon.ico`, `iconv2.png` e os `mipmap-*` do Android (`ic_launcher`, `_round`, `_foreground`). As versões web da marca ficam em `assets/marca/skin-marca[-sm].webp`, `skin-icone[-sm].webp` e `skin-simbolo.webp` (o "S" sozinho, usado no cabeçalho do site).
+**Ícone do app (21/09/2026):** só o símbolo "S" (sem texto, legível em 48 px) sobre fundo grafite com brilho verde, recortado de `fontes/marca/icon-relatorio.skin.png`. O manifest usa `assets/app/icone-{192,512}.png` e `icone-maskable-{192,512}.png` (símbolo em 52%, dentro da área segura). Nomes novos forçam a troca do ícone nos celulares com o app instalado: ao mudar o ícone de novo, use outro nome de arquivo. `icon-192/512.png`, `maskable-icon-512.png`, `apple-touch-icon.png`, `favicon-16/32x32.png` e `favicon.ico` (16/32/48) têm a mesma arte. **Ícones antigos:** gerados a partir de `fontes/marca/icon-relatorio.skin.png` (quadrado) e `fontes/marca/logo-relatorio.skin.png` (horizontal) — `icon-192/512`, `maskable-icon-512` (13% de folga), `apple-touch-icon`, `favicon-16/32`, `favicon.ico`, `iconv2.png` e os `mipmap-*` do Android (`ic_launcher`, `_round`, `_foreground`). As versões web da marca ficam em `assets/marca/skin-marca[-sm].webp`, `skin-icone[-sm].webp` e `skin-simbolo.webp` (o "S" sozinho, usado no cabeçalho do site).
 
 **Regra:** nada de azul, roxo azulado, neon ou ilustração escolar infantil nas páginas da marca. O verde é cor de ação e destaque, nunca o fundo.
 
@@ -579,7 +589,7 @@ O "← Início" da Casavequia e da Hermínio aponta para `escolas.html`.
 
 "AXION PROEDUQ · Tecnologia que move a educação." é a marca que abriga o Relatório (relatorio.skin), a Biblioteca Digital (biblioteca-ac.com) e os projetos futuros.
 - **Página institucional:** `axion-proeduq.html` (pública, sem login): quem somos, propósito, princípios, valores, plataformas, integração, objetivos, identidade visual e contato. Links para os dois domínios são absolutos, então a mesma página serve aos dois sites.
-- **Logos:** originais em `assets/icons/axion-bg-escuro.png` e `axion-bg-claro.png`; versões recortadas para a web em `assets/marca/` (`axion-escuro[-sm].webp`, `axion-claro[-sm].webp`, `plataforma-*.webp`).
+- **Logos:** originais em `fontes/marca/axion-bg-escuro.png` e `axion-bg-claro.png`; versões recortadas para a web em `assets/marca/` (`axion-escuro[-sm].webp`, `axion-claro[-sm].webp`, `plataforma-*.webp`).
 - **Onde aparece:** rodapé da página inicial (`.marca`, com "PROPRIEDADE DA AXION PROEDUQ" e os links legais), rodapé da tela de login (`.rel-auth-marca`, em `supabase-report-sync.js`) e, na Biblioteca, rodapé da tela de abertura (`#splash-marca`) e dos painéis (`.marca-axion` nos `.content-footer`).
 - **Cópia idêntica nos dois repositórios:** a página e as imagens de `assets/marca/` estão em `scripts/check-copias-compartilhadas.js`. Alterou aqui, rode `node scripts/check-copias-compartilhadas.js --copiar` e faça commit nos dois.
 - Na página inicial, a regra global `a:not(.projetos-pessoais) > img` dá 320 px às imagens; a logo usa seletor mais específico. O rodapé é `<div>` e não `<footer>`, porque `dark-mode-2026.css` pinta `footer`.

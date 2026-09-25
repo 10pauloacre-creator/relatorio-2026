@@ -70,10 +70,18 @@ const entry = {
   downloadPath: `./apk/${fileName}`
 };
 
-const nextReleases = [
+// Só as 2 versões mais novas ficam no site (cada APK tem ~13 MB e todo o
+// downloads/ vai em cada publicação); as antigas continuam no histórico do git.
+const MANTER = 2;
+const todas = [
   entry,
   ...releasesData.releases.filter((item) => item.versionName !== entry.versionName)
 ];
+const nextReleases = todas.slice(0, MANTER);
+todas.slice(MANTER).forEach((item) => {
+  const velho = path.join(targetDir, item.fileName);
+  if (fs.existsSync(velho)) fs.unlinkSync(velho);
+});
 
 writeJson(latestFile, {
   generatedAt: releasedAt,
