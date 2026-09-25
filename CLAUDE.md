@@ -690,3 +690,27 @@ Na aba de cada turma, ao lado de "Abrir página de alunos", o botão **"Frequên
 - **Migração:** as sequências antigas (`R.seq` de `meu-diario:recursos:v1`) viram documentos da aba Sequências, em Turma › Disciplina, com id fixo `seq-<turma>-<disc>-<bim>` (não duplica entre aparelhos). Os dados antigos continuam em `recursos` (não apagados).
 - **Baixar** (`assets/js/documentos-exportar.js`, `window.DocExportar`): PDF pela impressão, Word `.docx` de verdade (docx@9.5.1: títulos, listas, tabelas), Excel `.xlsx` (cada tabela do documento vira uma aba), HTML, Markdown e texto; pasta inteira em `.zip` com as subpastas (JSZip) ou num PDF só. Bibliotecas do jsDelivr, carregadas só quando precisa.
 - **Teste de ponta a ponta (24/09/2026):** conta temporária semeada com uma escola e uma turma, Meu Diário local no Chrome sem janela: migração, pastas, 26 ferramentas, prompt preenchido, resposta real da IA da plataforma (na 2ª rodada, já pelo OpenRouter, respondeu `openrouter/free`), identificação de turma/disciplina/bimestre, pasta automática, gravação no banco e os 6 formatos + ZIP. Conta apagada no fim.
+
+## 29. TELA ESCOLAS VIVA E CABEÇALHOS ANIMADOS (24/09/2026)
+
+**`escolas.html`** carrega `assets/css/escolas-vivo.css` + `assets/js/escolas-vivo.js` (classe `html.sk-vivo`; tudo com `data-runtime-ui`, nada é gravado):
+- **Fundo:** aurora em canvas de baixa resolução (1/5 da tela, sálvia/dourado/verde/areia) + vagalumes que desviam do cursor com redemoinho, seguem a rolagem e a inclinação do celular. Laço único de `requestAnimationFrame`, que para com a aba escondida. Variáveis da raiz (`--sk-sv`, `--sk-sy`, `--sk-p`) só são escritas quando mudam.
+- **Som ambiente** (Web Audio, sem arquivo): acordes longos Cmaj9 → Am9 → Fmaj9 → G6/9 trocados a cada 16 s com fusão de 7 s, filtro que "respira", mar ao longe (ruído marrom com LFO), sininhos pentatônicos a cada 4,5–11 s e eco gerado. Começa no primeiro gesto (no celular só `touchend`/`click` liberam o áudio) e o volume sobe em 5 s. Botão "Som ambiente" no canto inferior esquerdo liga e desliga; a escolha fica em `localStorage "skin-som"` (padrão ligado). Passar sobre um cartão toca uma nota, e abrir uma escola toca um arpejo. Pausa quando a aba sai de foco.
+- **Cursor** (nasce no primeiro movimento de mouse de verdade; no toque não existe): ponto + anel com mola que estica na direção do movimento, cresce sobre o que é clicável, mostra "ABRIR"/"NOVA" sobre os cartões, deixa rastro e solta faíscas no clique. Campos de texto mantêm o cursor normal.
+- **Cartões:** inclinação 3D + brilho seguindo o cursor (`--rx`/`--ry` numéricos, sem dividir ângulo por ângulo), flutuação lenta, revelação em sequência na rolagem (cada cartão só uma vez; ao redesenhar pela sincronia, os já vistos voltam direto), borda girando no "Cadastre sua escola". No celular, inclinação pelo `deviceorientation` (iPhone: a permissão é pedida ao tocar no botão do som).
+- **Rolagem:** título em paralaxe que some devagar, grade que "balança" (`skewY`) com a velocidade, linha de progresso no topo.
+- **Portal:** clique numa escola → os outros cartões desfocam, um círculo cresce a partir do cartão, o logo viaja ao centro (escola sem imagem: o emoji vira um SVG) e a navegação sai em 1,15 s. Grava `sessionStorage "skin-portal"` `{t, img, nome}`. Voltar pelo navegador (bfcache) desfaz o portal.
+
+**Chegada na escola:** `assets/js/skin-transicao.js`, SEM `defer`, logo depois do `<meta charset>` de `casavequia.html`, `herminio.html`, `meu-diario.html` e `aee.html`. Só age com o aviso `skin-portal` de menos de 9 s: cobre a página com `html.skin-chegando::after` (mesmo fundo do portal, logo "respirando") até o `DOMContentLoaded` e abre uma íris do centro (`@property --skin-r` numa máscara radial), com o cabeçalho subindo. Trava de segurança: abre em no máximo 5 s.
+
+**Cabeçalho vivo:** `assets/js/cabecalho-vivo.js` (`defer`, as mesmas 4 páginas) põe `.cv-vivo` como primeiro filho de `header.cab` (z-index 0; o conteúdo fica em 1–3):
+- três luzes que derivam e mudam de tom (`hue-rotate` lento);
+- grade tecnológica que acende em volta do cursor (máscara num envoltório parado, `.cv-gradew`);
+- foco de luz seguindo o cursor em qualquer ponto da página;
+- faixa de brilho periódica, pontos de "circuito" e uma onda a cada toque.
+
+No celular, a inclinação do aparelho move tudo (iPhone: permissão no primeiro toque no cabeçalho). Cores: claro = dourado/menta/areia; escuro (`html.dark-2026`) = laranja/sálvia/dourado. Pausa fora da tela (IntersectionObserver) e o laço de suavização dorme quando para.
+
+**Reduzir movimento** (`prefers-reduced-motion`; o Windows com "Efeitos de animação" desligados ativa isso no Chrome): a página fica **calma, não parada**. O fundo e os vagalumes andam a 35–40% da velocidade e o cursor continua. Saem a inclinação, o balanço da rolagem, a paralaxe e a flutuação; o portal e a íris viram esmaecer; o cabeçalho deriva em 40–60 s, sem faixa de brilho.
+
+**Teste (24/09/2026):** conta temporária no Chrome sem janela passou em todos os itens: fundo, revelação, inclinação e "ABRIR", som tocando após o 1º clique, portal com logo, íris de chegada, cabeçalho reagindo ao cursor (claro e escuro), volta sem cobertura, celular sem cursor falso, modo calmo, Casavequia montando o cabeçalho, zero erros de JavaScript.

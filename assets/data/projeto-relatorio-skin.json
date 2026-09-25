@@ -276,6 +276,34 @@
               "Modo escuro grafite (html.dark-2026) sobre os estilos legados.",
               "Aviso de versão nova do app/APK."
             ]
+          },
+          {
+            "id": "js-escolas-vivo",
+            "icon": "file",
+            "title": "assets/js/escolas-vivo.js + assets/css/escolas-vivo.css — tela Escolas viva",
+            "status": "Concluído",
+            "details": [
+              "Fundo em aurora com vagalumes, som ambiente gerado no navegador (liga/desliga no canto), cursor elástico com faíscas.",
+              "Cartões com inclinação 3D e brilho (no celular, pela inclinação do aparelho), revelação na rolagem e portal de abertura da escola."
+            ]
+          },
+          {
+            "id": "js-transicao",
+            "icon": "file",
+            "title": "assets/js/skin-transicao.js — chegada na escola",
+            "status": "Concluído",
+            "details": [
+              "Carregado sem defer no <head> das 4 páginas de escola: logo respirando enquanto carrega e íris que abre do centro."
+            ]
+          },
+          {
+            "id": "js-cabecalho-vivo",
+            "icon": "file",
+            "title": "assets/js/cabecalho-vivo.js — cabeçalho animado",
+            "status": "Concluído",
+            "details": [
+              "Luzes que mudam de tom, grade tecnológica e foco de luz seguindo o cursor; no celular, a inclinação do aparelho. Casavequia, Hermínio, Meu Diário e AEE."
+            ]
           }
         ]
       },
@@ -1373,6 +1401,47 @@
           "id": "rs-ia-9",
           "text": "Documentos também na Casavequia e na Hermínio",
           "done": false
+        }
+      ]
+    },
+    {
+      "id": "rs-vivo",
+      "text": "13. Tela Escolas viva e cabeçalhos animados",
+      "children": [
+        {
+          "id": "rs-vivo-1",
+          "text": "Fundo animado (aurora e vagalumes) reagindo ao cursor, à rolagem e ao celular",
+          "done": true
+        },
+        {
+          "id": "rs-vivo-2",
+          "text": "Som ambiente relaxante gerado no navegador, com botão de liga/desliga",
+          "done": true
+        },
+        {
+          "id": "rs-vivo-3",
+          "text": "Cursor animado com anel elástico, rastro e faíscas",
+          "done": true
+        },
+        {
+          "id": "rs-vivo-4",
+          "text": "Cartões das escolas com inclinação 3D, brilho e revelação na rolagem",
+          "done": true
+        },
+        {
+          "id": "rs-vivo-5",
+          "text": "Portal de abertura da escola e íris de chegada",
+          "done": true
+        },
+        {
+          "id": "rs-vivo-6",
+          "text": "Cabeçalho das escolas com cores em movimento (cursor no computador, movimento no celular)",
+          "done": true
+        },
+        {
+          "id": "rs-vivo-7",
+          "text": "Modo calmo para quem usa \"reduzir movimento\"",
+          "done": true
         }
       ]
     }
