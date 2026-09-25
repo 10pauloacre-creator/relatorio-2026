@@ -1,5 +1,5 @@
 {
-  "versao": 10,
+  "versao": 11,
   "atualizadoEm": "2026-09-25",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -90,11 +90,13 @@
           {
             "id": "p-index",
             "icon": "file",
-            "title": "index.html — site de apresentação",
+            "title": "index.html — site de apresentação com demonstração interativa",
             "status": "Concluído",
             "details": [
-              "Página pública da marca: hero, problema, vitrine, módulos, demonstração, fluxo, segurança, sobre, CTA e rodapé legal.",
-              "Não exige conta. Animações respeitam prefers-reduced-motion."
+              "Página pública (sem conta): hero, problema com calculadora do tempo, solução, demonstração interativa, benefícios (I.A. e inclusão), prova social, perguntas, CTA e rodapé legal com a marca AXION.",
+              "Demonstração em 15 etapas com dados fictícios (Profa. Ana Clara Mendes, Escola Municipal Dom Pedro II, 5º Ano A com 28 alunos, 3 com PEI): um cursor percorre login, cadastro pelo INEP, ocupação, Meu Diário, turma pela I.A., relato com presença/atividades/observações, Frequência Diária, Conteúdos, Calendário, Documentos, I.A. (26 ferramentas), Contador com projeção, Perfil, Configurações e painel AEE.",
+              "Modo Pratique: as mesmas telas ficam clicáveis. Nada sai da página; login de demonstração fictício (example.com), escola com INEP 99xxxxxx inexistente e respostas de I.A. de exemplo.",
+              "Arquivo único (HTML + CSS + JS, sem biblioteca). Modo claro/escuro na chave modo-tema (a mesma do Meu Diário). Mantém o redirecionamento de quem já está logado para escolas.html."
             ]
           },
           {
@@ -922,6 +924,11 @@
         {
           "id": "rs-contas-5",
           "text": "Marca RELATORIO SKIN e site de apresentação",
+          "done": true
+        },
+        {
+          "id": "rs-site-demo",
+          "text": "Site com demonstração interativa (passeio automático + modo Pratique)",
           "done": true
         },
         {
