@@ -1,0 +1,116 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   escolas-vivo.css — tela Escolas viva (24/09/2026)
+   Fundo animado, cursor, cartões 3D, rolagem e portal de abertura.
+   O comportamento está em assets/js/escolas-vivo.js (classe html.sk-vivo).
+   Paleta da marca: grafite + sálvia + areia + dourado (nada de azul).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Camadas do fundo ── */
+.sk-aurora,.sk-vaga{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0}
+.sk-aurora{filter:saturate(1.1);opacity:.95}
+.sk-vinheta{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(120% 90% at 50% 40%,transparent 55%,rgba(0,0,0,.55))}
+html.sk-vivo .topo,html.sk-vivo main{position:relative;z-index:1}
+.sk-prog{position:fixed;left:0;top:0;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(var(--sk-p,0));background:linear-gradient(90deg,#6F9B71,#C2CE9E,#D6CBB8);z-index:30;pointer-events:none;box-shadow:0 0 12px rgba(194,206,158,.5)}
+
+/* ── Título ── */
+html.sk-vivo .titulo{transform:translate3d(0,calc(var(--sk-sy,0) * .22px),0);opacity:calc(1 - var(--sk-sy,0) / 520)}
+html.sk-vivo .titulo h1{background:linear-gradient(100deg,#F3F1E9 20%,#C2CE9E 38%,#D6CBB8 50%,#B89B69 58%,#F3F1E9 76%);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:skBrilho 11s ease-in-out infinite}
+@keyframes skBrilho{0%,100%{background-position:100% 0}50%{background-position:0 0}}
+html.sk-vivo .titulo p{animation:skSurge 1.4s .2s cubic-bezier(.22,1,.36,1) both}
+@keyframes skSurge{from{opacity:0;transform:translateY(10px);letter-spacing:.06em}to{opacity:1;transform:none}}
+
+/* ── Cartões ── */
+html.sk-vivo .grade{transform:skewY(calc(var(--sk-sv,0) * 1.6deg));transform-origin:50% 0}
+html.sk-vivo .grade .item{perspective:1000px}
+html.sk-vivo .grade .item.sk-vis{animation:skFlutua 7s ease-in-out var(--sk-fd,0s) infinite}
+@keyframes skFlutua{0%,100%{translate:0 0}50%{translate:0 -7px}}
+html.sk-vivo .grade .card{
+  transform:translate3d(var(--sk-mx,0px),var(--sk-ty,0px),0) rotateX(calc(var(--rx,0) * 1deg)) rotateY(calc(var(--ry,0) * 1deg)) scale(var(--sk-s,1));
+  transition:transform .7s cubic-bezier(.22,1,.36,1),box-shadow .5s ease;
+  box-shadow:calc(var(--ry,0) * -1.4px) calc(18px + var(--rx,0) * 1.4px) 44px rgba(0,0,0,.45);
+  will-change:transform}
+html.sk-vivo .grade .card.sk-tilt{transition:transform .14s linear,box-shadow .3s ease}
+html.sk-vivo .grade .card:hover,html.sk-vivo .grade .card:focus-visible{--sk-ty:-10px;--sk-s:1.045;box-shadow:0 34px 70px rgba(0,0,0,.6),0 0 0 1px rgba(194,206,158,.25),0 0 60px rgba(167,181,138,.18)}
+html.sk-vivo .grade .card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(circle at var(--gx,50%) var(--gy,-10%),rgba(255,255,255,.34),rgba(255,255,255,.06) 32%,transparent 58%);
+  mix-blend-mode:overlay;opacity:var(--sk-brilho,0);transition:opacity .5s}
+html.sk-vivo .grade .card:hover::after,html.sk-vivo.sk-giro .grade .card::after{--sk-brilho:1}
+html.sk-vivo .grade .card.novo .mais{transition:transform .6s cubic-bezier(.34,1.56,.64,1)}
+html.sk-vivo .grade .card.novo:hover .mais{transform:rotate(90deg) scale(1.08)}
+html.sk-vivo .grade .card.novo::before{content:"";position:absolute;inset:-2px;border-radius:inherit;pointer-events:none;
+  background:conic-gradient(from var(--sk-ang,0deg),transparent 0 70%,rgba(194,206,158,.55) 80%,transparent 90%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;padding:2px;animation:skGira 6s linear infinite}
+@property --sk-ang{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes skGira{to{--sk-ang:360deg}}
+html.sk-vivo .selo{transition:transform .35s cubic-bezier(.34,1.56,.64,1),border-color .2s,color .2s}
+html.sk-vivo .selo:hover{transform:translateY(-2px)}
+
+/* Revelação na rolagem */
+html.sk-vivo .grade .item.sk-rev{opacity:0;transform:translateY(46px) scale(.95);filter:blur(8px);
+  transition:opacity .9s ease var(--sk-d,0s),transform 1.2s cubic-bezier(.22,1,.36,1) var(--sk-d,0s),filter .9s ease var(--sk-d,0s)}
+html.sk-vivo .grade .item.sk-rev.sk-vis{opacity:1;transform:none;filter:none}
+
+/* Saída: os outros cartões se afastam, o escolhido sobe */
+html.sk-vivo .grade.sk-saindo .item:not(.sk-ativo){opacity:.18;filter:blur(4px);transform:scale(.94);transition:all .7s cubic-bezier(.22,1,.36,1)}
+html.sk-vivo .grade.sk-saindo .item.sk-ativo .card{--sk-s:1.08;--sk-ty:-14px}
+
+/* ── Portal de abertura ── */
+.sk-portal{position:fixed;inset:0;z-index:2147483000;pointer-events:all;
+  background:radial-gradient(70vmax 70vmax at var(--cx) var(--cy),#232a1f 0%,#141712 45%,#0D0E0D 75%);
+  clip-path:circle(0px at var(--cx) var(--cy));transition:clip-path 1s cubic-bezier(.65,0,.35,1)}
+.sk-portal.aberto{clip-path:circle(150vmax at var(--cx) var(--cy))}
+.sk-portal .sk-onda{position:absolute;left:50%;top:44%;width:180px;height:180px;margin:-90px;border-radius:50%;border:1px solid rgba(194,206,158,.45);animation:skOnda 2.4s cubic-bezier(.22,.61,.36,1) infinite;opacity:0}
+.sk-portal .sk-onda:nth-child(2){animation-delay:.8s}.sk-portal .sk-onda:nth-child(3){animation-delay:1.6s}
+@keyframes skOnda{0%{transform:scale(.6);opacity:.8}100%{transform:scale(3.2);opacity:0}}
+.sk-portal .sk-logo{position:fixed;border-radius:24px;object-fit:cover;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 90px rgba(167,181,138,.28);
+  transition:left .95s cubic-bezier(.65,0,.35,1),top .95s cubic-bezier(.65,0,.35,1),width .95s cubic-bezier(.65,0,.35,1),height .95s cubic-bezier(.65,0,.35,1),border-radius .95s}
+.sk-portal .sk-logo.centro{animation:skRespira 2.6s ease-in-out .95s infinite}
+@keyframes skRespira{50%{transform:scale(1.05)}}
+.sk-portal .sk-txt{position:absolute;left:0;right:0;top:calc(44% + 120px);text-align:center;font:600 .92rem Inter,sans-serif;color:#B6B7AE;letter-spacing:.04em;opacity:0;transition:opacity .6s .5s}
+.sk-portal .sk-txt b{display:block;font:800 1.15rem Manrope,sans-serif;color:#F3F1E9;margin-bottom:4px;letter-spacing:0}
+.sk-portal.aberto .sk-txt{opacity:1}
+
+/* ── Cursor ── */
+html.sk-cursor-on,html.sk-cursor-on *{cursor:none!important}
+html.sk-cursor-on :is(input,textarea,select,[contenteditable="true"]){cursor:auto!important}
+.sk-cur,.sk-anel{position:fixed;left:0;top:0;pointer-events:none;z-index:2147483647;will-change:transform}
+.sk-cur{width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#C2CE9E;box-shadow:0 0 12px rgba(194,206,158,.9);transition:opacity .2s,width .25s,height .25s,margin .25s}
+.sk-anel{width:40px;height:40px;margin:-20px 0 0 -20px;display:flex;align-items:center;justify-content:center;
+  transition:width .45s cubic-bezier(.22,1,.36,1),height .45s cubic-bezier(.22,1,.36,1),margin .45s cubic-bezier(.22,1,.36,1),opacity .25s}
+.sk-anel i{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(194,206,158,.7);transition:background .35s,border-color .35s}
+.sk-anel span{position:relative;font:800 .6rem Manrope,sans-serif;letter-spacing:.2em;color:#F3F1E9;opacity:0;transform:scale(.5);transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1);text-transform:uppercase}
+.sk-anel.sk-alvo{width:60px;height:60px;margin:-30px 0 0 -30px}
+.sk-anel.sk-alvo i{background:rgba(167,181,138,.12);border-color:#C2CE9E}
+.sk-anel.sk-card{width:92px;height:92px;margin:-46px 0 0 -46px}
+.sk-anel.sk-card i{background:rgba(20,23,18,.45);border-color:#D6CBB8;box-shadow:0 0 30px rgba(167,181,138,.35)}
+.sk-anel.sk-card span{opacity:1;transform:none}
+.sk-anel.sk-card~.sk-cur,.sk-cur.sk-some{opacity:0}
+.sk-anel.sk-aperta i{background:rgba(194,206,158,.3)}
+.sk-cursor-fora .sk-cur,.sk-cursor-fora .sk-anel,.sk-texto .sk-anel,.sk-texto .sk-cur{opacity:0}
+
+/* ── Botão do som ── */
+.sk-som{position:fixed;left:16px;bottom:16px;z-index:50;display:inline-flex;align-items:center;gap:10px;padding:9px 16px 9px 12px;border-radius:999px;
+  background:rgba(19,21,18,.72);border:1px solid #30352D;color:#F3F1E9;font:700 .8rem Inter,sans-serif;cursor:pointer;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:border-color .3s,transform .3s}
+.sk-som:hover{border-color:#A7B58A;transform:translateY(-2px)}
+.sk-som .sk-barras{display:inline-flex;align-items:flex-end;gap:2px;height:14px;width:16px}
+.sk-som .sk-barras i{width:3px;height:30%;border-radius:2px;background:#A7B58A;transition:height .3s}
+.sk-som.tocando .sk-barras i{animation:skBarra 1.3s ease-in-out infinite}
+.sk-som.tocando .sk-barras i:nth-child(2){animation-delay:.25s}.sk-som.tocando .sk-barras i:nth-child(3){animation-delay:.5s}.sk-som.tocando .sk-barras i:nth-child(4){animation-delay:.75s}
+@keyframes skBarra{0%,100%{height:25%}50%{height:100%}}
+.sk-som.espera{border-color:rgba(167,181,138,.55);animation:skChama 2.6s ease-in-out infinite}
+@keyframes skChama{50%{box-shadow:0 0 0 8px rgba(167,181,138,.12),0 10px 30px rgba(0,0,0,.35)}}
+.sk-som.mudo{color:#7E8279}.sk-som.mudo .sk-barras i{background:#7E8279;height:20%}
+
+@media(max-width:560px){.sk-som{left:12px;bottom:12px;padding:8px 13px 8px 10px;font-size:.74rem}}
+@media(prefers-reduced-motion:reduce){
+  html.sk-vivo .grade,html.sk-vivo .titulo{transform:none!important}
+  html.sk-vivo .grade .item.sk-vis{animation:none}
+  html.sk-vivo .titulo h1{animation:none}
+  html.sk-vivo .grade .card{transition:box-shadow .4s ease}
+  html.sk-vivo .grade .card:hover{--sk-ty:0px;--sk-s:1}
+}
+/* Portal calmo (reduzir movimento): esmaece em vez de expandir. */
+.sk-portal.calmo{clip-path:none;opacity:0;transition:opacity .8s ease}
+.sk-portal.calmo.aberto{clip-path:none;opacity:1}
+.sk-portal.calmo .sk-onda{animation-duration:5s}
