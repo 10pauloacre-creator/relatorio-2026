@@ -15,6 +15,8 @@
 // O documento abre numa janela própria com o botão "Imprimir / Salvar PDF",
 // que chama a tela de impressão do navegador (lá o aluno escolhe "Salvar como
 // PDF"). Padrão de documento: A4, margens de 15 mm, Times New Roman 12pt.
+// "🔗 Compartilhar" (25/09/2026) manda o documento como arquivo HTML pelo menu
+// de compartilhar do aparelho (WhatsApp, e-mail…); sem esse menu, baixa o arquivo.
 //
 // O relatório é sempre ANUAL e se atualiza sozinho: cada novo relato, prova
 // ou observação lançada entra na próxima vez que o documento for aberto.
@@ -27,7 +29,7 @@
 // Depende de window.BoletimRegras (motor das notas).
 // ═══════════════════════════════════════════════════════════════════════════
 (function (root) {
-  var VERSAO = "2026-09-19a";
+  var VERSAO = "2026-09-25a";
   var PONTOS_CONDUTA = { leve: 0.25, medio: 0.5, grave: 1, muito_grave: 2 };
   var BIMESTRES = ["1", "2", "3", "4"];
   var PROFESSOR = "Paulo Roberto Ramalho Magalhães";
@@ -339,6 +341,7 @@
     + ".toolbar{position:sticky;top:0;z-index:20;display:flex;gap:8px;justify-content:center;padding:10px;background:#1e1e1e;box-shadow:0 2px 8px rgba(0,0,0,.2)}"
     + ".toolbar button{border:0;border-radius:5px;padding:10px 16px;font:700 12pt 'Times New Roman',Times,serif;cursor:pointer}"
     + ".toolbar .primaria{background:#c9a84c;color:#3a2b06}"
+    + ".toolbar .partilha{background:#2d6147;color:#fff}"
     + ".toolbar .aviso{color:#e8e2d2;font-size:10pt;align-self:center}"
     + ".page{width:210mm;min-height:297mm;margin:14px auto;padding:15mm;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.18)}"
     + ".official-header{width:100%;display:block;margin:0 0 12px}"
@@ -494,6 +497,7 @@
       + "<title>Relatório Individual Anual — " + esc(aluno) + "</title>"
       + "<style>" + CSS + "</style></head><body>"
       + '<div class="toolbar">'
+      + '<button type="button" class="partilha" onclick="compartilhar()">🔗 Compartilhar</button>'
       + '<button type="button" class="primaria" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>'
       + '<button type="button" onclick="window.close()">Fechar</button>'
       + '<span class="aviso">Na tela de impressão, escolha "Salvar como PDF" para baixar.</span>'
@@ -510,7 +514,22 @@
       + '<div class="signature-line"></div>'
       + '<div class="signature-name">' + PROFESSOR + "</div>"
       + '<div class="signature-role">Professor responsável</div>'
-      + "</div></main></body></html>";
+      + "</div></main>" + scriptCompartilhar("Relatorio-Individual-" + nomeArquivo(aluno)) + "</body></html>";
+  }
+
+  function nomeArquivo(texto) {
+    return String(texto || "aluno").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  }
+  // Compartilhar: o documento vai sem a barra e sem scripts; sem o menu do aparelho, baixa o HTML.
+  function scriptCompartilhar(nome) {
+    return "<script>function compartilhar(){"
+      + "var c=document.documentElement.cloneNode(true);"
+      + "[].forEach.call(c.querySelectorAll('.toolbar,script'),function(e){e.parentNode.removeChild(e);});"
+      + "var html='<!doctype html>'+c.outerHTML,arq=new File([html]," + JSON.stringify(nome + ".html") + ",{type:'text/html'});"
+      + "if(navigator.canShare&&navigator.canShare({files:[arq]}))return navigator.share({files:[arq],title:document.title}).catch(function(){});"
+      + "var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));a.download=arq.name;document.body.appendChild(a);a.click();"
+      + "setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);"
+      + "alert('Este aparelho não compartilha arquivos direto. O documento foi baixado: envie por WhatsApp ou e-mail.');}</" + "script>";
   }
 
   /** Abre o documento numa janela própria. Devolve null se o navegador bloquear. */
