@@ -1,0 +1,13 @@
+{
+  "name": "relatorio-skin-video-marketing",
+  "private": true,
+  "description": "Vídeo de marketing do RELATORIO SKIN: cenas em HTML/CSS/JS + GLSL, render em Node (Puppeteer + ffmpeg), trilha em Python.",
+  "scripts": {
+    "video": "node render.js",
+    "previa": "node render.js --previa"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "puppeteer-core": "^24.0.0"
+  }
+}

@@ -31,3 +31,9 @@ release/app-version.json
 # Crash logs da JVM
 hs_err_pid*.log
 replay_pid*.log
+
+# Vídeo de marketing: arquivos gerados (o mestre em 1080p fica só na máquina;
+# a versão do site vai em assets/video/). Refaça com marketing/video/gerar-video.ps1
+marketing/video/saida/
+marketing/*.mp4
+marketing/*.png

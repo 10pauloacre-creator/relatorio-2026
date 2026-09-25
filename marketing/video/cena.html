@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>RELATORIO SKIN — vídeo de marketing (cenas)</title>
+<!--
+  Vídeo de marketing do RELATORIO SKIN — cenas.
+  Tudo aqui é função do tempo: window.renderAt(t) desenha o quadro do segundo t
+  (sem animação "ao vivo"), então o render.js pode tirar os quadros um a um.
+  Os efeitos sonoros são declarados em cada cena (lista "sons") e exportados por
+  window.eventosSonoros(); o trilha.py sintetiza o áudio nos mesmos instantes.
+  Camadas: fundo GLSL (WebGL) · cenas (DOM) · cortina de transição · flash · granulado · vinheta.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&family=Caveat:wght@500;700&display=block" rel="stylesheet">
+<style>
+:root{--bg:#0D0E0D;--cream:#F3F1E9;--muted:#B6B7AE;--sage:#A7B58A;--sage2:#C2CE9E;--gold:#E3B861;--orange:#FFA65B;--red:#E8736B;--forest:#1a3a2a;--app:#15181b;--app2:#1d2125;--linha:#383d43}
+*{box-sizing:border-box}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
+#palco{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--bg);font-family:Inter,sans-serif;color:var(--cream)}
+#gl{position:absolute;left:0;top:0;width:1920px;height:1080px}
+#cenas{position:absolute;inset:0}
+.cena{position:absolute;inset:0;display:none}
+.a{position:absolute;left:0;top:0;transform-origin:50% 50%}
+.a.esq{transform-origin:0 50%}
+#wipe{position:absolute;inset:0;display:none;pointer-events:none;z-index:20}
+#wipe i{position:absolute;top:-10%;left:-20%;width:140%;height:120%}
+#flash,#preto{position:absolute;inset:0;pointer-events:none;opacity:0;z-index:21}
+#flash{background:#fffaf0}
+#preto{background:#000;z-index:23}
+#grao{position:absolute;inset:-64px;pointer-events:none;z-index:22;display:none} /* o granulado é aplicado pelo ffmpeg (filtro noise) no render */
+#vinheta{position:absolute;inset:0;pointer-events:none;z-index:22;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(0,0,0,.55) 100%)}
+
+/* Tipografia cinética */
+.txt{white-space:nowrap;font-family:Manrope,sans-serif;font-weight:800;letter-spacing:-.045em;line-height:1.02;color:var(--cream)}
+.txt.c{text-align:center}
+.txt .w{display:inline-block;transform-origin:50% 85%}
+.h1{font-size:150px}.h2{font-size:106px}.h3{font-size:70px}
+.giant{font-size:260px;letter-spacing:-.06em}
+.p{font:600 46px/1.28 Inter,sans-serif;letter-spacing:-.012em;color:var(--muted)}
+.muted{color:var(--muted)}
+.red{color:var(--red)}
+.dest{background:linear-gradient(95deg,var(--sage2) 0%,var(--gold) 55%,var(--orange) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:.1em}
+.red .dest{background-image:linear-gradient(95deg,#ff9a8a,#E8736B 60%,#c9483f)}
+.sage{color:var(--sage2)}
+
+/* Papéis da pilha (problema) */
+.papel{width:540px;height:320px;border-radius:16px;background:#EFE8D8;box-shadow:0 40px 70px -25px rgba(0,0,0,.8),0 2px 0 rgba(0,0,0,.08);overflow:hidden;color:#3a3326}
+.papel .topo{position:absolute;left:0;right:0;top:0;height:70px;display:flex;align-items:center;padding:0 28px;font:800 32px Manrope;color:#fff;letter-spacing:-.01em}
+.papel .linhas{position:absolute;left:0;right:0;top:70px;bottom:0;background:repeating-linear-gradient(#EFE8D8 0 39px,#d3c9b3 39px 41px)}
+.papel .margem{position:absolute;left:74px;top:70px;bottom:0;width:3px;background:#dc8f87}
+.papel .mao{position:absolute;left:96px;top:78px;right:24px;font:600 34px/40px Caveat,cursive;color:#35527a00;color:#3b3a55}
+.papel .mao s{color:#b3423a;text-decoration-thickness:3px}
+
+/* Relógio */
+.relogio svg{display:block;overflow:visible}
+
+/* Janela do app (modo escuro do Meu Diário) */
+.win{background:var(--app);border:1px solid var(--linha);border-radius:26px;overflow:hidden;box-shadow:0 60px 140px -40px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.03);font-family:'DM Sans',sans-serif;color:#e9eaeb}
+.win-bar{height:54px;display:flex;align-items:center;gap:10px;padding:0 22px;background:#101214;border-bottom:1px solid #2a2e33}
+.win-bar i{width:14px;height:14px;border-radius:50%;background:#383d43}
+.win-bar .url{margin-left:14px;flex:1;height:34px;border-radius:10px;background:#0b0c0d;border:1px solid #2a2e33;color:#aeb3b8;font:500 18px Inter;display:flex;align-items:center;padding:0 14px;gap:8px}
+.win-bar .url b{color:#f4f5f6;font-weight:600}
+.win-b{padding:26px 30px}
+.win-t{font:700 36px 'Playfair Display',serif;color:#f4f5f6;margin-bottom:14px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.chips span{padding:8px 16px;border-radius:30px;background:#202327;border:1px solid var(--linha);font:600 20px 'DM Sans';color:#b3b8bd}
+.lbl{font:700 19px 'DM Sans';color:#8b9197;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.area{height:250px;border-radius:16px;background:#101214;border:2px solid #ffa65b;box-shadow:0 0 0 5px rgba(255,166,91,.18);padding:18px 20px;font:500 28px/1.45 'DM Sans';color:#e9eaeb;white-space:pre-wrap;overflow:hidden}
+.area .caret{display:inline-block;width:3px;height:30px;background:#ffa65b;vertical-align:-5px;margin-left:2px}
+.bt-ia{position:absolute;right:30px;bottom:26px;padding:16px 26px;border-radius:14px;background:#ffa65b;color:#1b130b;font:800 24px 'DM Sans';box-shadow:0 14px 34px -12px #ffa65b}
+.res{width:380px;height:210px;border-radius:20px;background:#1d2125;border:1px solid #474d55;box-shadow:0 34px 70px -24px rgba(0,0,0,.8);padding:20px 22px;font-family:'DM Sans'}
+.res b{display:block;font:800 30px Manrope;color:#f4f5f6;letter-spacing:-.02em;margin-bottom:12px}
+.res p{margin:0;font:500 22px/1.4 'DM Sans';color:#b3b8bd}
+.res .tag{position:absolute;right:18px;top:18px;padding:5px 12px;border-radius:20px;font:800 17px Inter}
+.res .ok{background:rgba(127,212,148,.14);color:#7fd494}
+.res .al{background:rgba(255,166,91,.15);color:#ffa65b}
+
+/* Cursor */
+.cursor{width:64px;height:64px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.5))}
+.onda-clique{width:120px;height:120px;border-radius:50%;border:4px solid #ffa65b}
+
+/* Chamada */
+.av{width:104px;height:104px;border-radius:50%;display:grid;place-items:center;font:800 30px Manrope;letter-spacing:-.02em;background:rgba(167,181,138,.13);border:3px solid rgba(167,181,138,.55);color:#C2CE9E}
+.av.f{background:#E8736B;border-color:#E8736B;color:#2a0f0c}
+.av.j{background:#E3B861;border-color:#E3B861;color:#2b1f06}
+.av.pei{box-shadow:0 0 0 5px rgba(227,184,97,.35)}
+.pill{padding:16px 30px;border-radius:40px;background:#1d2125;border:1px solid #474d55;font:800 34px Manrope;color:#f4f5f6;letter-spacing:-.02em;white-space:nowrap}
+.pill.ok{background:rgba(127,212,148,.16);border-color:rgba(127,212,148,.5);color:#9be3ad}
+
+/* Frequência (papel A4) */
+.a4{width:860px;height:600px;background:#fffdf8;color:#222;border-radius:8px;box-shadow:0 60px 120px -30px rgba(0,0,0,.85);padding:30px 34px;font-family:'Times New Roman',Georgia,serif}
+.a4 h5{margin:0;text-align:center;font-size:25px;letter-spacing:.04em}
+.a4 .sub{text-align:center;font-size:19px;color:#444;margin:4px 0 14px}
+.a4 .meta{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:17px;border:1px solid #bbb;padding:8px 12px;margin-bottom:12px}
+.a4 table{border-collapse:collapse;width:100%;font-size:16px}
+.a4 th,.a4 td{border:1px solid #9a9a9a;padding:4px 3px;text-align:center;height:33px}
+.a4 td.nm{text-align:left;white-space:nowrap;padding-left:8px;width:210px}
+.a4 td.F{color:#b3261e;font-weight:700}
+.a4 td.J{color:#8a5a00;font-weight:700}
+.carimbo{width:250px;height:250px;border-radius:50%;border:10px solid #ff8a3d;color:#ff8a3d;display:grid;place-items:center;text-align:center;font:900 44px/1 Manrope;letter-spacing:-.02em;background:rgba(255,166,91,.07)}
+.carimbo small{display:block;font:800 22px Inter;letter-spacing:.12em;margin-top:8px}
+
+/* Contador */
+.ccard{width:780px;height:132px;border-radius:22px;background:#1d2125;border:1px solid #3a4047;padding:20px 26px;font-family:'DM Sans'}
+.ccard .l1{display:flex;justify-content:space-between;align-items:baseline;font:800 30px Manrope;color:#f4f5f6;letter-spacing:-.02em}
+.ccard .l1 span{font:700 26px 'DM Sans';color:#b3b8bd}
+.ccard .bar{height:16px;border-radius:10px;background:#2a2e33;margin:14px 0 10px;overflow:hidden}
+.ccard .bar i{display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,#7fd494,#C2CE9E);transform-origin:left}
+.ccard .bims{display:flex;gap:8px}
+.ccard .bims b{flex:1;text-align:center;padding:3px 0;border-radius:8px;font:800 16px Inter;background:#2a2e33;color:#8b9197}
+.ccard .bims b.co{background:rgba(127,212,148,.16);color:#7fd494}
+.ccard .bims b.at{background:rgba(255,166,91,.16);color:#ffa65b}
+.grafico{width:780px;height:210px;border-radius:22px;background:#1d2125;border:1px solid #3a4047;padding:14px 20px}
+.grafico svg{width:100%;height:100%;overflow:visible}
+
+/* I.A. */
+.tile{width:220px;height:118px;border-radius:18px;background:#1d2125;border:1px solid #3a4047;padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-family:'DM Sans'}
+.tile i{font-style:normal;font-size:34px;line-height:1}
+.tile span{font:700 19px/1.2 'DM Sans';color:#e9eaeb}
+.tile.hl{border-color:#ffa65b;box-shadow:0 0 0 4px rgba(255,166,91,.25),0 30px 60px -20px rgba(255,166,91,.45)}
+.chat{width:1140px;height:520px;border-radius:26px;background:#15181b;border:1px solid #474d55;box-shadow:0 60px 140px -40px rgba(0,0,0,.9);padding:26px 32px;font-family:'DM Sans';overflow:hidden}
+.chat .u{margin-left:auto;width:max-content;max-width:80%;padding:14px 20px;border-radius:20px 20px 6px 20px;background:#ffa65b;color:#1b130b;font:700 24px 'DM Sans';margin-bottom:18px}
+.chat .r{padding:18px 22px;border-radius:20px 20px 20px 6px;background:#202327;border:1px solid #383d43;font:500 23px/1.5 'DM Sans';color:#e9eaeb;white-space:pre-wrap;height:330px;overflow:hidden}
+.chat .r b{color:#fff}
+.chat .who{font:800 16px Inter;letter-spacing:.08em;color:#8b9197;margin-bottom:8px}
+
+/* Inclusão */
+.orbita{width:620px;height:620px;border-radius:50%;border:3px dashed rgba(194,206,158,.45)}
+.centro{width:300px;height:300px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#2b3a2a,#141814);border:3px solid #A7B58A;display:grid;place-items:center;text-align:center;font:800 42px/1.08 Manrope;letter-spacing:-.03em;box-shadow:0 0 90px -10px rgba(167,181,138,.55)}
+.orb{padding:16px 26px;border-radius:40px;background:#1d2125;border:2px solid #A7B58A;font:800 32px Manrope;color:#f4f5f6;letter-spacing:-.02em;white-space:nowrap;box-shadow:0 20px 40px -18px rgba(0,0,0,.8)}
+.papel-role{padding:14px 26px;border-radius:40px;background:rgba(227,184,97,.14);border:2px solid rgba(227,184,97,.6);font:800 30px Manrope;color:#f1d59b;white-space:nowrap}
+
+/* Aparelhos */
+.laptop{width:820px;height:560px}
+.laptop .tela{position:absolute;left:40px;top:0;width:740px;height:480px;border-radius:24px 24px 6px 6px;background:#0b0c0d;border:10px solid #2c3035;overflow:hidden}
+.laptop .base{position:absolute;left:0;top:480px;width:820px;height:34px;border-radius:0 0 22px 22px;background:linear-gradient(#3a3f45,#23272b)}
+.cel{width:300px;height:600px;border-radius:48px;background:#0b0c0d;border:10px solid #2c3035;overflow:hidden;box-shadow:0 50px 100px -30px rgba(0,0,0,.9)}
+.mini{padding:18px;font-family:'DM Sans'}
+.mini .t{font:700 26px 'Playfair Display';color:#f4f5f6;margin-bottom:12px}
+.mini .it{display:flex;gap:12px;align-items:center;padding:12px;border-radius:14px;background:#1d2125;border:1px solid #383d43;margin-bottom:10px;font:600 19px 'DM Sans';color:#e9eaeb}
+.mini .it b{width:52px;text-align:center;font:700 26px 'Playfair Display';color:#ffa65b}
+.mini .it.novo{border-color:#ffa65b;box-shadow:0 0 0 3px rgba(255,166,91,.3)}
+.pulso{width:34px;height:34px;border-radius:50%;background:#ffa65b;box-shadow:0 0 30px 10px rgba(255,166,91,.6)}
+
+/* CTA */
+.botao{padding:40px 76px;border-radius:120px;background:linear-gradient(135deg,#A7B58A,#D2DBB3);color:#141711;font:800 66px Manrope;letter-spacing:-.03em;white-space:nowrap;box-shadow:0 30px 80px -20px rgba(167,181,138,.8)}
+.anel{width:700px;height:170px;border-radius:120px;border:4px solid #C2CE9E}
+.url-cta{padding:22px 40px;border-radius:24px;background:#131512;border:2px solid #3B4137;font:700 56px Inter;color:#F3F1E9;white-space:nowrap}
+.url-cta span{color:#8A8E84}
+.selo{padding:16px 30px;border-radius:40px;background:#181B17;border:2px solid #3B4137;font:700 34px Inter;color:#F3F1E9;white-space:nowrap}
+.selo::first-letter{color:#A7B58A}
+.confete{width:18px;height:30px;border-radius:4px}
+.ponto{width:16px;height:16px;border-radius:50%}
+.onda{width:200px;height:200px;border-radius:50%;border:5px solid #F3F1E9}
+.marca-skin small{display:block;text-align:center;font:700 40px Inter;letter-spacing:.62em;color:var(--muted);margin-bottom:6px;margin-right:-.62em}
+.marca-skin b{display:block;text-align:center;font:800 200px/0.95 Manrope;letter-spacing:.05em;background:linear-gradient(180deg,#F3F1E9 30%,#C2CE9E);-webkit-background-clip:text;background-clip:text;color:transparent}
+.legado{width:190px;height:190px;border-radius:50%;background:#1b1d1a;border:3px solid #4a4f45;display:grid;place-items:center;font-size:90px}
+.legado-l{font:800 30px Manrope;color:var(--muted);letter-spacing:-.02em;white-space:nowrap}
+.risco{width:230px;height:10px;border-radius:6px;background:#E8736B;transform-origin:0 50%}
+.cardnovo{width:940px;height:230px;white-space:nowrap;border-radius:30px;background:linear-gradient(160deg,rgba(167,181,138,.22),rgba(19,21,18,.95) 60%);border:3px solid #A7B58A;box-shadow:0 40px 120px -30px rgba(167,181,138,.6);display:flex;align-items:center;gap:30px;padding:0 44px}
+.cardnovo img{width:130px;height:130px;border-radius:30px}
+.cardnovo b{display:block;font:800 64px Manrope;letter-spacing:.03em}
+.cardnovo span{display:block;font:700 30px Inter;color:#C2CE9E;margin-top:6px}
+</style>
+</head>
+<body>
+<div id="palco">
+  <canvas id="gl" width="960" height="540"></canvas>
+  <div id="cenas"></div>
+  <div id="wipe"><i id="wp2"></i><i id="wp1"></i></div>
+  <div id="flash"></div>
+  <div id="grao"></div>
+  <div id="vinheta"></div>
+  <div id="preto"></div>
+</div>
+
+<script type="x-shader/x-fragment" id="frag">
+// Fundo "aurora" em GLSL: ruído fractal (fbm) com distorção de domínio.
+// u_mood: 0 = problema (fumaça grafite e brasas) · 1 = solução (floresta, sálvia, laranja, ouro).
+precision highp float;
+uniform vec2 u_res;
+uniform float u_t, u_mood, u_quente, u_intens, u_flash;
+float hash(vec2 p){ p = fract(p * vec2(234.34, 435.345)); p += dot(p, p + 34.23); return fract(p.x * p.y); }
+float noise(vec2 p){
+  vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+float fbm(vec2 p){
+  float v = 0.0, a = 0.5; mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
+  for (int i = 0; i < 5; i++) { v += a * noise(p); p = m * p; a *= 0.5; }
+  return v;
+}
+void main(){
+  vec2 p = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
+  float t = u_t * 0.09;
+  vec2 q = vec2(fbm(p * 1.3 + vec2(0.0, t)), fbm(p * 1.3 + vec2(5.2, -t * 0.8)));
+  vec2 r = vec2(fbm(p * 1.7 + 2.0 * q + vec2(1.7, 9.2) + t * 0.6), fbm(p * 1.7 + 2.0 * q + vec2(8.3, 2.8) - t * 0.4));
+  float n = fbm(p * 1.5 + 2.2 * r);
+  vec3 base = vec3(0.051, 0.055, 0.051);
+  vec3 cp = mix(vec3(0.11, 0.105, 0.10), vec3(0.46, 0.12, 0.09), smoothstep(0.55, 0.95, n));
+  vec3 cs = mix(vec3(0.05, 0.17, 0.11), vec3(0.56, 0.65, 0.43), smoothstep(0.35, 0.8, n));
+  cs = mix(cs, vec3(1.0, 0.60, 0.30), smoothstep(0.55, 0.95, r.x) * 0.65);
+  cs = mix(cs, vec3(0.96, 0.77, 0.38), smoothstep(0.5, 0.9, q.y) * (0.22 + 0.6 * u_quente));
+  vec3 col = mix(cp, cs, u_mood);
+  float vig = smoothstep(1.35, 0.15, length(p * vec2(0.85, 1.1)));
+  float k = (0.2 + 0.8 * n * n) * vig * u_intens;
+  col = mix(base, col, k);
+  col += u_flash * vec3(1.0, 0.97, 0.9);
+  gl_FragColor = vec4(col, 1.0);
+}
+</script>
+
+<script>
+'use strict';
+/* =====================================================================
+   0. MOTOR: easing, interpolação, criação de elementos, texto cinético
+   ===================================================================== */
+const W = 1920, H = 1080, DUR = 60;
+const $ = s => document.querySelector(s);
+const palco = $('#palco');
+const E = {
+  lin: x => x,
+  out: x => 1 - Math.pow(1 - x, 3),
+  out5: x => 1 - Math.pow(1 - x, 5),
+  in: x => x * x * x,
+  io: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+  back: x => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); },
+  el: x => x <= 0 ? 0 : x >= 1 ? 1 : Math.pow(2, -10 * x) * Math.sin((x * 10 - .75) * (2 * Math.PI / 3)) + 1
+};
+const cl = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const pr = (t, t0, d) => cl((t - t0) / d);
+const lerp = (a, b, p) => a + (b - a) * p;
+const k = (t, t0, t1, a, b, e = 'out') => lerp(a, b, E[e](pr(t, t0, t1 - t0)));
+// Gerador pseudoaleatório com semente: o mesmo vídeo em toda renderização.
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+function mk(tag, cls, html, par, x, y) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (html != null) e.innerHTML = html;
+  if (x != null) { e.style.left = x + 'px'; e.style.top = y + 'px'; }
+  (par || palco).appendChild(e);
+  return e;
+}
+// Aplica posição/escala/rotação/opacidade/desfoque ao elemento ancorado no ponto (left, top).
+function ap(el, o) {
+  o = o || {};
+  const x = o.x || 0, y = o.y || 0, s = o.s == null ? 1 : o.s, r = o.r || 0, op = o.o == null ? 1 : o.o, b = o.b || 0;
+  const sx = o.sx == null ? s : o.sx, sy = o.sy == null ? s : o.sy;
+  const base = el.classList.contains('esq') ? 'translate(0,-50%)' : 'translate(-50%,-50%)';
+  el.style.transform = base + ' translate(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px) scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ') rotate(' + r.toFixed(2) + 'deg)';
+  el.style.opacity = cl(op).toFixed(3);
+  el.style.filter = b > .15 ? 'blur(' + b.toFixed(1) + 'px)' : '';
+  if (!el._w) el.style.visibility = op <= .002 ? 'hidden' : 'visible';
+}
+// Texto palavra por palavra. "*palavra*" = destaque em gradiente; "|" = quebra de linha.
+function txt(par, x, y, str, cls, esq) {
+  const el = mk('div', 'a txt ' + (cls || '') + (esq ? ' esq' : ' c'), '', par, x, y);
+  el._w = [];
+  let dentro = false;   // o destaque pode abranger várias palavras: "*em um só lugar.*"
+  str.split('|').forEach((linha, li) => {
+    if (li) el.appendChild(document.createElement('br'));
+    linha.split(' ').forEach((w, i) => {
+      if (i) el.appendChild(document.createTextNode(' '));
+      if (/^\*/.test(w)) dentro = true;
+      const s = document.createElement('span');
+      s.className = 'w' + (dentro ? ' dest' : '');
+      if (/\*[.,!?:]*$/.test(w)) dentro = false;
+      s.textContent = w.replace(/\*/g, '');
+      el.appendChild(s); el._w.push(s);
+    });
+  });
+  ap(el);
+  return el;
+}
+// Entrada (tin) e saída (tout) das palavras, com leve atraso entre elas.
+function palavras(el, tl, tin, tout, o) {
+  o = o || {};
+  const stg = o.stg == null ? .065 : o.stg, d = o.d || .5, dy = o.dy == null ? 70 : o.dy, bl = o.blur == null ? 14 : o.blur, sai = o.sai || .32;
+  const n = el._w.length;
+  if (tl < tin - .001 || (tout != null && tl > tout + sai + n * stg * .4 + .02)) { el.style.visibility = 'hidden'; return; }
+  el.style.visibility = 'visible';
+  el._w.forEach((w, i) => {
+    const p = E.out(pr(tl, tin + i * stg, d));
+    let y = (1 - p) * dy, op = p, b = (1 - p) * bl, s = lerp(.86, 1, E.back(pr(tl, tin + i * stg, d)));
+    if (tout != null) { const q = E.in(pr(tl, tout + i * stg * .4, sai)); y -= q * dy * .9; op *= 1 - q; b += q * bl; }
+    w.style.transform = 'translateY(' + y.toFixed(2) + 'px) scale(' + s.toFixed(4) + ')';
+    w.style.opacity = op.toFixed(3);
+    w.style.filter = (b > .2 && !w.classList.contains('dest')) ? 'blur(' + b.toFixed(1) + 'px)' : '';
+  });
+}
+// Mostra um trecho de texto como se fosse digitado.
+function digitado(texto, tl, t0, t1) { const n = Math.round(texto.length * cl((tl - t0) / (t1 - t0))); return texto.slice(0, n); }
+const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+const SVG_CURSOR = '<svg viewBox="0 0 26 26" width="64" height="64"><path d="M4 2.5 21 13.2l-7.4 1.4 4.3 7.7-3.4 1.9-4.3-7.7L4.8 21.4z" fill="#fff" stroke="#141711" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+
+/* =====================================================================
+   1. CENAS
+   cena(id, início, fim, montar, quadro, sons)
+   quadro(tl, refs) recebe o tempo LOCAL da cena (0 = início da cena).
+   sons: [tempo local, nome do efeito, parâmetros] → trilha.py
+   ===================================================================== */
+const CENAS = [];
+function cena(id, ini, fim, montar, quadro, sons) {
+  const root = mk('div', 'cena', null, $('#cenas'));
+  root.id = 'cena-' + id;
+  CENAS.push({ id, ini, fim, root, r: montar(root) || {}, quadro, sons: sons || [] });
+}
+const NOMES = ['Alice Nascimento', 'Arthur Gomes', 'Beatriz Souza', 'Bernardo Lima', 'Cecília Martins', 'Davi Ferreira', 'Eloá Santos', 'Enzo Rocha', 'Gabriel Albuquerque', 'Heitor Cavalcante', 'Helena Moreira', 'Isabela Freitas', 'Isaac Monteiro', 'Júlia Pinto', 'Kauã Barbosa', 'Laura Teixeira', 'Lívia Campos', 'Lorenzo Pereira', 'Manuela Cardoso', 'Maria Nogueira', 'Miguel Andrade', 'Pedro Lima', 'Rafaela Moura', 'Samuel Batista', 'Sophia Correia', 'Théo Vasconcelos', 'Valentina Duarte', 'Yasmin Farias'];
+const iniciais = nm => nm.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+
+/* Relógio (usado no começo e na virada do tempo) */
+function relogio(par, x, y, tam, corMao, corSeg, corAro) {
+  const el = mk('div', 'a relogio', '', par, x, y);
+  let marcas = '';
+  for (let i = 0; i < 60; i++) {
+    const a = i * 6 * Math.PI / 180, h = i % 5 === 0, r1 = h ? 228 : 250, r2 = 270;
+    marcas += '<line x1="' + (Math.sin(a) * r1).toFixed(1) + '" y1="' + (-Math.cos(a) * r1).toFixed(1) + '" x2="' + (Math.sin(a) * r2).toFixed(1) + '" y2="' + (-Math.cos(a) * r2).toFixed(1) + '" stroke="' + corAro + '" stroke-width="' + (h ? 9 : 3) + '" stroke-linecap="round" opacity="' + (h ? .9 : .45) + '"/>';
+  }
+  el.innerHTML = '<svg viewBox="-300 -300 600 600" width="' + tam + '" height="' + tam + '"><circle r="292" fill="rgba(243,241,233,.03)" stroke="' + corAro + '" stroke-opacity=".5" stroke-width="7"/>' + marcas
+    + '<g class="hh"><rect x="-9" y="-150" width="18" height="178" rx="9" fill="' + corMao + '"/></g>'
+    + '<g class="mm"><rect x="-6" y="-232" width="12" height="258" rx="6" fill="' + corMao + '"/></g>'
+    + '<g class="ss"><rect x="-2.5" y="-250" width="5" height="300" rx="2.5" fill="' + corSeg + '"/><circle r="15" fill="' + corSeg + '"/></g></svg>';
+  el._hh = el.querySelector('.hh'); el._mm = el.querySelector('.mm'); el._ss = el.querySelector('.ss');
+  ap(el);
+  return el;
+}
+function ponteiros(rel, h, m, s) {
+  rel._hh.setAttribute('transform', 'rotate(' + h.toFixed(2) + ')');
+  rel._mm.setAttribute('transform', 'rotate(' + m.toFixed(2) + ')');
+  rel._ss.setAttribute('transform', 'rotate(' + s.toFixed(2) + ')');
+}
+const ANG_H = (10 + 47 / 60) * 30, ANG_M = 47 * 6 + 3;
+
+/* ---------- ATO 1 · O PROBLEMA ---------- */
+
+// 1. Domingo, 22h47 (0–4 s)
+cena('relogio', 0, 4, root => ({
+  rel: relogio(root, 1440, 540, 640, '#F3F1E9', '#E8736B', '#F3F1E9'),
+  a: txt(root, 150, 300, 'Domingo.', 'h3 muted', true),
+  b: txt(root, 138, 505, '22h47.', 'giant red', true),
+  c: txt(root, 150, 745, 'E você ainda está passando|a chamada a limpo.', 'p', true)
+}), (tl, r) => {
+  const giro = E.io(pr(tl, 3.15, .85));
+  ponteiros(r.rel, ANG_H + giro * 60, ANG_M + giro * 720, 30 + Math.min(7, Math.floor(tl / .5)) * 6 + giro * 2160);
+  const sai = E.in(pr(tl, 3.55, .45));
+  ap(r.rel, { o: k(tl, .05, .8, 0, 1) * (1 - sai), s: k(tl, 0, 1.4, .92, 1) + sai * .25, r: sai * -8, b: sai * 18 });
+  palavras(r.a, tl, .45, 3.5); palavras(r.b, tl, 1.1, 3.5, { stg: .09, dy: 110 }); palavras(r.c, tl, 2.0, 3.5, { stg: .045 });
+}, [[0, 'tick', { p: 0 }], [.5, 'tick', { p: 1 }], [1, 'tick', { p: 0 }], [1.5, 'tick', { p: 1 }], [2, 'tick', { p: 0 }], [2.5, 'tick', { p: 1 }], [3, 'tick', { p: 0 }], [1.1, 'baque', { p: 0 }], [3.1, 'whoosh', { dur: .9, up: 1 }]]);
+
+// 2. A pilha de papel (4–10 s)
+const PAPEIS = [
+  ['Caderno de chamada', '#9a4f3e', ['1. Alice <b>P</b> · 2. Arthur P', '3. Bia <s>P</s> F · 4. Bernardo P', '5. Cecília P · 6. Davi P']],
+  ['Diário de classe', '#56663C', ['03/08 — Leitura da fábula...', 'mesmo texto da chamada', 'passar para o sistema!']],
+  ['Planilha de faltas', '#7E8279', ['=SOMA(B2:AF2) → #REF!', 'faltas: 3? 4? conferir', 'justificadas: ???']],
+  ['Relatório do AEE', '#B89B69', ['Davi — avanços do bimestre', 'escrever até amanhã', 'cadê os registros?']],
+  ['Plano de aula', '#6f5a3e', ['Semana 32: fábulas', 'refazer do zero...', 'material de apoio?']],
+  ['Contagem de h/aula', '#8a3f35', ['LP: 38? 40? recontar', '3º bim fecha quando?', 'somar nos dedos']],
+  ['Frequência do bimestre', '#5d6b4a', ['aluno 7: 88%? 91%?', 'calculadora...', 'passar a limpo de novo']],
+  ['Ata do conselho', '#7a6848', ['reunião sexta', 'pareceres pendentes', '28 alunos × 5 matérias']]
+];
+cena('pilha', 4, 10, root => {
+  const R = rng(11), cards = PAPEIS.map((p, i) => {
+    const el = mk('div', 'a papel', '<div class="topo" style="background:' + p[1] + '">' + p[0] + '</div><div class="linhas"></div><div class="margem"></div><div class="mao">' + p[2].join('<br>') + '</div>', root, 1300 + (R() - .5) * 90, 800 - i * 34);
+    el._r = (R() - .5) * 16; el._t = [.3, .8, 1.3, 1.7, 2.1, 2.5, 2.85, 3.2][i]; el._dir = R() < .5 ? -1 : 1;
+    return el;
+  });
+  return {
+    cards,
+    a: txt(root, 140, 280, '3 cadernos.', 'h2', true),
+    b: txt(root, 140, 410, '2 planilhas.', 'h2', true),
+    c: txt(root, 140, 540, '1 diário.', 'h2', true),
+    d: txt(root, 144, 700, '*Nada* conversa entre si.', 'h3 red', true)
+  };
+}, (tl, r) => {
+  const amp = k(tl, 3.6, 4.8, 0, 5, 'in');
+  r.cards.forEach((el, i) => {
+    const t0 = el._t;
+    if (tl < t0 - .45) { ap(el, { o: 0 }); return; }
+    const cai = E.in(pr(tl, t0 - .45, .45));
+    const bate = tl > t0 ? Math.sin(Math.PI * pr(tl, t0, .22)) * .07 : 0;
+    const bal = Math.sin((tl - 3.6) * 10 + i * .6) * amp * (i + 2) / 5;
+    const des = E.in(pr(tl, 4.9 + (7 - i) * .05, .8));
+    ap(el, {
+      y: lerp(-900, 0, cai) + des * des * 900 + bal * 2,
+      x: bal * 6 + des * el._dir * (500 + i * 90),
+      r: el._r + (1 - cai) * 30 * el._dir + bal + des * el._dir * 110,
+      sy: 1 - bate, sx: 1 + bate * .6, o: 1 - pr(tl, 5.4, .3)
+    });
+  });
+  palavras(r.a, tl, .35, 4.9); palavras(r.b, tl, .95, 4.9); palavras(r.c, tl, 1.55, 4.9); palavras(r.d, tl, 2.35, 4.9, { stg: .08 });
+}, [[.3, 'papel', { p: 0 }], [.8, 'papel', { p: 1 }], [1.3, 'papel', { p: 2 }], [1.7, 'papel', { p: 3 }], [2.1, 'papel', { p: 4 }], [2.5, 'papel', { p: 5 }], [2.85, 'papel', { p: 6 }], [3.2, 'papel', { p: 7 }], [3.6, 'rumble', { dur: 1.4 }], [4.95, 'desaba']]);
+
+// 3. O custo em horas (10–14.3 s)
+cena('custo', 10, 14.3, root => {
+  const num = mk('div', 'a txt giant c', '', root, 960, 525);
+  num.innerHTML = '<span class="n">0</span><span style="font-size:.55em;margin-left:.04em">h</span>';
+  num.style.textShadow = '0 0 80px rgba(232,115,107,.45)';
+  const g1 = num.cloneNode(true), g2 = num.cloneNode(true);
+  [g1, g2].forEach((g, i) => { g.style.textShadow = 'none'; g.style.color = i ? '#C2CE9E' : '#E8736B'; g.style.mixBlendMode = 'screen'; root.appendChild(g); });
+  return {
+    num, g1, g2,
+    lbl: txt(root, 960, 285, 'Só com papelada, por ano:', 'p c'),
+    sub: txt(root, 960, 735, '50 minutos por dia × 200 dias letivos', 'p c'),
+    chip: mk('div', 'a pill', '= 21 dias inteiros de trabalho', root, 960, 850),
+    nao: txt(root, 960, 530, 'Não é falta de vontade.', 'h2 c'),
+    exc: txt(root, 960, 530, 'É excesso de *papel.*', 'h1 c red')
+  };
+}, (tl, r) => {
+  const n = Math.round(167 * E.out5(pr(tl, .3, 1.35)));
+  [r.num, r.g1, r.g2].forEach(e => { e.querySelector('.n').textContent = n; });
+  const soco = tl > 1.62 ? .09 * Math.exp(-(tl - 1.62) * 7) : 0;
+  const glit = tl > 2.5 && tl < 2.85;
+  const vis = k(tl, .2, .5, 0, 1) * (1 - pr(tl, 2.82, .06));
+  ap(r.num, { o: vis, s: k(tl, .2, .8, .8, 1) + soco });
+  const jit = glit ? Math.sin(tl * 211) * 26 : 0;
+  ap(r.g1, { o: glit ? .8 : 0, x: jit, s: 1 + soco, y: glit ? Math.cos(tl * 97) * 8 : 0 });
+  ap(r.g2, { o: glit ? .7 : 0, x: -jit, s: 1 + soco });
+  if (glit) r.num.style.clipPath = 'inset(' + (Math.abs(Math.sin(tl * 51)) * 60).toFixed(0) + '% 0 ' + (Math.abs(Math.cos(tl * 37)) * 30).toFixed(0) + '% 0)'; else r.num.style.clipPath = '';
+  palavras(r.lbl, tl, .1, 2.5); palavras(r.sub, tl, .95, 2.5, { stg: .04 });
+  ap(r.chip, { o: pr(tl, 2.0, .12) * (1 - pr(tl, 2.5, .2)), s: lerp(.6, 1, E.back(pr(tl, 2.0, .35))), y: 0 });
+  r.chip.style.background = 'rgba(232,115,107,.16)'; r.chip.style.borderColor = 'rgba(232,115,107,.6)'; r.chip.style.color = '#ffb3a8';
+  palavras(r.nao, tl, 2.9, 3.4, { stg: .05, sai: .22 });
+  palavras(r.exc, tl, 3.45, 4.05, { stg: .09, dy: 90 });
+}, [[.3, 'ticker', { dur: 1.3 }], [1.62, 'baque', { p: 1 }], [2.0, 'pop', { p: 2 }], [2.5, 'glitch'], [2.9, 'swipe'], [3.45, 'baque', { p: 2 }]]);
+
+// 4. Existe um jeito mais leve (14.3–16 s): tudo é sugado para o centro
+cena('virada', 14.3, 16, root => {
+  const R = rng(5), bits = [];
+  for (let i = 0; i < 34; i++) {
+    const ang = R() * Math.PI * 2, raio = 900 + R() * 500;
+    const el = mk('div', 'a', '', root, 960, 540);
+    el.style.width = (30 + R() * 50) + 'px'; el.style.height = (20 + R() * 36) + 'px'; el.style.borderRadius = '6px';
+    el.style.background = ['#EFE8D8', '#d3c9b3', '#E8736B', '#B6B7AE'][i % 4];
+    el._x = Math.cos(ang) * raio; el._y = Math.sin(ang) * raio * .7; el._r = R() * 720 - 360; el._d = R() * .3;
+    bits.push(el);
+  }
+  return { bits, t: txt(root, 960, 530, 'Existe um jeito|*mais leve.*', 'h1 c') };
+}, (tl, r) => {
+  r.bits.forEach(el => { const p = E.in(pr(tl, .2 + el._d, 1.3)); ap(el, { x: el._x * (1 - p), y: el._y * (1 - p), r: el._r * p, s: 1 - p * .9, o: pr(tl, .1, .3) * (1 - pr(tl, 1.45, .1)) }); });
+  palavras(r.t, tl, .12, null, { stg: .07 });
+  const suga = E.in(pr(tl, 1.05, .5));
+  ap(r.t, { s: 1 - suga * .95, r: -suga * 30, b: suga * 20, o: 1 - pr(tl, 1.45, .1) });
+}, [[0, 'riser', { dur: 1.4 }]]);
+
+/* ---------- ATO 2 · A SOLUÇÃO ---------- */
+
+// 5. Impacto + marca (16–19 s)
+cena('marca', 16, 19, root => {
+  const R = rng(21), pts = [];
+  for (let i = 0; i < 56; i++) {
+    const el = mk('div', 'a ponto', '', root, 960, 470);
+    const a = R() * Math.PI * 2, v = 700 + R() * 1300;
+    el._vx = Math.cos(a) * v; el._vy = Math.sin(a) * v; el._s = .5 + R() * 1.6;
+    el.style.background = ['#A7B58A', '#FFA65B', '#E3B861', '#F3F1E9', '#C2CE9E'][i % 5];
+    if (i % 3 === 0) el.style.borderRadius = '4px';
+    pts.push(el);
+  }
+  const onda = mk('div', 'a onda', '', root, 960, 470), onda2 = mk('div', 'a onda', '', root, 960, 470);
+  onda2.style.borderColor = '#FFA65B';
+  const sim = mk('img', 'a', null, root, 960, 400); sim.src = '../../assets/marca/skin-simbolo.webp'; sim.style.width = '250px'; sim.style.borderRadius = '56px'; sim.style.boxShadow = '0 40px 100px -20px rgba(167,181,138,.7)';
+  const marca = mk('div', 'a marca-skin', '<small>RELATORIO</small><b>SKIN</b>', root, 960, 680);
+  return { pts, onda, onda2, sim, marca, tag: txt(root, 960, 860, 'Gestão docente inteligente', 'p c sage'), frase: txt(root, 960, 730, 'Tudo o que era papel, *em um só lugar.*', 'h3 c') };
+}, (tl, r) => {
+  r.pts.forEach(el => { const d = 1 - Math.exp(-tl * 3.2); ap(el, { x: el._vx * d / 3.2, y: el._vy * d / 3.2 + tl * tl * 60, s: el._s * (1 - pr(tl, .9, .8)), o: 1 - pr(tl, .8, .9) }); });
+  const d1 = lerp(80, 2400, E.out(pr(tl, 0, .9))), d2 = lerp(80, 1700, E.out(pr(tl, .08, 1)));
+  r.onda.style.width = r.onda.style.height = d1.toFixed(0) + 'px'; r.onda2.style.width = r.onda2.style.height = d2.toFixed(0) + 'px';
+  ap(r.onda, { o: 1 - pr(tl, .1, .8) }); ap(r.onda2, { o: .8 * (1 - pr(tl, .2, .8)) });
+  const sobe = E.io(pr(tl, 1.55, .6));
+  ap(r.sim, { s: lerp(2.3, 1, E.back(pr(tl, 0, .55))) * lerp(1, .62, sobe), o: pr(tl, 0, .08), y: -sobe * 150, x: -sobe * 0 });
+  ap(r.marca, { o: pr(tl, .25, .3), s: lerp(1.25, 1, E.out(pr(tl, .25, .6))) * lerp(1, .62, sobe), y: -sobe * 250, b: (1 - pr(tl, .25, .45)) * 20 });
+  palavras(r.tag, tl, .85, 1.5, { stg: .06 });
+  palavras(r.frase, tl, 1.85, null, { stg: .06 });
+}, [[0, 'impacto'], [.25, 'brilho', { dur: .7 }], [.9, 'sino', { p: 79 }], [1.85, 'swipe']]);
+
+// 6. Quatro ferramentas viraram uma (19–22 s)
+cena('quatro', 19, 22, root => {
+  const itens = [['📒', 'Caderno de chamada'], ['📜', 'Diário no papel'], ['🧮', 'Planilha de faltas'], ['🤖', 'I.A. avulsa']].map((it, i) => {
+    const x = 960 + (i - 1.5) * 400, g = mk('div', 'a', '', root, x, 330);
+    g.innerHTML = '<div class="legado">' + it[0] + '</div><div class="legado-l" style="text-align:center;margin-top:18px">' + it[1] + '</div>';
+    const rc = mk('div', 'a risco', '', root, x, 300); rc.style.transform = 'none';
+    g._x = x; rc._x = x; g._rc = rc; return g;
+  });
+  const card = mk('div', 'a cardnovo', '<img src="../../assets/marca/skin-simbolo.webp" alt=""><div><b>RELATORIO SKIN</b><span>Chamada · Diário · Frequência · I.A.</span></div>', root, 960, 690);
+  return { itens, card, cap: txt(root, 960, 940, 'Quatro ferramentas viraram *uma.*', 'h3 c') };
+}, (tl, r) => {
+  const chegou = [];
+  r.itens.forEach((g, i) => {
+    const t0 = .1 + i * .2, voa = E.in(pr(tl, 1.25 + i * .1, .42));
+    if (voa >= 1) chegou.push(i);
+    ap(g, { s: lerp(0, 1, E.back(pr(tl, t0, .4))) * (1 - voa * .85), o: pr(tl, t0, .1) * (1 - pr(tl, 1.55 + i * .1, .1)), x: (960 - g._x) * voa, y: 360 * voa, r: voa * 90 * (i % 2 ? 1 : -1) });
+    const rs = E.out(pr(tl, .95 + i * .04, .2));
+    g._rc.style.transform = 'translate(' + (g._x - 115 + (960 - g._x) * voa) + 'px,' + (300 + 360 * voa) + 'px) rotate(-14deg) scaleX(' + rs.toFixed(3) + ')';
+    g._rc.style.left = '0px'; g._rc.style.top = '0px';
+    g._rc.style.opacity = (1 - voa).toFixed(3);
+  });
+  let pulso = 0; [1.67, 1.77, 1.87, 1.97].forEach(tt => { if (tl > tt) pulso += .06 * Math.exp(-(tl - tt) * 9); });
+  ap(r.card, { s: lerp(.7, 1, E.back(pr(tl, 1.2, .45))) + pulso, o: pr(tl, 1.2, .15) });
+  palavras(r.cap, tl, 2.0, null, { stg: .07 });
+}, [[.1, 'pop', { p: 0 }], [.3, 'pop', { p: 1 }], [.5, 'pop', { p: 2 }], [.7, 'pop', { p: 3 }], [.95, 'risco'], [1.25, 'whoosh', { dur: .6, up: 1 }], [1.95, 'sino', { p: 84 }]]);
+
+// 7. Escreva do seu jeito → a I.A. organiza (22–26 s)
+const RASCUNHO = 'Leitura da fábula A cigarra e a formiga. Faltou o Enzo; a Rafaela trouxe atestado. Davi leu em voz alta e se destacou. Atividade: reescrita do final.';
+cena('escreva', 22, 26, root => {
+  const win = mk('div', 'a win', '<div class="win-bar"><i></i><i></i><i></i><div class="url">🔒 <b>relatorio.skin</b>/meu-diario.html</div></div><div class="win-b"><div class="win-t">✏️ Novo Diário — 5º Ano A</div><div class="chips"><span>03/08</span><span>Língua Portuguesa</span><span>07:30–09:10</span><span>2 h/aula</span></div><div class="lbl">Rascunho livre</div><div class="area"></div></div><div class="bt-ia">🤖 Organizar com IA</div>', root, 1400, 540);
+  win.style.width = '900px'; win.style.height = '660px';
+  const res = [
+    ['📄 Relato', 'Leitura da fábula A cigarra e a formiga. Reescrita do final.', '', ''],
+    ['👥 Presença', '26 de 28 presentes · Enzo faltou · Rafaela: atestado', 'ok', '26/28'],
+    ['📝 Atividades', 'Reescrita do final da fábula · entregas marcadas', 'al', 'Fez ✓'],
+    ['🗒️ Observações', 'Davi: destaque na leitura em voz alta (registrado no PEI)', 'ok', '09:05']
+  ].map((d, i) => { const el = mk('div', 'a res', '<b>' + d[0] + '</b><p>' + d[1] + '</p>' + (d[3] ? '<span class="tag ' + d[2] + '">' + d[3] + '</span>' : ''), root, [1195, 1605, 1195, 1605][i], [420, 420, 700, 700][i]); return el; });
+  const cur = mk('div', 'a cursor', SVG_CURSOR, root, 0, 0); cur.style.transformOrigin = '0 0';
+  const onda = mk('div', 'a onda-clique', '', root, 1685, 814);
+  return { win, area: win.querySelector('.area'), bt: win.querySelector('.bt-ia'), res, cur, onda, c1: txt(root, 120, 440, 'Escreva|do seu *jeito.*', 'h2', true), c2: txt(root, 120, 440, 'A I.A.|*organiza.*', 'h2', true) };
+}, (tl, r) => {
+  const ent = E.out(pr(tl, 0, .45)), apaga = pr(tl, 2.3, .3);
+  ap(r.win, { x: (1 - ent) * 380, o: ent * (1 - apaga * .7), s: 1 - apaga * .06, b: apaga * 4 });
+  const escrito = digitado(RASCUNHO, tl, .35, 1.85);
+  r.area.innerHTML = esc(escrito) + (tl < 2.3 && Math.floor(tl * 4) % 2 === 0 ? '<span class="caret"></span>' : '');
+  r.area.style.opacity = (1 - pr(tl, 2.15, .2)).toFixed(3);
+  const aperta = tl > 2.0 && tl < 2.14 ? .93 : 1;
+  r.bt.style.transform = 'scale(' + aperta + ')';
+  r.bt.style.boxShadow = tl > 2.0 ? '0 0 0 ' + (8 * (1 - pr(tl, 2.0, .5))).toFixed(1) + 'px rgba(255,166,91,.35),0 14px 34px -12px #ffa65b' : '';
+  const mv = E.io(pr(tl, 1.5, .45));
+  r.cur.style.transform = 'translate(' + lerp(1880, 1675, mv).toFixed(1) + 'px,' + lerp(1040, 808, mv).toFixed(1) + 'px) scale(' + (tl > 2.0 && tl < 2.12 ? .85 : 1) + ')';
+  r.cur.style.opacity = (pr(tl, 1.4, .15) * (1 - pr(tl, 2.5, .2))).toFixed(3);
+  ap(r.onda, { s: lerp(.2, 1.6, E.out(pr(tl, 2.02, .45))), o: tl > 2.02 ? 1 - pr(tl, 2.02, .45) : 0 });
+  r.res.forEach((el, i) => {
+    const t0 = 2.2 + i * .13, p = pr(tl, t0, .45);
+    ap(el, { x: (1400 - [1195, 1605, 1195, 1605][i]) * (1 - E.out(p)), y: (560 - [420, 420, 700, 700][i]) * (1 - E.out(p)), s: lerp(.25, 1, E.back(p)), o: pr(tl, t0, .1), r: (1 - E.out(p)) * (i % 2 ? 14 : -14) });
+  });
+  palavras(r.c1, tl, .1, 1.95); palavras(r.c2, tl, 2.15, null);
+}, [[.35, 'digitar', { dur: 1.5 }], [2.0, 'clique'], [2.2, 'whoosh', { dur: .5, up: 1 }], [2.3, 'pop', { p: 0 }], [2.43, 'pop', { p: 1 }], [2.56, 'pop', { p: 2 }], [2.69, 'pop', { p: 3 }]]);
+
+// 8. Chamada em um toque (26–29 s)
+cena('chamada', 26, 29, root => {
+  const avs = NOMES.map((nm, i) => { const c = i % 7, l = Math.floor(i / 7); const el = mk('div', 'a av' + ([5, 16, 21].includes(i) ? ' pei' : ''), iniciais(nm), root, 1375 + (c - 3) * 124, 330 + l * 124); return el; });
+  const cur = mk('div', 'a cursor', SVG_CURSOR, root, 0, 0); cur.style.transformOrigin = '0 0';
+  return { avs, cur, chip: mk('div', 'a pill', '', root, 1375, 890), c: txt(root, 120, 450, 'Chamada|em um *toque.*', 'h2', true) };
+}, (tl, r) => {
+  const toques = [[.8, 7, 'f'], [1.2, 22, 'f'], [1.55, 22, 'j']];
+  r.avs.forEach((el, i) => {
+    let st = ''; toques.forEach(tq => { if (tl >= tq[0] && tq[1] === i) st = tq[2]; });
+    el.classList.toggle('f', st === 'f'); el.classList.toggle('j', st === 'j');
+    let pulo = 0; toques.forEach(tq => { if (tq[1] === i && tl > tq[0]) pulo += .18 * Math.exp(-(tl - tq[0]) * 10) * Math.cos((tl - tq[0]) * 30); });
+    ap(el, { s: lerp(0, 1, E.back(pr(tl, .05 + i * .02, .35))) + pulo, o: pr(tl, .05 + i * .02, .1) });
+  });
+  const alvo = t => { let a = null; toques.forEach(tq => { if (t >= tq[0] - .38) a = tq; }); return a; };
+  const pos = i => [1375 + (i % 7 - 3) * 124 + 10, 330 + Math.floor(i / 7) * 124 + 12];
+  let cx = 1900, cy = 1060; const tq = alvo(tl);
+  if (tq) { const idx = toques.indexOf(tq), de = idx ? pos(toques[idx - 1][1]) : [1900, 1060], para = pos(tq[1]), m = E.io(pr(tl, tq[0] - .38, .34)); cx = lerp(de[0], para[0], m); cy = lerp(de[1], para[1], m); }
+  if (tl > 1.9) { const m = E.io(pr(tl, 1.9, .5)); const de = pos(22); cx = lerp(de[0], 1900, m); cy = lerp(de[1], 1100, m); }
+  const aperta = toques.some(x => tl > x[0] && tl < x[0] + .1);
+  r.cur.style.transform = 'translate(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px) scale(' + (aperta ? .85 : 1) + ')';
+  r.cur.style.opacity = pr(tl, .45, .15).toFixed(3);
+  const pres = 28 - (tl >= .8 ? 1 : 0) - (tl >= 1.2 ? 1 : 0);
+  r.chip.className = 'a pill' + (tl > 2.0 ? ' ok' : '');
+  r.chip.innerHTML = tl > 2.0 ? '✓ Chamada salva · ' + pres + ' presentes' : '👥 ' + pres + ' presentes' + (tl >= 1.55 ? ' · 1 com atestado' : '');
+  ap(r.chip, { o: pr(tl, .5, .2), y: (1 - E.out(pr(tl, .5, .3))) * 30, s: 1 + (tl > 2 ? .08 * Math.exp(-(tl - 2) * 8) : 0) });
+  palavras(r.c, tl, .1, null);
+}, [[.05, 'cascata', { dur: .6 }], [.8, 'pop', { p: 0 }], [1.2, 'pop', { p: 1 }], [1.55, 'pop', { p: 3 }], [2.0, 'ding']]);
+
+// 9. Frequência pronta (29–32 s)
+cena('frequencia', 29, 32, root => {
+  const R = rng(9);
+  let linhas = '';
+  for (let l = 0; l < 10; l++) {
+    let cels = '';
+    for (let c = 0; c < 12; c++) { const x = R(); const v = x < .08 ? 'F' : x < .11 ? 'J' : '•'; cels += '<td class="' + (v === '•' ? '' : v) + '" data-c="' + c + '">' + v + '</td>'; }
+    linhas += '<tr><td class="nm">' + (l + 1) + '. ' + NOMES[l] + '</td>' + cels + '</tr>';
+  }
+  const ths = Array.from({ length: 12 }, (_, i) => '<th>' + ['04', '05', '06', '07', '10', '11', '12', '13', '14', '17', '18', '19'][i] + '/08</th>').join('');
+  const a4 = mk('div', 'a a4', '<h5>ESCOLA MUNICIPAL DOM PEDRO II</h5><p class="sub">FREQUÊNCIA DIÁRIA — LÍNGUA PORTUGUESA · 5º ANO A</p><div class="meta"><span><b>Professora:</b> Ana Clara Mendes</span><span><b>Bimestre:</b> 3º</span></div><table><thead><tr><th>Aluno</th>' + ths + '</tr></thead><tbody>' + linhas + '</tbody></table>', root, 1330, 560);
+  const car = mk('div', 'a carimbo', '<div>PDF ✓<small>PRONTO</small></div>', root, 1620, 800);
+  return { a4, cels: Array.from(a4.querySelectorAll('td[data-c]')), car, c: txt(root, 120, 400, 'Frequência|*pronta.*', 'h2', true), s: txt(root, 124, 640, 'Imprima, salve em PDF|ou compartilhe.', 'p', true) };
+}, (tl, r) => {
+  const ent = E.out(pr(tl, 0, .5));
+  const soco = tl > 1.9 ? Math.sin((tl - 1.9) * 40) * 6 * Math.exp(-(tl - 1.9) * 9) : 0;
+  ap(r.a4, { y: (1 - ent) * 700 + soco, r: -2.5 + (1 - ent) * 8, o: pr(tl, 0, .15) });
+  r.cels.forEach(td => { const c = +td.dataset.c; td.style.opacity = pr(tl, .5 + c * .085, .12).toFixed(2); });
+  ap(r.car, { s: lerp(2.6, 1, E.out5(pr(tl, 1.78, .14))), o: pr(tl, 1.78, .08), r: -16 });
+  palavras(r.c, tl, .1, null); palavras(r.s, tl, .6, null, { stg: .04 });
+}, [[.5, 'ticker', { dur: 1.1, p: 1 }], [1.9, 'carimbo']]);
+
+// 10. O contador anda sozinho (32–35 s)
+cena('contador', 32, 35, root => {
+  const dados = [['📖 Língua Portuguesa', 211, 320, 3], ['➗ Matemática', 208, 320, 3], ['🔬 Ciências', 52, 80, 3]];
+  const cards = dados.map((d, i) => { const el = mk('div', 'a ccard', '<div class="l1">' + d[0] + '<span class="v">0 / ' + d[2] + '</span></div><div class="bar"><i></i></div><div class="bims"><b>1º</b><b>2º</b><b>3º</b><b>4º</b></div>', root, 1350, 300 + i * 162); el._d = d; return el; });
+  const graf = mk('div', 'a grafico', '<svg viewBox="0 0 740 180"><line x1="0" y1="150" x2="740" y2="150" stroke="#3a4047" stroke-width="2"/><line x1="0" y1="100" x2="740" y2="100" stroke="#2a2e33" stroke-width="2" stroke-dasharray="6 8"/><line x1="0" y1="45" x2="740" y2="45" stroke="#2a2e33" stroke-width="2" stroke-dasharray="6 8"/><polyline class="real" fill="none" stroke="#7fd494" stroke-width="6" stroke-linecap="round" points="0,158 60,146 120,137 180,126 240,117 300,108" pathLength="1" stroke-dasharray="1" /><polyline class="proj" fill="none" stroke="#ffa65b" stroke-width="6" stroke-linecap="round" stroke-dasharray="14 12" points="300,108 380,96 460,84 540,72 620,60 700,48"/><circle class="mk" cx="540" cy="72" r="11" fill="#ffa65b"/><text class="rot" x="560" y="112" fill="#ffa65b" font-family="Inter" font-weight="800" font-size="22">13/10 · fim do 3º bim.</text></svg>', root, 1350, 820);
+  return { cards, graf, real: graf.querySelector('.real'), proj: graf.querySelector('.proj'), mk: graf.querySelector('.mk'), rot: graf.querySelector('.rot'), c: txt(root, 120, 420, 'O contador|anda *sozinho.*', 'h2', true), s: txt(root, 124, 650, 'E mostra quando cada|bimestre termina.', 'p', true) };
+}, (tl, r) => {
+  r.cards.forEach((el, i) => {
+    const d = el._d, p = E.out(pr(tl, .3 + i * .15, 1.1)), v = Math.round(d[1] * p);
+    ap(el, { x: (1 - E.out(pr(tl, i * .08, .45))) * 300, o: pr(tl, i * .08, .2) });
+    el.querySelector('.bar i').style.transform = 'scaleX(' + (v / d[2]).toFixed(4) + ')';
+    el.querySelector('.v').textContent = v + ' / ' + d[2];
+    const bims = el.querySelectorAll('.bims b'), meta = d[2] / 4;
+    bims.forEach((b, j) => { b.className = v >= (j + 1) * meta ? 'co' : (v >= j * meta ? 'at' : ''); b.textContent = (j + 1) + 'º' + (v >= (j + 1) * meta ? ' ✓' : ''); });
+  });
+  ap(r.graf, { o: pr(tl, 1.2, .2), y: (1 - E.out(pr(tl, 1.2, .4))) * 60 });
+  r.real.style.strokeDashoffset = (1 - E.out(pr(tl, 1.4, .8))).toFixed(3);
+  r.proj.style.opacity = pr(tl, 2.1, .3).toFixed(2);
+  r.proj.style.strokeDashoffset = (-(tl * 40)).toFixed(1);
+  const m = pr(tl, 2.55, .12); r.mk.setAttribute('r', (11 * E.back(m)).toFixed(2)); r.rot.style.opacity = m.toFixed(2);
+  palavras(r.c, tl, .1, null); palavras(r.s, tl, .6, null, { stg: .04 });
+}, [[.3, 'blip', { p: 0 }], [.45, 'blip', { p: 1 }], [.6, 'blip', { p: 2 }], [1.4, 'subida', { dur: 1.2 }], [2.55, 'ding']]);
+
+// 11. 26 ferramentas de I.A. (35–39 s)
+const FERR = [['🗂', 'Sequência didática'], ['📝', 'Plano de aula'], ['📘', 'Plano de curso'], ['📚', 'Aulas do bimestre'], ['🎯', 'Habilidades da BNCC'], ['🧩', 'Projeto interdisciplinar'], ['🧪', 'Prova / avaliação'], ['🎓', 'Questões ENEM / SAEB'], ['📏', 'Rubrica de correção'], ['🔁', 'Recuperação'], ['🖊️', 'Corrigir redação'], ['✏️', 'Lista de exercícios'], ['📖', 'Leitura e interpretação'], ['🎲', 'Dinâmica / gamificação'], ['🧠', 'Resumo de estudo'], ['🖥️', 'Roteiro de slides'], ['📊', 'Relatório da turma'], ['🧑‍🎓', 'Parecer do aluno'], ['🗒️', 'Ata de conselho'], ['🗓️', 'Relatório bimestral'], ['♿', 'Adaptar atividade (DUA)'], ['🧭', 'Rascunho de PEI'], ['✉️', 'Comunicado à família'], ['📨', 'Ofício / e-mail'], ['🔤', 'Simplificar texto'], ['📓', 'Registrar aula']];
+const RESPOSTA = '<div class="who">🤖 I.A DA PLATAFORMA</div>__R__';
+const RESP_TXT = 'Plano de aula — Fábulas e a moral da história\n5º Ano A · Língua Portuguesa · 3º bimestre\n\n• Acolhida: o que a cigarra deveria ter feito?\n• Leitura compartilhada com pausas para previsões\n• Produção em duplas: um novo final\n• Adaptações: Davi (apoio visual), Pedro (fonte ampliada)';
+cena('ia', 35, 39, root => {
+  const tiles = FERR.map((f, i) => { const c = i % 7, l = Math.floor(i / 7); const el = mk('div', 'a tile', '<i>' + f[0] + '</i><span>' + f[1] + '</span>', root, 960 + (c - 3) * 236, 330 + l * 134); return el; });
+  const chat = mk('div', 'a chat', '<div class="u">📝 Plano de aula — Tema: fábulas e a moral da história</div><div class="r"></div>', root, 960, 600);
+  return { tiles, chat, r: chat.querySelector('.r'), t: txt(root, 960, 150, '*26 ferramentas* de I.A.', 'h2 c'), b: txt(root, 960, 975, 'que conhecem a sua turma.', 'h3 c') };
+}, (tl, r) => {
+  const foco = E.io(pr(tl, 1.9, .45));
+  r.tiles.forEach((el, i) => {
+    const t0 = .3 + i * .045;
+    el.classList.toggle('hl', i === 1 && tl > 1.85);
+    ap(el, { s: lerp(.5, 1, E.back(pr(tl, t0, .35))) * (i === 1 ? 1 + .12 * foco : 1 - .06 * foco), o: pr(tl, t0, .1) * (i === 1 ? 1 - pr(tl, 2.25, .2) : 1 - foco * .75), b: i === 1 ? 0 : foco * 5 });
+  });
+  const abre = E.out(pr(tl, 2.1, .45));
+  ap(r.chat, { s: lerp(.25, 1, abre), o: pr(tl, 2.1, .12), x: (1 - abre) * (960 + (1 - 3) * 236 - 960), y: (1 - abre) * (330 - 600) });
+  const txtR = digitado(RESP_TXT, tl, 2.45, 3.75);
+  r.r.innerHTML = RESPOSTA.replace('__R__', esc(txtR).replace(/^(.*)$/m, '<b>$1</b>')) + (tl < 3.8 ? '<span style="display:inline-block;width:10px;height:24px;background:#ffa65b;vertical-align:-4px"></span>' : '');
+  palavras(r.t, tl, .05, null, { stg: .07 }); palavras(r.b, tl, 2.3, null, { stg: .06 });
+}, [[.3, 'cascata', { dur: 1.2 }], [1.9, 'clique'], [2.1, 'whoosh', { dur: .5, up: 1 }], [2.45, 'digitar', { dur: 1.3, suave: 1 }]]);
+
+// 12. Inclusão de verdade (39–43 s)
+cena('inclusao', 39, 43, root => {
+  const orb = mk('div', 'a orbita', '', root, 1250, 520);
+  const centro = mk('div', 'a centro', '<div>Cada aluno,<br><span style="color:#C2CE9E">um caminho.</span></div>', root, 1250, 520);
+  const chips = ['🎯 PEI e metas', '📝 Registros', '📁 Documentos', '👥 Equipe'].map(t => mk('div', 'a orb', t, root, 1250, 520));
+  const linha = mk('div', 'a', '', root, 1250, 945); linha.style.display = 'flex'; linha.style.gap = '18px'; ap(linha);
+  const papeis = ['🧑‍🏫 Regente', '🤝 Mediador', '🧩 Assistente', '♿ AEE'].map(t => mk('div', 'papel-role', t, linha));
+  return { orb, centro, chips, papeis, c: txt(root, 110, 380, 'Inclusão|de *verdade.*', 'h2', true), s: txt(root, 114, 610, 'Perfil, PEI, registros e|relatório individual.', 'p', true) };
+}, (tl, r) => {
+  ap(r.orb, { s: lerp(.6, 1, E.out(pr(tl, .1, .6))), o: pr(tl, .1, .3), r: tl * 12 });
+  ap(r.centro, { s: lerp(.3, 1, E.back(pr(tl, .15, .5))), o: pr(tl, .15, .15) });
+  r.chips.forEach((el, i) => {
+    const a = (-90 + i * 90 + tl * 14) * Math.PI / 180, t0 = .55 + i * .25;
+    ap(el, { x: Math.cos(a) * 310, y: Math.sin(a) * 310, s: lerp(0, 1, E.back(pr(tl, t0, .4))), o: pr(tl, t0, .1) });
+  });
+  r.papeis.forEach((el, i) => { const t0 = 1.85 + i * .16; el.style.transform = 'translateY(' + ((1 - E.out(pr(tl, t0, .35))) * 40).toFixed(1) + 'px) scale(' + lerp(.4, 1, E.back(pr(tl, t0, .35))).toFixed(3) + ')'; el.style.opacity = pr(tl, t0, .1).toFixed(3); });
+  palavras(r.c, tl, .1, null); palavras(r.s, tl, .8, null, { stg: .04 });
+}, [[.55, 'sino', { p: 84 }], [.8, 'sino', { p: 88 }], [1.05, 'sino', { p: 91 }], [1.3, 'sino', { p: 96 }], [1.85, 'pop', { p: 0 }], [2.01, 'pop', { p: 1 }], [2.17, 'pop', { p: 2 }], [2.33, 'pop', { p: 3 }]]);
+
+// 13. No computador e no celular (43–46 s)
+cena('aparelhos', 43, 46, root => {
+  const lista = n => '<div class="mini"><div class="t">5º Ano A</div>' + (n ? '<div class="it novo"><b>21</b>Língua Portuguesa · 2h</div>' : '') + '<div class="it"><b>18</b>Geografia · 1h</div><div class="it"><b>18</b>Matemática · 2h</div><div class="it"><b>17</b>Ciências · 1h</div></div>';
+  const lap = mk('div', 'a laptop', '<div class="tela">' + lista(true) + '</div><div class="base"></div>', root, 720, 590);
+  const cel = mk('div', 'a cel', lista(false), root, 1440, 600);
+  const pulso = mk('div', 'a pulso', '', root, 0, 0); pulso.style.transform = 'none';
+  return { lap, cel, celTela: cel, pulso, lista, sync: mk('div', 'a pill ok', '☁ Sincronizado em segundos', root, 900, 945), off: mk('div', 'a pill', '📴 Sem internet? Fica salvo e sobe depois.', root, 960, 1022), c: txt(root, 960, 130, 'No computador *e no celular.*', 'h2 c') };
+}, (tl, r) => {
+  const sai = E.in(pr(tl, 2.65, .35));
+  ap(r.lap, { x: (1 - E.out(pr(tl, 0, .5))) * -300, o: pr(tl, 0, .2) * (1 - sai), s: 1 - sai * .2 });
+  ap(r.cel, { x: (1 - E.out(pr(tl, .15, .5))) * 300, o: pr(tl, .15, .2) * (1 - sai), s: (1 - sai * .2) * (1 + (tl > 1.22 ? .05 * Math.exp(-(tl - 1.22) * 7) : 0)) });
+  if (tl >= 1.22 && !r._novo) { r.celTela.innerHTML = r.lista(true); r._novo = true; }
+  if (tl < 1.22 && r._novo) { r.celTela.innerHTML = r.lista(false); r._novo = false; }
+  const p = E.io(pr(tl, .65, .57)), x0 = 900, y0 = 420, x1 = 1440, y1 = 520, cx = 1170, cy = 180;
+  const bx = (1 - p) * (1 - p) * x0 + 2 * (1 - p) * p * cx + p * p * x1, by = (1 - p) * (1 - p) * y0 + 2 * (1 - p) * p * cy + p * p * y1;
+  r.pulso.style.transform = 'translate(' + (bx - 17).toFixed(1) + 'px,' + (by - 17).toFixed(1) + 'px)';
+  r.pulso.style.opacity = (tl > .65 && tl < 1.25 ? 1 : 0).toString();
+  ap(r.sync, { s: lerp(.5, 1, E.back(pr(tl, 1.35, .35))), o: pr(tl, 1.35, .1) * (1 - sai) });
+  ap(r.off, { s: lerp(.5, 1, E.back(pr(tl, 1.9, .35))), o: pr(tl, 1.9, .1) * (1 - sai) });
+  palavras(r.c, tl, .05, 2.6, { stg: .07 });
+}, [[.65, 'whoosh', { dur: .55, up: 1 }], [1.22, 'ping'], [1.35, 'pop', { p: 2 }], [1.9, 'pop', { p: 1 }]]);
+
+// 14. Ganhe a noite de volta (46–50 s)
+cena('tempo', 46, 50, root => ({
+  rel: relogio(root, 960, 540, 900, '#F3F1E9', '#E3B861', '#E3B861'),
+  a: txt(root, 960, 530, 'Registre a aula *uma vez.*', 'h2 c'),
+  b: txt(root, 960, 530, 'Ganhe a *noite* de volta.', 'h2 c'),
+  c: txt(root, 960, 430, 'Mais tempo para o que importa:', 'h3 c'),
+  d: txt(root, 960, 610, '*o aluno.*', 'giant c')
+}), (tl, r) => {
+  const volta = E.io(pr(tl, 0, 1.8));
+  ponteiros(r.rel, ANG_H - 128.5 * volta, ANG_M - 1542 * volta, 30 - 3600 * volta);
+  ap(r.rel, { o: .22 * pr(tl, 0, .5) * (1 - .6 * pr(tl, 2.7, .5)), s: k(tl, 0, 4, .95, 1.08, 'lin'), r: -volta * 10 });
+  palavras(r.a, tl, .25, 1.45); palavras(r.b, tl, 1.55, 2.7, { stg: .08, dy: 90 });
+  palavras(r.c, tl, 2.8, null, { stg: .05 }); palavras(r.d, tl, 3.2, null, { stg: .1, dy: 120 });
+}, [[0, 'rebobinar', { dur: 1.8 }], [1.55, 'sino', { p: 76 }], [3.2, 'sino', { p: 84 }]]);
+
+/* ---------- ATO 3 · CRIE SUA CONTA ---------- */
+
+// 15. Chamada para ação (50–57 s)
+cena('cta', 50, 57, root => {
+  const R = rng(33), conf = [];
+  for (let i = 0; i < 70; i++) {
+    const el = mk('div', 'a confete', '', root, 1010, 585); el.style.zIndex = 6;
+    el.style.background = ['#A7B58A', '#FFA65B', '#E3B861', '#F3F1E9', '#C2CE9E', '#E8736B'][i % 6];
+    const a = -Math.PI / 2 + (R() - .5) * 2.6, v = 900 + R() * 1100;
+    el._vx = Math.cos(a) * v; el._vy = Math.sin(a) * v; el._rr = (R() - .5) * 1400; el._s = .6 + R() * .9;
+    conf.push(el);
+  }
+  const sim = mk('img', 'a', null, root, 960, 175); sim.src = '../../assets/marca/skin-simbolo.webp'; sim.style.width = '140px'; sim.style.borderRadius = '32px';
+  const aneis = [mk('div', 'a anel', '', root, 960, 560), mk('div', 'a anel', '', root, 960, 560)];
+  const bt = mk('div', 'a botao', 'Criar conta grátis →', root, 960, 560);
+  const cur = mk('div', 'a cursor', SVG_CURSOR, root, 0, 0); cur.style.transformOrigin = '0 0';
+  const url = mk('div', 'a url-cta', '', root, 960, 745);
+  const selos = ['✓ Grátis para começar', '✓ Sem instalar nada', '✓ Funciona no celular'].map((s, i) => mk('div', 'a selo', s, root, 960 + (i - 1) * 540, 900));
+  return { conf, sim, aneis, bt, cur, url, selos, h: txt(root, 960, 345, 'Crie sua conta *grátis.*', 'h2 c') };
+}, (tl, r) => {
+  let final = tl > 6 ? .06 * Math.exp(-(tl - 6) * 5) : 0;
+  const some = pr(tl, 6.55, .45);
+  ap(r.sim, { s: lerp(0, 1, E.back(pr(tl, 0, .45))) + final, o: pr(tl, 0, .1) * (1 - some) });
+  palavras(r.h, tl, .15, null, { stg: .09, dy: 90 });
+  r.h.style.opacity = (1 - some).toFixed(3);
+  const clique = tl > 2.45 && tl < 2.58;
+  ap(r.bt, { s: lerp(.3, 1, E.el(pr(tl, 1.0, .9))) * (clique ? .93 : 1) + (tl > 2.58 ? .07 * Math.exp(-(tl - 2.58) * 6) : 0) + final, o: pr(tl, 1.0, .12) * (1 - some) });
+  r.aneis.forEach((an, i) => { const ciclo = ((tl - 1.4 - i * .6) % 1.2 + 1.2) % 1.2; ap(an, { s: 1 + ciclo * .35, o: tl > 1.4 ? (1 - ciclo / 1.2) * .6 * (1 - some) : 0 }); });
+  const m = E.io(pr(tl, 1.7, .7));
+  r.cur.style.transform = 'translate(' + lerp(1860, 1010, m).toFixed(1) + 'px,' + lerp(1060, 585, m).toFixed(1) + 'px) scale(' + (clique ? .85 : 1) + ')';
+  r.cur.style.opacity = (pr(tl, 1.65, .15) * (1 - pr(tl, 3.1, .3))).toFixed(3);
+  r.conf.forEach(el => { const d = tl - 2.5; if (d < 0) { ap(el, { o: 0 }); return; } const f = 1 - Math.exp(-d * 3); ap(el, { x: el._vx * f / 3, y: el._vy * f / 3 + d * d * 500, r: el._rr * d, s: el._s, o: 1 - pr(d, 1.1, .7) }); });
+  const u = digitado('relatorio.skin', tl, 3.25, 3.85);
+  r.url.innerHTML = '🔒 ' + esc(u) + (tl > 3.2 && Math.floor(tl * 4) % 2 === 0 ? '<span style="display:inline-block;width:5px;height:56px;background:#A7B58A;vertical-align:-8px;margin-left:4px"></span>' : '');
+  ap(r.url, { o: pr(tl, 3.1, .15) * (1 - some), s: lerp(.8, 1, E.out(pr(tl, 3.1, .3))) + final });
+  r.selos.forEach((el, i) => { const t0 = 4.2 + i * .35; ap(el, { s: lerp(.4, 1, E.back(pr(tl, t0, .35))) + final, o: pr(tl, t0, .1) * (1 - some), y: (1 - E.out(pr(tl, t0, .35))) * 50 }); });
+}, [[.15, 'swipe'], [1.0, 'pop', { p: 1 }], [2.45, 'clique'], [2.5, 'brilho', { dur: 1.0 }], [2.55, 'sucesso'], [3.25, 'digitar', { dur: .6 }], [4.2, 'pop', { p: 0 }], [4.55, 'pop', { p: 1 }], [4.9, 'pop', { p: 2 }], [6.0, 'brilho', { dur: .8 }]]);
+
+// 16. Assinatura (56.7–60 s)
+cena('fim', 56.7, 60, root => {
+  const sim = mk('img', 'a', null, root, 960, 300); sim.src = '../../assets/marca/skin-simbolo.webp'; sim.style.width = '170px'; sim.style.borderRadius = '38px';
+  const marca = mk('div', 'a marca-skin', '<small>RELATORIO</small><b>SKIN</b>', root, 960, 520);
+  marca.style.transform = 'none';
+  const ax = mk('div', 'a', '<img src="../../assets/marca/axion-escuro-sm.webp" alt="" style="width:260px;display:block;margin:0 auto"><div style="margin-top:8px;text-align:center;font:600 20px Inter;letter-spacing:.24em;color:#B6B7AE">PROPRIEDADE DA AXION PROEDUQ</div>', root, 960, 950);
+  return { sim, marca, ax, url: txt(root, 960, 720, '*relatorio.skin*', 'h3 c'), cta: txt(root, 960, 810, 'Crie sua conta grátis. Ganhe tempo de volta.', 'p c') };
+}, (tl, r) => {
+  const e = pr(tl, .15, .5);
+  ap(r.sim, { o: e, s: lerp(.8, 1, E.out(e)) });
+  ap(r.marca, { o: pr(tl, .25, .5), s: lerp(.92, 1, E.out(pr(tl, .25, .6))), y: 0 });
+  palavras(r.url, tl, .6, null, { stg: .05 }); palavras(r.cta, tl, .9, null, { stg: .03 });
+  ap(r.ax, { o: pr(tl, 1.1, .5) });
+}, []);
+
+/* =====================================================================
+   2. CAMADAS GLOBAIS: transições, flash, tremor, fundo GLSL, granulado
+   ===================================================================== */
+const WIPES = [[19, '#FFA65B'], [22, '#A7B58A'], [26, '#E3B861'], [29, '#F3F1E9'], [32, '#A7B58A'], [35, '#FFA65B'], [39, '#F3F1E9'], [43, '#C2CE9E']];
+const FLASHES = [[16, .45, .95], [50, .35, .6], [56, .5, .3]];
+const TREMORES = [[16, 26, .55], [30.9, 10, .3], [50, 12, .4], [4 + 4.95, 8, .6]];
+const wp = $('#wipe'), wp1 = $('#wp1'), wp2 = $('#wp2');
+function transicoes(t) {
+  const w = WIPES.find(w => t >= w[0] - .3 && t <= w[0] + .3);
+  if (!w) { wp.style.display = 'none'; return; }
+  wp.style.display = 'block';
+  const d = t - w[0], x = d < 0 ? lerp(-1.3, 0, E.in(pr(d, -.3, .3))) : lerp(0, 1.3, E.out(pr(d, 0, .3)));
+  wp1.style.background = w[1]; wp2.style.background = '#0D0E0D';
+  wp1.style.transform = 'translateX(' + (x * W).toFixed(1) + 'px) skewX(-14deg)';
+  wp2.style.transform = 'translateX(' + ((x + (d < 0 ? .1 : -.1)) * W).toFixed(1) + 'px) skewX(-14deg)';
+}
+function flashes(t) { let a = 0; FLASHES.forEach(f => { if (t >= f[0]) a = Math.max(a, f[2] * Math.exp(-(t - f[0]) / f[1] * 3)); }); $('#flash').style.opacity = a.toFixed(3); return a; }
+function tremor(t) {
+  let x = 0, y = 0;
+  TREMORES.forEach(s => { const d = t - s[0]; if (d >= 0 && d < s[2]) { const a = s[1] * (1 - d / s[2]); x += Math.sin(d * 83 + s[0]) * a; y += Math.cos(d * 71 + s[0] * 2) * a; } });
+  $('#cenas').style.transform = 'translate(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px)';
+}
+function preto(t) {
+  let a = 1 - pr(t, 0, .35);
+  a = Math.max(a, pr(t, 15.72, .12) * (1 - pr(t, 16, .01)));
+  a = Math.max(a, pr(t, 59.2, .8));
+  $('#preto').style.opacity = a.toFixed(3);
+}
+// Granulado de filme: textura gerada uma vez, deslocada a cada quadro.
+(function () {
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d'), im = g.createImageData(256, 256), R = rng(3);
+  for (let i = 0; i < im.data.length; i += 4) { const claro = R() < .5, v = claro ? 255 : 0; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = Math.floor(R() * (claro ? 14 : 22)); }
+  g.putImageData(im, 0, 0); $('#grao').style.backgroundImage = 'url(' + c.toDataURL() + ')';
+})();
+// WebGL: fundo em GLSL (meia resolução, esticado — é um fundo suave).
+const GL = (function () {
+  const cv = $('#gl'), gl = cv.getContext('webgl', { preserveDrawingBuffer: true, antialias: false });
+  if (!gl) { cv.style.background = 'radial-gradient(ellipse at 60% 40%,#1a3a2a,#0D0E0D 70%)'; return null; }
+  const sh = (tipo, src) => { const s = gl.createShader(tipo); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+  const pg = gl.createProgram();
+  gl.attachShader(pg, sh(gl.VERTEX_SHADER, 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}'));
+  gl.attachShader(pg, sh(gl.FRAGMENT_SHADER, $('#frag').textContent));
+  gl.linkProgram(pg); gl.useProgram(pg);
+  const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(pg, 'a'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  const u = n => gl.getUniformLocation(pg, n);
+  const U = { res: u('u_res'), t: u('u_t'), mood: u('u_mood'), quente: u('u_quente'), intens: u('u_intens'), flash: u('u_flash') };
+  gl.uniform2f(U.res, cv.width, cv.height);
+  return { gl, U };
+})();
+function fundo(t, flash) {
+  if (!GL || window.SEM_GL) return;
+  const { gl, U } = GL;
+  const mood = pr(t, 15.95, .15);
+  const intens = t < 16 ? lerp(.35, .55, pr(t, 4, 9)) * (1 - pr(t, 14.6, 1.2) * .7) : t < 46 ? .9 : 1;
+  const quente = pr(t, 45.8, .8) * (1 - pr(t, 50, .5) * .6);
+  gl.uniform1f(U.t, t); gl.uniform1f(U.mood, mood); gl.uniform1f(U.quente, quente); gl.uniform1f(U.intens, intens); gl.uniform1f(U.flash, flash * .35);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+
+/* =====================================================================
+   3. API usada pelo render.js
+   ===================================================================== */
+window.renderAt = function (t) {
+  for (const c of CENAS) {
+    const on = t >= c.ini && t < c.fim;
+    c.root.style.display = on ? 'block' : 'none';
+    if (on) c.quadro(t - c.ini, c.r, t);
+  }
+  transicoes(t);
+  const f = flashes(t);
+  tremor(t); preto(t); fundo(t, f);
+};
+window.eventosSonoros = function () {
+  const ev = [];
+  CENAS.forEach(c => c.sons.forEach(s => ev.push(Object.assign({ t: +(c.ini + s[0]).toFixed(3), som: s[1] }, s[2] || {}))));
+  WIPES.forEach(w => ev.push({ t: +(w[0] - .3).toFixed(3), som: 'swipe' }));
+  return ev.sort((a, b) => a.t - b.t);
+};
+window.DURACAO = DUR;
+// Pronto quando as fontes e as imagens carregaram.
+Promise.all([document.fonts.ready, ...Array.from(document.images).map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; }))]).then(() => { window.renderAt(0); window.PRONTO = true; });
+// Prévia no navegador: ?t=12.5 mostra o quadro desse segundo; ?tocar=1 anima em tempo real.
+(function () {
+  const q = new URLSearchParams(location.search);
+  if (q.has('t')) setTimeout(() => window.renderAt(parseFloat(q.get('t'))), 600);
+  if (q.has('tocar')) { const t0 = performance.now(); const f = () => { const t = (performance.now() - t0) / 1000; window.renderAt(t % DUR); requestAnimationFrame(f); }; setTimeout(f, 600); }
+})();
+</script>
+</body>
+</html>
