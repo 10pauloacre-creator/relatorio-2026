@@ -7,7 +7,8 @@
 //   • diários editáveis           → NovoDiario.diarios() / NovoDiario.salvar
 //   • relatos escritos no HTML     → resumo só de leitura (resumoExtra)
 // Nas escolas a I.A só registra e altera diários (turmas e alunos são fixos
-// no HTML; plano, livros e sequências têm sistema próprio).
+// no HTML; plano e livros têm sistema próprio). Com 📁 Documentos
+// (escola-documentos.js), também salva documentos e sequências.
 //
 // A conta do administrador não tem cota: a "IA da plataforma" é ilimitada
 // aqui (ia_consumir_cota devolve ilimitado para 10pauloacre@gmail.com).
@@ -117,7 +118,7 @@
     return {
       contexto: CONTEXTO,
       nomePlataforma: "do Relatório da " + ESCOLA,
-      acoes: ["criar_diario", "editar_diario"],
+      acoes: window.MeuDiarioDocumentos ? ["criar_diario", "editar_diario", "documento", "sequencia"] : ["criar_diario", "editar_diario"],
       boasVindas: "👋 Olá, professor! Aqui eu <strong>registro e corrijo diários</strong> da " + ESCOLA + ", leio <strong>fotos do caderno de chamada</strong>, PDFs e documentos, e respondo sobre as suas turmas e os relatos já escritos.<br>Escreva abaixo, envie um arquivo 📎 ou tire uma foto 📷. Nada muda no diário sem a sua confirmação.",
       sugestoes: [
         ["📝 Registrar a aula de hoje", "Registre a aula de hoje: turma , disciplina , das  às . Conteúdo: . Faltaram: ."],
