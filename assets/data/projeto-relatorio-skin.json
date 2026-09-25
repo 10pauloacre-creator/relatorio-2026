@@ -1,5 +1,5 @@
 {
-  "versao": 12,
+  "versao": 13,
   "atualizadoEm": "2026-09-25",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -965,6 +965,11 @@
         {
           "id": "rs-video-marketing",
           "text": "Vídeo de marketing (60 s, trilha e efeitos sonoros) no início do site",
+          "done": true
+        },
+        {
+          "id": "rs-video-autoplay",
+          "text": "Vídeo do site: edição do professor (1min40), começa sozinho sem som, com pausa e versão leve no celular",
           "done": true
         },
         {
