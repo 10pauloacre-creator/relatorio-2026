@@ -246,9 +246,10 @@
       id: "registrar", ic: "📓", cat: "apoio", doc: "", acao: "criar_diario", nome: "Registrar aula no diário",
       desc: "Transforma o que você escreveu ou falou sobre a aula em um registro no diário, com faltas e atividades.",
       instrucoes: ["Escolha turma e disciplina.", "Escreva do seu jeito: o que deu, quem faltou, quem fez a atividade.", "Confira o cartão e toque em Aplicar."],
-      campos: [T, D, { id: "data", rotulo: "Data", tipo: "texto", valor: "hoje" }, { id: "horario", rotulo: "Horário", tipo: "texto", ph: "Ex.: 07:30 às 09:10" }, { id: "relato", rotulo: "Como foi a aula", tipo: "area", obrig: true, ph: "Conteúdo, faltas, atividade, comportamento…" }],
-      prompt: "Registre a aula da turma {{turma}}, disciplina {{disciplina}}, data {{data}}, horário {{horario}}. Relato: {{relato}}",
-      papel: "Você registra aulas no diário. Responda com uma frase e proponha a ação criar_diario completa (conteúdo, faltas, atividade e comportamento só se foram informados)."
+      campos: [T, D, { id: "data", rotulo: "Data", tipo: "texto", valor: "hoje" }, { id: "horario", rotulo: "Horário", tipo: "texto", ph: "Ex.: 07:30 às 09:10" }, { id: "relato", rotulo: "Como foi a aula", tipo: "area", obrig: true, ph: "Conteúdo, faltas, atividade, comportamento…" },
+        { id: "prazo", rotulo: "Prazo para entrega da atividade", tipo: "opcoes", opcoes: ["sem prazo", "1 dia", "2 dias", "3 dias", "5 dias", "7 dias", "15 dias", "12 horas", "24 horas", "48 horas"], valor: "sem prazo" }],
+      prompt: "Registre a aula da turma {{turma}}, disciplina {{disciplina}}, data {{data}}, horário {{horario}}. Prazo para entrega da atividade: {{prazo}}. Relato: {{relato}}",
+      papel: "Você registra aulas no diário. Responda com uma frase e proponha a ação criar_diario completa (conteúdo, faltas, atividade e comportamento só se foram informados). Se houver prazo para entrega, envie atividade.houve=true e atividade.prazo com dias e horas (\"48 horas\" = {\"dias\":2,\"horas\":0}; \"12 horas\" = {\"dias\":0,\"horas\":12}); \"sem prazo\" = não envie prazo. Mais de uma atividade na aula vai em atividades_extras, cada uma com título."
     }
   ];
 

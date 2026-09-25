@@ -20,7 +20,7 @@ const RH_TURMA_LABELS = {   t89: '8º/9º Ano',   t1: '1ª Série',   t23: '2ª/
 const RH_GRUPOS_CONT = {   lp: { container: 'rh-cont-lp', badge: 'LP', badgeStyle: 'background:var(--vs);color:var(--vm)', bar: 'linear-gradient(90deg,var(--vm),var(--vc))' },   ing:{ container: 'rh-cont-ing', badge: 'ING', badgeStyle: 'background:#e8f9ef;color:#1f7a52', bar: 'linear-gradient(90deg,#27ae60,#58d68d)' },   esp:{ container: 'rh-cont-esp', badge: 'ESP', badgeStyle: 'background:#f3e9fb;color:#7d3c98', bar: 'linear-gradient(90deg,#8e44ad,#c39bd3)' },   art:{ container: 'rh-cont-art', badge: 'ART', badgeStyle: 'background:var(--lav);color:var(--la)', bar: 'linear-gradient(90deg,var(--la),#e67e22)' },   red:{ container: 'rh-cont-red', badge: 'RED', badgeStyle: 'background:#e6f4ea;color:#1f6f43', bar: 'linear-gradient(90deg,#1f7a4d,#58b77c)' } };
 const RH_LIVROS_DISCS = {   lp: { nm:'Língua Portuguesa', cor:'d-lp', turmas:['t89','t1','t23'] },   ing:{ nm:'Inglês',            cor:'d-lp', turmas:['t89','t1','t23'] },   esp:{ nm:'Espanhol',          cor:'d-lp', turmas:['t89','t1','t23'] },   art:{ nm:'Arte',              cor:'d-ar', turmas:['t89','t1','t23'] },   red:{ nm:'Redação',           cor:'d-lp', turmas:['t1','t23'] } };
 const RH_LIV_ICS = {   '':          { ic:'📘', lbl:'Não iniciado' },   criando:     { ic:'📕', lbl:'Criando' },   concluido:   { ic:'📗', lbl:'Concluído' } };
-var _rhLivStatus = JSON.parse(localStorage.getItem('rh_liv_status') || '{}'); var _rhLivUrls = JSON.parse(localStorage.getItem('rh_liv_urls') || '{}'); const RH_SEQ_DISCS = {   t89:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'}],   t1:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'},{id:'red',nm:'Redação',cor:'d-lp'}],   t23:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'},{id:'red',nm:'Redação',cor:'d-lp'}] }; const RH_SEQ_ICS = {'':{ic:'🗂',lbl:'Não iniciado'},criando:{ic:'📝',lbl:'Criando'},concluido:{ic:'✅',lbl:'Concluído'}}; var _rhSeqStatus = JSON.parse(localStorage.getItem('rh_seq_status') || '{}'); var _rhPresencaCliques = JSON.parse(localStorage.getItem('rh_presenca_cliques') || '{}'); var _rhAtividadeCliques = JSON.parse(localStorage.getItem('rh_atividade_cliques') || '{}'); const RH_ALUNOS_SYNC_KEY = 'rh_alunos_sync_v1'; const RH_SUPABASE_DAILY_SCOPE = 'herminio:daily:shared-v1'; const RH_DAILY_LOCAL_TS_KEY = 'rh_daily_sync_local_ts'; var _rhRemoteDailySync = null; var _rhAplicandoSyncRemoto = false;
+var _rhLivStatus = JSON.parse(localStorage.getItem('rh_liv_status') || '{}'); var _rhLivUrls = JSON.parse(localStorage.getItem('rh_liv_urls') || '{}'); const RH_SEQ_DISCS = {   t89:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'}],   t1:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'},{id:'red',nm:'Redação',cor:'d-lp'}],   t23:[{id:'lp',nm:'Língua Portuguesa',cor:'d-lp'},{id:'ing',nm:'Inglês',cor:'d-lp'},{id:'esp',nm:'Espanhol',cor:'d-lp'},{id:'red',nm:'Redação',cor:'d-lp'}] }; const RH_SEQ_ICS = {'':{ic:'🗂',lbl:'Não iniciado'},criando:{ic:'📝',lbl:'Criando'},concluido:{ic:'✅',lbl:'Concluído'}}; var _rhSeqStatus = JSON.parse(localStorage.getItem('rh_seq_status') || '{}'); var _rhPresencaCliques = JSON.parse(localStorage.getItem('rh_presenca_cliques') || '{}'); var _rhPresencaJust = JSON.parse(localStorage.getItem('rh_presenca_just') || '{}'); var _rhAtividadeCliques = JSON.parse(localStorage.getItem('rh_atividade_cliques') || '{}'); const RH_ALUNOS_SYNC_KEY = 'rh_alunos_sync_v1'; const RH_SUPABASE_DAILY_SCOPE = 'herminio:daily:shared-v1'; const RH_DAILY_LOCAL_TS_KEY = 'rh_daily_sync_local_ts'; var _rhRemoteDailySync = null; var _rhAplicandoSyncRemoto = false;
 const RH_MESES = {   Jan: 0, Fev: 1, Mar: 2, Abr: 3, Mai: 4, Jun: 5,   Jul: 6, Ago: 7, Set: 8, Out: 9, Nov: 10, Dez: 11 };
 function fmtHoraAula(valor) { 
 if (valor === 0) return '0'; 
@@ -259,7 +259,7 @@ function getBimAtualRH(feitas, bimestre) {
 if (!bimestre) return 1;   for (var b = 1; b <= 4; b++) {   
 if (feitas < b * bimestre) return b;   }   return 4; }
 function rhSalvarCliques(tipo) {   localStorage.setItem(RH_DAILY_LOCAL_TS_KEY, new Date().toISOString()); 
-if (tipo === 'presenca') {     localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));     rhAgendarSyncRemoto('presenca');     return;   }   localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));   rhAgendarSyncRemoto('atividade'); }
+if (tipo === 'presenca') {     localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));     localStorage.setItem('rh_presenca_just', JSON.stringify(_rhPresencaJust));     rhAgendarSyncRemoto('presenca');     return;   }   localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));   rhAgendarSyncRemoto('atividade'); }
 function rhExtrairTurmaDoTitulo(txt) { 
 if (!txt) return null; 
 if (txt.indexOf('1ª Série') >= 0) return 't1'; 
@@ -398,7 +398,7 @@ if (estado === true) {         aluno.atividadesFeitas += 1;         aluno.ativid
 if (!(infoDisc && contaTema) || estado !== true) return;     
 var resumoDiscAluno = rhGarantirResumoDisciplinaAluno(aluno, infoDisc.disc);       resumoDiscAluno.atividadesFeitas += 1;       resumoDiscAluno.atividadesPorBimestre[bim] = (resumoDiscAluno.atividadesPorBimestre[bim] || 0) + 1;     });   });    return {     updatedAt: new Date().toISOString(),     classes: classes   }; }
 function rhSincronizarResumoAlunos() {   localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(rhMontarResumoAlunosSync())); }
-function rhMontarPayloadSyncRemoto() {   return {     localUpdatedAt: localStorage.getItem(RH_DAILY_LOCAL_TS_KEY) || new Date().toISOString(),     presencaCliques: _rhPresencaCliques,     atividadeCliques: _rhAtividadeCliques,     valePonto: _rhValePonto,     alunosSync: rhMontarResumoAlunosSync()   }; }
+function rhMontarPayloadSyncRemoto() {   return {     localUpdatedAt: localStorage.getItem(RH_DAILY_LOCAL_TS_KEY) || new Date().toISOString(),     presencaCliques: _rhPresencaCliques,     presencaJust: _rhPresencaJust,     atividadeCliques: _rhAtividadeCliques,     valePonto: _rhValePonto,     alunosSync: rhMontarResumoAlunosSync()   }; }
 /* ── Lançamentos oficiais (Supabase: relatorio_aulas / lancamentos / ocorrencias) ──
    Mesmas regras de rhMontarResumoAlunosSync, mas aula por aula e aluno por aluno. */
 var _rhLancamentos = null;
@@ -451,9 +451,9 @@ function rhMontarRetratoLancamentos() {
       var estado = rhGetEstadoAtual(tipo, pane, aluno.n);
       if (tipo === 'presenca') {
         if (estado === true) mapa[aluno.n] = 'p';
-        else if (estado === false) mapa[aluno.n] = 'f';
+        else if (estado === false) mapa[aluno.n] = rhPresencaJustificada(pane, aluno.n) ? 'j' : 'f';
       } else {
-        if (!rhAntesDaEntrada(turmaId, aluno.n, pane.id)) mapa[aluno.n] = estado === true ? 'fz' : estado === false ? 'nf' : 'pd';
+        if (!rhAntesDaEntrada(turmaId, aluno.n, pane.id)) mapa[aluno.n] = estado === true ? 'fz' : estado === false ? 'nf' : 'ag';
       }
     });
     if (tipo === 'presenca') aula.p = mapa; else aula.a = mapa;
@@ -542,7 +542,7 @@ function rhAplicarSyncRemoto(payload, meta) {
 if (!payload || typeof payload !== 'object') return; 
 var localStamp = Date.parse(localStorage.getItem(RH_DAILY_LOCAL_TS_KEY) || '') || 0; 
 var remoteStamp = Date.parse((payload && payload.localUpdatedAt) || (meta && meta.updatedAt) || '') || 0; 
-if (localStamp && remoteStamp && localStamp > remoteStamp) {     rhAgendarSyncRemoto('keep-local');     return;   }   _rhAplicandoSyncRemoto = true;    _rhPresencaCliques = payload.presencaCliques && typeof payload.presencaCliques === 'object'     ? payload.presencaCliques     : {};   _rhAtividadeCliques = payload.atividadeCliques && typeof payload.atividadeCliques === 'object'     ? payload.atividadeCliques     : {};    localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));   localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));   if (payload.valePonto && typeof payload.valePonto === 'object') {     _rhValePonto = payload.valePonto;     localStorage.setItem('rh_vale_ponto', JSON.stringify(_rhValePonto));     if (_rhValePontoUI) document.querySelectorAll('.ipane.on[id^="a-t"]').forEach(_rhValePontoUI.montar);   }   localStorage.setItem(RH_DAILY_LOCAL_TS_KEY, payload.localUpdatedAt || (meta && meta.updatedAt) || new Date().toISOString());   localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(payload.alunosSync || rhMontarResumoAlunosSync()));    rhMarcarPanesInterativosDirty('presenca');   rhMarcarPanesInterativosDirty('atividade');   rhRenderInterativosVisiveis(false);   rhSincronizarResumoAlunos();    _rhAplicandoSyncRemoto = false;   rhAgendarLancamentos(); }
+if (localStamp && remoteStamp && localStamp > remoteStamp) {     rhAgendarSyncRemoto('keep-local');     return;   }   _rhAplicandoSyncRemoto = true;    _rhPresencaCliques = payload.presencaCliques && typeof payload.presencaCliques === 'object'     ? payload.presencaCliques     : {};   _rhAtividadeCliques = payload.atividadeCliques && typeof payload.atividadeCliques === 'object'     ? payload.atividadeCliques     : {};    _rhPresencaJust = payload.presencaJust && typeof payload.presencaJust === 'object' ? payload.presencaJust : {};    localStorage.setItem('rh_presenca_cliques', JSON.stringify(_rhPresencaCliques));   localStorage.setItem('rh_presenca_just', JSON.stringify(_rhPresencaJust));   localStorage.setItem('rh_atividade_cliques', JSON.stringify(_rhAtividadeCliques));   if (payload.valePonto && typeof payload.valePonto === 'object') {     _rhValePonto = payload.valePonto;     localStorage.setItem('rh_vale_ponto', JSON.stringify(_rhValePonto));     if (_rhValePontoUI) document.querySelectorAll('.ipane.on[id^="a-t"]').forEach(_rhValePontoUI.montar);   }   localStorage.setItem(RH_DAILY_LOCAL_TS_KEY, payload.localUpdatedAt || (meta && meta.updatedAt) || new Date().toISOString());   localStorage.setItem(RH_ALUNOS_SYNC_KEY, JSON.stringify(payload.alunosSync || rhMontarResumoAlunosSync()));    rhMarcarPanesInterativosDirty('presenca');   rhMarcarPanesInterativosDirty('atividade');   rhRenderInterativosVisiveis(false);   rhSincronizarResumoAlunos();    _rhAplicandoSyncRemoto = false;   rhAgendarLancamentos(); }
 function rhAgendarSyncRemoto(reason) {
 rhAgendarLancamentos();
 if (_rhAplicandoSyncRemoto || !_rhRemoteDailySync) return;   _rhRemoteDailySync.schedulePush(reason || 'daily-change'); }
@@ -550,26 +550,42 @@ function rhIniciarSyncRemoto() {
 if (!window.RelatorioSupabaseSync || !window.RelatorioSupabaseSync.isAvailable()) return;    _rhRemoteDailySync = window.RelatorioSupabaseSync.createScopeSync({     scope: RH_SUPABASE_DAILY_SCOPE,     schoolSlug: 'raimundo-herminio-de-melo',     classSlug: 'relatos-gerais',     source: 'herminio-html',     debounceMs: 550,     getLocalPayload: function () {       return rhMontarPayloadSyncRemoto();     },     onRemotePayload: function (payload, meta) {       rhAplicarSyncRemoto(payload, meta);     },     onStatus: function (status) {     
 if (status === 'erro') {         console.warn('[SupabaseSync] Raimundo Herminio permaneceu em modo local.');       }     }   });    _rhRemoteDailySync.start().then(function(ready) {   
 if (!ready) return;     window.setTimeout(function() {       rhAgendarSyncRemoto('bootstrap');     }, 900);   }); }
-function rhProximoEstado(valorAtual) { 
+function rhProximoEstado(valorAtual) {
 if (valorAtual === null || valorAtual === undefined) return true;   return !valorAtual; }
-function rhClasseMarcacao(valor) { 
-if (valor === true) return 'is-green'; 
-if (valor === false) return 'is-red';   return 'is-neutral'; }
+// Atividade: aguardando (null) → feito (true) → não entregue (false) → aguardando.
+function rhProximoEstadoAtividade(valorAtual) {
+if (valorAtual === true) return false;
+if (valorAtual === false) return null;
+return true; }
+// Falta justificada (25/09/2026): a presença continua false; a justificativa
+// fica em _rhPresencaJust[pane][n] (true/false explícito) e, sem clique, vem
+// da lista faltJ do relato.
+function rhPresencaJustificada(pane, n) {
+var paneId = typeof pane === 'string' ? pane : (pane && pane.id) || '';
+var j = (_rhPresencaJust[paneId] || {})[n];
+if (j !== undefined) return !!j;
+if ((_rhPresencaCliques[paneId] || {})[n] !== undefined) return false;
+var base = PRESENCA_RH['pl-' + paneId.slice(2)];
+return !!(base && (base.faltJ || []).indexOf(parseInt(n, 10)) >= 0); }
+function rhClasseMarcacao(valor, justificada) {
+if (valor === true) return 'is-green';
+if (valor === false) return justificada ? 'is-just' : 'is-red';   return 'is-neutral'; }
 function rhResumoMarcacao(tipo, pane, turmaId) { 
 var alunos = ALUNOS_RH[turmaId] || []; 
 var verd = 0; 
 var verm = 0; 
-var neut = 0;   alunos.forEach(function(aluno) {   
-var estado = rhGetEstadoAtual(tipo, pane, aluno.n);   
-if (rhAntesDaEntrada(turmaId, aluno.n, pane.id)) return; if (estado === true) verd += 1;     else if (estado === false) verm += 1;     else neut += 1;   }); 
-if (tipo === 'presenca') {     return verd + ' presentes · ' + verm + ' faltas' + (neut ? ' · ' + neut + ' sem marcação' : '');   }   return verd + ' fizeram · ' + verm + ' não fizeram' + (neut ? ' · ' + neut + ' sem marcação' : ''); }
+var neut = 0; var just = 0;   alunos.forEach(function(aluno) {
+var estado = rhGetEstadoAtual(tipo, pane, aluno.n);
+if (rhAntesDaEntrada(turmaId, aluno.n, pane.id)) return; if (estado === true) verd += 1;     else if (estado === false) { if (tipo === 'presenca' && rhPresencaJustificada(pane, aluno.n)) just += 1; else verm += 1; }     else neut += 1;   });
+if (tipo === 'presenca') {     return verd + ' presentes · ' + verm + ' faltas · ' + just + ' faltas justificadas' + (neut ? ' · ' + neut + ' sem marcação' : '');   }   return verd + ' feito · ' + verm + ' não entregue · ' + neut + ' aguardando'; }
 function rhHtmlMosaico(tipo, pane, turmaId) { 
 var alunos = ALUNOS_RH[turmaId] || []; 
 var gridClass = tipo === 'presenca' ? 'pres-grid' : 'atv-grid'; 
-var help = tipo === 'presenca'     ? 'Clique para marcar <strong>verde</strong> quem esteve presente e <strong>vermelho</strong> quem faltou.'     : 'Clique para marcar <strong>verde</strong> quem fez a atividade e <strong>vermelho</strong> quem não fez.';   return '<div class="rh-mark-help"><span class="dot g"></span> Verde <span class="dot r"></span> Vermelho <span class="dot n"></span> Neutro · ' + help + '</div>'     + '<div class="' + gridClass + '">'     + alunos.map(function(aluno) {     
-var estado = rhGetEstadoAtual(tipo, pane, aluno.n);     
-var classe = rhClasseMarcacao(estado);     
-var flag = estado === true ? '●' : (estado === false ? '●' : '○');       if (rhAntesDaEntrada(turmaId, aluno.n, pane.id)) {         return '<span class="rh-mark-btn is-neutral" style="opacity:.55;cursor:default" title="Ainda não estava na turma">'           + '<span class="mk-num">' + aluno.n + '</span><span class="mk-name">' + aluno.nm + '</span>'           + '<span class="mk-flag" style="font-size:.6rem">' + RelatorioAlunosAdicionados.rotuloEntrada(aluno) + '</span></span>';       }       return '<button type="button" class="rh-mark-btn ' + classe + '" data-rh-toggle="' + tipo + '" data-pane="' + pane.id + '" data-aluno="' + aluno.n + '">'         + '<span class="mk-num">' + aluno.n + '</span>'         + '<span class="mk-name">' + aluno.nm + '</span>'         + '<span class="mk-flag">' + flag + '</span>'       + '</button>';     }).join('')     + '</div>'; }
+var help = tipo === 'presenca'     ? 'Clique no aluno para trocar: <strong>presente</strong> → <strong>falta</strong> → <strong>falta justificada</strong> (📄 abre a justificativa).'     : 'Clique no aluno para trocar: <strong>aguardando</strong> → <strong>feito</strong> → <strong>não entregue</strong>.';   var legenda = tipo === 'presenca'     ? '<span class="dot g"></span> Presente <span class="dot r"></span> Falta <span class="dot j"></span> Falta justificada <span class="dot n"></span> Sem marcação · '     : '<span class="dot g"></span> Feito <span class="dot r"></span> Não entregue <span class="dot n"></span> Aguardando · ';   return '<div class="rh-mark-help">' + legenda + help + '</div>'     + '<div class="' + gridClass + '">'     + alunos.map(function(aluno) {
+var estado = rhGetEstadoAtual(tipo, pane, aluno.n);
+var justificada = tipo === 'presenca' && estado === false && rhPresencaJustificada(pane, aluno.n);
+var classe = rhClasseMarcacao(estado, justificada);
+var flag = justificada ? 'FJ' : (estado === true || estado === false ? '●' : (tipo === 'atividade' ? '⏳' : '○'));       if (rhAntesDaEntrada(turmaId, aluno.n, pane.id)) {         return '<span class="rh-mark-btn is-neutral" style="opacity:.55;cursor:default" title="Ainda não estava na turma">'           + '<span class="mk-num">' + aluno.n + '</span><span class="mk-name">' + aluno.nm + '</span>'           + '<span class="mk-flag" style="font-size:.6rem">' + RelatorioAlunosAdicionados.rotuloEntrada(aluno) + '</span></span>';       }       return '<button type="button" class="rh-mark-btn ' + classe + '" data-rh-toggle="' + tipo + '" data-pane="' + pane.id + '" data-aluno="' + aluno.n + '">'         + '<span class="mk-num">' + aluno.n + '</span>'         + '<span class="mk-name">' + aluno.nm + '</span>'         + '<span class="mk-flag">' + flag + '</span>'       + '</button>';     }).join('')     + '</div>'; }
 function rhRenderPanePresenca(pane) { 
 var turmaId = rhDescobrirTurmaPane(pane); 
 if (!turmaId) return; 
@@ -1531,11 +1547,15 @@ var paneId = btn.getAttribute('data-pane');
 var aluno = btn.getAttribute('data-aluno'); 
 var pane = document.getElementById(paneId); 
 if (!pane || !aluno) return; 
-var atual = rhGetEstadoAtual(tipo, pane, aluno); 
-var proximo = rhProximoEstado(atual); 
-if (tipo === 'presenca') {   
-if (!_rhPresencaCliques[paneId]) _rhPresencaCliques[paneId] = {};     _rhPresencaCliques[paneId][aluno] = proximo;     rhSalvarCliques('presenca');     rhRenderPanePresenca(pane);     rhSincronizarResumoAlunos();     return;   } 
-if (!_rhAtividadeCliques[paneId]) _rhAtividadeCliques[paneId] = {};   _rhAtividadeCliques[paneId][aluno] = proximo;   rhSalvarCliques('atividade');   rhRenderPaneAtividade(pane);   rhSincronizarResumoAlunos(); });
+var atual = rhGetEstadoAtual(tipo, pane, aluno);
+if (tipo === 'presenca') {
+// presente → falta → falta justificada → presente (sem marcação → presente)
+var justAtual = atual === false && rhPresencaJustificada(pane, aluno);
+var proximo = atual === true ? false : (atual === false && !justAtual ? false : true);
+var justProx = atual === false && !justAtual;
+if (!_rhPresencaCliques[paneId]) _rhPresencaCliques[paneId] = {};     _rhPresencaCliques[paneId][aluno] = proximo;
+if (!_rhPresencaJust[paneId]) _rhPresencaJust[paneId] = {};     _rhPresencaJust[paneId][aluno] = justProx;     rhSalvarCliques('presenca');     rhRenderPanePresenca(pane);     rhSincronizarResumoAlunos();     return;   } 
+if (!_rhAtividadeCliques[paneId]) _rhAtividadeCliques[paneId] = {};   _rhAtividadeCliques[paneId][aluno] = rhProximoEstadoAtividade(atual);   rhSalvarCliques('atividade');   rhRenderPaneAtividade(pane);   rhSincronizarResumoAlunos(); });
 if ('serviceWorker' in navigator) { 
 window.addEventListener('load', function() {     navigator.serviceWorker.register('sw.js').catch(function(){});   }); }
 function rhRemoverAbaJogos() {
@@ -1656,9 +1676,7 @@ function rhAbrirFrequencia(sectionId) {
       var e = rhGetEstadoAtual('presenca', pane, n);
       if (e === true) return 'p';
       if (e !== false) return null;
-      var clique = (_rhPresencaCliques['p-' + codigo] || {})[n];
-      var base = PRESENCA_RH['pl-' + codigo];
-      return (clique === undefined && base && (base.faltJ || []).indexOf(n) >= 0) ? 'j' : 'f';
+      return rhPresencaJustificada(pane, n) ? 'j' : 'f';
     }
   });
 }

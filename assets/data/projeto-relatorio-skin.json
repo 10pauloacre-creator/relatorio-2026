@@ -1,5 +1,5 @@
 {
-  "versao": 14,
+  "versao": 15,
   "atualizadoEm": "2026-09-25",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -401,6 +401,17 @@
               "Cada documento guarda turma, disciplina e bimestre (filtros e busca). Pasta automática Turma › Disciplina ao salvar da I.A.",
               "Escopo meu-diario:documentos:v1 em professor_dados; as sequências antigas migram sozinhas (id seq-<chave>).",
               "Casavequia e Hermínio: escola-documentos.js troca o botão Sequências por Documentos e traz as sequências antigas da página (25/09/2026)."
+            ]
+          },
+          {
+            "id": "js-diario-extras",
+            "icon": "file",
+            "title": "assets/js/diario-extras.js — justificativas e prazos das atividades",
+            "status": "Concluído",
+            "details": [
+              "Ícone 📄 na falta justificada: texto e anexos (arrastar, colar, anexar), salvos na aula; anexos no bucket professor-arquivos.",
+              "Barra ⏰ Prazo para entrega em toda atividade, com contagem e aviso de prazo encerrado.",
+              "Escopo diario:extras:v1 em professor_dados; vale na Casavequia, na Hermínio e no Meu Diário."
             ]
           },
           {
@@ -1475,6 +1486,47 @@
           "id": "rs-vivo-10",
           "text": "Bug corrigido: transição de abertura mostrava a página pelo meio do véu",
           "done": true
+        }
+      ]
+    },
+    {
+      "id": "rs-diario",
+      "text": "14. Presença, justificativas e atividades (regra global)",
+      "children": [
+        {
+          "id": "rs-diario-1",
+          "text": "Presença com 3 opções no clique (presente, falta, falta justificada) em todas as escolas, inclusive Hermínio",
+          "done": true
+        },
+        {
+          "id": "rs-diario-2",
+          "text": "Ícone 📄 na falta justificada: justificativa escrita + anexos (arrastar, colar, anexar) salva na aula",
+          "done": true
+        },
+        {
+          "id": "rs-diario-3",
+          "text": "Atividades com os estados Aguardando, Feito e Não entregue",
+          "done": true
+        },
+        {
+          "id": "rs-diario-4",
+          "text": "Prazo para entrega (dias e horas) com contagem e aviso de prazo encerrado",
+          "done": true
+        },
+        {
+          "id": "rs-diario-5",
+          "text": "Prazo no lançamento de aula: + Novo Diário e I.A (criar_diario e ferramenta Registrar aula)",
+          "done": true
+        },
+        {
+          "id": "rs-diario-6",
+          "text": "Várias atividades no mesmo diário, com título e todos os alunos começando em Aguardando",
+          "done": true
+        },
+        {
+          "id": "rs-diario-7",
+          "text": "Atividades extras contando na nota de trabalho e no banco",
+          "done": false
         }
       ]
     }
