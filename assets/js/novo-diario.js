@@ -672,6 +672,27 @@
     if (resposta.data.cota && window.SkinPlanos) window.SkinPlanos.aposIA(resposta.data.cota);
     return resposta.data;
   }
+  // Animação "pensando" (ia-pensando.js + lattice-loader.js) com as frases do
+  // diário: lendo o relato, alunos da turma, horário, h/aula no contador…
+  function textoPrazo(p) {
+    if (!p || !p.ativo) return "";
+    var d = p.dias ? p.dias + (p.dias === 1 ? " dia" : " dias") : "", h = p.horas ? p.horas + (p.horas === 1 ? " hora" : " horas") : "";
+    return d && h ? d + " e " + h : d || h;
+  }
+  function mostrarPensando(e, prazo, ondeEl, depois) {
+    if (!window.IAPensando || !ondeEl || !ondeEl.parentNode) return null;
+    var velho = $(".nd-pensa"); if (velho) velho.remove();
+    var p = window.IAPensando.iniciar({ tipo: "diario", texto: e.rascunho, valores: {
+      turma: A.rotulo(e.turma), disciplina: e.discNome, assunto: e.assunto, ini: e.ini, fim: e.fim,
+      horas: e.horas || Math.round((minutosDoIntervalo(e.ini, e.fim) || 0) / 60) || "",
+      alunos: alunosDe(e.turma).length || "", prazo: textoPrazo(prazo)
+    } }, { color: "var(--nd-acento)" });
+    var host = document.createElement("div");
+    host.className = "nd-pensa";
+    host.appendChild(p.el);
+    ondeEl.parentNode.insertBefore(host, depois ? ondeEl.nextSibling : ondeEl);
+    return p;
+  }
   function numerosValidos(t, lista) {
     var seen = {}, out = [];
     (lista || []).forEach(function (n) {
@@ -872,6 +893,10 @@
       ".nd-b{flex:1;min-width:120px;border:none;border-radius:10px;padding:10px 14px;font:inherit;font-weight:700;font-size:.86rem;cursor:pointer}" +
       ".nd-b.pri{background:var(--vm,#2d6147);color:#fff}.nd-b.sec{background:var(--cl,#e8e5de);color:var(--ce,#2b2b2b)}.nd-b.perigo{background:var(--rs,#fdecea);color:var(--ra,#c0392b);flex:0 1 auto}.nd-b:disabled{opacity:.55;cursor:wait}" +
       ".nd-msg{font-size:.82rem;border-radius:8px;padding:9px 12px;margin:0 0 12px}" +
+      ".nd-pensa{--nd-acento:var(--vm,#2d6147);display:flex;min-width:0;margin:12px 0 2px;padding:11px 14px;border:1px solid var(--cl,#e8e5de);border-radius:12px;background:rgba(255,255,255,.55);color:var(--ce,#2b2b2b)}" +
+      ".nd-pensa .lattice-loader__timer{color:var(--cm,#5a5a5a)}" +
+      "html.dark-2026 .nd-pensa{--nd-acento:var(--dark-accent,#ffa65b);background:var(--dark-surface-2,#202327);border-color:var(--dark-line,#383d43);color:var(--dark-text,#f4f5f6)}" +
+      "html.dark-2026 .nd-pensa .lattice-loader__timer{color:var(--dark-muted,#aeb4bd)}" +
       ".nd-msg.err{background:var(--rs,#fdecea);color:var(--ra,#c0392b)}.nd-msg.warn{background:rgba(201,168,76,.15);color:var(--og,#876020)}" +
       ".nd-prev h4{font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;color:var(--vm,#2d6147);margin:12px 0 4px}" +
       ".nd-prev p,.nd-prev li{font-size:.86rem;line-height:1.45}.nd-prev ul{padding-left:18px}" +
@@ -1068,13 +1093,16 @@
     if (!lido.entrada.rascunho) { passo.relato = relVazio(); return abrirEditorDoPasso(); }
     var btn = $('[data-nd="seguir"]');
     btn.disabled = true; btn.textContent = "🤖 Organizando…"; mostrarMsg("");
+    var pensa = mostrarPensando(lido.entrada, lido.entrada.prazo, $(".nd-acts"));
     try {
       var r = await organizarComIA(lido.entrada);
       passo.relato = normalizarRelato(r.relato, t);
       passo.aviso = trocarCodigos(r.relato.aviso || "", t);
       passo.modelo = r.modelo || "";
+      passo.tempo = pensa ? pensa.concluir() : null;
       abrirRevisao();
     } catch (erro) {
+      if (pensa) pensa.falhar();
       btn.disabled = false; btn.textContent = "🤖 Organizar com IA";
       mostrarMsg(String((erro && erro.message) || erro));
       if (!$('[data-nd="semia"]')) {
@@ -1095,7 +1123,7 @@
     var L = function (n) { return esc(nomesCompletos(t, n)); };
     abrirCasca('<div class="nd-tit">Revise o diário — ' + esc(A.rotulo(t)) + '</div>' +
       '<div class="nd-sub">' + esc(e.discNome) + " · " + esc(e.dateKey.split("-").reverse().join("/")) + " · " + esc(e.ini) + "–" + esc(e.fim) +
-      (passo.modelo ? " · organizado por " + esc(passo.modelo) : "") + "</div>" +
+      (passo.modelo || passo.tempo != null ? " · organizado " + (passo.modelo ? "por " + esc(passo.modelo) : "pela IA") + (passo.tempo != null && window.IAPensando ? " em " + esc(window.IAPensando.tempo(passo.tempo)) : "") : "") + "</div>" +
       (passo.aviso ? '<div class="nd-msg warn">⚠️ ' + esc(passo.aviso) + "</div>" : "") +
       '<div class="nd-prev"><h4>Assunto</h4><p>' + esc(e.assunto) + "</p><h4>Conteúdo</h4><p>" + (r.conteudo ? esc(r.conteudo) : "<em>Sem texto.</em>") + "</p>" +
       "<h4>Presença</h4><p>" + ((r.faltaram.length || r.faltJ.length)
@@ -1343,8 +1371,10 @@
     if (v && /data|disciplina|assunto/i.test(v)) return mostrarMsg(v);
     if (!window.confirm("A IA vai substituir conteúdo, faltas, comportamento, atividade e análise pelos dados do rascunho. Continuar?")) return;
     var botao = $('[data-nd="ia"]'); botao.disabled = true; botao.textContent = "🤖 Organizando…";
+    var pensa = mostrarPensando(st, (st.prazos || {}).main, botao, true);
     try {
       var r = await organizarComIA(st);
+      var seg = pensa ? pensa.concluir() : null;
       var rel = normalizarRelato(r.relato, st.turma);
       rel.presencaNI = false;
       if (st.rel.analiseHtml) delete st.rel.analiseHtml;
@@ -1352,8 +1382,9 @@
       var m = mapasDeRel(st.turma, st.rel);
       st.pres = m.pres; st.atv = m.atv;
       desenharEditor();
-      mostrarMsg(r.relato.aviso ? "⚠️ " + trocarCodigos(r.relato.aviso, st.turma) : "Campos preenchidos pela IA. Confira e salve.", "warn");
+      mostrarMsg(r.relato.aviso ? "⚠️ " + trocarCodigos(r.relato.aviso, st.turma) : "Campos preenchidos pela IA" + (seg != null && window.IAPensando ? " em " + window.IAPensando.tempo(seg) : "") + ". Confira e salve.", "warn");
     } catch (erro) {
+      if (pensa) pensa.falhar();
       botao.disabled = false; botao.textContent = "🤖 Preencher os campos com a IA";
       mostrarMsg(String((erro && erro.message) || erro));
     }

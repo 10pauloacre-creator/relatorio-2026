@@ -76,7 +76,7 @@
   // IA da plataforma: mesmos tetos da Edge Function "assistente-ia".
   var LIMITE_MENSAGENS = 20, MAX_ANEXOS_PLAT = 4, MAX_BYTES_PLAT = 7 * 1024 * 1024;
 
-  var M = null, cfg = null, chat = [], anexos = [], ocupado = false;
+  var M = null, cfg = null, chat = [], anexos = [], ocupado = false, pensaAtual = null;
   var saldo = null, ultimoModelo = "", ultimoProv = "", ligadosPlat = null;
 
   // ── utilidades ─────────────────────────────────────────────────────
@@ -796,7 +796,9 @@
     gravarChat();
     campo.value = ""; ajustarAltura(campo);
     anexos = []; desenharAnexos();
-    ocupado = true; desenharChat(true);
+    ocupado = true;
+    pensaAtual = window.IAPensando ? window.IAPensando.iniciar(contextoPensando(texto, envio), { color: "var(--md-destaque, currentColor)" }) : null;
+    desenharChat(true);
     try {
       var mapa = mapaAlunos();
       var partesAnexos = [];
@@ -813,14 +815,44 @@
       var dm = extrairDocumento(bruto), r = extrairAcoes(dm.texto);
       var resp = { role: "assistant", texto: r.texto, bruto: bruto, acoes: r.acoes, estados: {}, prov: ultimoProv, meta: dm.meta,
         modelo: PROV[ultimoProv].nome + (ultimoModelo ? " · " + ultimoModelo : "") + (ultimoProv !== cfg.prov ? " · ↻ rodízio" : ""), em: new Date().toISOString() };
+      if (pensaAtual) resp.tempo = pensaAtual.segundos();
       chat.push(resp);
-      if (cfg.auto && r.acoes.length) await aplicarTodas(chat.length - 1, true);
+      if (cfg.auto && r.acoes.length) {
+        if (pensaAtual) pensaAtual.fase(r.acoes.length > 1 ? "Aplicando as " + r.acoes.length + " mudanças" : "Aplicando a mudança");
+        await aplicarTodas(chat.length - 1, true);
+      }
     } catch (e) {
-      chat.push({ role: "erro", texto: String((e && e.message) || e) });
+      chat.push({ role: "erro", texto: String((e && e.message) || e), tempo: pensaAtual ? pensaAtual.falhar() : undefined });
     }
+    if (pensaAtual) { pensaAtual.parar(); pensaAtual = null; }
     ocupado = false;
     gravarChat();
     desenharChat();
+  }
+  // Contexto das frases do "pensando" (ia-pensando.js): ferramenta e campos
+  // da conversa, intenção da mensagem, anexos e nomes ocultos.
+  function contextoPensando(texto, envio) {
+    var c = conversaAtual() || {}, ts = [];
+    try { ts = turmasIA(); } catch (e) {}
+    var v = Object.assign({}, c.campos || (c.ferramenta && cfg.ferrValores && cfg.ferrValores[c.ferramenta]) || {});
+    var t = ts.filter(function (x) { return x.id === v.turma; })[0];
+    // Conversa livre: turma e disciplina citadas na mensagem ("7º Ano B", "Língua Portuguesa").
+    var n = " " + norm(texto) + " ";
+    if (!c.ferramenta && !t) { var citadas = ts.filter(function (x) { return norm(x.nome) && n.indexOf(" " + norm(x.nome) + " ") >= 0; }); if (citadas.length === 1) t = citadas[0]; }
+    if (t) { v.turma = t.nome; v.alunos = (t.alunos || []).length || ""; } else v.turma = "";
+    if (!c.ferramenta && t) { var d = (t.disciplinas || []).filter(function (x) { return norm(x.nome) && n.indexOf(" " + norm(x.nome) + " ") >= 0; })[0]; if (d) v.disciplina = d.nome; }
+    return {
+      ferramenta: c.ferramenta || "", valores: v, texto: texto, pagina: M.contexto || "",
+      anexos: envio.map(function (a) { return { tipo: a.tipo, nome: a.nome }; }),
+      plataforma: naPlataforma(), seguimento: chat.some(function (m) { return m.role === "assistant"; }),
+      ocultar: ocultarNomes() && ts.some(function (x) { return (x.alunos || []).length; })
+    };
+  }
+  // Campos da ferramenta guardados na conversa (curtos: só servem às frases).
+  function camposCurtos(v) {
+    var o = {};
+    Object.keys(v || {}).forEach(function (k) { var s = String(v[k] == null ? "" : v[k]).trim(); if (s) o[k] = s.slice(0, 120); });
+    return o;
   }
 
   // ── resolução de turma, disciplina e alunos ─────────────────────────
@@ -1186,9 +1218,10 @@
       ".ia-ac.er{border-color:#e87878}.ia-ac.er .res{color:var(--ra)}.ia-ac.ds{opacity:.5}" +
       ".ia-ac-b{display:flex;gap:5px;flex-shrink:0}" +
       ".ia-acoes-b{display:flex;gap:8px;flex-wrap:wrap}" +
-      ".ia-pensa{align-self:flex-start;font-size:.84rem;color:var(--cm);padding:8px 14px;background:var(--md-sup);border:1px solid var(--md-linha);border-radius:14px}" +
-      ".ia-pensa i{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin:0 2px;animation:iaP 1.2s infinite}.ia-pensa i:nth-child(2){animation-delay:.2s}.ia-pensa i:nth-child(3){animation-delay:.4s}" +
-      "@keyframes iaP{0%,80%,100%{opacity:.25}40%{opacity:1}}" +
+      ".ia-pensa{align-self:flex-start;max-width:88%;min-width:0;display:flex;font-size:.84rem;color:var(--ce);padding:11px 15px;background:var(--md-sup);border:1px solid var(--md-linha);border-radius:14px;border-bottom-left-radius:4px;box-sizing:border-box}" +
+      ".ia-pensa .lattice-loader__timer{color:var(--cm)}" +
+      ".ia-tempo{display:flex;margin:-1px 0 7px;color:var(--cm);opacity:.9}.ia-m.e .ia-tempo{color:inherit;opacity:.85}" +
+      "@media(max-width:560px){.ia-pensa{max-width:96%}}" +
       ".ia-sug{display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px 0}" +
       ".ia-sug button{border:1px solid var(--md-linha);background:var(--md-sup);color:var(--ce);border-radius:999px;padding:6px 11px;font-size:.76rem;cursor:pointer}" +
       ".ia-anexos{display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px 0}" +
@@ -1309,12 +1342,13 @@
   ];
   function desenharChat(pensando) {
     var box = $(".ia-msgs"); if (!box) return;
+    pensando = pensando || ocupado;
     var html = chat.length ? "" : (M.boasVindas ? '<div class="ia-vazio">' + M.boasVindas + '</div>' : '') || '<div class="ia-vazio">👋 Olá! Sou o seu assistente. Posso <strong>registrar aulas</strong>, <strong>ler fotos da chamada</strong>, <strong>montar o plano de aulas</strong>, organizar o <strong>calendário</strong> e responder dúvidas sobre as suas turmas.<br>Escreva abaixo, envie um arquivo 📎 ou tire uma foto 📷. Nada muda no diário sem a sua confirmação.' + (ferrVisiveis().length ? '<br>Para sequências didáticas, provas, planos e relatórios, use <strong>🧰 Ferramentas</strong>, acima.' : "") + '</div>';
     chat.forEach(function (m, mi) {
       if (m.role === "user") {
         html += '<div class="ia-m u">' + esc(m.texto || "") + ((m.anexos || []).length ? '<div class="ia-anx-u">' + m.anexos.map(function (a) { return "<span>📎 " + esc(a.nome) + "</span>"; }).join("") + "</div>" : "") + "</div>";
       } else if (m.role === "erro") {
-        html += '<div class="ia-m e">⚠️ ' + esc(m.texto) + "</div>";
+        html += '<div class="ia-m e">' + seloTempo(m, true) + "⚠️ " + esc(m.texto) + "</div>";
       } else {
         var acoes = "";
         if ((m.acoes || []).length) {
@@ -1332,11 +1366,18 @@
           (window.MeuDiarioDocumentos ? (m.salvo ? '<button type="button" data-abrirdoc="' + mi + '">✓ Salvo em Documentos · Abrir</button>' : '<button type="button" class="pri" data-salvar="' + mi + '">💾 Salvar em Documentos</button>') : "") +
           (window.DocExportar ? '<button type="button" data-baixar="' + mi + '">⬇️ Baixar</button>' : "") +
           '<button type="button" data-copiar="' + mi + '">📋 Copiar</button></div>' : "";
-        html += '<div class="ia-m a">' + markdown(restaurar(m.texto || "")) + acoes + bts + (m.modelo ? '<div class="ia-meta">' + esc(m.modelo) + "</div>" : "") + "</div>";
+        html += '<div class="ia-m a">' + seloTempo(m) + markdown(restaurar(m.texto || "")) + acoes + bts + (m.modelo ? '<div class="ia-meta">' + esc(m.modelo) + "</div>" : "") + "</div>";
       }
     });
-    if (pensando) html += '<div class="ia-pensa">🤖 Pensando <i></i><i></i><i></i></div>';
     box.innerHTML = html;
+    // A bolha do "pensando" é o mesmo elemento a cada redesenho: o relógio
+    // e as frases continuam de onde estavam.
+    if (pensando) {
+      var bolha = document.createElement("div");
+      bolha.className = "ia-pensa";
+      if (pensaAtual) bolha.appendChild(pensaAtual.el); else bolha.textContent = "🤖 Pensando…";
+      box.appendChild(bolha);
+    }
     box.scrollTop = box.scrollHeight;
     box.querySelectorAll("[data-ap]").forEach(function (b) { b.onclick = function () { var p = b.getAttribute("data-ap").split(":"); b.disabled = true; aplicarUma(+p[0], +p[1]).then(function () { gravarChat(); desenharChat(); }); }; });
     box.querySelectorAll("[data-ds]").forEach(function (b) { b.onclick = function () { var p = b.getAttribute("data-ds").split(":"), m = chat[+p[0]]; m.estados = m.estados || {}; m.estados[+p[1]] = { ok: false, descartada: true }; gravarChat(); desenharChat(); }; });
@@ -1353,6 +1394,12 @@
       slot.innerHTML = f ? '<span class="ia-ferr-atual" title="Assistente especializado desta conversa">' + f.ic + " " + esc(f.nome) + ' <button type="button" title="Sair da ferramenta (abre uma conversa comum)" aria-label="Sair da ferramenta">✕</button></span>' : "";
       var sb = slot.querySelector("button"); if (sb) sb.onclick = novoChatGeral;
     }
+  }
+
+  // "✓ Concluído em 4,2s" / "✕ Falhou após 3,1s" (tempo que a I.A pensou).
+  function seloTempo(m, erro) {
+    if (m.tempo == null || !window.IAPensando) return "";
+    return '<div class="ia-tempo">' + window.IAPensando.selo(m.tempo, erro, { fontSize: 12, cellSize: 5 }) + "</div>";
   }
 
   // ── salvar, baixar e copiar respostas ──────────────────────────────
@@ -1536,7 +1583,7 @@
     var titulo = f.ic + " " + f.nome + (v.tema ? ": " + v.tema : t ? " · " + t.nome : "");
     var atual = conversaAtual();
     if (atual && !atual.msgs.length) conversas.lista = conversas.lista.filter(function (x) { return x.id !== atual.id; });
-    var c = { id: novoIdConversa(), titulo: titulo.length > 60 ? titulo.slice(0, 58) + "…" : titulo, tituloManual: true, criado: agoraIso, atualizado: agoraIso, msgs: [], ferramenta: f.id,
+    var c = { id: novoIdConversa(), titulo: titulo.length > 60 ? titulo.slice(0, 58) + "…" : titulo, tituloManual: true, criado: agoraIso, atualizado: agoraIso, msgs: [], ferramenta: f.id, campos: camposCurtos(v),
       dicas: { turma: v.turma || "", turmaId: v.turma || "", disciplina: v.disciplina || "", bimestre: v.bimestre || "", tipo: f.doc || "" } };
     conversas.lista.push(c); conversas.atual = c.id; chat = c.msgs;
     cfg.ferrValores[f.id] = v; gravarCfg();
