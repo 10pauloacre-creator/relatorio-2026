@@ -71,6 +71,12 @@
     mammoth: "https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js",
     xlsx: "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
   };
+  // Integridade (SRI) de cada biblioteca: se o CDN entregar outro arquivo, o
+  // navegador recusa. Ao trocar a versão, recalcule (SEGURANCA.md, seção 5).
+  var SRI = {};
+  SRI[LIBS.pdf] = "sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e";
+  SRI[LIBS.mammoth] = "sha384-/cXAMbzovUIKbBERjPmR3SnPTh8siWr5lsvFYj1Uq4XP0yaJUZJmsh0YXyGv5P0y";
+  SRI[LIBS.xlsx] = "sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw";
   var DIAS = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
   var MAX_ANEXOS = 6, MAX_BYTES = 20 * 1024 * 1024, MAX_TEXTO = 60000, MAX_HIST = 16;
   // IA da plataforma: mesmos tetos da Edge Function "assistente-ia".
@@ -86,10 +92,19 @@
   function hojeKey() { var d = new Date(); return d.getFullYear() + "-" + dois(d.getMonth() + 1) + "-" + dois(d.getDate()); }
   function $(sel) { var s = document.getElementById("sec-ia"); return s ? s.querySelector(sel) : null; }
   function uid() { var u = M.usuario(); return u ? u.id : "x"; }
+  // Link sugerido pela IA só é aceito se for http(s) (injeção de prompt num anexo
+  // não consegue gravar "javascript:" no botão 🔗 Acessar).
+  function urlSeguraIA(u) {
+    var t = String(u == null ? "" : u).trim();
+    if (!t) return "";
+    try { var x = new URL(t); return /^https?:$/.test(x.protocol) ? x.href : ""; } catch (e) { return ""; }
+  }
   function carregarScript(url) {
     return new Promise(function (ok, erro) {
       if (document.querySelector('script[src="' + url + '"]')) return ok();
-      var s = document.createElement("script"); s.src = url; s.onload = ok; s.onerror = function () { erro(new Error("Não consegui carregar o leitor de arquivos. Verifique a internet.")); };
+      var s = document.createElement("script"); s.src = url;
+      if (SRI[url]) { s.integrity = SRI[url]; s.crossOrigin = "anonymous"; }
+      s.onload = ok; s.onerror = function () { erro(new Error("Não consegui carregar o leitor de arquivos. Verifique a internet.")); };
       document.head.appendChild(s);
     });
   }
@@ -486,7 +501,7 @@
   async function textoDoPdf(f) {
     await carregarScript(LIBS.pdf);
     var lib = window.pdfjsLib; lib.GlobalWorkerOptions.workerSrc = LIBS.pdfWorker;
-    var doc = await lib.getDocument({ data: await f.arrayBuffer() }).promise, out = [];
+    var doc = await lib.getDocument({ data: await f.arrayBuffer(), isEvalSupported: false }).promise, out = [];
     for (var p = 1; p <= doc.numPages && out.join("\n").length < MAX_TEXTO; p++) {
       var pg = await doc.getPage(p), tc = await pg.getTextContent();
       out.push(tc.items.map(function (i) { return i.str; }).join(" "));
@@ -1024,7 +1039,7 @@
           return "Sequência salva em " + sq.onde + ".";
         }
         var bb = bimDe(d, a.bimestre);
-        var campos = { titulo: txt(a.titulo), url: txt(a.url), st: ({ criando: "criando", concluido: "concluido", "concluído": "concluido", concluida: "concluido", "concluída": "concluido" })[norm(a.status)] || undefined };
+        var campos = { titulo: txt(a.titulo), url: urlSeguraIA(a.url), st: ({ criando: "criando", concluido: "concluido", "concluído": "concluido", concluida: "concluido", "concluída": "concluido" })[norm(a.status)] || undefined };
         if (a.tipo === "sequencia") {
           ["objetivo", "recursos", "etapas", "observacoes"].forEach(function (c) { if (a[c] !== undefined) campos[c] = txt(a[c]); });
           R.salvarSequencia(t.id, d.id, bb, campos);

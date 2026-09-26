@@ -1,0 +1,4 @@
+#!/bin/sh
+# Hook de segurança (SEGURANCA.md): verificação completa antes de enviar.
+command -v node >/dev/null 2>&1 || { echo "Aviso: node não encontrado; verificação de segurança pulada."; exit 0; }
+exec node "$(git rev-parse --show-toplevel)/scripts/check-seguranca.js"

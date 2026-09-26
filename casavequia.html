@@ -15,10 +15,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Relatório — Pe. Carlos Casavequia</title> <link rel="stylesheet" href="assets/css/local-font-aliases.css?v=20260717d">
 <script defer src="assets/js/dark-mode-2026.js?v=20260921b"></script><script defer src="assets/js/barra-lateral.js?v=20260921d"></script>
-<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260926a"></script>
+<script defer src="assets/js/casavequia-sync-plano.js?v=20260926a"></script>
 <script src="assets/js/relatorio-alunos-adicionados.js?v=20260917a"></script>
 <script defer src="assets/js/relatorio-lancamentos.js?v=20260919a"></script>
 <script defer src="assets/js/relatorio-ocorrencias.js?v=20260919a"></script>
@@ -7450,10 +7449,6 @@ function pcFlushPresenceManualSave(){
   try{
     localStorage.setItem('pres_manual',JSON.stringify(_presManual));
   }catch(e){console.warn('[PRES localStorage]',e.message);}
-  try{
-    if(_db) _db.collection('app_data').doc('pres_manual').set(_presManual)
-      .catch(function(e){console.error('[SYNC pres]',e.code,e.message);});
-  }catch(e){console.warn('[SYNC pres]',e.message);}
   pcSchedulePresenceSideEffects();
 }
 function _presManualSalvar(){
@@ -7557,10 +7552,6 @@ function _atvSalvar(){
   try{
     localStorage.setItem('atv_manual',JSON.stringify(_atvManual));
   }catch(e){console.warn('[ATV localStorage]',e.message);}
-  try{
-    if(_db) _db.collection('app_data').doc('atv_manual').set(_atvManual)
-      .catch(function(e){console.error('[SYNC atv]',e.code,e.message);});
-  }catch(e){console.warn('[SYNC atv]',e.message);}
   try{
     if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
   }catch(e){console.warn('[ATV sync geral]',e.message);}
@@ -10725,34 +10716,21 @@ function marcarAulasLecionadas() {
 }
 document.addEventListener('DOMContentLoaded', marcarAulasLecionadas);
 
-/* ── FIREBASE + STATUS BUTTONS ── */
-// Config Firebase
-const _fbCfg = {
-  apiKey: "AIzaSyDO-BTsc6pYMBd89WIKEUcz4_iaaD46tR4",
-  authDomain: "relatorio-c693d.firebaseapp.com",
-  projectId: "relatorio-c693d",
-  storageBucket: "relatorio-c693d.firebasestorage.app",
-  messagingSenderId: "457657450375",
-  appId: "1:457657450375:web:15b1335aed2ba9939bdd22"
-};
+/* ── PLANO ANUAL: BOTÕES DE STATUS ──
+   Sincronia entre aparelhos pelo Supabase (assets/js/casavequia-sync-plano.js,
+   escopo casavequia:storage:shared-v1, só o administrador). O Firestore antigo
+   ficava aberto para qualquer pessoa e foi desligado em 26/09/2026. */
+function pcStorageSyncAgendar(motivo){
+  try{ if(window.PcStorageSync) window.PcStorageSync.agendar(motivo); }catch(e){}
+}
 
-let _db = null;
-document.addEventListener('DOMContentLoaded', function() {
-  try {
-    if (typeof firebase !== 'undefined') {
-      if (!firebase.apps.length) firebase.initializeApp(_fbCfg);
-      _db = firebase.firestore();
-    }
-  } catch(e) { _db = null; }
-});
-
-// Persistência: Firebase se disponível, senão localStorage
+// Persistência: localStorage + Supabase (casavequia-sync-plano.js)
 function salvarStatus(key, cls, ativo) {
   const lsKey = 'ps_' + key;
   const atual = JSON.parse(localStorage.getItem(lsKey) || '{}');
   atual[cls] = ativo;
   localStorage.setItem(lsKey, JSON.stringify(atual));
-  if (_db) _db.collection('plano_status').doc(key).set({[cls]: ativo}, {merge: true}).catch(()=>{});
+  pcStorageSyncAgendar('plano');
 }
 
 function carregarStatusLocal(key) {
@@ -10801,10 +10779,11 @@ function _exibirUltimaModPlano(r) {
   const el = document.getElementById('plano-ultima-mod');
   if (!el || !r) return;
   const txt = el.querySelector('.pum-txt');
+  const e = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   if (txt) txt.innerHTML = '<strong>Última atualização:</strong> '
-    + r.dia + ' — ' + r.hora
-    + ' <span class="pum-det">(' + r.serie + ' · ' + r.bim
-    + ' · Aula ' + r.num + ' marcada como <strong>' + r.acao + '</strong>)</span>';
+    + e(r.dia) + ' — ' + e(r.hora)
+    + ' <span class="pum-det">(' + e(r.serie) + ' · ' + e(r.bim)
+    + ' · Aula ' + e(r.num) + ' marcada como <strong>' + e(r.acao) + '</strong>)</span>';
   el.classList.add('on');
 }
 
@@ -10825,9 +10804,7 @@ function _registrarUltimaModPlano(item, cls) {
     const r = { ts: agora.getTime(), dia, hora, serie, bim, num, acao };
     localStorage.setItem('plano_ultima_mod', JSON.stringify(r));
     _exibirUltimaModPlano(r);
-    // Sync Firestore
-    if (_db) _db.collection('app_data').doc('plano_ultima_mod').set(r)
-      .catch(e => console.warn('[Plano mod]', e.code));
+    pcStorageSyncAgendar('plano-mod');
   } catch(e) { console.warn('[Plano] registrar mod:', e); }
 }
 
@@ -10912,24 +10889,6 @@ function initStatusButtons() {
     });
   });
 
-  // Sincronização Firestore em tempo real: qualquer mudança num dispositivo
-  // aparece imediatamente em todos os outros
-  if (_db) {
-    _db.collection('plano_status').onSnapshot(snap => {
-      snap.forEach(doc => {
-        const data = doc.data();
-        localStorage.setItem('ps_' + doc.id, JSON.stringify(data));
-        document.querySelectorAll(`[data-fbkey="${doc.id}"]`).forEach(item => {
-          BOTOES.forEach(({cls}) => {
-            if (data[cls] !== undefined) {
-              const btn = item.querySelector('.btn-st.' + cls);
-              if (btn) aplicarEstadoVisual(btn, item, cls, data[cls]);
-            }
-          });
-        });
-      });
-    }, ()=>{});
-  }
 }
 document.addEventListener('DOMContentLoaded', function() {
   pcBindPlannerStatusOverrides();
@@ -10939,16 +10898,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const salvo = localStorage.getItem('plano_ultima_mod');
     if (salvo) _exibirUltimaModPlano(JSON.parse(salvo));
   } catch(e) {}
-  // Sincroniza última modificação do Firestore (outro dispositivo pode ter atualizado)
-  if (_db) {
-    _db.collection('app_data').doc('plano_ultima_mod').onSnapshot(doc => {
-      if (doc.exists && !doc.metadata.hasPendingWrites) {
-        const r = doc.data();
-        localStorage.setItem('plano_ultima_mod', JSON.stringify(r));
-        _exibirUltimaModPlano(r);
-      }
-    }, () => {});
-  }
 });
 
 /* ── LIVROS DIGITAIS ── */
@@ -10956,8 +10905,7 @@ var _livStatus=JSON.parse(localStorage.getItem('liv_status')||'{}');
 var _livUrls=JSON.parse(localStorage.getItem('liv_urls')||'{}');
 function _livSalvar(){
   localStorage.setItem('liv_status',JSON.stringify(_livStatus));
-  if(_db) _db.collection('app_data').doc('livros').set({status:_livStatus,urls:_livUrls})
-    .catch(function(e){console.error('[SYNC livros]',e.code,e.message);});
+  pcStorageSyncAgendar('livros');
 }
 
 var _LIV_DISCS={
@@ -11208,10 +11156,14 @@ function livSetStatus(key,st,evt){
   if(card)_livAtualizarCard(card,key);
 }
 
+function _livUrlSegura(url){
+  if(typeof url!=='string'||url.length>2000)return '';
+  try{var u=new URL(url,location.href);return (u.protocol==='https:'||u.protocol==='http:')?u.href:'';}catch(e){return '';}
+}
 function livAcessar(key,evt){
   if(evt)evt.stopPropagation();
-  var url=_livUrls[key];
-  if(url)window.open(url,'_blank');
+  var url=_livUrlSegura(_livUrls[key]);
+  if(url)window.open(url,'_blank','noopener,noreferrer');
 }
 
 function _livAtualizarCard(card,key){
@@ -11271,10 +11223,11 @@ function livRender(){
 // Função pública: Claude chama isso para registrar URL de um livro concluído
 // Uso: livRegistrarUrl('t1-lp-b1', 'https://...')
 function livRegistrarUrl(key,url){
+  url=_livUrlSegura(url);
+  if(!url){console.warn('[Livros] URL recusada: use http(s)://');return;}
   _livUrls[key]=url;
   localStorage.setItem('liv_urls',JSON.stringify(_livUrls));
-  if(_db) _db.collection('app_data').doc('livros').set({status:_livStatus,urls:_livUrls})
-    .catch(function(e){console.error('[SYNC livros url]',e.code,e.message);});
+  pcStorageSyncAgendar('livros');
   var aceBtn=document.querySelector('[data-liv="'+key+'"] .b-ace');
   if(aceBtn)aceBtn.disabled=false;
 }
@@ -11355,81 +11308,44 @@ function seqRender(){
 document.addEventListener('DOMContentLoaded',seqRender);
 
 // ═══════════════════════════════════════════════════════
-// SYNC UNIVERSAL — tudo que muda num dispositivo aparece
-// em todos os outros em tempo real via Firestore
+// SYNC ENTRE APARELHOS — Supabase (casavequia-sync-plano.js)
+// Presença e atividades vão no escopo casavequia:daily:shared-v1
+// (pcIniciarSyncRemoto); plano, livros e timers no
+// casavequia:storage:shared-v1. Os dois são só do administrador.
 // ═══════════════════════════════════════════════════════
 
-// Aplica dados de atividades vindos do Firestore ao DOM
-function _syncAplicarAtv(data) {
-  if (!data) return;
-  var atvIds = {};
-  var celulas = pcIndexarCelulas('data-atv');
-  Object.keys(data).forEach(function(k) {
-    _atvManual[k] = data[k];
-    var idx = k.lastIndexOf('_');
-    if (idx < 0) return;
-    var atvId = k.slice(0, idx);
-    var n = parseInt(k.slice(idx + 1));
-    (celulas[atvId + '_' + n] || []).forEach(function(cell){
-      _atvAtualizarCelula(cell, data[k]);
+// Chamado pelo módulo depois de gravar no localStorage o que veio de outro aparelho.
+function pcStorageRemotoAplicado() {
+  try {
+    document.querySelectorAll('.plano-wrapper .lesson-item[data-fbkey]').forEach(function(item) {
+      var salvo = carregarStatusLocal(item.dataset.fbkey);
+      BOTOES.forEach(function(b) {
+        var btn = item.querySelector('.btn-st.' + b.cls);
+        if (btn) aplicarEstadoVisual(btn, item, b.cls, !!salvo[b.cls]);
+      });
     });
-    atvIds[atvId] = true;
-  });
-  localStorage.setItem('atv_manual', JSON.stringify(_atvManual));
-  var stats = pcIndexarStats();
-  Object.keys(atvIds).forEach(function(atvId){ _atvAtualizarStat(atvId, stats[atvId]); });
-  if(typeof pcSyncAndBroadcast==='function')pcSyncAndBroadcast();
+  } catch(e) { console.warn('[Plano sync]', e.message); }
+  try {
+    var mod = JSON.parse(localStorage.getItem('plano_ultima_mod') || 'null');
+    if (mod) _exibirUltimaModPlano(mod);
+  } catch(e) {}
+  try {
+    _livStatus = JSON.parse(localStorage.getItem('liv_status') || '{}') || {};
+    _livUrls = JSON.parse(localStorage.getItem('liv_urls') || '{}') || {};
+    document.querySelectorAll('[data-liv]').forEach(function(card) {
+      _livAtualizarCard(card, card.getAttribute('data-liv'));
+    });
+  } catch(e) { console.warn('[Livros sync]', e.message); }
+  if (typeof claudeRenderizar === 'function') claudeRenderizar();
 }
 
-// Aplica dados de livros vindos do Firestore
-function _syncAplicarLivros(data) {
-  if (!data) return;
-  if (data.status) { _livStatus = data.status; localStorage.setItem('liv_status', JSON.stringify(_livStatus)); }
-  if (data.urls)   { _livUrls   = data.urls;   localStorage.setItem('liv_urls',   JSON.stringify(_livUrls));   }
-  // Atualiza apenas os cards já renderizados — sem reconstruir o DOM (evita duplicação)
-  document.querySelectorAll('[data-liv]').forEach(function(card) {
-    _livAtualizarCard(card, card.getAttribute('data-liv'));
-  });
-}
-
-var _syncUnsubs = [];
-
-function iniciarSyncUniversal() {
-  // Cancela listeners anteriores
-  _syncUnsubs.forEach(function(u){ try{ u(); }catch(e){} });
-  _syncUnsubs = [];
-  if (!_db) return;
-
-  // 1. Leitura forçada do servidor (ignora cache offline do SDK)
-  _db.collection('app_data').doc('atv_manual').get({source:'server'})
-    .then(function(doc){ if(doc.exists) _syncAplicarAtv(doc.data()); })
-    .catch(function(){});
-  _db.collection('app_data').doc('livros').get({source:'server'})
-    .then(function(doc){ if(doc.exists) _syncAplicarLivros(doc.data()); })
-    .catch(function(){});
-
-  // 2. Listeners em tempo real para mudanças futuras
-  // hasPendingWrites: ignora snapshot gerado pela nossa própria escrita
-  _syncUnsubs.push(
-    _db.collection('app_data').doc('atv_manual').onSnapshot(
-      {includeMetadataChanges: true},
-      function(doc) {
-        if (!doc.exists || doc.metadata.hasPendingWrites) return;
-        _syncAplicarAtv(doc.data());
-      },
-      function(e){ console.warn('[SYNC atv]', e.message); }
-    )
-  );
-  _syncUnsubs.push(
-    _db.collection('app_data').doc('livros').onSnapshot(
-      {includeMetadataChanges: true},
-      function(doc) {
-        if (!doc.exists || doc.metadata.hasPendingWrites) return;
-        _syncAplicarLivros(doc.data());
-      },
-      function(e){ console.warn('[SYNC livros]', e.message); }
-    )
-  );
+function pcStorageSyncStatus(status) {
+  var el = document.getElementById('cl-fb-status');
+  if (!el) return;
+  var ok = status === 'online' || status === 'salvo' || status === 'salvando' || status === 'conectando';
+  var txt = {conectando:'● Conectando…', online:'● Sincronizado (Supabase)', salvando:'● Salvando…', salvo:'● Sincronizado (Supabase)', offline:'● Sem internet — salvo no aparelho', erro:'● Falha na sincronia', indisponivel:'● Sincronia indisponível'}[status] || ('● ' + status);
+  el.textContent = txt;
+  el.style.color = ok ? '#4a9467' : '#c0392b';
 }
 </script>
 <!-- TOOLBAR EDITOR -->
@@ -11517,114 +11433,10 @@ var CLAUDE_CONTAS = [
 ];
 var CLAUDE_ESPERA_MS = 5 * 60 * 60 * 1000;
 
-// ── Claude Timer — sincronização Firebase ──────────────
-// Usa _db já inicializado pelo bloco do Plano Anual (linha ~6524)
-
-function _claudeFBStatus(ok, msg) {
-  var el = document.getElementById('cl-fb-status');
-  if (!el) return;
-  el.textContent = ok ? '● Firestore OK' : '● ' + (msg || 'Firestore offline');
-  el.style.color = ok ? '#4a9467' : '#c0392b';
-}
-
+// ── Claude Timer — sincronizado pelo Supabase (cl_fim_* em casavequia:storage:shared-v1)
 function _claudeSyncFB(id, fim) {
-  if (!_db) { console.warn('[Claude Timer] _db não disponível'); return; }
-  if (fim) {
-    _db.collection('claude_timers').doc(id).set({ fim: fim, ts: Date.now() })
-      .then(function() { _claudeFBStatus(true); })
-      .catch(function(e) {
-        console.error('[Claude Timer] ERRO ao salvar no Firestore:', e.code, e.message);
-        _claudeFBStatus(false, 'Erro: ' + e.code);
-      });
-  } else {
-    _db.collection('claude_timers').doc(id).delete()
-      .then(function() { _claudeFBStatus(true); })
-      .catch(function(e) { console.error('[Claude Timer] ERRO ao remover:', e.code, e.message); });
-  }
+  pcStorageSyncAgendar('claude-timer');
 }
-
-// Aplica snapshot do Firestore ao localStorage e re-renderiza
-function _claudeAplicarSnap(snap) {
-  var idsFB = [];
-  snap.forEach(function(doc) {
-    var d = doc.data();
-    idsFB.push(doc.id);
-    if (d && d.fim) {
-      var fim = parseInt(d.fim);
-      localStorage.setItem('cl_fim_' + doc.id, fim.toString());
-      localStorage.removeItem('cl_notif_' + doc.id);
-    }
-  });
-  // Limpa localStorage para contas que não existem mais no Firestore
-  CLAUDE_CONTAS.forEach(function(conta) {
-    if (idsFB.indexOf(conta.id) === -1) {
-      localStorage.removeItem('cl_fim_' + conta.id);
-    }
-  });
-  claudeRenderizar();
-}
-
-// Leitura forçada do servidor (ignora cache offline do SDK)
-function _claudeFetchServidor() {
-  if (!_db) return;
-  _db.collection('claude_timers').get({ source: 'server' })
-    .then(function(snap) {
-      _claudeFBStatus(true);
-      _claudeAplicarSnap(snap);
-    })
-    .catch(function(e) {
-      console.error('[Claude Timer] Erro ao buscar do servidor:', e.code, e.message);
-      _claudeFBStatus(false, e.code);
-      // NÃO limpa localStorage — mantém timers locais íntegros em caso de erro
-      claudeRenderizar();
-    });
-}
-
-// Listener em tempo real — fica ouvindo mudanças depois do fetch inicial
-var _claudeUnsub = null;
-var _claudeFBRetries = 0;
-var _claudeFBRetryTimer = null;
-
-function claudeListenFirebase() {
-  if (_claudeFBRetryTimer) { clearTimeout(_claudeFBRetryTimer); _claudeFBRetryTimer = null; }
-  if (!_db) {
-    if (_claudeFBRetries < 15) { _claudeFBRetries++; _claudeFBRetryTimer = setTimeout(claudeListenFirebase, 1500); }
-    return;
-  }
-  if (_claudeUnsub) { try { _claudeUnsub(); } catch(e){} _claudeUnsub = null; }
-
-  // Busca do servidor primeiro para ignorar cache offline
-  _claudeFetchServidor();
-
-  // Depois mantém listener de tempo real para mudanças futuras
-  _claudeUnsub = _db.collection('claude_timers').onSnapshot(
-    { includeMetadataChanges: false },
-    function(snap) {
-      _claudeFBRetries = 0;
-      _claudeFBStatus(true);
-      // Ignora snapshots que vieram apenas do cache local
-      if (snap.metadata && snap.metadata.fromCache) return;
-      _claudeAplicarSnap(snap);
-    },
-    function(err) {
-      _claudeUnsub = null;
-      console.warn('[Claude Timer] Listener desconectado:', err.message);
-      _claudeFBStatus(false, err.code || 'desconectado');
-      var delay = Math.min(30000, 3000 * Math.pow(2, _claudeFBRetries));
-      _claudeFBRetries++;
-      _claudeFBRetryTimer = setTimeout(claudeListenFirebase, delay);
-    }
-  );
-}
-
-// Reconecta + força leitura do servidor ao voltar ao app
-document.addEventListener('visibilitychange', function() {
-  if (document.visibilityState === 'visible') {
-    _claudeFBRetries = 0;
-    claudeListenFirebase();    // re-sincroniza timers Claude
-    iniciarSyncUniversal();    // re-sincroniza atividades, livros, etc.
-  }
-});
 
 // ── Notification Triggers (agenda notificação com app fechado) ──
 async function _claudeAgendarNotifSistema(id, nome, timestampFim, urlDestino) {
@@ -12065,8 +11877,6 @@ function setModo(modo) {
 document.addEventListener('DOMContentLoaded', function() {
   claudeRenderizar();
   setInterval(claudeTick, 1000);
-  claudeListenFirebase();    // timers Claude
-  iniciarSyncUniversal();    // atividades, livros, plano (via onSnapshot já registrado)
 });
 
 // ── IndexedDB: sincroniza timers para o Service Worker ──

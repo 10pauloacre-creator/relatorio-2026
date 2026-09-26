@@ -5,13 +5,11 @@
       "Bash(Select-Object FullName, Length)",
       "Bash(Format-Table -AutoSize)",
       "Bash(awk '$1>1 {print $0}')",
-      "Bash(cat > *)",
       "Read(//tmp/**)",
       "Bash(grep -oE \"'pl-t[^']*':\" \"/c/Downloads/relatorio-2026/index.html\" | sed \"s/'//g\" | sed \"s/://g\" | sort -u > /tmp/presenca_keys.txt && echo \"Total em PRESENCA object: $\\(wc -l < /tmp/presenca_keys.txt\\)\")",
       "Bash(tee /tmp/functions.txt)",
       "Bash(grep -oE \"{n:[0-9]+,nm:\" \"/c/Downloads/relatorio-2026/index.html\")",
       "Bash(awk 'NR==1{prev=$1} {if \\($1 != prev+1 && NR>1\\) print \"Faltando entre\", prev, \"e\", $1; prev=$1}')",
-      "Bash(read func *)",
       "Bash(grep -q '__TRACKED_VAR__\\(' /c/Downloads/relatorio-2026/index.html)",
       "Bash(Select-Object Name)",
       "PowerShell(\\(Get-Content \"c:\\\\Downloads\\\\relatorio-2026\\\\index.html\" | Measure-Object -Line\\).Lines)",
@@ -24,8 +22,6 @@
       "Bash(head -20 \"/mnt/c/Downloads/relatorio-2026/casavequia.html\")",
       "Read(//mnt/c/Downloads/relatorio-2026/**)",
       "Bash(git revert *)",
-      "Bash(node --input-type=module)",
-      "Bash(node -e ' *)",
       "WebFetch(domain:10pauloacre-creator.github.io)",
       "Bash(grep -o \"herminio-alunos-8ano.html[^\\\\\"]*\\\\\"[^<]{0,80}\" /c/Downloads/relatorio-2026/herminio.html)",
       "Bash(grep -o \"Artes[^<]\\\\{0,30\\\\}\" /c/Downloads/relatorio-2026/herminio.html)",
@@ -34,23 +30,14 @@
       "Bash(grep -o \"8[ºo] [Aa]no[^<]\\\\{0,150\\\\}\" /c/Downloads/relatorio-2026/herminio.html)",
       "Bash(grep -oE \"8. Ano[^<]{0,150}\" /c/Downloads/relatorio-2026/herminio.html)",
       "Bash(grep -o \"8.Ano[^<]\\\\{0,150\\\\}\" /c/Downloads/relatorio-2026/herminio.html)",
-      "Bash(python3 -)",
       "Bash(where python3 *)",
       "Bash(python3 -c \"print\\('hi'\\)\")",
       "Bash(node --check /c/Downloads/relatorio-2026/_tmp_check.js)",
       "Bash(supabase --version)",
-      "Bash(curl -s 'https://vgceathgwvtmjxbdpecr.supabase.co/rest/v1/boletim_normalizado?select=*&limit=5' -H 'apikey: sb_publishable_ba-g-ww4KwM2Wq0x2vsGVg_x_9pTqUQ' -H 'Authorization: Bearer sb_publishable_ba-g-ww4KwM2Wq0x2vsGVg_x_9pTqUQ')",
       "Read(//c/Program Files/Google/Chrome/Application/**)",
       "Read(//c/Program Files \\\\\\(x86\\\\\\)/Microsoft/Edge/Application/**)",
-      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe.js\")",
-      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe2.js\")",
-      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe3.js\")",
       "Bash(node --check assets/js/editor.js)",
-      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe4.js\")",
-      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe5.js\")",
       "Bash(awk -F: '$1>770 && $1<10300')",
-      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe6.js\")",
-      "Bash(node \"C:/Users/PAULOR~1/AppData/Local/Temp/claude/c--Downloads-relatorio-2026/97a8f6e0-3e84-4924-9ffa-0d32d901c0ef/scratchpad/probe.js\" \"file:///C:/Downloads/relatorio-2026/herminio.html\")",
       "Bash(ls /c/Downloads/ | head -50)",
       "Read(//c/Downloads//**)",
       "Bash(ls -la \"/c/Downloads/Biblioteca Digital/\" 2>/dev/null | head -40)",
@@ -68,6 +55,43 @@
       "\\tmp",
       "C:\\Projetos\\AXION PROEDUQ\\BIBLIOTECA-DIGITAL\\sql",
       "C:\\Projetos\\AXION PROEDUQ\\BIBLIOTECA-DIGITAL\\assets\\js"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/*.jks)",
+      "Read(**/*.keystore)",
+      "Read(**/jarvis.env)",
+      "Read(./firebase-config.js)",
+      "Read(./android/key.properties)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/seguranca/hook-claude.js\"",
+            "timeout": 20
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/seguranca/hook-claude.js\"",
+            "timeout": 60
+          }
+        ]
+      }
     ]
   }
 }

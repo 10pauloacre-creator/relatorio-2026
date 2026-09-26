@@ -15,7 +15,11 @@
     "apk:release": "npm run cap:sync && node scripts/run-android-gradle.js :app:assembleRelease",
     "release:publish": "node scripts/publish-apk-release.js",
     "release:debug": "npm run release:prepare && npm run apk:debug && npm run release:publish -- --apk android/app/build/outputs/apk/debug/app-debug.apk && npm run build:web",
-    "linha-do-tempo": "node scripts/gerar-linha-do-tempo.js"
+    "linha-do-tempo": "node scripts/gerar-linha-do-tempo.js",
+    "check:seguranca": "node scripts/check-seguranca.js",
+    "check:seguranca:site": "npm run build:pages && node scripts/check-seguranca.js --dist",
+    "seguranca:hooks": "node scripts/seguranca/instalar-hooks.js",
+    "prepare": "node scripts/seguranca/instalar-hooks.js"
   },
   "devDependencies": {
     "@capacitor/android": "^7.4.2",

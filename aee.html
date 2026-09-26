@@ -19,7 +19,7 @@
   if(m==='escuro')document.documentElement.classList.add('dark-2026');})();
 </script>
 <script defer src="assets/js/dark-mode-2026.js?v=20260921b"></script><script defer src="assets/js/barra-lateral.js?v=20260921d"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
 <script defer src="assets/js/supabase-report-sync.js?v=20260926a"></script>
 <script defer src="assets/js/conta-skin.js?v=20260922a"></script>
 <script defer src="assets/js/planos.js?v=20260926a"></script>
@@ -382,6 +382,8 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
   function aluno(id){var v=VINC.filter(function(x){return x.aluno_id===id;})[0];return v?v.aee_alunos:null;}
   function meuPapel(id){var v=VINC.filter(function(x){return x.aluno_id===id;})[0];return v?v.papel:'';}
   function editor(id){return ['mediador','assistente','aee'].indexOf(meuPapel(id))>=0;}
+  // Mediador ou AEE: gerencia a equipe (funções, remover, trocar o código). Regra no banco (Etapa 18).
+  function gestor(id){return ['mediador','aee'].indexOf(meuPapel(id))>=0;}
   function papelPadrao(){return OCUP.indexOf('aee')>=0?'aee':OCUP.indexOf('mediador')>=0?'mediador':OCUP.indexOf('assistente')>=0?'assistente':'regente';}
   function abrirOverlay(html,ligar){
     var velho=document.querySelector('.md-ov');if(velho)velho.remove();
@@ -769,12 +771,29 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
 
   // Equipe
   function subEquipe(box,a,d,ed,id){
+    var ges=gestor(id);
     box.innerHTML='<div class="md-card"><h3>👥 Profissionais ligados a '+esc(a.nome.split(' ')[0])+'</h3><table class="aee-tab"><tr><th>Nome</th><th>Função</th><th>Disciplina</th><th>Desde</th><th></th></tr>'
-      +d.equipe.map(function(v){var eu=v.user_id===usuario.id;return '<tr><td>'+esc(v.nome_profissional||'—')+(eu?' <b>(você)</b>':'')+'</td><td>'+esc(PAPEIS[v.papel]||v.papel)+'</td><td>'+esc(v.disciplina||'—')+'</td><td>'+new Date(v.criado_em).toLocaleDateString('pt-BR')+'</td><td>'+(!eu&&ed?'<button type="button" class="md-btn mini perigo" data-tirar="'+v.user_id+'">Remover</button>':'')+'</td></tr>';}).join('')+'</table></div>'
+      +d.equipe.map(function(v){var eu=v.user_id===usuario.id;
+        var funcao=ges?'<select class="md-in" data-funcao="'+esc(v.user_id)+'" style="padding:4px 6px;font-size:.8rem">'+Object.keys(PAPEIS).map(function(p){return '<option value="'+p+'"'+(p===v.papel?' selected':'')+'>'+PAPEIS[p]+'</option>';}).join('')+'</select>':esc(PAPEIS[v.papel]||v.papel);
+        return '<tr><td>'+esc(v.nome_profissional||'—')+(eu?' <b>(você)</b>':'')+'</td><td>'+funcao+'</td><td>'+esc(v.disciplina||'—')+'</td><td>'+new Date(v.criado_em).toLocaleDateString('pt-BR')+'</td><td>'+(!eu&&ges?'<button type="button" class="md-btn mini perigo" data-tirar="'+esc(v.user_id)+'">Remover</button>':'')+'</td></tr>';}).join('')+'</table>'
+      +'<p style="font-size:.78rem;color:var(--cm);margin-top:8px">'+(ges?'Quem entra pelo código chega como <b>Professor regente</b>. Você libera a função certa (mediador, assistente ou AEE) aqui.':'Só o mediador ou o professor do AEE mudam funções e removem pessoas.')+'</p></div>'
       +'<div class="md-card"><h3>🔑 Código do aluno</h3><p>Todos os professores de '+esc(a.nome.split(' ')[0])+' acessam o mesmo perfil com o código abaixo. O professor regente vincula-se em <b>⚙️ Configurações da escola › Alunos da Educação Especial</b>; mediadores, assistentes e AEE, em <b>＋ Aluno › Vincular pelo código</b>. Compartilhe só com quem trabalha com o aluno.</p>'
-      +'<div style="margin-top:12px"><span class="aee-cod" data-copiar>🔑 '+esc(a.codigo)+' <small>copiar</small></span></div>'
+      +'<div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="aee-cod" data-copiar>🔑 '+esc(a.codigo)+' <small>copiar</small></span>'+(ges?'<button type="button" class="md-btn mini" data-trocar-codigo title="Use se o código foi parar com quem não deveria">🔄 Trocar código</button>':'')+'</div>'
       +'<p style="font-size:.78rem;color:var(--cm);margin-top:10px">Quando a escola usar o Conex-ED (gestão escolar), todos os alunos terão código de usuário cadastrado pela gestão.</p></div>';
     box.querySelector('[data-copiar]').onclick=function(){try{navigator.clipboard.writeText(a.codigo);toast('Código copiado.');}catch(e){toast(a.codigo);}};
+    box.querySelectorAll('[data-funcao]').forEach(function(sel){sel.onchange=function(){
+      var uid=sel.getAttribute('data-funcao'),papel=sel.value;
+      cli.rpc('aee_definir_papel',{p_aluno:id,p_user:uid,p_papel:papel}).then(function(r){
+        if(r.error){toast(r.error.message);}else toast('Função atualizada: '+PAPEIS[papel]+'.');
+        return (uid===usuario.id?recarregar(id):carregarDetalhe(id).then(function(){desenharAluno(id);}));
+      });
+    };});
+    var bt=box.querySelector('[data-trocar-codigo]');
+    if(bt)bt.onclick=function(){
+      C.confirmarPerigo({titulo:'Trocar o código de '+a.nome+'?',texto:'O código atual deixa de funcionar. Quem já está na equipe continua; pessoas novas vão precisar do código novo.',botao:'Trocar código',botaoFinal:'Trocar'}).then(function(ok){
+        if(!ok)return;cli.rpc('aee_trocar_codigo',{p_aluno:id}).then(function(r){if(r.error)return toast(r.error.message);toast('Código novo: '+r.data);recarregar(id);});
+      });
+    };
     box.querySelectorAll('[data-tirar]').forEach(function(b){b.onclick=function(){
       var v=d.equipe.filter(function(x){return x.user_id===b.getAttribute('data-tirar');})[0];
       C.confirmarPerigo({titulo:'Remover '+(v.nome_profissional||'o profissional')+' do perfil?',texto:'A pessoa deixa de ver o perfil, os registros e os documentos de '+esc(a.nome)+'. Os registros que ela escreveu continuam.',botao:'Sim, remover',botaoFinal:'Remover'}).then(function(ok){
@@ -810,7 +829,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       +'.bar{position:fixed;top:0;left:0;right:0;background:#1a3a2a;color:#fff;padding:8px;text-align:center;font-family:sans-serif}.bar button{font-size:14px;padding:6px 14px;cursor:pointer}@media print{.bar{display:none}body{margin-top:0}}'
       +'</style></head><body><div class="bar"><button onclick="window.print()">🖨️ Imprimir / Salvar PDF</button></div><div style="height:48px"></div>'
       +'<h1>RELATÓRIO INDIVIDUAL — EDUCAÇÃO ESPECIAL</h1><div class="sub">'+esc(a.escola_nome||ESC.nome)+(ESC.inep?' · INEP '+ESC.inep.codigo:'')+'<br>Período: '+(de?dataBr(de):'início')+' a '+(ate?dataBr(ate):'hoje')+' · Emitido em '+new Date().toLocaleDateString('pt-BR')+'</div>'
-      +'<h2>1. Identificação</h2><table><tr><th>Aluno(a)</th><td>'+e(a.nome)+'</td><th>Código</th><td>'+e(a.codigo)+'</td></tr><tr><th>Nascimento</th><td>'+(a.nascimento?dataBr(a.nascimento)+' ('+idadeDe(a)+')':'—')+'</td><th>Série/turma/turno</th><td>'+e([a.serie,a.turma,a.turno].filter(Boolean).join(' · '))+'</td></tr>'
+      +'<h2>1. Identificação</h2><table><tr><th>Aluno(a)</th><td colspan="3">'+e(a.nome)+'</td></tr><tr><th>Nascimento</th><td>'+(a.nascimento?dataBr(a.nascimento)+' ('+idadeDe(a)+')':'—')+'</td><th>Série/turma/turno</th><td>'+e([a.serie,a.turma,a.turno].filter(Boolean).join(' · '))+'</td></tr>'
       +'<tr><th>Deficiência(s)</th><td colspan="3">'+e((a.deficiencias||[]).join(', ')+(p.deficienciaOutra?' — '+p.deficienciaOutra:''))+(a.cid?' · CID '+esc(a.cid):'')+'</td></tr></table>'
       +'<h2>2. Perfil pedagógico</h2><table>'+CAMPOS_PERFIL.filter(function(c){return p[c[0]];}).map(function(c){return '<tr><th style="width:32%">'+esc(c[1])+'</th><td class="pre">'+esc(p[c[0]])+'</td></tr>';}).join('')+'</table>'
       +'<h2>3. Plano Educacional Individualizado</h2>'+(pei.objetivo?'<p><b>Objetivo geral:</b> '+esc(pei.objetivo)+'</p>':'')
@@ -870,9 +889,15 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       +'<div class="md-row"><span style="font-size:.8rem;color:var(--cm)">Você entra como</span><div class="md-f" style="margin:0" data-papel-novo>'+selPapel+'</div><span style="flex:1"></span><button type="button" class="md-btn pri" data-criar>Cadastrar aluno</button></div></div>';
     sec.querySelector('[data-vincular]').onclick=function(){
       var cod=sec.querySelector('[data-cod]').value.trim().toUpperCase();if(!cod)return toast('Informe o código.');
-      cli.rpc('aee_vincular',{p_codigo:cod,p_papel:sec.querySelector('[data-papel]').value,p_escola_local:ESCOLA_ID,p_nome_profissional:perfilNome()}).then(function(r){
+      var pedido=sec.querySelector('[data-papel]').value;
+      cli.rpc('aee_vincular',{p_codigo:cod,p_papel:pedido,p_escola_local:ESCOLA_ID,p_nome_profissional:perfilNome()}).then(function(r){
         if(r.error)return toast(r.error.message);
-        toast('Vinculado a '+r.data.nome+'.');recarregar(r.data.id);
+        var alunoId=r.data.id,nome=r.data.nome;
+        Promise.resolve(recarregar(alunoId)).then(function(){
+          var ficou=meuPapel(alunoId);
+          if(ficou&&ficou!==pedido)toast('Vinculado a '+nome+' como '+PAPEIS[ficou]+'. Peça ao mediador ou ao professor do AEE para liberar a função '+PAPEIS[pedido]+' na aba Equipe.');
+          else toast('Vinculado a '+nome+'.');
+        });
       });
     };
     sec.querySelector('[data-criar]').onclick=function(){

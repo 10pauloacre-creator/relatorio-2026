@@ -1,0 +1,29 @@
+# Configuração do gitleaks (varredura de segredos) — RELATORIO SKIN
+# Usada pelo workflow .github/workflows/seguranca.yml e por quem rodar
+# `gitleaks dir .` na máquina. Regras do projeto em SEGURANCA.md.
+# Só entra aqui o que é PÚBLICO POR DESENHO ou falso positivo comprovado.
+# Nunca coloque uma chave real na lista para "passar" no teste: revogue-a.
+
+title = "RELATORIO SKIN"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Chave publishable do Supabase: pública por desenho (os dados são protegidos pelo RLS)"
+regexTarget = "secret"
+regexes = ['''^sb_publishable_[A-Za-z0-9_-]{10,}$''']
+
+[[allowlists]]
+description = "Nomes de chaves do localStorage/escopos (não são segredos)"
+regexTarget = "secret"
+regexes = [
+  '''^[a-z]{1,4}_[a-z0-9_]+_v[0-9]+$''',
+  '''^[A-Z][A-Z0-9_]+_V[0-9]+$''',
+  '''^[a-z0-9_-]+(:[a-z0-9_-]+)+:(shared-)?v[0-9]+$''',
+  '''^previsao_aulas[a-z0-9_]*$''',
+]
+
+[[allowlists]]
+description = "Regex de detecção de segredos (o próprio verificador)"
+paths = ['''^scripts/seguranca/padroes\.js$''', '''^\.gitleaks\.toml$''']

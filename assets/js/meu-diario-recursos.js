@@ -15,6 +15,10 @@
 // ═══════════════════════════════════════════════════════════════════════
 (function () {
   "use strict";
+  // Só abre link http(s): um "javascript:" vindo de dado (ou de uma resposta de IA) nunca roda.
+  function urlSegura(u) {
+    try { var x = new URL(String(u || ""), location.href); return /^https?:$/.test(x.protocol) ? x.href : ""; } catch (e) { return ""; }
+  }
 
   var SCOPE = "meu-diario:recursos:v1";
   var CORES = ["#1a7340", "#6b21a8", "#1d4ed8", "#c2410c", "#0e7a6b", "#b45309", "#be185d", "#475569"];
@@ -366,7 +370,7 @@
         }
         var a = btn.getAttribute("data-a"), o = dados[k] = dados[k] || {};
         if (a === "criando" || a === "concluido") { o.st = o.st === a ? "" : a; if (o.st === "concluido") o.concluidoEm = hojeKey(); salvar(); }
-        else if (a === "abrir") { if (o.url) window.open(o.url, "_blank", "noopener"); }
+        else if (a === "abrir") { var u = urlSegura(o.url); if (u) window.open(u, "_blank", "noopener,noreferrer"); else if (o.url) alert("Link inválido: use um endereço que comece com https://"); }
         else if (a === "editar") { if (ehSeq) editarSequencia(k); else editarLivro(k); }
       });
     });

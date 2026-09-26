@@ -1,5 +1,5 @@
 {
-  "versao": 19,
+  "versao": 20,
   "atualizadoEm": "2026-09-26",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -456,6 +456,16 @@
               "26 assistentes especializados em 7 categorias (planejamento, avaliação, atividades, relatórios, inclusão, comunicação, apoio).",
               "Cada um: descrição, como usar, campos e prompt inicial com {{campo}}; papel próprio no sistema da conversa."
             ]
+          },
+          {
+            "id": "js-casavequia-sync-plano",
+            "icon": "project",
+            "title": "assets/js/casavequia-sync-plano.js",
+            "status": "Concluído",
+            "details": [
+              "Sincronia do Plano Anual, Livros e timers da Casavequia pelo Supabase (casavequia:storage:shared-v1, só admin).",
+              "Substituiu o Firestore aberto em 26/09/2026, com migração única e validada dos dados antigos."
+            ]
           }
         ]
       },
@@ -701,6 +711,19 @@
               "Indicação: 30 dias de PRO para quem indica (até 12 por ano) e 7 para quem foi indicado, liberados quando o indicado confirma o e-mail pelo código.",
               "Mensagens de marketing só com autorização registrada (canal, texto e data)."
             ]
+          },
+          {
+            "id": "r-seguranca",
+            "icon": "project",
+            "title": "Segurança obrigatória (SEGURANCA.md)",
+            "status": "Concluído",
+            "details": [
+              "Regras de segredos, banco (RLS), navegador (XSS, URL, SRI), publicação e CI em SEGURANCA.md, importado pelo CLAUDE.md.",
+              "Verificador scripts/check-seguranca.js (npm run check:seguranca; --dist para o site gerado) com padrões em scripts/seguranca/padroes.js.",
+              "Hooks: Claude Code (.claude/settings.json → hook-claude.js) e git (.githooks, ligados pelo npm install).",
+              "CI .github/workflows/seguranca.yml (gitleaks, verificador, build, npm audit) e Dependabot; deploy só publica se passar.",
+              "Cabeçalhos de segurança no vercel.json e agente .claude/agents/guardiao-seguranca.md."
+            ]
           }
         ]
       },
@@ -710,6 +733,19 @@
         "title": "10. Pendências e próximos passos",
         "description": "O que falta, em ordem de prioridade.",
         "children": [
+          {
+            "id": "pd-seguranca-professor",
+            "icon": "project",
+            "title": "Segurança: passos do professor",
+            "status": "Prioridade alta",
+            "details": [
+              "Revogar a chave do Google AIzaSyDTVh… (vazada em mensagem de commit em 05/04/2026).",
+              "Abrir a Casavequia logado uma vez e publicar firestore.rules (deny-all) no Firebase Console.",
+              "Rodar no SQL Editor a migração de segurança de 26/09/2026.",
+              "Ligar Secret scanning, Push protection e Dependabot alerts no GitHub.",
+              "Decidir: repositório privado e migração dos nomes de alunos do HTML para o banco (docs/auditoria-seguranca-2026-09-26.md)."
+            ]
+          },
           {
             "id": "pd-supabase",
             "icon": "project",
@@ -1419,9 +1455,24 @@
           "done": true
         },
         {
+          "id": "rs-seguranca-aee",
+          "text": "AEE: função definida pela equipe, registros carimbados pelo banco, código trocável (Etapa 18)",
+          "done": true
+        },
+        {
           "id": "rs-seg-7",
           "text": "Tela de conta testada em 7 tamanhos (npm run check:login)",
           "done": true
+        },
+        {
+          "id": "rs-seguranca-10",
+          "text": "Nomes de alunos fora do HTML público e repositório privado (professor decide)",
+          "done": false
+        },
+        {
+          "id": "rs-seguranca-11",
+          "text": "2 fatores na conta do administrador e CAPTCHA no cadastro (professor)",
+          "done": false
         }
       ]
     },
@@ -1676,6 +1727,72 @@
         {
           "id": "rs-planos-11",
           "text": "Vídeo da integração com a Biblioteca Digital no \"Mais detalhes\" do Plus",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "rs-seguranca",
+      "text": "16. Cibersegurança",
+      "children": [
+        {
+          "id": "rs-seguranca-1",
+          "text": "Firestore aberto desligado; plano, livros e timers da Casavequia no Supabase",
+          "done": true
+        },
+        {
+          "id": "rs-seguranca-2",
+          "text": "Segredos: verificador, hooks do git e do Claude Code, gitleaks no CI, linha do tempo sem chaves",
+          "done": true
+        },
+        {
+          "id": "rs-seguranca-3",
+          "text": "Scripts de CDN com versão exata e SRI; pdf.js com mitigação da CVE-2024-4367",
+          "done": true
+        },
+        {
+          "id": "rs-seguranca-4",
+          "text": "Cabeçalhos de segurança na Vercel e actions presas por SHA",
+          "done": true
+        },
+        {
+          "id": "rs-seguranca-5",
+          "text": "Dependências sem vulnerabilidade alta (raiz e vídeo)",
+          "done": true
+        },
+        {
+          "id": "rs-seguranca-6",
+          "text": "SEGURANCA.md + agente guardiao-seguranca",
+          "done": true
+        },
+        {
+          "id": "rs-seguranca-aee",
+          "text": "AEE: função definida pela equipe, registros carimbados pelo banco, código trocável (Etapa 18)",
+          "done": true
+        },
+        {
+          "id": "rs-seguranca-7",
+          "text": "Revogar a chave do Google vazada em 05/04/2026 (professor)",
+          "done": false
+        },
+        {
+          "id": "rs-seguranca-8",
+          "text": "Publicar firestore.rules deny-all no Firebase (professor)",
+          "done": false
+        },
+        {
+          "id": "rs-seguranca-9",
+          "text": "Rodar a migração SQL de segurança no Supabase (professor)",
+          "done": false
+        },
+        {
+          "id": "rs-seguranca-10",
+          "text": "Nomes de alunos fora do HTML público e repositório privado (professor decide)",
+          "done": false
+        },
+        {
+          "id": "rs-seguranca-11",
+          "text": "2 fatores na conta do administrador e CAPTCHA no cadastro (professor)",
           "done": false
         }
       ]

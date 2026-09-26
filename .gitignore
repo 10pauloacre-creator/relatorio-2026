@@ -47,3 +47,25 @@ tmp/
 output/
 .chrome-*/
 chrome-profile/
+
+# Segurança (SEGURANCA.md): segredos e credenciais NUNCA entram no git
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+android/key.properties
+jarvis.env
+google-services.json
+GoogleService-Info.plist
+service-account*.json
+supabase/.temp/
+supabase/.branches/
+.claude/settings.local.json
+
+# Backups com dados de alunos nunca no git (repositório público). Use o backup do banco.
+backup/*.json

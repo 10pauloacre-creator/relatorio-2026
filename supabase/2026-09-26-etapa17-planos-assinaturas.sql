@@ -38,8 +38,8 @@ create table if not exists public.planos (
 );
 alter table public.planos enable row level security;
 drop policy if exists planos_leitura on public.planos;
-create policy planos_leitura on public.planos for select using (true);
-grant select on public.planos to anon, authenticated;
+create policy planos_leitura on public.planos for select using (true); -- seguranca:ok catálogo de planos e preços é público
+grant select on public.planos to anon, authenticated; -- seguranca:ok catálogo público (página planos.html)
 
 insert into public.planos (id, nome, ordem, preco_mensal, preco_anual, promo_primeiro_mes, limites, recursos) values
   ('gratis', 'Grátis', 0, 0, 0, null,
@@ -63,8 +63,8 @@ create table if not exists public.planos_config (
 );
 alter table public.planos_config enable row level security;
 drop policy if exists planos_config_leitura on public.planos_config;
-create policy planos_config_leitura on public.planos_config for select using (true);
-grant select on public.planos_config to anon, authenticated;
+create policy planos_config_leitura on public.planos_config for select using (true); -- seguranca:ok configuração pública (modo, desconto, versões); NUNCA guarde segredo aqui
+grant select on public.planos_config to anon, authenticated; -- seguranca:ok configuração pública, sem segredos
 
 insert into public.planos_config (chave, valor) values
   ('modo_limites', '"lancamento"'),
@@ -755,7 +755,7 @@ begin
   return true;
 end;
 $$;
-grant execute on function public.plano_evento(text, jsonb) to anon, authenticated;
+grant execute on function public.plano_evento(text, jsonb) to anon, authenticated; -- seguranca:ok funil público (limite por minuto na Etapa 18)
 
 create or replace function public.lead_escola_registrar(p_nome text, p_email text, p_telefone text, p_escola text, p_cargo text,
   p_municipio text, p_uf text, p_professores int, p_mensagem text, p_aceita_contato boolean, p_origem text default 'planos')
@@ -779,7 +779,7 @@ begin
   return jsonb_build_object('ok', true);
 end;
 $$;
-grant execute on function public.lead_escola_registrar(text, text, text, text, text, text, text, int, text, boolean, text) to anon, authenticated;
+grant execute on function public.lead_escola_registrar(text, text, text, text, text, text, text, int, text, boolean, text) to anon, authenticated; -- seguranca:ok formulário público (limites na Etapa 18)
 
 -- Painel do administrador: funil, planos, pedidos, indicação, consentimentos e leads.
 create or replace function public.plano_painel_admin(p_dias int default 30)

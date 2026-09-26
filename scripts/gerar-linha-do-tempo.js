@@ -11,6 +11,9 @@
 const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
+// Mensagens de commit vão para um JSON público: nunca levam segredo junto
+// (em 05/04/2026 uma chave do Google foi parar no título de dois commits).
+const { ocultarSegredos } = require("./seguranca/padroes");
 
 const raiz = path.resolve(__dirname, "..");
 const saida = path.join(raiz, "assets", "data", "relatorio-skin-linha-do-tempo.json");
@@ -30,7 +33,7 @@ const commits = bruto.split(FIM).map((b) => b.replace(/^\s+/, "")).filter(Boolea
     .split("\n")
     .filter((l) => !/^Co-Authored-By:|^🤖 Generated/i.test(l.trim()))
     .join("\n").trim();
-  return { sha: sha.slice(0, 40), data, titulo: (titulo || "").trim(), corpo: texto.slice(0, 1200) };
+  return { sha: sha.slice(0, 40), data, titulo: ocultarSegredos((titulo || "").trim()), corpo: ocultarSegredos(texto.slice(0, 1200)) };
 }).filter((c) => c.sha && c.data);
 
 let atual = null;

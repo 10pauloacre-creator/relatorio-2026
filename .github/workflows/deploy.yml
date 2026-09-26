@@ -5,30 +5,45 @@ on:
     branches:
       - main
 
+# Só o necessário: escrever no branch gh-pages.
 permissions:
   contents: write
+
+concurrency:
+  group: deploy-pages
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # Actions presas por commit (SHA): uma tag pode ser movida por quem
+      # invadir o repositório da action; o SHA não. Dependabot atualiza.
       - name: Checkout do repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Configurar Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
           cache: npm
 
       - name: Instalar dependencias
-        run: npm ci
+        run: npm ci --ignore-scripts
+
+      - name: Verificar seguranca do codigo
+        run: node scripts/check-seguranca.js
 
       - name: Gerar site publicado
         run: npm run build:pages
 
+      - name: Verificar seguranca do site gerado
+        run: node scripts/check-seguranca.js --dist
+
       - name: Deploy para GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist

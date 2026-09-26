@@ -6,14 +6,6 @@
   var CACHE_KEY = 'projetos_pessoais_workspace_v1';
   var SYNC_SCOPE = 'projetos-pessoais:workspace:v1';
   var VAULT_MS = 15 * 60 * 1000;
-  var LEGACY_FIREBASE = {
-    apiKey: 'AIzaSyDO-BTsc6pYMBd89WIKEUcz4_iaaD46tR4',
-    authDomain: 'relatorio-c693d.firebaseapp.com',
-    projectId: 'relatorio-c693d',
-    storageBucket: 'relatorio-c693d.firebasestorage.app',
-    messagingSenderId: '457657450375',
-    appId: '1:457657450375:web:15b1335aed2ba9939bdd22'
-  };
   var SEED_TIMESTAMP = '2020-01-01T00:00:00.000Z';
   var PROJECT_STATUSES = [
     'Ideia',
@@ -1068,6 +1060,9 @@
     RS_COMMITS = RS_COMMITS.concat(lista).filter(function (c) { if (!c || !c.sha || vistos[c.sha]) return false; vistos[c.sha] = 1; return true; })
       .sort(function (a, b) { return toTime(b.data) - toTime(a.data); });
   }
+  // Mensagem de commit nunca mostra segredo (mesmos padrões de scripts/seguranca/padroes.js).
+  var RS_SEGREDO = /AIza[0-9A-Za-z_-]{35}|GOCSPX-[0-9A-Za-z_-]{20,}|\bsk-(?:proj-|ant-|or-v1-)?[A-Za-z0-9_-]{20,}|\bsk_[a-f0-9]{40,}|\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{16,}|\bgsk_[A-Za-z0-9]{20,}|\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,})|\bsb_secret_[A-Za-z0-9_-]{10,}|\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g;
+  function rsOcultar(t) { return String(t || '').replace(RS_SEGREDO, '[segredo removido]'); }
   // Commits publicados depois do arquivo, direto do GitHub (cache de 15 min).
   function rsBuscarNovos(desde) {
     var CH = 'pp_rs_github_v1', cache = null;
@@ -1077,7 +1072,7 @@
     return fetch(url, { headers: { Accept: 'application/vnd.github+json' } }).then(function (r) { return r.ok ? r.json() : []; }).then(function (lista) {
       var commits = (Array.isArray(lista) ? lista : []).map(function (x) {
         var msg = String((x.commit && x.commit.message) || ''), linhas = msg.split('\n');
-        return { sha: x.sha, data: (x.commit && x.commit.author && x.commit.author.date) || '', titulo: linhas[0], corpo: linhas.slice(1).filter(function (l) { return !/^Co-Authored-By:|^🤖 Generated/i.test(l.trim()); }).join('\n').trim().slice(0, 1200) };
+        return { sha: x.sha, data: (x.commit && x.commit.author && x.commit.author.date) || '', titulo: rsOcultar(linhas[0]), corpo: rsOcultar(linhas.slice(1).filter(function (l) { return !/^Co-Authored-By:|^🤖 Generated/i.test(l.trim()); }).join('\n').trim().slice(0, 1200)) };
       });
       try { localStorage.setItem(CH, JSON.stringify({ desde: desde, em: Date.now(), commits: commits })); } catch (e) {}
       return commits;
@@ -1092,7 +1087,7 @@
       fetch('assets/data/relatorio-skin-linha-do-tempo.json', semCache).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
     ]).then(function (res) {
       RS_DOC = res[0];
-      rsJuntarCommits((res[1] && res[1].commits) || []);
+      rsJuntarCommits(((res[1] && res[1].commits) || []).map(function (c) { return c && Object.assign({}, c, { titulo: rsOcultar(c.titulo), corpo: rsOcultar(c.corpo) }); }));
       ensureRelatorioSkinIdentity();
       mergeRelatorioChecklist();
       render();
@@ -2314,14 +2309,9 @@
     ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(function (legacyId) { localStorage.removeItem('cl_fim_' + legacyId); localStorage.removeItem('cl_notif_' + legacyId); removeTimerFromDb(legacyId); });
     ['rh1', 'rh2', 'rh3', 'rh4', 'rh5', 'rh6'].forEach(function (legacyId) { localStorage.removeItem('rh_cl_fim_' + legacyId); localStorage.removeItem('rh_cl_notif_' + legacyId); removeTimerFromDb(legacyId); });
   }
-  function legacyFirestoreTimers() {
-    if (!window.firebase || !window.firebase.firestore) return Promise.resolve({});
-    try {
-      var app = window.firebase.apps.filter(function (item) { return item.name === 'projetos-pessoais-migracao'; })[0] || window.firebase.initializeApp(LEGACY_FIREBASE, 'projetos-pessoais-migracao');
-      var database = app.firestore();
-      return Promise.all(['c1', 'c2'].map(function (legacyId) { return database.collection('claude_timers').doc(legacyId).get().then(function (documentSnapshot) { return { id: legacyId, fim: documentSnapshot.exists ? Number(documentSnapshot.data().fim || 0) : 0 }; }); })).then(function (items) { var result = {}; items.forEach(function (item) { result[item.id] = item.fim; }); return result; }).catch(function () { return {}; });
-    } catch (error) { return Promise.resolve({}); }
-  }
+  // O Firestore antigo (claude_timers) foi desligado em 26/09/2026: ficava aberto
+  // para qualquer pessoa. Os timers antigos migram só do localStorage.
+  function legacyFirestoreTimers() { return Promise.resolve({}); }
   function migrateLegacyTimers() {
     if (state.migrations.legacyAiTimersV1) return;
     var candidates = {

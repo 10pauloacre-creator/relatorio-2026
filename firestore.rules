@@ -1,9 +1,16 @@
 rules_version = '2';
+// Firestore do projeto relatorio-c693d — DESLIGADO em 26/09/2026.
+// Até essa data as regras eram "allow read, write: if true": qualquer pessoa na
+// internet lia e reescrevia os dados, e a Casavequia aplicava o que vinha daqui
+// no diário (e dali no banco de notas). Tudo passou para o Supabase, com RLS
+// só do administrador (assets/js/casavequia-sync-plano.js).
+//
+// Publicar: Firebase Console → Firestore Database → Regras → colar e "Publicar"
+// (ou `firebase deploy --only firestore:rules`). Nunca volte a abrir.
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Diário escolar pessoal — acesso livre (site privado do professor)
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

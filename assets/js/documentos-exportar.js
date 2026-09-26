@@ -35,6 +35,11 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c];
     });
   }
+  // Integridade (SRI): se o CDN entregar outro arquivo, o navegador recusa.
+  var SRI = {};
+  SRI[LIBS.docx] = "sha384-HWC8sFPgg/WYrr43jIR6e0YIKgPkS3VLdteGgh9MFlUet3xdAVEM8YS69xP4Puse";
+  SRI[LIBS.xlsx] = "sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw";
+  SRI[LIBS.zip] = "sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG";
   var GLOBAIS = {};
   GLOBAIS[LIBS.docx] = "docx"; GLOBAIS[LIBS.xlsx] = "XLSX"; GLOBAIS[LIBS.zip] = "JSZip";
   function carregar(url) {
@@ -48,6 +53,7 @@
         return;
       }
       var s = document.createElement("script"); s.src = url;
+      if (SRI[url]) { s.integrity = SRI[url]; s.crossOrigin = "anonymous"; }
       s.onload = function () { s.dataset.ok = "1"; ok(); };
       s.onerror = function () { erro(new Error("Não consegui carregar o gerador de arquivos. Verifique a internet.")); };
       document.head.appendChild(s);

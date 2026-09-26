@@ -26,8 +26,6 @@ const rootFileAllowlist = new Set([
   "favicon-16x16.png",
   "favicon-32x32.png",
   "favicon.ico",
-  "firebase-config.js",
-  "firebase-config.example.js",
   "herminio-alunos-1serie.html",
   "herminio-alunos-2serie.html",
   "herminio-alunos-3serie.html",

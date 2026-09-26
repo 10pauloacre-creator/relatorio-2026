@@ -1,0 +1,6 @@
+#!/bin/sh
+# Hook de segurança (SEGURANCA.md): bloqueia commit com segredo, arquivo
+# proibido ou regra de segurança quebrada. Instalado por `npm install`
+# (scripts/seguranca/instalar-hooks.js) ou `git config core.hooksPath .githooks`.
+command -v node >/dev/null 2>&1 || { echo "Aviso: node não encontrado; verificação de segurança pulada."; exit 0; }
+exec node "$(git rev-parse --show-toplevel)/scripts/check-seguranca.js" --staged

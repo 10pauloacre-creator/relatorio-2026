@@ -3,6 +3,18 @@
 
 ---
 
+## 0. SEGURANÇA PRIMEIRO (obrigatório, 26/09/2026)
+
+Antes de qualquer mudança, leia e siga **`SEGURANCA.md`** (importado abaixo). Resumo que não pode ser esquecido:
+- O repositório é **público** e o site guarda dados de **alunos menores**: nenhum segredo (chave privada, token, senha, `service_role`) em arquivo, mensagem de commit ou JSON publicado; nenhum dado pessoal de aluno em exemplo, teste ou `assets/data/`.
+- Quem protege os dados é o **RLS do Supabase**, não o front. SQL novo: RLS ligada, `security definer` com `search_path` fixo, `revoke` de `anon`/`public`, nada de `using (true)` em dado privado. Firebase/Firestore **desligado** — não reative.
+- Dado externo (banco, outro usuário, IA, URL) é escapado antes de ir para `innerHTML`; URL só `http(s)`; script de CDN com versão exata + `integrity` (SRI).
+- `npm run check:seguranca` precisa passar (os hooks do git e do Claude Code rodam sozinhos; nunca use `--no-verify`). Mudança sensível → acione o agente **`guardiao-seguranca`** (`.claude/agents/`).
+
+@SEGURANCA.md
+
+---
+
 ## 1. OBJETIVO DO PROJETO
 
 Plataforma **RELATORIO SKIN** (relatorio.skin): site público de apresentação (`index.html`), tela de conta (`entrar.html`), a tela **Escolas** de toda conta (`escolas.html`), o diário do administrador (`casavequia.html`, `herminio.html`), a página de cada escola do professor (`meu-diario.html?escola=<id>`) e o perfil (`perfil.html`). O diário escolar digital contém:
@@ -32,6 +44,7 @@ C:\Projetos\AXION PROEDUQ\RELATORIO-SKIN\
 ├── aee.html, projetos-pessoais.html, projeto-detalhes.html, planejamento-aulas-2026.html, mapa-*.html
 ├── privacidade.html, termos.html, axion-proeduq.html  ← páginas públicas
 ├── CLAUDE.md           ← Este arquivo
+├── SEGURANCA.md        ← Regras de segurança OBRIGATÓRIAS (seção 0)
 ├── manifest.json, sw.js, favicon*, icon-*.png, apple-touch-icon.png ← PWA (ficam na raiz)
 ├── botao-*.png, botão_projetos.png, iconv2.png ← imagens dos botões (na raiz: caminho gravado nos dados)
 ├── assets/             ← Tudo que o site usa: js/, css/, img/, icons/, marca/, video/, data/, app/
@@ -131,7 +144,7 @@ const DISC = [
 
 ## 4. CREDENCIAIS E SEGREDOS
 
-> ⚠️ As chaves reais NÃO ficam no código — ficam no `localStorage` do navegador.
+> ⚠️ As chaves reais NÃO ficam no código — ficam no `localStorage` do navegador. **Legado:** o fluxo "Novo Relato → Groq → GitHub" desta seção (e das seções 3, 5 e 10) é do `index.html` antigo e não existe mais no código (o `index.html` virou o site público). Não recrie: token do GitHub com permissão de escrita no navegador é um risco grave. Regras atuais de segredos: `SEGURANCA.md`.
 
 | Segredo | Onde fica | Como configurar |
 |---|---|---|
@@ -309,6 +322,8 @@ Quando o professor envia o rascunho **diretamente no chat**, Claude:
 
 | **Frequência Diária quebrada no celular (25/09/2026)** | No modal, `.fd-datas{display:grid}` vencia o atributo `hidden` (as datas apareciam mesmo em "Tempo total"), e no celular a coluna única `1fr` crescia até a largura da tabela da prévia: os filtros não quebravam linha e os campos de data saíam da tela | `.fd-modal [hidden]{display:none!important}` e `grid-template-columns:minmax(0,1fr)` com `min-width:0` em `.fd-lado`/`.fd-visor` (`frequencia-diaria.js`, `estilo()`) |
 
+| **Firestore aberto (26/09/2026)** | `firestore.rules` com `allow read, write: if true`: qualquer pessoa lia e reescrevia plano, livros, timers e cliques de presença/atividade, e a Casavequia aplicava isso no diário (e dali no banco de notas); URL de livro vinda de lá abria sem checar | Firestore desligado (deny-all) e trocado pelo escopo `casavequia:storage:shared-v1` do Supabase (`assets/js/casavequia-sync-plano.js`, migração única validada); `livAcessar` só abre `http(s)`. Ver `SEGURANCA.md` |
+
 > **Regra da tela de conta:** depois de mexer em `entrar.html` ou no CSS/HTML da trava em `supabase-report-sync.js`, rode `npm run check:login` (precisa de `npm i --no-save puppeteer-core` e Chrome/Edge instalado). Ele abre a página local em 7 tamanhos de tela e falha com camada invisível por cima, elemento `hidden` ainda na tela, rolagem lateral, espaço vazio, botão fora de alcance ou campo que não aceita digitação. Nunca dê `display` por classe a um elemento que usa o atributo `hidden` sem uma regra `[hidden]{display:none!important}`.
 
 > **Regra de ouro após esses bugs:** nunca colocar `document.querySelector(All)` dentro de laço que percorre alunos/relatos. Indexe o DOM uma vez e consulte o índice. O DOM da Casavequia tem ~57 mil elementos.
@@ -319,9 +334,9 @@ Quando o professor envia o rascunho **diretamente no chat**, Claude:
 
 **Arquivo:** `backup/backup-YYYYMMDD.json`  
 **Conteúdo:** DISC, PRESENÇA, ALUNOS, lista de relatos, config, relatório de vistoria  
-**Regra:** Atualizar o backup a cada novo relato (`cp` ou reescrever o JSON com os novos dados)
+**Regra (revista em 26/09/2026, segurança):** NÃO criar nem atualizar `backup/*.json` no repositório enquanto ele for público — o arquivo tem nomes e faltas de alunos menores. O backup de verdade é o do banco (lixeira, histórico diário e "⬇️ Baixar todos os dados" do ano letivo, seção 18). Ver `SEGURANCA.md`.
 
-Backup atual: `backup/backup-20260424.json`
+Backup antigo `backup/backup-20260424.json` saiu do repositório em 26/09/2026 (dados de alunos). Para recuperar localmente: `git show 04db605:backup/backup-20260424.json > backup-20260424.json` (não commitar).
 
 ---
 
@@ -336,7 +351,7 @@ Backup atual: `backup/backup-20260424.json`
 
 ### Quando o professor enviar novo relato
 1. Ele escreve rascunho no chat
-2. Claude gera HTML → injeta → atualiza PRESENCA + DISC → atualiza `backup/backup-YYYYMMDD.json` → `git push`
+2. Claude gera HTML → injeta → atualiza PRESENCA + DISC → `git push` (sem backup JSON no repositório: ver seção 12 e `SEGURANCA.md`)
 3. Ou: usar o botão "✏️ Novo Relato" diretamente no site (fluxo automático via Groq)
 
 ### Não implementado ainda
@@ -484,6 +499,7 @@ Toda página que carrega `supabase-report-sync.js` exige conta. O tipo de acesso
 
 **E-mail verificado depois (Etapa 15, 22/09/2026, decisão do professor):** "Confirm email" DESLIGADO no Supabase (`mailer_autoconfirm = true`, mudado pela API de gestão). Com isso o Supabase preenche `email_confirmed_at` em todo cadastro, e essa coluna NÃO diz mais se o e-mail foi verificado. A verificação fica em `public.conta_email_verificado` (só leitura do dono), gravada apenas por `conta_email_status()`: sessão aberta pelo código/link do e-mail (`amr` com `otp`/`magiclink`) = verificado; trocou o e-mail = volta a pendente (ver Etapa 15B abaixo). No `perfil.html`, card 🚪 Conta: selo "⚠ Verificar e-mail" / "✓ E-mail verificado" (também no topo) e o botão "Verificar e-mail", que manda o modelo "Link mágico" (link + código de 8 dígitos) por `signInWithOtp({shouldCreateUser:false})`; o código é digitado no próprio perfil (`verifyOtp`), então funciona com o e-mail aberto no celular. API: `S.auth.emailStatus()`, `enviarVerificacaoEmail()`, `confirmarCodigoEmail(codigo)`. SQL em `supabase/2026-09-22-etapa15-email-verificado.sql`.
 - **Etapa 15B (22/09/2026, decisão do professor): só o código verifica.** A verificação de todas as contas foi desfeita (inclusive Google e as confirmadas na regra antiga). `conta_email_status()` aceita apenas sessão aberta pelo código/link do e-mail (`amr` `otp`/`magiclink`, `metodo = 'codigo'`); Google não verifica mais. `escolas.html` mostra o aviso "⚠ Verifique o seu e-mail" (`#aviso-email`) enquanto a conta não estiver verificada, com o botão para `perfil.html#verificar-email`. SQL em `supabase/2026-09-22-etapa15b-verificacao-so-por-codigo.sql`.
+- **Troca de e-mail (Etapa 18, 26/09/2026):** trocar o e-mail da conta derruba a verificação (gatilho em `auth.users` → `private.conta_email_trocado`); só um código pedido depois da troca verifica o endereço novo. `conta_verificar_senha` bloqueia 15 min após 5 erros seguidos.
 - **E-mail do código sem spam (22/09/2026):** o modelo "Magic link" do Supabase é usado só para o código de verificação e foi trocado por `supabase/emails/codigo-verificacao.html` (texto, o código e a logo da AXION PROEDUQ no cabeçalho, `assets/icons/axion-email.png`, 41 KB; sem link do supabase.co e sem "acesso/entrar"); assunto "{{ .Token }} é o seu código de verificação do RELATORIO SKIN"; remetente "RELATORIO SKIN". Publicado pela API de gestão (`PATCH /v1/projects/<ref>/config/auth`). Cópia dos modelos anteriores em `supabase/emails/backup-2026-09-22-antes-do-spam.json`. Não recolocar link nem imagens pesadas nesse modelo. Solução definitiva: enviar por domínio próprio (`@relatorio.skin`) com SPF, DKIM e DMARC; o DNS do relatorio.skin fica na Vercel.
 - **Remetente atual (25/09/2026):** o SMTP do Auth já envia por `suporte@axionproeduq.com.br` (nome "Axion Pro"), o e-mail institucional da AXION PROEDUQ; o código chega em segundos.
 - **O modelo "Magic link" serve também a Biblioteca Digital (25/09/2026):** a recuperação de senha do aluno (Edge Function `aluno-email`, repositório da Biblioteca) usa o mesmo código. O aluno recebe a versão da Biblioteca quando `user_metadata.bdm = true` (`{{ if .Data.bdm }}`, com `.Data.nome` e `.Data.recuperar`); o professor continua recebendo a do RELATORIO SKIN. No modelo, só `if .Data.x` (chave ausente = falso), nunca `eq .Data.x`. **Publicar:** `node scripts/publicar-modelo-email.js` (guarda o modelo anterior em `tmp/`, publica, manda um código de teste para cada versão numa caixa descartável do mail.tm e volta ao anterior se algo falhar). Contas temporárias da Biblioteca no Auth têm `app_metadata.bdm_sombra = true` e somem em até 1 h: não são professores.
@@ -590,7 +606,7 @@ O "← Início" da Casavequia e da Hermínio aponta para `escolas.html`.
 2. Só depois, trocar os relatos da página pelos do ano novo, atualizar `ALUNOS` etc., e mudar `data-ano-letivo` nas duas páginas e `anoAtual` no `anos-letivos.json` para o ano novo. Nunca mude o `data-ano-letivo` com relatos do ano anterior na página: a publicação dataria essas aulas no ano novo.
 3. As chaves de escopo `*:shared-v1` continuam as mesmas: o arquivo do ano lê o estado como estava na data do arquivamento, no histórico.
 
-**Página de arquivo** (`data-arquivo-ate`): `supabase-report-sync.js` lê cada escopo por `relatorio_estado_ate` e nunca grava nem escuta o tempo real; a publicação dos lançamentos e a IA das observações ficam desligadas; `<base href="../../">`; o `localStorage` fica isolado em memória (só as chaves `sb-*` da sessão passam). Limitações conhecidas: o iframe de projeções e o Firebase do plano anual continuam lendo os dados atuais; os scripts em `assets/` são os atuais do site.
+**Página de arquivo** (`data-arquivo-ate`): `supabase-report-sync.js` lê cada escopo por `relatorio_estado_ate` e nunca grava nem escuta o tempo real; a publicação dos lançamentos e a IA das observações ficam desligadas; `<base href="../../">`; o `localStorage` fica isolado em memória (só as chaves `sb-*` da sessão passam). Limitações conhecidas: o iframe de projeções e a sincronia do plano anual (`casavequia:storage:shared-v1`) continuam lendo os dados atuais; os scripts em `assets/` são os atuais do site.
 
 ---
 
@@ -634,6 +650,7 @@ O "← Início" da Casavequia e da Hermínio aponta para `escolas.html`.
 **Ocupação obrigatória por escola** (`escola.ocupacoes`, uma ou mais): `regente`, `mediador`, `assistente`, `aee`. Pedida no cadastro da escola (INEP ou manual), ao abrir uma escola antiga sem ocupação (escolas.html e meu-diario.html) e trocável pelo selo "🧑‍🏫" abaixo do botão ou em ⚙️ Configurações. Escolas fixas do administrador: `E.fixas.{id}.ocupacoes` (padrão regente). Roteamento em `ContaSkin.ocupacao.destino`: com `regente` → layout do diário (prioridade), senão → `aee.html?escola=<id>`. Regente + outra ocupação: botão "🔀 Mudar painel: AEE" no cabeçalho do diário (e "Mudar painel: Regente" no AEE); nas fixas, selo "♿ Painel AEE".
 
 **Aluno compartilhado (banco, não professor_dados):** `aee_alunos` (perfil, deficiências, CID, laudo, foto, `perfil` jsonb com comunicação, necessidades, potencialidades, estratégias, cuidados, crise, disciplinas, responsáveis e `pei`), `aee_vinculos` (quem acessa e com que papel), `aee_registros` (diario, atendimento, avaliacao, ocorrencia, comunicado, relatorio, nota com disciplina/bimestre), `aee_documentos` + bucket privado `aee-arquivos` (`<aluno_id>/<pasta>/…`). **Código do aluno** `AEE-XXXX-XXXX` (`private.aee_novo_codigo`): quem tem o código entra por `aee_vincular` e passa a ver o mesmo perfil. No futuro o Conex-ED (gestão escolar) cadastra todos os alunos da escola com o código. RLS: lê quem é vinculado; edita perfil/PEI quem é mediador, assistente ou AEE (`private.aee_editor`); cada registro só é alterado por quem escreveu; excluir aluno só mediador/AEE com senha (`aee_excluir_aluno`). SQL em `supabase/2026-09-21-etapa15-aee-alunos.sql`.
+- **Segurança da equipe (Etapa 18, 26/09/2026):** quem entra pelo código num aluno que já tem mediador/AEE entra como **regente**; o mediador ou o professor do AEE libera outra função na aba 👥 Equipe (`aee_definir_papel`, select na tabela), remove pessoas e troca o código (`aee_trocar_codigo`, "🔄 Trocar código"). O aluno nunca fica sem mediador/AEE. O banco carimba autor/função/disciplina dos registros (regente com disciplina só lança nota dela), documento só em `<aluno_id>/…`, foto só `data:image/`. O código não sai no relatório impresso.
 
 **aee.html:** mediador/assistente → uma aba por aluno (nome em destaque); AEE → "📋 Alunos do AEE" com indicadores e filtros (nome/código, deficiência, série, mediador, ordem por registro mais antigo; alerta de 14 dias sem registro) + abas dos alunos abertos; regente só → abre `?aluno=` a partir do cartão "♿ Alunos da Educação Especial" em ⚙️ Configurações do diário (vínculo pelo código com a disciplina). Sub-abas do aluno: Perfil · Disciplinas e boletim (nota mais recente de cada disciplina/bimestre) · Registros (filtros) · PEI (metas com situação) · Documentos (7 pastas) · Equipe (código para compartilhar, remover profissional) · Relatório individual (janela de impressão A4 com identificação, perfil, PEI, boletim, registros do período e parecer).
 
@@ -806,5 +823,7 @@ update public.planos_config set valor = '"ativo"' where chave = 'modo_limites';
 4. Informar a empresa de pagamentos na Política de Privacidade (seção 6) e ligar `modo_limites = 'ativo'`.
 
 **Limitação conhecida:** diário e documento são contados pela página (o servidor conta e decide, mas não intercepta a gravação do `professor_dados`); a I.A. é conferida no servidor. Quem burlar o JavaScript no modo ativo consegue gravar diários além do limite — aceitável para o nicho; se precisar, mover a trava para um gatilho em `professor_dados`.
+
+**Segurança (Etapa 18, 26/09/2026):** `private.plano_ativar_pedido` só ativa com `p_valor` ≥ `valor_primeira` (a cobrança nunca pode usar valor vindo da página); `assinatura_pedidos.dados` guarda só campos conhecidos (gatilho) e no máximo 20 pedidos/dia por conta; `plano_evento` aceita no máximo 60 eventos/min de visitantes no total; `lead_escola_registrar` 30/hora no total; indicação recusa a mesma caixa de e-mail (`private.email_canonico`); teto global diário da I.A. em `planos_config.ia_teto_global_dia` (3000); `professor_dados` com até 40 escopos e 50 MB por conta (admin livre). `planos_config` é público: nunca guarde segredo nela.
 
 **Teste (26/09/2026):** SQL testado em transação desfeita (cadastro com código e consentimentos, limites, pedido Plus R$ 1 e PRO anual, modo ativo, indicação confirmada pelo e-mail, autoindicação recusada, admin sem limite, painel). Página e modais no navegador (computador e 375 px, sem rolagem lateral), cadastro (validações do código e do WhatsApp) e os fluxos com conta num banco simulado local (limite do dia e do mês, aviso de lançamento, lembrete de 80%, checkout até "Pedido reservado", cartões do perfil); zero erros de JavaScript em todas as páginas.
