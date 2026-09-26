@@ -210,6 +210,19 @@ html.js .rv.in{opacity:1;transform:none}
 .hvid-pausa{position:absolute;right:12px;top:12px;z-index:4;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(13,14,13,.8);border:1px solid rgba(167,181,138,.45);color:#F3F1E9;font:700 .78rem/1 var(--f-txt);transition:background .2s,border-color .2s}
 .hvid-pausa:hover{background:rgba(13,14,13,.95);border-color:#C2CE9E}
 @media(max-width:720px){.hvid-card{transform:none}}
+/* Vídeo narrado "Por dentro" (seção A solução) */
+.pd{margin:4px auto 56px;max-width:1040px}
+.pd-card{position:relative;aspect-ratio:16/9;border-radius:20px;overflow:hidden;border:1px solid var(--line2);background:#0D0E0D;box-shadow:var(--shadow),0 0 0 1px rgba(167,181,138,.14),0 0 90px -24px var(--glow)}
+.pd-card video{display:block;width:100%;height:100%;object-fit:cover;background:#0D0E0D}
+.pd-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:16px;border:0;cursor:pointer;color:#F3F1E9;background:linear-gradient(180deg,rgba(13,14,13,.05) 30%,rgba(13,14,13,.6));transition:opacity .35s var(--ease)}
+.pd-bt{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;padding-left:6px;background:linear-gradient(135deg,#A7B58A,#C2CE9E);color:#141711;font-size:1.7rem;box-shadow:0 0 0 10px rgba(194,206,158,.18),0 18px 50px rgba(0,0,0,.5);transition:transform .3s var(--ease),box-shadow .3s}
+.pd-play:hover .pd-bt,.pd-play:focus-visible .pd-bt{transform:scale(1.07);box-shadow:0 0 0 14px rgba(194,206,158,.22),0 18px 50px rgba(0,0,0,.5)}
+.pd-tx{display:flex;flex-direction:column;text-align:left;text-shadow:0 2px 14px rgba(0,0,0,.6)}
+.pd-tx b{font:800 1.3rem/1.1 var(--f-title)}
+.pd-tx small{margin-top:5px;font-size:.85rem;color:#D6CBB8}
+.pd-card.tocando .pd-play{opacity:0;pointer-events:none}
+.pd-nota{margin-top:10px;font-size:.76rem;color:var(--tx3);text-align:center}
+@media(max-width:600px){.pd{margin-bottom:40px}.pd-bt{width:62px;height:62px;font-size:1.3rem}.pd-tx b{font-size:1.05rem}}
 @media (prefers-reduced-motion:reduce){.hvid-card{transform:none}}
 
 /* Tags soltas em volta do vídeo: flutuam; arrastar e soltar joga a tag pela tela;
@@ -1069,7 +1082,7 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
     </a>
     <nav class="nav" id="nav" aria-label="Seções da página">
       <a href="#problema">O problema</a>
-      <a href="#solucao">A solução</a>
+      <a href="#solucao">Por dentro</a>
       <a href="#demo">Demonstração</a>
       <a href="#beneficios">Benefícios</a>
       <a href="#depoimentos">Depoimentos</a>
@@ -1094,7 +1107,7 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
       <div>
         <p class="eyebrow in-a" style="--i:0">Para regentes, mediadores, assistentes e AEE</p>
         <h1 class="in-a" style="--i:1">Você virou professor para ensinar. <span class="l2">Não para <span class="risca">preencher papel</span>.</span></h1>
-        <p class="sub in-a" style="--i:2">O RELATORIO SKIN junta chamada, diário, frequência, planejamento e uma I.A. que trabalha para você. <b>Registre a aula uma vez</b> — presença, atividades, contador de aulas e relatórios se organizam sozinhos. O tempo que sobra volta para quem importa: <b>o aluno</b>.</p>
+        <p class="sub in-a" style="--i:2">Chamada, diário, frequência e I.A. numa tela só. <b>Registre a aula uma vez</b> — o resto se organiza.</p>
         <div class="hero-cta in-a" style="--i:3">
           <a class="btn btn-pri" href="entrar.html?modo=criar" data-magnet>Criar conta grátis <span class="arr" aria-hidden="true">→</span></a>
           <button class="btn btn-play" type="button" data-praticar data-magnet><span class="pi" aria-hidden="true">▶</span> Pratique agora</button>
@@ -1123,23 +1136,21 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
       <div class="sec-head rv">
         <p class="eyebrow">O problema</p>
         <h2>O dia tem 24 horas.<br><span class="dim">A burocracia quer 25.</span></h2>
-        <p class="lead">Você conhece essa rotina. A gente também — esta plataforma nasceu dentro de uma sala de aula.</p>
       </div>
       <ul class="pains">
-        <li class="pain rv" tabindex="0" style="--d:0"><span class="pain-tag">Domingo · 22h40</span><p>Passando a chamada da semana a limpo.</p><div class="pain-fix"><span><b>No SKIN:</b> a chamada é feita com um toque, na porta da sala, e já conta na frequência.</span></div><span class="pain-hint">Passe o mouse para ver a saída →</span></li>
-        <li class="pain rv" tabindex="0" style="--d:80"><span class="pain-tag">3 cadernos + 2 planilhas</span><p>Registros que não conversam entre si.</p><div class="pain-fix"><span><b>No SKIN:</b> um registro alimenta tudo — presença, atividades, contador, plano e relatórios.</span></div><span class="pain-hint">Passe o mouse para ver a saída →</span></li>
-        <li class="pain rv" tabindex="0" style="--d:160"><span class="pain-tag">Calculadora na mão</span><p>Somando faltas e frequência, aluno por aluno.</p><div class="pain-fix"><span><b>No SKIN:</b> a Frequência Diária calcula presenças, faltas e percentual, pronta para imprimir.</span></div><span class="pain-hint">Passe o mouse para ver a saída →</span></li>
-        <li class="pain rv" tabindex="0" style="--d:0"><span class="pain-tag">Véspera do conselho</span><p>O relatório do aluno com deficiência escrito às pressas.</p><div class="pain-fix"><span><b>No SKIN:</b> registros, PEI e parecer ficam juntos; o relatório individual sai pronto.</span></div><span class="pain-hint">Passe o mouse para ver a saída →</span></li>
-        <li class="pain rv" tabindex="0" style="--d:80"><span class="pain-tag">Σ h/aula nos dedos</span><p>Sem saber se o bimestre já fechou.</p><div class="pain-fix"><span><b>No SKIN:</b> o contador soma sozinho e projeta o dia em que cada bimestre termina.</span></div><span class="pain-hint">Passe o mouse para ver a saída →</span></li>
-        <li class="pain rv" tabindex="0" style="--d:160"><span class="pain-tag">Página em branco</span><p>Planejando do zero, toda semana, sozinho.</p><div class="pain-fix"><span><b>No SKIN:</b> 26 ferramentas de I.A. fazem a primeira versão. Você revisa e decide.</span></div><span class="pain-hint">Passe o mouse para ver a saída →</span></li>
+        <li class="pain rv" tabindex="0" style="--d:0"><span class="pain-tag">Domingo · 22h40</span><p>Chamada da semana a limpo.</p><div class="pain-fix"><span><b>No SKIN:</b> um toque, já na frequência.</span></div><span class="pain-hint">Ver a saída →</span></li>
+        <li class="pain rv" tabindex="0" style="--d:80"><span class="pain-tag">3 cadernos + 2 planilhas</span><p>Nada conversa entre si.</p><div class="pain-fix"><span><b>No SKIN:</b> um registro alimenta tudo.</span></div><span class="pain-hint">Ver a saída →</span></li>
+        <li class="pain rv" tabindex="0" style="--d:160"><span class="pain-tag">Calculadora na mão</span><p>Faltas somadas aluno por aluno.</p><div class="pain-fix"><span><b>No SKIN:</b> frequência pronta para imprimir.</span></div><span class="pain-hint">Ver a saída →</span></li>
+        <li class="pain rv" tabindex="0" style="--d:0"><span class="pain-tag">Véspera do conselho</span><p>Relatório do AEE às pressas.</p><div class="pain-fix"><span><b>No SKIN:</b> PEI e relatório individual prontos.</span></div><span class="pain-hint">Ver a saída →</span></li>
+        <li class="pain rv" tabindex="0" style="--d:80"><span class="pain-tag">Σ h/aula nos dedos</span><p>O bimestre já fechou?</p><div class="pain-fix"><span><b>No SKIN:</b> o contador soma sozinho.</span></div><span class="pain-hint">Ver a saída →</span></li>
+        <li class="pain rv" tabindex="0" style="--d:160"><span class="pain-tag">Página em branco</span><p>Planejar do zero, toda semana.</p><div class="pain-fix"><span><b>No SKIN:</b> 26 ferramentas de I.A.</span></div><span class="pain-hint">Ver a saída →</span></li>
       </ul>
       <p class="punch rv">Não é falta de vontade. <span>É excesso de papel.</span></p>
 
       <div class="calc rv" id="calc">
         <div class="calc-in">
           <h3>Quanto a papelada custa para você?</h3>
-          <p>Mova os controles com os seus números. A conta é sua, sem mágica.</p>
-          <label for="r-min">Minutos por dia com chamada, diário, frequência e relatórios <output id="o-min" for="r-min">50 min</output></label>
+          <label for="r-min">Minutos por dia com papelada <output id="o-min" for="r-min">50 min</output></label>
           <input type="range" id="r-min" min="10" max="180" step="5" value="50">
           <label for="r-dias">Dias letivos no ano <output id="o-dias" for="r-dias">200 dias</output></label>
           <input type="range" id="r-dias" min="100" max="220" step="5" value="200">
@@ -1150,7 +1161,7 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
             <span>= <b id="c-dias8">21</b> dias inteiros de trabalho de 8 horas</span>
             <span>= <b id="c-fds">10</b> fins de semana completos</span>
           </div>
-          <p class="calc-note">É o tempo que o RELATORIO SKIN quer devolver a você — ao menos uma boa parte dele.</p>
+          <p class="calc-note">É esse tempo que a gente quer devolver.</p>
         </div>
       </div>
     </div>
@@ -1162,32 +1173,35 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
       <div class="sec-head rv">
         <p class="eyebrow">A solução</p>
         <h2>Quatro ferramentas<br><span class="grad">viraram uma.</span></h2>
-        <p class="lead">Tudo o que hoje fica espalhado entre cadernos, planilhas e aplicativos passa a morar no mesmo lugar — e a conversar entre si.</p>
+      </div>
+      <!-- Vídeo narrado "Por dentro" (2 min): a plataforma inteira, telas reais -->
+      <div class="pd rv" id="por-dentro">
+        <div class="pd-card" id="pd-card">
+          <video id="pd-v" playsinline preload="none" poster="assets/video/relatorio-skin-por-dentro-capa.jpg" data-celular="assets/video/relatorio-skin-por-dentro-celular.mp4">
+            <source src="assets/video/relatorio-skin-por-dentro.mp4" type="video/mp4">
+            Seu navegador não reproduz vídeo. <a href="assets/video/relatorio-skin-por-dentro.mp4">Baixe o vídeo</a>.
+          </video>
+          <button class="pd-play" type="button" id="pd-play" aria-label="Assistir ao vídeo narrado: a plataforma por dentro, 2 minutos e 13 segundos"><span class="pd-bt" aria-hidden="true">▶</span><span class="pd-tx"><b>Veja por dentro</b><small>2 min · com narração</small></span></button>
+        </div>
+        <p class="pd-nota">Telas reais, dados fictícios. Narração: voz sintética (ElevenLabs).</p>
       </div>
       <div class="merge rv" id="merge">
         <div class="old" aria-label="O que fica para trás">
-          <div class="old-i" style="--k:0"><span class="ic">📓</span><span><b>Caderno de chamada</b><small>Folhas, rasuras, passar a limpo</small></span></div>
-          <div class="old-i" style="--k:1"><span class="ic">📘</span><span><b>Diário de classe no papel</b><small>O mesmo conteúdo escrito duas vezes</small></span></div>
-          <div class="old-i" style="--k:2"><span class="ic">📊</span><span><b>Planilha de notas e faltas</b><small>Fórmulas que quebram no fim do bimestre</small></span></div>
-          <div class="old-i" style="--k:3"><span class="ic">🤖</span><span><b>I.A. avulsa</b><small>Que não conhece a sua turma</small></span></div>
+          <div class="old-i" style="--k:0"><span class="ic">📓</span><span><b>Caderno de chamada</b></span></div>
+          <div class="old-i" style="--k:1"><span class="ic">📘</span><span><b>Diário no papel</b></span></div>
+          <div class="old-i" style="--k:2"><span class="ic">📊</span><span><b>Planilha de faltas</b></span></div>
+          <div class="old-i" style="--k:3"><span class="ic">🤖</span><span><b>I.A. avulsa</b></span></div>
         </div>
         <div class="merge-arrow" aria-hidden="true"><span>→</span></div>
         <div class="new">
           <div class="new-h"><img src="assets/marca/skin-simbolo.webp" alt="" width="42" height="42"><div><b>RELATORIO SKIN</b><small>Gestão docente inteligente</small></div></div>
           <ul>
-            <li style="--k:0"><span><b>Chamada em um toque</b>, com faltas justificadas e frequência calculada.</span></li>
-            <li style="--k:1"><span><b>Diário organizado pela I.A.</b> a partir do que você escreve do seu jeito.</span></li>
-            <li style="--k:2"><span><b>Atividades, faltas e h/aula somadas sozinhas</b>, por disciplina e bimestre.</span></li>
-            <li style="--k:3"><span><b>26 ferramentas de I.A.</b> que conhecem suas turmas, seu plano e seus diários.</span></li>
+            <li style="--k:0"><span><b>Chamada em um toque</b></span></li>
+            <li style="--k:1"><span><b>Diário organizado pela I.A.</b></span></li>
+            <li style="--k:2"><span><b>Faltas e h/aula somadas sozinhas</b></span></li>
+            <li style="--k:3"><span><b>26 ferramentas de I.A.</b></span></li>
           </ul>
         </div>
-      </div>
-      <p class="note-off rv">O RELATORIO SKIN não é o sistema oficial da secretaria de educação: ele organiza o seu trabalho para que preencher o oficial leve minutos, não noites.</p>
-      <div class="how" id="how">
-        <div class="how-line" aria-hidden="true"><i id="how-line"></i></div>
-        <div class="how-i rv" style="--d:0"><h3>Você escreve do seu jeito</h3><p>Um rascunho livre, como contaria a um colega: o que deu, quem faltou, quem se destacou.</p></div>
-        <div class="how-i rv" style="--d:120"><h3>A I.A. organiza</h3><p>Conteúdo, presença, atividade, comportamento e observações em abas. Você revisa e salva.</p></div>
-        <div class="how-i rv" style="--d:240"><h3>O resto se atualiza</h3><p>Contador de aulas, plano, frequência, calendário e relatório de cada aluno — sem digitar de novo.</p></div>
       </div>
     </div>
   </section>
@@ -1198,7 +1212,7 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
       <div class="sec-head rv">
         <p class="eyebrow">Demonstração interativa</p>
         <h2 id="demo-h">Veja um dia de trabalho acontecer.<br><span class="dim">Depois, faça você mesmo.</span></h2>
-        <p class="lead">A professora Ana Clara acabou de criar a conta. Acompanhe o caminho real, do login ao painel do AEE — ou toque em <b>Pratique</b> e assuma o controle de todas as telas.</p>
+        <p class="lead">Assista — ou toque em <b>Pratique</b> e use você mesmo.</p>
       </div>
       <div class="demo" id="demo-box" data-mode="auto">
         <div class="demo-bar">
@@ -1248,7 +1262,7 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
           </div>
           <div class="cap-prog" aria-hidden="true"><i id="cap-prog"></i></div>
         </div>
-        <p class="demo-note">🔑 Login usado na demonstração: <b>ana.clara.mendes@example.com</b> · senha <b>SkinDemo2026</b>. É uma conta fictícia que existe só nesta página — assim como a escola (INEP de exemplo) e os alunos. Nada do que você faz aqui é enviado a lugar nenhum. As respostas da I.A. são exemplos.</p>
+        <p class="demo-note">🔑 Conta fictícia: <b>ana.clara.mendes@example.com</b> · <b>SkinDemo2026</b>. Escola, alunos e respostas da I.A. são exemplos. Nada sai desta página.</p>
       </div>
     </div>
   </section>
@@ -1264,33 +1278,31 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
         <article class="bx bx-big glow rv">
           <span class="tag">Inteligência artificial</span>
           <h3>Uma assistente que conhece a sua turma.</h3>
-          <p>26 ferramentas em 7 categorias — do plano de curso ao comunicado para a família. A I.A. lê seus diários, seu plano e sua lista de alunos, e entrega a primeira versão. A decisão pedagógica continua sendo sua.</p>
+          <p>26 ferramentas. A primeira versão é dela; a decisão é sua.</p>
           <ul class="bx-list">
-            <li><span><b>Grátis na plataforma</b> (20 mensagens por dia) ou ilimitada com a sua própria chave.</span></li>
-            <li><span><b>Nomes viram códigos</b> antes de sair do aparelho na I.A. da plataforma.</span></li>
-            <li><span><b>Nada entra no diário sozinho:</b> cada sugestão vira um cartão que você aplica ou descarta.</span></li>
-            <li><span>Lê <b>foto, PDF, Word e planilha</b>: mande a lista de chamada e a turma nasce pronta.</span></li>
+            <li><span><b>Grátis</b> na plataforma</span></li>
+            <li><span><b>Nomes viram códigos</b> antes de sair</span></li>
+            <li><span>Lê <b>foto, PDF, Word e planilha</b></span></li>
           </ul>
           <div class="marq" aria-hidden="true"><div class="marq-t" id="marq1"></div><div class="marq-t" id="marq2"></div></div>
         </article>
         <article class="bx bx-big glow rv" style="--d:100">
           <span class="tag">Educação inclusiva</span>
           <h3>Cada aluno, um caminho. A equipe, no mesmo perfil.</h3>
-          <p>Mediador, assistente, professor do AEE e regentes trabalham no mesmo perfil do aluno, ligados por um código. Perfil, PEI com metas, registros, documentos e relatório individual — tudo no mesmo lugar.</p>
+          <p>Regente, mediador e AEE no mesmo perfil, ligados por um código.</p>
           <div class="ring-vis" aria-hidden="true">
             <div class="o"><span>🎯 PEI e metas</span><span>📝 Registros</span><span>📁 Documentos</span><span>👥 Equipe</span></div>
             <div class="c">Cada<br>aluno</div>
           </div>
           <ul class="bx-list">
-            <li><span><b>Alerta de 14 dias</b> sem registro para ninguém ficar para trás.</span></li>
-            <li><span>Linguagem <b>não capacitista</b> e referências de PEI, DUA e LBI na I.A. do AEE.</span></li>
+            <li><span><b>Alerta de 14 dias</b> sem registro</span></li>
           </ul>
         </article>
-        <article class="bx glow rv"><div class="ic">📋</div><h3>Frequência em um clique</h3><p>Escolha disciplina, bimestre e período. O documento sai com datas, faltas, justificadas e percentual — para imprimir, PDF ou HTML.</p></article>
-        <article class="bx glow rv" style="--d:80"><div class="ic">📊</div><h3>O contador anda sozinho</h3><p>Cada diário soma h/aula. O bimestre fecha pela soma das aulas, e a projeção mostra quando cada um termina.</p></article>
-        <article class="bx glow rv"><div class="ic">📱</div><h3>Em todos os aparelhos</h3><p>Escreveu no computador, aparece no celular em segundos. Sem internet, o registro fica salvo e sobe quando a conexão voltar.</p></article>
-        <article class="bx glow rv" style="--d:80"><div class="ic">🗄️</div><h3>Nada se perde</h3><p>Dados guardados por ano letivo, com histórico diário das alterações e lixeira permanente. A virada do ano não apaga nada.</p></article>
-        <article class="bx glow rv"><div class="ic">🔒</div><h3>Seus dados são seus</h3><p>Conta individual: só você vê o que registra. Baixe uma cópia completa quando quiser. Tratamento conforme a LGPD.</p></article>
+        <article class="bx glow rv"><div class="ic">📋</div><h3>Frequência em um clique</h3><p>Pronta para imprimir ou compartilhar.</p></article>
+        <article class="bx glow rv" style="--d:80"><div class="ic">📊</div><h3>O contador anda sozinho</h3><p>Cada aula soma. O bimestre fecha sozinho.</p></article>
+        <article class="bx glow rv"><div class="ic">📱</div><h3>Em todos os aparelhos</h3><p>Computador ou celular. Até sem internet.</p></article>
+        <article class="bx glow rv" style="--d:80"><div class="ic">🗄️</div><h3>Nada se perde</h3><p>Tudo guardado, ano a ano.</p></article>
+        <article class="bx glow rv"><div class="ic">🔒</div><h3>Seus dados são seus</h3><p>Só você vê. Conforme a LGPD.</p></article>
         <article class="bx glow rv" style="--d:80"><div class="ic">🧑‍🏫</div><h3>Um painel para cada papel</h3>
           <div class="roles"><span><b>Regente</b>Diário das turmas</span><span><b>Mediador</b>Acompanha de perto</span><span><b>Assistente</b>Apoio na rotina</span><span><b>AEE</b>Vários alunos, indicadores</span></div>
         </article>
@@ -1304,12 +1316,12 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
       <div class="sec-head rv">
         <p class="eyebrow">Na prática</p>
         <h2>Nasceu na sala de aula,<br><span class="dim">não num escritório.</span></h2>
-        <p class="lead">O RELATORIO SKIN começou como o diário digital de um professor da rede pública do Acre, feito para resolver um problema real. Só depois foi aberto a outros professores.</p>
+        <p class="lead">Começou como o diário de um professor da rede pública do Acre.</p>
       </div>
       <div class="proof rv">
-        <div><b>1 ano letivo</b><span>de uso diário antes da abertura para outros professores</span></div>
-        <div><b>2 escolas</b><span>com várias turmas e disciplinas registradas todos os dias</span></div>
-        <div><b>Milhares</b><span>de registros de aula, presença e ocorrências conferidos</span></div>
+        <div><b>1 ano letivo</b><span>de uso diário</span></div>
+        <div><b>2 escolas</b><span>registrando todo dia</span></div>
+        <div><b>Milhares</b><span>de aulas registradas</span></div>
       </div>
       <div class="tst">
         <figure class="rv"><blockquote>Eu fazia a chamada no caderno e passava tudo para o sistema no domingo. Hoje saio da sala com o diário pronto.</blockquote><figcaption><span class="av">AC</span><span><b>Ana Clara M.</b>Professora regente · 5º ano<span class="ilus">Depoimento ilustrativo</span></span></figcaption></figure>
@@ -1326,11 +1338,11 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
     <div class="wrap">
       <div class="sec-head rv"><p class="eyebrow">Perguntas rápidas</p><h2>Antes de começar</h2></div>
       <div class="faq rv">
-        <details><summary>É grátis mesmo?</summary><p>Sim, para começar. A conta nasce vazia, com todas as ferramentas disponíveis. A I.A. da plataforma tem um limite diário de mensagens; com a sua própria chave de I.A. não há limite da plataforma.</p></details>
-        <details><summary>Substitui o sistema da secretaria?</summary><p>Não. O RELATORIO SKIN é um projeto independente de apoio ao professor. Ele organiza aulas, presença, atividades e relatórios para que preencher o sistema oficial seja rápido.</p></details>
-        <details><summary>Funciona no celular e sem internet?</summary><p>Funciona no navegador do celular e pode ser fixado na tela inicial. Sem internet, o registro fica salvo no aparelho e sobe quando a conexão voltar.</p></details>
-        <details><summary>Quem vê os dados dos meus alunos?</summary><p>Só a sua conta. Cada professor entra com o próprio e-mail e o banco de dados só entrega a uma conta os dados dela. No painel do AEE, o perfil do aluno é compartilhado apenas com quem recebeu o código dele.</p></details>
-        <details><summary>Serve para mediador, assistente e AEE?</summary><p>Sim. Ao cadastrar a escola, você escolhe a sua ocupação. Regente abre o diário das turmas; mediador, assistente e AEE abrem o painel da Educação Especial. Quem tem mais de uma ocupação troca de painel com um toque.</p></details>
+        <details><summary>É grátis mesmo?</summary><p>Sim, para começar — com todas as ferramentas.</p></details>
+        <details><summary>Substitui o sistema da secretaria?</summary><p>Não. Ele deixa o oficial pronto em minutos.</p></details>
+        <details><summary>Funciona no celular e sem internet?</summary><p>Sim. Sem internet, salva e envia depois.</p></details>
+        <details><summary>Quem vê os dados dos meus alunos?</summary><p>Só você. No AEE, só quem tem o código do aluno.</p></details>
+        <details><summary>Serve para mediador, assistente e AEE?</summary><p>Sim. Cada papel tem o seu painel.</p></details>
       </div>
     </div>
   </section>
@@ -1340,7 +1352,7 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
     <div class="wrap rv">
       <p class="eyebrow">Comece hoje</p>
       <h2 style="margin-top:16px">Seu tempo vale mais<br>do que papel.</h2>
-      <p>Crie sua conta em menos de um minuto. A plataforma nasce vazia, com todas as ferramentas — e só você vê os seus dados.</p>
+      <p>Conta grátis em menos de um minuto.</p>
       <div class="btns">
         <a class="btn btn-pri" href="entrar.html?modo=criar" data-magnet>Criar conta grátis <span class="arr" aria-hidden="true">→</span></a>
         <button class="btn btn-play" type="button" data-praticar data-magnet><span class="pi" aria-hidden="true">▶</span> Pratique antes</button>
@@ -1655,6 +1667,23 @@ if (!reduz.matches && matchMedia('(pointer: fine)').matches) {
   vv.addEventListener('ended', () => { fim.hidden = false; });
   $('#vmodal-rever').addEventListener('click', () => { fim.hidden = true; vv.currentTime = 0; vv.play(); });
   $$('[data-praticar]', dlg).forEach(b => b.addEventListener('click', fechar));
+})();
+
+// Vídeo narrado "Por dentro": só carrega no toque e toca com som (controles
+// nativos assumem). Enquanto ele toca, a prévia do hero fica pausada.
+(function videoPorDentro() {
+  const card = $('#pd-card'), v = $('#pd-v'), b = $('#pd-play');
+  if (!card || !v || !b) return;
+  if (matchMedia('(max-width: 720px)').matches && v.dataset.celular) v.src = v.dataset.celular;
+  b.addEventListener('click', () => {
+    card.classList.add('tocando');
+    const hero = $('#hvid-v'); if (hero) hero.pause();
+    v.controls = true; v.muted = false; v.preload = 'auto';
+    const p = v.play(); if (p) p.catch(() => card.classList.remove('tocando'));
+    try { v.focus({ preventScroll: true }); } catch (e) {}
+  });
+  v.addEventListener('play', () => card.classList.add('tocando'));
+  v.addEventListener('ended', () => card.classList.remove('tocando'));
 })();
 
 // Tags soltas em volta do vídeo do hero. Flutuam; arrastar e soltar joga a tag

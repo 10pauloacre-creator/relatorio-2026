@@ -1,5 +1,5 @@
 {
-  "versao": 17,
+  "versao": 18,
   "atualizadoEm": "2026-09-25",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -999,6 +999,16 @@
         {
           "id": "rs-freq-celular",
           "text": "Frequência Diária usável no celular (filtros e datas)",
+          "done": true
+        },
+        {
+          "id": "rs-video-por-dentro",
+          "text": "Vídeo narrado Por dentro (2 min, telas reais com dados fictícios) na seção A solução",
+          "done": true
+        },
+        {
+          "id": "rs-site-enxuto",
+          "text": "Página inicial enxuta: títulos, subtítulos e frases curtas",
           "done": true
         },
         {
