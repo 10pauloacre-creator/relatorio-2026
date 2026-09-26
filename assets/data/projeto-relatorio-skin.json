@@ -1,5 +1,5 @@
 {
-  "versao": 19,
+  "versao": 20,
   "atualizadoEm": "2026-09-26",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
@@ -11,11 +11,11 @@
         "label": "páginas HTML"
       },
       {
-        "n": 50,
+        "n": 52,
         "label": "scripts das páginas"
       },
       {
-        "n": 12,
+        "n": 13,
         "label": "folhas de estilo"
       },
       {
@@ -455,6 +455,17 @@
             "details": [
               "26 assistentes especializados em 7 categorias (planejamento, avaliação, atividades, relatórios, inclusão, comunicação, apoio).",
               "Cada um: descrição, como usar, campos e prompt inicial com {{campo}}; papel próprio no sistema da conversa."
+            ]
+          },
+          {
+            "id": "js-pensando",
+            "icon": "file",
+            "title": "assets/js/ia-pensando.js + lattice-loader.js — a I.A está pensando",
+            "status": "Concluído",
+            "details": [
+              "LatticeLoader do React Bits (variante JS-CSS) portado para JavaScript puro: órbita 3×3, relógio e fim com ✓ \"Concluído em\" ou ✕ \"Falhou após\" (assets/css/lattice-loader.css, carregado sozinho).",
+              "Frases que se revezam conforme o trabalho: cada uma das 26 ferramentas tem as suas, com os campos preenchidos (tema, número de questões, turma…); o diário usa \"Lendo o relato\", alunos da turma, horário e h/aula no contador.",
+              "No chat da I.A (Meu Diário, AEE, Casavequia, Hermínio) e no + Novo Diário; cada resposta guarda quanto tempo a I.A levou."
             ]
           }
         ]
@@ -1518,6 +1529,11 @@
         {
           "id": "rs-ia-9",
           "text": "Documentos também na Casavequia e na Hermínio",
+          "done": true
+        },
+        {
+          "id": "rs-ia-10",
+          "text": "Animação \"pensando\" (LatticeLoader) com relógio e frases de acordo com a ferramenta e o trabalho, no chat e no + Novo Diário",
           "done": true
         }
       ]

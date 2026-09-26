@@ -1,0 +1,308 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   lattice-loader.css — LatticeLoader do React Bits (variante JS-CSS),
+   portado para JavaScript puro em assets/js/lattice-loader.js (26/09/2026).
+   Fonte: https://reactbits.dev/micro/lattice-loader
+   O CSS abaixo é o original, com uma mudança: em "reduzir movimento" a
+   órbita continua, mais lenta (--ll-lento), em vez de todas as células
+   piscarem juntas — regra do projeto: calma, não parada (é só opacidade,
+   nada se desloca). A parte "Extensão RELATORIO SKIN", no fim, acrescenta
+   as frases que se revezam (esmaecer + desfoque e largura suave).
+   Carregado sozinho pelo lattice-loader.js (não precisa de <link>).
+   ═══════════════════════════════════════════════════════════════════════ */
+.lattice-loader {
+  --ll-n: 3;
+  --ll-cell: 6px;
+  --ll-gap: 2px;
+  --ll-font: 14px;
+  --ll-color: currentColor;
+  --ll-mark: #22c55e;
+  --ll-idle: 0.15;
+  --ll-glow: currentColor;
+  --ll-mark-glow: #22c55e;
+  --ll-peak: 1;
+  --ll-cycle: 864ms;
+  --ll-lento: 1;
+  --ll-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ll-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--ll-font) * 0.625);
+  font-family: inherit;
+  font-size: var(--ll-font);
+  line-height: 1;
+}
+
+.lattice-loader__grid {
+  display: grid;
+  flex: none;
+}
+
+.lattice-loader__layer {
+  grid-area: 1 / 1;
+  display: grid;
+  grid-template-columns: repeat(var(--ll-n), var(--ll-cell));
+  gap: var(--ll-gap);
+}
+
+.lattice-loader__cell {
+  width: var(--ll-cell);
+  height: var(--ll-cell);
+  border-radius: max(1px, calc(var(--ll-cell) * 0.25));
+  background: var(--ll-color);
+  opacity: var(--ll-idle);
+}
+
+.lattice-loader[data-shape='round'] .lattice-loader__cell {
+  border-radius: 50%;
+}
+
+.lattice-loader[data-glow] .lattice-loader__run .lattice-loader__cell:not([data-hole]) {
+  box-shadow: 0 0 calc(var(--ll-cell) * 1.2) calc(var(--ll-cell) * 0.12) var(--ll-glow);
+}
+
+.lattice-loader[data-glow] .lattice-loader__mark .lattice-loader__cell[data-on] {
+  box-shadow: 0 0 calc(var(--ll-cell) * 1.2) calc(var(--ll-cell) * 0.12) var(--ll-mark-glow);
+}
+
+.lattice-loader__run {
+  transition: opacity 200ms ease;
+}
+
+.lattice-loader__run .lattice-loader__cell {
+  animation: lattice-on calc(var(--ll-cycle) * var(--ll-lento)) var(--ll-ease-in-out) infinite;
+}
+
+.lattice-loader__run .lattice-loader__cell[data-lit='45'] {
+  animation-name: lattice-on-45;
+}
+
+.lattice-loader__run .lattice-loader__cell[data-lit='35'] {
+  animation-name: lattice-on-35;
+}
+
+.lattice-loader__run .lattice-loader__cell[data-lit='25'] {
+  animation-name: lattice-on-25;
+}
+
+.lattice-loader__run .lattice-loader__cell[data-hole] {
+  animation: none;
+  opacity: calc(var(--ll-idle) * 0.47);
+}
+
+.lattice-loader__mark {
+  opacity: 0;
+  transform: scale(0.9);
+  transform-origin: center;
+  transition:
+    opacity 160ms var(--ll-ease-out),
+    transform 160ms var(--ll-ease-out);
+}
+
+.lattice-loader__mark .lattice-loader__cell {
+  transition:
+    opacity 200ms ease,
+    background-color 200ms ease;
+}
+
+.lattice-loader__mark .lattice-loader__cell[data-on] {
+  background: var(--ll-mark);
+  opacity: var(--ll-peak);
+}
+
+.lattice-loader:not([data-status='working']) .lattice-loader__run {
+  opacity: 0;
+}
+
+.lattice-loader:not([data-status='working']) .lattice-loader__run .lattice-loader__cell {
+  animation-play-state: paused;
+}
+
+.lattice-loader:not([data-status='working']) .lattice-loader__mark {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 200ms ease,
+    transform 200ms var(--ll-ease-out);
+}
+
+.lattice-loader__label {
+  position: relative;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.lattice-loader__text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  opacity: 0;
+  filter: blur(2px);
+  transition:
+    opacity 200ms ease,
+    filter 200ms ease;
+}
+
+.lattice-loader__text[data-active] {
+  position: static;
+  opacity: 1;
+  filter: blur(0);
+}
+
+.lattice-loader__timer {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: calc(var(--ll-font) * 0.875);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+
+.lattice-loader__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@keyframes lattice-on {
+  0%,
+  100% {
+    opacity: var(--ll-idle);
+  }
+
+  18%,
+  42% {
+    opacity: var(--ll-peak);
+  }
+
+  62% {
+    opacity: var(--ll-idle);
+  }
+}
+
+@keyframes lattice-on-45 {
+  0%,
+  100% {
+    opacity: var(--ll-idle);
+  }
+
+  13%,
+  31% {
+    opacity: var(--ll-peak);
+  }
+
+  45% {
+    opacity: var(--ll-idle);
+  }
+}
+
+@keyframes lattice-on-35 {
+  0%,
+  100% {
+    opacity: var(--ll-idle);
+  }
+
+  10%,
+  24% {
+    opacity: var(--ll-peak);
+  }
+
+  35% {
+    opacity: var(--ll-idle);
+  }
+}
+
+@keyframes lattice-on-25 {
+  0%,
+  100% {
+    opacity: var(--ll-idle);
+  }
+
+  7%,
+  17% {
+    opacity: var(--ll-peak);
+  }
+
+  25% {
+    opacity: var(--ll-idle);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lattice-loader {
+    --ll-lento: 1.7;
+  }
+
+  .lattice-loader__run {
+    --ll-peak: 0.7;
+  }
+
+  .lattice-loader .lattice-loader__mark {
+    transform: none;
+  }
+
+  .lattice-loader .lattice-loader__text {
+    filter: none;
+  }
+}
+
+/* ── Extensão RELATORIO SKIN: frases que se revezam ───────────────────
+   Com a opção "fluid" o loader cabe no espaço disponível: a frase corta
+   com reticências em vez de empurrar o relógio para fora (celular), e a
+   largura acompanha a troca de frase suavemente. A frase que sai sobe um
+   pouco e a que entra vem de baixo, com o desfoque do original. */
+.lattice-loader[data-fluid] {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.lattice-loader[data-fluid] .lattice-loader__label {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  transition: width 260ms var(--ll-ease-out);
+}
+
+.lattice-loader[data-fluid] .lattice-loader__text {
+  transform: translateY(0.45em);
+  transition:
+    opacity 220ms ease,
+    filter 220ms ease,
+    transform 260ms var(--ll-ease-out);
+}
+
+.lattice-loader[data-fluid] .lattice-loader__text[data-saindo] {
+  transform: translateY(-0.45em);
+}
+
+.lattice-loader[data-fluid] .lattice-loader__text[data-active] {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transform: none;
+  /* espaço para descendentes (g, p, q) não cortarem com o overflow */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.lattice-loader[data-fluid] .lattice-loader__timer {
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lattice-loader[data-fluid] .lattice-loader__label {
+    transition: none;
+  }
+
+  .lattice-loader[data-fluid] .lattice-loader__text,
+  .lattice-loader[data-fluid] .lattice-loader__text[data-saindo] {
+    transform: none;
+  }
+}
