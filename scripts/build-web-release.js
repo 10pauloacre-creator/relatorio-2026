@@ -46,6 +46,7 @@ const rootFileAllowlist = new Set([
   "axion-proeduq.html",
   "privacidade.html",
   "termos.html",
+  "planos.html",
   "projetos-pessoais.html",
   "projeto-detalhes.html",
   "mapa-mental.html",

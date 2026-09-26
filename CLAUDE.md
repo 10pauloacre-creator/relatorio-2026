@@ -22,6 +22,7 @@ Plataforma **RELATORIO SKIN** (relatorio.skin): site público de apresentação 
 C:\Projetos\AXION PROEDUQ\RELATORIO-SKIN\
 ├── index.html          ← Site de apresentação RELATORIO SKIN (público)
 ├── entrar.html         ← Tela de conta (login/cadastro)
+├── planos.html         ← Planos, preços e assinatura (público; seção 31)
 ├── escolas.html        ← Escolas de toda conta (Etapa 14): cadastro pelo INEP
 ├── perfil.html         ← Perfil do professor (foto, Restritos, zona de perigo)
 ├── casavequia.html     ← DIÁRIO PRINCIPAL do administrador (~1,1 MB)
@@ -759,3 +760,51 @@ Vale para Casavequia, Hermínio e Meu Diário (todas as escolas das contas), nos
 - **Várias atividades no mesmo diário:** no editor ✏️, "📝 Atividades" tem a Atividade 1 (título/identificação, descrição, prazo, status por aluno) e "+ Adicionar outra atividade" (título, descrição, prazo; todos os alunos começam "Aguardando"). Ficam em `rel.atividadesExtras = [{id, titulo, descricao, estados:{n:"fz"|"nf"}}]` e aparecem no cartão abaixo da atividade principal, com os mesmos cliques. **Ainda não entram na nota de trabalho nem no banco** (`relatorio_lancamentos` tem uma atividade por aula); só a Atividade 1 conta.
 - **Dados:** `professor_dados`, escopo `diario:extras:v1` (só o dono), `{just:{"<escola>|pl-<código>|<nº>":{texto, anexos:[{nome,tipo,tamanho,caminho}], aluno, aula, em}}, prazos:{"<escola>|<chave da atividade>[#<id extra>]":{ativo, dias, horas, inicio, fim, rotulo, em}}}`; mescla por item (vale o `em` mais novo). Escola = `casavequia` | `herminio` | `md:<id>`. Chave da atividade: `atv-<código>` (Casavequia, Meu Diário) e `a-<código>` (Hermínio). Anexos no bucket privado `professor-arquivos`, pasta `<user_id>/justificativas/<escola>/`. API `window.DiarioExtras` (`prazo`, `definirPrazo`, `moverPrazo`, `justificativa`).
 - **Teste (25/09/2026):** as três páginas abertas no Chrome sem janela (script de conta simulado): ciclo de presença, 📄 com texto + PDF, reabrir, prazo iniciado, fim do prazo com aviso, Novo Diário com prazo e 2ª atividade, ciclo da atividade extra, retrato da Hermínio com `'j'`; zero erros de JavaScript.
+
+## 31. PLANOS, ASSINATURAS E FUNIL DE VENDAS (Etapa 17, 26/09/2026)
+
+**Planos** (fonte: `public.planos`, leitura pública; o `planos.js` tem uma cópia de reserva):
+| Plano | Preço | Limites |
+|---|---|---|
+| Grátis | R$ 0 | todas as ferramentas; **1 diário por dia letivo** (pela data da aula), **30 pedidos à I.A./mês**, **3 documentos/mês** |
+| PRO | R$ 49,90/mês · R$ 538,92/ano | 400 diários, 500 pedidos à I.A., 150 documentos por mês |
+| Plus | R$ 99,90/mês · R$ 1.078,92/ano · **R$ 1 no 1º mês** (só mensal, uma vez por pessoa) | sem limites + integração com a Biblioteca Digital (liberação gradual) + suporte prioritário |
+
+Anual = 10% de desconto (`planos_config.desconto_anual`). **Preço de fundador**: assinaturas até 31/12/2026 mantêm o valor enquanto ativas (está nos Termos, seção 7). Limites mensais renovam no dia 1º (horário de Rio Branco).
+
+**O que conta:** diário = aula nova pelo "+ Novo Diário" ou criada pela I.A. (editar não conta; editar relato do HTML também não), com `ref` = `escola:id` (não conta duas vezes). Pedido à I.A. = cada chamada a `assistente-ia` ou `organizar-relato` (chave própria não conta). Documento = Frequência Diária, relatório do aluno (Meu Diário), relatório individual do AEE e cada exportação do `documentos-exportar.js`. Administrador: sem limites.
+
+**Modo dos limites** (`planos_config.modo_limites`): **`lancamento`** (padrão até o gateway) conta o uso e mostra o aviso "Você passou do limite… período de lançamento", sem bloquear; na I.A. continua o teto diário de proteção (20/dia no assistente, 40 no organizar). **`ativo`** bloqueia e abre o modal de upgrade. Trocar (depois do gateway):
+```sql
+update public.planos_config set valor = '"ativo"' where chave = 'modo_limites';
+```
+
+**Banco** (`supabase/2026-09-26-etapa17-planos-assinaturas.sql`): `planos`, `planos_config`, `assinaturas`, `assinatura_pedidos`, `plano_creditos`, `private.plano_uso`, `indicacao_codigos`, `indicacoes`, `consentimentos`, `private.plano_eventos`, `private.leads_escolas`. RPCs: `plano_status(p_dia)`, `plano_consumir(recurso, ref, dia)`, `plano_criar_pedido`, `plano_cancelar_pedido`, `indicacao_meu_codigo`, `indicacao_registrar`, `consentimento_registrar`, `plano_evento` (aceita visitante), `lead_escola_registrar` (aceita visitante), `plano_painel_admin` (só admin). `ia_consumir_cota`/`ia_saldo` passaram a seguir o plano (a cota volta com `periodo:'mes'`; o teto diário com `periodo:'dia'`). A Edge Function `organizar-relato` devolve `cota` também na resposta de sucesso.
+
+**Front-end — `assets/js/planos.js` (`window.SkinPlanos`)**, carregado em `planos.html`, `meu-diario.html`, `aee.html`, `escolas.html` e `perfil.html` (Casavequia e Hermínio não precisam: administrador). Toda chamada nas páginas é `window.SkinPlanos && …`, então página sem o módulo segue funcionando.
+- `usar(recurso, {ref, dia})` (assíncrono, o servidor decide) — `novo-diario.js` ao salvar diário novo; `verificar()` antes de gastar a I.A. no "+ Novo Diário" e no `criar_diario` da I.A.
+- `tentar(recurso)` (síncrono, decide pelo que já carregou e conta em segundo plano) — onde há `window.open` no clique: `frequencia-diaria.js` (`gerar`), `documentos-exportar.js` (`baixar`, `baixarPasta`), relatório do aluno (`meu-diario.html`) e do AEE (`aee.html`). Também em `NovoDiario.salvar` (caminho da I.A.).
+- `aposIA(cota)` / `limiteIA(cota)` — `meu-diario-ia.js` (`chamarPlataforma`) e `novo-diario.js` (`organizarComIA`). O texto do saldo da I.A. fala em "pedidos neste mês · plano X".
+- `limite(recurso)` abre o modal; aos 80% aparece um lembrete (uma vez por recurso no mês); no lançamento, o aviso aparece uma vez por recurso no mês (`localStorage skin-aviso-*`, `skin-80-*`).
+- `checkout({plano, ciclo, origem})`: sem conta guarda `skin-intencao` e manda para `entrar.html?modo=criar&volta=planos`; o `entrar.html` volta para `planos.html`, que reabre o checkout. Com conta: plano, ciclo, resumo com a oferta, autorizações (e-mail/WhatsApp) e aceite obrigatório dos Termos → `plano_criar_pedido` (valores calculados no banco).
+- `selo(el)`, `cartaoPlano(el)`, `cartaoComunicacoes(el)` — tela Escolas (selo + faixa: pedido reservado → Plus por R$ 1 → indicação; fechar esconde 7 dias) e Perfil (`#plano`, `#comunicacoes`).
+
+**Indicação:** código por conta (`NOME-XXXX`). Link `relatorio.skin/?ref=CODIGO` (também `?indicacao=`/`?convite=`, em qualquer página): o `index.html` e o `planos.js` guardam em `localStorage skin-ref` (60 dias), o site mostra a faixa do convite e o cadastro mostra o código. Vale se a conta nova usa o código em até 30 dias do cadastro e **confirma o e-mail pelo código** (gatilho em `conta_email_verificado`): quem indicou ganha 30 dias de PRO (Plus se já for Plus; até 12 por ano; quem paga recebe `plano_creditos` para o gateway aplicar) e o indicado 7 dias de PRO (`teste`). Autoindicação é recusada.
+
+**Cadastro** (`supabase-report-sync.js`, modo "criar"): código de indicação, duas caixas **desmarcadas** (e-mail, WhatsApp + número) e o aceite dos Termos em texto. Vão em `options.data` (`skin_ref`, `skin_consent_email`, `skin_consent_whatsapp`, `skin_whatsapp`, `skin_origem`) e o gatilho `trg_skin_conta_nova` grava código, indicação, consentimentos e o evento `conta_criada`. Origem da visita (utm_*, site de origem, página de entrada) em `localStorage skin-origem`.
+
+**Consentimentos (LGPD):** registro só de acréscimo por canal, com o texto da versão (`planos_config.consentimento_versao`) e a data. Telefone normalizado para 55+DDD+número. Retirar: perfil › Comunicações.
+
+**Funil:** eventos em `private.plano_eventos` (`planos_visita`, `planos_cta`, `checkout_sem_conta`, `conta_criada`, `checkout_aberto`, `pedido_reservado`, `gateway_iniciar`, `limite_modal`, `limite_cta`, `nudge_80`, `biblioteca_detalhes`, `calculadora_uso`, `faq_abrir`, `exit_intent`, `indicacao_*`, `lead_escola`). O **Painel de vendas** aparece no fim de `planos.html` para a conta do administrador. Estratégia comercial e próximos passos em `docs/estrategia-comercial-planos.md`.
+
+**`planos.html`** (pública, na lista do `build-web-release.js`): hero com Mensal/Anual, 3 cartões, preço de fundador, calculadora do tempo, comparativo, indicação, escolas e redes (lead), perguntas, CTA, janela "Mais detalhes" da Biblioteca (vídeo: preencher `VIDEO_BIBLIOTECA` no script da página), aviso antes de sair (computador, sem conta, 1× por semana) e barra fixa no celular. `?plano=pro|plus` abre o checkout direto; `?ciclo=anual` abre no anual. No servidor local (`npx serve`), `planos.html` vira `/planos` e o redirecionamento perde a `?query`: teste o cadastro abrindo `/entrar?modo=criar&volta=planos` direto (na Vercel e no GitHub Pages a query é mantida).
+
+**Integrar o gateway (próximo passo do professor):**
+1. Escolher o meio de pagamento (Pix + cartão com assinatura recorrente) e guardar as chaves como segredos do Supabase (nunca no código).
+2. Na página: `SkinPlanos.definirGateway({ nome: 'x', iniciar: async function (pedido) { … abrir o checkout do gateway com pedido.id, pedido.valor_primeira, pedido.valor_recorrente … } })` (num script novo carregado depois do `planos.js`) e gravar `planos_config.gateway`.
+3. Edge Function de webhook (repositório da Biblioteca, `--no-verify-jwt`), que confere a assinatura do gateway e chama `private.plano_ativar_pedido(pedido, gateway, id_transacao, valor)` com a chave de serviço; ela cria a assinatura, aplica créditos de indicação e marca o pedido como pago.
+4. Informar a empresa de pagamentos na Política de Privacidade (seção 6) e ligar `modo_limites = 'ativo'`.
+
+**Limitação conhecida:** diário e documento são contados pela página (o servidor conta e decide, mas não intercepta a gravação do `professor_dados`); a I.A. é conferida no servidor. Quem burlar o JavaScript no modo ativo consegue gravar diários além do limite — aceitável para o nicho; se precisar, mover a trava para um gatilho em `professor_dados`.
+
+**Teste (26/09/2026):** SQL testado em transação desfeita (cadastro com código e consentimentos, limites, pedido Plus R$ 1 e PRO anual, modo ativo, indicação confirmada pelo e-mail, autoindicação recusada, admin sem limite, painel). Página e modais no navegador (computador e 375 px, sem rolagem lateral), cadastro (validações do código e do WhatsApp) e os fluxos com conta num banco simulado local (limite do dia e do mês, aviso de lançamento, lembrete de 80%, checkout até "Pedido reservado", cartões do perfil); zero erros de JavaScript em todas as páginas.

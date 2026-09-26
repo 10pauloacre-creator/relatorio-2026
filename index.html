@@ -8,6 +8,22 @@
 // de apresentação. Roda antes de pintar a página. Para ver o site mesmo logado,
 // use index.html?site=1 (link "Site" em escolas.html). A chave é a mesma de
 // authStorageKey em assets/js/supabase-report-sync.js.
+// Código de indicação (?ref=) e origem da visita (utm_*, site de origem): guardados
+// para o cadastro. Mesmas chaves de assets/js/planos.js ("skin-ref", "skin-origem").
+(function () {
+  try {
+    var q = new URLSearchParams(location.search);
+    var ref = (q.get('ref') || q.get('indicacao') || q.get('convite') || '').trim().toUpperCase();
+    if (/^[A-Z]{2,8}-[A-Z0-9]{4}$/.test(ref)) localStorage.setItem('skin-ref', JSON.stringify({ codigo: ref, em: Date.now() }));
+    if (!localStorage.getItem('skin-origem')) {
+      var o = {};
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) { var v = q.get(k); if (v) o[k.slice(4)] = v.slice(0, 60); });
+      if (document.referrer && document.referrer.indexOf(location.host) < 0) o.referrer = document.referrer.replace(/^https?:\/\//, '').split('/')[0].slice(0, 60);
+      o.entrada = 'index.html'; o.em = Date.now();
+      localStorage.setItem('skin-origem', JSON.stringify(o));
+    }
+  } catch (e) {}
+})();
 (function () {
   try {
     if (/[?&]site=1(&|$)/.test(location.search)) return;
@@ -477,6 +493,21 @@ html[data-theme=light] .ripple{border-color:#2d6147}
 .tst-note{margin-top:14px;font-size:.78rem;color:var(--tx3)}
 
 /* ---------- 12. Perguntas ---------- */
+.convite{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;padding:10px 16px;background:linear-gradient(90deg,rgba(184,155,105,.18),rgba(167,181,138,.12));border-bottom:1px solid var(--line);font-size:.9rem;text-align:center}
+.convite b{color:var(--sand)}
+.vit{display:grid;gap:14px}
+@media(min-width:860px){.vit{grid-template-columns:repeat(3,1fr)}}
+.vit-c{position:relative;display:flex;flex-direction:column;gap:6px;padding:24px 22px;border-radius:var(--r-panel);border:1px solid var(--line);background:var(--s1);transition:transform .3s var(--ease),border-color .3s}
+.vit-c:hover{transform:translateY(-3px);border-color:var(--brand)}
+.vit-c b{font:800 1.2rem var(--f-title)}
+.vit-p{font:800 2rem/1.1 var(--f-title);letter-spacing:-.03em}
+.vit-p small{font:600 .9rem var(--f-txt);color:var(--tx3)}
+.vit-c>small{color:var(--tx2);font-size:.9rem}
+.vit-c em{position:absolute;top:14px;right:14px;font:800 .64rem/1.4 var(--f-title);letter-spacing:.08em;text-transform:uppercase;font-style:normal;padding:4px 10px;border-radius:99px;background:var(--btn-bg);color:var(--on-brand)}
+.vit-c.pro{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
+.vit-c.plus em{background:linear-gradient(135deg,#B89B69,#D6CBB8);color:#141711}
+.vit-mais{margin-top:18px;font-weight:700;color:var(--brand2)}
+.vit-mais a:hover{text-decoration:underline}
 .faq{display:grid;gap:10px;max-width:860px}
 .faq details{border:1px solid var(--line);border-radius:var(--r-card);background:var(--s1);transition:border-color .3s}
 .faq details[open]{border-color:var(--line2)}
@@ -1085,7 +1116,7 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
       <a href="#solucao">Por dentro</a>
       <a href="#demo">Demonstração</a>
       <a href="#beneficios">Benefícios</a>
-      <a href="#depoimentos">Depoimentos</a>
+      <a href="#planos">Planos</a>
       <a href="entrar.html">Entrar</a>
       <a class="nav-cta btn btn-pri" href="entrar.html?modo=criar">Criar conta grátis</a>
     </nav>
@@ -1100,6 +1131,7 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
   </div>
 </header>
 
+<div class="convite" id="convite" hidden><span>🎁 Convite de um colega: crie a conta com o código <b id="convite-cod"></b> e ganhe <b>7 dias de PRO</b>.</span><a class="btn btn-pri btn-sm" href="entrar.html?modo=criar">Criar conta grátis</a></div>
 <main>
   <!-- ============ 1. HERO ============ -->
   <section class="hero" id="inicio">
@@ -1333,12 +1365,25 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
     </div>
   </section>
 
+  <!-- ============ 6B. PLANOS (vitrine; página completa em planos.html) ============ -->
+  <section class="sec" id="planos" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head rv"><p class="eyebrow">Planos</p><h2>Comece grátis.<br><span class="dim">Cresça quando quiser.</span></h2></div>
+      <div class="vit rv">
+        <a class="vit-c" href="entrar.html?modo=criar"><b>Grátis</b><span class="vit-p">R$ 0</span><small>Todas as ferramentas, com limites mensais</small></a>
+        <a class="vit-c pro" href="planos.html?origem=site"><em>Mais escolhido</em><b>PRO</b><span class="vit-p">R$ 49,90<small>/mês</small></span><small>400 diários, 500 pedidos à I.A. e 150 documentos por mês</small></a>
+        <a class="vit-c plus" href="planos.html?origem=site"><em>R$ 1 no 1º mês</em><b>Plus</b><span class="vit-p">R$ 99,90<small>/mês</small></span><small>Sem limites + Biblioteca Digital</small></a>
+      </div>
+      <p class="vit-mais rv"><a href="planos.html?origem=site">Comparar os planos, ver o anual com 10% de desconto e indicar colegas →</a></p>
+    </div>
+  </section>
+
   <!-- ============ 7. PERGUNTAS ============ -->
   <section class="sec" id="perguntas" style="padding-top:0">
     <div class="wrap">
       <div class="sec-head rv"><p class="eyebrow">Perguntas rápidas</p><h2>Antes de começar</h2></div>
       <div class="faq rv">
-        <details><summary>É grátis mesmo?</summary><p>Sim, para começar — com todas as ferramentas.</p></details>
+        <details><summary>É grátis mesmo?</summary><p>Sim. O Grátis tem todas as ferramentas, com limites mensais. <a href="planos.html" style="text-decoration:underline">PRO e Plus</a> ampliam os limites.</p></details>
         <details><summary>Substitui o sistema da secretaria?</summary><p>Não. Ele deixa o oficial pronto em minutos.</p></details>
         <details><summary>Funciona no celular e sem internet?</summary><p>Sim. Sem internet, salva e envia depois.</p></details>
         <details><summary>Quem vê os dados dos meus alunos?</summary><p>Só você. No AEE, só quem tem o código do aluno.</p></details>
@@ -1391,7 +1436,7 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
           <span class="rodape-prop">PROPRIEDADE DA AXION PROEDUQ</span>
         </a>
       </div>
-      <div><h5>Plataforma</h5><ul><li><a href="#demo">Demonstração</a></li><li><a href="#beneficios">Benefícios</a></li><li><a href="entrar.html?modo=criar">Criar conta</a></li><li><a href="entrar.html">Entrar</a></li></ul></div>
+      <div><h5>Plataforma</h5><ul><li><a href="#demo">Demonstração</a></li><li><a href="#beneficios">Benefícios</a></li><li><a href="planos.html">Planos e preços</a></li><li><a href="entrar.html?modo=criar">Criar conta</a></li><li><a href="entrar.html">Entrar</a></li></ul></div>
       <div><h5>Legal</h5><ul><li><a href="privacidade.html">Privacidade</a></li><li><a href="termos.html">Termos de Serviço</a></li><li><a href="privacidade.html#cookies">Cookies</a></li><li><a href="privacidade.html#direitos">LGPD e seus direitos</a></li></ul></div>
       <div><h5>AXION PROEDUQ</h5><ul><li><a href="axion-proeduq.html">Quem somos</a></li><li><a href="https://biblioteca-ac.com" rel="noopener">Biblioteca Digital</a></li></ul></div>
     </div>
@@ -1399,6 +1444,16 @@ html[data-theme=dark] .ae-cab{border-bottom-width:1px}
   </div>
 </footer>
 
+<script>
+(function () {
+  try {
+    var r = JSON.parse(localStorage.getItem('skin-ref') || 'null');
+    if (!r || !r.codigo || Date.now() - (r.em || 0) > 60 * 86400000) return;
+    document.getElementById('convite-cod').textContent = r.codigo;
+    document.getElementById('convite').hidden = false;
+  } catch (e) {}
+})();
+</script>
 <noscript><p style="padding:16px;text-align:center">Ative o JavaScript para usar a demonstração interativa. Você também pode <a href="entrar.html" style="text-decoration:underline">acessar a plataforma</a>.</p></noscript>
 
 <script>

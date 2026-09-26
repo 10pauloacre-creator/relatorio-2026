@@ -637,6 +637,12 @@
     if (sync) return tentar(function () { return sync.pushNow("force"); });
   }
 
+  // ── Plano (Etapa 17, assets/js/planos.js) ─────────────────────
+  function refPlano(id) {
+    var q = new URLSearchParams(window.location.search);
+    return (q.get("escola") || document.documentElement.getAttribute("data-escola-slug") || "escola") + ":" + id;
+  }
+
   // ── IA ────────────────────────────────────────────────────────
   async function organizarComIA(e) {
     var cliente = window.RelatorioSupabaseSync && window.RelatorioSupabaseSync.getClient();
@@ -655,10 +661,15 @@
     });
     if (resposta.error) {
       var detalhe = "";
-      try { detalhe = (await resposta.error.context.json()).erro || ""; } catch (x) {}
+      try {
+        var corpoErro = await resposta.error.context.json();
+        detalhe = corpoErro.erro || "";
+        if (corpoErro.cota && window.SkinPlanos) window.SkinPlanos.limiteIA(corpoErro.cota);
+      } catch (x) {}
       throw new Error(detalhe || "A IA não respondeu agora. Tente de novo em instantes.");
     }
     if (!resposta.data || !resposta.data.relato) throw new Error((resposta.data && resposta.data.erro) || "A IA devolveu uma resposta vazia.");
+    if (resposta.data.cota && window.SkinPlanos) window.SkinPlanos.aposIA(resposta.data.cota);
     return resposta.data;
   }
   function numerosValidos(t, lista) {
@@ -1052,6 +1063,7 @@
   async function seguir(t) {
     var lido = lerPasso1(t);
     if (lido.erro) return mostrarMsg(lido.erro);
+    if (window.SkinPlanos && !(await window.SkinPlanos.verificar("diario", { dia: lido.entrada.dateKey, origem: "novo-diario" }))) return;
     passo = { entrada: lido.entrada, relato: null, aviso: "", modelo: "" };
     if (!lido.entrada.rascunho) { passo.relato = relVazio(); return abrirEditorDoPasso(); }
     var btn = $('[data-nd="seguir"]');
@@ -1361,6 +1373,10 @@
     if (!id) return mostrarMsg("Já existem registros demais nesta data para esta turma. Exclua um antes de criar outro.");
     if (A.comHoras === false) st.minutos = minutosDoIntervalo(st.ini, st.fim) || st.minutos || 0;
     var existente = estado.diarios.filter(function (d) { return d.id === idAntigo; })[0];
+    if (!existente && !st.origem && window.SkinPlanos) {
+      var liberado = await window.SkinPlanos.usar("diario", { ref: refPlano(id), dia: st.dateKey, origem: "novo-diario" });
+      if (!liberado) { if (modal) mostrarMsg("O limite de diários do seu plano acabou. Veja os planos para continuar."); return; }
+    }
     var t = agora();
     var d = {
       id: id, turma: st.turma, dateKey: st.dateKey, disc: A.codigoDisc(st.discNome, st.turma), discNome: st.discNome, assunto: st.assunto,
@@ -1466,6 +1482,7 @@
       var existente = dados.id ? estado.diarios.filter(function (x) { return x.id === dados.id && !x.excluido; })[0] : null;
       var id = existente ? existente.id : A.novoId(dados.turma, dados.dateKey, dados.discNome, "");
       if (!id) return "";
+      if (!existente && window.SkinPlanos && !window.SkinPlanos.tentar("diario", { ref: refPlano(id), dia: dados.dateKey, origem: "ia" })) return "";
       var base = relVazio(), rel = Object.assign(base, (existente && existente.rel) || {}, dados.rel || {});
       rel.atividade = Object.assign(relVazio().atividade, rel.atividade || {});
       // Prazos (I.A): {dias, horas} na atividade e em cada extra; vão para o diario-extras.js.

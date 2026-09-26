@@ -22,16 +22,17 @@ window.NOVO_DIARIO_MANUAL = true;
 </script>
 <script defer src="assets/js/dark-mode-2026.js?v=20260921b"></script><script defer src="assets/js/barra-lateral.js?v=20260921d"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="assets/js/supabase-report-sync.js?v=20260922a"></script>
+<script defer src="assets/js/supabase-report-sync.js?v=20260926a"></script>
 <script defer src="assets/js/ano-letivo.js?v=20260921a"></script>
 <script defer src="assets/js/conta-skin.js?v=20260922a"></script>
+<script defer src="assets/js/planos.js?v=20260926a"></script>
 <script defer src="assets/js/meu-diario-recursos.js?v=20260921a"></script>
-<script defer src="assets/js/documentos-exportar.js?v=20260924a"></script>
+<script defer src="assets/js/documentos-exportar.js?v=20260926a"></script>
 <script defer src="assets/js/meu-diario-documentos.js?v=20260925a"></script>
 <script defer src="assets/js/ia-ferramentas.js?v=20260925c"></script>
-<script defer src="assets/js/meu-diario-ia.js?v=20260925c"></script>
-<script defer src="assets/js/frequencia-diaria.js?v=20260925c"></script>
-<script defer src="assets/js/novo-diario.js?v=20260925c"></script>
+<script defer src="assets/js/meu-diario-ia.js?v=20260926a"></script>
+<script defer src="assets/js/frequencia-diaria.js?v=20260926a"></script>
+<script defer src="assets/js/novo-diario.js?v=20260926a"></script>
 <script defer src="assets/js/diario-extras.js?v=20260925c"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--vs:#c8e6d4;--ou:#c9a84c;--os:#f5e6be;--cr:#faf8f2;--ce:#2b2b2b;--cm:#5a5a5a;--cl:#e8e5de;--ra:#c0392b;--rs:#fdecea;--ai:#2980b9;--og:#876020;--card:#fff;--ss:0 4px 24px rgba(26,58,42,.10);--sc:0 2px 12px rgba(26,58,42,.08);--r:14px;--rs2:8px;
@@ -1049,7 +1050,7 @@ document.getElementById('modo-escuro-btn').onclick=function(){setModo('escuro');
       +'<h4>Observações de conduta</h4>'+(ocs.length?'<table>'+ocs.map(function(o){return '<tr><td>'+dataBr(o.d.dateKey)+'</td><td>'+esc(o.d.discNome)+'</td><td>'+({advertencia:'⚠️ Advertência',grave:'🚨 Grave',destaque:'✅ Destaque'})[o.c.tipo]+'</td><td>'+esc(o.c.texto)+'</td></tr>';}).join('')+'</table>':'<p>Nenhuma ocorrência.</p>')
       +'<div class="md-noprint" style="margin-top:18px;display:flex;gap:10px;justify-content:flex-end"><button type="button" class="md-btn" data-voltar>← Alunos</button><button type="button" class="md-btn pri" data-imprimir>🖨️ Imprimir / Salvar PDF</button></div>',function(ov){
         ov.querySelector('[data-voltar]').onclick=function(){abrirListaAlunos(tid);};
-        ov.querySelector('[data-imprimir]').onclick=function(){document.body.classList.add('md-imprimindo');window.print();setTimeout(function(){document.body.classList.remove('md-imprimindo');},500);};
+        ov.querySelector('[data-imprimir]').onclick=function(){if(window.SkinPlanos&&!window.SkinPlanos.tentar('documento',{origem:'relatorio-aluno'}))return;document.body.classList.add('md-imprimindo');window.print();setTimeout(function(){document.body.classList.remove('md-imprimindo');},500);};
       });
   }
   function abrirOverlay(html,ligar){

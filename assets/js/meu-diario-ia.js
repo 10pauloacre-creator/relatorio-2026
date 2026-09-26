@@ -74,7 +74,7 @@
   var DIAS = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
   var MAX_ANEXOS = 6, MAX_BYTES = 20 * 1024 * 1024, MAX_TEXTO = 60000, MAX_HIST = 16;
   // IA da plataforma: mesmos tetos da Edge Function "assistente-ia".
-  var LIMITE_MENSAGENS = 20, LIMITE_DIARIOS = 4, MAX_ANEXOS_PLAT = 4, MAX_BYTES_PLAT = 7 * 1024 * 1024;
+  var LIMITE_MENSAGENS = 20, MAX_ANEXOS_PLAT = 4, MAX_BYTES_PLAT = 7 * 1024 * 1024;
 
   var M = null, cfg = null, chat = [], anexos = [], ocupado = false;
   var saldo = null, ultimoModelo = "", ultimoProv = "", ligadosPlat = null;
@@ -204,10 +204,21 @@
 
   // ── saldo da IA da plataforma ──────────────────────────────────────
   function cliente() { var S = window.RelatorioSupabaseSync; return S && S.getClient ? S.getClient() : null; }
+  // Cota da I.A. da plataforma (Etapa 17): pedidos por mês conforme o plano da conta
+  // (assets/js/planos.js). No período de lançamento vale também o teto diário antigo.
+  function nomePlano(id) { var P = window.SkinPlanos && window.SkinPlanos.PLANOS; return (P && P[id] && P[id].nome) || (id === "pro" ? "PRO" : id === "plus" ? "Plus" : "Grátis"); }
   function textoSaldo() {
-    if (!saldo) return "grátis · " + LIMITE_MENSAGENS + " mensagens por dia";
-    if (saldo.ilimitado) return "sem limite (administrador)";
+    if (!saldo) return window.SkinPlanos ? "pedidos por mês conforme o seu plano" : "grátis · " + LIMITE_MENSAGENS + " mensagens por dia";
+    if (saldo.ilimitado) return saldo.plano ? "sem limite · plano " + nomePlano(saldo.plano) : "sem limite (administrador)";
+    if (saldo.periodo === "mes") {
+      if (saldo.restante > 0) return "restam " + saldo.restante + " de " + saldo.limite + " pedidos neste mês · plano " + nomePlano(saldo.plano);
+      return saldo.modo === "ativo" ? "limite do mês atingido · renova no dia 1º" : "limite do plano atingido · liberado no período de lançamento";
+    }
     return saldo.restante > 0 ? "restam " + saldo.restante + " de " + saldo.limite + " mensagens hoje" : "limite de hoje atingido · renova à meia-noite";
+  }
+  // Sem saldo de verdade? No lançamento o limite do mês só avisa (o servidor segue liberando).
+  function semSaldo() {
+    return !!(saldo && !saldo.ilimitado && saldo.restante != null && saldo.restante <= 0 && (saldo.periodo !== "mes" || saldo.modo === "ativo"));
   }
   function rotuloCabecalho() {
     if (naPlataforma()) return PROV.plataforma.nome + " · " + textoSaldo();
@@ -547,9 +558,11 @@
       var d = {};
       try { d = await r.error.context.json(); } catch (e) {}
       atualizarSaldo(d.cota);
+      if (d.cota && window.SkinPlanos) window.SkinPlanos.limiteIA(d.cota);
       throw new Error(d.erro || "A IA da plataforma não respondeu agora. Tente de novo em instantes.");
     }
     atualizarSaldo(r.data && r.data.cota);
+    if (r.data && r.data.cota && window.SkinPlanos) window.SkinPlanos.aposIA(r.data.cota);
     if (!r.data || !r.data.texto) throw new Error((r.data && r.data.erro) || "A IA devolveu uma resposta vazia. Tente de novo.");
     ultimoModelo = r.data.modelo || "";
     return r.data.texto;
@@ -572,7 +585,7 @@
     for (var i = 0; i < ordem.length; i++) {
       var p = ordem[i];
       if (pdf && !PROV[p].pdf) continue;
-      if (p === "plataforma" && ordem.length > 1 && saldo && !saldo.ilimitado && saldo.restante <= 0) continue;
+      if (p === "plataforma" && ordem.length > 1 && semSaldo()) continue;
       try {
         var texto;
         if (p === "plataforma") texto = await chamarPlataforma(sis, msgs);
@@ -763,9 +776,14 @@
     if (!texto && !anexos.length) return;
     if (!pronto()) { abrirConfig(true); return M.toast("Escolha a IA da plataforma ou cole a sua chave de API."); }
     if (naPlataforma()) {
-      if (saldo && !saldo.ilimitado && saldo.restante <= 0 && !temOutraIA()) {
-        chat.push({ role: "erro", texto: "Você usou as " + saldo.limite + " mensagens gratuitas de hoje. A cota renova à meia-noite (horário do Acre). Para continuar agora, cole a sua própria chave de API em 🔑 Configurar." });
-        gravarChat(); return desenharChat();
+      if (semSaldo() && !temOutraIA()) {
+        var doMes = saldo.periodo === "mes";
+        chat.push({ role: "erro", texto: doMes
+          ? "Você usou os " + saldo.limite + " pedidos à I.A. do plano " + nomePlano(saldo.plano) + " neste mês. O limite renova no dia 1º. Para continuar agora, veja os planos (relatorio.skin/planos.html) ou cole a sua própria chave de API em 🔑 Configurar."
+          : "Você usou as " + saldo.limite + " mensagens gratuitas de hoje. A cota renova à meia-noite (horário do Acre). Para continuar agora, cole a sua própria chave de API em 🔑 Configurar." });
+        gravarChat(); desenharChat();
+        if (doMes && window.SkinPlanos) window.SkinPlanos.limite("ia", { origem: "ia-chat" });
+        return;
       }
       if (anexos.length > MAX_ANEXOS_PLAT) return M.toast("Na IA da plataforma, envie até " + MAX_ANEXOS_PLAT + " arquivos por mensagem.");
       var pesados = anexos.filter(function (a) { return a.tipo === "pdf" && a.arquivo.size > 5 * 1024 * 1024; });
@@ -905,17 +923,6 @@
     return padrao || 1;
   }
 
-  // Diário criado por uma resposta da IA da plataforma conta no limite do dia.
-  async function consumirDiario() {
-    var cli = cliente();
-    if (!cli) throw new Error("Sem conexão com a plataforma.");
-    var r = await cli.rpc("ia_consumir_cota", { p_tipo: "diarios", p_limite: LIMITE_DIARIOS });
-    if (r.error) throw new Error("Não consegui conferir o limite de diários agora. Tente de novo.");
-    if (!r.data || !r.data.ok) {
-      throw new Error("A IA gratuita cria até " + ((r.data && r.data.limite) || LIMITE_DIARIOS) + " diários por dia, e esse limite já foi usado hoje. Registre à mão com + Novo Diário ou use a sua própria chave de API.");
-    }
-  }
-
   // Aplica uma ação. Devolve a mensagem de sucesso ou lança o erro.
   async function aplicar(a, origem) {
     var R = window.MeuDiarioRecursos, perdidos = [], t, d, msg;
@@ -931,7 +938,9 @@
         var ini = hora(a.inicio), fim = hora(a.fim);
         var rel = relDaAcao(t, Object.assign({ conteudo: "", faltaram: [], faltas_justificadas: [], comportamento: [], atividade: { houve: false } }, a), perdidos);
         var assunto = txt(a.assunto) || String(rel.conteudo || "").split(/[.\n]/)[0].slice(0, 80) || "Aula";
-        if (origem === "plataforma") await consumirDiario();
+        if (window.SkinPlanos && !(await window.SkinPlanos.verificar("diario", { dia: a.data, origem: "ia" }))) {
+          throw new Error("O limite de diários do seu plano acabou. Veja os planos para continuar registrando.");
+        }
         var id = window.NovoDiario.salvar({ turma: t.id, dateKey: a.data, discNome: d.nome, assunto: assunto, ini: ini, fim: fim, horas: horasDe(a, ini, fim, 1), rel: rel });
         if (!id) throw new Error("Não consegui criar o diário (já há registros demais nesta data para esta turma?).");
         msg = "Diário criado: " + t.nome + " · " + d.nome + " · " + M.dataBr(a.data) + ((rel.faltaram || []).length ? " · faltas: " + nomesDe(t, rel.faltaram) : "") + ".";
@@ -1280,13 +1289,14 @@
     return '<details class="md-card ia-cfg"><summary>🤖 IA da plataforma <span class="ia-st ok">✓ ' + esc(textoSaldo()) + '</span><span style="flex:1"></span><span style="font-size:.74rem;color:var(--cm);font-weight:500">Trocar ▾</span></summary>' +
       '<p style="margin-top:12px">Você está usando a <strong>IA gratuita do RELATORIO SKIN</strong>: não precisa de chave nem de conta em outro serviço. Para usar sem limite, escolha um serviço abaixo e cole a sua própria chave.</p>' +
       cartoesProvedores() +
-      '<div class="ia-plano"><div><b>Plano gratuito</b><span data-ia="saldo">' + esc(textoSaldo()) + '</span></div>' +
-      '<ul><li><strong>' + LIMITE_MENSAGENS + ' mensagens por dia</strong> ao assistente</li><li><strong>' + LIMITE_DIARIOS + ' diários por dia</strong> criados pela IA</li><li>Renova à meia-noite (horário do Acre)</li><li>Lê fotos e PDFs (até ' + MAX_ANEXOS_PLAT + ' arquivos, 7 MB por mensagem)</li></ul>' +
+      '<div class="ia-plano"><div><b>Seu plano</b><span data-ia="saldo">' + esc(textoSaldo()) + '</span></div>' +
+      '<ul><li><strong>Pedidos por mês</strong> conforme o plano: Grátis 30 · PRO 500 · Plus sem limite</li><li>Diários criados pela I.A. contam no limite de diários do plano</li><li>Com a sua própria chave de API, os pedidos não contam no plano</li><li>Lê fotos e PDFs (até ' + MAX_ANEXOS_PLAT + ' arquivos, 7 MB por mensagem)</li></ul>' +
+      '<a class="md-btn mini" href="planos.html?origem=ia" style="text-decoration:none;margin-right:6px">💎 Ver planos</a>' +
       '<button type="button" class="md-btn mini" data-ia="atualizar">↻ Atualizar saldo</button></div>' +
       '<label class="ia-chk"><input type="checkbox" data-ia="auto"' + (cfg.auto ? " checked" : "") + '><span><strong>Aplicar as mudanças automaticamente</strong>, sem pedir confirmação. Deixe desligado para revisar cada ação antes.</span></label>' +
       '<label class="ia-chk"><input type="checkbox" data-ia="rodizio"' + (cfg.rodizio ? " checked" : "") + '><span><strong>Rodízio com as minhas chaves</strong>: se a IA da plataforma falhar ou a cota do dia acabar, usar as chaves que eu salvei (Gemini, OpenRouter, Groq…).</span></label>' +
       filaPlataformaHtml() +
-      '<div class="ia-nota">🔒 Nesta opção os nomes dos alunos são <strong>sempre</strong> trocados por códigos antes de sair do seu aparelho. As mensagens passam pelos servidores da plataforma e são processadas pelos serviços de IA gratuitos do projeto (lista acima). Fotos e documentos seguem como estão.<br>✨ <strong>Em breve:</strong> planos de IA com limites maiores.</div></details>';
+      '<div class="ia-nota">🔒 Nesta opção os nomes dos alunos são <strong>sempre</strong> trocados por códigos antes de sair do seu aparelho. As mensagens passam pelos servidores da plataforma e são processadas pelos serviços de IA gratuitos do projeto (lista acima). Fotos e documentos seguem como estão.<br>💎 Precisa de mais pedidos? <a href="planos.html?origem=ia" style="color:inherit;text-decoration:underline">Conheça o PRO e o Plus</a>.</div></details>';
   }
   function sugestoes() { return (M && M.sugestoes) || SUGESTOES; }
   var SUGESTOES = [

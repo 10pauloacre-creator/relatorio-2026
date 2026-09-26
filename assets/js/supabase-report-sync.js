@@ -274,13 +274,17 @@ window.RelatorioSupabaseSync = (function () {
     return response.data.session;
   }
 
-  async function signUp(nome, email, password) {
+  async function signUp(nome, email, password, extras) {
     var client = getClient();
     if (!client) throw new Error("Supabase indisponível nesta página.");
+    // extras (Etapa 17): skin_ref, skin_consent_email, skin_consent_whatsapp,
+    // skin_whatsapp e skin_origem — lidos pelo gatilho trg_skin_conta_nova.
+    var dados = { nome: String(nome || "").trim() };
+    Object.keys(extras || {}).forEach(function (k) { if (/^skin_/.test(k)) dados[k] = extras[k]; });
     var response = await client.auth.signUp({
       email: normalizeEmail(email),
       password: password,
-      options: { data: { nome: String(nome || "").trim() }, emailRedirectTo: urlDeRetorno() }
+      options: { data: dados, emailRedirectTo: urlDeRetorno() }
     });
     if (response.error) throw new Error(translateAuthError(response.error));
     // E-mail que já tem conta: o Supabase responde "sucesso" sem enviar nada
@@ -466,6 +470,11 @@ window.RelatorioSupabaseSync = (function () {
     + ".rel-auth-sep::before,.rel-auth-sep::after{content:'';flex:1;height:1px;background:#30352D}"
     + ".rel-auth-google{width:100%;min-height:46px;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #30352D;"
     + "border-radius:9px;background:#F3F1E9;color:#1f1f1f;font-size:.92rem;font-weight:700;font-family:inherit;cursor:pointer}"
+    + ".rel-auth-card label.rel-auth-chk{display:flex;align-items:flex-start;gap:10px;margin:0 0 10px;font-size:.8rem;font-weight:500;letter-spacing:0;text-transform:none;line-height:1.45;color:#B6B7AE;cursor:pointer}"
+    + ".rel-auth-card input.rel-auth-caixa{width:18px;height:18px;min-height:0;margin:1px 0 0;padding:0;flex-shrink:0;accent-color:#A7B58A;box-shadow:none}"
+    + ".rel-auth-ref{margin:0 0 14px;padding:10px 12px;border-radius:10px;border:1px dashed rgba(214,203,184,.35);background:rgba(184,155,105,.08);font-size:.8rem;color:#D6CBB8}"
+    + ".rel-auth-ref b{color:#F3F1E9;letter-spacing:.06em}.rel-auth-ref input{margin:8px 0 0;text-transform:uppercase;letter-spacing:.08em}"
+    + ".rel-auth-aceite{margin:4px 0 14px;font-size:.74rem;line-height:1.5;color:#7E8279}.rel-auth-aceite a{color:#A7B58A}"
     + ".rel-auth-link{background:none;border:0;padding:0;color:#A7B58A;font-size:.8rem;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:underline}"
     + ".rel-auth-link:hover{color:#D2DBB3}"
     + ".rel-auth-error{min-height:20px;margin:10px 0 0;font-size:.84rem;color:#E09A95;line-height:1.45}"
@@ -550,6 +559,19 @@ window.RelatorioSupabaseSync = (function () {
         + '<div class="rel-auth-pass"><input id="rel-auth-password" type="password" autocomplete="' + (m === "entrar" ? "current-password" : "new-password") + '" required>'
         + '<button class="rel-auth-toggle" type="button" aria-label="Mostrar senha">Mostrar</button></div>';
     }
+    if (m === "criar") {
+      var refSalvo = codigoIndicacaoSalvo();
+      html += '<div class="rel-auth-ref">'
+        + (refSalvo
+          ? '🎁 Convite de um colega: <b>' + esc(refSalvo) + '</b> — você ganha 7 dias de PRO ao confirmar o e-mail.<input id="rel-auth-ref" type="hidden" value="' + esc(refSalvo) + '">'
+          : '<button type="button" class="rel-auth-link" data-ref-abrir>🎁 Tenho um código de indicação</button>'
+            + '<div data-ref-campo hidden><input id="rel-auth-ref" type="text" autocomplete="off" maxlength="13" placeholder="EX.: MARIA-7K2P" aria-label="Código de indicação"></div>')
+        + '</div>'
+        + '<label class="rel-auth-chk"><input class="rel-auth-caixa" type="checkbox" id="rel-auth-cons-email"> <span>Quero receber novidades, dicas de uso e ofertas por e-mail.</span></label>'
+        + '<label class="rel-auth-chk"><input class="rel-auth-caixa" type="checkbox" id="rel-auth-cons-whats"> <span>Quero receber avisos e ofertas pelo WhatsApp.</span></label>'
+        + '<div data-whats-campo hidden><label for="rel-auth-whats">WhatsApp com DDD</label><input id="rel-auth-whats" type="tel" inputmode="tel" autocomplete="tel" placeholder="(68) 99999-9999" maxlength="16"></div>'
+        + '<div class="rel-auth-aceite">Ao criar a conta, você aceita os <a href="termos.html" target="_blank" rel="noopener">Termos de Serviço</a> e a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>. As mensagens são opcionais e você pode sair quando quiser, no perfil.</div>';
+    }
     html += '<button class="rel-auth-submit" type="submit">'
       + { entrar: "Entrar", criar: "Criar minha conta", esqueci: "Enviar link", "nova-senha": "Salvar nova senha" }[m] + "</button>"
       + '<div class="rel-auth-error" role="alert">' + esc(gateMensagem) + "</div>";
@@ -590,6 +612,19 @@ window.RelatorioSupabaseSync = (function () {
         toggle.setAttribute("aria-label", show ? "Ocultar senha" : "Mostrar senha");
       });
     }
+    var refAbrir = authGateEl.querySelector("[data-ref-abrir]");
+    if (refAbrir) refAbrir.addEventListener("click", function () {
+      refAbrir.hidden = true;
+      var campo = authGateEl.querySelector("[data-ref-campo]");
+      campo.hidden = false;
+      campo.querySelector("input").focus();
+    });
+    var consWhats = authGateEl.querySelector("#rel-auth-cons-whats");
+    if (consWhats) consWhats.addEventListener("change", function () {
+      var campo = authGateEl.querySelector("[data-whats-campo]");
+      campo.hidden = !consWhats.checked;
+      if (consWhats.checked) campo.querySelector("input").focus();
+    });
     var boxGoogle = authGateEl.querySelector(".rel-auth-google-box");
     if (boxGoogle) {
       googleAtivo().then(function (ativo) { if (ativo) boxGoogle.hidden = false; });
@@ -613,6 +648,8 @@ window.RelatorioSupabaseSync = (function () {
       var senha = passwordInput ? passwordInput.value : "";
       if (emailInput && !/^\S+@\S+\.\S+$/.test(email)) { errorBox.textContent = "Digite um e-mail válido."; return; }
       if (m === "criar" && !nomeInput.value.trim()) { errorBox.textContent = "Digite o seu nome."; return; }
+      var extras = m === "criar" ? extrasCadastro() : null;
+      if (extras && extras.erro) { errorBox.textContent = extras.erro; return; }
       if (passwordInput && !senha) { errorBox.textContent = "Digite a senha."; return; }
       if ((m === "criar" || m === "nova-senha") && (senha.length < 8 || !/[a-z]/i.test(senha) || !/\d/.test(senha))) {
         errorBox.textContent = "A senha precisa ter pelo menos 8 caracteres, com letras e números.";
@@ -625,7 +662,7 @@ window.RelatorioSupabaseSync = (function () {
         if (m === "entrar") {
           await signIn(email, senha);
         } else if (m === "criar") {
-          var r = await signUp(nomeInput.value, email, senha);
+          var r = await signUp(nomeInput.value, email, senha, extras);
           if (!r.entrou) {
             gateModo = "entrar";
             desenharGate();
@@ -650,6 +687,33 @@ window.RelatorioSupabaseSync = (function () {
         submit.textContent = rotulo;
       }
     });
+  }
+
+  // Código de indicação guardado pelo link ?ref= (assets/js/planos.js), por 60 dias.
+  function codigoIndicacaoSalvo() {
+    try {
+      var r = JSON.parse(window.localStorage.getItem("skin-ref") || "null");
+      if (r && r.codigo && Date.now() - (r.em || 0) < 60 * 86400000) return String(r.codigo);
+    } catch (e) {}
+    return "";
+  }
+  function extrasCadastro() {
+    var q = function (s) { return authGateEl ? authGateEl.querySelector(s) : null; };
+    var ref = String((q("#rel-auth-ref") || {}).value || "").trim().toUpperCase();
+    if (ref && !/^[A-Z]{2,8}-[A-Z0-9]{4}$/.test(ref)) return { erro: "Confira o código de indicação (ex.: MARIA-7K2P) ou deixe em branco." };
+    var cEmail = !!(q("#rel-auth-cons-email") || {}).checked;
+    var cWhats = !!(q("#rel-auth-cons-whats") || {}).checked;
+    var tel = String((q("#rel-auth-whats") || {}).value || "").replace(/\D/g, "").replace(/^55(?=\d{10,11}$)/, "");
+    if (cWhats && !/^\d{10,11}$/.test(tel)) return { erro: "Digite o WhatsApp com DDD, ou desmarque a opção do WhatsApp." };
+    var origem = "";
+    try {
+      var o = JSON.parse(window.localStorage.getItem("skin-origem") || "null") || {};
+      origem = [o.source, o.medium, o.campaign, o.referrer, o.entrada].filter(Boolean).join("|").slice(0, 160);
+    } catch (e) {}
+    var x = { skin_consent_email: cEmail, skin_consent_whatsapp: cWhats, skin_origem: origem || (location.pathname.split("/").pop() || "index.html") };
+    if (ref) x.skin_ref = ref;
+    if (cWhats) x.skin_whatsapp = "55" + tel;
+    return x;
   }
 
   function hideAuthGate() {
