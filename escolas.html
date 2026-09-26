@@ -13,8 +13,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="assets/js/supabase-report-sync.js?v=20260922a"></script>
+<script defer src="assets/js/supabase-report-sync.js?v=20260926a"></script>
 <script defer src="assets/js/conta-skin.js?v=20260922a"></script>
+<script defer src="assets/js/planos.js?v=20260926a"></script>
 <link rel="stylesheet" href="assets/css/escolas-vivo.css?v=20260924c">
 <script defer src="assets/js/escolas-vivo.js?v=20260924c"></script>
 <title>Escolas — RELATORIO SKIN</title>
@@ -68,6 +69,19 @@ button{font:inherit}
 .aviso-email span{font-size:.82rem;color:var(--txt2)}
 .aviso-email a{background:var(--marca);color:#141710;font-weight:800;font-size:.84rem;text-decoration:none;border-radius:9px;padding:9px 16px;white-space:nowrap}
 .aviso-email a:hover{background:var(--marca2)}
+/* ── Plano e indicação (Etapa 17, assets/js/planos.js) ── */
+.topo .sp-selo{flex-shrink:0}
+.faixa-plano{position:relative;display:flex;gap:14px;align-items:center;flex-wrap:wrap;max-width:1000px;margin:14px auto 4px;width:calc(100% - 32px);padding:14px 44px 14px 16px;border-radius:14px;background:linear-gradient(120deg,rgba(184,155,105,.16),rgba(19,21,18,.85) 60%);border:1px solid rgba(184,155,105,.45);color:var(--txt)}
+.faixa-plano .fp-ic{font-size:1.5rem;line-height:1}
+.faixa-plano .fp-tx{flex:1;min-width:210px}
+.faixa-plano b{display:block;font-size:.95rem;color:var(--areia)}
+.faixa-plano span{font-size:.84rem;color:var(--txt2)}
+.faixa-plano .fp-bt{display:flex;gap:8px;flex-wrap:wrap}
+.faixa-plano .fp-bt a,.faixa-plano .fp-bt button{border:1px solid var(--linha);background:var(--sup3);color:var(--txt);font-weight:800;font-size:.82rem;border-radius:9px;padding:9px 14px;text-decoration:none;cursor:pointer;white-space:nowrap}
+.faixa-plano .fp-bt .pri{border:0;background:linear-gradient(135deg,#B89B69,#D6CBB8);color:#141711}
+.faixa-plano .fp-cod{font-family:Manrope,sans-serif;letter-spacing:.08em;color:var(--txt)}
+.faixa-plano .fp-x{position:absolute;right:8px;top:8px;width:30px;height:30px;border-radius:50%;border:0;background:transparent;color:var(--mudo);cursor:pointer;font-size:.9rem}
+.faixa-plano .fp-x:hover{color:var(--txt)}
 .selo{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;color:var(--txt2);background:var(--sup2);border:1px solid var(--linha);border-radius:999px;padding:5px 11px;cursor:pointer}
 .selo:hover{border-color:var(--marca);color:var(--txt)}
 .selo.falta{color:#e2c48c;border-color:rgba(194,154,91,.5)}
@@ -120,6 +134,7 @@ a.selo{text-decoration:none}
   <a class="marca-mini" href="index.html?site=1" aria-label="RELATORIO SKIN — site"><img src="assets/marca/skin-simbolo.webp" alt="" width="30" height="30"><span>RELATORIO <b>SKIN</b></span></a>
   <span class="esp"></span>
   <span class="email" id="conta-email"></span>
+  <a id="plano-selo" hidden></a>
   <a id="conta-chip" href="perfil.html"></a>
 </header>
 
@@ -128,6 +143,7 @@ a.selo{text-decoration:none}
     <div><b>⚠ Verifique o seu e-mail</b><span id="aviso-email-txt">Confirme que o e-mail da conta é seu com um código que vamos enviar para ele. Assim você pode recuperar a senha e receber avisos.</span></div>
     <a href="perfil.html#verificar-email">Verificar agora</a>
   </div>
+  <div class="faixa-plano" id="faixa-plano" role="status" hidden></div>
   <section class="vista" id="vista-escolas">
     <div class="titulo" id="titulo" hidden><h1>Suas escolas</h1><p>Toque na escola para abrir o diário, as turmas e o planejamento.</p></div>
     <div class="grade" id="grade"><div class="carregando">Carregando suas escolas…</div></div>
@@ -408,6 +424,43 @@ a.selo{text-decoration:none}
     }).catch(function () {});
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', quandoPronto); else quandoPronto();
+
+  // Plano (Etapa 17): selo no topo e uma faixa só (pedido reservado → oferta do Plus
+  // para quem está no Grátis → convite de indicação). Fechar esconde por 7 dias.
+  function ligarPlano() {
+    var SP = window.SkinPlanos;
+    if (!SP) return;
+    SP.selo(document.getElementById('plano-selo'));
+    var faixa = document.getElementById('faixa-plano');
+    SP.aoMudar(function (st) {
+      if (!st || st.admin) { faixa.hidden = true; return; }
+      var tipo = st.pedido_aberto ? 'pedido' : (st.plano && st.plano.id === 'gratis' && st.promo_plus !== false) ? 'plus' : 'indicacao';
+      var fechada = 0;
+      try { fechada = +localStorage.getItem('skin-faixa-' + tipo) || 0; } catch (e) {}
+      if (Date.now() - fechada < 7 * 86400000 || (tipo === 'indicacao' && !(st.indicacao && st.indicacao.codigo))) { faixa.hidden = true; return; }
+      var cod = st.indicacao && st.indicacao.codigo;
+      var esc = function (v) { return String(v || '').replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+      if (tipo === 'pedido') {
+        faixa.innerHTML = '<span class="fp-ic">🧾</span><div class="fp-tx"><b>Pedido ' + esc(st.pedido_aberto.codigo) + ' reservado</b><span>A sua condição de lançamento está guardada. Avisaremos quando o pagamento abrir.</span></div>'
+          + '<div class="fp-bt"><a href="planos.html?origem=escolas-pedido">Ver planos</a></div>';
+      } else if (tipo === 'plus') {
+        faixa.innerHTML = '<span class="fp-ic">✦</span><div class="fp-tx"><b>Plus por R$ 1 no primeiro mês</b><span>Tudo sem limites e integração com a Biblioteca Digital. Ou indique colegas e ganhe 1 mês de PRO por indicação.</span></div>'
+          + '<div class="fp-bt"><a class="pri" href="planos.html?origem=escolas-faixa">Conhecer os planos</a>' + (cod ? '<button type="button" data-fp="copiar">🎁 Copiar convite</button>' : '') + '</div>';
+      } else {
+        faixa.innerHTML = '<span class="fp-ic">🎁</span><div class="fp-tx"><b>Indique e ganhe 1 mês de PRO</b><span>Seu código: <span class="fp-cod">' + esc(cod) + '</span>. Cada colega que criar a conta e confirmar o e-mail vale 30 dias para você.</span></div>'
+          + '<div class="fp-bt"><button type="button" class="pri" data-fp="copiar">Copiar convite</button><a target="_blank" rel="noopener" data-fp="whats" href="https://wa.me/?text=' + encodeURIComponent(SP.textoConvite(cod)) + '">WhatsApp</a></div>';
+      }
+      faixa.insertAdjacentHTML('beforeend', '<button type="button" class="fp-x" aria-label="Fechar">✕</button>');
+      faixa.hidden = false;
+      var cp = faixa.querySelector('[data-fp="copiar"]'); if (cp) cp.onclick = function () { SP.copiarConvite(); cp.textContent = 'Copiado ✓'; };
+      var wz = faixa.querySelector('[data-fp="whats"]'); if (wz) wz.onclick = function () { SP.evento('indicacao_whatsapp', { origem: 'escolas' }); };
+      faixa.querySelector('.fp-x').onclick = function () {
+        try { localStorage.setItem('skin-faixa-' + tipo, String(Date.now())); } catch (e) {}
+        faixa.hidden = true;
+      };
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ligarPlano); else ligarPlano();
 })();
 </script>
 <script defer src="assets/app-build.js?v=20260717a"></script>

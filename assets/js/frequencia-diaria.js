@@ -797,6 +797,8 @@
   function gerar() {
     var tabs = tabelas();
     if (!tabs.length) return;
+    // Plano (Etapa 17): a emissão conta 1 documento (assets/js/planos.js).
+    if (window.SkinPlanos && !window.SkinPlanos.tentar("documento", { origem: "frequencia" })) return;
     var j = window.open("", "_blank");
     if (!j) { alert("Permita as janelas pop-up para abrir o relatório."); return; }
     j.document.open();

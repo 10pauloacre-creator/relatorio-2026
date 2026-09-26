@@ -20,8 +20,9 @@
 </script>
 <script defer src="assets/js/dark-mode-2026.js?v=20260921b"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="assets/js/supabase-report-sync.js?v=20260922a"></script>
+<script defer src="assets/js/supabase-report-sync.js?v=20260926a"></script>
 <script defer src="assets/js/conta-skin.js?v=20260922a"></script>
+<script defer src="assets/js/planos.js?v=20260926a"></script>
 <style>
 :root{--vd:#1a3a2a;--vm:#2d6147;--vc:#4a9467;--ou:#c9a84c;--os:#f5e6be;--ce:#2b2b2b;--cm:#5a5a5a;--ra:#c0392b;--rs:#fdecea;
   --sup:#fff;--sup2:#faf8f2;--sup3:#f5f3ee;--linha:#e8e5de;--titulo:#1a3a2a;--acento:#2d6147;--acento-txt:#fff;--fundo:#faf8f2;--ss:0 4px 24px rgba(26,58,42,.10)}
@@ -59,6 +60,8 @@ main{max-width:900px;margin:0 auto;padding:26px 20px 60px}
 /* Cartões */
 .card{background:var(--sup);border-radius:14px;box-shadow:var(--ss);padding:20px 22px;margin-bottom:18px;border:1px solid transparent}
 html.dark-2026 .card{border-color:var(--linha)}
+.sp-bloco{margin-bottom:18px;scroll-margin-top:20px}
+.sp-bloco .sp-card h4{font-family:'Playfair Display',serif;font-size:1.15rem}
 .card h3{font-family:'Playfair Display',serif;color:var(--titulo);font-size:1.15rem;margin-bottom:4px}
 .card>p.exp{font-size:.84rem;color:var(--cm);line-height:1.55;margin-bottom:16px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px 16px}
@@ -191,6 +194,10 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
 
   <div class="salvar"><button type="button" class="btn pri" id="salvar">💾 Salvar perfil</button></div>
 
+  <!-- Plano e comunicações (Etapa 17): cartões desenhados por assets/js/planos.js -->
+  <section class="sp-bloco" id="plano"><div id="plano-card"><div class="card"><h3>💎 Meu plano</h3><p class="exp">Carregando…</p></div></div></section>
+  <section class="sp-bloco" id="comunicacoes"><div id="comunicacoes-card"></div></section>
+
   <section class="card">
     <h3>🚪 Conta</h3>
     <div class="pg" id="email-pg">
@@ -221,7 +228,15 @@ html.dark-2026 .btn:not(.pri):not(.perigo){background:var(--sup2)!important;colo
     </div>
   </section>
 </main>
-<footer><a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
+<footer><a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a> · <a href="planos.html">Planos</a></footer>
+<script>
+// Plano da conta, indicação e autorização de mensagens (assets/js/planos.js).
+document.addEventListener('DOMContentLoaded', function () {
+  if (!window.SkinPlanos) return;
+  window.SkinPlanos.cartaoPlano(document.getElementById('plano-card'));
+  window.SkinPlanos.cartaoComunicacoes(document.getElementById('comunicacoes-card'));
+});
+</script>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════════

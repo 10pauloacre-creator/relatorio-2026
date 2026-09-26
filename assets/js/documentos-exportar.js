@@ -312,7 +312,12 @@
     return { nome: nome + ".txt", blob: new Blob(["﻿" + textoTxt(d)], { type: "text/plain;charset=utf-8" }) };
   }
 
+  // Plano (Etapa 17): cada exportação conta 1 documento. Confere antes de abrir a
+  // janela do PDF (tem de ser no mesmo clique, senão o navegador bloqueia).
+  function cabeNoPlano(origem) { return !window.SkinPlanos || window.SkinPlanos.tentar("documento", { origem: origem }); }
+
   async function baixar(d, fmt) {
+    if (!cabeNoPlano("exportar")) return;
     if (fmt === "pdf") return abrirPdf(d.titulo || "Documento", [d]);
     var a = await arquivo(d, fmt);
     salvarBlob(a.blob, a.nome);
@@ -322,6 +327,7 @@
   // ou, em "pdf", um documento só com uma página por documento.
   async function baixarPasta(nome, itens, fmt) {
     if (!itens.length) throw new Error("A pasta está vazia.");
+    if (!cabeNoPlano("exportar-pasta")) return;
     if (fmt === "pdf") return abrirPdf(nome, itens.map(function (x) { return x.doc; }));
     await carregar(LIBS.zip);
     var zip = new window.JSZip(), usados = {};

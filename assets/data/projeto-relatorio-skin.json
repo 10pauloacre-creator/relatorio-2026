@@ -1,17 +1,17 @@
 {
-  "versao": 18,
-  "atualizadoEm": "2026-09-25",
+  "versao": 19,
+  "atualizadoEm": "2026-09-26",
   "projetoId": "project-relatorios-diarios",
   "documentation": {
     "title": "Mapa documental do RELATORIO SKIN",
     "summary": "Tudo o que existe no projeto em 21/09/2026: páginas, scripts, estilos, banco de dados, manutenção, publicação e regras. Cada item diz para que serve, o que já está pronto e o que falta. Atualize este arquivo (assets/data/projeto-relatorio-skin.json) sempre que algo novo entrar no projeto.",
     "stats": [
       {
-        "n": 24,
+        "n": 25,
         "label": "páginas HTML"
       },
       {
-        "n": 49,
+        "n": 50,
         "label": "scripts das páginas"
       },
       {
@@ -19,7 +19,7 @@
         "label": "folhas de estilo"
       },
       {
-        "n": 16,
+        "n": 17,
         "label": "etapas do banco"
       },
       {
@@ -212,6 +212,18 @@
             "details": [
               "Política de Privacidade (LGPD, inclusive dados sensíveis da Educação Especial), Termos de Serviço e página institucional da AXION PROEDUQ. Públicas, sem conta."
             ]
+          },
+          {
+            "id": "p-planos",
+            "icon": "file",
+            "title": "planos.html — planos, preços e assinatura",
+            "status": "Concluído",
+            "details": [
+              "Página pública de vendas: Grátis, PRO (R$ 49,90/mês) e Plus (R$ 99,90/mês, R$ 1 no 1º mês), com Mensal/Anual (−10%), preços lidos do banco (public.planos).",
+              "Calculadora do tempo ganho, comparativo completo, programa de indicação com o código da conta, formulário de escolas e redes (leads), perguntas frequentes e barra fixa no celular.",
+              "\"Mais detalhes\" do Plus: janela da integração com a Biblioteca Digital com espaço para o vídeo (VIDEO_BIBLIOTECA no script da página).",
+              "Painel de vendas só para o administrador: funil, sinais de interesse, contas por plano, pedidos, indicações, autorizações de mensagem e leads."
+            ]
           }
         ]
       },
@@ -305,6 +317,17 @@
             "status": "Concluído",
             "details": [
               "Luzes que mudam de tom, grade tecnológica e foco de luz seguindo o cursor; no celular, a inclinação do aparelho. Casavequia, Hermínio, Meu Diário e AEE."
+            ]
+          },
+          {
+            "id": "js-planos",
+            "icon": "file",
+            "title": "assets/js/planos.js — planos, limites, checkout e indicação",
+            "status": "Concluído",
+            "details": [
+              "window.SkinPlanos: plano da conta (plano_status), limites de diário, I.A. e documentos (plano_consumir), modal de upgrade, aviso no período de lançamento e lembrete aos 80%.",
+              "Checkout pronto para o gateway (plano_criar_pedido + SkinPlanos.definirGateway); sem gateway, reserva o pedido com a condição de lançamento.",
+              "Indicação (?ref=, código, convite pelo WhatsApp) e consentimentos de e-mail e WhatsApp (consentimento_registrar), com cartões para o perfil."
             ]
           }
         ]
@@ -559,6 +582,17 @@
               "15: alunos da Educação Especial compartilhados por código (aee_alunos, vínculos, registros, documentos).",
               "16: excluir escola do administrador com cópia na lixeira e trava contra republicação."
             ]
+          },
+          {
+            "id": "db-17",
+            "icon": "code",
+            "title": "Etapa 17 — planos, assinaturas, indicação e consentimentos",
+            "status": "Concluído",
+            "details": [
+              "planos, planos_config (modo_limites lançamento/ativo, desconto anual, gateway), assinaturas, pedidos, créditos, uso por recurso, indicações, consentimentos, eventos do funil e leads de escolas.",
+              "ia_consumir_cota e ia_saldo seguem o plano (pedidos por mês); no lançamento continua o teto diário de proteção.",
+              "Ponto do gateway: private.plano_ativar_pedido(pedido, gateway, id, valor), chamado pelo webhook com a chave de serviço."
+            ]
           }
         ]
       },
@@ -655,6 +689,18 @@
               "Dados de deficiência são sensíveis (LGPD art. 11): só profissionais vinculados pelo código do aluno leem.",
               "Excluir escola, turma, aluno ou conta pede confirmação e senha."
             ]
+          },
+          {
+            "id": "r-planos",
+            "icon": "code",
+            "title": "Planos e limites",
+            "status": "Concluído",
+            "details": [
+              "Grátis: 1 diário por dia letivo, 30 pedidos à I.A. e 3 documentos por mês. PRO: 400/500/150 por mês. Plus: sem limites.",
+              "Modo \"lancamento\" (padrão até o gateway): conta e avisa, sem bloquear. Modo \"ativo\": bloqueia e abre o modal de upgrade.",
+              "Indicação: 30 dias de PRO para quem indica (até 12 por ano) e 7 para quem foi indicado, liberados quando o indicado confirma o e-mail pelo código.",
+              "Mensagens de marketing só com autorização registrada (canal, texto e data)."
+            ]
           }
         ]
       },
@@ -722,6 +768,16 @@
               "Remover scripts Python e sobras da raiz.",
               "Marcador T6_INICIO para injeção automática no 6º Ano (legado).",
               "Validação do HTML gerado pela IA antes de injetar (fluxo antigo do Groq)."
+            ]
+          },
+          {
+            "id": "pd-gateway",
+            "icon": "project",
+            "title": "Pagamentos (gateway)",
+            "status": "Planejado",
+            "details": [
+              "Escolher o gateway (Pix e cartão), criar a Edge Function do webhook que chama private.plano_ativar_pedido e registrar SkinPlanos.definirGateway na página.",
+              "Depois do primeiro pagamento real: ligar modo_limites = 'ativo', informar a empresa de pagamentos na Política de Privacidade e gravar o vídeo da integração com a Biblioteca."
             ]
           }
         ]
@@ -1559,6 +1615,67 @@
         {
           "id": "rs-diario-7",
           "text": "Atividades extras contando na nota de trabalho e no banco",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "rs-planos",
+      "text": "15. Planos, assinaturas e funil de vendas",
+      "children": [
+        {
+          "id": "rs-planos-1",
+          "text": "Planos Grátis, PRO (R$ 49,90) e Plus (R$ 99,90, R$ 1 no 1º mês) com anual −10%",
+          "done": true
+        },
+        {
+          "id": "rs-planos-2",
+          "text": "Página planos.html com calculadora, comparativo, indicação, escolas e redes e perguntas",
+          "done": true
+        },
+        {
+          "id": "rs-planos-3",
+          "text": "Limites de diário, I.A. e documentos em todas as telas, com modal de upgrade e lembrete aos 80%",
+          "done": true
+        },
+        {
+          "id": "rs-planos-4",
+          "text": "Checkout com pedido reservado (pronto para o gateway)",
+          "done": true
+        },
+        {
+          "id": "rs-planos-5",
+          "text": "Indicação com código: +30 dias de PRO para quem indica, 7 dias para o indicado",
+          "done": true
+        },
+        {
+          "id": "rs-planos-6",
+          "text": "Autorização de e-mail e WhatsApp no cadastro, na assinatura e no perfil (LGPD)",
+          "done": true
+        },
+        {
+          "id": "rs-planos-7",
+          "text": "Funil de vendas e painel do administrador (eventos, pedidos, leads)",
+          "done": true
+        },
+        {
+          "id": "rs-planos-8",
+          "text": "Termos e Política de Privacidade com planos, cobrança, cancelamento, indicação e mensagens",
+          "done": true
+        },
+        {
+          "id": "rs-planos-9",
+          "text": "Integrar o gateway de pagamento (webhook → plano_ativar_pedido)",
+          "done": false
+        },
+        {
+          "id": "rs-planos-10",
+          "text": "Ligar o modo \"ativo\" dos limites depois do gateway",
+          "done": false
+        },
+        {
+          "id": "rs-planos-11",
+          "text": "Vídeo da integração com a Biblioteca Digital no \"Mais detalhes\" do Plus",
           "done": false
         }
       ]
