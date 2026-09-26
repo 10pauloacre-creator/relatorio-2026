@@ -37,6 +37,9 @@ replay_pid*.log
 marketing/video/saida/
 marketing/*.mp4
 marketing/*.png
+marketing/video/__pycache__/
+# Projeto HyperFrames do vídeo "Por dentro" (capturas, voz e render ~150 MB; só na máquina)
+marketing/videos/
 
 # Rascunhos, saídas geradas e perfis de navegador dos testes automáticos
 # (nunca subir: um perfil do Chrome guarda cookies e senhas)
