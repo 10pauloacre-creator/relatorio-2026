@@ -690,7 +690,7 @@
         id: 'project-relatorios-diarios',
         name: 'Relatórios diários',
         description: 'Sistema de registros, relatórios e acompanhamento pedagógico das escolas.',
-        status: 'Desenvolvimento', type: 'Site', url: 'https://10pauloacre-creator.github.io/relatorio-2026/', logo: 'iconv2.png',
+        status: 'Desenvolvimento', type: 'Site', url: 'https://relatorio.skin/', logo: 'iconv2.png',
         tools: [
           { id: 'tool-relatorios-github', provider: 'GitHub', label: 'GitHub', url: 'https://github.com/10pauloacre-creator/relatorio-2026', createdAt: stamp, updatedAt: stamp },
           { id: 'tool-relatorios-supabase', provider: 'Supabase', label: 'Supabase', url: 'https://vgceathgwvtmjxbdpecr.supabase.co/', createdAt: stamp, updatedAt: stamp }

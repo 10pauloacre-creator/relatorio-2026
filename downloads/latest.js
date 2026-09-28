@@ -14,7 +14,7 @@
     sha256: "ca234ed6d6adb3c72b76ae378f272888c37279607f60e5907fe3a060041ec6c5",
     releasedAt: "2026-07-20T18:08:27.164Z",
     releasedAtLabel: "20/07/2026, 13:08",
-    downloadUrl: "https://10pauloacre-creator.github.io/relatorio-2026/downloads/apk/relatorios-diarios-v1.0.13.apk",
+    downloadUrl: "https://relatorio.skin/downloads/apk/relatorios-diarios-v1.0.13.apk",
     downloadPath: "./apk/relatorios-diarios-v1.0.13.apk"
   };
 })();
