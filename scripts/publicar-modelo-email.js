@@ -7,6 +7,11 @@
  *   • Biblioteca Digital (user_metadata.bdm = true): assunto "... da Biblioteca Digital".
  * Se um dos e-mails não chegar ou vier errado, volta ao modelo anterior.
  *
+ * O modelo leva a marca data-modelo="__VERSAO__", trocada aqui por um código
+ * do conteúdo: é assim que o teste sabe se o Supabase já está usando o modelo
+ * novo (a mudança pode levar um ou dois minutos para valer). Enquanto o e-mail
+ * vier sem a marca, o script espera 1 minuto e tenta de novo (até 5 vezes).
+ *
  * Uso:  node scripts/publicar-modelo-email.js [--sem-teste]
  * Chaves: SUPABASE_ACCESS_TOKEN e SUPABASE_SERVICE_ROLE_KEY no ambiente ou no
  * ../BIBLIOTECA-DIGITAL/SUPABASE_PROJECT.env. O script nunca imprime chaves.
@@ -14,6 +19,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const RAIZ = path.resolve(__dirname, '..');
 const ARQ_MODELO = path.join(RAIZ, 'supabase', 'emails', 'codigo-verificacao.html');
@@ -21,6 +27,7 @@ const ARQ_ENV = path.resolve(RAIZ, '..', 'BIBLIOTECA-DIGITAL', 'SUPABASE_PROJECT
 const ARQ_CONFIG_PUBLICA = path.resolve(RAIZ, '..', 'BIBLIOTECA-DIGITAL', 'assets', 'js', 'supabase-config.js');
 const ASSUNTO = '{{ .Token }} é o seu código {{ if .Data.bdm }}da Biblioteca Digital{{ else }}de verificação do RELATORIO SKIN{{ end }}';
 const SEM_TESTE = process.argv.includes('--sem-teste');
+const TENTATIVAS = 5;
 
 function lerEnv() {
   const env = {};
@@ -59,13 +66,18 @@ async function gestao(metodo, corpo) {
 
 function modeloSemComentario() {
   const bruto = fs.readFileSync(ARQ_MODELO, 'utf8');
-  const html = bruto.replace(/^\s*<!--[\s\S]*?-->\s*/, '').trim();
+  let html = bruto.replace(/^\s*<!--[\s\S]*?-->\s*/, '').trim();
   if (html.includes('<!--')) throw new Error('O modelo tem outro comentário HTML: tire antes de publicar.');
+  if ((html.match(/__VERSAO__/g) || []).length < 2) {
+    throw new Error('O modelo precisa de data-modelo="__VERSAO__" nas duas versões (Biblioteca e RELATORIO SKIN).');
+  }
+  const versao = crypto.createHash('sha1').update(html + ASSUNTO).digest('hex').slice(0, 10);
+  html = html.replace(/__VERSAO__/g, versao);
   const abre = (html.match(/{{\s*if\b/g) || []).length;
   const fecha = (html.match(/{{\s*end\s*}}/g) || []).length;
   if (abre !== fecha) throw new Error(`Modelo com "if" (${abre}) e "end" (${fecha}) desiguais.`);
   if (/{{\s*[^}]*\beq\b/.test(html)) throw new Error('Não use "eq" no modelo (chave ausente quebra o envio).');
-  return html;
+  return { html, versao };
 }
 
 // ── Caixa descartável (mail.tm) ─────────────────────────────────────
@@ -89,11 +101,16 @@ async function criarCaixa() {
   const { token } = await mt('/token', { method: 'POST', headers: json, body: JSON.stringify({ address, password }) });
   return { address, token };
 }
-async function esperarEmail(caixa, depoisDe, segundos = 120) {
+async function idsNaCaixa(caixa) {
+  const lista = (await mt('/messages', { headers: { Authorization: `Bearer ${caixa.token}` } }))['hydra:member'] || [];
+  return new Set(lista.map((m) => m.id));
+}
+// Espera um e-mail que ainda não estava na caixa (não depende do relógio do computador).
+async function esperarEmail(caixa, vistos, segundos = 120) {
   const fim = Date.now() + segundos * 1000;
   while (Date.now() < fim) {
     const lista = (await mt('/messages', { headers: { Authorization: `Bearer ${caixa.token}` } }))['hydra:member'] || [];
-    const nova = lista.find((m) => new Date(m.createdAt).getTime() >= depoisDe - 5000);
+    const nova = lista.find((m) => !vistos.has(m.id));
     if (nova) return mt('/messages/' + nova.id, { headers: { Authorization: `Bearer ${caixa.token}` } });
     await esperar(4000);
   }
@@ -127,43 +144,64 @@ async function idDoUsuario(email) {
   return u && u.id;
 }
 
-async function testar() {
-  const caixa = await criarCaixa();
-  console.log('Caixa de teste:', caixa.address);
-  let id = null;
-  try {
-    // 1) Versão RELATORIO SKIN (sem bdm)
-    let t0 = Date.now();
-    await pedirCodigo(caixa.address, { nome: 'Teste' });
-    let msg = await esperarEmail(caixa, t0);
-    if (!msg) throw new Error('O e-mail do RELATORIO SKIN não chegou em 2 minutos.');
-    console.log('  RELATORIO SKIN →', msg.subject);
-    if (!/RELATORIO SKIN/.test(msg.subject) || !/\d{6,10}/.test(msg.subject)) throw new Error('Assunto errado na versão do RELATORIO SKIN.');
+function resumo(msg) {
+  return `Assunto: "${msg.subject}". Texto: "${String(msg.text || '').replace(/\s+/g, ' ').trim().slice(0, 160)}"`;
+}
 
-    // 2) Versão Biblioteca (bdm = true, recuperação)
-    id = await idDoUsuario(caixa.address);
-    if (!id) throw new Error('Conta de teste não encontrada no Auth.');
-    await adminUsuario('PUT', id, { user_metadata: { bdm: true, nome: 'Jarvis', recuperar: true }, app_metadata: { bdm_sombra: true } });
-    await esperar(62000); // o Auth só manda outro código ao mesmo e-mail depois de 60 s
-    t0 = Date.now();
-    await pedirCodigo(caixa.address, {});
-    msg = await esperarEmail(caixa, t0);
-    if (!msg) throw new Error('O e-mail da Biblioteca não chegou em 2 minutos.');
-    console.log('  Biblioteca     →', msg.subject);
-    if (!/Biblioteca Digital/.test(msg.subject) || !/senha nova/.test(msg.text || '') || !/Jarvis/.test(msg.text || '')) {
-      throw new Error('Texto errado na versão da Biblioteca.');
+/**
+ * Pede códigos para uma caixa nova até o e-mail vir com a marca do modelo
+ * novo, e então confere o texto. dados = user_metadata da conta de teste
+ * (entra na criação da conta, no 1º pedido).
+ */
+async function testarVersao(nome, dados, versao, confere) {
+  const caixa = await criarCaixa();
+  console.log(`  ${nome}: caixa de teste ${caixa.address}`);
+  try {
+    for (let tentativa = 1; tentativa <= TENTATIVAS; tentativa++) {
+      const vistos = await idsNaCaixa(caixa);
+      await pedirCodigo(caixa.address, dados);
+      const msg = await esperarEmail(caixa, vistos);
+      if (!msg) throw new Error(`${nome}: o e-mail não chegou em 2 minutos.`);
+      const html = [].concat(msg.html || []).join('');
+      if (!html.includes(versao)) {
+        if (tentativa < TENTATIVAS) {
+          console.log(`  ${nome}: o Supabase ainda mandou o modelo antigo (tentativa ${tentativa} de ${TENTATIVAS}). Espero 1 minuto e tento de novo…`);
+          await esperar(62000); // o Auth só manda outro código ao mesmo e-mail depois de 60 s
+          continue;
+        }
+        throw new Error(`${nome}: depois de ${TENTATIVAS} tentativas o Supabase ainda manda o modelo antigo. ${resumo(msg)}`);
+      }
+      const erro = confere(msg);
+      if (erro) throw new Error(`${nome}: o modelo novo chegou, mas ${erro}. ${resumo(msg)}`);
+      console.log(`  ${nome} → ${msg.subject}  ✔`);
+      return;
     }
   } finally {
-    if (!id) id = await idDoUsuario(caixa.address).catch(() => null);
+    const id = await idDoUsuario(caixa.address).catch(() => null);
     if (id) await adminUsuario('DELETE', id).catch((e) => console.warn('  (não apaguei a conta de teste:', e.message + ')'));
   }
+}
+
+async function testar(versao) {
+  // 1) Biblioteca: conta com user_metadata.bdm = true (recuperação de senha)
+  await testarVersao('Biblioteca', { bdm: true, nome: 'Jarvis', recuperar: true }, versao, (msg) => {
+    if (!/Biblioteca Digital/.test(msg.subject)) return 'o assunto não fala da Biblioteca Digital (a condição .Data.bdm não funcionou)';
+    if (!/Jarvis/.test(msg.text || '') || !/senha nova/.test(msg.text || '')) return 'o texto não tem o nome ou a frase da senha nova';
+    return '';
+  });
+  // 2) RELATORIO SKIN: conta sem nenhum dado (a chave ausente não pode quebrar o e-mail do professor)
+  await testarVersao('RELATORIO SKIN', {}, versao, (msg) => {
+    if (!/RELATORIO SKIN/.test(msg.subject) || !/\d{6,10}/.test(msg.subject)) return 'o assunto do RELATORIO SKIN veio errado';
+    if (/Biblioteca Digital/.test(msg.text || '')) return 'o professor recebeu o texto da Biblioteca';
+    return '';
+  });
 }
 
 (async () => {
   if (!TOKEN) throw new Error('Falta SUPABASE_ACCESS_TOKEN (ambiente ou SUPABASE_PROJECT.env da Biblioteca).');
   if (!SEM_TESTE && (!SERVICE || !PUBLICA)) throw new Error('Para testar faltam SUPABASE_SERVICE_ROLE_KEY ou a chave pública.');
 
-  const html = modeloSemComentario();
+  const { html, versao } = modeloSemComentario();
   const atual = await gestao('GET');
   const anterior = {
     mailer_subjects_magic_link: atual.mailer_subjects_magic_link,
@@ -180,11 +218,11 @@ async function testar() {
   if (conferido.mailer_templates_magic_link_content !== html || conferido.mailer_subjects_magic_link !== ASSUNTO) {
     throw new Error('O Supabase não guardou o modelo igual ao arquivo.');
   }
-  console.log('Modelo publicado.');
+  console.log(`Modelo publicado (versão ${versao}). Testando as duas versões; pode levar alguns minutos…`);
   if (SEM_TESTE) return;
 
   try {
-    await testar();
+    await testar(versao);
     console.log('✅ As duas versões chegaram certas. Modelo em uso.');
   } catch (e) {
     console.error('❌ Teste falhou:', e.message);
