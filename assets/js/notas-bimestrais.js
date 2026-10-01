@@ -98,7 +98,7 @@ window.NotasBimestrais = (function () {
         if (opcoes.scopeKey) {
           var respostaProvas = await sync.getClient()
             .from("relatorio_provas_bimestrais")
-            .select("aluno_relatorio_id,disciplina,bimestre,nota_prova,realizada_em,origem,nota_primeira,nota_recuperacao")
+            .select("aluno_relatorio_id,disciplina,bimestre,nota_prova,realizada_em,origem,nota_primeira,nota_recuperacao,atividade_tema")
             .eq("scope_key", opcoes.scopeKey)
             .order("realizada_em", { ascending: true });
           if (respostaProvas.error) {
@@ -115,6 +115,7 @@ window.NotasBimestrais = (function () {
                 primeira: linha.nota_primeira === null ? null : Number(linha.nota_primeira),
                 recuperacao: linha.nota_recuperacao === null ? null : Number(linha.nota_recuperacao),
                 origem: linha.origem,
+                atividade: linha.atividade_tema || null,
                 realizadaEm: linha.realizada_em
               };
             });
