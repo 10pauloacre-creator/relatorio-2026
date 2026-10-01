@@ -2468,8 +2468,32 @@
       if (button) button.click();
     }
   }
+  // 💡 Ideias prontas (01/10/2026): assets/data/ideias-semente.json. Cada ideia entra uma vez, pelo id;
+  // se o professor editar ou excluir, a edição vale e a ideia não volta. Subir `versao` no JSON só acrescenta as novas.
+  function ensureIdeiasSemente() {
+    var chave = 'ideiasSementeV1';
+    fetch('assets/data/ideias-semente.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (dados) {
+      if (!dados || !Array.isArray(dados.ideias)) return;
+      var feitas = (state.migrations[chave] && state.migrations[chave].ids) || [];
+      var projeto = coreProjectByName(dados.projeto, 'project-biblioteca-digital');
+      var novas = dados.ideias.filter(function (i) { return feitas.indexOf(i.id) < 0 && !state.ideas.some(function (x) { return x.id === i.id; }); });
+      if (!novas.length) return;
+      function item(t) { var s = now(); return { id: id('chk'), text: t, done: false, children: [], createdAt: s, updatedAt: s }; }
+      novas.forEach(function (i) {
+        state.ideas.push({
+          id: i.id, title: i.title, description: i.description, section: i.section, priority: i.priority, status: i.status,
+          labels: i.labels || [], prompt: i.prompt || '', favorite: !!i.favorite, dueDate: null, attachments: [],
+          projectId: projeto ? projeto.id : null,
+          checklist: (i.chk || []).map(function (c) { var n = item(c[0]); n.children = (c[1] || []).map(item); return n; }),
+          createdAt: i.stamp, updatedAt: i.stamp
+        });
+      });
+      state.migrations[chave] = { addedAt: now(), ids: feitas.concat(novas.map(function (i) { return i.id; })) };
+      persist('ideias-semente'); render();
+    }).catch(function () {});
+  }
   function boot() {
-    loadCache(); ensureCoreProjects(); ensureReportsProjectIcon(); ensureLibraryProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureAxionProject(); ensureConexProject(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); carregarRelatorioSkin(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
+    loadCache();ensureCoreProjects(); ensureReportsProjectIcon(); ensureLibraryProjectIcon(); ensureFinanceProject(); ensureFinanceProjectIcon(); ensureRuralManagerProject(); ensureRuralManagerIcon(); ensureAxionProject(); ensureConexProject(); ensureLibraryDocumentation(); ensureProjectMindMaps(); render(); ensureIdeiasSemente(); carregarRelatorioSkin(); installServiceWorker(); initSync(); if (!syncStarted) migrateLegacyTimers();
     document.addEventListener('click', handleAction); document.addEventListener('change', handleFilter); document.addEventListener('keydown', handleKeyboard);
     window.addEventListener('hashchange', function () { if (PAGE === 'workspace') render(); });
     aiTickId = window.setInterval(updateAiTimers, 1000);
