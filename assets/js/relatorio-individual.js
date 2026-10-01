@@ -27,13 +27,14 @@
 // Atividades extras (01/10/2026) = cada atividade extra da Biblioteca para a
 // turma do aluno, com a entrega e a correção do professor (nota, parecer sobre
 // uso de I.A. e o relatório de correção, tabela extra_activity_correcoes).
+// Marcada como "Avaliação bimestral", a nota dela vale como nota de prova.
 // Comportamento desconta nota (Etapa 8B): leve 0,25 · médio 0,5 · grave 1,0 ·
 // muito grave 2,0, na nota do bimestre da disciplina, até 2,0 por bimestre.
 //
 // Depende de window.BoletimRegras (motor das notas).
 // ═══════════════════════════════════════════════════════════════════════════
 (function (root) {
-  var VERSAO = "2026-10-01a";
+  var VERSAO = "2026-10-01b";
   var PONTOS_CONDUTA = { leve: 0.25, medio: 0.5, grave: 1, muito_grave: 2 };
   var BIMESTRES = ["1", "2", "3", "4"];
   var PROFESSOR = "Paulo Roberto Ramalho Magalhães";
@@ -311,8 +312,10 @@
     } else if (!e.entregue && prazoPassou) {
       h += '<div class="section-note">O aluno não enviou resposta até o prazo.</div>';
     }
+    // Marcada como Avaliação bimestral: a nota da correção vale como nota de prova do bimestre.
+    var av = e.avaliacaoBimestral ? '<div class="ae-av">📝 Avaliação bimestral · a nota vale como nota de prova do bimestre</div>' : "";
     return '<div class="prova-bimestre ae"><div class="prova-titulo">' + (e.bimestre ? esc(e.bimestre) + "º Bimestre · " : "")
-      + titulo + '</div><div class="prova-bloco">' + h + "</div></div>";
+      + titulo + '</div><div class="prova-bloco">' + av + h + "</div></div>";
   }
 
   function atividadesExtrasDaDisciplina(dados, disciplina) {
@@ -443,6 +446,7 @@
     + ".ae-ia{display:inline-block;border-radius:999px;padding:1px 9px;font-size:10pt;font-weight:700;border:1px solid #2e7d4f;color:#1f6a40}"
     + ".ae-ia.possivel{border-color:#b7791f;color:#8a5a12}.ae-ia.provavel,.ae-ia.confirmado{border-color:#b42318;color:#a11d14}"
     + ".ae-detalhe{font-size:11pt}"
+    + ".ae-av{display:inline-block;margin:0 0 6px;padding:2px 10px;border:1px solid #b7791f;border-radius:999px;font-size:10pt;font-weight:700;color:#8a5a12}"
     + ".ae-detalhe .ae-sub{font-weight:700;color:var(--azul);border-bottom:1px solid #c9d6e3;padding-bottom:2px;margin:10px 0 5px;break-after:avoid}"
     + ".ae-detalhe table{table-layout:auto;margin:4px 0 6px}"
     + ".ae-detalhe th,.ae-detalhe td{font-size:10.5pt;padding:4px 6px;vertical-align:top;text-align:left}"
