@@ -1,0 +1,1137 @@
+{
+ "versao": 1,
+ "projeto": "Biblioteca digital",
+ "ideias": [
+  {
+   "id": "ideia-3d-01",
+   "title": "3D·01 — Proteger o projeto: backup, branch segura e auditoria da arquitetura",
+   "description": "Primeiro passo de tudo. Antes de qualquer MCP, Blender ou Tripo mexer no projeto, o código atual da Biblioteca Digital precisa estar versionado e o Claude precisa mapear o que existe (framework, bundler, Three.js atual, pasta de assets, rotas e livros). Nada é alterado nesta etapa: só leitura e relatório. Saída esperada: relatório de arquitetura + branch feature/avatar-3d + branch feature/downloads-realismo.",
+   "section": "0 · Fundação (vale para os dois temas)",
+   "priority": "Urgente",
+   "status": "Para o futuro",
+   "labels": [
+    "fundação",
+    "backup",
+    "git"
+   ],
+   "prompt": "Quero preparar este projeto para receber um pipeline profissional de realismo 3D e de personagem 3D animado.\nAntes de alterar qualquer arquivo:\n1. Analise a estrutura atual: framework, bundler, sistema de assets, Three.js existente, dependências, rotas, estrutura dos livros e a página /downloads/.\n2. Verifique o estado do Git (branch, arquivos sujos, remoto).\n3. NÃO modifique componentes existentes.\n4. Verifique se estamos numa branch segura. Se não, crie feature/downloads-realismo e feature/avatar-3d (a partir da main limpa).\n5. Não remova nem sobrescreva nada. Toda ferramenta 3D trabalha numa área isolada (3d-pipeline/).\n6. Entregue um relatório (docs/3d/ARQUITETURA.md): raiz do projeto, framework, versão do Node, build, onde ficam os assets públicos, se há Three.js (versão), estado do Git, tamanho atual da página /downloads/ (HTML+JS+imagens), riscos.\nNão instale Tripo nem Blender ainda.",
+   "favorite": true,
+   "chk": [
+    [
+     "👤 VOCÊ: Fazer cópia completa da pasta da Biblioteca (zip em outro disco/nuvem) ou confirmar que está tudo commitado e enviado ao GitHub",
+     []
+    ],
+    [
+     "👤 VOCÊ: Abrir o projeto no VS Code com o Claude Code (Opus 5.5 serve; Fable 5.1 só para as etapas longas)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Rodar o prompt desta ideia e gerar docs/3d/ARQUITETURA.md",
+     [
+      "Confirmar branches feature/downloads-realismo e feature/avatar-3d",
+      "Registrar tamanho atual da página /downloads/ (base para comparar depois)"
+     ]
+    ],
+    [
+     "👤 VOCÊ: Ler o relatório e dizer \"OK, pode seguir\" (se houver risco listado, decidir o que fazer)",
+     []
+    ]
+   ],
+   "ordem": 1,
+   "stamp": "2026-10-01T12:00:00.000Z"
+  },
+  {
+   "id": "ideia-3d-02",
+   "title": "3D·02 — Montar o \"estúdio\" do Claude Code: Playwright, Blender MCP, Tripo CLI, Poly Haven e CLAUDE.md 3D",
+   "description": "Transforma o Claude Code num estúdio de desenvolvimento. Ordem de instalação (do mais seguro ao que exige mais cuidado): 1) Playwright MCP (navegador real para testar e tirar prints), 2) Blender MCP (comunitário, executa Python dentro do Blender: só de fonte confiável), 3) Tripo CLI (geração/rig/animação do personagem, login pelo navegador, sem colar chave no chat), 4) script/MCP de assets Poly Haven (CC0), 5) CLAUDE.md da Biblioteca com a direção de arte e as regras de desempenho. Regras: nunca usar --dangerously-skip-permissions, nunca colocar chave de API em arquivo do repositório (o projeto é público no GitHub), não instalar dois Blender MCP ao mesmo tempo. Créditos do Web App do Tripo NÃO são os mesmos da API/CLI: conferir saldo antes de gerar.",
+   "section": "0 · Fundação (vale para os dois temas)",
+   "priority": "Urgente",
+   "status": "Para o futuro",
+   "labels": [
+    "fundação",
+    "mcp",
+    "claude-code"
+   ],
+   "prompt": "Prepare este computador para o pipeline 3D da Biblioteca Digital.\nExecute nesta ordem e valide cada passo antes do próximo:\n1. Verifique Claude Code, Node (>=20), npm, Git, Python, PowerShell. Atualize o que for necessário. Não use --dangerously-skip-permissions.\n2. Instale o Playwright MCP: claude mcp add playwright npx @playwright/mcp@latest. Teste abrindo http://localhost (a Biblioteca) e tirando um print.\n3. Instale uv (método oficial Windows) e registre o Blender MCP: claude mcp add blender uvx blender-mcp. Consulte primeiro a documentação ATUAL do pacote e a compatibilidade com a minha versão do Blender. Instale o add-on e PARE para eu ativar o servidor dentro do Blender (diga exatamente onde clicar).\n4. Instale a CLI do Tripo: npm install -g tripo-cli. Se o PowerShell bloquear o .ps1, use a solução oficial só para CurrentUser. Rode tripo --version e tripo docs --llm e LEIA a documentação inteira (não invente parâmetros). Rode tripo login e PARE para eu autorizar no navegador. Depois: tripo doctor, tripo whoami, tripo balance (sem mostrar credenciais). Não gere nada que gaste crédito.\n5. Registre o Tripo MCP no Claude Code usando exclusivamente a sintaxe de tripo mcp --help e claude mcp --help, no escopo do projeto.\n6. Crie um script de assets Poly Haven (API pública, licença CC0): search_texture, search_hdri, search_model, download_asset. Salve em 3d-pipeline/tools/.\n7. Crie o CLAUDE.md da Biblioteca (seção 3D) com: direção de arte, orçamento de polígonos, tamanhos de textura, metas de FPS, celulares-alvo, estrutura de pastas, regra \"nenhum GLB entra em produção sem passar pelo pipeline\", regra \"bloom só em fogo/magia/runas/portal\", regra \"sem chave de API no código\".\n8. Crie docs/3d/SETUP.md (como testar e reconectar cada integração) e .gitignore para caches, .blend pesados e credenciais.\nEntregue uma tabela COMPONENTE | VERSÃO | STATUS | AÇÃO.",
+   "favorite": true,
+   "chk": [
+    [
+     "🤖 CLAUDE: Verificar/atualizar Claude Code, Node 20+, Git, Python, PowerShell",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Instalar Playwright MCP e provar com um print real da Biblioteca",
+     []
+    ],
+    [
+     "👤 VOCÊ: Instalar o Blender estável (blender.org) se ainda não tiver, abrir uma vez e fechar",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Instalar uv, registrar Blender MCP e instalar o add-on",
+     [
+      "👤 VOCÊ: No Blender: Edit → Preferences → Add-ons → ativar \"Blender MCP\"",
+      "👤 VOCÊ: Viewport → tecla N → aba Blender MCP → Start MCP Server (deixar o Blender aberto)",
+      "👤 VOCÊ: Dizer ao Claude: \"Blender MCP está ativo\""
+     ]
+    ],
+    [
+     "🤖 CLAUDE: Testar o Blender MCP: criar esfera+plano+luz+câmera, renderizar 3d-pipeline/tests/blender-mcp-test.png e confirmar que o arquivo existe de verdade",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Instalar tripo-cli, ler tripo docs --llm, rodar tripo login",
+     [
+      "👤 VOCÊ: Autorizar a conta no navegador (nunca colar chave de API no chat) e dizer \"Concluí o login\"",
+      "🤖 CLAUDE: Rodar tripo doctor / whoami / balance e registrar o saldo"
+     ]
+    ],
+    [
+     "🤖 CLAUDE: Registrar Tripo MCP e criar docs/3d/TRIPO_SETUP.md",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Criar o script/MCP de assets Poly Haven e testar uma busca (\"old dark wood\")",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Criar o CLAUDE.md 3D da Biblioteca e o .gitignore de segurança",
+     []
+    ],
+    [
+     "👤 VOCÊ: Conferir a tabela final e anotar quanto crédito Tripo existe (Web App ≠ API)",
+     []
+    ]
+   ],
+   "ordem": 2,
+   "stamp": "2026-10-01T11:59:00.000Z"
+  },
+  {
+   "id": "ideia-3d-03",
+   "title": "3D·03 — Definir a direção de arte da biblioteca (decisão sua, antes de gerar qualquer coisa)",
+   "description": "É a decisão que o Claude NÃO deve tomar sozinho: ela muda iluminação, materiais, arquitetura, câmera e cores. Alvo sugerido: \"biblioteca medieval cinematográfica de fantasia\" (RPG AAA), combinando com Mago, Ranking de Poder, grimório e jogos. Escolha 1 referência dominante (Hogwarts / Skyrim / Diablo IV / biblioteca histórica europeia / Baldur's Gate 3) e 1 secundária. Saída: um \"Art Bible\" de 1 página que vai para o CLAUDE.md e serve de régua para toda aprovação visual. Observação do diagnóstico: os painéis (avisos e Sanctum Codex) já estão à frente do cenário 3D; o objetivo é o mundo atingir o nível visual dos painéis.",
+   "section": "1 · Tema 1 — Realismo da página /downloads/",
+   "priority": "Alta",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-1",
+    "direção-de-arte",
+    "manual"
+   ],
+   "prompt": "Ajude-me a criar o Art Bible da Biblioteca Digital (docs/3d/ART-BIBLE.md) a partir das minhas escolhas abaixo. Não gere código.\nReferência dominante: [ESCOLHER]. Secundária: [ESCOLHER].\nEstruture: 1) pilares visuais (3 frases), 2) paleta (HEX de pedra, madeira, metal envelhecido, pergaminho, luz quente de vela, luz fria da lua, magia), 3) materiais (lista com nível de desgaste), 4) iluminação (luz principal = lua pela janela; quente = velas/lareira; secundária = bounce; destaque = portal/pergaminhos mágicos), 5) regras de magia (só aparece onde é mágico; poeira sutil no resto), 6) o que é proibido (superfícies perfeitas, bloom global, 90° matemáticos), 7) 10 frases de prompt reutilizáveis para gerar imagens do ambiente, 8) critérios de \"ficou bom\" que eu possa usar para aprovar.\nUse o que já existe nos painéis do site (pedra, madeira, metal, desgaste, iluminação coerente) como âncora de estilo.",
+   "favorite": false,
+   "chk": [
+    [
+     "👤 VOCÊ: Escolher referência dominante e secundária (ver prints/trailers de cada uma)",
+     []
+    ],
+    [
+     "👤 VOCÊ: Reunir 8–12 imagens de referência (salão, estante, mesa do escriba, portal, galeria) em 3d-pipeline/input/moodboard/",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Gerar docs/3d/ART-BIBLE.md com paleta, materiais, luz e proibições",
+     []
+    ],
+    [
+     "👤 VOCÊ: Aprovar o Art Bible (editar à mão o que não gostar)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Copiar as regras essenciais para o CLAUDE.md 3D",
+     []
+    ]
+   ],
+   "ordem": 3,
+   "stamp": "2026-10-01T11:58:00.000Z"
+  },
+  {
+   "id": "ideia-3d-04",
+   "title": "3D·04 — Linha de base medida: prints, FPS, peso e erros da /downloads/ atual",
+   "description": "Antes de melhorar, medir. O Claude abre a página com o Playwright, percorre as 7 paradas em 1920×1080, 1366×768, tablet e celular, e salva: prints de cada parada, FPS médio/mínimo, peso total, tempo até interativo, erros de console, overflow e draw calls/triângulos. Esse \"antes\" é o que permite provar que o \"depois\" ficou melhor sem ficar mais pesado. Também lista o que hoje é geometria básica (BoxGeometry/CylinderGeometry + cores CSS) e que limita o realismo.",
+   "section": "1 · Tema 1 — Realismo da página /downloads/",
+   "priority": "Alta",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-1",
+    "qa",
+    "playwright"
+   ],
+   "prompt": "Use o Playwright MCP para auditar http://localhost/downloads/ (e a versão publicada https://biblioteca-digital-medieval.vercel.app/downloads/).\nPara 1920x1080, 1366x768, tablet e smartphone, percorra TODAS as sete paradas e, em cada uma: capture print, meça FPS médio e mínimo (via requestAnimationFrame por 5 s), registre erros de console, overflow, tempo de carregamento e peso transferido. Via renderer.info registre triângulos, draw calls, texturas e geometrias.\nSalve tudo em 3d-pipeline/reports/baseline/ (PNG + baseline.json + baseline.md).\nDepois leia o código da cena e liste, por objeto, o que é geometria primitiva com cor lisa (mesa, estantes, colunas, candelabros, portas, pedestais), o que já usa textura e o que é imagem de fundo. Classifique cada item: SUBSTITUIR POR GLB / TROCAR POR MATERIAL PBR / VIRAR IMAGEM DE FUNDO / MANTER.\nNão altere nenhum arquivo do site.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Capturar as 7 paradas em 4 tamanhos de tela",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Medir FPS, peso, draw calls, triângulos, erros",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Gerar baseline.md com a classificação de cada objeto (GLB / PBR / imagem / manter)",
+     []
+    ],
+    [
+     "👤 VOCÊ: Ver os prints e dizer o que mais te incomoda visualmente (vira prioridade da lista)",
+     []
+    ]
+   ],
+   "ordem": 4,
+   "stamp": "2026-10-01T11:57:00.000Z"
+  },
+  {
+   "id": "ideia-3d-05",
+   "title": "3D·05 — Pipeline de assets: Poly Haven (CC0), otimização de GLB/texturas e KTX2",
+   "description": "Regra de ouro: nenhum asset entra direto em produção. Todo GLB/textura baixado passa por: validação → remoção de dados inúteis → otimização de malha → redução de texturas → compressão (meshopt/Draco) → KTX2/Basis para texturas → teste desktop+mobile → relatório. Poly Haven é a fonte preferida (CC0, sem atribuição); Sketchfab só com licença conferida e atribuição registrada num arquivo CREDITOS.md. Resultado: um comando (npm run assets:optimize) que o Claude e você reutilizam para tudo.",
+   "section": "1 · Tema 1 — Realismo da página /downloads/",
+   "priority": "Alta",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-1",
+    "pipeline",
+    "assets",
+    "otimização"
+   ],
+   "prompt": "Construa o pipeline de assets 3D da Biblioteca (3d-pipeline/tools/assets/).\nRequisitos:\n1. Comando \"npm run assets:optimize <arquivo>\" que: valida o GLB (gltf-validator), remove nós/dados não usados, aplica dedup/prune/weld/simplify conservador (gltf-transform), comprime com meshopt ou Draco, reduz texturas (máx 2048 web, 1024 mobile), converte texturas para KTX2 (toktx/basisu) quando aplicável, e escreve relatório antes/depois (tamanho, triângulos, memória de textura).\n2. Comando \"npm run assets:fetch -- --type texture|hdri|model --query '...'\" usando a API do Poly Haven: baixa em 2K, PBR completo (albedo, normal, roughness, AO, displacement quando houver), grava a licença e a URL de origem em assets/CREDITOS.md.\n3. Estrutura: assets/3d/{models,textures,hdri,backgrounds}/ + manifest.json com hash, origem, licença e orçamento.\n4. Orçamentos como erro de build: modelo de cenário <= 15k triângulos; textura 2K web; GLB <= 2 MB cada (exceções documentadas).\n5. Instale o suporte no Three.js: GLTFLoader, MeshoptDecoder/DRACOLoader, KTX2Loader (com transcoder servido localmente).\n6. Teste com UMA textura de pedra e UMA de madeira de verdade, mostrando o relatório antes/depois.\nNão aplique nada na cena ainda.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Criar assets:optimize e assets:fetch (Poly Haven) com relatório antes/depois",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Configurar GLTFLoader + Meshopt/Draco + KTX2Loader no Three.js do projeto",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Testar com textura de pedra e de madeira reais e mostrar o relatório",
+     []
+    ],
+    [
+     "👤 VOCÊ: Conferir assets/CREDITOS.md (licenças) e aprovar o formato dos orçamentos",
+     []
+    ]
+   ],
+   "ordem": 5,
+   "stamp": "2026-10-01T11:56:00.000Z"
+  },
+  {
+   "id": "ideia-3d-06",
+   "title": "3D·06 — Qualidade adaptativa HIGH / MEDIUM / LOW (para alunos com celulares fracos)",
+   "description": "Fazer ANTES de adicionar beleza, para o orçamento já existir. Detecta hardwareConcurrency, deviceMemory, devicePixelRatio, GPU (WEBGL_debug_renderer_info) e FPS real nos 2 primeiros segundos, e escolhe o nível. HIGH: texturas 2K, AO, contact shadows, HDR, mais partículas e luzes, modelos detalhados. MEDIUM: texturas 1K, sombras médias, menos partículas. LOW: fundo pré-renderizado, poucos modelos, sombras \"baked\", sem AO/DOF. Se o FPS cair abaixo de 40 por 3 s, desce um nível sozinho; opção manual no menu e respeito a prefers-reduced-motion e economia de dados.",
+   "section": "1 · Tema 1 — Realismo da página /downloads/",
+   "priority": "Alta",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-1",
+    "desempenho",
+    "celular"
+   ],
+   "prompt": "Implemente o sistema de qualidade adaptativa na cena de /downloads/.\n- Módulo quality.js: detecta capacidades (hardwareConcurrency, deviceMemory, pixelRatio, GPU, FPS medido por 2 s) e devolve 'high' | 'medium' | 'low'.\n- Perfil por nível: resolução de textura (2048/1024/512), pixelRatio máx (2/1.5/1), sombras (mapa 2048/1024/desligado+baked), AO (sim/leve/não), partículas (200/80/20), luzes dinâmicas (6/3/1), pós-processamento (completo/leve/nenhum), modelos (LOD0/LOD1/LOD2), fundo (3D+imagem / imagem + 3D mínimo / imagem estática).\n- Degradação dinâmica: se FPS médio < 40 por 3 s, desce um nível; nunca sobe sozinho na mesma sessão.\n- Seletor manual (Auto/Alto/Médio/Baixo) salvo em localStorage, com try/catch.\n- Respeitar prefers-reduced-motion (câmera mais calma, sem sway) e Save-Data (força LOW).\n- Fallback sem WebGL: imagem estática + HTML funcional (a página continua utilizável).\n- Pausar render quando a aba está oculta ou o canvas fora da viewport; dispose correto.\n- Teste com o Playwright emulando 4x CPU throttling e mobile; mostrar qual nível cada cenário recebe.\nNão mude o visual ainda, só a infraestrutura.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Criar quality.js e os perfis HIGH/MEDIUM/LOW",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Degradação dinâmica por FPS + seletor manual + Save-Data + reduced-motion",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Fallback sem WebGL (imagem estática + HTML funcional)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Testar com Playwright em 4 cenários (PC forte, notebook, tablet, celular fraco)",
+     []
+    ],
+    [
+     "👤 VOCÊ: Se puder, abrir no seu celular real e no mais fraco que um aluno usaria e dizer qual nível apareceu",
+     []
+    ]
+   ],
+   "ordem": 6,
+   "stamp": "2026-10-01T11:55:00.000Z"
+  },
+  {
+   "id": "ideia-3d-07",
+   "title": "3D·07 — Materiais PBR de verdade + HDRI (PMREM) + hierarquia de luz",
+   "description": "Maior salto técnico de realismo. Troca \"MeshStandardMaterial({color})\" por materiais com albedo + normal + roughness + AO (+ displacement leve) para pedra, madeira, ferro, bronze, couro, pergaminho, tecido, chão, paredes e portas. Variação de roughness e desgaste (arranhões, bordas gastas, oxidação, musgo, rejunte irregular, manchas). Iluminação por HIERARQUIA em vez de muitas luzes: principal = lua pela janela; quente = velas/lareira com flicker; secundária = bounce da sala; destaque = portal/pergaminhos. HDRI interior escuro processado com PMREMGenerator (IBL) para metal, madeira encerada e couro. Tone mapping ACES/AgX.",
+   "section": "1 · Tema 1 — Realismo da página /downloads/",
+   "priority": "Alta",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-1",
+    "pbr",
+    "iluminação",
+    "materiais"
+   ],
+   "prompt": "Contexto fixo do projeto: Biblioteca Digital (Three.js + HTML), página https://biblioteca-digital-medieval.vercel.app/downloads/ (abertura dos \"Pergaminhos Sagrados\", escolha de música, sete paradas, instalação do app). Direção alvo: biblioteca medieval CINEMATOGRÁFICA DE FANTASIA (RPG AAA), não medieval historicamente realista. Público: alunos em celulares muito diferentes, então desempenho vem junto com beleza. Three.js = mundo; HTML/CSS = informação e interface.\nTarefa: realismo de materiais e luz da cena de /downloads/ SEM mudar a composição ainda.\n1. Usando 3d-pipeline/reports/baseline/, liste as superfícies a trocar. Para cada uma, use \"npm run assets:fetch\" para achar no Poly Haven texturas PBR 2K coerentes com o ART-BIBLE (pedra de parede, pedra de chão, madeira escura envelhecida, metal oxidado/bronze, couro, tecido, pergaminho). Priorize PBR completo.\n2. Crie material-library.js: uma função por material (stone, woodDark, ironAged, bronze, leather, parchment, cloth) que carrega mapas (map, normalMap, roughnessMap, aoMap, displacementMap leve), define repeat/anisotropy, usa colorSpace correto (sRGB só no albedo) e aceita o nível de qualidade (2K/1K/512).\n3. Variação anti-\"perfeito\": multiplique roughness por um ruído de baixa frequência; adicione um segundo conjunto de UV para AO; use detail maps ou decals sutis (sujeira, musgo, arranhões) nos encontros e cantos.\n4. Ambiente: baixe um HDRI de interior escuro (Poly Haven), gere com PMREMGenerator, aplique em scene.environment com intensidade baixa; scene.background continua sendo o cenário.\n5. Luz em hierarquia: 1 DirectionalLight fria (lua) com sombra de qualidade por nível; PointLights quentes agrupadas (máx 3 dinâmicas em HIGH) com flicker por ruído; HemisphereLight bem suave; luz de destaque no portal. Remova as luzes redundantes.\n6. toneMapping ACESFilmic (ou AgX), toneMappingExposure ajustado, outputColorSpace sRGB.\n7. Compare antes/depois com o Playwright (mesmos ângulos da linha de base) e FPS. Não aceite se FPS HIGH < 60 ou LOW < 30.\nEntregue prints lado a lado e o relatório. Eu aprovarei visualmente.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Buscar e instalar texturas PBR (pedra, madeira, metal, couro, tecido, pergaminho) via pipeline",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Criar material-library.js com variação de roughness e desgaste",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Aplicar HDRI com PMREMGenerator e tone mapping",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Reorganizar a iluminação em hierarquia (lua, velas, bounce, destaque) com flicker",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Gerar comparação antes/depois e medir FPS nos 3 níveis",
+     []
+    ],
+    [
+     "👤 VOCÊ: Aprovar ou pedir ajuste: \"a pedra ficou clara demais\", \"a madeira está lisa\" etc.",
+     []
+    ]
+   ],
+   "ordem": 7,
+   "stamp": "2026-10-01T11:54:00.000Z"
+  },
+  {
+   "id": "ideia-3d-08",
+   "title": "3D·08 — Fundo 2.5D: imagem cinematográfica do grande salão + impostores (planos transparentes)",
+   "description": "Em vez de modelar centenas de livros, dezenas de estantes, colunas e arcos, gerar UMA imagem monumental do salão (3840×2160) para a parte distante, e manter 3D real só no que fica perto da câmera. Objetos de segundo/terceiro plano (pilha de livros, candelabros distantes, tapeçarias) viram PNG/WebP com transparência em planos 3D (impostores). Camadas: BACKGROUND (imagem) → MIDGROUND (3D simples + impostores) → FOREGROUND (3D PBR detalhado). Imagens podem ser geradas com os conectores que você já tem (Higgsfield, ElevenLabs Image, Canva); o Claude gera vários candidatos e VOCÊ escolhe (risco: arquitetura incoerente, escala errada, perspectiva estranha, luz incompatível).",
+   "section": "1 · Tema 1 — Realismo da página /downloads/",
+   "priority": "Alta",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-1",
+    "imagem-ia",
+    "cenário-2.5d"
+   ],
+   "prompt": "Contexto fixo do projeto: Biblioteca Digital (Three.js + HTML), página https://biblioteca-digital-medieval.vercel.app/downloads/ (abertura dos \"Pergaminhos Sagrados\", escolha de música, sete paradas, instalação do app). Direção alvo: biblioteca medieval CINEMATOGRÁFICA DE FANTASIA (RPG AAA), não medieval historicamente realista. Público: alunos em celulares muito diferentes, então desempenho vem junto com beleza. Three.js = mundo; HTML/CSS = informação e interface.\nPrompt-base para a imagem do salão (ajuste com o ART-BIBLE):\n\"Interior monumental de uma biblioteca medieval de fantasia, arquitetura gótica, paredes de pedra envelhecida, enormes estantes de madeira escura, milhares de livros, velas, iluminação volumétrica dourada, poeira suspensa, luz fria da lua por janelas altas, profundidade cinematográfica, ambiente sombrio, concept art de ambiente ultra detalhado, materiais realistas, sem pessoas, composição centrada, perspectiva central, 3840x2160\".\nTarefa:\n1. Gere 6 candidatos (variações de ângulo/luz) com o gerador de imagens disponível e salve em 3d-pipeline/input/backgrounds/candidatos/. Monte uma folha de contato numerada e PARE para eu escolher.\n2. Com a escolhida: separe em camadas (fundo distante, meio com colunas/estantes, névoa) quando possível; exporte WebP 2K e 1K (e 512 para LOW). Ajuste cor/contraste ao ART-BIBLE sem destruir detalhes.\n3. Implemente o fundo 2.5D: planos em profundidades diferentes com parallax leve conforme a câmera, névoa fina entre as camadas, vinheta natural.\n4. Crie impostores (pilhas de livros, candelabros, tapeçarias) como planos com alpha, sempre voltados para a câmera (billboards), só no meio/fundo.\n5. LOW usa só a imagem; MEDIUM imagem + poucos impostores; HIGH completo.\n6. Verifique se a perspectiva da imagem bate com a câmera da cena (altura do horizonte, ponto de fuga) e corrija o FOV/posição, não a imagem.\nMostre prints antes/depois.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Gerar 6 candidatos de salão e montar folha de contato numerada",
+     []
+    ],
+    [
+     "👤 VOCÊ: Escolher a imagem (ou pedir nova rodada). Critérios: arquitetura coerente, escala, perspectiva, luz, estilo igual aos painéis",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Exportar WebP 2K/1K/512, montar camadas e parallax",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Criar impostores com alpha (livros, candelabros, tapeçarias)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Casar horizonte/ponto de fuga com a câmera da cena",
+     []
+    ],
+    [
+     "👤 VOCÊ: Aprovar o fundo e os impostores",
+     []
+    ]
+   ],
+   "ordem": 8,
+   "stamp": "2026-10-01T11:53:00.000Z"
+  },
+  {
+   "id": "ideia-3d-09",
+   "title": "3D·09 — Primeiro plano com modelos GLB reais (mesa do escriba, estantes, castiçal, portal, pedestal, baú)",
+   "description": "Objetos que ficam perto da câmera deixam de ser caixas e cilindros. Cada peça: modelo do Poly Haven/Sketchfab (licença conferida) OU feito no Blender via Blender MCP, com bevel em todas as arestas, UV decente, material PBR, ≤ 15 mil triângulos, origem e escala corretas, exportado em GLB e passado pelo pipeline de assets. Lista inicial: biblioteca (estrutura), estante, mesa-escriba, castiçal, livros (variados, levemente tortos), pergaminho, portal, brasão, pedestal do app, baú. Você escolhe entre 2–3 opções de cada antes de entrar (julgamento artístico).",
+   "section": "1 · Tema 1 — Realismo da página /downloads/",
+   "priority": "Alta",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-1",
+    "blender",
+    "glb",
+    "modelagem"
+   ],
+   "prompt": "Contexto fixo do projeto: Biblioteca Digital (Three.js + HTML), página https://biblioteca-digital-medieval.vercel.app/downloads/ (abertura dos \"Pergaminhos Sagrados\", escolha de música, sete paradas, instalação do app). Direção alvo: biblioteca medieval CINEMATOGRÁFICA DE FANTASIA (RPG AAA), não medieval historicamente realista. Público: alunos em celulares muito diferentes, então desempenho vem junto com beleza. Three.js = mundo; HTML/CSS = informação e interface.\nPara cada peça abaixo, proponha 2-3 opções (Poly Haven primeiro; se não houver, modele no Blender via MCP) e PARE para eu escolher. Depois de escolhida, entregue o GLB final:\nPeças: mesa-escriba, estante alta, castiçal de ferro, pilha de livros variados, pergaminho aberto, portal de pedra, brasão, pedestal do app, baú.\nRequisitos de cada modelo: bordas chanfradas (bevel) em tudo, sem arestas de 90° matemáticas; UV sem esticar; material PBR com variação de roughness e desgaste nas bordas; <= 15k triângulos (<= 5k para peças pequenas); escala em metros; origem na base; sem câmeras/luzes dentro do GLB; nomes de nó legíveis.\nLivros: tamanhos, inclinações, cores e lombadas diferentes (nunca 100 livros iguais alinhados) usando InstancedMesh com variação por instância.\nExporte para 3d-pipeline/exports/, passe por \"npm run assets:optimize\" e só então copie para assets/3d/models/. Atualize manifest.json e CREDITOS.md.\nIntegre na cena com o material-library e valide FPS nos 3 níveis. Entregue prints dos objetos de perto e de longe.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Propor 2–3 opções por peça (com prints) e esperar a escolha",
+     []
+    ],
+    [
+     "👤 VOCÊ: Escolher uma opção por peça",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Modelar/ajustar no Blender MCP: bevel, UV, material, desgaste",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Exportar GLB, otimizar, validar e integrar na cena",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Criar InstancedMesh de livros com variação por instância",
+     []
+    ],
+    [
+     "👤 VOCÊ: Aprovar o conjunto de primeiro plano",
+     []
+    ]
+   ],
+   "ordem": 9,
+   "stamp": "2026-10-01T11:52:00.000Z"
+  },
+  {
+   "id": "ideia-3d-10",
+   "title": "3D·10 — Contato com o chão, AO, atmosfera sutil (poeira, névoa, chama das velas)",
+   "description": "O que faz objeto deixar de \"flutuar\": sombras de contato e ambient occlusion nos encontros parede×chão, livro×prateleira, coluna×piso, objeto×mesa. Atmosfera com moderação: poucas partículas de poeira muito lentas, fog leve, flicker das velas, cinza perto do fogo, e partículas mágicas SÓ perto de elementos mágicos (quanto menos efeito mágico no ambiente comum, mais forte parece quando a magia acontece). Luz volumétrica falsa (cones de luz da janela com sprites/shader barato).",
+   "section": "1 · Tema 1 — Realismo da página /downloads/",
+   "priority": "Alta",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-1",
+    "atmosfera",
+    "sombras",
+    "partículas"
+   ],
+   "prompt": "Contexto fixo do projeto: Biblioteca Digital (Three.js + HTML), página https://biblioteca-digital-medieval.vercel.app/downloads/ (abertura dos \"Pergaminhos Sagrados\", escolha de música, sete paradas, instalação do app). Direção alvo: biblioteca medieval CINEMATOGRÁFICA DE FANTASIA (RPG AAA), não medieval historicamente realista. Público: alunos em celulares muito diferentes, então desempenho vem junto com beleza. Three.js = mundo; HTML/CSS = informação e interface.\nImplemente sombras de contato e atmosfera, respeitando os níveis de qualidade.\n1. Contact shadows: plano de sombra de contato sob mesa, estantes, pedestais, colunas e livros (HIGH: render target com blur; MEDIUM: decals/gradientes pré-assados; LOW: assado na textura).\n2. AO: GTAO/SAO no pós-processamento só em HIGH; MEDIUM usa aoMap das texturas; LOW nada.\n3. Partículas de poeira: 40-80 em HIGH, 20 MEDIUM, 0-10 LOW; movimento lentíssimo; mais densas dentro do cone de luz da janela; cor quente sutil.\n4. Fog exponencial bem leve ajustado ao ART-BIBLE; luz volumétrica falsa na janela (cone com gradiente aditivo, baixa opacidade).\n5. Velas: flicker por ruído (intensidade e posição levemente variando), chama como sprite/shader, cinza ascendente raro.\n6. Magia: partículas douradas SOMENTE em portal, grimório e objetos mágicos; nada no ambiente comum.\nVerifique com Playwright e meça FPS. Mostre antes/depois de 3 ângulos.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Contact shadows em todos os objetos de primeiro e segundo plano",
+     []
+    ],
+    [
+     "🤖 CLAUDE: AO (HIGH) e aoMap (MEDIUM)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Poeira lenta, fog leve e luz volumétrica falsa na janela",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Flicker e chama das velas",
+     []
+    ],
+    [
+     "👤 VOCÊ: Dizer se está \"sutil\" ou \"exagerado\" (regra: na dúvida, menos)",
+     []
+    ]
+   ],
+   "ordem": 10,
+   "stamp": "2026-10-01T11:51:00.000Z"
+  },
+  {
+   "id": "ideia-3d-11",
+   "title": "3D·11 — Pós-processamento seletivo e color grading cinematográfico",
+   "description": "Cadeia com moderação via EffectComposer: tone mapping, AO (HIGH), anti-aliasing (SMAA/FXAA), bloom SELETIVO só em fogo, magia, runas e portal (nunca global — senão vira \"jogo mobile\"), vinheta muito sutil, color grading (contraste e matiz coerentes com o ART-BIBLE) e profundidade de campo apenas em momentos específicos (ex.: ao abrir uma parada). Desligado em MEDIUM/LOW, exceto tone mapping e vinheta barata em CSS.",
+   "section": "1 · Tema 1 — Realismo da página /downloads/",
+   "priority": "Alta",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-1",
+    "pós-processamento",
+    "bloom"
+   ],
+   "prompt": "Contexto fixo do projeto: Biblioteca Digital (Three.js + HTML), página https://biblioteca-digital-medieval.vercel.app/downloads/ (abertura dos \"Pergaminhos Sagrados\", escolha de música, sete paradas, instalação do app). Direção alvo: biblioteca medieval CINEMATOGRÁFICA DE FANTASIA (RPG AAA), não medieval historicamente realista. Público: alunos em celulares muito diferentes, então desempenho vem junto com beleza. Three.js = mundo; HTML/CSS = informação e interface.\nCrie o pipeline de pós-processamento cinematográfico para /downloads/.\n- EffectComposer (ou pmndrs/postprocessing se já estiver no projeto): RenderPass → GTAO (HIGH) → Bloom seletivo (layers/ emissive threshold: SOMENTE velas/chamas, runas, portal, grimório) → SMAA → ColorGrade (LUT leve ou curva de contraste/saturação) → Vinheta sutil.\n- DOF somente durante a abertura de uma parada (foco no objeto de interesse), com transição suave e desligado fora disso.\n- Perfis: HIGH completo; MEDIUM só SMAA + vinheta + bloom leve; LOW nenhum (tone mapping do renderer).\n- Orçamento: 60 FPS em HIGH no notebook de referência. Se não bater, cortar na ordem: DOF → AO → bloom → resolução.\n- Teste que o bloom NÃO afeta pedra/madeira (mostre print com bloom ligado/desligado).\nEntregue relatório com custo de cada passe em ms.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Montar composer com passes por nível de qualidade",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Bloom seletivo (velas, runas, portal, grimório) e prova de que não vaza para o resto",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Color grading + vinheta + DOF só na abertura de paradas",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Relatório de custo por passe (ms) e FPS",
+     []
+    ],
+    [
+     "👤 VOCÊ: Aprovar o \"clima\" final (sombrio, quente, mágico) ou pedir ajuste",
+     []
+    ]
+   ],
+   "ordem": 11,
+   "stamp": "2026-10-01T11:50:00.000Z"
+  },
+  {
+   "id": "ideia-3d-12",
+   "title": "3D·12 — Câmera de cinema e as 7 paradas como lugares físicos do salão",
+   "description": "Hoje a câmera só muda position.z (efeito PowerPoint 3D). Passa a ter aceleração/desaceleração, trajetória curva (CatmullRomCurve3), parallax, sway mínimo, mudança suave de FOV e foco no objeto de interesse. As sete paradas deixam de ser telas e viram lugares: Entrada → Grande Salão → Painel de avisos (na parede de pedra) → Galeria do Ranking (placa enorme) → Portal da Sala de Jogos → Mesa do Grimório (login como grimório aberto sobre a mesa) → Pedestal do App → Sala de instruções. Ex.: ao chegar no Ranking, a câmera sai do centro, passa por uma coluna, o quadro aparece, desacelera e aproxima; aí o ranking abre.",
+   "section": "1 · Tema 1 — Realismo da página /downloads/",
+   "priority": "Alta",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-1",
+    "câmera",
+    "ux",
+    "sete-paradas"
+   ],
+   "prompt": "Contexto fixo do projeto: Biblioteca Digital (Three.js + HTML), página https://biblioteca-digital-medieval.vercel.app/downloads/ (abertura dos \"Pergaminhos Sagrados\", escolha de música, sete paradas, instalação do app). Direção alvo: biblioteca medieval CINEMATOGRÁFICA DE FANTASIA (RPG AAA), não medieval historicamente realista. Público: alunos em celulares muito diferentes, então desempenho vem junto com beleza. Three.js = mundo; HTML/CSS = informação e interface.\nReconstrua a navegação da /downloads/ como um percurso físico.\n1. Defina em camera-path.js um waypoint por parada: posição, alvo (lookAt), FOV, duração e easing, mais pontos intermediários para curvar o trajeto (CatmullRomCurve3).\n2. Mapa físico: Entrada → Grande Salão → Painel de avisos (parede de pedra) → Galeria do Ranking (placa grande) → Portal da Sala de Jogos → Mesa do Grimório (login) → Pedestal do App → Sala de instruções. Posicione os objetos GLB já aprovados nesses lugares.\n3. Movimento: ease in-out cúbico, leve overshoot amortecido, sway de respiração de 0,2-0,4 px, parallax por ponteiro/giroscópio (desligado em reduced-motion), FOV sobe levemente na viagem e desce na chegada, foco (DOF HIGH) no objeto da parada.\n4. Interrupção segura: se o usuário clicar durante a viagem, a câmera redireciona suavemente, sem pulo.\n5. Acessibilidade: botões/teclado (←/→/Enter/Esc), foco visível, aria-live anunciando \"Parada 3 de 7: Galeria do Ranking\", e um botão \"Pular animação\".\n6. Celular: trajetos mais curtos, sem sway, toque para avançar.\nTeste cada transição no Playwright e grave um vídeo curto de cada.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Criar camera-path.js com waypoints, curva e easing",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Posicionar cada objeto/interface no seu lugar físico do salão",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Sway, parallax, FOV dinâmico, foco, interrupção segura",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Teclado, aria-live, \"Pular animação\" e versão mobile",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Gravar vídeos de teste das 7 transições",
+     []
+    ],
+    [
+     "👤 VOCÊ: Assistir e aprovar a sensação da câmera (rápida demais? lenta?)",
+     []
+    ]
+   ],
+   "ordem": 12,
+   "stamp": "2026-10-01T11:49:00.000Z"
+  },
+  {
+   "id": "ideia-3d-13",
+   "title": "3D·13 — Interfaces HTML ancoradas em objetos 3D (hotspots), sem texto dentro do canvas",
+   "description": "Three.js = mundo; HTML/CSS = informação. O usuário clica num objeto 3D (placa do ranking, grimório, portal, pedestal) e a interface HTML aparece por cima, ancorada em coordenadas projetadas, preservando legibilidade, acessibilidade, responsividade, desempenho e manutenção. O painel de avisos e o Sanctum Codex (já bonitos) seguem como HTML, agora \"apoiados\" na parede de pedra. Hotspots com raycaster, hover com brilho sutil, cursor pointer, e equivalente por teclado.",
+   "section": "1 · Tema 1 — Realismo da página /downloads/",
+   "priority": "Alta",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-1",
+    "ui",
+    "html",
+    "hotspots"
+   ],
+   "prompt": "Contexto fixo do projeto: Biblioteca Digital (Three.js + HTML), página https://biblioteca-digital-medieval.vercel.app/downloads/ (abertura dos \"Pergaminhos Sagrados\", escolha de música, sete paradas, instalação do app). Direção alvo: biblioteca medieval CINEMATOGRÁFICA DE FANTASIA (RPG AAA), não medieval historicamente realista. Público: alunos em celulares muito diferentes, então desempenho vem junto com beleza. Three.js = mundo; HTML/CSS = informação e interface.\nImplemente hotspots 3D → UI HTML.\n- Raycaster para pointer e toque; hover = leve realce (emissive/outline fino); cursor pointer; fila de objetos clicáveis em hotspots.js.\n- Ancoragem: projetar a posição 3D do objeto para CSS (CSS2DRenderer ou transform manual), reposicionando a cada frame só quando visível; ocultar atrás de objetos (depth check simples).\n- Cada parada tem um painel HTML (já existente) que abre ao clicar no objeto, com animação de entrada, foco gerenciado, Esc para fechar, e a câmera aproxima durante a abertura.\n- Equivalente acessível: cada hotspot tem um botão HTML invisível focável com aria-label, para teclado/leitor de tela.\n- Nunca renderizar texto longo dentro do canvas.\n- Celular: toque abre o painel em folha inferior, não ancorado.\nTeste com Playwright: clicar em cada objeto, abrir/fechar, navegar por Tab, verificar sem overflow e sem erros.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Raycaster + hover + ancoragem de painéis HTML",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Botões acessíveis para cada hotspot (teclado e leitor de tela)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Versão celular em folha inferior",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Testes Playwright de clique, Tab e Esc",
+     []
+    ],
+    [
+     "👤 VOCÊ: Testar no celular e dizer se o toque acerta os objetos",
+     []
+    ]
+   ],
+   "ordem": 13,
+   "stamp": "2026-10-01T11:48:00.000Z"
+  },
+  {
+   "id": "ideia-3d-14",
+   "title": "3D·14 — QA final do Tema 1: regressão visual, desempenho, acessibilidade e aprovação",
+   "description": "Fecha o Tema 1. Compara com a linha de base (prints, FPS, peso), roda auditoria Lighthouse, testa 4 tamanhos de tela e os 3 níveis de qualidade, verifica console/overflow/memória (vazamento ao navegar), e só então publica. Nenhuma tarefa é considerada concluída com regressão aberta. A decisão de \"ficou bonito\" é sua.",
+   "section": "1 · Tema 1 — Realismo da página /downloads/",
+   "priority": "Alta",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-1",
+    "qa",
+    "aprovação"
+   ],
+   "prompt": "Execute o QA final da /downloads/ renovada.\n1. Repita a auditoria da linha de base (3d-pipeline/reports/baseline) e gere comparação lado a lado de cada parada (antes × depois).\n2. Meça FPS (HIGH/MEDIUM/LOW), peso transferido, tempo até interativo, memória após navegar 3 vezes pelas 7 paradas (detectar vazamento) e renderer.info.\n3. Lighthouse (desempenho, acessibilidade, boas práticas) em desktop e mobile.\n4. Verifique: overflow horizontal, erros de console, WebGL perdido (context lost), fallback sem WebGL, reduced-motion, teclado, contraste do texto sobre cena.\n5. Valide que nenhum GLB/textura entrou sem passar pelo pipeline e que CREDITOS.md está completo.\n6. Gere reports/downloads-realismo/FINAL.html com PASS/WARNING/FAIL. Não declare sucesso com FAIL crítico.\n7. Se tudo passar, abra o PR da branch feature/downloads-realismo e NÃO faça merge: eu aprovo.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Comparar antes × depois e medir desempenho/memória",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Lighthouse desktop e mobile, acessibilidade e fallback",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Gerar FINAL.html (PASS/WARNING/FAIL)",
+     []
+    ],
+    [
+     "👤 VOCÊ: Revisão visual final (você decide se está \"real\" o bastante) e aprovar o PR",
+     []
+    ],
+    [
+     "👤 VOCÊ: Publicar (merge) e conferir a página no ar em celular e computador",
+     []
+    ]
+   ],
+   "ordem": 14,
+   "stamp": "2026-10-01T11:47:00.000Z"
+  },
+  {
+   "id": "ideia-3d-15",
+   "title": "3D·15 — Referências do Mago: multiview (frente, costas, lados, 3/4, rosto) em pose neutra",
+   "description": "Consistência vem das referências. Gerar/organizar imagens do mago em pose A ou T, SEM cajado na mão (o cajado vira objeto separado depois) e sem objetos flutuantes: front, back, left, right, front-3-4 e face. Mesma roupa, cores, barba, cabelo e proporções em todas. O Claude audita as imagens ANTES de gastar créditos e propõe quais enviar ao Tripo. Imagens podem ser produzidas com os conectores de imagem disponíveis (Higgsfield \"character sheet\", ElevenLabs Image, Canva).",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "mago",
+    "referências"
+   ],
+   "prompt": "Analise as imagens em 3d-pipeline/input/reference/ antes de qualquer crédito do Tripo.\n1. Liste cada imagem: resolução, proporção, fundo.\n2. Compare consistência entre as vistas: rosto, cabelo preto, barba, túnica roxa, detalhes dourados, proporções caricatas, acessórios.\n3. Aponte o que atrapalha a geração: cajado fundido na mão, objetos flutuantes, poses diferentes, pés/mãos cortados, perspectiva exagerada, fundo poluído.\n4. Decida: A) adequadas, B) usar só algumas, C) produzir multiview antes. Se C, gere as vistas faltantes com o gerador de imagens mantendo o personagem idêntico (character sheet) e pose A neutra, sem cajado.\n5. Não altere os originais. Escreva reports/reference-analysis.md e proponha exatamente quais arquivos enviar ao Tripo.\nPARE e mostre o plano; não gaste crédito.",
+   "favorite": false,
+   "chk": [
+    [
+     "👤 VOCÊ: Colocar as imagens em 3d-pipeline/input/reference/ (front, back, left, right, front-3-4, face) — pose A/T, sem cajado na mão",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Auditar consistência e gerar reference-analysis.md",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Se faltar vista, produzir o character sheet com o gerador de imagens",
+     []
+    ],
+    [
+     "👤 VOCÊ: Aprovar o plano: \"Aprovado. Pode gerar o modelo mestre.\"",
+     []
+    ]
+   ],
+   "ordem": 15,
+   "stamp": "2026-10-01T11:46:00.000Z"
+  },
+  {
+   "id": "ideia-3d-16",
+   "title": "3D·16 — Gerar o modelo mestre no Tripo e otimizar a geometria ANTES do rig",
+   "description": "Ordem importante: retopologia/decimation/segmentação ANTES do rigging, porque essas operações podem descartar o esqueleto e as animações. O modelo atual tem ~1 milhão de vértices e ~1,9 milhão de triângulos: pesado demais para navegador. Metas: master ≤ 80k tri; web ≈ 40k; LODs 20k/10k/5k; avatar pequeno em livro ≈ 15–30k. Preservar rosto, dedos, olhos, silhueta e bordas da túnica; se a redução degradar, marcar REQUIRES_REVIEW e manter o original. Nunca regenerar um modelo pago se a entrada (hash) não mudou.",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "tripo",
+    "geometria"
+   ],
+   "prompt": "Gere e prepare o modelo mestre do mago com o Tripo CLI.\nAntes: releia tripo docs --llm e os tópicos commands/make, examples/game-asset, examples/animation, examples/ar-web. Não use parâmetro que não esteja na documentação instalada.\n1. Gere com as referências aprovadas (tarefa \"mage-master-generation\"), preservando identidade facial, cabelo preto, barba, túnica roxa, detalhes dourados e proporções caricatas. Sem rigging ainda. Saída estruturada (JSON), aguarde a tarefa terminar, salve outputs e task metadata em 3d-pipeline/tripo/. Inspecione o preview.\n2. Reports: reports/generation-report.md (comando, task id, créditos, arquivos, tamanho, observações visuais). Não faça segunda geração paga sem justificar.\n3. Geometria: inspecione vértices, triângulos, materiais, UV, texturas, não-manifold, duplicações. Preserve uma cópia HIGH intacta. Use retopologia/decimation do Tripo (consultando a doc) até ~80k tri; não use Decimate agressivo que destrua rosto, dedos, olhos, silhueta e bordas da roupa. Salve mage_master_unrigged.glb e reports/geometry-report.md (antes/depois).\n4. Cache: grave hash das entradas; nunca recrie nada pago se o hash for o mesmo.\nPARE e mostre previews para minha aprovação visual.",
+   "favorite": false,
+   "chk": [
+    [
+     "👤 VOCÊ: Aprovar a primeira geração (checkpoint humano no primeiro personagem)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Gerar o modelo no Tripo e salvar metadata/preview",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Retopologia/decimation até ~80k tri sem destruir rosto, mãos e roupa",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Relatórios geometry-report.md e generation-report.md",
+     []
+    ],
+    [
+     "👤 VOCÊ: Olhar os previews: o rosto continua sendo o seu mago? Aprovar ou pedir correção",
+     []
+    ]
+   ],
+   "ordem": 16,
+   "stamp": "2026-10-01T11:45:00.000Z"
+  },
+  {
+   "id": "ideia-3d-17",
+   "title": "3D·17 — Rig-check, Auto Rig (biped, skeleton Mixamo) e cajado como objeto separado",
+   "description": "Primeiro rig-check (riggable e rig_type recomendado = biped; se não for, diagnosticar a geometria, não forçar). Depois Auto Rig: biped, spec Mixamo (nomes de ossos compatíveis com animações Mixamo), saída GLB (+ FBX de segurança para edição no Blender). Conferir hierarquia: Root → Hips → Spine → Chest → Neck → Head, braços, mãos, pernas, pés. Testar pose simples e procurar deformações graves em ombros, cotovelos, joelhos, mãos, túnica e barba. No Blender (MCP): separar o cajado como MageStaff, ponto de attachment no osso da mão direita, equipar/desequipar/trocar.",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "rig",
+    "tripo",
+    "blender"
+   ],
+   "prompt": "Faça o rig do mago.\n1. Riggability check do modelo otimizado (equivalente a rig-check do Tripo, conforme a documentação instalada). Se riggable != true ou rig_type != biped: não force; diagnostique e corrija a causa. Registre em reports/rig-check.md.\n2. Auto Rig do Tripo: rig_type biped, spec mixamo (se suportado), saída GLB principal e FBX intermediário. Verifique quantidade de bones, hierarquia, root, hips, spine, head, arms, hands, legs, feet. Teste uma pose/movimento simples e procure deformação em ombros, cotovelos, joelhos, mãos, túnica e barba. Salve mage_rigged.glb e reports/rig-report.md. Não avance silenciosamente se houver deformação grave.\n3. Blender via MCP: abra o rigado. Se o cajado estiver fundido na malha, separe em um objeto \"MageStaff\" preservando materiais, corrija a malha, crie um ponto de attachment e vincule ao osso da mão direita (equipar/desequipar/trocar). Não altere rosto nem proporções. Salve 3d-pipeline/blender/mage_master_rigged.blend.\n4. Auditoria técnica (geometria, rig, pesos, vértices sem peso, materiais PBR, texturas ausentes, dependências externas, compatibilidade glTF) em reports/blender-audit.md/json; classifique ERROR/WARNING/INFO e corrija só o que for seguro, com backup antes.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Rig-check e relatório (parar se não for biped/riggable)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Auto Rig biped Mixamo + FBX de segurança",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Teste de deformação e relatório de rig",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Separar o cajado (MageStaff) e vincular à mão direita",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Auditoria Blender (ERROR/WARNING/INFO)",
+     []
+    ],
+    [
+     "👤 VOCÊ: Revisar capa, barba, mãos e túnica (weight painting é onde a automação mais erra)",
+     []
+    ]
+   ],
+   "ordem": 17,
+   "stamp": "2026-10-01T11:44:00.000Z"
+  },
+  {
+   "id": "ideia-3d-18",
+   "title": "3D·18 — Biblioteca inicial de animações do Mago (core, gestos, emoções, ações)",
+   "description": "Clips retargetados para o rig do mago, 30 FPS, in-place (sem deslocamento acidental) e root motion documentado. Loops perfeitos em Idle, IdleLookAround, Walk, Run. Gestos começam/terminam compatíveis com transição para Idle. CORE: Idle, IdleLookAround, Walk, Run, Jump. GESTOS: Wave, PointLeft, PointRight, Explain, Thinking, NodYes, ShakeNo. EMOÇÕES CORPORAIS: Happy, Celebrate, Surprised, Sad, Confused. AÇÕES: MagicCast, StaffRaise, ReadBook. Registrar tudo em config/animations.json (name, type, loop, duration, fps, rootMotion, source, file). Carregamento sob demanda: core no GLB base, o resto em arquivos separados.",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "animação",
+    "tripo"
+   ],
+   "prompt": "Crie a biblioteca inicial de animações do mago.\nConsulte antes: tripo docs --topic examples/animation e os comandos atuais de animação/retarget (não invente presets).\nLista: Idle, IdleLookAround, Walk, Run, Jump | Wave, PointLeft, PointRight, Explain, Thinking, NodYes, ShakeNo | Happy, Celebrate, Surprised, Sad, Confused | MagicCast, StaffRaise, ReadBook.\nPara cada uma: retarget ao rig do mago; 30 FPS; eliminar deslocamentos acidentais; marcar in-place vs root-motion; loop perfeito (Idle, IdleLookAround, Walk, Run); início/fim compatíveis com Idle nos gestos; nomes padronizados; preview quando possível; não gaste crédito duplicando tarefas existentes (cache por hash).\nRevise no Blender via MCP (Actions/NLA, frame rate). Exporte: core embutido em mago-base.glb e as demais em animations/*.glb carregáveis sob demanda.\nRegistre tudo em config/animations.json e gere um contact sheet de poses-chave para eu revisar.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Gerar/retargetar as 20 animações (reaproveitando por hash)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Garantir loops perfeitos e gestos que voltam ao Idle",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Exportar core embutido + animações em arquivos separados",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Preencher config/animations.json e gerar contact sheet",
+     []
+    ],
+    [
+     "👤 VOCÊ: Assistir aos previews e marcar quais animações ficaram estranhas",
+     []
+    ]
+   ],
+   "ordem": 18,
+   "stamp": "2026-10-01T11:43:00.000Z"
+  },
+  {
+   "id": "ideia-3d-19",
+   "title": "3D·19 — Expressões faciais (shape keys / morph targets) e visemas para fala",
+   "description": "Rig corporal ≠ rig facial. O Auto Rig do Tripo NÃO entrega expressões; criar Shape Keys no Blender (via MCP/Python) e exportar como morph targets no GLB. Base: Basis (nunca alterada). Olhos: BlinkLeft, BlinkRight, BlinkBoth, EyesWide. Sobrancelhas: BrowUp, BrowDown. Emoções: Smile, Sad, Angry, Surprised, Confused. Boca: JawOpen, MouthSmile, MouthFrown, MouthO, MouthA, MouthE. Fase 2: visemas (A, E, I, O, U…) para lip-sync com áudio. Verificar em 0.0 / 0.5 / 1.0, sem deformar barba e cabelo indevidamente. Se a topologia não permitir, marcar REQUIRES_MANUAL_REVIEW em vez de criar deformação feia. Esta é a parte que mais exige olho humano.",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "rosto",
+    "morph-targets",
+    "blender"
+   ],
+   "prompt": "Analise a topologia facial do mago e decida se é adequada para morph targets.\nSe for, crie no Blender (via MCP/Python) os Shape Keys: Basis; BlinkLeft, BlinkRight, BlinkBoth, EyesWide; BrowUp, BrowDown; Smile, Sad, Angry, Surprised, Confused; JawOpen, MouthSmile, MouthFrown, MouthO, MouthA, MouthE.\nRegras: Basis intacta; cada key afeta só a região necessária; preserve a identidade facial; evite deformar barba/cabelo; teste em 0.0, 0.5 e 1.0; gere renders comparativos (reports/facial-rig-report.md e renders/preview/facial-contact-sheet.png).\nSe a topologia tornar uma key inviável, NÃO crie deformação ruim: marque REQUIRES_MANUAL_REVIEW e explique o que um artista precisaria fazer.\nExporte com morph targets no GLB e valide que o Three.js enxerga morphTargetDictionary com esses nomes.\nFase 2 (separada): visemas A/E/I/O/U/MBP/FV para lip-sync por áudio.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Auditar a topologia do rosto (adequada ou não?)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Criar shape keys de olhos, sobrancelhas, emoções e boca",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Gerar facial-contact-sheet.png (0.0 / 0.5 / 1.0)",
+     []
+    ],
+    [
+     "👤 VOCÊ: Revisar o contact sheet: sorriso, olhos, barba. Corrigir o que parecer estranho",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Exportar morph targets no GLB e conferir os nomes no Three.js",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Fase 2: visemas para lip-sync",
+     []
+    ]
+   ],
+   "ordem": 19,
+   "stamp": "2026-10-01T11:42:00.000Z"
+  },
+  {
+   "id": "ideia-3d-20",
+   "title": "3D·20 — Aprovar o master, travar versão e exportar LODs, texturas otimizadas e GLB final",
+   "description": "Depois da aprovação do mestre (marco humano: \"Aprovado o modelo mestre\"), nada mais mexe nele sem criar nova versão. A partir do master: LOD0 40k, LOD1 20k, LOD2 10k, LOD3 5k, preservando rig, UV, materiais, nomes de bones e morph targets essenciais (rosto íntegro em LOD0/LOD1). Texturas: master até 4096 quando necessário, web 2048, LODs distantes menores, ORM packing se compatível, meshopt/KTX2. GLB final sem caminhos absolutos, escala/orientação/origem corretas, sem câmeras/luzes dentro. Versionamento imutável (mage/v1, v2…) com character-lock.json.",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "aprovação",
+    "lod",
+    "texturas",
+    "glb"
+   ],
+   "prompt": "Com o master APROVADO, produza os artefatos de produção sem modificar o master.\n1. LODs a partir do master: mage_LOD0.glb (~40k), LOD1 (~20k), LOD2 (~10k), LOD3 (~5k). Preserve rig, UV, materiais, nomes de bones; morph targets essenciais em LOD0/LOD1; screenshots na mesma câmera para comparação (reports/lod-report.md).\n2. Texturas: master até 4096 só se necessário; web 2048; LODs distantes reduzidos; avalie ORM packing; KTX2/meshopt; meça antes/depois de memória e tamanho (reports/textures-report.md).\n3. Exportação: valide sem paths absolutos, sem arquivos ausentes, escala/orientação/origem corretas, sem objetos auxiliares, glTF válido. Saída em assets/characters/mage/models/ e manifest.json.\n4. Versionamento imutável: assets/characters/mage/v1/ com character-lock.json (versão, data, hashes de entrada/saída, task IDs do Tripo, contagens de triângulos, versão do rig, animações, hashes de textura, versão do pipeline, status de aprovação) e alias controlado \"current\".\nNunca sobrescreva silenciosamente uma versão aprovada.",
+   "favorite": false,
+   "chk": [
+    [
+     "👤 VOCÊ: Dizer \"Aprovado o modelo mestre.\" (ou listar correções)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Gerar LOD0–LOD3 com relatório visual",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Otimizar texturas (2048 web, KTX2) e medir ganho",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Exportar GLBs válidos e atualizar manifest.json",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Criar v1 + character-lock.json + alias current",
+     []
+    ]
+   ],
+   "ordem": 20,
+   "stamp": "2026-10-01T11:41:00.000Z"
+  },
+  {
+   "id": "ideia-3d-21",
+   "title": "3D·21 — MageAvatar no Three.js: arquitetura, API pública e camada de intenções",
+   "description": "Componente central único (MageAvatar) usado por todos os livros: ModelLoader, AnimationController (AnimationMixer + crossfade), FacialController (morph targets), LookAtController, GestureController, AttachmentController (cajado), AudioLipSyncController e LODController. API de 3 níveis: AÇÃO (play, walkTo, lookAt), EMOÇÃO (setEmotion) e INTENÇÃO (help, explain, congratulate, encourage, warn, think, greet, point, read). O livro nunca controla ossos: diz \"mage.explain(questao2)\" e o controlador decide olhar + apontar + expressão + animação + áudio + volta ao Idle. LOD adaptativo (não carregar 40k triângulos para um avatar de 80 px), lazy loading, pausa fora da viewport, dispose correto, fallback sem WebGL, respeita prefers-reduced-motion.",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "three.js",
+    "api",
+    "avatar"
+   ],
+   "prompt": "Integre o Mage Avatar à Biblioteca. Analise a arquitetura atual e adapte-se a ela sem reescrever componentes desnecessariamente.\nCrie MageAvatar com: ModelLoader, AnimationController (AnimationMixer, crossfade, prevenção de actions duplicadas), FacialController (morph targets, blink automático, transições suaves), LookAtController (cabeça/olhos até limites), GestureController, AttachmentController (equipar/desequipar cajado), AudioLipSyncController (visemas por áudio quando existirem) e LODController (escolhe LOD pelo tamanho em pixels).\nAPI: load(), play(name), idle(), walk(), lookAt(target), pointAt(target), setEmotion(name), equip('staff'), unequip('staff'), setLOD('auto'), destroy().\nIntenções (camada separada do conteúdo): help(target), explain(target), congratulate(), encourage(), warn(), think(), greet(), point(target), read(target). Cada uma orquestra animação + expressão + olhar + apontar + retorno ao Idle (ex.: congratulate = Happy facial + Celebrate + olhar para o aluno + Idle).\nEngenharia: lazy loading, pausa fora da viewport, dispose completo, fallback se WebGL falhar (imagem estática), prefers-reduced-motion, sem vazamento ao abrir/fechar livros.\nCrie a página \"3D Avatar Lab\" (interna, fora da produção dos alunos) para testar todas as animações, expressões, LODs, lookAt, cajado, FPS, triângulos, draw calls e memória, com botão \"RUN AUTOMATED TESTS\" (PASS/FAIL).",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Criar MageAvatar e seus controladores",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Implementar a API de ações/emoções/intenções",
+     []
+    ],
+    [
+     "🤖 CLAUDE: LOD adaptativo, lazy loading, pausa fora da viewport, dispose, fallback",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Criar o 3D Avatar Lab com testes automáticos",
+     []
+    ],
+    [
+     "👤 VOCÊ: Abrir o Lab e brincar com cada animação e expressão; listar o que está estranho",
+     []
+    ]
+   ],
+   "ordem": 21,
+   "stamp": "2026-10-01T11:40:00.000Z"
+  },
+  {
+   "id": "ideia-3d-22",
+   "title": "3D·22 — Mago dentro dos livros: tutor que reage ao aluno (acerta, erra, demora, pede ajuda)",
+   "description": "O mago continua pequeno no canto da tela, mas agora é objeto 3D programável: olha para a questão, aponta elementos DOM (botão \"Enviar resposta\"), reage ao clique. Gatilhos pedagógicos: aluno abre questão → olha; demora → Thinking; pede ajuda → Explain + fala; acerta → Celebrate; erra → Confused → Explain; sobe de nível → MagicCast + Celebrate. Sem código específico por página: tudo via eventos do sistema de livros → MageAvatar.intenções. Integração com o Ranking de Poder (ver CLAUDE.md seção 15) e com a regra de que a prova só inicia com aluno logado.",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "livros",
+    "pedagogia"
+   ],
+   "prompt": "Implemente a camada que liga os livros ao MageAvatar, sem código específico por livro.\n- Barramento de eventos do livro (question:open, question:idle(10s), question:correct, question:wrong, help:request, level:up, book:open, book:close) → mapeamento declarativo (JSON) → intenções do MageAvatar.\n- Apontar para elementos DOM: converter retângulo DOM em direção 3D do olhar/braço; destacar o elemento com um halo CSS sutil; retornar ao Idle depois.\n- Falas: texto na bolha HTML (acessível, aria-live) e, quando houver áudio, lip-sync.\n- Respeitar acessibilidade: botão para silenciar/ocultar o mago, preferência salva (try/catch), reduced-motion, e que o conteúdo nunca dependa do mago.\n- Desempenho: avatar em LOD pelo tamanho na tela, canvas pequeno e pausado quando o livro está em segundo plano.\n- Teste no Playwright: simular cada evento e verificar a animação/expressão esperadas; sem erros de console; memória estável ao abrir/fechar 10 livros.\nEntregue um guia curto \"como um livro novo usa o mago\" (docs/3d/MAGO-NOS-LIVROS.md).",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Barramento de eventos + mapeamento declarativo evento → intenção",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Apontar para elementos DOM com halo sutil",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Bolha de fala acessível, botão de silenciar e preferência salva",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Testes simulando acerto, erro, demora e pedido de ajuda",
+     []
+    ],
+    [
+     "👤 VOCÊ: Testar num livro real com um aluno/colega e anotar se o mago ajuda ou atrapalha",
+     []
+    ]
+   ],
+   "ordem": 22,
+   "stamp": "2026-10-01T11:39:00.000Z"
+  },
+  {
+   "id": "ideia-3d-23",
+   "title": "3D·23 — Controlador de personagem para jogos (state machine, input abstrato, playground)",
+   "description": "Mesmo mago, mesmo GLB. Fluxo obrigatório: Input → CharacterController → StateMachine → AnimationController → Movement/Physics (nunca teclado direto no AnimationMixer). Estados: IDLE, WALK, RUN, JUMP, FALL, INTERACT, CAST_MAGIC, HURT. Entradas abstratas: Keyboard, Touch, Gamepad. Playground: WASD, Shift correr, Space pular, E interagir, 1 magia; câmera de terceira pessoa SÓ no playground. Preparar integração futura com Rapier sem forçar física pesada nos livros.",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "jogo",
+    "state-machine"
+   ],
+   "prompt": "Estenda o MageAvatar para um CharacterController reutilizável de jogos.\n- StateMachine com estados IDLE, WALK, RUN, JUMP, FALL, INTERACT, CAST_MAGIC, HURT, transições explícitas e blend por velocidade.\n- Camada de input abstrata (KeyboardInput, TouchInput com joystick virtual, GamepadInput) que emite comandos, nunca toca no AnimationMixer.\n- Fluxo: Input → CharacterController → StateMachine → AnimationController → Movement/Physics.\n- Interface de física plugável (movimento cinemático simples por padrão; adaptador Rapier opcional, carregado só no playground).\n- Playground \"Mage Playground\": WASD mover, Shift correr, Space pular, E interagir, 1 magia; câmera terceira pessoa apenas ali; mapa simples com obstáculos.\n- Mobile: joystick + botões grandes, 60 FPS alvo em MEDIUM.\n- Testes: transições válidas, nenhum estado preso, animações disparadas pelo estado.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Criar a state machine e os 8 estados",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Input abstrato (teclado, toque, controle)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Interface de física plugável (Rapier opcional)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Playground com câmera de terceira pessoa",
+     []
+    ],
+    [
+     "👤 VOCÊ: Jogar 5 minutos no PC e no celular e anotar o que está pesado ou travando",
+     []
+    ]
+   ],
+   "ordem": 23,
+   "stamp": "2026-10-01T11:38:00.000Z"
+  },
+  {
+   "id": "ideia-3d-24",
+   "title": "3D·24 — Validador automático + comandos mage:* + pipeline de um comando (mage:build)",
+   "description": "Automação de verdade. scripts/validate-character valida modelo (GLB válido, tamanho, triângulos), rig (bones necessários, skinning, pesos), animações (Idle/Walk/Run, transições, duplicadas), rosto (morph targets esperados), texturas (dimensões, ausentes), web (carrega, renderiza, erros de console, memória, FPS) e arquivos (paths, manifest, nomes) → PASS/WARNING/FAIL em JSON+HTML; nada vai à produção com FAIL. Comandos: mage:generate, mage:rig, mage:animate, mage:optimize, mage:render, mage:export, mage:validate, mage:test, mage:publish e mage:build (pipeline completo com reviewMode, logs, retries, resume, cache, tratamento de rate-limit e créditos insuficientes, e proibição de repetir tarefas pagas sem necessidade).",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "validação",
+    "automação",
+    "pipeline"
+   ],
+   "prompt": "Crie o validador e o pipeline reproduzível do mago.\n1. scripts/validate-character: valida MODEL, RIG, ANIMATION, FACE, TEXTURE, WEB e FILES; gera reports/validation.json e validation.html com PASS/WARNING/FAIL; nenhum asset vai à produção se houver FAIL.\n2. Comandos (adapte ao package manager): mage:generate, mage:rig, mage:animate [--name], mage:optimize, mage:render [--animation X | --turntable], mage:export [--target web], mage:validate [--strict], mage:test, mage:publish e mage:build.\n3. mage:build encadeia: Validate References → Tripo Generation → Geometry → Rig Check → Auto Rig → Animation Retarget → Blender Import → Blender Audit → Facial Rig → LOD → Texture Optimization → GLB Export → GLB Validation → Studio Render → Animation Previews → Copy Production Assets → Manifest → Web Tests → Final Report.\n4. reviewMode configurável (true = pede aprovação após geração e após facial rig; false = segue se os testes técnicos passarem).\n5. Robustez: logs estruturados, retries, resume, cache por hash, task IDs, rate-limit, créditos insuficientes, detecção de arquivos existentes, build ID/versão, nunca sobrescrever master aprovado, nunca recriar modelo Tripo com entrada inalterada.\n6. Documentação em 3d-pipeline/README.md.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Construir validate-character com relatório JSON+HTML",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Criar os comandos mage:* e documentar no README",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Montar mage:build com resume, cache e proteção de créditos",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Implementar reviewMode (pausas de aprovação)",
+     []
+    ],
+    [
+     "👤 VOCÊ: Rodar \"mage:validate --strict\" e entender o relatório (qualquer FAIL bloqueia)",
+     []
+    ]
+   ],
+   "ordem": 24,
+   "stamp": "2026-10-01T11:37:00.000Z"
+  },
+  {
+   "id": "ideia-3d-25",
+   "title": "3D·25 — Estúdio de render automático: turntable, previews de animação e fundo transparente",
+   "description": "Blender em background (sem interface) com cena de estúdio reutilizável (fundo neutro, iluminação de 3 pontos, câmera consistente, shadow catcher, enquadramento automático). Saídas: frontal, 3/4, lateral, costas, close facial, thumbnail, turntable 360° (6–10 s, 30 FPS, MP4 H.264 via FFmpeg) e preview de cada animação. Preview rápido com Eevee; final com Cycles (só quando pedir). Presets: portrait, full-body, close-up, turntable, transparent, studio. Comando mage-render com animation, camera, background, engine, resolution e fps. Esses renders também servem de capa dos livros e do site.",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "render",
+    "blender",
+    "vídeo"
+   ],
+   "prompt": "Construa o sistema automatizado de render do mago.\n1. 3d-pipeline/blender/mage_render_studio.blend: fundo neutro, iluminação de três pontos, câmera consistente, shadow catcher, enquadramento automático, color management adequado.\n2. Scripts Python (chamados com blender --background --python) para: frontal, 3/4 esquerda, lateral, costas, close facial, thumbnail, turntable 360°, preview de cada animação.\n3. Preview: Eevee, rápido. Final: Cycles apenas sob pedido explícito.\n4. Turntable: rotação 360° uniforme, personagem em Idle, câmera fixa, 30 FPS, 6-10 s; sequência PNG e, se o FFmpeg estiver instalado (ou puder ser instalado por método confiável), MP4 H.264 + capa PNG.\n5. Comando mage-render com parâmetros animation, camera (portrait|full-body|close-up), background (transparent|studio), engine, resolution, fps; calcular intervalo de frames pela animação; registrar tempo de render.\n6. Saídas em renders/{preview,turntable,animations}/.\nNão renderize tudo em Cycles; comece com previews.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Criar o estúdio .blend e os scripts de render headless",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Gerar turntable.mp4 + capa",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Criar o comando mage-render com os presets",
+     []
+    ],
+    [
+     "👤 VOCÊ: Aprovar o enquadramento/iluminação do estúdio",
+     []
+    ]
+   ],
+   "ordem": 25,
+   "stamp": "2026-10-01T11:36:00.000Z"
+  },
+  {
+   "id": "ideia-3d-26",
+   "title": "3D·26 — mage-motion: novas animações só descrevendo em português (sem tocar no Tripo/Blender)",
+   "description": "Workflow final de uso diário: \"o mago olha para cima, levanta o cajado, comemora por dois segundos e volta ao Idle\". O sistema interpreta o texto, reutiliza clips existentes quando possível, consulta o Tripo só se uma animação nova for necessária, retargeta, importa no Blender, corrige transições, valida, exporta, renderiza preview, atualiza animations.json, integra ao AvatarController e gera relatório. NUNCA regenera o personagem e NUNCA altera o skeleton master. Teste de aceitação: CelebrateMagic (sem loop, Idle → olhar → sorriso → cajado → pose 1 s → Idle) entregue como CelebrateMagic.glb + preview.mp4 + PASS.",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "linguagem-natural",
+    "animação"
+   ],
+   "prompt": "Crie o workflow \"mage-motion\".\nEntrada: uma descrição natural de movimento. O sistema deve: 1) interpretar e decompor em fases; 2) identificar clips reutilizáveis em animations.json e compor/blendar quando possível; 3) consultar o Tripo apenas se for realmente necessário (respeitando cache e créditos); 4) retargetar; 5) importar no Blender (MCP) e corrigir transições; 6) validar; 7) exportar GLB; 8) renderizar preview (mage-render); 9) atualizar config/animations.json; 10) integrar ao AnimationController/intenções; 11) gerar relatório. Regras: não regenerar o personagem; nunca alterar o skeleton master.\nTeste de aceitação (execute): \"Crie CelebrateMagic: o mago começa em Idle, olha para a frente, abre um sorriso, levanta o cajado, o braço esquerdo acompanha, faz pose de comemoração, mantém por ~1 s e volta suavemente ao Idle. Sem loop.\" Entregue CelebrateMagic.glb, preview.mp4 e PASS no validador.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Criar o interpretador de descrição → plano de clips",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Reaproveitar clips e só chamar o Tripo se necessário",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Rodar o teste CelebrateMagic de ponta a ponta",
+     []
+    ],
+    [
+     "👤 VOCÊ: Ver preview.mp4 e aprovar (se PASS + bom, o pipeline está operacional)",
+     []
+    ]
+   ],
+   "ordem": 26,
+   "stamp": "2026-10-01T11:35:00.000Z"
+  },
+  {
+   "id": "ideia-3d-27",
+   "title": "3D·27 — Teste E2E completo do Mage 3D Pipeline (sem mocks) e relatório final",
+   "description": "Verificação de ponta a ponta: Tripo e Blender disponíveis, MCPs conectados, master/rig/animações/exports presentes, GLBs válidos, renders funcionando, Lab funcionando, Three.js carrega, animações e expressões executam, LOD funciona, cleanup funciona, build de produção continua passando e NENHUM segredo commitado. Relatório E2E-REPORT.html/json com PASS/WARNING/FAIL; sem declarar sucesso com FAIL crítico.",
+   "section": "2 · Tema 2 — Mago 3D: avatar, livros e jogos",
+   "priority": "Média",
+   "status": "Para o futuro",
+   "labels": [
+    "tema-2",
+    "e2e",
+    "qualidade"
+   ],
+   "prompt": "Execute um teste E2E completo do Mage 3D Pipeline, sem mocks nas etapas locais.\nVerifique: Tripo e Blender disponíveis; Tripo MCP e Blender MCP conectados; master, rig, animações e exports localizados; GLBs válidos; renders funcionando; Mage 3D Lab funcionando; Three.js carrega o modelo; animações e expressões executam; LOD funciona; cleanup/dispose funciona (sem vazamento); build de produção da Biblioteca passa; nenhum segredo está commitado (rode scanner de segredos).\nGere reports/E2E-REPORT.html e .json com PASS/WARNING/FAIL por item. Não declare sucesso se houver FAIL crítico. Abra PR de feature/avatar-3d sem merge.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Rodar todos os checks do E2E",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Scanner de segredos no repositório (público!)",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Gerar E2E-REPORT.html/json",
+     []
+    ],
+    [
+     "👤 VOCÊ: Ler o relatório e aprovar o PR de feature/avatar-3d",
+     []
+    ]
+   ],
+   "ordem": 27,
+   "stamp": "2026-10-01T11:34:00.000Z"
+  },
+  {
+   "id": "ideia-3d-28",
+   "title": "3D·28 — Mago vivo na /downloads/ e identidade visual única (Tema 1 + Tema 2 juntos)",
+   "description": "Quando as duas frentes estiverem aprovadas: o mago aparece na biblioteca renovada, recebe o visitante na Entrada, caminha/aponta até cada parada, comemora quando o app instala e reage ao clique nos objetos. Reaproveita câmera cinematográfica, hotspots, qualidade adaptativa e LOD. Critério: o mundo ao redor atinge o mesmo nível visual dos painéis e do personagem.",
+   "section": "3 · Integração final",
+   "priority": "Baixa",
+   "status": "Para o futuro",
+   "labels": [
+    "integração",
+    "tema-1",
+    "tema-2"
+   ],
+   "prompt": "Contexto fixo do projeto: Biblioteca Digital (Three.js + HTML), página https://biblioteca-digital-medieval.vercel.app/downloads/ (abertura dos \"Pergaminhos Sagrados\", escolha de música, sete paradas, instalação do app). Direção alvo: biblioteca medieval CINEMATOGRÁFICA DE FANTASIA (RPG AAA), não medieval historicamente realista. Público: alunos em celulares muito diferentes, então desempenho vem junto com beleza. Three.js = mundo; HTML/CSS = informação e interface.\nIntegre o MageAvatar (LOD adaptativo) à /downloads/ renovada.\n- Entrada: mago acena (Wave) e o visitante inicia o percurso.\n- Em cada parada o mago se posiciona perto do objeto e usa intenções (point, explain, greet, congratulate quando o app é instalado).\n- Respeitar qualidade: LOW sem mago 3D (imagem/sprite), MEDIUM LOD2, HIGH LOD1.\n- Iluminar o mago com o mesmo HDRI/luzes da cena, sombra de contato, sem bloom no personagem.\n- Acessibilidade: botão para ocultar o mago, reduced-motion, conteúdo nunca depende dele.\n- Medir FPS e comparar com o QA do Tema 1; se perder mais de 10%, reduzir LOD/efeitos antes de publicar.\nGere prints e vídeo curto da jornada completa.",
+   "favorite": false,
+   "chk": [
+    [
+     "🤖 CLAUDE: Posicionar o mago em cada parada com intenções adequadas",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Integrar luz/sombra do mago à cena",
+     []
+    ],
+    [
+     "🤖 CLAUDE: Medir FPS e ajustar LOD",
+     []
+    ],
+    [
+     "👤 VOCÊ: Assistir à jornada completa no PC e no celular e aprovar",
+     []
+    ],
+    [
+     "👤 VOCÊ: Publicar e divulgar aos alunos",
+     []
+    ]
+   ],
+   "ordem": 28,
+   "stamp": "2026-10-01T11:33:00.000Z"
+  }
+ ]
+}
