@@ -845,7 +845,8 @@
     const data = d.realizadaEm ? new Date(d.realizadaEm).toLocaleDateString("pt-BR") : "";
     let texto = formatNumber(d.nota) + "/10";
     // Atividade extra marcada como Avaliação bimestral (01/10/2026).
-    if (d.origem === "atividade_extra") texto += " · Avaliacao bimestral (atividade extra" + (d.atividade ? ": " + d.atividade : "") + ")";
+    if (d.origem === "atividade_extra") texto += " · Avaliacao bimestral (atividade extra" + (d.atividade ? ": " + d.atividade : "") + ")"
+      + (d.naoEntregue ? " · nao entregue = 0 (a prova do livro substitui se for maior)" : "");
     if (d.recuperacao !== null && d.primeira !== null) {
       texto += " (prova " + formatNumber(d.primeira) + ", recuperacao do livro " + formatNumber(d.recuperacao) + ": vale a maior)";
     }
