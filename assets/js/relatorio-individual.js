@@ -34,7 +34,7 @@
 // Depende de window.BoletimRegras (motor das notas).
 // ═══════════════════════════════════════════════════════════════════════════
 (function (root) {
-  var VERSAO = "2026-10-01b";
+  var VERSAO = "2026-10-01c";
   var PONTOS_CONDUTA = { leve: 0.25, medio: 0.5, grave: 1, muito_grave: 2 };
   var BIMESTRES = ["1", "2", "3", "4"];
   var PROFESSOR = "Paulo Roberto Ramalho Magalhães";
@@ -294,10 +294,12 @@
     if (e.entregue) entrega = dataBr(dataLocal(e.entregueEm)) + (e.atrasado ? " · fora do prazo" : " · no prazo");
     else entrega = prazoPassou ? "Não entregue" : "Ainda no prazo";
     var corrigida = e.nota !== null && e.nota !== undefined;
+    // Avaliação bimestral não entregue até o prazo = nota 0 (a prova do livro, se maior, vale no lugar).
+    var zero = e.avaliacaoBimestral && !e.entregue && prazoPassou && !corrigida;
     var ia = e.usoIa ? '<span class="ae-ia ' + esc(e.usoIa) + '">' + esc(ROTULO_IA[e.usoIa] || e.usoIa) + "</span>" : "—";
     var h = '<table class="ae-info"><tr><th>Prazo</th><th>Entrega</th><th>Nota</th><th>Uso de I.A.</th></tr>'
       + "<tr><td>" + (e.prazo ? dataBr(dataLocal(e.prazo)) : "—") + "</td><td>" + esc(entrega) + "</td><td>"
-      + (corrigida ? "<strong>" + numero(e.nota) + "</strong> / " + numero(e.notaMax || 10) : (e.entregue ? "aguardando correção" : "—"))
+      + (corrigida ? "<strong>" + numero(e.nota) + "</strong> / " + numero(e.notaMax || 10) : (e.entregue ? "aguardando correção" : (zero ? "<strong>" + numero(0) + "</strong> / " + numero(10) : "—")))
       + "</td><td>" + (corrigida ? ia : "—") + "</td></tr></table>";
     var miolo = corrigida ? mioloDoRelatorio(e.relatorioHtml) : "";
     if (miolo) {
@@ -310,7 +312,8 @@
         + (crit ? '<div class="ae-sub">Avaliação por critério</div><table><tr><th>Critério</th><th class="num">Pontos</th></tr>' + crit + "</table>" : "")
         + "</div>";
     } else if (!e.entregue && prazoPassou) {
-      h += '<div class="section-note">O aluno não enviou resposta até o prazo.</div>';
+      h += '<div class="section-note">O aluno não enviou resposta até o prazo.'
+        + (zero ? " Por ser Avaliação bimestral, fica com nota 0 na prova do bimestre; se fizer a prova do livro, vale a maior nota." : "") + "</div>";
     }
     // Marcada como Avaliação bimestral: a nota da correção vale como nota de prova do bimestre.
     var av = e.avaliacaoBimestral ? '<div class="ae-av">📝 Avaliação bimestral · a nota vale como nota de prova do bimestre</div>' : "";
