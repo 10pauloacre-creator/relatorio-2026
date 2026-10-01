@@ -10,7 +10,7 @@ window.__RELATORIOS_APP_BUILD__ = {
   "downloadPageUrl": "https://relatorio.skin/downloads/",
   "latestJsonUrl": "https://relatorio.skin/downloads/latest.json",
   "latestScriptUrl": "https://relatorio.skin/downloads/latest.js",
-  "generatedAt": "2026-09-28T21:02:40.161Z"
+  "generatedAt": "2026-10-01T14:16:51.535Z"
 };
 
 (function loadRelatorio2026Theme() {
