@@ -4,8 +4,9 @@
 // Monta o documento do modelo do professor
 // (docs/modelo_relatorio_individual_anual_aluno.html) já preenchido com os
 // dados do banco (RPC relatorio_individual): identificação, notas por
-// bimestre, relatório de provas, atividades feitas e observações de
-// comportamento, com cabeçalho oficial e assinatura.
+// bimestre, relatório de provas, atividades extras (correção do professor),
+// atividades feitas e observações de comportamento, com cabeçalho oficial e
+// assinatura.
 //
 // Usado pelo painel do professor (Relatório 2026) E pelo perfil do aluno
 // (Biblioteca Digital). Os dois repositórios têm uma cópia IDÊNTICA deste
@@ -23,13 +24,16 @@
 //
 // Relatório de provas = o mesmo resultado que o aluno vê ao terminar a prova
 // no livro (prova-report.js), em versão compacta para papel.
+// Atividades extras (01/10/2026) = cada atividade extra da Biblioteca para a
+// turma do aluno, com a entrega e a correção do professor (nota, parecer sobre
+// uso de I.A. e o relatório de correção, tabela extra_activity_correcoes).
 // Comportamento desconta nota (Etapa 8B): leve 0,25 · médio 0,5 · grave 1,0 ·
 // muito grave 2,0, na nota do bimestre da disciplina, até 2,0 por bimestre.
 //
 // Depende de window.BoletimRegras (motor das notas).
 // ═══════════════════════════════════════════════════════════════════════════
 (function (root) {
-  var VERSAO = "2026-09-25a";
+  var VERSAO = "2026-10-01a";
   var PONTOS_CONDUTA = { leve: 0.25, medio: 0.5, grave: 1, muito_grave: 2 };
   var BIMESTRES = ["1", "2", "3", "4"];
   var PROFESSOR = "Paulo Roberto Ramalho Magalhães";
@@ -48,6 +52,12 @@
   function dataBr(iso) {
     var partes = String(iso || "").slice(0, 10).split("-");
     return partes.length === 3 ? partes[2] + "/" + partes[1] + "/" + partes[0] : "";
+  }
+
+  /** Data e hora com fuso (timestamptz) → AAAA-MM-DD no horário de Rio Branco (UTC−5). */
+  function dataLocal(iso) {
+    var t = Date.parse(iso);
+    return isFinite(t) ? new Date(t - 5 * 3600000).toISOString().slice(0, 10) : String(iso || "").slice(0, 10);
   }
 
   function esc(valor) {
@@ -84,6 +94,9 @@
     var datas = [];
     (dados.aulas || []).forEach(function (a) { if (a.data) datas.push(String(a.data).slice(0, 10)); });
     (dados.ocorrencias || []).forEach(function (o) { if (o.data) datas.push(String(o.data).slice(0, 10)); });
+    (dados.atividadesExtras || []).forEach(function (e) {
+      [e.entregueEm, e.corrigidoEm].forEach(function (d) { if (d) datas.push(dataLocal(d)); });
+    });
     datas.sort();
     return datas.length ? dataBr(datas[datas.length - 1]) : dataBr(dados.geradoEm);
   }
@@ -251,6 +264,66 @@
     }).join("");
   }
 
+  // ── Atividades extras (correção do professor) ─────────────────────────
+  var ROTULO_IA = { nao: "Sem indícios de I.A.", possivel: "Possível uso de I.A.", provavel: "Fortes indícios de I.A.", confirmado: "Uso de I.A. confirmado" };
+
+  /** Mesma disciplina com nomes diferentes ("Inglês" = "Língua Inglesa", "Arte" = "Artes"). */
+  function chaveDisciplina(nome) {
+    var k = String(nome || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+    return { ingles: "lingua inglesa", espanhol: "lingua espanhola", arte: "artes" }[k] || k;
+  }
+
+  /** Miolo do relatório de correção (do 1º título até antes da assinatura), sem scripts. */
+  function mioloDoRelatorio(html) {
+    html = String(html || "");
+    var ini = html.search(/<h2[\s>]/i);
+    if (ini < 0) return "";
+    var fim = html.indexOf('<div class="ass"', ini);
+    return html.slice(ini, fim > ini ? fim : html.length)
+      .replace(/<script[\s\S]*?<\/script>/gi, "")
+      .replace(/\son[a-z]+\s*=\s*("[^"]*"|'[^']*')/gi, "")
+      .replace(/<h2([^>]*)>\s*\d+\.\s*/gi, "<h2$1>")
+      .replace(/<h2[^>]*>/gi, '<div class="ae-sub">').replace(/<\/h2>/gi, "</div>");
+  }
+
+  function atividadeExtra(e) {
+    var titulo = esc(e.tema || "Atividade extra") + (e.subtema ? " — " + esc(e.subtema) : "");
+    var prazoPassou = e.prazo && Date.parse(e.prazo) < Date.now();
+    var entrega;
+    if (e.entregue) entrega = dataBr(dataLocal(e.entregueEm)) + (e.atrasado ? " · fora do prazo" : " · no prazo");
+    else entrega = prazoPassou ? "Não entregue" : "Ainda no prazo";
+    var corrigida = e.nota !== null && e.nota !== undefined;
+    var ia = e.usoIa ? '<span class="ae-ia ' + esc(e.usoIa) + '">' + esc(ROTULO_IA[e.usoIa] || e.usoIa) + "</span>" : "—";
+    var h = '<table class="ae-info"><tr><th>Prazo</th><th>Entrega</th><th>Nota</th><th>Uso de I.A.</th></tr>'
+      + "<tr><td>" + (e.prazo ? dataBr(dataLocal(e.prazo)) : "—") + "</td><td>" + esc(entrega) + "</td><td>"
+      + (corrigida ? "<strong>" + numero(e.nota) + "</strong> / " + numero(e.notaMax || 10) : (e.entregue ? "aguardando correção" : "—"))
+      + "</td><td>" + (corrigida ? ia : "—") + "</td></tr></table>";
+    var miolo = corrigida ? mioloDoRelatorio(e.relatorioHtml) : "";
+    if (miolo) {
+      h += '<div class="ae-detalhe">' + miolo + "</div>";
+    } else if (corrigida) {
+      var crit = (e.criterios || []).map(function (c) {
+        return "<tr><td>" + esc(c.criterio) + '</td><td class="num">' + numero(c.nota) + " / " + numero(c.max) + "</td></tr>";
+      }).join("");
+      h += '<div class="ae-detalhe">' + (e.resumo ? '<div class="ae-sub">Resumo da produção</div><p class="resumo">' + esc(e.resumo) + "</p>" : "")
+        + (crit ? '<div class="ae-sub">Avaliação por critério</div><table><tr><th>Critério</th><th class="num">Pontos</th></tr>' + crit + "</table>" : "")
+        + "</div>";
+    } else if (!e.entregue && prazoPassou) {
+      h += '<div class="section-note">O aluno não enviou resposta até o prazo.</div>';
+    }
+    return '<div class="prova-bimestre ae"><div class="prova-titulo">' + (e.bimestre ? esc(e.bimestre) + "º Bimestre · " : "")
+      + titulo + '</div><div class="prova-bloco">' + h + "</div></div>";
+  }
+
+  function atividadesExtrasDaDisciplina(dados, disciplina) {
+    var chave = chaveDisciplina(disciplina.nome);
+    var lista = (dados.atividadesExtras || []).filter(function (e) {
+      return e.disciplina && chaveDisciplina(e.disciplina) === chave;
+    });
+    if (!lista.length) return '<div class="prova-bimestre"><div class="prova-bloco">Nenhuma atividade extra nesta disciplina até agora.</div></div>';
+    return lista.map(atividadeExtra).join("");
+  }
+
   function atividadesDaDisciplina(dados, disciplina, calc) {
     var valorPorBimestre = {};
     var previstas = 0;
@@ -366,6 +439,18 @@
     + ".prova-bimestre{border:1px solid var(--borda);margin-bottom:10px}"
     + ".prova-titulo{background:var(--cinza);font-weight:700;padding:5px 8px;border-bottom:1px solid var(--borda);break-after:avoid}"
     + ".prova-bloco{padding:8px}.prova-bloco+.prova-bloco{border-top:1px dashed var(--borda)}"
+    + ".ae-info th,.ae-info td{text-align:center;font-size:11pt}"
+    + ".ae-ia{display:inline-block;border-radius:999px;padding:1px 9px;font-size:10pt;font-weight:700;border:1px solid #2e7d4f;color:#1f6a40}"
+    + ".ae-ia.possivel{border-color:#b7791f;color:#8a5a12}.ae-ia.provavel,.ae-ia.confirmado{border-color:#b42318;color:#a11d14}"
+    + ".ae-detalhe{font-size:11pt}"
+    + ".ae-detalhe .ae-sub{font-weight:700;color:var(--azul);border-bottom:1px solid #c9d6e3;padding-bottom:2px;margin:10px 0 5px;break-after:avoid}"
+    + ".ae-detalhe table{table-layout:auto;margin:4px 0 6px}"
+    + ".ae-detalhe th,.ae-detalhe td{font-size:10.5pt;padding:4px 6px;vertical-align:top;text-align:left}"
+    + ".ae-detalhe td:first-child{width:28%}.ae-detalhe .num{text-align:center;white-space:nowrap;width:80px}"
+    + ".ae-detalhe .tot td{font-weight:700;background:var(--azul-claro)}"
+    + ".ae-detalhe .ia{border-radius:6px;padding:7px 9px;margin:4px 0}.ae-detalhe .ia b{display:block;margin-bottom:3px}"
+    + ".ae-detalhe ul{margin:3px 0 3px 18px;padding:0}.ae-detalhe li{margin:2px 0}"
+    + ".ae-detalhe p{margin:4px 0}.ae-detalhe .resumo{text-align:justify}.ae-detalhe .peq{font-size:9.5pt;color:#555}"
     + ".prova-bloco.pr{break-inside:avoid;"
     + "--pr-bg:#fff;--pr-surface:#f7faf8;--pr-line:#e4ebe6;--pr-ink:#14261c;--pr-ink-2:#4d6357;--pr-muted:#7b8c83;"
     + "--pr-green:#15803d;--pr-green-2:#16a34a;--pr-green-soft:#eaf6ee;--pr-green-line:#c9e6d4;"
@@ -433,7 +518,7 @@
     + ".toolbar{display:none !important}"
     + ".page{width:auto;min-height:auto;margin:0;padding:0;box-shadow:none}"
     + "thead{display:table-header-group}tr{break-inside:avoid}"
-    + ".section-title,th,.label,.provas td:first-child{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
+    + ".section-title,th,.label,.provas td:first-child,.ae-detalhe .ia,.ae-detalhe .tot td{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
 
   /**
    * Documento completo (HTML) do Relatório Individual Anual do Aluno.
@@ -464,14 +549,18 @@
         + '<div class="section-title">2 - RELATÓRIO DE PROVAS</div>'
         + '<div class="section-note">Resultado de cada Avaliação Bimestral, como o aluno vê ao terminar a prova no livro.</div>'
         + tabelaProvas(dados, disciplina, calc, serie)
-        + '<div class="section-title page-break">3 - ATIVIDADES FEITAS</div>'
+        + '<div class="section-title page-break">3 - ATIVIDADES EXTRAS</div>'
+        + '<div class="section-note">Atividades extras da Biblioteca Digital com a correção do professor: entrega, nota de 0 a 10,'
+        + ' parecer sobre uso de inteligência artificial e o relatório de correção.</div>'
+        + atividadesExtrasDaDisciplina(dados, disciplina)
+        + '<div class="section-title page-break">4 - ATIVIDADES FEITAS</div>'
         + '<div class="section-note">Cada atividade que vale ponto no bimestre divide os 10 pontos de trabalho. "Aguardando" fica fora do cálculo até ser corrigida.</div>'
         + atividades.html;
     });
 
     var descontoLigado = !!(boletim.regras || {}).descontoConduta;
     var observacoes = tabelaObservacoes(dados, descontoLigado);
-    corpo += '<div class="section-title page-break">4 - OBSERVAÇÕES</div>'
+    corpo += '<div class="section-title page-break">5 - OBSERVAÇÕES</div>'
       + '<div class="section-note">' + esc(observacoes.resumo)
       + (descontoLigado
         ? " Cada ocorrência desconta na nota do bimestre da disciplina em que aconteceu: leve 0,25 · médio 0,5 · grave 1,0 · muito grave 2,0,"
